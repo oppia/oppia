@@ -1,4 +1,4 @@
-# Various compiled, temporary, and hidden files
+# Various compiled, temporary, and hidden files.
 *~
 *.pyc
 *.pyo
@@ -7,19 +7,29 @@
 *.bak
 .*
 __pycache__/
-# Typescript files in core
-core/**.ts
-# Typescript output log file
-tsc_output_log.txt
-# Python test files
+
+# Markdown files.
+*.md
+
+# Typescript files in core and extension they are not needed as
+# we compile webpack which contains these files.
+core/**/*.ts
+extensions/**/*.ts
+
+# Python test files.
 *_test.py
-# Other folders to ignore
-core/tests/
-node_modules/
-scripts/
-third_party/python3_libs/
-third_party/python_libs/
-local_compiled_js_for_test/
+
+# Other folders to ignore.
+/backend_prod_files/webpack_bundles/
+/core/tests/
+/local_compiled_js_for_test/
+/node_modules/
+/scripts/
+/stubs/
+/third_party/python3_libs/
+/third_party/python_libs/
+/typings/
+/webpack_bundles/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
@@ -39,10 +49,6 @@ third_party/static/bower-angular-translate-loader-static-files-2.18.1/
 third_party/static/bower-angular-translate-storage-cookie-2.18.1/
 third_party/static/bower-material-1.1.19/layouts/
 third_party/static/bower-material-1.1.19/modules/
-third_party/python_libs/google/appengine/
-third_party/python_libs/google/net/
-third_party/python_libs/google/pyglib/
-third_party/python_libs/grpc/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include
 # only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
 # find, flash, forms, iframe, image, link, liststyle, magicline, pagebreak,
