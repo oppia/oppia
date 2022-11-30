@@ -57,10 +57,10 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
     def _update_content_id_in_translation_suggestions(
         suggestions: List[suggestion_models.GeneralSuggestionModel],
         exp_model: exp_models.ExplorationModel
-    ) -> result.Result[
-        List[suggestion_models.GeneralSuggestionModel],
+    ) -> List[result.Result[
+        suggestion_models.GeneralSuggestionModel,
         Tuple[str, Exception]
-    ]:
+    ]]:
         """Updates content id in translation suggestion.
 
         Args:
@@ -81,28 +81,35 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             )
         )
 
+        results = []
         for suggestion in suggestions:
-            try:
-                suggestion_content_id = suggestion.change_cmd['content_id']
-                old_to_new_content_id_in_state = old_to_new_content_id_mapping[
-                    suggestion.change_cmd['state_name']
-                ]
-                if suggestion_content_id not in old_to_new_content_id_in_state:
-                    return result.Err(
-                        (
-                            suggestion.id,
-                            'Content ID %s does not exist in the exploration'
-                            % suggestion_content_id
-                        )
+            suggestion_content_id = suggestion.change_cmd['content_id']
+            state_name = suggestion.change_cmd['state_name']
+
+            if not state_name in old_to_new_content_id_mapping:
+                results.append(result.Err((
+                    suggestion.id,
+                    'State name %s does not exist in the exploration'
+                    % state_name)))
+                continue
+
+            old_to_new_content_id_in_state = old_to_new_content_id_mapping[
+                state_name]
+            if suggestion_content_id not in old_to_new_content_id_in_state:
+                results.append(result.Err(
+                    (
+                        suggestion.id,
+                        'Content ID %s does not exist in the exploration'
+                        % suggestion_content_id
                     )
+                ))
+                continue
 
-                suggestion.change_cmd['content_id'] = (
-                    old_to_new_content_id_in_state[suggestion_content_id])
-            except Exception as e:
-                logging.exception(e)
-                return result.Err((suggestion.id, e))
+            suggestion.change_cmd['content_id'] = (
+                old_to_new_content_id_in_state[suggestion_content_id])
+            results.append(result.Ok(suggestion))
 
-        return result.Ok(suggestions)
+        return results
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the suggestion migration.
@@ -155,13 +162,13 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
                         objects['exploration_model'][0]
                     )
                 ))
+            | 'Flatten results' >> beam.FlatMap(lambda x: x)
         )
 
         migrated_suggestion_models = (
             migrated_suggestion_results
             | 'Filter oks' >> beam.Filter(lambda item: item.is_ok())
             | 'Unwrap ok' >> beam.Map(lambda item: item.unwrap())
-            | 'Flatten suggestion models' >> beam.FlatMap(lambda x: x)
         )
 
         migrated_suggestion_job_run_results = (

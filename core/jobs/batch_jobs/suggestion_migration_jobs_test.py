@@ -194,6 +194,7 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         suggestion_1_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=16,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id='user1',
             change_cmd=change_dict,
@@ -205,8 +206,56 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
             language_code='bn'
         )
         suggestion_1_model.update_timestamps()
+
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'invalid',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+
+        suggestion_2_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=17,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=change_dict,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.TARGET_ID,
+            target_version_at_submission=0,
+            language_code='bn'
+        )
+        suggestion_2_model.update_timestamps()
+
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'default_outcome',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+
+        suggestion_3_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=change_dict,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.TARGET_ID,
+            target_version_at_submission=0,
+            language_code='bn'
+        )
+        suggestion_3_model.update_timestamps()
+
         suggestion_models.GeneralSuggestionModel.put_multi([
-            suggestion_1_model])
+            suggestion_1_model, suggestion_2_model, suggestion_3_model])
         unmigrated_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get(suggestion_1_model.id)
         )
@@ -217,11 +266,20 @@ class MigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
+                stdout='SUGGESTION TARGET PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='SUGGESTION MIGRATED SUCCESS: 1'),
+            job_run_result.JobRunResult(
                 stderr=(
-                    'SUGGESTION TARGET PROCESSED ERROR: \"(3, KeyError(\''
-                    'invalid_state_name\'))\": 1'
-                )
-            )
+                    'SUGGESTION TARGET PROCESSED ERROR: \"(16, '
+                    '\'State name invalid_state_name does not exist in the '
+                    'exploration\')\": 1')
+            ), job_run_result.JobRunResult(
+                stderr=(
+                    'SUGGESTION TARGET PROCESSED ERROR: '
+                    '\"(17, \'Content ID invalid does not exist in the '
+                    'exploration\')\": 1')
+            ),
         ])
 
     def test_suggestion_with_invalid_content_id_raise_error(self) -> None:
@@ -417,6 +475,7 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
 
         suggestion_1_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=15,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             author_id='user1',
             change_cmd=change_dict,
@@ -434,7 +493,7 @@ class AuditMigrateSuggestionJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'SUGGESTION TARGET PROCESSED ERROR: "(1, '
+                    'SUGGESTION TARGET PROCESSED ERROR: "(15, '
                     '\'Content ID invalid_id does not exist in the exploration'
                     '\')": 1')),
         ])
