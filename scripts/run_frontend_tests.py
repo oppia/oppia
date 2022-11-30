@@ -77,37 +77,6 @@ _PARSER.add_argument(
     action='store_true'
 )
 
-CHROME_PATHS = [
-    # Unix.
-    '/usr/bin/google-chrome',
-    '/usr/bin/chromium-browser',
-    # Arch Linux.
-    '/usr/bin/brave',
-    '/usr/bin/chromium',
-    # Windows.
-    '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-    'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe',
-    # WSL.
-    '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-    # Mac OS.
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-]
-
-
-def setup_chrome_bin_env_variable() -> None:
-    """Sets the CHROME_BIN environment variable to the path of the Chrome.
-
-    Raises:
-        Exception. Chrome not found.
-    """
-    for path in CHROME_PATHS:
-        if os.path.isfile(path):
-            os.environ['CHROME_BIN'] = path
-            break
-    else:
-        print('Chrome is not found, stopping...')
-        raise Exception('Chrome not found.')
-
 
 def run_dtslint_type_tests() -> None:
     """Runs the dtslint type tests in typings/tests."""
@@ -149,7 +118,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if not parsed_args.skip_install:
         install_third_party_libs.main()
 
-    setup_chrome_bin_env_variable()
+    common.setup_chrome_bin_env_variable()
 
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',
