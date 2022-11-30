@@ -1728,13 +1728,14 @@ def record_user_created_an_exploration(user_id: str) -> None:
         save_user_settings(user_settings)
 
 
-def add_user_to_android_list(email: str, name: str) -> bool:
-    """Adds user to the bulk email provider with the 'Android' tag and required
+def add_user_to_mailing_list(email: str, name: str, tag: str) -> bool:
+    """Adds user to the bulk email provider with the relevant tag and required
     merge fields.
 
     Args:
         email: str. Email of the user.
         name: str. Name of the user.
+        tag: str. Tag for the mailing list.
 
     Returns:
         bool. Whether the operation was successful or not.
@@ -1743,7 +1744,7 @@ def add_user_to_android_list(email: str, name: str) -> bool:
         'NAME': name
     }
     return bulk_email_services.add_or_update_user_status(
-        email, merge_fields, 'Android', can_receive_email_updates=True)
+        email, merge_fields, tag, can_receive_email_updates=True)
 
 
 def update_email_preferences(

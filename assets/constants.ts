@@ -309,6 +309,9 @@ export default {
   "ROLE_VOICE_ARTIST": "voice artist",
   "ROLE_VIEWER": "viewer",
 
+  // The supported tags for the mailing list subscriptions.
+  "MAILING_LIST_ANDROID_TAG": "Android",
+  "MAILING_LIST_WEB_TAG": "Web",
   // Regex to validate the format of Math rich-text component SVGs. If this is
   // changed in the future, the existing filenames on the server should be
   // handled as well.
@@ -4983,6 +4986,11 @@ export default {
     "direction": "ltr",
     "decimal_separator": ","
   }, {
+    "code": "am",
+    "description": "አማርኛ (Amharic)",
+    "direction": "ltr",
+    "decimal_separator": "."
+  }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
     "direction": "ltr",
@@ -5349,6 +5357,11 @@ export default {
     "id": "sq",
     "description": "shqip (Albanian)",
     "relatedLanguages": ["sq"],
+    "direction": "ltr"
+  }, {
+    "id": "am",
+    "description": "አማርኛ (Amharic)",
+    "relatedLanguages": ["am"],
     "direction": "ltr"
   }, {
     "id": "ar",

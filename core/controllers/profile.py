@@ -199,21 +199,22 @@ class BulkEmailWebhookEndpoint(
         self.render_json({})
 
 
-class AndroidListSubscriptionHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of AndroidListSubscriptionHandler's
+class MailingListSubscriptionHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of MailingListSubscriptionHandler's
     normalized_request dictionary.
     """
 
     email: str
     name: str
+    tag: str
 
 
-class AndroidListSubscriptionHandler(
+class MailingListSubscriptionHandler(
     base.BaseHandler[
-        AndroidListSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]
+        MailingListSubscriptionHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
-    """Adds user to Android mailing list."""
+    """Adds user to the mailing list."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -234,6 +235,14 @@ class AndroidListSubscriptionHandler(
                         'id': 'is_nonempty'
                     }]
                 }
+            },
+            'tag': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
+                }
             }
         }
     }
@@ -244,7 +253,8 @@ class AndroidListSubscriptionHandler(
         assert self.normalized_payload is not None
         email = self.normalized_payload['email']
         name = self.normalized_payload['name']
-        status = user_services.add_user_to_android_list(email, name)
+        tag = self.normalized_payload['tag']
+        status = user_services.add_user_to_mailing_list(email, name, tag)
         self.render_json({'status': status})
 
 
