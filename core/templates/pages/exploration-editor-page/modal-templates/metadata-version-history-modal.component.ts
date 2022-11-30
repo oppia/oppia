@@ -21,7 +21,6 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
@@ -49,6 +48,7 @@ export class MetadataVersionHistoryModalComponent
   @Input() oldVersion: number | null = null;
   @Input() newMetadata!: ExplorationMetadata;
   @Input() oldMetadata!: ExplorationMetadata;
+  validationErrorIsShown: boolean = false;
   yamlStrs: HeadersAndYamlStrs = {
     previousVersionMetadataYaml: '',
     currentVersionMetadataYaml: '',
@@ -63,7 +63,6 @@ export class MetadataVersionHistoryModalComponent
 
   constructor(
       private ngbActiveModal: NgbActiveModal,
-      private alertsService: AlertsService,
       private contextService: ContextService,
       private versionHistoryService: VersionHistoryService,
       private versionHistoryBackendApiService: VersionHistoryBackendApiService,
@@ -103,6 +102,13 @@ export class MetadataVersionHistoryModalComponent
         .getBackwardMetadataDiffData()
         .committerUsername
     );
+  }
+
+  getLastEditedVersionNumberInCaseOfError(): number {
+    return (
+      this.versionHistoryService.fetchedMetadataVersionNumbers[
+        this.versionHistoryService
+          .getCurrentPositionInMetadataVersionHistoryList()] as number);
   }
 
   getNextEditedVersionNumber(): number {
@@ -149,6 +155,8 @@ export class MetadataVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
+    this.validationErrorIsShown = false;
+
     this.versionHistoryService
       .decrementCurrentPositionInMetadataVersionHistoryList();
   }
@@ -176,6 +184,8 @@ export class MetadataVersionHistoryModalComponent
     this.updateLeftPane();
     this.updateRightPane();
 
+    this.validationErrorIsShown = false;
+
     this.fetchPreviousVersionHistory();
   }
 
@@ -199,9 +209,9 @@ export class MetadataVersionHistoryModalComponent
           this.versionHistoryService
             .incrementCurrentPositionInMetadataVersionHistoryList();
         } else {
-          this.alertsService.addWarning(
-            'Could not fetch the version history data. ' +
-            'Please reload the page and try again.');
+          this.validationErrorIsShown = true;
+          this.versionHistoryService
+            .incrementCurrentPositionInMetadataVersionHistoryList();
         }
       });
     }
