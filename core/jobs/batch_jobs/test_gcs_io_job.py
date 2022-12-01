@@ -112,8 +112,7 @@ class TestGcsIoGetFilesJob(base_jobs.JobBase):
             | 'Create PCollection of prefix that needs to be fetched' >> (
                 beam.Create(['dummy_folder/dummy_subfolder']))
             | 'Get files with prefix' >> gcs_io.GetFiles()
-            | 'Sort the file paths' >> beam.Map(
-                lambda file_paths: sorted(file_paths))
+            | 'Sort the file paths' >> beam.Map(sorted)
         )
 
         total_files_with_prefixes = (
