@@ -1043,7 +1043,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'last_logged_in_msec': None,
             'last_edited_an_exploration_msec': None,
             'last_created_an_exploration_msec': None,
-            'profile_picture_data_url': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': None,
