@@ -20,7 +20,7 @@
 // Note: Instantiating some of the editors, e.g. RichTextEditor, occurs
 // asynchronously and so must be prefixed by "await".
 
-// const {DOMPurify} = require('dompurify');
+const { decomment } = require('decomment');
 
 var richTextComponents = require(
   '../../../extensions/rich_text_components/webdriverio.js');
@@ -558,7 +558,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     // While (res.includes('<!--')) {
     //   res = res.replace(/<!--[^>]*-*-*>*/gm, '');
     // }
-    // Res = DOMPurify.sanitize(res);
+    res = decomment(res);
     expect(res).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;

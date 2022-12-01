@@ -36,7 +36,7 @@ describe('Changes in Human Readable Form Component', () => {
   const removeComments = (HTML: string) => {
     HTML = HTML.toString();
     // Removes Comments.
-    // While (HTML.includes('<!--')) {
+    // while (HTML.includes('<!--')) {
     //   HTML = HTML.replace(/<!--[^>]*-*-*>*/gm, '');
     // }
     HTML = DOMPurify.sanitize(HTML);
