@@ -442,7 +442,7 @@ def check_test_results(
                 if (
                         spec.test_target not in coverage_exclusions
                         and float(coverage) != 100.0):
-                    print('INCOMPLETE COVERAGE (%s%%): %s' % (
+                    print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
                         coverage, spec.test_target))
                     incomplete_coverage += 1
                     print(task.task_results[0].get_report()[-3])
