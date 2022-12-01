@@ -105,8 +105,19 @@ class TestGCSIoGetFilesJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = test_gcs_io_job.TestGcsIoGetFilesJob
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.filepath3 = 'dummy_folder/dummy_subfolder/dummy_file_3'
+        self.filepath4 = 'dummy_folder/dummy_subfolder/dummy_file_4'
+        storage_services.commit(
+            BUCKET, self.filepath3, b'testing_3', 'application/octet-stream')
+        storage_services.commit(
+            BUCKET, self.filepath4, b'testing_4', 'application/octet-stream')
+
     def test_to_fetch_filename(self) -> None:
         blobs = write_files_to_gcs()
+        blobs.append(self.filepath3)
+        blobs.append(self.filepath4)
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='TOTAL PREFIXES FETCHED SUCCESS: 1'),
