@@ -19,7 +19,8 @@
 
 // Note: Instantiating some of the editors, e.g. RichTextEditor, occurs
 // asynchronously and so must be prefixed by "await".
-// Import DOMPurify from 'dompurify';
+
+import DOMPurify from 'dompurify';
 
 var richTextComponents = require(
   '../../../extensions/rich_text_components/webdriverio.js');
@@ -553,7 +554,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       await arrayOfElems[arrayPointer].getTagName()
     ).toBe(tagName);
     // Remove comments introduced by angular for bindings using replace.
-    let res = await arrayOfElems[arrayPointer].getHTML(false);
+    let res = DOMPurify.sanitize(await arrayOfElems[arrayPointer].getHTML(false));
     // While (res.includes('<!--')) {
     //   res = res.replace(/<!--[^>]*-*-*>*/gm, '');
     // }
