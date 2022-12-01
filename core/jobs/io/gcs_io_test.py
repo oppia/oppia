@@ -111,10 +111,9 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
         file_path = 'dummy_folder/dummy_subfolder/dummy_file'
         file_paths = [file_path]
 
-        def _mock_delete(unused_self: gcs_io.DeleteFile, filepath: str) -> str: # pylint: disable=unused-argument
-            return filepath
-
-        with self.swap(gcs_io.DeleteFile, '_delete_file', _mock_delete):
+        with self.swap(gcs_io.DeleteFile, '_delete_file', lambda self,
+            file_path: file_path
+        ): # pylint: disable=unused-argument
             filepath_p_collec = (
                 self.pipeline
                 | 'Create pcoll of filepaths' >> beam.Create(file_paths)
@@ -140,6 +139,8 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
             self.pipeline
             | 'Create pcoll of filepaths' >> beam.Create(prefixes)
             | 'Get files from GCS' >> gcs_io.GetFiles()
+            | 'Sort the values' >> beam.Map(
+                lambda file_paths: sorted(file_paths))
         )
         self.assert_pcoll_equal(
             filepath_p_collec, [
@@ -152,14 +153,10 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
     def test_check_correct_filepath_is_passing(self) -> None:
         file_paths = ['dummy_folder/dummy_subfolder']
 
-        def _mock_list_prefix(
-            unused_self: gcs_io.GetFiles, filepath: str
-        ) -> str: # pylint: disable=unused-argument
-            return filepath
-
         with self.swap(
-            gcs_io.GetFiles, '_get_file_with_prefix', _mock_list_prefix
-        ):
+            gcs_io.GetFiles, '_get_file_with_prefix', lambda self,
+            file_path: file_path
+        ): # pylint: disable=unused-argument
             filepath_p_collec = (
                 self.pipeline
                 | 'Create pcoll of filepaths' >> beam.Create(file_paths)

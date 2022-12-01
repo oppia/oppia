@@ -237,6 +237,4 @@ class GetFiles(beam.PTransform): # type: ignore[misc]
             as value.
         """
         list_of_blobs = storage_services.listdir(self.bucket, prefix)
-        return list(
-            sorted(blob.name for blob in list_of_blobs)
-        )
+        return list(blob.name for blob in list_of_blobs)
