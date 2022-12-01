@@ -22,7 +22,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { Subscription } from 'rxjs';
-// import DOMPurify from 'dompurify';
+// Import DOMPurify from 'dompurify';
 
 interface CkEditorCopyEvent {
   rootElement?: HTMLElement;
@@ -128,7 +128,7 @@ export class CkEditorCopyContentService {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
-    // html = DOMPurify.sanitize(html);
+    // Html = DOMPurify.sanitize(html);
     while (html.includes('<!--')) {
       html = html.replace(/<!--[^>]*-*-*>*/gm, '');
     }
