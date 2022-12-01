@@ -554,8 +554,8 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       await arrayOfElems[arrayPointer].getTagName()
     ).toBe(tagName);
     // Remove comments introduced by angular for bindings using replace.
-    let res = DOMPurify.sanitize(await arrayOfElems[arrayPointer]
-      .getHTML(false));
+    let res = DOMPurify.sanitize(
+      await arrayOfElems[arrayPointer].getHTML(false));
     // While (res.includes('<!--')) {
     //   res = res.replace(/<!--[^>]*-*-*>*/gm, '');
     // }
