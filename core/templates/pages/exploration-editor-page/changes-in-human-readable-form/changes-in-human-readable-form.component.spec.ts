@@ -23,7 +23,7 @@ import { LostChangeBackendDict, LostChangeObjectFactory, LostChangeValue } from 
 import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
-// import DOMPurify from 'dompurify';
+// Import DOMPurify from 'dompurify';
 
 describe('Changes in Human Readable Form Component', () => {
   let component: ChangesInHumanReadableFormComponent;

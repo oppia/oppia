@@ -22,7 +22,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { Subscription } from 'rxjs';
-// import DOMPurify from 'dompurify';
+// Import DOMPurify from 'dompurify';
 
 interface CkEditorCopyEvent {
   rootElement?: HTMLElement;

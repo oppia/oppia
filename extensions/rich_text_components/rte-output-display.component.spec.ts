@@ -22,7 +22,7 @@ import { By } from '@angular/platform-browser';
 import { OppiaRteParserService } from 'services/oppia-rte-parser.service';
 import { RichTextComponentsModule } from './rich-text-components.module';
 import { RteOutputDisplayComponent } from './rte-output-display.component';
-// import DOMPurify from 'dompurify';
+// Import DOMPurify from 'dompurify';
 
 describe('RTE display component', () => {
   let fixture: ComponentFixture<RteOutputDisplayComponent>;
