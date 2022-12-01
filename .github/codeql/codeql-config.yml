@@ -1,7 +1,7 @@
 name: "CodeQL Analysis File Ignoring Config"
 
 paths-ignore:
-  - core/tests/data
+  - core/tests
   # TODO(#16641): These files cause CodeQL to throw the error "Clear text
   # storage of sensitive information." Remove the following two lines once we
   # store the API key in a secrets manager on production.
