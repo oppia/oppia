@@ -1138,3 +1138,41 @@ class CommonTests(test_utils.GenericTestBase):
                     'https://example.com', output_path, enforce_https=False)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+    def test_chrome_bin_setup_with_google_chrome(self) -> None:
+        isfile_swap = self.swap(
+            os.path, 'isfile', lambda path: path == '/usr/bin/google-chrome'
+        )
+        with isfile_swap:
+            common.setup_chrome_bin_env_variable()
+        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
+
+    def test_chrome_bin_setup_with_wsl_chrome_browser(self) -> None:
+        isfile_swap = self.swap(
+            os.path,
+            'isfile',
+            lambda path: path == (
+                '/mnt/c/Program Files (x86)/Google/'
+                'Chrome/Application/chrome.exe'
+            )
+        )
+        with isfile_swap:
+            common.setup_chrome_bin_env_variable()
+        self.assertEqual(
+            os.environ['CHROME_BIN'],
+            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+        )
+
+    def test_chrome_bin_setup_with_error(self) -> None:
+        print_arr = []
+        def mock_print(msg: str) -> None:
+            print_arr.append(msg)
+
+        isfile_swap = self.swap(os.path, 'isfile', lambda _: False)
+        print_swap = self.swap(builtins, 'print', mock_print)
+
+        with print_swap, isfile_swap, self.assertRaisesRegex(
+            Exception, 'Chrome not found.'
+        ):
+            common.setup_chrome_bin_env_variable()
+        self.assertIn('Chrome is not found, stopping...', print_arr)

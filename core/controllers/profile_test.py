@@ -1209,7 +1209,7 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
 
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
-    GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
+    GENERIC_DATE: Final = datetime.datetime(2021, 5, 20)
     GENERIC_EPOCH: Final = utils.get_time_in_millisecs(GENERIC_DATE)
 
     def setUp(self) -> None:

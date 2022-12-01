@@ -18,10 +18,13 @@
 
 from __future__ import annotations
 
+import datetime
 import os
 
 from core import feconf
 from core.tests import test_utils
+
+import bs4
 
 
 class FeconfTests(test_utils.GenericTestBase):
@@ -75,3 +78,22 @@ class FeconfTests(test_utils.GenericTestBase):
             feconf.VALID_MODERATOR_ACTIONS[
                 'unpublish_exploration']['email_intent'],
             'unpublish_exploration')
+
+    def test_terms_page_last_updated_is_in_sync_with_terms_page(self) -> None:
+        with open(
+            'core/templates/pages/terms-page/terms-page.component.html',
+            'r',
+            encoding='utf-8'
+        ) as f:
+            terms_page_contents = f.read()
+            terms_page_parsed_html = bs4.BeautifulSoup(
+                terms_page_contents, 'html.parser')
+            max_date = max(
+                datetime.datetime.strptime(
+                    element.get_text().split(':')[0], '%d %b %Y'
+                ) for element in terms_page_parsed_html.find(
+                    'ul', class_='e2e-test-changelog'
+                ).find_all('li')
+            )
+        self.assertEqual(
+            feconf.TERMS_PAGE_LAST_UPDATED_UTC, max_date)

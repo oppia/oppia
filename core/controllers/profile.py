@@ -526,7 +526,7 @@ class SignupHandler(
             'has_agreed_to_latest_terms': bool(
                 user_settings.last_agreed_to_terms and
                 user_settings.last_agreed_to_terms >=
-                feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC),
+                feconf.TERMS_PAGE_LAST_UPDATED_UTC),
             'has_ever_registered': bool(
                 user_settings.username and user_settings.last_agreed_to_terms),
             'username': user_settings.username,

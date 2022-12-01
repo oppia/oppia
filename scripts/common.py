@@ -191,6 +191,22 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
 
+CHROME_PATHS = [
+    # Unix.
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    # Arch Linux.
+    '/usr/bin/brave',
+    '/usr/bin/chromium',
+    # Windows.
+    '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+    'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe',
+    # WSL.
+    '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+    # Mac OS.
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+]
+
 
 def is_windows_os() -> bool:
     """Check if the running system is Windows."""
@@ -856,3 +872,19 @@ def url_retrieve(
             print('Retrying download.')
         else:
             success = True
+
+
+def setup_chrome_bin_env_variable() -> None:
+    """Sets the CHROME_BIN environment variable to the path
+    of the Chrome binary.
+
+    Raises:
+        Exception. Chrome not found.
+    """
+    for path in CHROME_PATHS:
+        if os.path.isfile(path):
+            os.environ['CHROME_BIN'] = path
+            break
+    else:
+        print('Chrome is not found, stopping...')
+        raise Exception('Chrome not found.')
