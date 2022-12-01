@@ -557,7 +557,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     while (res.includes('<!--')) {
       res = res.replace(/<!--[^>]*-*-*>*/gm, '');
     }
-    // res = DOMPurify.sanitize(res);
+    // Res = DOMPurify.sanitize(res);
     expect(res).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
