@@ -128,10 +128,10 @@ export class CkEditorCopyContentService {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
-    html = DOMPurify.sanitize(html);
-    // While (html.includes('<!--')) {
-    //   html = html.replace(/<!--[^>]*-*-*>*/gm, '');
-    // }
+    // Html = DOMPurify.sanitize(html);
+    while (html.includes('<!--')) {
+      html = html.replace(/<!--[^>]*-*-*>*/gm, '');
+    }
     if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
