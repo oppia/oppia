@@ -22,7 +22,7 @@ import { By } from '@angular/platform-browser';
 import { OppiaRteParserService } from 'services/oppia-rte-parser.service';
 import { RichTextComponentsModule } from './rich-text-components.module';
 import { RteOutputDisplayComponent } from './rte-output-display.component';
-import DOMPurify from 'dompurify';
+// Import DOMPurify from 'dompurify';
 
 describe('RTE display component', () => {
   let fixture: ComponentFixture<RteOutputDisplayComponent>;
@@ -56,10 +56,10 @@ describe('RTE display component', () => {
 
     // eslint-disable-next-line oppia/no-inner-html
     let html = fixture.nativeElement.innerHTML;
-    // While (html.includes('<!--')) {
-    //   html = html.replace(/(?=<!--)([\s\S]*?)-->/g, '');
-    // }
-    html = DOMPurify.sanitize(html);
+    while (html.includes('<!--')) {
+      html = html.replace(/(?=<!--)([\s\S]*?)-->/g, '');
+    }
+    // Html = DOMPurify.sanitize(html);
     expect(html).toBe('');
 
     fixture.detectChanges();
