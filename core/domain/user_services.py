@@ -950,7 +950,7 @@ def has_fully_registered_account(user_id: str) -> bool:
     return bool(
         user_settings.username and user_settings.last_agreed_to_terms and (
             user_settings.last_agreed_to_terms >=
-            feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC
+            feconf.TERMS_PAGE_LAST_UPDATED_UTC
         )
     )
 
