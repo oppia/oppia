@@ -1007,7 +1007,9 @@ export class ConversationSkinComponent {
             storyUrlFragment, nodeId
           ).then((returnObject) => {
             if (returnObject.readyForReviewTest) {
-              (this.windowRef.nativeWindow as Window).location =
+              (
+                this.windowRef.nativeWindow as {location: string | Location}
+              ).location =
                 this.urlInterpolationService.interpolateUrl(
                   TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE, {
                     topic_url_fragment: topicUrlFragment,
