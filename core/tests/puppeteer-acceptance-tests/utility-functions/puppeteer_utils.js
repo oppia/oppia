@@ -62,4 +62,8 @@ module.exports = class browser {
     let fileToUpload = filePath;
     inputUploadHandle.uploadFile(fileToUpload);
   }
+
+  async closeBrowser() {
+    await this.browser.close();
+  }
 };
