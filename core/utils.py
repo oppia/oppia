@@ -22,6 +22,7 @@ import collections
 import datetime
 import hashlib
 import imghdr
+import io
 import itertools
 import json
 import os
@@ -38,6 +39,7 @@ import zlib
 from core import feconf
 from core.constants import constants
 
+from PIL import Image
 import certifi
 import yaml
 
@@ -398,7 +400,22 @@ def get_url_scheme(url: str) -> str:
     return urllib.parse.urlparse(url).scheme
 
 
-def convert_png_or_webp_data_url_to_binary(
+def convert_png_binary_to_webp_binary(png_binary: bytes) -> bytes:
+    """Convert png binary to webp binary.
+
+    Args:
+        png_binary: bytes. The binary content of png.
+
+    Returns:
+        bytes. The binary content of webp.
+    """
+    output = io.BytesIO()
+    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+    image.save(output, 'webp')
+    return output.getvalue()
+
+
+def convert_data_url_to_binary(
     image_data_url: str, file_type: str
 ) -> bytes:
     """Converts a PNG or WEBP base64 data URL to a PNG binary data.
@@ -423,7 +440,7 @@ def convert_png_or_webp_data_url_to_binary(
             'The given string does not represent a %s data URL.' % file_type)
 
 
-def convert_png_or_webp_binary_to_data_url(
+def convert_image_binary_to_data_url(
     content: bytes, file_type: str
 ) -> str:
     """Converts a PNG or WEBP image string (represented by 'content')
@@ -476,7 +493,7 @@ def convert_png_to_data_url(filepath: str) -> str:
         str. Data url created from the filepath of the PNG.
     """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
-    return convert_png_or_webp_binary_to_data_url(file_contents, 'png')
+    return convert_image_binary_to_data_url(file_contents, 'png')
 
 
 def camelcase_to_hyphenated(camelcase_str: str) -> str:

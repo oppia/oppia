@@ -1699,13 +1699,13 @@ class UpdateUsernameHandler(
         if not old_fs.isfile('profile_picture.png'):
             raise self.InvalidInputException(
                 'The user with username %s does not have a '
-                'profile picture with png extension.' % (old_username)
+                'profile picture with png extension.' % old_username
             )
 
         if not old_fs.isfile('profile_picture.webp'):
             raise self.InvalidInputException(
                 'The user with username %s does not have a '
-                'profile picture with webp extension.' % (old_username)
+                'profile picture with webp extension.' % old_username
             )
 
         image_png = old_fs.get('profile_picture.png')

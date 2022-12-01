@@ -110,9 +110,9 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
                 feconf.ENTITY_TYPE_USER, user_settings.username)
             filename_png = 'profile_picture.png'
             filename_webp = 'profile_picture.webp'
-            image_data_png = utils.convert_png_or_webp_binary_to_data_url(
+            image_data_png = utils.convert_image_binary_to_data_url(
                 fs.get(filename_png), 'png')
-            image_data_webp = utils.convert_png_or_webp_binary_to_data_url(
+            image_data_webp = utils.convert_image_binary_to_data_url(
                 fs.get(filename_webp), 'webp')
             takeout_image_files.append(
                 takeout_domain.TakeoutImage(

@@ -21,7 +21,6 @@ from __future__ import annotations
 import datetime
 import hashlib
 import imghdr
-import io
 import itertools
 import logging
 import re
@@ -39,7 +38,6 @@ from core.domain import state_domain
 from core.domain import user_domain
 from core.platform import models
 
-from PIL import Image
 import requests
 
 from typing import (
@@ -399,7 +397,7 @@ def fetch_gravatar(email: str) -> str:
     else:
         if response.ok:
             if imghdr.what(None, h=response.content) == 'png':
-                return utils.convert_png_or_webp_binary_to_data_url(
+                return utils.convert_image_binary_to_data_url(
                     response.content, 'png')
         else:
             logging.error(
@@ -1416,20 +1414,14 @@ def update_profile_picture_data_url(
     user_settings = get_user_settings(user_id, strict=True)
     username = user_settings.username
     if username is None:
-        raise utils.ValidationError(
-            'User should have a non-None username.')
-    # Ruling out the possibility of different types for mypy type checking.
-    # assert isinstance(username, str)
+        return
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
-    png_binary = utils.convert_png_or_webp_data_url_to_binary(
+    png_binary = utils.convert_data_url_to_binary(
         profile_picture_data_url, 'png')
     fs.commit(filename_png, png_binary, mimetype='image/png')
 
-    output = io.BytesIO()
-    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
-    image.save(output, 'webp')
-    webp_binary = output.getvalue()
+    webp_binary = utils.convert_png_binary_to_webp_binary(png_binary)
     filename_webp = 'profile_picture.webp'
     fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
