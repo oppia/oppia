@@ -2394,6 +2394,9 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     def test_update_username(self) -> None:
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        old_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.OLD_USERNAME)
+        image_with_old_username = old_fs.get('profile_picture.png')
 
         self.put_json(
             '/updateusernamehandler',
@@ -2402,6 +2405,12 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token)
         self.assertEqual(user_services.get_username(user_id), self.NEW_USERNAME)
+
+        new_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.NEW_USERNAME)
+        image_with_new_username = new_fs.get('profile_picture.png')
+
+        self.assertEqual(image_with_old_username, image_with_new_username)
 
     def test_update_username_creates_audit_model(self) -> None:
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)

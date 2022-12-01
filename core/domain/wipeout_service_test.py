@@ -5715,7 +5715,7 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
 
         self.filename_png = 'profile_picture.png'
         self.filename_webp = 'profile_picture.webp'
-        self.png_binary = utils.convert_png_or_webp_data_url_to_binary(
+        self.png_binary = utils.convert_data_url_to_binary(
             user_services.DEFAULT_IDENTICON_DATA_URL, 'png')
         self.webp_binary = utils.convert_png_binary_to_webp_binary(
             self.png_binary)
@@ -5752,8 +5752,8 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
                 self.user_2_id))
             self.assertEqual(
                 logs[0], (
-                    '[WIPEOUT] Profile picture having png is not deleted for '
-                    'user having username username2.'))
+                    '[WIPEOUT] Profile picture in .png format is not deleted '
+                    'for user having username username2.'))
             self.fs_2.delete(self.filename_png)
 
             self.fs_2.commit(self.filename_webp, self.webp_binary)
@@ -5762,5 +5762,5 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
             self.maxDiff = None
             self.assertEqual(
                 logs[1], (
-                    '[WIPEOUT] Profile picture having webp is not deleted for '
-                    'user having username username2.'))
+                    '[WIPEOUT] Profile picture in .webp format is not deleted '
+                    'for user having username username2.'))

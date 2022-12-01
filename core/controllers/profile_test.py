@@ -401,7 +401,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
                 'update_type': 'profile_picture_data_url',
                 'data': user_services.DEFAULT_IDENTICON_DATA_URL},
             csrf_token=csrf_token)
-        profile_data = utils.convert_png_or_webp_binary_to_data_url(
+        profile_data = utils.convert_image_binary_to_data_url(
             fs.get('profile_picture.png'), 'png')
         self.assertEqual(profile_data, user_services.DEFAULT_IDENTICON_DATA_URL)
         self.logout()
