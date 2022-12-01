@@ -5759,7 +5759,6 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
             self.fs_2.commit(self.filename_webp, self.webp_binary)
             self.assertFalse(wipeout_service.verify_user_deleted(
                 self.user_2_id))
-            self.maxDiff = None
             self.assertEqual(
                 logs[1], (
                     '[WIPEOUT] Profile picture in .webp format is not deleted '
