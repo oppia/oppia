@@ -145,8 +145,7 @@ def is_source_mailchimp(
         """
         if not email_manager.verify_mailchimp_secret(secret):
             logging.error(
-                'Invalid Mailchimp webhook request received with secret: %s'
-                % secret)
+                'Invalid Mailchimp webhook request received with secret')
             raise self.PageNotFoundException
 
         return handler(self, secret, **kwargs)
