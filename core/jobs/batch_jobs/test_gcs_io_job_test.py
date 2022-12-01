@@ -105,7 +105,7 @@ class TestGCSIoGetFilesJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = test_gcs_io_job.TestGcsIoGetFilesJob
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.filepath3 = 'dummy_folder/dummy_subfolder/dummy_file_3'
         self.filepath4 = 'dummy_folder/dummy_subfolder/dummy_file_4'
