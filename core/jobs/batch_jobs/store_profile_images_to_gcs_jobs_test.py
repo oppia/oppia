@@ -205,8 +205,7 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         filepath_png = f'user/{self.user_1.username}/assets/profile_picture.png'
         filepath_webp = (
-            f'user/{self.user_1.username}/assets/'
-            'profile_picture.webp')
+            f'user/{self.user_1.username}/assets/profile_picture.webp')
         png_binary = utils.convert_png_data_url_to_binary(
             user_services.DEFAULT_IDENTICON_DATA_URL)
         valid_image_png_binary = utils.convert_png_data_url_to_binary(
