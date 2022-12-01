@@ -21,7 +21,6 @@ from __future__ import annotations
 import datetime
 import hashlib
 import imghdr
-import io
 import itertools
 import logging
 import re
@@ -39,7 +38,6 @@ from core.domain import state_domain
 from core.domain import user_domain
 from core.platform import models
 
-from PIL import Image
 import requests
 
 from typing import (

@@ -22,8 +22,8 @@ import collections
 import datetime
 import hashlib
 import imghdr
-import itertools
 import io
+import itertools
 import json
 import os
 import random
@@ -36,10 +36,10 @@ import urllib.parse
 import urllib.request
 import zlib
 
-from PIL import Image
 from core import feconf
 from core.constants import constants
 
+from PIL import Image
 import certifi
 import yaml
 
