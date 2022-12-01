@@ -19,7 +19,7 @@
 
 // Note: Instantiating some of the editors, e.g. RichTextEditor, occurs
 // asynchronously and so must be prefixed by "await".
-import DOMPurify from 'dompurify';
+// import DOMPurify from 'dompurify';
 
 var richTextComponents = require(
   '../../../extensions/rich_text_components/webdriverio.js');
