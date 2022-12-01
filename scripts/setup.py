@@ -169,8 +169,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # The second option allows this script to also be run from deployment
     # folders.
-    if not os.getcwd().endswith('oppia') and not os.getcwd().endswith(
-            'deploy-'):
+    if not os.getcwd().endswith(('oppia', 'deploy-')):
         print('')
         print('WARNING This script should be run from the oppia/ root folder.')
         print('')
@@ -222,44 +221,6 @@ def main(args: Optional[List[str]] = None) -> None:
             'https://github.com/yarnpkg/yarn/releases/download/v%s/%s'
             % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
 
-    # Adjust path to support the default Chrome locations for Unix, Windows and
-    # Mac OS.
-    if os.path.isfile('/usr/bin/google-chrome'):
-        # Unix.
-        chrome_bin = '/usr/bin/google-chrome'
-    elif os.path.isfile('/usr/bin/chromium-browser'):
-        # Unix.
-        chrome_bin = '/usr/bin/chromium-browser'
-    elif os.path.isfile('/usr/bin/brave'):
-        # Arch Linux.
-        chrome_bin = '/usr/bin/brave'
-    elif os.path.isfile('/usr/bin/chromium'):
-        # Arch Linux.
-        chrome_bin = '/usr/bin/chromium'
-    elif os.path.isfile(
-            '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
-        # Windows.
-        chrome_bin = (
-            '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
-    elif os.path.isfile(
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe'):
-        chrome_bin = (
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
-    elif os.path.isfile(
-            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
-        # WSL.
-        chrome_bin = (
-            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
-    elif os.path.isfile(
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'):
-        # Mac OS.
-        chrome_bin = (
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
-    else:
-        print('Chrome is not found, stopping ...')
-        raise Exception('Chrome not found.')
-
-    os.environ['CHROME_BIN'] = chrome_bin
     print('Environment setup completed.')
 
 
