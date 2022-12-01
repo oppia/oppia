@@ -33,6 +33,7 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import translation_domain
+from core.domain import translation_services
 from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_migration_jobs
@@ -392,7 +393,9 @@ class MigrateExplorationJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='EXP RELATED MODELS GENERATED SUCCESS: 1')
         ])
 
         updated_opp_model = (
@@ -503,6 +506,93 @@ class MigrateExplorationJobTests(
                 )
             )
         ])
+
+    def test_unmigrated_exp_with_invalid_related_data_raise_error(self) -> None:
+        exp_model = exp_models.ExplorationModel(
+            id=self.NEW_EXP_ID,
+            category=EXP_V46_DICT['category'],
+            title='A title',
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
+                'correctness_feedback_enabled']
+        )
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        exp_summary_model = exp_models.ExpSummaryModel(**{
+            'id': self.NEW_EXP_ID,
+            'title': exp_model.title,
+            'category': exp_model.category,
+            'objective': exp_model.objective,
+            'language_code': exp_model.language_code,
+            'tags': exp_model.tags,
+            'ratings': None,
+            'scaled_average_rating': 4.0,
+            'exploration_model_last_updated': exp_model.last_updated,
+            'exploration_model_created_on': exp_model.created_on,
+            'first_published_msec': None,
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
+            'community_owned': False,
+            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
+            'editor_ids': [],
+            'voice_artist_ids': [],
+            'viewer_ids': [],
+            'contributor_ids': [],
+            'contributors_summary': {},
+            'version': exp_model.version
+        })
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
+
+        owner_action = user_services.get_user_actions_info(
+            feconf.SYSTEM_COMMITTER_ID)
+        exp_services.publish_exploration_and_update_user_profiles(
+            owner_action, self.NEW_EXP_ID)
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='topic',
+                story_id='story_id_1',
+                story_title='A story title',
+                chapter_title='Title 1',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={'hi': 1, 'ar': 2},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[]))
+        opportunity_model.put()
+
+        self.create_story_linked_to_exploration()
+
+        self.assertEqual(exp_model.states_schema_version, 41)
+
+        with self.swap_to_always_raise(
+            translation_services,
+            'compute_translation_related_change',
+            Exception('Error generating related models')
+        ):
+            self.assert_job_output_is([
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'EXP RELATED MODELS GENERATED ERROR: \"('
+                        '\'exp_1\', Exception('
+                        '\'Error generating related models\''
+                        '))\": 1'
+                    )
+                ),
+                job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1')
+
+            ])
 
 
 # Exploration migration backend tests with BEAM jobs involves creating and

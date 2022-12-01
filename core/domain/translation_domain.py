@@ -341,9 +341,6 @@ class BaseTranslatableObject:
             self.get_translatable_contents_collection()
             .content_id_to_translatable_content.values())
 
-        content_ids_for_translated_contents = (
-            entity_translation.translations.keys())
-
         content_id_to_translatable_content = {}
 
         for translatable_content in translatable_content_list:
@@ -364,7 +361,7 @@ class BaseTranslatableObject:
 
             if (
                 translatable_content.content_id not in
-                content_ids_for_translated_contents
+                entity_translation.translations
             ):
                 content_id_to_translatable_content[
                     translatable_content.content_id] = translatable_content

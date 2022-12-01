@@ -2082,6 +2082,9 @@ def compute_models_to_put_when_saving_new_exp_version(
         None,
         [exploration_id]
     )
+    old_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    old_content_id_set = set(old_exploration.get_translatable_content_ids())
+
     updated_exploration = apply_change_list(exploration_id, change_list)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
@@ -2095,23 +2098,26 @@ def compute_models_to_put_when_saving_new_exp_version(
         )
     )
 
-    content_ids_corresponding_translations_to_remove = []
-    content_ids_corresponding_translations_to_mark_needs_update = []
+    new_content_id_set = set(updated_exploration.get_translatable_content_ids())
+    content_ids_corresponding_translations_to_remove = (
+        old_content_id_set - new_content_id_set
+    )
+    content_ids_corresponding_translations_to_mark_needs_update = set()
     for change in change_list:
         if change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
-            content_ids_corresponding_translations_to_mark_needs_update.append(
+            content_ids_corresponding_translations_to_mark_needs_update.add(
                 change.content_id)
             continue
 
         if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
-            content_ids_corresponding_translations_to_remove.append(
+            content_ids_corresponding_translations_to_remove.add(
                 change.content_id)
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_change(
             exploration_id,
             updated_exploration.version - 1,
-            content_ids_corresponding_translations_to_remove,
-            content_ids_corresponding_translations_to_mark_needs_update,
+            list(content_ids_corresponding_translations_to_remove),
+            list(content_ids_corresponding_translations_to_mark_needs_update),
         )
     )
     models_to_put.extend(new_translation_models)
