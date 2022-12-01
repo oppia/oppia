@@ -126,9 +126,9 @@ export class CkEditorCopyContentService {
   ) {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
-    let html = element.outerHTML
+    let html = element.outerHTML;
     html = html.replace(/<!--(?!>)[\S\s]*?-->/gm, '');
-    // while (html.includes('<!--')) {
+    // While (html.includes('<!--')) {
     //   html = html.replace(/<!--[^>]*-*-*>*/gm, '');
     // }
     if (!containedWidgetTagName) {
