@@ -23,6 +23,7 @@ import { LostChangeBackendDict, LostChangeObjectFactory, LostChangeValue } from 
 import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
+import DOMPurify from 'dompurify';
 
 describe('Changes in Human Readable Form Component', () => {
   let component: ChangesInHumanReadableFormComponent;
@@ -35,9 +36,10 @@ describe('Changes in Human Readable Form Component', () => {
   const removeComments = (HTML: string) => {
     HTML = HTML.toString();
     // Removes Comments.
-    while (HTML.includes('<!--')) {
-      HTML = HTML.replace(/<!--[^>]*-*-*>*/gm, '');
-    }
+    // while (HTML.includes('<!--')) {
+    //   HTML = HTML.replace(/<!--[^>]*-*-*>*/gm, '');
+    // }
+    HTML = DOMPurify.sanitize(HTML);
     return HTML
       // Removes Unecessary white spaces and new lines.
       .replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2')

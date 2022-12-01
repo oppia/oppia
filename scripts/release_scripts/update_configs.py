@@ -258,7 +258,6 @@ def verify_config_files(
 
 def add_mailgun_api_key(release_feconf_path: str) -> None:
     """Adds mailgun api key to feconf config file.
-
     Args:
         release_feconf_path: str. The path to feconf file in release
             directory.

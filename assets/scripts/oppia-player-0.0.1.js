@@ -62,7 +62,7 @@
   var SECRET_LENGTH = 64;
   var secret = '';
   for (var i = 0; i < SECRET_LENGTH; i++) {
-    secret += String.fromCharCode(65 + Math.floor(random.SystemRandom().random() * 26));
+    secret += String.fromCharCode(65 + Math.floor(window.crypto.getRandomValues(new Uint32Array(1))[0] * 26));
   }
 
   var OppiaEmbed = (function() {
