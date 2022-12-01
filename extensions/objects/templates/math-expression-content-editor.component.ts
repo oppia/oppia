@@ -28,6 +28,9 @@ import { AlertsService } from 'services/alerts.service';
 import { ExternalRteSaveService } from 'services/external-rte-save.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+
+// Relative path used as an work around to get the angular compiler and webpack
+// build to not complain.
 import '../../../core/templates/mathjaxConfig';
 
 interface MathExpression {

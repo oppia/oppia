@@ -58,6 +58,9 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+
+// Relative path used as an work around to get the angular compiler and webpack
+// build to not complain.
 import '../../../core/templates/third-party-imports/gif-frames.import';
 
 const gifshot = require('gifshot');

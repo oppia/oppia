@@ -14,37 +14,78 @@
 
 /**
  * @fileoverview This is a webpack loader that replaces templateUrl: './html'
- * with template: require('./html). This is needed for our webpack based
+ * with template: require('./html'). This is needed for our webpack based
  * compilation and not the angular compiler. Angular compiler parses the html
  * and converts it to js instructions.
  */
 
-
+/**
+ * The regexes are trying to find the templateUrl from the component decorator
+ * Eg:
+ * @Component({
+ *   selector: 'oppia-base-content',
+ *   templateUrl: './base-content.component.html',
+ *   styleUrls: ['./base-content.component.css']
+ * })
+ *
+ * From the above we need to get './base-content.component.html' and
+ * ['./base-content.component.css'].
+ *
+ * After modifications, it will look like:
+ * @Component({
+ *   selector: 'oppia-base-content',
+ *   template: require('./base-content.component.html'),
+ *   styleUrls: []
+ * })
+ * Templates can be found using the regex:
+ * templateUrl[any number of spaces]:[any number of spaces]
+ * [any of '"` that starts a string in javascript]
+ * [match all characters between the quotes][End quotes '"`]
+ * [any number of spaces]
+ * [
+ *   ends with a comma or a closing curly bracket depending or wether there are
+ *   more items in the decorator or not
+ * ]
+ */
 const TEMPLATE_URL_REGEX = /templateUrl\s*:(\s*['"`](.*?)['"`]\s*([,}]))/gm;
 const STYLES_URL_REGEX = /styleUrls *:(\s*\[[^\]]*?\])/g;
 const VALUE_REGEX = /(['`"])((?:[^\\]\\\1|.)*?)\1/g;
 
+/**
+ * This function is only used for templateUrl modifications. From a string this
+ * function extracts the first value inside quotes ('"`).
+ * Example: For a string like: "templateUrl: './base-content.component.html',"
+ * The VALUE_REGEX will match "'./base-content.component.html'" and the first
+ * group is the quote ("'") and the second group is
+ * ""./base-content.component.html"
+ * @param {string} str
+ * @returns Relative url
+ */
 const replaceStringsWithRequiresStatement = (str) => {
   return str.replace(VALUE_REGEX, function(_, __, url) {
-    if (url.charAt(0) !== '.') {
-      url = './' + url;
-    }
     return "require('" + url + "')";
   });
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const loader = (sourceString) => {
-  // Not cacheable during unit tests;
+  // https://webpack.js.org/api/loaders/#thiscacheable
+  // Cacheable is an interface provided by webpack and is used to speed up
+  // the build by caching results.
   this.cacheable && this.cacheable();
-
-  const newSource = sourceString.replace(TEMPLATE_URL_REGEX, (_, url) => {
-    return 'template' + ':' + replaceStringsWithRequiresStatement(url);
-  }).replace(STYLES_URL_REGEX, () => {
+  /**
+   * The templateURL regex will match something like:
+   * "templateUrl: './base-content.component.html',"
+   */
+  const newSourceString = sourceString.replace(
+    TEMPLATE_URL_REGEX, (_, url) => {
+      return 'template:' + replaceStringsWithRequiresStatement(url);
+    }
+  ).replace(STYLES_URL_REGEX, () => {
     return 'styleUrl: []';
   });
 
-  return newSource;
+  return newSourceString;
 };
 
 

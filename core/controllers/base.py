@@ -669,7 +669,7 @@ class BaseHandler(
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
-            template_is_aot_compiled: bool or None. False by default. Use
+            template_is_aot_compiled: bool. False by default. Use
                 True when the template is compiled by angular AoT compiler.
 
         Raises:

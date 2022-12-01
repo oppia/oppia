@@ -115,8 +115,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if parsed_args.dtslint_only:
         return
 
-    # if not parsed_args.skip_install:
-    #     install_third_party_libs.main()
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
 
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',

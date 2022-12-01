@@ -104,7 +104,8 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
   }
 
   changeSkillWithDifficulty(
-      newSkillWithDifficulty: SkillDifficulty, idx: number): void {
+      newSkillWithDifficulty: SkillDifficulty, idx: number
+  ): void {
     this.linkedSkillsWithDifficulty[idx] = newSkillWithDifficulty;
   }
 

@@ -77,6 +77,8 @@ import { ReviewTestBackendApiService } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
+// Relative path used as an work around to get the angular compiler and webpack
+// build to not complain.
 import '../third-party-imports/ckeditor.import';
 
 import { NoninteractiveCollapsible } from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';

@@ -1007,13 +1007,13 @@ export class ConversationSkinComponent {
             storyUrlFragment, nodeId
           ).then((returnObject) => {
             if (returnObject.readyForReviewTest) {
-              this.windowRef.nativeWindow.location =
+              (this.windowRef.nativeWindow as Window).location =
                 this.urlInterpolationService.interpolateUrl(
                   TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE, {
                     topic_url_fragment: topicUrlFragment,
                     classroom_url_fragment: classroomUrlFragment,
                     story_url_fragment: storyUrlFragment
-                  }) as unknown as Location;
+                  });
             }
             this.learnerDashboardBackendApiService
               .fetchLearnerCompletedChaptersCountDataAsync().then(

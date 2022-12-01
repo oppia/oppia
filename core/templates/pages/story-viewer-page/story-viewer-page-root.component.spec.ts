@@ -36,8 +36,4 @@ describe('Story Viewer Page Root component', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
   });
-
-  it('should be defined', () => {
-    expect(1).toBe(1);
-  });
 });

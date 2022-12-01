@@ -16,6 +16,8 @@
  * @fileoverview Component for a schema-based editor for unicode strings.
  */
 
+// Relative path used as an work around to get the angular compiler and webpack
+// build to not complain.
 import '../../../third-party-imports/ui-codemirror.import';
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';

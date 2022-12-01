@@ -250,7 +250,7 @@ def mock_load_template(
     Args:
         filename: str. The name of the file for which template is to be
             returned.
-        template_is_aot_compiled: bool or None. False by default. Use
+        template_is_aot_compiled: bool. False by default. Use
             True when the template is compiled by angular AoT compiler.
 
     Returns:
