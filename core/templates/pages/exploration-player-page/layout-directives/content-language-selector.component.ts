@@ -78,9 +78,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
           this.contentTranslationLanguageService.getCurrentContentLanguageCode()
         );
         break;
-      }
-      
-      else if (option.value === this.currentGlobalLanguageCode) {
+      } else if (option.value === this.currentGlobalLanguageCode) {
         this.contentTranslationLanguageService.setCurrentContentLanguageCode(
           option.value);
         this.selectedLanguageCode = (
