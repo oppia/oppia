@@ -23,8 +23,7 @@ import os
 import subprocess
 import sys
 
-from typing import List, Optional
-from typing_extensions import Final
+from typing import Final, List, Optional
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -181,6 +180,9 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
 def main(args: Optional[List[str]] = None) -> None:
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
+
+    # Verify if Chrome is installed.
+    common.setup_chrome_bin_env_variable()
 
     if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY

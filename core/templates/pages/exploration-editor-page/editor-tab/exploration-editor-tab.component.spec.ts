@@ -45,9 +45,13 @@ import { DomRefService, JoyrideDirective, JoyrideOptionsService, JoyrideService,
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { Router } from '@angular/router';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
-import { State } from 'domain/state/StateObjectFactory';
+import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { TranslationBackendDict } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { ContextService } from 'services/context.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { VersionHistoryService } from '../services/version-history.service';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
@@ -69,7 +73,12 @@ describe('Exploration editor tab component', () => {
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let focusManagerService: FocusManagerService;
+  let contextService: ContextService;
   let mockRefreshStateEditorEventEmitter = null;
+  let versionHistoryService: VersionHistoryService;
+  let stateObjectFactory: StateObjectFactory;
+  let stateObject: StateBackendDict;
+  let versionHistoryBackendApiService: VersionHistoryBackendApiService;
 
   class MockNgbModal {
     open() {
@@ -96,6 +105,48 @@ describe('Exploration editor tab component', () => {
     closeTour() {}
   }
 
+  class MockWindowRef {
+    location = { path: '/create/2234' };
+    nativeWindow = {
+      scrollTo: (value1, value2) => {},
+      sessionStorage: {
+        promoIsDismissed: null,
+        setItem: (testKey1, testKey2) => {},
+        removeItem: (testKey) => {}
+      },
+      gtag: (value1, value2, value3) => {},
+      navigator: {
+        onLine: true,
+        userAgent: null
+      },
+      location: {
+        path: '/create/2234',
+        pathname: '/',
+        hostname: 'oppiaserver.appspot.com',
+        search: '',
+        protocol: '',
+        reload: () => {},
+        hash: '',
+        href: '',
+      },
+      document: {
+        documentElement: {
+          setAttribute: (value1, value2) => {},
+          clientWidth: null,
+          clientHeight: null,
+        },
+        body: {
+          clientWidth: null,
+          clientHeight: null,
+          style: {
+            overflowY: ''
+          }
+        }
+      },
+      addEventListener: (value1, value2) => {}
+    };
+  }
+
   class MockRouter {}
 
   beforeEach(waitForAsync(() => {
@@ -116,6 +167,10 @@ describe('Exploration editor tab component', () => {
           useClas: MockRouter,
         },
         TemplatesService,
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
         JoyrideOptionsService,
         JoyrideStepsContainerService,
         LoggerService,
@@ -136,7 +191,8 @@ describe('Exploration editor tab component', () => {
               return;
             }
           }
-        }
+        },
+        VersionHistoryService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -167,8 +223,15 @@ describe('Exploration editor tab component', () => {
     stateEditorRefreshService = TestBed.inject(StateEditorRefreshService);
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService);
+    contextService = TestBed.inject(ContextService);
+    versionHistoryService = TestBed.inject(VersionHistoryService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    versionHistoryBackendApiService = TestBed.inject(
+      VersionHistoryBackendApiService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
+    spyOn(contextService, 'getExplorationId').and.returnValue(
+      'explorationId');
     spyOn(stateEditorService, 'checkEventListenerRegistrationStatus')
       .and.returnValue(true);
     spyOn(document, 'getElementById').and.returnValue({
@@ -180,6 +243,66 @@ describe('Exploration editor tab component', () => {
     let element = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue((
       element as HTMLElement));
+    spyOn(
+      versionHistoryService, 'getLatestVersionOfExploration'
+    ).and.returnValue(3);
+
+    stateObject = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      linked_skill_id: null,
+      next_content_id_index: 0,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+          hint_1: {},
+          rule_input_2: {}
+        }
+      }
+    };
 
     explorationStatesService.init({
       'First State': {
@@ -197,7 +320,10 @@ describe('Exploration editor tab component', () => {
               content_id: 'ca_placeholder',
               unicode_str: ''
             }},
-            rows: {value: 1}
+            rows: {value: 1},
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             rule_specs: [],
@@ -289,7 +415,10 @@ describe('Exploration editor tab component', () => {
               content_id: 'ca_placeholder',
               unicode_str: ''
             }},
-            rows: {value: 1}
+            rows: {value: 1},
+            catchMisspellings: {
+              value: false
+            }
           },
           answer_groups: [{
             rule_specs: [],
@@ -572,7 +701,10 @@ describe('Exploration editor tab component', () => {
 
     expect(stateEditorService.interaction.customizationArgs).toEqual({
       rows: { value: 1 },
-      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') }
+      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') },
+      catchMisspellings: {
+        value: false
+      }
     });
 
     let displayedValue = {
@@ -581,6 +713,9 @@ describe('Exploration editor tab component', () => {
       },
       rows: {
         value: 2
+      },
+      catchMisspellings: {
+        value: false
       }
     };
     component.saveInteractionCustomizationArgs(displayedValue);
@@ -834,4 +969,48 @@ describe('Exploration editor tab component', () => {
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(component.tutorialInProgress).toBe(false);
   });
+
+  it('should get the last edited version number in case of error', () => {
+    versionHistoryService.insertStateVersionHistoryData(4, null, '');
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toEqual(4);
+  });
+
+  it('should fetch the version history data on initialization of state editor',
+    fakeAsync(() => {
+      stateEditorService.setActiveStateName('First State');
+      let stateData = stateObjectFactory.createFromBackendDict(
+        'State', stateObject);
+      spyOn(
+        versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+      ).and.resolveTo({
+        lastEditedVersionNumber: 2,
+        stateNameInPreviousVersion: 'State',
+        stateInPreviousVersion: stateData,
+        lastEditedCommitterUsername: 'some'
+      });
+
+      component.initStateEditor();
+      tick();
+      flush();
+
+      expect(
+        versionHistoryBackendApiService.fetchStateVersionHistoryAsync
+      ).toHaveBeenCalled();
+    }));
+
+  it('should show error message if the backend api fails', fakeAsync(() => {
+    stateEditorService.setActiveStateName('First State');
+    spyOn(
+      versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+    ).and.resolveTo(null);
+
+    expect(component.validationErrorIsShown).toBeFalse();
+
+    component.initStateEditor();
+    tick();
+    flush();
+
+    expect(component.validationErrorIsShown).toBeTrue();
+  }));
 });

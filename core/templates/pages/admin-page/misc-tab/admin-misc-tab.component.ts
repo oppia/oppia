@@ -58,11 +58,12 @@ export class AdminMiscTabComponent {
   publishedOn!: string;
   showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
+  message: string = '';
 
   constructor(
-    private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
-    private adminTaskManagerService: AdminTaskManagerService
+    private adminTaskManagerService: AdminTaskManagerService,
+    private windowRef: WindowRef
   ) {}
 
   clearSearchIndex(): void {

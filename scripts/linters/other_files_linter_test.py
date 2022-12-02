@@ -25,14 +25,13 @@ import os
 from core import utils
 from core.tests import test_utils
 
-from typing import List, Tuple
-from typing_extensions import Final
+from typing import Final, List, Tuple
 
 from . import other_files_linter
 from . import pre_commit_linter
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
-NAME_SPACE.files = pre_commit_linter.FileCache()  # type: ignore[no-untyped-call]
+NAME_SPACE.files = pre_commit_linter.FileCache()
 FILE_CACHE: Final = NAME_SPACE.files
 
 LINTER_TESTS_DIR: Final = os.path.join(

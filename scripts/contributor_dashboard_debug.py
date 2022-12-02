@@ -41,8 +41,7 @@ from core.constants import constants
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 import requests
-from typing import Dict, Iterator, List
-from typing_extensions import Final
+from typing import Dict, Final, Iterator, List
 
 FIREBASE_AUTH_EMULATOR_HOST: Final = (
     'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT)
@@ -124,11 +123,17 @@ class ContributorDashboardDebugInitializer:
         self._make_request('GET', '/signup?return_url=/')
         self.csrf_token = self._get_csrf_token()
 
-        params = {'payload': json.dumps({
-            'username': username,
-            'agreed_to_terms': True,
-            'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
-        }), 'csrf_token': self.csrf_token}
+        params = {
+            'payload': json.dumps({
+                'username': username,
+                'agreed_to_terms': True,
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'can_receive_email_updates': (
+                    feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                )
+            }),
+            'csrf_token': self.csrf_token
+        }
 
         self._make_request('POST', feconf.SIGNUP_DATA_URL, params=params)
 

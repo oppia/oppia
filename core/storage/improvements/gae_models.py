@@ -24,8 +24,7 @@ from core import feconf
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover

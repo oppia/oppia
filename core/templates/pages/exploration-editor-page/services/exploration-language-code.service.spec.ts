@@ -23,8 +23,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationLanguageCodeService } from './exploration-language-code.service';
 
 describe('Exploration Language Code Service', () => {
-  let elcs: ExplorationLanguageCodeService = null;
-  let cs: ContextService = null;
+  let elcs: ExplorationLanguageCodeService;
+  let cs: ContextService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

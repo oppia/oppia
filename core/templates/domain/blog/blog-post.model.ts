@@ -20,7 +20,7 @@
 import { AppConstants } from 'app.constants';
 export interface BlogPostBackendDict {
   'id': string ;
-  'author_username': string;
+  'displayed_author_name': string;
   'title': string;
   'content': string;
   'thumbnail_filename': string | null;
@@ -30,12 +30,8 @@ export interface BlogPostBackendDict {
   'published_on'?: string;
 }
 export class BlogPostData {
-  // TODO(#13637): Remove the use of interstitial blog post
-  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
-  // blog post that is displayed in the editor until the actual
-  // is fetched from the backend.
-  _id: string | null;
-  _authorUsername: string;
+  _id: string;
+  _displayedAuthorName: string;
   _title: string;
   _content: string;
   _tags: string[];
@@ -44,8 +40,8 @@ export class BlogPostData {
   _lastUpdated?: string;
   _publishedOn?: string;
   constructor(
-      id: string | null,
-      authorUsername: string,
+      id: string,
+      displayedAuthorName: string,
       title: string,
       content: string,
       tags: string[],
@@ -54,7 +50,7 @@ export class BlogPostData {
       lastUpdated?: string,
       publishedOn?: string) {
     this._id = id;
-    this._authorUsername = authorUsername;
+    this._displayedAuthorName = displayedAuthorName;
     this._title = title;
     this._content = content;
     this._tags = tags;
@@ -64,12 +60,12 @@ export class BlogPostData {
     this._publishedOn = publishedOn;
   }
 
-  get id(): string | null {
+  get id(): string {
     return this._id;
   }
 
-  get authorUsername(): string {
-    return this._authorUsername;
+  get displayedAuthorName(): string {
+    return this._displayedAuthorName;
   }
 
   get lastUpdated(): string | undefined {
@@ -182,7 +178,7 @@ export class BlogPostData {
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
-      blogPostBackendDict.author_username,
+      blogPostBackendDict.displayed_author_name,
       blogPostBackendDict.title,
       blogPostBackendDict.content,
       blogPostBackendDict.tags,
@@ -190,14 +186,5 @@ export class BlogPostData {
       blogPostBackendDict.url_fragment,
       blogPostBackendDict.last_updated,
       blogPostBackendDict.published_on);
-  }
-
-  // Create an interstitial blog post that would be displayed in the editor
-  // until the actual blog post is fetched from the backend.
-  static createInterstitialBlogPost(): BlogPostData {
-    return new BlogPostData (
-      null, 'loading', 'Blog Post Title loading', '', [],
-      null, 'Url Fragment loading'
-    );
   }
 }

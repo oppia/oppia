@@ -109,7 +109,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         summary = blog_services.generate_summary_of_blog_post(html_content)
         self.assertEqual(expected_summary, summary)
 
-        content = '<p>abc</p>' * 150
+        content = '<p>abc</p><strong>QWERTY</strong>' * 150
         expected_summary = 'abc' * 99 + '...'
         summary = blog_services.generate_summary_of_blog_post(content)
         self.assertEqual(expected_summary, summary)
@@ -150,10 +150,62 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             1
         )
 
+    def test_get_total_number_of_published_blog_post_summaries_by_author(
+        self
+    ) -> None:
+        self.assertEqual(
+             blog_services
+             .get_total_number_of_published_blog_post_summaries_by_author(
+                self.user_id_a
+             ), 0)
+
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_two)
+        blog_services.publish_blog_post(self.blog_post_a_id)
+
+        self.assertEqual(
+            blog_services
+            .get_total_number_of_published_blog_post_summaries_by_author(
+                self.user_id_a), 1)
+
+        # Publishing blog post from user with user_id_b.
+        change_dict: blog_services.BlogPostChangeDict = {
+            'title': 'Sample title B',
+            'thumbnail_filename': 'test.svg',
+            'content': '<p>hi<p>',
+            'tags': ['one', 'two']
+        }
+        blog_services.update_blog_post(
+                self.blog_post_b_id, change_dict)
+        blog_services.publish_blog_post(self.blog_post_b_id)
+
+        self.assertEqual(
+            blog_services
+            .get_total_number_of_published_blog_post_summaries_by_author(
+                self.user_id_a), 1)
+        self.assertEqual(
+            blog_services
+            .get_total_number_of_published_blog_post_summaries_by_author(
+                self.user_id_b), 1)
+
+    def test_get_total_number_of_published_blog_post_summaries(self) -> None:
+        number_of_published_blogs = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(number_of_published_blogs, 0)
+        blog_services.update_blog_post(
+            self.blog_post_a_id,
+            self.change_dict_two)
+        blog_services.publish_blog_post(self.blog_post_a_id)
+        number_of_published_blogs = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
+        self.assertEqual(number_of_published_blogs, 1)
+
     def test_get_published_blog_post_summaries_by_user_id(self) -> None:
         self.assertEqual(
             len(blog_services.get_published_blog_post_summaries_by_user_id(
-                self.user_id_a, 20
+                self.user_id_a, 20, 0
             )),
             0
         )
@@ -163,10 +215,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_services.publish_blog_post(self.blog_post_a_id)
         no_of_published_blog_post = (
             blog_services.get_published_blog_post_summaries_by_user_id(
-                self.user_id_a,
-                20
-            )
-        )
+                self.user_id_a, 20, 0))
         self.assertEqual(
             len(no_of_published_blog_post), 1
         )
@@ -696,6 +745,87 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(add_docs_counter.times_called, 2)
 
 
+class BlogAuthorDetailsTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        auth_id = 'someUser'
+        self.user_bio = 'new bio'
+        self.user_name = 'username'
+        user_email = 'user@example.com'
+
+        self.user_id = user_services.create_new_user(
+            auth_id, user_email).user_id
+        user_services.set_username(self.user_id, self.user_name)
+        user_services.update_user_bio(self.user_id, self.user_bio)
+
+    def test_get_blog_author_details_model(self) -> None:
+        author_details = blog_services.get_blog_author_details(self.user_id)
+        assert author_details is not None
+        self.assertEqual(author_details.displayed_author_name, self.user_name)
+        self.assertEqual(author_details.author_bio, self.user_bio)
+
+    def test_get_blog_author_details_model_raises_exception(self) -> None:
+        def _mock_get_author_details_by_author(unused_user_id: str) -> None:
+            return None
+
+        get_author_details_swap = self.swap(
+            blog_models.BlogAuthorDetailsModel,
+            'get_by_author',
+            _mock_get_author_details_by_author
+            )
+
+        with get_author_details_swap:
+            with self.assertRaisesRegex(
+                Exception,
+                (
+                    'Unable to fetch author details for the given user.'
+                )
+            ):
+                blog_services.get_blog_author_details(self.user_id)
+
+    def test_update_blog_author_details(self) -> None:
+        new_author_name = 'new author name'
+        new_author_bio = 'new blog author bio'
+
+        pre_update_author_details = blog_services.get_blog_author_details(
+            self.user_id)
+        assert pre_update_author_details is not None
+        self.assertNotEqual(
+            pre_update_author_details.displayed_author_name, new_author_name)
+        self.assertNotEqual(
+            pre_update_author_details.author_bio, new_author_bio)
+
+        blog_services.update_blog_author_details(
+            self.user_id, new_author_name, new_author_bio)
+
+        updated_author_details = blog_services.get_blog_author_details(
+            self.user_id)
+        assert updated_author_details is not None
+        self.assertEqual(
+            updated_author_details.displayed_author_name, new_author_name)
+        self.assertEqual(updated_author_details.author_bio, new_author_bio)
+
+    def test_update_blog_author_details_with_invalid_author_name(self) -> None:
+        new_author_name = 'new_author_name'
+        new_author_bio = 'new blog author bio'
+
+        pre_update_author_details = blog_services.get_blog_author_details(
+            self.user_id)
+        assert pre_update_author_details is not None
+        self.assertNotEqual(
+            pre_update_author_details.displayed_author_name, new_author_name)
+        self.assertNotEqual(
+            pre_update_author_details.author_bio, new_author_bio)
+
+        with self.assertRaisesRegex(
+            Exception, (
+                'Author name can only have alphanumeric characters and spaces.'
+            )):
+            blog_services.update_blog_author_details(
+                self.user_id, new_author_name, new_author_bio)
+
+
 class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
     """Tests blog post summary query methods which operate on BlogPostSummary
     objects.
@@ -800,7 +930,12 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
     def test_get_blog_post_summaries_with_no_query(self) -> None:
         # An empty query should return all published blog posts.
         (blog_post_ids, search_offset) = (
-            blog_services.get_blog_post_ids_matching_query('', []))
+            blog_services.get_blog_post_ids_matching_query(
+                '',
+                [],
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+            )
+        )
         self.assertEqual(
             sorted(blog_post_ids),
             sorted(self.all_blog_post_ids[:6])
@@ -814,7 +949,12 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             blog_services.delete_blog_post(blog_id)
 
         blog_post_ids = (
-            blog_services.get_blog_post_ids_matching_query('', []))[0]
+            blog_services.get_blog_post_ids_matching_query(
+                '',
+                [],
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+            )
+        )[0]
         self.assertEqual(
             sorted(blog_post_ids),
             sorted(self.all_blog_post_ids[3:6])
@@ -826,14 +966,22 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # If no published blog posts are loaded, a blank query should not get
         # any blog post.
         self.assertEqual(
-            blog_services.get_blog_post_ids_matching_query('', []),
-            ([], None))
+            blog_services.get_blog_post_ids_matching_query(
+                '',
+                [],
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+            ),
+            ([], None)
+        )
 
     def test_search_blog_post_summaries(self) -> None:
 
         # Search for blog posts containing 'Oppia'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
-            'Oppia', [])
+            'Oppia',
+            [],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+        )
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
@@ -844,7 +992,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
 
         # Search for blog posts containing 'Basic'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
-            'Basic', [])
+            'Basic',
+            [],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+        )
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
@@ -855,7 +1006,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
 
         # Search for blog posts containing tag 'Math' and 'Social'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
-            '', ['Math', 'Social'])
+            '',
+            ['Math', 'Social'],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+        )
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
@@ -865,7 +1019,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
 
         # Search for blog posts containing 'Lessons'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
-            'Lessons', [])
+            'Lessons',
+            [],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+        )
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
@@ -876,7 +1033,10 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
 
         # Search for blog posts containing 'Lessons' and tag 'Social'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
-            'Lessons', ['Social'])
+            'Lessons',
+            ['Social'],
+            feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+        )
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
@@ -901,7 +1061,11 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             # Page 1: 2 initial blog posts.
             (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
-                    '', []))
+                    '',
+                    [],
+                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
+                )
+            )
             self.assertEqual(len(blog_post_ids), 2)
             self.assertIsNotNone(search_offset)
             found_blog_post_ids += blog_post_ids
@@ -909,7 +1073,12 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             # Page 2: 2 more blog posts.
             (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
-                    '', [], offset=search_offset))
+                    '',
+                    [],
+                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
+                    offset=search_offset
+                )
+            )
             self.assertEqual(len(blog_post_ids), 2)
             self.assertIsNotNone(search_offset)
             found_blog_post_ids += blog_post_ids
@@ -917,7 +1086,12 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             # Page 3: 2 final blog posts.
             (blog_post_ids, search_offset) = (
                 blog_services.get_blog_post_ids_matching_query(
-                    '', [], offset=search_offset))
+                    '',
+                    [],
+                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
+                    offset=search_offset
+                )
+            )
             self.assertEqual(len(blog_post_ids), 2)
             self.assertIsNone(search_offset)
             found_blog_post_ids += blog_post_ids
@@ -960,7 +1134,12 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
 
         with logging_swap, search_results_page_size_swap, max_iterations_swap:
             (blog_post_ids, _) = (
-                blog_services.get_blog_post_ids_matching_query('', []))
+                blog_services.get_blog_post_ids_matching_query(
+                    '',
+                    [],
+                    feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+                )
+            )
 
         self.assertEqual(
             observed_log_messages,

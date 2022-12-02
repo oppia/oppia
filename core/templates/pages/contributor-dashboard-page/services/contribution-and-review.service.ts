@@ -193,7 +193,7 @@ export class ContributionAndReviewService {
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      explorationId: string
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
@@ -205,7 +205,7 @@ export class ContributionAndReviewService {
       targetId: string, suggestionId: string, action: string,
       reviewMessage: string, commitMessage: string | null,
       onSuccess: (suggestionId: string) => void,
-      onFailure: (error: Error) => void
+      onFailure: (errorMessage: string) => void
   ): Promise<void> {
     const requestBody = {
       action: action,
@@ -218,8 +218,8 @@ export class ContributionAndReviewService {
         targetId, suggestionId, requestBody
       ).then(() => {
         onSuccess(suggestionId);
-      }, (error) => {
-        onFailure && onFailure(error);
+      }, (errorResponse) => {
+        onFailure && onFailure(errorResponse.error.error);
       });
   }
 

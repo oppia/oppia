@@ -45,9 +45,11 @@ import { ExplorationTitleService } from './exploration-title.service';
 import { ExplorationWarningsService } from './exploration-warnings.service';
 import { RouterService } from './router.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
+import { DiffNodeData } from 'components/version-diff-visualization/version-diff-visualization.component';
 
 @Injectable({
   providedIn: 'root'
@@ -61,8 +63,11 @@ export class ExplorationSaveService {
   // at any one time.
   modalIsOpen: boolean = false;
 
-  diffData = null;
-  _initExplorationPageEventEmitter = new EventEmitter<void>();
+  // This property is initialized using private methods and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  diffData!: DiffNodeData;
+  _initExplorationPageEventEmitter = new EventEmitter();
 
   constructor(
     private alertsService: AlertsService,
@@ -157,7 +162,7 @@ export class ExplorationSaveService {
           draftChanges !== null &&
           draftChanges.length > 0) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
-            changeList as unknown as LostChange[]);
+              changeList);
             return;
           }
 
@@ -177,11 +182,14 @@ export class ExplorationSaveService {
             this.editabilityService.markEditable();
             resolve();
           });
-        }, (errorResponse: {error: {error: string}}) => {
+        // The type of error 'e' is unknown because anything can be throw
+        // in TypeScript. We need to make sure to check the type of 'e'.
+        }, (errorResponse: unknown) => {
           this.saveIsInProgress = false;
           resolve();
           this.editabilityService.markEditable();
-          const errorMessage = errorResponse.error.error;
+          let httpErrorResponse = errorResponse as HttpErrorResponse;
+          const errorMessage = httpErrorResponse.error.error;
           this.alertsService.addWarning(
             'Error! Changes could not be saved - ' + errorMessage);
         }
@@ -196,7 +204,7 @@ export class ExplorationSaveService {
       !this.explorationCategoryService.savedMemento ||
       this.explorationLanguageCodeService.savedMemento ===
       AppConstants.DEFAULT_LANGUAGE_CODE ||
-      (this.explorationTagsService.savedMemento as string[]).length === 0);
+      (this.explorationTagsService.savedMemento as ParamChange[]).length === 0);
   }
 
   async saveChangesAsync(

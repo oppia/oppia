@@ -40,8 +40,7 @@ from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
 import github
-from typing import Generator, List, NoReturn
-from typing_extensions import Literal
+from typing import Generator, List, Literal, NoReturn
 
 from . import common
 
@@ -928,11 +927,6 @@ class CommonTests(test_utils.GenericTestBase):
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
 
-    def test_fix_third_party_imports_correctly_sets_up_imports(self) -> None:
-        common.fix_third_party_imports()
-        # Asserts that imports from problematic modules do not error.
-        from google.cloud import tasks_v2  # pylint: disable=unused-import
-
     def test_cd(self) -> None:
         def mock_chdir(unused_path: str) -> None:
             pass
@@ -1144,3 +1138,41 @@ class CommonTests(test_utils.GenericTestBase):
                     'https://example.com', output_path, enforce_https=False)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+    def test_chrome_bin_setup_with_google_chrome(self) -> None:
+        isfile_swap = self.swap(
+            os.path, 'isfile', lambda path: path == '/usr/bin/google-chrome'
+        )
+        with isfile_swap:
+            common.setup_chrome_bin_env_variable()
+        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
+
+    def test_chrome_bin_setup_with_wsl_chrome_browser(self) -> None:
+        isfile_swap = self.swap(
+            os.path,
+            'isfile',
+            lambda path: path == (
+                '/mnt/c/Program Files (x86)/Google/'
+                'Chrome/Application/chrome.exe'
+            )
+        )
+        with isfile_swap:
+            common.setup_chrome_bin_env_variable()
+        self.assertEqual(
+            os.environ['CHROME_BIN'],
+            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+        )
+
+    def test_chrome_bin_setup_with_error(self) -> None:
+        print_arr = []
+        def mock_print(msg: str) -> None:
+            print_arr.append(msg)
+
+        isfile_swap = self.swap(os.path, 'isfile', lambda _: False)
+        print_swap = self.swap(builtins, 'print', mock_print)
+
+        with print_swap, isfile_swap, self.assertRaisesRegex(
+            Exception, 'Chrome not found.'
+        ):
+            common.setup_chrome_bin_env_variable()
+        self.assertIn('Chrome is not found, stopping...', print_arr)

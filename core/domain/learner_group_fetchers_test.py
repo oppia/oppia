@@ -60,6 +60,15 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(learner_group)
         self.assertEqual(learner_group.group_id, self.LEARNER_GROUP_ID)
 
+        with self.assertRaisesRegex(
+            Exception,
+            'No LearnerGroupModel found for the given group_id: '
+            'fake_learner_group_id'
+        ):
+            learner_group_fetchers.get_learner_group_by_id(
+                fake_learner_group_id, strict=True
+            )
+
     def test_raises_error_if_learner_group_model_is_fetched_with_strict_and_invalid_id(  # pylint: disable=line-too-long
         self
     ) -> None:
@@ -99,3 +108,38 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
             learner_group_fetchers.can_multi_learners_share_progress(
                 [self.LEARNER_ID_1, self.LEARNER_ID_2], self.LEARNER_GROUP_ID
             ), [True, False])
+
+    def test_get_invited_learner_groups_of_learner(self) -> None:
+        fake_learner_id = 'fake_learner_id'
+        learner_groups = (
+            learner_group_fetchers.get_invited_learner_groups_of_learner(
+                fake_learner_id
+            )
+        )
+        self.assertEqual(len(learner_groups), 0)
+
+        learner_groups = (
+            learner_group_fetchers.get_invited_learner_groups_of_learner(
+                self.LEARNER_ID_1
+            )
+        )
+        self.assertEqual(len(learner_groups), 1)
+        self.assertEqual(learner_groups[0].group_id, self.LEARNER_GROUP_ID)
+
+    def test_get_learner_groups_joined_by_learner(self) -> None:
+        learner_groups = (
+            learner_group_fetchers.get_learner_groups_joined_by_learner(
+                self.LEARNER_ID_1
+            )
+        )
+        self.assertEqual(len(learner_groups), 0)
+
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID_1, True)
+        learner_groups = (
+            learner_group_fetchers.get_learner_groups_joined_by_learner(
+                self.LEARNER_ID_1
+            )
+        )
+        self.assertEqual(len(learner_groups), 1)
+        self.assertEqual(learner_groups[0].group_id, self.LEARNER_GROUP_ID)

@@ -653,34 +653,9 @@ def _save_topic(
             'which is too old. Please reload the page and try again.'
             % (topic_model.version, topic.version))
 
-    topic_model.description = topic.description
-    topic_model.name = topic.name
-    topic_model.canonical_name = topic.canonical_name
-    topic_model.abbreviated_name = topic.abbreviated_name
-    topic_model.url_fragment = topic.url_fragment
-    topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
-    topic_model.thumbnail_filename = topic.thumbnail_filename
-    topic_model.thumbnail_size_in_bytes = topic.thumbnail_size_in_bytes
-    topic_model.canonical_story_references = [
-        reference.to_dict() for reference in topic.canonical_story_references
-    ]
-    topic_model.additional_story_references = [
-        reference.to_dict() for reference in topic.additional_story_references
-    ]
-    topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
-    topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
-    topic_model.subtopic_schema_version = topic.subtopic_schema_version
-    topic_model.story_reference_schema_version = (
-        topic.story_reference_schema_version)
-    topic_model.next_subtopic_id = topic.next_subtopic_id
-    topic_model.language_code = topic.language_code
-    topic_model.meta_tag_content = topic.meta_tag_content
-    topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
-    topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
-    topic_model.skill_ids_for_diagnostic_test = (
-        topic.skill_ids_for_diagnostic_test)
+    topic_model_to_commit = populate_topic_model_fields(topic_model, topic)
     change_dicts = [change.to_dict() for change in change_list]
-    topic_model.commit(committer_id, commit_message, change_dicts)
+    topic_model_to_commit.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_TOPIC, None, [topic.id])
     topic.version += 1
@@ -1158,37 +1133,12 @@ def save_topic_summary(topic_summary: topic_domain.TopicSummary) -> None:
         topic_summary: TopicSummary. The topic summary object to be saved
             in the datastore.
     """
-    topic_summary_dict = {
-        'name': topic_summary.name,
-        'description': topic_summary.description,
-        'canonical_name': topic_summary.canonical_name,
-        'language_code': topic_summary.language_code,
-        'version': topic_summary.version,
-        'additional_story_count': topic_summary.additional_story_count,
-        'canonical_story_count': topic_summary.canonical_story_count,
-        'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
-        'subtopic_count': topic_summary.subtopic_count,
-        'total_skill_count': topic_summary.total_skill_count,
-        'total_published_node_count':
-            topic_summary.total_published_node_count,
-        'thumbnail_filename': topic_summary.thumbnail_filename,
-        'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
-        'topic_model_last_updated': topic_summary.topic_model_last_updated,
-        'topic_model_created_on': topic_summary.topic_model_created_on,
-        'url_fragment': topic_summary.url_fragment
-    }
-
-    topic_summary_model = (
+    existing_topic_summary_model = (
         topic_models.TopicSummaryModel.get_by_id(topic_summary.id))
-    if topic_summary_model is not None:
-        topic_summary_model.populate(**topic_summary_dict)
-        topic_summary_model.update_timestamps()
-        topic_summary_model.put()
-    else:
-        topic_summary_dict['id'] = topic_summary.id
-        model = topic_models.TopicSummaryModel(**topic_summary_dict)
-        model.update_timestamps()
-        model.put()
+    topic_summary_model = populate_topic_summary_model_fields(
+    existing_topic_summary_model, topic_summary)
+    topic_summary_model.update_timestamps()
+    topic_summary_model.put()
 
 
 def publish_topic(topic_id: str, committer_id: str) -> None:
@@ -1339,7 +1289,7 @@ def check_can_edit_topic(
         return True
     if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
         return False
-    if topic_rights.is_manager(user.user_id):
+    if user.user_id and topic_rights.is_manager(user.user_id):
         return True
 
     return False
@@ -1357,8 +1307,14 @@ def deassign_user_from_all_topics(
 
     Raises:
         Exception. The committer does not have rights to modify a role.
+        Exception. Guest users are not allowed to deassing users from
+            all topics.
     """
     topic_rights_list = topic_fetchers.get_topic_rights_with_user(user_id)
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassing users from all topics.'
+        )
     for topic_rights in topic_rights_list:
         topic_rights.manager_ids.remove(user_id)
         commit_cmds = [topic_domain.TopicRightsChange({
@@ -1389,7 +1345,13 @@ def deassign_manager_role_from_topic(
 
     Raises:
         Exception. The committer does not have rights to modify a role.
+        Exception. Guest users are not allowed to deassing manager role
+            from topic.
     """
+    if committer.user_id is None:
+        raise Exception(
+            'Guest users are not allowed to deassing manager role from topic.'
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if user_id not in topic_rights.manager_ids:
         raise Exception('User does not have manager rights in topic.')
@@ -1431,8 +1393,14 @@ def assign_role(
         Exception. The assignee is already a manager for the topic.
         Exception. The assignee doesn't have enough rights to become a manager.
         Exception. The role is invalid.
+        Exception. Guest user is not allowed to assign roles to a user.
+        Exception. The role of the Guest user cannot be changed.
     """
     committer_id = committer.user_id
+    if committer_id is None:
+        raise Exception(
+            'Guest user is not allowed to assign roles to a user.'
+        )
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
@@ -1443,6 +1411,10 @@ def assign_role(
         raise Exception(
             'UnauthorizedUserException: Could not assign new role.')
 
+    if assignee.user_id is None:
+        raise Exception(
+            'Cannot change the role of the Guest user.'
+        )
     assignee_username = user_services.get_username(assignee.user_id)
     if role_services.ACTION_EDIT_OWNED_TOPIC not in assignee.actions:
         raise Exception(
@@ -1590,6 +1562,93 @@ def get_topic_id_to_diagnostic_test_skill_ids(
         )
         raise Exception(error_msg)
     return topic_id_to_diagnostic_test_skill_ids
+
+
+def populate_topic_model_fields(
+    topic_model: topic_models.TopicModel,
+    topic: topic_domain.Topic
+) -> topic_models.TopicModel:
+    """Populate topic model with the data from topic object.
+
+    Args:
+        topic_model: TopicModel. The model to populate.
+        topic: Topic. The topic domain object which should be used to
+            populate the model.
+
+    Returns:
+        TopicModel. Populated model.
+    """
+    topic_model.description = topic.description
+    topic_model.name = topic.name
+    topic_model.canonical_name = topic.canonical_name
+    topic_model.abbreviated_name = topic.abbreviated_name
+    topic_model.url_fragment = topic.url_fragment
+    topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
+    topic_model.thumbnail_filename = topic.thumbnail_filename
+    topic_model.thumbnail_size_in_bytes = topic.thumbnail_size_in_bytes
+    topic_model.canonical_story_references = [
+        reference.to_dict() for reference in topic.canonical_story_references
+    ]
+    topic_model.additional_story_references = [
+        reference.to_dict() for reference in topic.additional_story_references
+    ]
+    topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
+    topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
+    topic_model.subtopic_schema_version = topic.subtopic_schema_version
+    topic_model.story_reference_schema_version = (
+        topic.story_reference_schema_version)
+    topic_model.next_subtopic_id = topic.next_subtopic_id
+    topic_model.language_code = topic.language_code
+    topic_model.meta_tag_content = topic.meta_tag_content
+    topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
+    topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
+    topic_model.skill_ids_for_diagnostic_test = (
+        topic.skill_ids_for_diagnostic_test)
+    return topic_model
+
+
+def populate_topic_summary_model_fields(
+    topic_summary_model: topic_models.TopicSummaryModel,
+    topic_summary: topic_domain.TopicSummary
+) -> topic_models.TopicSummaryModel:
+    """Populate topic summary model with the data from topic summary object.
+
+    Args:
+        topic_summary_model: TopicSummaryModel. The model to populate.
+        topic_summary: TopicSummary. The topic summary domain object which
+            should be used to populate the model.
+
+    Returns:
+        TopicSummaryModel. Populated model.
+    """
+    topic_summary_dict = {
+        'name': topic_summary.name,
+        'description': topic_summary.description,
+        'canonical_name': topic_summary.canonical_name,
+        'language_code': topic_summary.language_code,
+        'version': topic_summary.version,
+        'additional_story_count': topic_summary.additional_story_count,
+        'canonical_story_count': topic_summary.canonical_story_count,
+        'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
+        'subtopic_count': topic_summary.subtopic_count,
+        'total_skill_count': topic_summary.total_skill_count,
+        'total_published_node_count':
+            topic_summary.total_published_node_count,
+        'thumbnail_filename': topic_summary.thumbnail_filename,
+        'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
+        'topic_model_last_updated': topic_summary.topic_model_last_updated,
+        'topic_model_created_on': topic_summary.topic_model_created_on,
+        'url_fragment': topic_summary.url_fragment
+    }
+
+    if topic_summary_model is not None:
+        topic_summary_model.populate(**topic_summary_dict)
+    else:
+        topic_summary_dict['id'] = topic_summary.id
+        topic_summary_model = topic_models.TopicSummaryModel(
+            **topic_summary_dict)
+
+    return topic_summary_model
 
 
 def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:

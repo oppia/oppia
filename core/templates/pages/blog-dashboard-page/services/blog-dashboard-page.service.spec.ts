@@ -193,7 +193,7 @@ describe('Blog Post Page service', () => {
   it('should set and retrieve blog post data correctly', () => {
     let summaryObject = BlogPostData.createFromBackendDict(
       { id: 'sampleId',
-        author_username: 'test_user',
+        displayed_author_name: 'test_user',
         title: 'Title',
         content: 'Hello World',
         tags: ['news'],
