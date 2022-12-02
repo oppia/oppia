@@ -6,7 +6,7 @@ const homePage = testConstants.Dashboard.MainDashboard;
 
 async function deleteDraftAsBlogPostAdmin() {
   const blogPostAdmin = await new e2eBlogPostAdmin();
-  await blogPostAdmin.getInitialized();
+  await blogPostAdmin.openBrowser();
 
   await blogPostAdmin.signInWithEmail("testadmin@example.com");
   await blogPostAdmin.waitForPageToLoad(homePage);

@@ -8,7 +8,7 @@ const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 async function playUploadedAudioAsVoiceoverAdmin() {
   const voiceoverAdmin = await new e2eVoiceoverAdmin();
-  await voiceoverAdmin.getInitialized();
+  await voiceoverAdmin.openBrowser();
   
   await voiceoverAdmin.signInWithEmail("testadmin@example.com");
   await voiceoverAdmin.waitForPageToLoad(homePage);

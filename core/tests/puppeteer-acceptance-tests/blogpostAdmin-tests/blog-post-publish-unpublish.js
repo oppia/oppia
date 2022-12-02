@@ -6,7 +6,7 @@ const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 
 async function publishBlogAsBlogPostAdmin() {
   const blogPostAdmin = await new e2eBlogPostAdmin();
-  await blogPostAdmin.getInitialized();
+  await blogPostAdmin.openBrowser();
 
   await blogPostAdmin.signInWithEmail("testadmin@example.com");
   await blogPostAdmin.waitForPageToLoad(homePage);

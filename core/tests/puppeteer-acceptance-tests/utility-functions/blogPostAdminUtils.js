@@ -12,7 +12,7 @@ module.exports = class e2eBlogPostAdmin {
   page;
   browserInstance;
 
-  async getInitialized() {
+  async openBrowser() {
     this.browserInstance = await new browser();
     this.page = await (this.browserInstance).initialize();
   }
