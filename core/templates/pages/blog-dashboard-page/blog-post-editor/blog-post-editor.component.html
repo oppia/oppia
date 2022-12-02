@@ -79,7 +79,6 @@
                minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
                aria-label="Title"
                (focusout)="updateLocalTitleValue()"
-               (focus)="true"
                autofocus>
         <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
           <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE }">
@@ -92,8 +91,12 @@
       </div>
     </div>
     <div class="blog-post-content d-flex mt-2" [ngClass]="{'flex-column': windowIsNarrow}">
-      <div class="title-heading col-sm-2 mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left' : 'text-center'">
+      <div class="title-heading mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left w-100' : 'text-center col-sm-2'">
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase }}</span>
+        <button class="fas fa-pen oppia-editor-edit-icon position-relative"
+                *ngIf="!contentEditorIsActive && windowIsNarrow"
+                (click)="contentEditorIsActive=true">
+        </button>
       </div>
       <div class="d-block flex-grow-1">
         <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="e2e-test-content-button blog-post-content-button">
@@ -150,6 +153,10 @@
           </div>
         </div>
       </div>
+      <button class="fas fa-pen oppia-editor-edit-icon position-relative mb-auto"
+              *ngIf="!contentEditorIsActive && !windowIsNarrow"
+              (click)="contentEditorIsActive=true">
+      </button>
     </div>
   </mat-card>
   <mat-card class="editor-profile-card col-sm-2" [ngClass]=" windowIsNarrow ? 'buttons-container' : 'mr-auto'">
@@ -254,6 +261,12 @@
     z-index: 10;
   }
 
+  .oppia-editor-edit-icon {
+    border: 0;
+    font-size: 18px;
+    padding-right: 15px;
+  }
+
   .author-username {
     color: #333;
     display: block;
@@ -265,11 +278,10 @@
   }
 
   .blog-title-input-field {
-    border: #fff;
     color: #333;
     font: normal normal bold 28px/33px 'Roboto', Arial, sans-serif;
     height: unset;
-    padding: 0;
+    padding: 1px;
   }
 
   .blog-title-input-field:focus {
@@ -552,6 +564,12 @@
     .buttons-container {
       margin: -10px 0 0 0;
       padding: 35px;
+    }
+
+    .oppia-editor-edit-icon {
+      float: right;
+      font-size: 14px;
+      line-height: 25px;
     }
 
     @media(max-width: 700px) {
