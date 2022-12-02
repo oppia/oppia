@@ -5,7 +5,6 @@ const blogEditOptions = "e2e-test-blog-post-edit-box";
 const blogTitleInput = "input.e2e-test-blog-post-title-field";
 const blogBodyInput = "div.e2e-test-rte";
 const thumbnailPhotoBox = "e2e-test-photo-clickable";
-const homePage = testConstants.Dashboard.MainDashboard;
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 
 
@@ -22,8 +21,12 @@ module.exports = class e2eBlogPostAdmin {
     await (this.browserInstance).signInWithEmail(email);
   }
 
+  async waitForPageToLoad(selector) {
+    await (this.page).waitForSelector(selector);
+  }
+
   async goto(destination) {
-    await (this.browserInstance).goto(destination, homePage);
+    await (this.browserInstance).goto(destination);
   }
 
   async createDraftBlogPostByTitle(draftBlogPostTitle) {
@@ -71,10 +74,10 @@ module.exports = class e2eBlogPostAdmin {
 
   async publishNewBlogPost() {
     await (this.browserInstance).clickOn("span", "PUBLISH");
-    await (this.browserInstance).clickOn("button", " Confirm ", 500);
+    await (this.browserInstance).clickOn("button", " Confirm ", 1000);
     
     console.log("Successfully published a blog!");
-    await this.browserInstance.goto(blogDashboardUrl);
+    await this.goto(blogDashboardUrl);
   }
 
   async unpublishBlogPostByTitle(publishedBlogPostTitle) {

@@ -1,33 +1,24 @@
-const acceptanceTests = require("../utility-functions/puppeteer_utils.js");
+const e2eVoiceoverAdmin = require("../utility-functions/voiceoverAdminUtils.js");
 const testConstants = require("../utility-functions/testConstants.js");
 
 
-const translationTab = "e2e-test-translation-tab";
-const startRecording = "e2e-test-accessibility-translation-start-record";
-const stopRecording = "e2e-test-stop-record-button";
+const homePage = testConstants.Dashboard.MainDashboard;
+const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 
 
 async function recordingAudioAsVoiceoverAdmin() {
-  const user = await new acceptanceTests;
-  const page = await user.init();
+  const voiceoverAdmin = await new e2eVoiceoverAdmin();
+  await voiceoverAdmin.getInitialized();
   
-  await user.signInWithEmail("testadmin@example.com");
+  await voiceoverAdmin.signInWithEmail("testadmin@example.com");
+  await voiceoverAdmin.waitForPageToLoad(homePage);
+  await voiceoverAdmin.goto(creatorDashboardUrl);
+  await voiceoverAdmin.gotoTranslationTabInNewExploration();
+  await voiceoverAdmin.record3secAudio();
+  await voiceoverAdmin.playAudio();
   
-  // creating a new exploration
-  await user.goto(testConstants.URLs.CreatorDashboard, testConstants.Dashboard.MainDashboard);
-  await user.clickOn("button", " + Create Exploration ");
-  await user.clickOn("li", translationTab); // icon
-
-  // recording a 3sec audio
-  await user.clickOn("button", startRecording);  // icon
-  await page.waitForSelector("button", stopRecording);
-  await page.waitForTimeout(3000);  // recording for 3sec
-  await user.clickOn("button", stopRecording);
-  await user.clickOn("button", " Confirm ");
-
-  console.log("Successfully tested recording of audio!");
-  await user.browser.close();
+  await voiceoverAdmin.closeBrowser();
 };
 
 recordingAudioAsVoiceoverAdmin();
