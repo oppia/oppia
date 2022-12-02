@@ -49,8 +49,6 @@ class RemoveProfilePictureFieldJob(base_jobs.JobBase):
         """
         if 'profile_picture_data_url' in user_model._properties:  # pylint: disable=protected-access
             del user_model._properties['profile_picture_data_url']  # pylint: disable=protected-access
-            if 'profile_picture_data_url' in user_model._values:  # pylint: disable=protected-access
-                del user_model._values['profile_picture_data_url']  # pylint: disable=protected-access
         return user_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
