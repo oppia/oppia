@@ -35,6 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -51,6 +52,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private ngbModal: NgbModal,
     private imagePreloaderService: ImagePreloaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private windowRef: WindowRef
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -61,6 +63,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
   currentGlobalLanguageCode!: string;
 
   ngOnInit(): void {
+    const url = new URL(this.windowRef.nativeWindow.location.href);
     this.currentGlobalLanguageCode = (
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.selectedLanguageCode = (
@@ -68,7 +71,15 @@ export class ContentLanguageSelectorComponent implements OnInit {
     this.languageOptions = (
       this.contentTranslationLanguageService.getLanguageOptionsForDropdown());
     for (let option of this.languageOptions) {
-      if (option.value === this.currentGlobalLanguageCode) {
+      if (url.searchParams.get('initialContentLanguageCode') === option.value) {
+        this.contentTranslationLanguageService.setCurrentContentLanguageCode(
+          option.value);
+        this.selectedLanguageCode = (
+          this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+        );
+        break;
+      }
+      else if (option.value === this.currentGlobalLanguageCode) {
         this.contentTranslationLanguageService.setCurrentContentLanguageCode(
           option.value);
         this.selectedLanguageCode = (
