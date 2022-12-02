@@ -1413,8 +1413,6 @@ def update_profile_picture_data_url(
     """
     user_settings = get_user_settings(user_id, strict=True)
     username = user_settings.username
-    if username is None:
-        return
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     png_binary = utils.convert_data_url_to_binary(
