@@ -127,7 +127,7 @@ export class DragAndDropSortInputValidationService {
         var rule = rules[j];
         if (!customizationArgs.allowMultipleItemsInSamePosition.value) {
           var xInputs = inputs.x as string[][];
-          for (var k = 0; k < xInputs.length; k++) {
+          for (var k = 0; xInputs && k < xInputs.length; k++) {
             if (xInputs[k].length > 1) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
