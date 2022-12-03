@@ -1293,10 +1293,36 @@ def grouper(
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
+@overload
 def partition(
-        iterable: Iterable[T],
-        predicate: Callable[..., bool] = bool,
-        enumerated: bool = False
+    iterable: Iterable[T],
+    predicate: Callable[..., bool],
+    enumerated: Literal[False]
+) -> Tuple[Iterable[T], Iterable[T]]:
+    ...
+
+
+@overload
+def partition(
+    iterable: Iterable[T],
+    predicate: Callable[..., bool],
+    enumerated: Literal[True]
+) -> Tuple[Iterable[Tuple[int, T]], Iterable[Tuple[int, T]]]:
+    ...
+
+
+@overload
+def partition(
+    iterable: Iterable[T],
+    predicate: Callable[..., bool] = bool,
+) -> Tuple[Iterable[T], Iterable[T]]:
+    ...
+
+
+def partition(
+    iterable: Iterable[T],
+    predicate: Callable[..., bool] = bool,
+    enumerated: bool = False
 ) -> Tuple[
         Iterable[Union[T, Tuple[int, T]]],
         Iterable[Union[T, Tuple[int, T]]]]:

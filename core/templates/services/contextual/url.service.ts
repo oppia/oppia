@@ -289,6 +289,21 @@ export class UrlService {
   }
 
   /**
+ * This function is used to find the blog author username from the url.
+ * @return {string} the blog author username fragment.
+ * @throws Will throw an error if the url is invalid.
+ */
+  getBlogAuthorUsernameFromUrl(): string {
+    let pathname = this.getPathname();
+    let argumentsArray = pathname.split('/');
+    if (pathname.startsWith('/blog/author') && argumentsArray.length === 4) {
+      return decodeURIComponent(pathname.split('/')[3]);
+    } else {
+      throw new Error('Invalid Blog Author Profile Page Url.');
+    }
+  }
+
+  /**
    * This function is used to find the query values as a list.
    * @param {string} fieldName - the name of the field.
    * @return {string[]} the list of query field values.

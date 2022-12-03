@@ -37,7 +37,7 @@
                  [src]="authorProfilePictureUrl || DEFAULT_PROFILE_PICTURE_URL"
                  alt="Profile image of the author of the blog post.">
             <span class="author-username text-center general-text-format ml-4 my-auto">
-              {{ authorUsername }}
+              {{ authorName }}
             </span>
           </div>
           <div class="mat-card-header-text mx-0 mt-3">
@@ -79,7 +79,6 @@
                minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
                aria-label="Title"
                (focusout)="updateLocalTitleValue()"
-               (focus)="true"
                autofocus>
         <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
           <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE }">
@@ -92,14 +91,18 @@
       </div>
     </div>
     <div class="blog-post-content d-flex mt-2" [ngClass]="{'flex-column': windowIsNarrow}">
-      <div class="title-heading col-sm-2 mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left' : 'text-center'">
+      <div class="title-heading mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left w-100' : 'text-center col-sm-2'">
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase }}</span>
+        <button class="fas fa-pen oppia-editor-edit-icon position-relative"
+                *ngIf="!contentEditorIsActive && windowIsNarrow"
+                (click)="contentEditorIsActive=true">
+        </button>
       </div>
       <div class="d-block flex-grow-1">
         <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="e2e-test-content-button blog-post-content-button">
           <div class="oppia-editable-section-mask">
             <oppia-rte-output-display [rteString]="this.blogPostData.content"
-                                      class="e2e-test-content-display">
+                                      class="e2e-test-content-display blog-post-content-display">
             </oppia-rte-output-display>
           </div>
         </div>
@@ -150,6 +153,10 @@
           </div>
         </div>
       </div>
+      <button class="fas fa-pen oppia-editor-edit-icon position-relative mb-auto"
+              *ngIf="!contentEditorIsActive && !windowIsNarrow"
+              (click)="contentEditorIsActive=true">
+      </button>
     </div>
   </mat-card>
   <mat-card class="editor-profile-card col-sm-2" [ngClass]=" windowIsNarrow ? 'buttons-container' : 'mr-auto'">
@@ -160,7 +167,7 @@
              [src]="authorProfilePictureUrl || DEFAULT_PROFILE_PICTURE_URL"
              alt="Profile image of the author of the blog post.">
         <span class="author-username text-center general-text-format e2e-test-username-visible">
-          {{ authorUsername }}
+          {{ authorName }}
         </span>
       </div>
       <div class="mat-card-header-text d-block mx-0 mt-3">
@@ -177,7 +184,7 @@
         <span [matTooltip]="(blogPostData.validate()).join('\n')"
               matTooltipClass="oppia-mat-tooltip-list"
               [matTooltipDisabled]="false"
-              aria-label="List that showns issues preventing to save blog post as draft"
+              aria-label="List that shows issues preventing to save blog post as draft"
               class="w-100">
           <button mat-button class="w-100 mx-auto my-2 e2e-test-save-as-draft-button"
                   [disabled]="(blogPostData.validate().length > 0) || !newChangesAreMade"
@@ -254,6 +261,12 @@
     z-index: 10;
   }
 
+  .oppia-editor-edit-icon {
+    border: 0;
+    font-size: 18px;
+    padding-right: 15px;
+  }
+
   .author-username {
     color: #333;
     display: block;
@@ -265,11 +278,10 @@
   }
 
   .blog-title-input-field {
-    border: #fff;
     color: #333;
     font: normal normal bold 28px/33px 'Roboto', Arial, sans-serif;
     height: unset;
-    padding: 0;
+    padding: 1px;
   }
 
   .blog-title-input-field:focus {
@@ -439,6 +451,44 @@
     font-size: 40px;
   }
 
+  .blog-post-content-display /deep/ h1 {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 30px;
+    margin-bottom: 1rem;
+  }
+
+  .blog-post-content-display /deep/ p {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 0;
+    line-height: 30px;
+  }
+
+  .blog-post-content-display /deep/ ol {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 0;
+    line-height: 30px;
+  }
+
+  .blog-post-content-display /deep/ strong {
+    font-weight: 600;
+  }
+
+  .blog-post-content-display /deep/ blockquote {
+    box-shadow: inset 3px 0 0 0 rgb(41 41 41);
+    margin-left: 20px;
+    padding-left: 23px;
+  }
+
   @media(max-width: 920px) {
     .editor-profile-card.col-sm-2 {
       flex: 0 0 25%;
@@ -447,6 +497,29 @@
 
     .mat-button {
       width: 16vw;
+    }
+
+    .blog-post-content-display /deep/ p {
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 20px;
+    }
+
+    .blog-post-content-display /deep/ ol {
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 20px;
+    }
+
+    .blog-post-content-display /deep/ strong {
+      font-weight: 600;
+    }
+
+    .blog-post-content-display /deep/ h1 {
+      font-size: 18px;
+      line-height: 26px;
+      margin-bottom: 1rem;
+      margin-top: 1rem;
     }
   }
 
@@ -493,6 +566,12 @@
       padding: 35px;
     }
 
+    .oppia-editor-edit-icon {
+      float: right;
+      font-size: 14px;
+      line-height: 25px;
+    }
+
     @media(max-width: 700px) {
 
       .preview-button.mat-icon-button {
@@ -516,6 +595,30 @@
         min-height: 60px;
         min-width: 240px;
         width: 66.667vw;
+      }
+
+      .blog-post-content-display /deep/ p {
+        font-size: 12px;
+        font-weight: 300;
+        line-height: 18px;
+        margin-bottom: 12px;
+      }
+
+      .blog-post-content-display /deep/ ol {
+        font-size: 12px;
+        font-weight: 300;
+        line-height: 18px;
+      }
+
+      .blog-post-content-display /deep/ strong {
+        font-weight: 600;
+      }
+
+      .blog-post-content-display /deep/ h1 {
+        font-size: 13px;
+        line-height: 24px;
+        margin-bottom: 1rem;
+        margin-top: 0.5rem;
       }
     }
   }

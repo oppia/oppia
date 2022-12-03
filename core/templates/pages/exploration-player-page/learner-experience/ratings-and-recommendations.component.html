@@ -53,14 +53,14 @@
     <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
     <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
     <div class="mt-2">
-      <button mat-button class="md-raised oppia-sign-up-button e2e-test-login-button text-light" (click)="signIn()">
+      <button mat-button class="md-raised oppia-sign-up-button e2e-test-login-button text-light" (click)="signIn('.oppia-sign-up-button')">
         SIGN UP
       </button>
     </div>
     <div class="conversation-skin-login-secondary-options">
       <button class="conversation-skin-login-button">
         Already have an account?
-        <span class="conversation-skin-login-button-text" translate="" (click)="signIn()">Sign In</span>
+        <span class="conversation-skin-login-button-text" translate="" (click)="signIn('.conversation-skin-login-button-text')">Sign In</span>
       </button>
       <button class="conversation-skin-hide-sign-up-section-button e2e-test-dismiss-sign-up-section-button" *ngIf="isEndChapterFeatureEnabled()">
         <span class="conversation-skin-hide-sign-up-section-text" translate="I18N_SIGNUP_SECTION_DONT_ASK_ME_AGAIN" (click)="hideSignUpSection()"></span>

@@ -28,7 +28,6 @@ import getpass
 import os
 import re
 
-import github
 from typing import Final, List, Optional
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
@@ -37,13 +36,8 @@ from typing import Final, List, Optional
 from .. import common  # isort:skip  # pylint: disable=wrong-import-position
 from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
-CONSTANTS_CONFIG_PATH: Final = os.path.join(
-    os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
 FECONF_REGEX: Final = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX: Final = '^(  "[A-Z_]+": ).*$'
-TERMS_PAGE_FOLDER_URL: Final = (
-    'https://github.com/oppia/oppia/commits/develop/core/'
-    'templates/pages/terms-page')
 
 _PARSER: Final = argparse.ArgumentParser(description='Updates configs.')
 _PARSER.add_argument(
@@ -119,54 +113,6 @@ def apply_changes_based_on_config(
 
     with utils.open_file(local_filepath, 'w') as writable_local_file:
         writable_local_file.write('\n'.join(local_lines) + '\n')
-
-
-def check_updates_to_terms_of_service(
-    release_feconf_path: str, personal_access_token: str
-) -> None:
-    """Checks if updates are made to terms of service and updates
-    REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
-
-    Args:
-        release_feconf_path: str. The path to feconf file in release
-            directory.
-        personal_access_token: str. The personal access token for the
-            GitHub id of user.
-    """
-    g = github.Github(personal_access_token)
-    repo = g.get_organization('oppia').get_repo('oppia')
-
-    common.open_new_tab_in_browser_if_possible(TERMS_PAGE_FOLDER_URL)
-    print(
-        'Are the terms of service changed? Check commits/changes made '
-        'to the files in: core/templates/pages/terms-page. '
-        'Enter y/ye/yes if they are changed else enter n/no.')
-    terms_of_service_are_changed = input().lower()
-    while terms_of_service_are_changed not in ['y', 'ye', 'yes', 'n', 'no']:
-        print(
-            'Invalid Input: %s. Please enter yes or no.' % (
-                terms_of_service_are_changed))
-        terms_of_service_are_changed = input().lower()
-
-    if terms_of_service_are_changed in (
-            common.AFFIRMATIVE_CONFIRMATIONS):
-        print('Enter sha of the commit which changed the terms of service.')
-        commit_sha = input().lstrip().rstrip()
-        commit_time = repo.get_commit(commit_sha).commit.committer.date
-        time_tuple = (
-            commit_time.year, commit_time.month, commit_time.day,
-            commit_time.hour, commit_time.minute, commit_time.second)
-        feconf_lines = []
-        with utils.open_file(release_feconf_path, 'r') as f:
-            feconf_lines = f.readlines()
-        with utils.open_file(release_feconf_path, 'w') as f:
-            for line in feconf_lines:
-                if line.startswith('REGISTRATION_PAGE_LAST_UPDATED_UTC'):
-                    line = (
-                        'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-                        'datetime.datetime(%s, %s, %s, %s, %s, %s)\n' % (
-                            time_tuple))
-                f.write(line)
 
 
 def update_app_yaml(
@@ -406,14 +352,8 @@ def main(args: Optional[List[str]] = None) -> None:
         options.release_dir_path, common.ANALYTICS_CONSTANTS_FILE_PATH)
 
     if options.prompt_for_mailgun_and_terms_update:
-        try:
-            utils.url_open(TERMS_PAGE_FOLDER_URL)
-        except Exception as e:
-            raise Exception('Terms mainpage does not exist on Github.') from e
         add_mailgun_api_key(release_feconf_path)
         add_mailchimp_api_key(release_feconf_path)
-        check_updates_to_terms_of_service(
-            release_feconf_path, options.personal_access_token)
 
     apply_changes_based_on_config(
         release_feconf_path, feconf_config_path, FECONF_REGEX)

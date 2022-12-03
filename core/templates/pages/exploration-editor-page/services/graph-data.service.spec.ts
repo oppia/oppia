@@ -84,7 +84,10 @@ describe('Graph Data Service', () => {
                 unicode_str: ''
               }
             },
-            rows: { value: 1 }
+            rows: { value: 1 },
+            catchMisspellings: {
+              value: false
+            }
           },
           default_outcome: {
             dest: 'Hola',
@@ -148,7 +151,7 @@ describe('Graph Data Service', () => {
     };
 
     graphDataService.recompute();
-    expect(graphDataService.getGraphData()).toBeNull();
+    expect(graphDataService.getGraphData()).toBeUndefined();
 
     explorationInitStateNameService.init('property_1');
     graphDataService.recompute();

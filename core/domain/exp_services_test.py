@@ -50,8 +50,11 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+from extensions import domain
 
-from typing import Dict, Final, List, Optional, Sequence, Tuple, Type, Union
+from typing import (
+    Dict, Final, List, Optional, Sequence, Tuple, Type, Union, cast
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -297,6 +300,19 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
+
+    def test_raises_error_if_guest_user_try_to_publish_the_exploration(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'To publish explorations and update users\' profiles, '
+            'user must be logged in and have admin access.'
+        ):
+            exp_services.publish_exploration_and_update_user_profiles(
+                guest_user, 'exp_id'
+            )
 
     def test_get_exploration_titles_and_categories(self) -> None:
         self.assertEqual(
@@ -1685,8 +1701,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_update_exploration_by_migration_bot_not_updates_contribution_model(
         self
     ) -> None:
-        user_services.create_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, [], [])
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
@@ -1919,6 +1933,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         dest_if_really_stuck: null
@@ -2279,7 +2295,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         self.set_interaction_for_state(state2, 'MultipleChoiceInput')
         self.set_interaction_for_state(state3, 'ItemSelectionInput')
 
-        customization_args_dict1: TestCustArgDictType = {
+        customization_args_dict1: Dict[
+            str, Dict[str, Union[bool, domain.ImageAndRegionDict]]
+        ] = {
             'highlightRegionsOnHover': {'value': True},
             'imageAndRegions': {
                 'value': {
@@ -2297,10 +2315,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 }
             }
         }
-        customization_args_dict2: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
-        ] = {
-            'choices': {'value': [{
+        customization_args_choices: List[state_domain.SubtitledHtmlDict] = [{
                 'content_id': 'ca_choices_0',
                 'html': (
                     '<p>This is value1 for MultipleChoice'
@@ -2318,40 +2333,45 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
                     '</p></p>')
-            }]},
+            }]
+        customization_args_dict2: Dict[
+            str, Dict[str, Union[bool, List[state_domain.SubtitledHtmlDict]]]
+        ] = {
+            'choices': {'value': customization_args_choices},
             'showChoicesInShuffledOrder': {'value': True}
         }
+        customization_args_choices = [{
+            'content_id': 'ca_choices_0',
+            'html': (
+                '<p>This is value1 for ItemSelection'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value='
+                '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                '</p>')
+        }, {
+            'content_id': 'ca_choices_1',
+            'html': (
+                '<p>This is value2 for ItemSelection'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value='
+                '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                '</p>')
+        }, {
+            'content_id': 'ca_choices_2',
+            'html': (
+                '<p>This is value3 for ItemSelection'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value='
+                '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
+                '</p>')
+        }]
         customization_args_dict3: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], int]]
+            str, Dict[str, Union[int, List[state_domain.SubtitledHtmlDict]]]
         ] = {
-            'choices': {'value': [{
-                'content_id': 'ca_choices_0',
-                'html': (
-                    '<p>This is value1 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
-            }, {
-                'content_id': 'ca_choices_1',
-                'html': (
-                    '<p>This is value2 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
-            }, {
-                'content_id': 'ca_choices_2',
-                'html': (
-                    '<p>This is value3 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;image&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
-            }]},
+            'choices': {'value': customization_args_choices},
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 5}
         }
@@ -2492,6 +2512,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -2535,6 +2557,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -2603,6 +2627,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -2646,6 +2672,8 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
+        catchMisspellings:
+          value: false
         placeholder:
           value:
             content_id: ca_placeholder_0
@@ -2731,7 +2759,8 @@ title: A title
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2824,7 +2853,8 @@ title: A title
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -2912,7 +2942,8 @@ title: A title
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -2993,6 +3024,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -3040,6 +3073,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -3088,6 +3123,8 @@ interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
   customization_args:
+    catchMisspellings:
+      value: false
     placeholder:
       value:
         content_id: ca_placeholder_0
@@ -3164,7 +3201,8 @@ written_translations:
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 }),
                 exp_domain.ExplorationChange({
@@ -3218,7 +3256,8 @@ written_translations:
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -3619,9 +3658,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'choices'].value,
             list
         )
-        choices: List[state_domain.SubtitledHtml] = (
+        # Here we use cast because we are narrowing down the type from
+        # various customization args value types to List[SubtitledHtml]
+        # type, and this is done because here we are accessing 'choices'
+        # key from MultipleChoiceInput customization arg whose value is
+        # always of List[SubtitledHtml] type.
+        choices = cast(
+            List[state_domain.SubtitledHtml],
             exploration.init_state.interaction.customization_args[
-            'choices'].value
+                'choices'
+            ].value
         )
         self.assertEqual(choices[0].html, '<p>Option A</p>')
         self.assertEqual(choices[0].content_id, 'ca_choices_0')
@@ -3660,8 +3706,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         customization_args = (
             exploration.init_state.interaction.customization_args)
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
+        button_text_subtitle_unicode = cast(
+            state_domain.SubtitledUnicode,
+            customization_args['buttonText'].value
+        )
         self.assertEqual(
-            customization_args['buttonText'].value.unicode_str,
+            button_text_subtitle_unicode.unicode_str,
             'Continue')
 
     def test_update_interaction_handlers_fails(self) -> None:
@@ -3686,7 +3740,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add state name')
 
@@ -3731,7 +3786,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': ''
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add state name')
 
@@ -4013,7 +4069,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -4176,7 +4233,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -4355,7 +4413,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'placeholder'
                         }
                     },
-                    'rows': {'value': 1}
+                    'rows': {'value': 1},
+                    'catchMisspellings': {'value': False}
                 }),
             'Add Customization Args')
 
@@ -5044,7 +5103,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5137,7 +5197,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5212,7 +5273,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         })]
         exp_services.update_exploration(
@@ -5251,7 +5313,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                         'unicode_str': ''
                     }
                 },
-                'rows': {'value': 1}
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False}
             }
         }, {
             'cmd': exp_domain.CMD_DELETE_STATE,
@@ -6752,14 +6815,24 @@ title: Old Title
         self
     ) -> None:
         self.save_new_valid_exploration('exp_id', 'user_id')
-
         exploration_model = exp_models.ExplorationModel.get('exp_id')
-        exploration_model.version = 0
+        exploration = exp_fetchers.get_exploration_from_model(exploration_model)
+        exploration.version = 2
 
-        with self.assertRaisesRegex(
+        def _mock_apply_change_list(
+            *unused_args: str, **unused_kwargs: str
+        ) -> exp_domain.Exploration:
+            """Mocks exp_fetchers.get_exploration_by_id()."""
+            return exploration
+
+        fetch_swap = self.swap(
+            exp_services, 'apply_change_list',
+            _mock_apply_change_list)
+
+        with fetch_swap, self.assertRaisesRegex(
             Exception,
-            'Unexpected error: trying to update version 0 of exploration '
-            'from version 1. Please reload the page and try again.'):
+            'Unexpected error: trying to update version 1 of exploration '
+            'from version 2. Please reload the page and try again.'):
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -7839,7 +7912,15 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(updated_exp)
 
     def test_draft_discarded(self) -> None:
-        exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
+        user_data_model = (
+            exp_services.get_exp_user_data_model_with_draft_discarded(
+                self.EXP_ID1,
+                self.USER_ID
+            )
+        )
+        assert user_data_model is not None
+        user_data_model.update_timestamps()
+        user_data_model.put()
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertIsNone(exp_user_data.draft_change_list)
@@ -7884,28 +7965,29 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
+        choices_subtitled_html_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>state customization arg html 1</p>'
+            },
+            {
+                'content_id': 'ca_choices_1',
+                'html': '<p>state customization arg html 2</p>'
+            },
+            {
+                'content_id': 'ca_choices_2',
+                'html': '<p>state customization arg html 3</p>'
+            },
+            {
+                'content_id': 'ca_choices_3',
+                'html': '<p>state customization arg html 4</p>'
+            }
+        ]
         state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], int]]
+            str, Dict[str, Union[int, List[state_domain.SubtitledHtmlDict]]]
         ] = {
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>state customization arg html 1</p>'
-                    },
-                    {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>state customization arg html 2</p>'
-                    },
-                    {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>state customization arg html 3</p>'
-                    },
-                    {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>state customization arg html 4</p>'
-                    }
-                ]
+                'value': choices_subtitled_html_dicts
             },
             'maxAllowableSelectionCount': {
                 'value': 1
@@ -7995,7 +8077,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 52,
+            'from_version': 53,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
@@ -8262,7 +8344,8 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
                                 'unicode_str': ''
                             }
                         },
-                        'rows': {'value': 1}
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False}
                     }
                 })
             ], 'Edited interaction'
@@ -8590,6 +8673,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         feedback:
@@ -8941,6 +9026,8 @@ states:
             unicode_str: ''
         rows:
           value: 1
+        catchMisspellings:
+          value: false
       default_outcome:
         dest: Introduction
         feedback:

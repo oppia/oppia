@@ -23,11 +23,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { HttpClient } from '@angular/common/http';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostChangeDict } from 'domain/blog/blog-post-update.service';
+import { ImagesData } from 'services/image-local-storage.service';
 
-interface ImageData {
-  filename: string;
-  imageBlob: Blob;
-}
 
 interface BlogPostUpdateBackendDict {
   'blog_post': BlogPostBackendDict;
@@ -43,7 +40,7 @@ interface DeleteBlogPostBackendResponse {
 
 interface BlogPostEditorBackendResponse {
   'blog_post_dict': BlogPostBackendDict;
-  'username': string;
+  'displayed_author_name': string;
   'profile_picture_data_url': string;
   'max_no_of_tags': number;
   'list_of_default_tags': string[];
@@ -51,7 +48,7 @@ interface BlogPostEditorBackendResponse {
 
 export interface BlogPostEditorData {
   blogPostDict: BlogPostData;
-  username: string;
+  displayedAuthorName: string;
   profilePictureDataUrl: string;
   maxNumOfTags: number;
   listOfDefaulTags: string[];
@@ -77,7 +74,7 @@ export class BlogPostEditorBackendApiService {
         blogPostDataUrl).toPromise().then(
         (response) => {
           resolve({
-            username: response.username,
+            displayedAuthorName: response.displayed_author_name,
             blogPostDict: BlogPostData.createFromBackendDict(
               response.blog_post_dict),
             maxNumOfTags: response.max_no_of_tags,
@@ -135,7 +132,7 @@ export class BlogPostEditorBackendApiService {
   }
 
   async postThumbnailDataAsync(
-      blogPostId: string, imagesData: ImageData[]): Promise<void> {
+      blogPostId: string, imagesData: ImagesData[]): Promise<void> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
         BlogDashboardPageConstants.BLOG_EDITOR_DATA_URL_TEMPLATE, {
@@ -145,7 +142,10 @@ export class BlogPostEditorBackendApiService {
       let payload = {
         thumbnail_filename: imagesData[0].filename,
       };
-      body.append('image', imagesData[0].imageBlob);
+      let imageBlob = imagesData[0].imageBlob;
+      if (imageBlob) {
+        body.append('image', imageBlob);
+      }
       body.append('payload', JSON.stringify(payload));
       this.http.post(blogPostDataUrl, body).toPromise().then(
         () => {

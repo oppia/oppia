@@ -42,10 +42,12 @@ from typing import (
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import email_models
+    from mypy_imports import secrets_services
     from mypy_imports import suggestion_models
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.Names.EMAIL, models.Names.SUGGESTION])
+secrets_services = models.Registry.import_secrets_services()
 
 
 class FailedMLTest(test_utils.EmailTestBase):
@@ -623,11 +625,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that no email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -650,11 +658,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
                 # No user-facing error should surface.
                 self.post_json(
-                    feconf.SIGNUP_DATA_URL, {
+                    feconf.SIGNUP_DATA_URL,
+                    {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }, csrf_token=csrf_token)
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'can_receive_email_updates': (
+                            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                        )
+                    },
+                    csrf_token=csrf_token
+                )
 
                 # However, an error should be recorded in the logs.
                 self.assertEqual(log_new_error_counter.times_called, 1)
@@ -699,11 +713,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
                 # No user-facing error should surface.
                 self.post_json(
-                    feconf.SIGNUP_DATA_URL, {
+                    feconf.SIGNUP_DATA_URL,
+                    {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }, csrf_token=csrf_token)
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'can_receive_email_updates': (
+                            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                        )
+                    },
+                    csrf_token=csrf_token
+                )
 
                 # However, an error should be recorded in the logs.
                 self.assertEqual(log_new_error_counter.times_called, 1)
@@ -740,11 +760,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
                 # No user-facing error should surface.
                 self.post_json(
-                    feconf.SIGNUP_DATA_URL, {
+                    feconf.SIGNUP_DATA_URL,
+                    {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }, csrf_token=csrf_token)
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'can_receive_email_updates': (
+                            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                        )
+                    },
+                    csrf_token=csrf_token
+                )
 
                 # However, an error should be recorded in the logs.
                 self.assertEqual(log_new_error_counter.times_called, 1)
@@ -773,11 +799,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that an email was sent with the correct content.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -807,11 +839,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that an email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -819,11 +857,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
             # Send a second POST request.
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that no new email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -847,9 +891,14 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 {
                     'agreed_to_terms': True,
                     'username': 'BadUsername!!!',
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
                 },
-                csrf_token=csrf_token, expected_status_int=400)
+                csrf_token=csrf_token,
+                expected_status_int=400
+            )
 
             # Check that no email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -857,11 +906,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
             # Redo the signup process with a good username.
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that a new email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -892,8 +947,13 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that a new email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -6490,3 +6550,80 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
                 'Thanks!',
                 messages[0].html
             )
+
+
+class MailchimpSecretTest(test_utils.GenericTestBase):
+    """Tests for the verify_mailchimp_secret."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.swap_webhook_feconf_return_secret = self.swap(
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', 'secret')
+        self.swap_webhook_feconf_return_none = self.swap(
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', None)
+        self.swap_webhook_secrets_return_none = self.swap_to_always_return(
+            secrets_services, 'get_secret', None)
+        self.swap_webhook_secrets_return_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: 'secret',
+            expected_args=[
+                ('MAILCHIMP_WEBHOOK_SECRET',),
+                ('MAILCHIMP_WEBHOOK_SECRET',),
+            ]
+        )
+
+    def test_cloud_secrets_return_none_feconf_return_secret_passes(
+        self
+    ) -> None:
+        with self.swap_webhook_feconf_return_secret:
+            with self.swap_webhook_secrets_return_none:
+                self.assertTrue(email_manager.verify_mailchimp_secret('secret'))
+                self.assertFalse(
+                    email_manager.verify_mailchimp_secret('not-secret'))
+
+    def test_cloud_secrets_return_none_feconf_return_secret_logs_exception(
+        self
+    ) -> None:
+        with self.swap_webhook_feconf_return_secret:
+            with self.swap_webhook_secrets_return_none:
+                with self.capture_logging(min_level=logging.WARNING) as logs:
+                    self.assertTrue(
+                        email_manager.verify_mailchimp_secret('secret'))
+                    self.assertEqual(
+                        [
+                            'Cloud Secret Manager is not able to get '
+                            'MAILCHIMP_WEBHOOK_SECRET.',
+                        ],
+                        logs
+                    )
+
+    def test_cloud_secrets_return_secret_passes(self) -> None:
+        with self.swap_webhook_secrets_return_secret:
+            self.assertTrue(
+                email_manager.verify_mailchimp_secret('secret'))
+            self.assertFalse(
+                email_manager.verify_mailchimp_secret('not-secret'))
+
+    def test_cloud_secrets_return_none_feconf_return_none_passes(self) -> None:
+        with self.swap_webhook_feconf_return_none:
+            with self.swap_webhook_secrets_return_none:
+                self.assertFalse(
+                    email_manager.verify_mailchimp_secret('secret'))
+
+    def test_cloud_secrets_return_none_feconf_return_none_logs_exception(
+        self
+    ) -> None:
+        with self.swap_webhook_feconf_return_none:
+            with self.swap_webhook_secrets_return_none:
+                with self.capture_logging(min_level=logging.WARNING) as logs:
+                    self.assertFalse(
+                        email_manager.verify_mailchimp_secret('secret'))
+                    self.assertEqual(
+                        [
+                            'Cloud Secret Manager is not able to get '
+                            'MAILCHIMP_WEBHOOK_SECRET.',
+                            'Mailchimp webhook secret is not available.'
+                        ],
+                        logs
+                    )

@@ -28,7 +28,7 @@ require(
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 require('domain/story/story-update.service.ts');
-require('domain/exploration/exploration-id-validation.service.ts');
+require('domain/exploration/curated-exploration-validation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 require(
@@ -67,16 +67,16 @@ angular.module('oppia').directive('storyNodeEditor', [
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$timeout',
-        'AlertsService',
-        'ExplorationIdValidationService', 'FocusManagerService', 'NgbModal',
+        'AlertsService', 'CuratedExplorationValidationService',
+        'FocusManagerService', 'NgbModal',
         'PageTitleService', 'SkillBackendApiService',
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         'MAX_CHARS_IN_EXPLORATION_TITLE', function(
             $rootScope, $scope, $timeout,
-            AlertsService,
-            ExplorationIdValidationService, FocusManagerService, NgbModal,
+            AlertsService, CuratedExplorationValidationService,
+            FocusManagerService, NgbModal,
             PageTitleService, SkillBackendApiService,
             StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,
@@ -252,7 +252,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                   5000);
                 return;
               }
-              ExplorationIdValidationService.isExpPublishedAsync(
+              CuratedExplorationValidationService.isExpPublishedAsync(
                 explorationId).then(function(expIdIsValid) {
                 $scope.expIdIsValid = expIdIsValid;
                 if ($scope.expIdIsValid) {

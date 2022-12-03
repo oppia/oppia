@@ -1135,7 +1135,7 @@ class ExplorationVersionsDiff:
             It doesn't include the name changes of added/deleted states.
     """
 
-    def __init__(self, change_list: List[ExplorationChange]) -> None:
+    def __init__(self, change_list: Sequence[ExplorationChange]) -> None:
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
@@ -1658,7 +1658,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict,
-                tagged_skill_misconception_id_required=False)
+                tagged_skill_misconception_id_required=False,
+                strict=strict)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in
@@ -2030,12 +2031,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     all_outcomes = curr_state.interaction.get_all_outcomes()
                     for outcome in all_outcomes:
                         dest_state = outcome.dest
+                        dest_if_stuck_state = outcome.dest_if_really_stuck
                         if (
                             dest_state is not None and
                             dest_state not in curr_queue and
                             dest_state not in processed_queue
                         ):
                             curr_queue.append(dest_state)
+                        if (
+                            dest_if_stuck_state is not None and
+                            dest_if_stuck_state not in curr_queue and
+                            dest_if_stuck_state not in processed_queue
+                        ):
+                            curr_queue.append(dest_if_stuck_state)
 
         if len(self.states) != len(processed_queue):
             unseen_states = list(
@@ -2079,9 +2087,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
                 set(self.states.keys()) - set(processed_queue))
+            sorted_dead_end_states = sorted(dead_end_states)
             raise utils.ValidationError(
                 'It is impossible to complete the exploration from the '
-                'following states: %s' % ', '.join(dead_end_states))
+                'following states: %s' % ', '.join(sorted_dead_end_states)
+            )
 
     def get_content_html(self, state_name: str, content_id: str) -> str:
         """Return the content for a given content id of a state.
@@ -2650,8 +2660,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 continue
 
             solution = state_dict['interaction']['solution']
-            choices = state_dict['interaction']['customization_args'][
-                'choices']['value']
+            # Here we use cast because we are narrowing down the type from
+            # various customization args value types to List[SubtitledHtmlDict]
+            # type, and this is done because here we are accessing 'choices' key
+            # over 'DragAndDropSortInput' and 'ItemSelectionInput' customization
+            # args and in these customization args 'choices' key will only have
+            # values of type List[SubtitledHtmlDict].
+            choices = cast(
+                List[state_domain.SubtitledHtmlDict],
+                state_dict['interaction']['customization_args']['choices'][
+                    'value'
+                ]
+            )
             if interaction_id == 'ItemSelectionInput':
                 # The solution type will be migrated from SetOfHtmlString to
                 # SetOfTranslatableHtmlContentIds.
@@ -3213,6 +3233,35 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v53_dict_to_v54_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from version 53 to 54. Version 54 adds
+        catchMisspellings customization arg to TextInput
+        interaction which allows creators to detect misspellings.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'TextInput':
+                customization_args = state_dict['interaction'][
+                    'customization_args']
+                customization_args.update({
+                    'catchMisspellings': {
+                        'value': False
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
     def _fix_labelled_as_correct_value_in_state_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
@@ -3337,7 +3386,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if state_dict['interaction']['solution'] is not None:
             solution = state_dict['interaction']['solution']['correct_answer']
             if isinstance(solution, list) and any(
-                invalid_choice['html'] in solution for invalid_choice in
+                invalid_choice['content_id'] in solution for invalid_choice in
                 choices_to_remove
             ):
                 state_dict['interaction']['solution'] = None
@@ -3592,10 +3641,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict: state_domain.StateDict. The state dictionary.
             language_code: str. The language code of the exploration.
         """
-        text_value = state_dict['interaction'][
-            'customization_args']['buttonText']['value']['unicode_str']
-        content_id = state_dict['interaction'][
-            'customization_args']['buttonText']['value']['content_id']
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to SubtitledUnicodeDict type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicodeDict type.
+        button_text_subtitled_unicode_dict = cast(
+            state_domain.SubtitledUnicodeDict,
+            state_dict['interaction']['customization_args']['buttonText'][
+                'value'
+            ]
+        )
+        text_value = button_text_subtitled_unicode_dict['unicode_str']
+        content_id = button_text_subtitled_unicode_dict['content_id']
         lang_code_to_unicode_str_dict = {
             'en': 'Continue',
             'es': 'Continuar',
@@ -3614,12 +3671,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
         }
         if len(text_value) > 20:
             if language_code in lang_code_to_unicode_str_dict:
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = (
-                        lang_code_to_unicode_str_dict[language_code])
+                button_text_subtitled_unicode_dict['unicode_str'] = (
+                    lang_code_to_unicode_str_dict[language_code]
+                )
             else:
-                state_dict['interaction']['customization_args'][
-                    'buttonText']['value']['unicode_str'] = 'Continue'
+                button_text_subtitled_unicode_dict['unicode_str'] = 'Continue'
 
             continue_button_translations = state_dict['written_translations'][
                 'translations_mapping'][content_id]
@@ -3640,9 +3696,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Args:
             state_dict: state_domain.StateDict. The state dictionary.
         """
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to List[str] type, and this is done
+        # because here we are accessing 'recommendedExplorationIds' key from
+        # EndExploration customization arg whose value is always of List[str]
+        # type.
+        recc_exp_ids = cast(
+            List[str],
+            state_dict['interaction']['customization_args'][
+                'recommendedExplorationIds'
+            ]['value']
+        )
         # Should be at most 3 recommended explorations.
-        recc_exp_ids = state_dict['interaction'][
-            'customization_args']['recommendedExplorationIds']['value']
         state_dict['interaction']['customization_args'][
             'recommendedExplorationIds']['value'] = recc_exp_ids[:3]
 
@@ -4021,10 +4086,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_name: str. The name of the state.
         """
         answer_groups = state_dict['interaction']['answer_groups']
-
-        choices: List[state_domain.SubtitledHtmlDict] = (
-            state_dict['interaction']['customization_args'][
-                'choices']['value']
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to List[SubtitledHtmlDict] type,
+        # and this is done because here we are accessing 'choices' key from
+        # MultipleChoiceInput customization arg whose value is always of
+        # List[SubtitledHtmlDict] type.
+        choices = (
+            cast(
+                List[state_domain.SubtitledHtmlDict],
+                state_dict['interaction']['customization_args']['choices'][
+                    'value'
+                ]
+            )
         )
         cls._choices_should_be_unique_and_non_empty(
             choices,
@@ -4060,17 +4133,40 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 to be fixed.
             state_name: str. The name of the state.
         """
-        min_value = (
-            state_dict['interaction']['customization_args']
-            ['minAllowableSelectionCount']['value']
-        )
-        max_value = (
-            state_dict['interaction']['customization_args']
-            ['maxAllowableSelectionCount']['value']
-        )
-        choices: List[state_domain.SubtitledHtmlDict] = (
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to int type, and this is done because
+        # here we are accessing 'minAllowableSelectionCount' key from
+        # ItemSelectionInput Customization arg whose value is always of int
+        # type.
+        min_value = cast(
+            int,
             state_dict['interaction']['customization_args'][
-                'choices']['value']
+                'minAllowableSelectionCount'
+            ]['value']
+        )
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to int type, and this is done because
+        # here we are accessing 'maxAllowableSelectionCount' key from
+        # ItemSelectionInput Customization arg whose value is always of int
+        # type.
+        max_value = cast(
+            int,
+            state_dict['interaction']['customization_args'][
+                'maxAllowableSelectionCount'
+            ]['value']
+        )
+        # Here we use cast because we are narrowing down the type from
+        # various customization args value types to List[SubtitledHtmlDict]
+        # type, and this is done because here we are accessing 'choices' key
+        # from ItemSelectionInput customization arg whose value is always of
+        # List[SubtitledHtmlDict] type.
+        choices = (
+            cast(
+                List[state_domain.SubtitledHtmlDict],
+                state_dict['interaction']['customization_args'][
+                    'choices'
+                ]['value']
+            )
         )
         answer_groups = state_dict['interaction']['answer_groups']
 
@@ -4129,11 +4225,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             answer_groups.remove(empty_ans_group)
 
         state_dict['interaction']['customization_args'][
-            'minAllowableSelectionCount']['value'] = min_value
+            'minAllowableSelectionCount'
+        ]['value'] = min_value
         state_dict['interaction']['customization_args'][
-            'maxAllowableSelectionCount']['value'] = max_value
+            'maxAllowableSelectionCount'
+        ]['value'] = max_value
         state_dict['interaction']['customization_args']['choices'][
-            'value'] = choices
+            'value'
+        ] = choices
         state_dict['interaction']['answer_groups'] = answer_groups
 
     @classmethod
@@ -4230,9 +4329,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
         invalid_rules = []
         ele_x_at_y_rules: List[Dict[str, Union[str, int]]] = []
         off_by_one_rules: List[List[List[str]]] = []
-        choices_drag_drop: List[state_domain.SubtitledHtmlDict] = (
-            state_dict['interaction']['customization_args'][
-                'choices']['value']
+        # Here we use cast because we are narrowing down the type from
+        # various customization args value types to List[SubtitledHtmlDict]
+        # type, and this is done because here we are accessing 'choices' key
+        # from DragAndDropInput customization arg whose value is always of
+        # List[SubtitledHtmlDict] type.
+        choices_drag_drop = (
+            cast(
+                List[state_domain.SubtitledHtmlDict],
+                state_dict['interaction']['customization_args'][
+                    'choices'
+                ]['value']
+            )
         )
 
         if state_dict['interaction']['solution'] is not None:
@@ -4351,6 +4459,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             ele_position = ele_x_at_y_rule['position']
                             ele_element = ele_x_at_y_rule['element']
                             assert isinstance(ele_position, int)
+                            if ele_position > len(rule_spec_val_x):
+                                continue
                             rule_choice = rule_spec_val_x[ele_position - 1]
 
                             if len(rule_choice) == 0:
@@ -4432,11 +4542,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         cls._remove_duplicate_rules_inside_answer_groups(
             answer_groups, state_name)
-        # Text input height shoule be >= 1 and <= 10.
-        rows_value = int(
-            state_dict['interaction']['customization_args'][
-                'rows']['value']
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to int type, and this is done because
+        # here we are accessing 'rows' key from TextInput customization arg
+        # whose value is always of int type.
+        rows_value = cast(
+            int,
+            state_dict['interaction']['customization_args']['rows']['value']
         )
+        # Text input height shoule be >= 1 and <= 10.
         if rows_value < 1:
             state_dict['interaction']['customization_args'][
                 'rows']['value'] = 1
@@ -4887,7 +5001,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         html = cls._fix_rte_tags(
             html, is_tags_nested_inside_tabs_or_collapsible=False)
         html = cls._fix_tabs_and_collapsible_tags(html)
-        return html
+        return html.replace('\xa0', '&nbsp;')
 
     @classmethod
     def _update_state_rte(
@@ -5010,7 +5124,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 58
+    CURRENT_EXP_SCHEMA_VERSION = 59
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5309,6 +5423,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v58_dict_to_v59_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v58 exploration dict into a v59 exploration dict.
+        Version 59 adds a new customization arg to TextInput allowing
+        creators to catch misspellings.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v58.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v59.
+        """
+        exploration_dict['schema_version'] = 59
+        exploration_dict['states'] = cls._convert_states_v53_dict_to_v54_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 54
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -5409,6 +5546,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v57_dict_to_v58_dict(
                 exploration_dict)
             exploration_schema_version = 58
+
+        if exploration_schema_version == 58:
+            exploration_dict = cls._convert_v58_dict_to_v59_dict(
+                exploration_dict)
+            exploration_schema_version = 59
 
         return exploration_dict
 
