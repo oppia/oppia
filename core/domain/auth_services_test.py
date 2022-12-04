@@ -256,9 +256,9 @@ class AuthServicesTests(test_utils.GenericTestBase):
         # Should not raise.
         auth_services.delete_external_auth_associations('does_not_exist')
 
+
 class FirebaseAdminSdkStub:
     """Helper class for swapping the Firebase Admin SDK with a stateful stub."""
-
 
     _IMPLEMENTED_SDK_FUNCTION_NAMES = [
         'create_session_cookie',
@@ -581,9 +581,9 @@ class FirebaseAdminSdkStub:
             'customAttributes': custom_claims,
         })
 
+
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     """Test base for Firebase-specific tests with helpful default behavior."""
-
 
     AUTH_ID = 'aid'
     EMAIL = 'foo@bar.com'
@@ -659,8 +659,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
                 value=session_cookie)
         return res
 
-class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
+class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
     def setUp(self) -> None:
         super().setUp()
