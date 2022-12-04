@@ -270,6 +270,11 @@ class FirebaseAdminSdkStub:
     ]
 
     _UNIMPLEMENTED_SDK_FUNCTION_NAMES = [
+        'create_custom_token',
+        'generate_email_verification_link',
+        'generate_password_reset_link',
+        'generate_sign_in_with_email_link',
+        'get_user_by_phone_number',
     ]
 
     def __init__(self) -> None:
