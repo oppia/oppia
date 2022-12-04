@@ -20,12 +20,10 @@ from __future__ import annotations
 
 import contextlib
 import datetime
-import itertools
 import json
 import logging
-from unittest import mock
 
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
@@ -35,8 +33,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from firebase_admin import auth as firebase_auth
-from firebase_admin import exceptions as firebase_exceptions
-from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast
+from typing import Dict, List, Optional, Tuple, Union, cast
 import webapp2
 
 MYPY = False
@@ -261,6 +258,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
 class FirebaseAdminSdkStub:
     """Helper class for swapping the Firebase Admin SDK with a stateful stub."""
+
 
     _IMPLEMENTED_SDK_FUNCTION_NAMES = [
         'create_session_cookie',
@@ -586,6 +584,7 @@ class FirebaseAdminSdkStub:
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     """Test base for Firebase-specific tests with helpful default behavior."""
 
+
     AUTH_ID = 'aid'
     EMAIL = 'foo@bar.com'
 
@@ -662,6 +661,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
 class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 
+
     def setUp(self) -> None:
         super().setUp()
         self.id_token = (
@@ -687,5 +687,3 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.assert_is_super_admin('aid')
         auth_services.revoke_super_admin_privileges('uid')
         self.firebase_sdk_stub.assert_is_not_super_admin('aid')
-
-
