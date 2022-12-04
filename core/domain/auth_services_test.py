@@ -258,8 +258,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
 
 class FirebaseAdminSdkStub:
-    """
-    Helper class for swapping the Firebase Admin SDK with a stateful stub
+    """Helper class for swapping the Firebase Admin SDK with a stateful stub
     (Extend from firebase_auth_services_test).
     """
 
