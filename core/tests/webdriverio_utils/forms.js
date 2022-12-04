@@ -20,8 +20,6 @@
 // Note: Instantiating some of the editors, e.g. RichTextEditor, occurs
 // asynchronously and so must be prefixed by "await".
 
-const { decomment } = require('decomment');
-
 var richTextComponents = require(
   '../../../extensions/rich_text_components/webdriverio.js');
 var objects = require('../../../extensions/objects/webdriverio.js');
@@ -555,10 +553,9 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     ).toBe(tagName);
     // Remove comments introduced by angular for bindings using replace.
     let res = await arrayOfElems[arrayPointer].getHTML(false);
-    // While (res.includes('<!--')) {
-    //   res = res.replace(/<!--[^>]*-*-*>*/gm, '');
-    // }
-    res = decomment(res);
+    while (res.includes('<!--')) {
+      res = res.replace(/<!--[^>]*-*-*>*/gm, '');
+    }
     expect(res).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
