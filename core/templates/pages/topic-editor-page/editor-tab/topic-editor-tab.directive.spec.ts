@@ -27,6 +27,7 @@ import { StoryReference } from 'domain/topic/story-reference-object.model';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 // ^^^ This block is to be removed.
 
 describe('Topic editor tab directive', function() {
@@ -45,7 +46,6 @@ describe('Topic editor tab directive', function() {
   var story2 = null;
   var directive = null;
   var TopicEditorStateService = null;
-  var TopicObjectFactory = null;
   var SkillCreationService = null;
   var EntityCreationService = null;
   var TopicUpdateService = null;
@@ -86,7 +86,6 @@ describe('Topic editor tab directive', function() {
     directive = $injector.get('topicEditorTabDirective')[0];
     ngbModal = $injector.get('NgbModal');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
     var MockContextSerivce = {
       getEntityType: () => 'topic',
       getEntityId: () => 'dkfn32sxssasd'
@@ -136,7 +135,11 @@ describe('Topic editor tab directive', function() {
       QuestionBackendApiService: QuestionBackendApiService
     });
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    topic = TopicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      'id', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+    );
     skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
     subtopic._skillSummaries = [skillSummary];

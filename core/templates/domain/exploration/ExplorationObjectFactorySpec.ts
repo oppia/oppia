@@ -84,7 +84,10 @@ describe('Exploration object factory', () => {
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         default_outcome: {
           dest: 'new state',
@@ -167,6 +170,7 @@ describe('Exploration object factory', () => {
       title: 'My Title',
       init_state_name: 'Introduction',
       language_code: 'en',
+      auto_tts_enabled: false,
       states: {
         'first state': firstState,
         'second state': secondState},
@@ -176,7 +180,23 @@ describe('Exploration object factory', () => {
       is_version_of_draft_valid: true,
       version: 1,
       draft_change_list_id: 0,
-      correctness_feedback_enabled: false
+      correctness_feedback_enabled: false,
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      }
     };
 
     exploration = eof.createFromBackendDict(explorationDict);
@@ -269,6 +289,9 @@ describe('Exploration object factory', () => {
         },
         rows: {
           value: 1
+        },
+        catchMisspellings: {
+          value: false
         }
       });
     expect(exploration.getInteractionCustomizationArgs('second state'))

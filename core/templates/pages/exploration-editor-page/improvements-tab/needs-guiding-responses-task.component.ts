@@ -28,12 +28,14 @@ import { RouterService } from '../services/router.service';
   templateUrl: './needs-guiding-responses-task.component.html'
 })
 export class NeedsGuidingResponsesTaskComponent implements OnInit {
-   @Input() stats: SupportingStateStats;
-   @Input() task: NeedsGuidingResponsesTask;
-
-   sortedTilesData: AnswerStats[];
-   sortedTilesTotalFrequency: number;
-   sortedTilesOptions: {
+   // These properties below are initialized using Angular lifecycle hooks
+   // where we need to do non-null assertion. For more information see
+   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+   @Input() stats!: SupportingStateStats;
+   @Input() task!: NeedsGuidingResponsesTask;
+   sortedTilesData!: AnswerStats[];
+   sortedTilesTotalFrequency!: number;
+   sortedTilesOptions!: {
      header: string;
      use_percentages: boolean;
    };

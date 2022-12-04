@@ -32,7 +32,7 @@ describe('Topic Editor Routing Service', () => {
         href: '',
         hash: '/'
       },
-      open: (url) => {}
+      open: (url: string) => {}
     };
   }
 

@@ -558,14 +558,40 @@ def get_exploration_user_data(
     )
 
 
+@overload
+def get_logged_out_user_progress(
+    unique_progress_url_id: str, *, strict: Literal[True]
+) -> exp_domain.TransientCheckpointUrl: ...
+
+
+@overload
 def get_logged_out_user_progress(
     unique_progress_url_id: str
+) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+
+
+@overload
+def get_logged_out_user_progress(
+    unique_progress_url_id: str, *, strict: Literal[False]
+) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+
+
+@overload
+def get_logged_out_user_progress(
+    unique_progress_url_id: str, *, strict: bool
+) -> Optional[exp_domain.TransientCheckpointUrl]: ...
+
+
+def get_logged_out_user_progress(
+    unique_progress_url_id: str, strict: bool = False
 ) -> Optional[exp_domain.TransientCheckpointUrl]:
     """Returns an TransientCheckpointUrl domain object.
 
     Args:
         unique_progress_url_id: str. The 6 digit long unique id
             assigned to the progress made by a logged-out user.
+        strict: bool. Whether to fail noisily if no TransientCheckpointUrlModel
+            with the given unique_progress_url_id exists in the datastore.
 
     Returns:
         TransientCheckpointUrl or None. The domain object corresponding to the
@@ -574,7 +600,7 @@ def get_logged_out_user_progress(
     """
     logged_out_user_progress_model = (
         exp_models.TransientCheckpointUrlModel.get(
-        unique_progress_url_id, strict=False))
+        unique_progress_url_id, strict=strict))
 
     if logged_out_user_progress_model is None:
         return None

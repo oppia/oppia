@@ -60,7 +60,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # Run Javascript and Python linters.
     print('Linting files since the last commit')
-    pre_commit_linter.main(args=[])  # type: ignore[no-untyped-call]
+    pre_commit_linter.main(args=[])
     print('Linting passed.')
     print('')
 
@@ -109,7 +109,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # Run backend tests.
     print('Running backend tests')
-    run_backend_tests.main(args=[])  # type: ignore[no-untyped-call]
+    run_backend_tests.main(args=[])
     print('Backend tests passed.')
 
 
