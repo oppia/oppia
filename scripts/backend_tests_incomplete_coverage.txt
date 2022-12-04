@@ -52,7 +52,6 @@ core.domain.learner_group_services_test
 core.domain.learner_playlist_services_test
 core.domain.learner_progress_services_test
 core.domain.opportunity_services_test
-core.domain.param_domain_test
 core.domain.platform_parameter_domain_test
 core.domain.platform_parameter_registry_test
 core.domain.playthrough_issue_registry_test
