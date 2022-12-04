@@ -1162,8 +1162,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                         'type': 'subscribe'
                     }, use_payload=False, expected_status_int=404)
                 self.assertIn(
-                    'Invalid Mailchimp webhook request received with secret: '
-                    'invalid_secret', captured_logs)
+                    'Received invalid Mailchimp webhook secret', captured_logs)
 
     def test_post(self) -> None:
         with self.swap_secret, self.swap_audience_id:
@@ -1209,7 +1208,7 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
 
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
-    GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
+    GENERIC_DATE: Final = datetime.datetime(2021, 5, 20)
     GENERIC_EPOCH: Final = utils.get_time_in_millisecs(GENERIC_DATE)
 
     def setUp(self) -> None:
