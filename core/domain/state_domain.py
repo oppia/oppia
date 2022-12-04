@@ -2290,7 +2290,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         for subtitled_html in subtitled_htmls:
             translatable_contents_collection.add_translatable_field(
                 subtitled_html.content_id,
-                translation_domain.ContentType.INTERACTION,
+                translation_domain.ContentType.CUSTOMIZATION_ARG,
                 translation_domain.TranslatableContentFormat.HTML,
                 subtitled_html.html,
                 kwargs['interaction_id'])
@@ -2299,7 +2299,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         for subtitled_unicode in subtitled_unicodes:
             translatable_contents_collection.add_translatable_field(
                 subtitled_unicode.content_id,
-                translation_domain.ContentType.INTERACTION,
+                translation_domain.ContentType.CUSTOMIZATION_ARG,
                 translation_domain.TranslatableContentFormat.UNICODE_STRING,
                 subtitled_unicode.unicode_str,
                 kwargs['interaction_id'])

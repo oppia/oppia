@@ -127,8 +127,7 @@ def add_new_translation(
 
 
 def compute_translation_related_change(
-    exploration_id: str,
-    exploration_version: int,
+    updated_exploration: exp_domain.Exploration,
     content_ids_corresponding_translations_to_remove: List[str],
     content_ids_corresponding_translations_to_mark_needs_update: List[str],
 ) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
@@ -136,8 +135,7 @@ def compute_translation_related_change(
     changes.
 
     Args:
-        exploration_id: str. The ID of the exploration.
-        exploration_version: int. The current version of exploration.
+        updated_exploration: Exploration. The updated exploration object.
         content_ids_corresponding_translations_to_remove: List[str]. The list of
             content Ids for translation removal.
         content_ids_corresponding_translations_to_mark_needs_update: List[str].
@@ -151,8 +149,8 @@ def compute_translation_related_change(
     old_translations = (
         translation_fetchers.get_all_entity_translations_for_entity(
             feconf.TranslatableEntityType.EXPLORATION,
-            exploration_id,
-            exploration_version
+            updated_exploration.id,
+            updated_exploration.version - 1
         ))
 
     # Create new_translation_models with updated id and entity version.
@@ -165,7 +163,7 @@ def compute_translation_related_change(
             content_ids_corresponding_translations_to_mark_needs_update)
 
         translation_counts[entity_translation.language_code] = (
-            entity_translation.get_translation_count())
+            updated_exploration.get_translation_count(entity_translation))
 
         new_translation_models.append(
             translation_models.EntityTranslationsModel.create_new(

@@ -2114,8 +2114,7 @@ def compute_models_to_put_when_saving_new_exp_version(
                 change.content_id)
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_change(
-            exploration_id,
-            updated_exploration.version - 1,
+            updated_exploration,
             list(content_ids_corresponding_translations_to_remove),
             list(content_ids_corresponding_translations_to_mark_needs_update),
         )

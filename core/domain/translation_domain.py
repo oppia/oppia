@@ -374,6 +374,29 @@ class BaseTranslatableObject:
 
         return content_id_to_translatable_content
 
+    def get_translation_count(
+        self, entity_translation: EntityTranslation
+    ) -> int:
+        """Returs the number of updated translations avialable.
+
+        Args:
+            entity_translation: EntityTranslation. The translation object
+                containing translations.
+
+        Returns:
+            int. The number of translatable contnet for which translations are
+            available in the given translation object.
+        """
+        count = 0
+        for content_id in self.get_all_contents_which_need_translations():
+            if not content_id in entity_translation.translations:
+                continue
+
+            if not entity_translation.translations[content_id].needs_update:
+                count += 1
+
+        return count
+
     def are_translations_displayable(
         self, entity_translation: EntityTranslation
     ) -> bool:
