@@ -173,13 +173,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.resultsLoaded = true;
     this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
       this.resultsLoaded);
-    this.siteAnalyticsService.registerPracticeSessionEndEvent(
-      this.urlService.getClassroomUrlFragmentFromUrl(),
-      this.urlService.getTopicUrlFragmentFromLearnerUrl(),
-      Object.keys(this.scorePerSkillMapping).toString(),
-      totalQuestions,
-      this.totalScore
-    );
   }
 
   getMasteryChangeForWrongAnswers(
@@ -571,6 +564,13 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
           }
 
           this.testIsPassed = this.hasUserPassedTest();
+          this.siteAnalyticsService.registerPracticeSessionEndEvent(
+            this.urlService.getClassroomUrlFragmentFromUrl(),
+            this.urlService.getTopicUrlFragmentFromLearnerUrl(),
+            Object.keys(this.scorePerSkillMapping).toString(),
+            Object.keys(questionStateData).length,
+            this.totalScore
+          );
         }
       });
 

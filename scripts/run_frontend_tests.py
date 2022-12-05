@@ -118,6 +118,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if not parsed_args.skip_install:
         install_third_party_libs.main()
 
+    common.setup_chrome_bin_env_variable()
+
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',
         '../karma_coverage_reports',

@@ -13,29 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for fixing the commit commands of a
- * problematic exploration.
+ * @fileoverview Controller for the donation page thanks for subscribing modal.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Component } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-@Injectable({
-  providedIn: 'root'
+
+@Component({
+  selector: 'thanks-for-subscribing-modal',
+  templateUrl: './thanks-for-subscribing-modal.component.html',
 })
-export class FixCommitCommandBackendApiService {
+export class ThanksForSubscribingModalComponent {
   constructor(
-    private http: HttpClient
+    private activeModal: NgbActiveModal
   ) {}
 
-  async fixCommitCommandsAsync(): Promise<string> {
-    return this.http.post('/fix_commit_commands/', {})
-      .toPromise()
-      .then(() => {
-        return 'Successfully fixed commit commands';
-      })
-      .catch(() => {
-        return 'Fixing commit commands failed';
-      });
+  dismiss(): void {
+    this.activeModal.dismiss();
   }
 }
