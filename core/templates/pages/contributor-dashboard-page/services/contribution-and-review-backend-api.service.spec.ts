@@ -324,7 +324,13 @@ describe('Contribution and review backend API service', () => {
     const failureHandler = jasmine.createSpy('failure');
     const url = '/contributorcertificate/user/translate_content?' +
       'from_date=2022-01-01&to_date=2022-01-02&language=hi';
-    const response = new Blob();
+    const response = {
+      from: '1 Nov 2022',
+      to: '1 Dec 2022',
+      contribution_hours: 1.0,
+      team_lead: 'Test User',
+      language: 'Hindi'
+    };
 
     carbas.downloadContributorCertificateAsync(
       'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02')

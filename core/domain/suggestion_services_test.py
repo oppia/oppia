@@ -17,8 +17,6 @@
 from __future__ import annotations
 
 import datetime
-import os
-import uuid
 
 from core import feconf
 from core import utils
@@ -46,7 +44,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Mapping, Tuple, Union
+from typing import Dict, Final, List, Mapping, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover

@@ -41,7 +41,7 @@ describe('Contributor Certificate Download Modal Component', () => {
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let contributionAndReviewService: ContributionAndReviewService;
   let alertsService: AlertsService;
-  const fileResponse: ContributorCertificateResponse = {
+  const certificateDataResponse: ContributorCertificateResponse = {
     from: '2 June 2022',
     to: '1 Dec 2022',
     team_lead: 'Test User',
@@ -93,7 +93,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     spyOn(
       contributionAndReviewService,
       'downloadContributorCertificateAsync')
-      .and.returnValue(Promise.resolve(fileResponse));
+      .and.returnValue(Promise.resolve(certificateDataResponse));
     spyOn(alertsService, 'addInfoMessage').and.stub();
 
     component.downloadCertificate();
@@ -111,7 +111,7 @@ describe('Contributor Certificate Download Modal Component', () => {
     spyOn(
       contributionAndReviewService,
       'downloadContributorCertificateAsync')
-      .and.returnValue(Promise.resolve(fileResponse));
+      .and.returnValue(Promise.resolve(certificateDataResponse));
     spyOn(alertsService, 'addInfoMessage').and.stub();
 
     component.downloadCertificate();
@@ -174,6 +174,25 @@ describe('Contributor Certificate Download Modal Component', () => {
     spyOn(activeModal, 'close');
     component.close();
     expect(activeModal.close).toHaveBeenCalled();
+  });
+
+  it('should throw error when canvas context is null', () => {
+    spyOn(document, 'createElement').and.callFake(
+      jasmine.createSpy('createElement').and.returnValue(
+        {
+          width: 0,
+          height: 0,
+          getContext: (txt) => {
+            return null;
+          },
+        }
+      )
+    );
+
+    expect(() => {
+      component.createCertificate(certificateDataResponse);
+      tick();
+    }).toThrowError();
   });
 
   afterEach(() => {

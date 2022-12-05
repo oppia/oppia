@@ -123,6 +123,10 @@ export class CertificateDownloadModalComponent {
     canvas.height = this.CERTIFICATE_HEIGHT;
     const ctx = canvas.getContext('2d');
 
+    if (ctx === null) {
+      throw new Error('Canvas context not found.');
+    }
+
     image.onload = () => {
       ctx.fillStyle = '#D0E1F0';
       ctx.fillRect(

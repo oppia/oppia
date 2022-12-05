@@ -1921,7 +1921,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             {
                 'from': from_date.strftime('%d %b %Y'),
                 'to': to_date.strftime('%d %b %Y'),
-                'contribution_hours': '0.5',
+                'contribution_hours': '0.01',
                 'team_lead': feconf.TRANSLATION_TEAM_LEAD,
                 'language': 'Hindi'
             }

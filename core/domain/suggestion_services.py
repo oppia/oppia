@@ -21,9 +21,7 @@ from __future__ import annotations
 import datetime
 import heapq
 import logging
-import os
 import re
-import uuid
 
 from core import feconf
 from core.constants import constants
@@ -3029,7 +3027,7 @@ def _generate_translation_contributor_certificate(
 
     Returns:
         Dict[str, Union[str, None]]. Data to generate translation submitter
-            certificate.
+        certificate.
 
     Raises:
         Exception. The language is invalid.
@@ -3114,7 +3112,7 @@ def _generate_question_contributor_certificate(
 
     Returns:
         Dict[str, Union[str, None]]. Data to generate question submitter
-            certificate.
+        certificate.
 
     Raises:
         Exception. The suggestion type given to generate the certificate is
