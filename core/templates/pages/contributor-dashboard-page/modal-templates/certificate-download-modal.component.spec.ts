@@ -182,7 +182,7 @@ describe('Contributor Certificate Download Modal Component', () => {
         {
           width: 0,
           height: 0,
-          getContext: (txt) => {
+          getContext: (txt: string) => {
             return null;
           },
         }
