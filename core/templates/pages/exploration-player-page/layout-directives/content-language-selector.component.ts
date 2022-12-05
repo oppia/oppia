@@ -53,7 +53,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private imagePreloaderService: ImagePreloaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef
-  ) {}
+  ) { }
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -61,6 +61,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
   selectedLanguageCode!: string;
   languageOptions!: ExplorationLanguageInfo[];
   currentGlobalLanguageCode!: string;
+  newLanguageCode!: string;
 
   ngOnInit(): void {
     const url = new URL(this.windowRef.nativeWindow.location.href);
@@ -70,15 +71,10 @@ export class ContentLanguageSelectorComponent implements OnInit {
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
     this.languageOptions = (
       this.contentTranslationLanguageService.getLanguageOptionsForDropdown());
+    this.newLanguageCode = url.searchParams.get('initialContentLanguageCode') || 
+      this.currentGlobalLanguageCode;
     for (let option of this.languageOptions) {
-      if (url.searchParams.get('initialContentLanguageCode') === option.value) {
-        this.contentTranslationLanguageService.setCurrentContentLanguageCode(
-          option.value);
-        this.selectedLanguageCode = (
-          this.contentTranslationLanguageService.getCurrentContentLanguageCode()
-        );
-        break;
-      } else if (option.value === this.currentGlobalLanguageCode) {
+      if (option.value === this.newLanguageCode) {
         this.contentTranslationLanguageService.setCurrentContentLanguageCode(
           option.value);
         this.selectedLanguageCode = (
@@ -123,4 +119,4 @@ export class ContentLanguageSelectorComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaContentLanguageSelector',
-  downgradeComponent({component: ContentLanguageSelectorComponent}));
+  downgradeComponent({ component: ContentLanguageSelectorComponent }));
