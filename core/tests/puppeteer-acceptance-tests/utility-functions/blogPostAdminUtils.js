@@ -1,3 +1,4 @@
+const { parseHTML } = require("jquery");
 const browser = require("./puppeteer_utils.js");
 const testConstants = require("./testConstants.js");
 
@@ -46,12 +47,29 @@ module.exports = class e2eBlogPostAdmin {
     // this.page = await this.browserInstance.browser.newPage();
   }
 
-  async deleteDraftBlogPostByTitle(draftBlogPostTitle) {
-    await (this.browserInstance).clickOn("button", blogEditOptions);
+  async deleteDraftBlogPost() {
     await (this.browserInstance).clickOn("span", "Delete", 100);
     await (this.browserInstance).clickOn("button", " Confirm ");
-    
-    console.log("Successfully tested deleting blog drafts");
+
+    console.log("draft blog post with given title deleted successfully!");
+  }
+
+  async deleteDraftBlogPostByTitle(draftBlogPostTitle) {
+    let draftBlogPostInfo = {
+      "draftBlogPostTitle": draftBlogPostTitle,
+      "deleteDraftBlogPost": this.deleteDraftBlogPost(),
+    }
+    await (this.page).evaluate(async(draftBlogPostInfo) => {
+      const allDraftBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
+      for(let i = 0; i < allDraftBlogPosts.length; i++) {
+        let draftBlogPostTitle = allDraftBlogPosts[i].getElementsByClassName('e2e-test-blog-post-title')[0].innerText;
+        if(draftBlogPostTitle === draftBlogPostInfo.draftBlogPostTitle) {
+          allDraftBlogPosts[i].getElementsByClassName('e2e-test-blog-post-edit-box')[0].click();
+          await draftBlogPostInfo.deleteDraftBlogPost;
+          return;
+        }
+      }
+    }, draftBlogPostInfo);
   }
 
   async createNewBlogPostByTitle(newBlogPostTitle) {
@@ -80,17 +98,35 @@ module.exports = class e2eBlogPostAdmin {
     await this.goto(blogDashboardUrl);
   }
 
+  async unpublishBlogPost() {
+    await (this.browserInstance).clickOn("span", "Unpublish", 100);
+    await (this.browserInstance).clickOn("button", " Confirm ", 100);
+
+    console.log("published blog post with given title unpublished successfully!");
+  }
+
   async unpublishBlogPostByTitle(publishedBlogPostTitle) {
     await (this.browserInstance).clickOn("div", " PUBLISHED ");
     await (this.page).waitForTimeout(500);
-    await (this.browserInstance).clickOn("button", blogEditOptions);
-    await (this.browserInstance).clickOn("span", "Unpublish", 100);
-    await (this.browserInstance).clickOn("button", " Confirm ", 100);
-    
-    console.log("Successfully unpublished a published blogs!");
+    let publishedBlogPostInfo = {
+      "publishedBlogPostTitle": publishedBlogPostTitle,
+      "unpublishBlogPost": this.unpublishBlogPost(),
+    }
+    await (this.page).evaluate(async(publishedBlogPostInfo) => {
+      const allPublishedBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
+      for(let i = 0; i < allPublishedBlogPosts.length; i++) {
+        let publishedBlogPostTitle = allPublishedBlogPosts[i].getElementsByClassName('e2e-test-blog-post-title')[0].innerText;
+        if(publishedBlogPostTitle === publishedBlogPostInfo.publishedBlogPostTitle) {
+          allPublishedBlogPosts[i].getElementsByClassName('e2e-test-blog-post-edit-box')[0].click();
+          await publishedBlogPostInfo.unpublishBlogPost;
+          return;
+        }
+      }
+    }, publishedBlogPostInfo);
   }
 
   async closeBrowser() {
+    await (this.page).waitForTimeout(1000);
     await (this.browserInstance).closeBrowser();
   }
 };
