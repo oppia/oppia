@@ -71,8 +71,8 @@ export class ContentLanguageSelectorComponent implements OnInit {
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
     this.languageOptions = (
       this.contentTranslationLanguageService.getLanguageOptionsForDropdown());
-    this.newLanguageCode = (url.searchParams.get('initialContentLanguageCode')
-      || this.currentGlobalLanguageCode);
+    this.newLanguageCode = url.searchParams.get('initialContentLanguageCode')
+      || this.currentGlobalLanguageCode;
     for (let option of this.languageOptions) {
       if (option.value === this.newLanguageCode) {
         this.contentTranslationLanguageService.setCurrentContentLanguageCode(
