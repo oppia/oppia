@@ -43,7 +43,6 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-import html2image
 from typing import (
     Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
     Sequence, Set, Tuple, Union, cast, overload
@@ -2971,8 +2970,8 @@ def generate_contributor_certificate(
     language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime
-) -> str:
-    """Generates a certificate for user contributions.
+) -> Dict[str, Union[str, None]]:
+    """Returns data to generate the certificate.
 
     Args:
         username: str. The username of the contributor.
@@ -2986,7 +2985,7 @@ def generate_contributor_certificate(
             contributions were created.
 
     Returns:
-        str. The path of the generated image of the certificate.
+        Dict[str, Union[str, None]]. Data to generate the certificate.
 
     Raises:
         Exception. The suggestion type is invalid.
@@ -2995,34 +2994,29 @@ def generate_contributor_certificate(
     user_id = user_services.get_user_id_from_username(username)
     if user_id is None:
         raise Exception('There is no user for the given username.')
-    date = datetime.datetime.now().strftime('%d %b %Y')
-    template = ''
+    data: Dict[str, Union[str, None]] = {}
 
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        template = _generate_translation_contributor_certificate(
-            language_code, from_date, to_date, username, user_id, date)
+        data = _generate_translation_contributor_certificate(
+            language_code, from_date, to_date, user_id)
 
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        template = _generate_question_contributor_certificate(
-            from_date, to_date, username, user_id, date)
+        data = _generate_question_contributor_certificate(
+            from_date, to_date, user_id)
 
     else:
         raise Exception('The suggestion type is invalid.')
 
-    image_path = _generate_contributor_certificate_image(template)
-
-    return image_path
+    return data
 
 
 def _generate_translation_contributor_certificate(
     language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime,
-    username: str,
-    user_id: str,
-    date: str
-) -> str:
-    """Generates a certificate for a user's translation contributions.
+    user_id: str
+) -> Dict[str, Union[str, None]]:
+    """Returns data to generate translation submitter certificate.
 
     Args:
         language_code: str|None. The language for which the contributions should
@@ -3031,13 +3025,11 @@ def _generate_translation_contributor_certificate(
             the contributions were created.
         to_date: datetime.datetime. The end of the date range for which
             the contributions were created.
-        username: str. The username of the contributor.
         user_id: str. The user ID of the contributor.
-        date: datetime.datetime. The current date that should be included in the
-            certificate.
 
     Returns:
-        str. The HTML template to generate the certificate.
+        Dict[str, Union[str, None]]. Data to generate translation submitter
+            certificate.
 
     Raises:
         Exception. The language is invalid.
@@ -3096,46 +3088,33 @@ def _generate_translation_contributor_certificate(
     if words_count == 0:
         raise Exception(
             'There are no contributions for the given time range.')
-    logo_path = os.getcwd() + (
-        '/assets/images/contributor_dashboard/oppia-logo.jpg')
 
-    certificate_template = feconf.TRANSLATION_SUBMITTER_CERTIFICATE.format(
-        logo_path,
-        username,
-        language_description,
-        language_description,
-        username,
-        str(hours_contributed),
-        from_date.strftime('%d %b %Y'),
-        to_date.strftime('%d %b %Y'),
-        signature,
-        date
-    )
-
-    return certificate_template
+    return {
+        'from': from_date.strftime('%d %b %Y'),
+        'to': to_date.strftime('%d %b %Y'),
+        'contribution_hours': str(hours_contributed),
+        'team_lead': signature,
+        'language': language_description
+    }
 
 
 def _generate_question_contributor_certificate(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
-    username: str,
-    user_id: str,
-    date: str
-) -> str:
-    """Generates a certificate for a user's question contributions.
+    user_id: str
+) -> Dict[str, Union[str, None]]:
+    """Returns data to generate question submitter certificate.
 
     Args:
         from_date: datetime.datetime. The start of the date range for which
             the contributions were created.
         to_date: datetime.datetime. The end of the date range for which
             the contributions were created.
-        username: str. The username of the contributor.
         user_id: str. The user ID of the contributor.
-        date: datetime.datetime. The current date that should be included in the
-            certificate.
 
     Returns:
-        str. The HTML template to generate the certificate.
+        Dict[str, Union[str, None]]. Data to generate question submitter
+            certificate.
 
     Raises:
         Exception. The suggestion type given to generate the certificate is
@@ -3175,50 +3154,11 @@ def _generate_question_contributor_certificate(
     if minutes_contributed == 0:
         raise Exception(
             'There are no contributions for the given time range.')
-    logo_path = os.getcwd() + (
-        '/assets/images/contributor_dashboard/oppia-logo.jpg')
 
-    certificate_template = feconf.QUESTION_SUBMITTER_CERTIFICATE.format(
-        logo_path,
-        username,
-        username,
-        str(hours_contributed),
-        from_date.strftime('%d %b %Y'),
-        to_date.strftime('%d %b %Y'),
-        signature,
-        date
-    )
-
-    return certificate_template
-
-
-def _generate_contributor_certificate_image(template: str) -> str:
-    """Generates an image from the html string.
-
-    Args:
-        template: str. The html template to create the image.
-
-    Returns:
-        str. The paths of the generated images.
-
-    Raises:
-        Exception. Image generation failed.
-    """
-    hti = html2image.Html2Image()
-    filename = str(uuid.uuid4()) + '.png'
-
-    # TODO(#16632): Certificate file should not be saved into the file
-    # system.
-    image_paths = hti.screenshot(
-        html_str=template, save_as=filename, size=(
-            constants.CONTRIBUTOR_CERTIFICATE_WIDTH,
-            constants.CONTRIBUTOR_CERTIFICATE_HEIGHT
-        ))
-    if len(image_paths) == 0:
-        raise Exception(
-            'Image generation failed.')
-    # Since there are corresponfing image paths we can confirm that
-    # image_paths is a list of strings.
-    assert isinstance(image_paths[0], str)
-
-    return image_paths[0]
+    return {
+        'from': from_date.strftime('%d %b %Y'),
+        'to': to_date.strftime('%d %b %Y'),
+        'team_lead': signature,
+        'contribution_hours': str(hours_contributed),
+        'language': None
+    }

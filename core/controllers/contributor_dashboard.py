@@ -1000,19 +1000,11 @@ class ContributorCertificateHandler(
             raise self.InvalidInputException(
                 'To date should not be a future date.')
 
-        file = suggestion_services.generate_contributor_certificate(
+        response = suggestion_services.generate_contributor_certificate(
             username, suggestion_type, language, from_datetime,
             to_datetime)
 
-        # TODO(#16632): Certificate file should not be saved into the file
-        # system.
-        with open(file, 'rb') as fh:
-            buf = io.BytesIO(fh.read())
-
-            # Removes the generated file.
-            os.remove(file)
-            self.render_downloadable_file(
-                buf, 'certificate.png', 'image/png')
+        self.render_json(response)
 
 
 class ContributorAllStatsSummariesHandler(

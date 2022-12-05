@@ -257,19 +257,21 @@ describe('Contribution and review service', () => {
       () => {
         downloadContributorCertificateAsyncSpy.and.returnValue(
           Promise.resolve({
-            size: 100,
-            type: 'image/png',
-            arrayBuffer: null,
-            stream: null,
-            slice: null,
-            text: null
+            from: '1 Nov 2022',
+            to: '1 Dec 2022',
+            contribution_hours: 1.0,
+            team_lead: 'Test User',
+            language: 'Hindi'
           }));
 
         cars.downloadContributorCertificateAsync(
           'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02')
           .then((response) => {
-            expect(response.type)
-              .toEqual('image/png');
+            expect(response.from).toEqual('1 Nov 2022');
+            expect(response.to).toEqual('1 Dec 2022');
+            expect(response.contribution_hours).toEqual(1.0);
+            expect(response.team_lead).toEqual('Test User');
+            expect(response.language).toEqual('Hindi');
           });
 
         expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();

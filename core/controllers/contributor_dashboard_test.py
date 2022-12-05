@@ -1908,18 +1908,24 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.OWNER_EMAIL)
 
-        response = self.get_custom_response(
+        response = self.get_json(
             '/contributorcertificate/%s/%s?language=%s&'
             'from_date=%s&to_date=%s' % (
                 self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'hi', from_date_str, to_date_str
-            ),
-            'image/png'
+            )
         )
 
         self.assertEqual(
-            response.headers['Content-Disposition'],
-            'attachment; filename=certificate.png')
+            response,
+            {
+                'from': from_date.strftime('%d %b %Y'),
+                'to': to_date.strftime('%d %b %Y'),
+                'contribution_hours': '0.5',
+                'team_lead': feconf.TRANSLATION_TEAM_LEAD,
+                'language': 'Hindi'
+            }
+        )
 
         self.logout()
 

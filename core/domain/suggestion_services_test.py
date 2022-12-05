@@ -46,7 +46,6 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-import html2image
 from typing import Dict, Final, List, Mapping, Tuple, Union
 
 MYPY = False
@@ -6045,8 +6044,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # Generated image file of the certificate is deleted.
-        os.remove(response)
 
     def test_create_translation_contributor_certificate_for_english(
         self
@@ -6081,8 +6078,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # Generated image file of the certificate is deleted.
-        os.remove(response)
 
     def test_create_question_contributor_certificate(self) -> None:
         suggestion_change: Dict[
@@ -6135,8 +6130,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # Generated image file of the certificate is deleted.
-        os.remove(response)
 
     def test_create_question_contributor_certificate_with_image_content(
         self
@@ -6192,8 +6185,6 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # Generated image file of the certificate is deleted.
-        os.remove(response)
 
     def test_create_contributor_certificate_raises_exception_for_no_suggestions(
         self
@@ -6289,40 +6280,3 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 from_date,
                 to_date
             )
-
-    def mock_screenshot(
-        self,
-        html_str: str,
-        save_as: str,
-        size: Tuple[str, str]
-    ) -> List[str]:
-        self.assertEqual(html_str, 'Template')
-        self.assertEqual(save_as, 'test_123.png')
-        self.assertEqual(
-            size,
-            (
-                constants.CONTRIBUTOR_CERTIFICATE_WIDTH,
-                constants.CONTRIBUTOR_CERTIFICATE_HEIGHT
-            )
-        )
-        return []
-
-    def test_generate_certificate_throws_exception(
-        self
-    ) -> None:
-        def mock_uuid() -> str:
-            return 'test_123'
-
-        with self.swap(uuid, 'uuid4', mock_uuid):
-            with self.swap(
-                html2image.Html2Image,
-                'screenshot',
-                self.mock_screenshot
-            ):
-                with self.assertRaisesRegex(
-                    Exception,
-                    'Image generation failed.'
-                ):
-                    suggestion_services._generate_contributor_certificate_image(  # pylint: disable=protected-access
-                        'Template'
-                    )

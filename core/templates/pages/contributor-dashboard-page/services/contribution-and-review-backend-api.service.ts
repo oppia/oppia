@@ -30,6 +30,14 @@ interface FetchSuggestionsResponse {
   next_offset: number;
 }
 
+export interface ContributorCertificateResponse {
+  'from': string;
+  'to': string;
+  'contribution_hours': number;
+  'team_lead': string;
+  'language': string | null;
+}
+
 interface ReviewExplorationSuggestionRequestBody {
   action: string;
   'review_message': string;
@@ -215,7 +223,7 @@ export class ContributionAndReviewBackendApiService {
       language: string | null,
       fromDate: string,
       toDate: string
-  ): Promise<Blob> {
+  ): Promise<ContributorCertificateResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.CONTRIBUTOR_CERTIFICATE_HANDLER_URL, {
         username: username,
@@ -227,11 +235,10 @@ export class ContributionAndReviewBackendApiService {
       to_date: toDate,
       ...(language && {language})
     };
-    return this.http.get<Blob>(
+    return this.http.get<ContributorCertificateResponse>(
       url,
       {
-        params,
-        responseType: 'blob' as 'json'
+        params
       }
     ).toPromise();
   }

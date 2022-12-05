@@ -27,6 +27,7 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 import { CertificateDownloadModalComponent } from './certificate-download-modal.component';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { AlertsService } from 'services/alerts.service';
+import { ContributorCertificateResponse } from '../services/contribution-and-review-backend-api.service';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -40,7 +41,13 @@ describe('Contributor Certificate Download Modal Component', () => {
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   let contributionAndReviewService: ContributionAndReviewService;
   let alertsService: AlertsService;
-  const fileResponse: Blob = new Blob(['Hello, world!'], {type: 'image/png'});
+  const fileResponse: ContributorCertificateResponse = {
+    from: '2 June 2022',
+    to: '1 Dec 2022',
+    team_lead: 'Test User',
+    contribution_hours: 1.0,
+    language: 'Hindi'
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -80,9 +87,27 @@ describe('Contributor Certificate Download Modal Component', () => {
     fixture.detectChanges();
   });
 
-  it('should download the certificate when available', () => {
+  it('should download translation submitter certificate when available', () => {
     component.fromDate = '2022/01/01';
     component.toDate = '2022/10/31';
+    spyOn(
+      contributionAndReviewService,
+      'downloadContributorCertificateAsync')
+      .and.returnValue(Promise.resolve(fileResponse));
+    spyOn(alertsService, 'addInfoMessage').and.stub();
+
+    component.downloadCertificate();
+
+    expect(component.errorsFound).toBeFalse();
+    expect(
+      contributionAndReviewService.downloadContributorCertificateAsync
+    ).toHaveBeenCalled();
+  });
+
+  it('should download question submitter certificate when available', () => {
+    component.fromDate = '2022/01/01';
+    component.toDate = '2022/10/31';
+    component.suggestionType = 'add_question';
     spyOn(
       contributionAndReviewService,
       'downloadContributorCertificateAsync')
