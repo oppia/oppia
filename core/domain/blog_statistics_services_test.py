@@ -1038,7 +1038,8 @@ class BlogPostEventHandlersTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'No blog post reading time model exists for the given blog_post_id.'
+            'No blog post reading time model exists for the given %s.' %
+            self.blog_post.id
         ):
             blog_statistics_services.save_blog_post_reading_time_model(
                 reading_time_domain_obj)

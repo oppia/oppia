@@ -295,7 +295,8 @@ def save_blog_post_reading_time_model(
     )
     if reading_time_model is None:
         raise Exception(
-            'No blog post reading time model exists for the given blog_post_id.'
+            'No blog post reading time model exists for the given %s.' %
+            reading_time_stats.blog_post_id
         )
 
     reading_time_model.zero_to_one_min = reading_time_stats.zero_to_one_min
