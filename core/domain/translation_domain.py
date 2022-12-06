@@ -414,9 +414,6 @@ class BaseTranslatableObject:
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContent.
         """
-        min_non_displayable_translation_count = (
-            feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS)
-
         content_id_to_translatable_content = (
             self.get_translatable_contents_collection()
             .content_id_to_translatable_content
@@ -431,16 +428,14 @@ class BaseTranslatableObject:
                 # Rule-related translations cannot be missing.
                 return False
 
-        translatable_content_count = len(
-            content_id_to_translatable_content.keys())
-        translated_content_count = entity_translation.get_translation_count()
+        translatable_content_count = self.get_content_count()
+        translated_content_count = self.get_translation_count(
+            entity_translation)
+
         translations_missing_count = (
             translatable_content_count - translated_content_count)
-        translation_needs_update_count = (
-            entity_translation.get_translation_needs_update_count())
-
-        return translations_missing_count + translation_needs_update_count < (
-            min_non_displayable_translation_count)
+        return translations_missing_count < (
+            feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS)
 
     def get_content_count(self) -> int:
         """Returns the total number of distinct content fields available in the
