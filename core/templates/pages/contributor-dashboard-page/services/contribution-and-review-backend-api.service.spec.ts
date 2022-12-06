@@ -73,8 +73,11 @@ describe('Contribution and review backend API service', () => {
 
       carbas.fetchSuggestionsAsync(
         'SUBMITTED_QUESTION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0, 'All'
+        {
+          limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          offset: 0,
+          explorationId: 'All'
+        }
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -96,8 +99,11 @@ describe('Contribution and review backend API service', () => {
 
       carbas.fetchSuggestionsAsync(
         'SUBMITTED_TRANSLATION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0, 'All'
+        {
+          limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          offset: 0,
+          explorationId: 'All'
+        }
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -120,8 +126,10 @@ describe('Contribution and review backend API service', () => {
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_QUESTION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0
+        {
+          limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          offset: 0
+        }
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -132,10 +140,51 @@ describe('Contribution and review backend API service', () => {
         .toHaveBeenCalledWith(
           'skill',
           'add_question',
-          AppConstants.OPPORTUNITIES_PAGE_SIZE, 0);
+          {
+            limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+            offset: 0,
+            sortKey: undefined
+          }
+        );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
+
+    it(
+      'should fetch reviewable question suggestions when a sort key is given',
+      fakeAsync(() => {
+        spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
+        const url = (
+          '/getreviewablesuggestions/skill/add_question' +
+          '?limit=10&offset=0&sort_key=Date');
+
+        carbas.fetchSuggestionsAsync(
+          'REVIEWABLE_QUESTION_SUGGESTIONS',
+          {
+            limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+            offset: 0,
+            sortKey: 'Date'
+          }
+        ).then(successHandler, failureHandler);
+        const req = http.expectOne(url);
+        expect(req.request.method).toEqual('GET');
+        req.flush(suggestionsBackendObject);
+        flushMicrotasks();
+
+        expect(carbas.fetchReviewableSuggestionsAsync)
+          .toHaveBeenCalledWith(
+            'skill',
+            'add_question',
+            {
+              limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+              offset: 0,
+              sortKey: 'Date'
+            }
+          );
+        expect(successHandler).toHaveBeenCalled();
+        expect(failureHandler).not.toHaveBeenCalled();
+      })
+    );
 
     it('should fetch reviewable suggestions from exp1', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
@@ -144,8 +193,11 @@ describe('Contribution and review backend API service', () => {
 
       carbas.fetchSuggestionsAsync(
         'REVIEWABLE_TRANSLATION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0, explorationId
+        {
+          limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          offset: 0,
+          explorationId: explorationId
+        }
       ).then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
@@ -155,7 +207,12 @@ describe('Contribution and review backend API service', () => {
       expect(carbas.fetchReviewableSuggestionsAsync)
         .toHaveBeenCalledWith(
           'exploration', 'translate_content',
-          AppConstants.OPPORTUNITIES_PAGE_SIZE, 0, explorationId);
+          {
+            limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+            offset: 0,
+            explorationId: explorationId
+          }
+        );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
@@ -163,8 +220,11 @@ describe('Contribution and review backend API service', () => {
     it('should throw error if fetch type is invalid', fakeAsync(() => {
       carbas.fetchSuggestionsAsync(
         'INVALID_SUGGESTION_TYPE',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0, 'All'
+        {
+          limit: AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          offset: 0,
+          explorationId: 'All'
+        }
       ).then(successHandler, failureHandler);
       flushMicrotasks();
 

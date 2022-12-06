@@ -111,6 +111,7 @@ export class ContributionsAndReview
   TAB_TYPE_CONTRIBUTIONS: string;
   TAB_TYPE_REVIEWS: string;
   TAB_TYPE_ACCOMPLISHMENTS: string;
+  QUESTIONS_SORT_KEYS: string[];
   activeExplorationId: string;
   contributions: Record<string, SuggestionDetails> | object;
   userDetailsLoading: boolean;
@@ -122,6 +123,7 @@ export class ContributionsAndReview
   reviewTabs: TabDetails[] = [];
   accomplishmentsTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
+  currentQuestionsSortKey: string;
   tabNameToOpportunityFetchFunction: {
     [key: string]: {
       [key: string]: Function;
@@ -337,6 +339,12 @@ export class ContributionsAndReview
       this.activeTabSubtype === this.SUGGESTION_TYPE_TRANSLATE);
   }
 
+  isReviewQuestionsTab(): boolean {
+    return (
+      this.activeTabType === this.TAB_TYPE_REVIEWS &&
+      this.activeTabSubtype === this.SUGGESTION_TYPE_QUESTION);
+  }
+
   openQuestionSuggestionModal(
       suggestionId: string,
       suggestion: Suggestion,
@@ -507,6 +515,12 @@ export class ContributionsAndReview
     return this.activeTabType === this.TAB_TYPE_ACCOMPLISHMENTS;
   }
 
+  setQuestionsSortKeys(sortKey: string): void {
+    this.currentQuestionsSortKey = sortKey;
+    this.contributionOpportunitiesService
+      .reloadOpportunitiesEventEmitter.emit();
+  }
+
   ngOnInit(): void {
     this.SUGGESTION_TYPE_QUESTION = 'add_question';
     this.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
@@ -515,6 +529,7 @@ export class ContributionsAndReview
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.TAB_TYPE_ACCOMPLISHMENTS = 'accomplishments';
+    this.QUESTIONS_SORT_KEYS = ['Default', 'Date'];
     this.activeExplorationId = null;
     this.contributions = {};
     this.userDetailsLoading = true;
@@ -629,7 +644,7 @@ export class ContributionsAndReview
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getReviewableQuestionSuggestionsAsync(
-              shouldResetOffset);
+              shouldResetOffset, this.currentQuestionsSortKey);
         }
       },
       [this.SUGGESTION_TYPE_TRANSLATE]: {

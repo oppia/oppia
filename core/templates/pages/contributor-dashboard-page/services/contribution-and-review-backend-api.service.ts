@@ -30,6 +30,13 @@ interface FetchSuggestionsResponse {
   next_offset: number;
 }
 
+interface FetchSuggestionsParams {
+  limit: number;
+  offset: number;
+  sortKey?: string;
+  explorationId?: string;
+}
+
 interface ReviewExplorationSuggestionRequestBody {
   action: string;
   'review_message': string;
@@ -87,9 +94,12 @@ export class ContributionAndReviewBackendApiService {
 
   async fetchSuggestionsAsync(
       fetchType: string,
-      limit: number,
-      offset: number,
-      explorationId?: string
+      {
+        limit,
+        offset,
+        sortKey,
+        explorationId
+      }: FetchSuggestionsParams
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -101,11 +111,15 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit, offset);
+        'skill',
+        'add_question',
+        {limit: limit, offset: offset, sortKey: sortKey});
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'exploration', 'translate_content', limit, offset, explorationId);
+        'exploration',
+        'translate_content',
+        {limit: limit, offset: offset, explorationId: explorationId});
     }
     throw new Error('Invalid fetch type');
   }
@@ -132,9 +146,12 @@ export class ContributionAndReviewBackendApiService {
   async fetchReviewableSuggestionsAsync(
       targetType: string,
       suggestionType: string,
-      limit: number,
-      offset: number,
-      explorationId?: string
+      {
+        limit,
+        offset,
+        sortKey,
+        explorationId
+      }: FetchSuggestionsParams
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -145,11 +162,15 @@ export class ContributionAndReviewBackendApiService {
     const params: {
       limit: string;
       offset: string;
+      sort_key?: string;
       exploration_id?: string;
     } = {
       limit: limit.toString(),
       offset: offset.toString(),
     };
+    if (sortKey !== undefined) {
+      params.sort_key = sortKey;
+    }
     if (explorationId !== undefined) {
       params.exploration_id = explorationId;
     }

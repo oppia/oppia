@@ -38,6 +38,7 @@ class SuggestionFetcher {
   // The current offset, i.e. the number of items to skip (from the beginning of
   // all matching results) in the next fetch.
   offset: number;
+  sortKey?: string;
   // Cache of suggestions.
   suggestionIdToDetails: SuggestionDetailsDict;
 
@@ -134,9 +135,12 @@ export class ContributionAndReviewService {
         // Fetch up to two pages at a time to compute if we have more results.
         // The first page of results is returned to the caller and the second
         // page is cached.
-        (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
-        fetcher.offset,
-        explorationId
+        {
+          limit: (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
+          offset: fetcher.offset,
+          sortKey: fetcher.sortKey,
+          explorationId: explorationId
+        }
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
@@ -176,8 +180,10 @@ export class ContributionAndReviewService {
   }
 
   async getReviewableQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true
+      shouldResetOffset: boolean = true,
+      sortKey: string
   ): Promise<FetchSuggestionsResponse> {
+    this.reviewableQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher,
       shouldResetOffset);
