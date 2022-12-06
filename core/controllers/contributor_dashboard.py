@@ -323,7 +323,7 @@ class ReviewableOpportunitiesHandler(
         ] = []
         if self.user_id:
             for opp in self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name, language if language else ''
+                self.user_id, topic_name, language
             ):
                 if opp is not None:
                     opportunity_dicts.append(opp.to_dict())
