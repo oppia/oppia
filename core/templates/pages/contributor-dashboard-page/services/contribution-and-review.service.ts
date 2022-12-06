@@ -181,7 +181,7 @@ export class ContributionAndReviewService {
 
   async getReviewableQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      sortKey: string
+      sortKey?: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
