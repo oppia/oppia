@@ -389,6 +389,67 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(translatable_object.get_content_count(), 4)
 
+    def test_get_translation_count(self) -> None:
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'My name is jack.',
+            'My name is jhon.',
+            'My name is Nikhil.',
+            'Content'
+        )
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'content_id_1 translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False),
+            'content_id_2': translation_domain.TranslatedContent(
+                'content_id_2 translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False),
+            'content_id_3': translation_domain.TranslatedContent(
+                'content_id_3 translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False),
+            'non_exsting_id': translation_domain.TranslatedContent(
+                'content_id_3 translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False),
+        }
+
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict
+        )
+
+        self.assertEqual(
+            translatable_object.get_translation_count(entity_translations),
+            3
+        )
+
+        translation_dict = {
+            'content_id_1': translation_domain.TranslatedContent(
+                'content_id_1 translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                False),
+            'content_id_2': translation_domain.TranslatedContent(
+                'content_id_2 translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+            'content_id_3': translation_domain.TranslatedContent(
+                'content_id_3 translation',
+                translation_domain.TranslatableContentFormat.HTML,
+                True),
+        }
+
+        entity_translations = translation_domain.EntityTranslation(
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
+            translation_dict
+        )
+
+        self.assertEqual(
+            translatable_object.get_translation_count(entity_translations),
+            1
+        )
+
     def test_get_all_html_content_strings(self) -> None:
         translatable_object = DummyTranslatableObjectWithFourParams(
             '<p>HTML content</p>', 'My name is jhon.', 'My name is Nikhil.', '')
