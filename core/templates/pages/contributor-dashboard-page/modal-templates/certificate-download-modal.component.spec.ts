@@ -42,8 +42,8 @@ describe('Contributor Certificate Download Modal Component', () => {
   let contributionAndReviewService: ContributionAndReviewService;
   let alertsService: AlertsService;
   const certificateDataResponse: ContributorCertificateResponse = {
-    from: '2 June 2022',
-    to: '1 Dec 2022',
+    from: '1 Jan 2022',
+    to: '31 Oct 2022',
     team_lead: 'Test User',
     contribution_hours: 1.0,
     language: 'Hindi'

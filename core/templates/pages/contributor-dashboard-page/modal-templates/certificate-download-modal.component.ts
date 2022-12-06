@@ -267,6 +267,8 @@ export class CertificateDownloadModalComponent {
       this.CERTIFICATE_MID_POINT,
       860
     );
+    // Increase y coordinate by 40.
+    linePosition += 100;
 
     return linePosition;
   }

@@ -987,10 +987,13 @@ class ContributorCertificateHandler(
         suggestion_type: str
     ) -> None:
         """Handles GET requests."""
+        language = None
         assert self.normalized_request is not None
-        language = self.normalized_request['language']
         from_date = self.normalized_request['from_date']
         to_date = self.normalized_request['to_date']
+
+        if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+            language = self.normalized_request['language']
 
         from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')
         to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
