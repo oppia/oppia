@@ -47,7 +47,6 @@ export class UnicodeStringEditorComponent implements
   componentSubscriptions = new Subscription();
   active: boolean = false;
   largeInput = false;
-  errorText: string = 'Enter the Error Message';
   constructor(private externalSaveService: ExternalSaveService) { }
 
   ngOnInit(): void {
@@ -78,10 +77,6 @@ export class UnicodeStringEditorComponent implements
   replaceValue(newValue: string): void {
     this.value = newValue;
     this.closeEditor();
-  }
-
-  getWarningText(): string {
-    return this.errorText;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

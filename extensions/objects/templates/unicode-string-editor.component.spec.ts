@@ -142,12 +142,6 @@ describe('UnicodeStringEditorComponent', () => {
     expect(component.active).toBe(false);
   });
 
-  it('should display text when user select contains error rule', () => {
-    let errorText = 'Enter the Error Message';
-
-    expect(component.getWarningText()).toBe(errorText);
-  });
-
   it('should replace old value when new value is entered' +
   ' in the input field', () => {
     component.active = true;
