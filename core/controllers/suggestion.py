@@ -95,7 +95,7 @@ SuggestionsProviderHandlerArgsSchemaDictType = Dict[
             Union[
                 Optional[
                     Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]],
-                bool
+                List[str]
             ]
         ]
     ]
@@ -681,7 +681,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
 
     limit: int
     offset: int
-    newest_first: bool
+    sort_key: Optional[str]
     exploration_id: Optional[str]
 
 
@@ -728,11 +728,12 @@ class ReviewableSuggestionsHandler(
                     }]
                 }
             },
-            'newest_first': {
+            'sort_key': {
                 'schema': {
-                    'type': 'bool'
+                    'type': 'basestring'
                 },
-                'default_value': False
+                'choices': feconf.QUESTIONS_SORT_KEYS,
+                'default_value': None
             },
             'exploration_id': {
                 'schema': {
@@ -757,8 +758,8 @@ class ReviewableSuggestionsHandler(
             target_type, suggestion_type)
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
-        newest_first = self.normalized_request['newest_first']
-        exploration_id = self.normalized_request['exploration_id']
+        sort_key = self.normalized_request.get('sort_key')
+        exploration_id = self.normalized_request.get('exploration_id')
         exp_ids = [exploration_id] if exploration_id else []
 
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
@@ -777,9 +778,9 @@ class ReviewableSuggestionsHandler(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestions, next_offset = (
-                suggestion_services.
-                get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, newest_first))
+                suggestion_services
+                .get_reviewable_question_suggestions_by_offset(
+                    self.user_id, limit, offset, sort_key))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 

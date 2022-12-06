@@ -608,7 +608,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_question_suggestions_by_offset(
-        cls, limit: int, offset: int, user_id: str, newest_first: bool = False
+        cls,
+        limit: int,
+        offset: int,
+        user_id: str,
+        sort_key: Optional[str] = None
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -620,8 +624,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query. As a
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
-            newest_first: bool. Whether to sort the suggestions with the newest
-                first.
+            sort_key: Optional[str]. The key to sort the suggestions.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -632,7 +635,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     returned by the current query.
         """
 
-        if newest_first:
+        if sort_key == 'Date':
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
@@ -646,10 +649,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
             while len(sorted_results) < limit:
                 suggestion_model: GeneralSuggestionModel = (
-                    suggestion_query.fetch(1, offset=offset))[0]
+                    suggestion_query.fetch(1, offset=offset))
+                if not suggestion_model:
+                    break
                 offset += 1
-                if suggestion_model.author_id != user_id:
-                    sorted_results.append(suggestion_model)
+                if suggestion_model[0].author_id != user_id:
+                    sorted_results.append(suggestion_model[0])
 
             return (
                 sorted_results,
