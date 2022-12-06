@@ -296,7 +296,7 @@ class ValidateEmailDashboardDataTests(test_utils.GenericTestBase):
             'have_fun': 6,
             'explore': True,
             }
-        with self.assertRaisesRegex(Exception,'400 Invalid input for query.'):
+        with self.assertRaisesRegex(Exception, '400 Invalid input for query.'):
             domain_objects_validator.validate_email_dashboard_data(data)
 
     def test_valid_email_do_not_raise_exception(self) -> None:
