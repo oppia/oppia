@@ -175,7 +175,7 @@ export class CertificateDownloadModalComponent {
       ctx.fillStyle = '#00645C';
       // Increase y coordinate by 100.
       linePosition += 100;
-      ctx.fillText('hasitha', this.CERTIFICATE_MID_POINT, linePosition);
+      ctx.fillText(this.username, this.CERTIFICATE_MID_POINT, linePosition);
 
       ctx.font = '28px Capriola';
       ctx.fillStyle = '#8F9899';
@@ -254,7 +254,7 @@ export class CertificateDownloadModalComponent {
     linePosition += 80;
 
     ctx.fillText(
-      'This certificate confirms that hasitha has contributed ' +
+      `This certificate confirms that ${this.username} has contributed ` +
       response.contribution_hours + ' hours worth of',
       this.CERTIFICATE_MID_POINT,
       linePosition
