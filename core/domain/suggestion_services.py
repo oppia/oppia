@@ -983,7 +983,7 @@ def get_reviewable_translation_suggestions_by_offset(
     opportunity_summary_exp_ids: Optional[List[str]],
     limit: Optional[int],
     offset: int,
-    language: str = ''
+    language: Optional[str] = None
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
@@ -1016,7 +1016,7 @@ def get_reviewable_translation_suggestions_by_offset(
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
 
-    if language != '': # Empty means all languages.
+    if language != None: # No language means all languages.
         if language in language_codes:
             language_codes = [language]
         else:
