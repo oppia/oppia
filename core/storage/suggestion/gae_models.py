@@ -648,7 +648,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             sorted_results: List[GeneralSuggestionModel] = []
 
             while len(sorted_results) < limit:
-                suggestion_model: GeneralSuggestionModel = (
+                suggestion_model: Sequence[GeneralSuggestionModel] = (
                     suggestion_query.fetch(1, offset=offset))
                 if not suggestion_model:
                     break
