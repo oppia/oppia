@@ -157,61 +157,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script failed. More details can be found above.',
             self.print_arr)
 
-    def test_run_ng_compilation_successfully(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: True, expected_kwargs=[])
-
-        with self.print_swap, self.swap_ng_build, swap_isdir:
-            run_lighthouse_tests.run_ng_compilation()
-
-        self.assertNotIn(
-            'Failed to complete ng build compilation, exiting...',
-            self.print_arr
-        )
-
-    def test_run_ng_compilation_failed(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: False, expected_kwargs=[])
-
-        with self.print_swap, self.swap_ng_build, swap_isdir:
-            with self.swap_sys_exit:
-                run_lighthouse_tests.run_ng_compilation()
-
-        self.assertIn(
-            'Failed to complete ng build compilation, exiting...',
-            self.print_arr
-        )
-
-    def test_subprocess_error_results_in_failed_ng_build(self) -> None:
-        class MockFailedCompiler:
-            def wait(self) -> None: # pylint: disable=missing-docstring
-                raise subprocess.CalledProcessError(
-                    returncode=1, cmd='', output='Subprocess execution failed.')
-
-        class MockFailedCompilerContextManager:
-            def __init__(self) -> None:
-                pass
-
-            def __enter__(self) -> MockFailedCompiler:
-                return MockFailedCompiler()
-
-            def __exit__(self, *unused_args: str) -> None:
-                pass
-
-        def mock_failed_context_manager() -> MockFailedCompilerContextManager:
-            return MockFailedCompilerContextManager()
-
-        self.swap_ng_build = self.swap_with_checks(
-            servers,
-            'managed_ng_build',
-            mock_failed_context_manager
-        )
-        swap_isdir = self.swap_with_checks(os.path, 'isdir', lambda _: False)
-
-        with self.print_swap, self.swap_ng_build, swap_isdir:
-            with self.swap_sys_exit:
-                run_lighthouse_tests.run_ng_compilation()
-
     def test_run_webpack_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: True, expected_kwargs=[])
