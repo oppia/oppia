@@ -42,21 +42,21 @@ class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
         response = self.get_html_response('/', expected_status_int=200)
         response.mustcontain(
             '<lightweight-oppia-root></lightweight-oppia-root>',
-            '<title>OppiaAngular</title>'
+            '<title>Loading | Oppia</title>'
         )
 
     def test_oppia_lightweight_root_page_with_rtl_lang_param(self) -> None:
         response = self.get_html_response('/?dir=rtl', expected_status_int=200)
         response.mustcontain(
             '<lightweight-oppia-root></lightweight-oppia-root>',
-            no='<title>OppiaAngular</title>'
+            no='<title>Loading | Oppia</title>'
         )
 
     def test_oppia_lightweight_root_page_with_ltr_lang_param(self) -> None:
         response = self.get_html_response('/?dir=ltr', expected_status_int=200)
         response.mustcontain(
             '<lightweight-oppia-root></lightweight-oppia-root>',
-            '<title>OppiaAngular</title>'
+            '<title>Loading | Oppia</title>'
         )
 
     def test_oppia_lightweight_root_page_with_rtl_dir_cookie(self) -> None:
@@ -64,7 +64,7 @@ class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
         response = self.get_html_response('/', expected_status_int=200)
         response.mustcontain(
             '<lightweight-oppia-root></lightweight-oppia-root>',
-            no='<title>OppiaAngular</title>'
+            no='<title>Loading | Oppia</title>'
         )
 
     def test_oppia_lightweight_root_page_with_ltr_dir_cookie(self) -> None:
@@ -72,5 +72,5 @@ class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
         response = self.get_html_response('/', expected_status_int=200)
         response.mustcontain(
             '<lightweight-oppia-root></lightweight-oppia-root>',
-            '<title>OppiaAngular</title>'
+            '<title>Loading | Oppia</title>'
         )
