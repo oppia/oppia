@@ -20,8 +20,6 @@ import { NgModule} from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
@@ -34,16 +32,16 @@ import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
 import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   imports: [
-    BrowserModule,
+    CommonModule,
     HttpClientModule,
     SharedComponentsModule,
     MatTabsModule,
     MatMenuModule,
-    MatButtonToggleModule,
-    BrowserAnimationsModule
+    MatButtonToggleModule
   ],
   declarations: [
     BlogDashboardNavbarBreadcrumbComponent,

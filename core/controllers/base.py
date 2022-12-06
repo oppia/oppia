@@ -92,7 +92,11 @@ def load_template(
         str. The HTML file content.
     """
     filepath = os.path.join(
-        (feconf.FRONTEND_AOT_DIR if template_is_aot_compiled else feconf.FRONTEND_TEMPLATES_DIR),
+        (
+            feconf.FRONTEND_AOT_DIR
+            if template_is_aot_compiled
+            else feconf.FRONTEND_TEMPLATES_DIR
+        ),
         filename
     )
     with utils.open_file(filepath, 'r') as f:

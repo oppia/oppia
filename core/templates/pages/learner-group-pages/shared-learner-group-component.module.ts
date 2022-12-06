@@ -17,9 +17,7 @@
  */
 
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { AddSyllabusItemsComponent } from './create-group/add-syllabus-items.component';
 import { InviteLearnersComponent } from './create-group/invite-learners.component';
@@ -29,8 +27,6 @@ import { LearnerGroupLearnerSpecificProgressComponent } from './edit-group/learn
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
     CommonModule,
     SharedComponentsModule
   ],
