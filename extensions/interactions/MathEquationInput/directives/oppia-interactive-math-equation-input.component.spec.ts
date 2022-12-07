@@ -48,6 +48,7 @@ describe('MathEquationInputInteractive', () => {
     }
   };
   class MockGuppy {
+    static focused = true;
     constructor(id: string, config: Object) {}
 
     asciimath() {
@@ -56,7 +57,7 @@ describe('MathEquationInputInteractive', () => {
 
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler({focused: true});
+      handler({focused: MockGuppy.focused});
     }
 
     static configure(name: string, val: Object): void {}
@@ -157,5 +158,13 @@ describe('MathEquationInputInteractive', () => {
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
+  });
+
+  it('should initialize component.value with an empty string', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject);
+    MockGuppy.focused = false;
+    component.ngOnInit();
+    expect(component.value).not.toBeNull();
   });
 });
