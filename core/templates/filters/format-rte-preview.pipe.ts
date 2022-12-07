@@ -35,7 +35,9 @@ export class FormatRtePreviewPipe {
     html = html.replace(/&nbsp;/ig, ' ');
     html = html.replace(/&quot;/ig, '');
     // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
-    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    while (html.includes('<')) {
+      html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    }
 
     let formattedOutput = html.replace(/(<([^>]+)>)/g, rteTag => {
       let replaceString = (
