@@ -424,11 +424,3 @@
   top: 10px;
 }
 
-@keyframes slideUp {
-  0% {
-    -webkit-transform: translate(-50%, 90vh);
-  }
-  100% {
-    -webkit-transform: translate(-50%, 0);
-  }
-}
