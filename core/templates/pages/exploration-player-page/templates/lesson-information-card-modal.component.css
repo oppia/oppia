@@ -321,12 +321,11 @@
 }
 
 .save-progress-menu {
-  animation: slideUp 0.8s;
   background-color: #fff;
   border-radius: 10px;
   height: auto;
   left: 50%;
-  max-width: 450px;
+  max-width: 495px;
   position: fixed;
   top: 8vh;
   transform: translateX(-50%);
@@ -423,13 +422,4 @@
   position: absolute;
   right: 10px;
   top: 10px;
-}
-
-@keyframes slideUp {
-  0% {
-    -webkit-transform: translate(-50%, 90vh);
-  }
-  100% {
-    -webkit-transform: translate(-50%, 0);
-  }
 }
