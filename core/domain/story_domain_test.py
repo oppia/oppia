@@ -1886,6 +1886,7 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'Expected language code to be a string, received 0'):
             self.story_summary.validate()
 
+
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.story_summary.language_code = 'invalid'
         with self.assertRaisesRegex(
