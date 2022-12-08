@@ -1,11 +1,13 @@
 const puppeteer = require("puppeteer");
 const testConstants = require("./testConstants.js");
+// change this to puppeteer_utils or puppeteer utility
 module.exports = class browser {
   page;
-  browser;
+  browserObject;
 
+  // change this to openBrowser
   async initialize(){
-    /* currently, headless is set to false and the page viewport
+   /* currently, headless is set to false and the page viewport
        is maximized so that it would be easy for the developers
        to debug easily while testing.
        We can remove these settings before merging as we have
@@ -16,20 +18,21 @@ module.exports = class browser {
         args: ["--start-fullscreen", "--use-fake-ui-for-media-stream"]
       })
       .then(async (browser) => {
-        this.browser = await browser;
+        this.browserObject = browser;
         this.page = await browser.newPage();
         await (this.page).setViewport({ width: 0, height: 0 });
       });
 
-      return this.page;
+    return this.page;
+
   }
 
   async signInWithEmail(email) {
-    await this.goto(testConstants.URLs.home);
-    await this.clickOn("button", "OK");
-    await this.clickOn("span", "Sign in");
-    await this.type(testConstants.SignInDetails.inputField, email);
-    await this.clickOn("span", "Sign In");
+    await (this.page).goto(testConstants.URLs.home);
+    await (this.page).clickOn("button", "OK");
+    await (this.page).clickOn("span", "Sign in");
+    await (this.page).type(testConstants.SignInDetails.inputField, email);
+    await (this.page).clickOn("span", "Sign In");
   }
   
   async clickOn(tag, selector, time = 0) {
@@ -64,6 +67,6 @@ module.exports = class browser {
   }
 
   async closeBrowser() {
-    await this.browser.close();
+    await this.browserObject.close();
   }
 };

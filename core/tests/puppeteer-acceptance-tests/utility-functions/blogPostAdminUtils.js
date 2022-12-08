@@ -1,55 +1,40 @@
-const { parseHTML } = require("jquery");
 const browser = require("./puppeteer_utils.js");
 const testConstants = require("./testConstants.js");
 
-const blogEditOptions = "e2e-test-blog-post-edit-box";
 const blogTitleInput = "input.e2e-test-blog-post-title-field";
 const blogBodyInput = "div.e2e-test-rte";
 const thumbnailPhotoBox = "e2e-test-photo-clickable";
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 
 
-module.exports = class e2eBlogPostAdmin {
-  page;
-  browserInstance;
+module.exports = class e2eBlogPostAdmin extends browser {
 
   async openBrowser() {
-    this.browserInstance = await new browser();
-    this.page = await (this.browserInstance).initialize();
-  }
-
-  async signInWithEmail(email) {
-    await (this.browserInstance).signInWithEmail(email);
+    return await this.initialize();
   }
 
   async waitForPageToLoad(selector) {
     await (this.page).waitForSelector(selector);
   }
 
-  async goto(destination) {
-    await (this.browserInstance).goto(destination);
-  }
-
   async createDraftBlogPostByTitle(draftBlogPostTitle) {
     try{
-      await (this.browserInstance).clickOn("span", "NEW POST");
+      await this.clickOn("span", "NEW POST");
     } catch {
-      await (this.browserInstance).clickOn("span", " CREATE NEW BLOG POST ");
+      await this.clickOn("span", " CREATE NEW BLOG POST ");
     }
-    await (this.browserInstance).type(blogTitleInput, draftBlogPostTitle);
-    await (this.browserInstance).type(blogBodyInput, "blog post test body content");
-    await (this.browserInstance).clickOn("span", " DONE ");
-    await (this.browserInstance).clickOn("span", "SAVE AS DRAFT", 500);
+    await this.type(blogTitleInput, draftBlogPostTitle);
+    await this.type(blogBodyInput, "blog post test body content");
+    await this.clickOn("span", " DONE ");
+    await this.clickOn("span", "SAVE AS DRAFT", 500);
     
-    await console.log("Successfully created a draft blog post!");
-    await this.browserInstance.goto(blogDashboardUrl);
-
-    // this.page = await this.browserInstance.browser.newPage();
+    console.log("Successfully created a draft blog post!");
+    await this.goto(blogDashboardUrl);
   }
 
   async deleteDraftBlogPost() {
-    await (this.browserInstance).clickOn("span", "Delete", 100);
-    await (this.browserInstance).clickOn("button", " Confirm ");
+    await this.clickOn("span", "Delete", 100);
+    await this.clickOn("button", " Confirm ");
 
     console.log("draft blog post with given title deleted successfully!");
   }
@@ -74,39 +59,39 @@ module.exports = class e2eBlogPostAdmin {
 
   async createNewBlogPostByTitle(newBlogPostTitle) {
     try{
-      await (this.browserInstance).clickOn("span", "NEW POST");
+      await this.clickOn("span", "NEW POST");
     } catch {
-      await (this.browserInstance).clickOn("span", " CREATE NEW BLOG POST ");
+      await this.clickOn("span", " CREATE NEW BLOG POST ");
     }
-    await (this.browserInstance).type(blogTitleInput, newBlogPostTitle);
-    await (this.browserInstance).type(blogBodyInput, "blog post test body content");
+    await this.type(blogTitleInput, newBlogPostTitle);
+    await this.type(blogBodyInput, "blog post test body content");
 
-    await (this.browserInstance).clickOn("div", thumbnailPhotoBox);
-    await (this.browserInstance).uploadFile('collection.svg');
-    await (this.browserInstance).clickOn("button", " Add Thumbnail Image ");
-    await (this.page).waitForTimeout(500);
+    await this.clickOn("div", thumbnailPhotoBox);
+    await this.uploadFile('collection.svg');
+    await this.clickOn("button", " Add Thumbnail Image ");
+    await this.waitForTimeout(500);
 
-    await (this.browserInstance).clickOn("span", " International ");
-    await (this.browserInstance).clickOn("span", " DONE ");
+    await this.clickOn("span", " International ");
+    await this.clickOn("span", " DONE ");
   }
 
   async publishNewBlogPost() {
-    await (this.browserInstance).clickOn("span", "PUBLISH");
-    await (this.browserInstance).clickOn("button", " Confirm ", 1000);
+    await this.clickOn("span", "PUBLISH");
+    await this.clickOn("button", " Confirm ", 1000);
     
     console.log("Successfully published a blog!");
     await this.goto(blogDashboardUrl);
   }
 
   async unpublishBlogPost() {
-    await (this.browserInstance).clickOn("span", "Unpublish", 100);
-    await (this.browserInstance).clickOn("button", " Confirm ", 100);
+    await this.clickOn("span", "Unpublish", 100);
+    await this.clickOn("button", " Confirm ", 100);
 
     console.log("published blog post with given title unpublished successfully!");
   }
 
   async unpublishBlogPostByTitle(publishedBlogPostTitle) {
-    await (this.browserInstance).clickOn("div", " PUBLISHED ");
+    await this.clickOn("div", " PUBLISHED ");
     await (this.page).waitForTimeout(500);
     let publishedBlogPostInfo = {
       "publishedBlogPostTitle": publishedBlogPostTitle,
@@ -123,10 +108,5 @@ module.exports = class e2eBlogPostAdmin {
         }
       }
     }, publishedBlogPostInfo);
-  }
-
-  async closeBrowser() {
-    await (this.page).waitForTimeout(1000);
-    await (this.browserInstance).closeBrowser();
   }
 };

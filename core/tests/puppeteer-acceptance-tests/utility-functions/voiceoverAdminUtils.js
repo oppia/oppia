@@ -10,58 +10,43 @@ const audioPause = "fa-pause";
 const uploadAudio = 'e2e-test-accessibility-translation-upload-audio';
 
 
-module.exports = class e2eVoiceoverAdmin {
-  page;
-  browserInstance;
+module.exports = class e2eVoiceoverAdmin extends browser {
 
   async openBrowser() {
-    this.browserInstance = await new browser();
-    this.page = await (this.browserInstance).initialize();
-  }
-
-  async signInWithEmail(email) {
-    await (this.browserInstance).signInWithEmail(email);
+    await this.initialize()
   }
 
   async waitForPageToLoad(selector) {
     await (this.page).waitForSelector(selector);
   }
 
-  async goto(destination) {
-    await (this.browserInstance).goto(destination);
-  }
-
   async gotoTranslationTabInNewExploration() {
-    await (this.browserInstance).clickOn("button", " + Create Exploration ");
-    await (this.browserInstance).clickOn("li", translationTab);
+    await this.clickOn("button", " + Create Exploration ");
+    await this.clickOn("li", translationTab);
   }
 
   async record3secAudio() {
-    await (this.browserInstance).clickOn("button", startRecording);
+    await this.clickOn("button", startRecording);
     await (this.page).waitForSelector("button", stopRecording);
     await (this.page).waitForTimeout(3000);  // recording for 3sec
-    await (this.browserInstance).clickOn("button", stopRecording);
-    await (this.browserInstance).clickOn("button", " Confirm ");
+    await this.clickOn("button", stopRecording);
+    await this.clickOn("button", " Confirm ");
 
     console.log("Successfully tested recording of audio!");
   }
 
   async uploadAudioFile(audioFileName) {
-    await (this.browserInstance).clickOn("button", uploadAudio);  // icon
-    await (this.browserInstance).uploadFile(audioFileName);
-    await (this.browserInstance).clickOn("button", " Save ");
+    await this.clickOn("button", uploadAudio);
+    await this.uploadFile(audioFileName);
+    await this.clickOn("button", " Save ");
 
     console.log("Successfully uploaded audio: " + audioFileName);
   }
 
   async playAudio() {
-    await (this.browserInstance).clickOn("button", audioPlay, 500);
-    await (this.browserInstance).clickOn("i", audioPause, 1000);
+    await this.clickOn("button", audioPlay, 500);
+    await this.clickOn("i", audioPause, 1000);
 
     console.log("Successfully played audio!");
-  }
-
-  async closeBrowser() {
-    await (this.browserInstance).closeBrowser();
   }
 };
