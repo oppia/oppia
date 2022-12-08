@@ -648,7 +648,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_node_validation(self) -> None:
         self.assertEqual(len(self.story.story_contents.nodes), 2)
         with self.assertRaisesRegex(
-            ValueError, 
+            ValueError,
             'The node with id %s is the starting node for the story, '
             'change the starting node before deleting it.' % self.NODE_ID_1):
             self.story.delete_node(self.NODE_ID_1)
@@ -1038,7 +1038,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'next_node_id': 'node_4'
         }
         self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_filename'], 'image.svg')
+            story_contents_dict_1['nodes'][0]['thumbnail_filename'],
+            'image.svg')
         self.assertEqual(
             story_contents_dict_1['nodes'][0]['thumbnail_bg_color'],
             constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
