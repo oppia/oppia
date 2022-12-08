@@ -1891,4 +1891,3 @@ class StorySummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.story_summary.validate()
-
