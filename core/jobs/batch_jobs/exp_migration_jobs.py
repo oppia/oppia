@@ -29,6 +29,7 @@ from core.domain import exp_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
+from core.jobs.transforms import results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -227,7 +228,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             )
         )
 
-        migrated_exp_results = (
+        all_migrated_exp_results = (
             (
                 unmigrated_exploration_models,
                 exp_publication_status
@@ -240,18 +241,21 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 )
         )
 
-        migrated_exp = (
-            migrated_exp_results
-            | 'Filter oks' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
-            | 'Unwrap ok' >> beam.Map(
-                lambda result_item: result_item.unwrap())
-        )
-
         migrated_exp_job_run_results = (
-            migrated_exp_results
+            all_migrated_exp_results
             | 'Generate results for migration' >> (
                 job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
+        )
+
+        filtered_migrated_exp = (
+            all_migrated_exp_results
+            | 'Filter migration results' >> (
+                results_transforms.DrainResultsOnError())
+        )
+        migrated_exp = (
+            filtered_migrated_exp
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
         )
 
         exp_changes = (
