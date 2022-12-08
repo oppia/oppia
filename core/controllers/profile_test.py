@@ -1162,8 +1162,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                         'type': 'subscribe'
                     }, use_payload=False, expected_status_int=404)
                 self.assertIn(
-                    'Invalid Mailchimp webhook request received with secret: '
-                    'invalid_secret', captured_logs)
+                    'Received invalid Mailchimp webhook secret', captured_logs)
 
     def test_post(self) -> None:
         with self.swap_secret, self.swap_audience_id:

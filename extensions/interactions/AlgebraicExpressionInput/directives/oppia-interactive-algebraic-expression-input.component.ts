@@ -20,9 +20,8 @@
  * followed by the name of the arg.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
@@ -32,6 +31,11 @@ import constants from 'assets/constants';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { TranslateService } from '@ngx-translate/core';
+
+interface FocusObj {
+  focused: boolean;
+}
+
 
 @Component({
   selector: 'oppia-interactive-algebraic-expression-input',
@@ -55,8 +59,6 @@ export class AlgebraicExpressionInputInteractionComponent
     private algebraicExpressionInputRulesService:
       AlgebraicExpressionInputRulesService,
     private currentInteractionService: CurrentInteractionService,
-    private changeDetectorRef: ChangeDetectorRef,
-    private deviceInfoService: DeviceInfoService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
     private htmlEscaperService: HtmlEscaperService,
@@ -64,10 +66,12 @@ export class AlgebraicExpressionInputInteractionComponent
     private translateService: TranslateService,
   ) {}
 
-  isCurrentAnswerValid(): boolean {
+  isCurrentAnswerValid(checkForTouched = true): boolean {
     const activeGuppyObject = (
       this.guppyInitializationService.findActiveGuppyObject());
-    if (this.hasBeenTouched && activeGuppyObject === undefined) {
+    if (
+      (!checkForTouched || this.hasBeenTouched) &&
+      activeGuppyObject === undefined) {
       // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
       // is not compatible with nerdamer or with the backend validations.
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
@@ -83,7 +87,7 @@ export class AlgebraicExpressionInputInteractionComponent
   }
 
   submitAnswer(): void {
-    if (!this.isCurrentAnswerValid()) {
+    if (!this.isCurrentAnswerValid(false)) {
       return;
     }
     this.currentInteractionService.onSubmit(
@@ -107,27 +111,24 @@ export class AlgebraicExpressionInputInteractionComponent
       translatedPlaceholder,
       this.savedSolution !== undefined ? this.savedSolution as string : ''
     );
-    const eventType = (
-      this.deviceInfoService.isMobileUserAgent() &&
-      this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
-    // We need the 'focus' event while using the on screen keyboard (only
-    // for touch-based devices) to capture input from user and the 'change'
-    // event while using the normal keyboard.
-    Guppy.event(eventType, () => {
-      const activeGuppyObject = (
+
+    Guppy.event('change', (focusObj: FocusObj) => {
+      let activeGuppyObject = (
         this.guppyInitializationService.findActiveGuppyObject());
       if (activeGuppyObject !== undefined) {
         this.hasBeenTouched = true;
         this.value = activeGuppyObject.guppyInstance.asciimath();
-        if (eventType === 'change') {
-          // Need to manually trigger the digest cycle to make any
-          // 'watchers' aware of changes in answer.
-          if (!this.viewIsDestroyed) {
-            this.changeDetectorRef.detectChanges();
-          }
-        }
+      }
+      if (!focusObj.focused) {
+        this.isCurrentAnswerValid();
       }
     });
+    Guppy.event('focus', (focusObj: FocusObj) => {
+      if (!focusObj.focused) {
+        this.isCurrentAnswerValid();
+      }
+    });
+
     const isCurrentAnswerValid = (): boolean => {
       return this.isCurrentAnswerValid();
     };
