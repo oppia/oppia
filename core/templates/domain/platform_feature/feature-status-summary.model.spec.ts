@@ -50,10 +50,7 @@ describe('Feature Status Summary Model', () => {
       const summary = FeatureStatusSummary.createFromBackendDict({});
       const checker = summary.toStatusChecker();
 
-      expect(
-        () => checker.DummyFeature.isEnabled
-      ).toThrowError(
-        `Feature \'${FeatureNames.DummyFeature}\' does not exist.`);
+      expect(checker.DummyFeature.isEnabled).toBeFalse();
     });
   });
 });

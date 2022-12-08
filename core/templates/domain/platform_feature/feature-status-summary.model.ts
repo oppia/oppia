@@ -142,13 +142,8 @@ export class FeatureStatusSummary {
    * @param {string} featureName - The name of the feature.
    *
    * @returns {boolean} - The value of the feature flag, true if enabled.
-   * @throws {Error} - If the feature with the specified name doesn't exist.
    */
   private isFeatureEnabled(featureName: string): boolean {
-    const isEnabled = this.featureNameToFlag.get(featureName);
-    if (isEnabled === undefined) {
-      throw new Error(`Feature '${featureName}' does not exist.`);
-    }
-    return isEnabled;
+    return this.featureNameToFlag.get(featureName) || false;
   }
 }
