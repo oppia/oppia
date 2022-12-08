@@ -504,7 +504,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_get_acquired_skill_ids_for_node_ids_not_found(
         self
     ) -> None:
-        # Test cases when node_id not in node_ids.
+        # Test cases when node.id not in node_ids.
         self.story.story_contents.nodes[0].acquired_skill_ids = [
             'skill_1', 'skill_2']
         self.story.story_contents.nodes[1].acquired_skill_ids = [
@@ -646,12 +646,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.add_node('node_4', 'Title 4')
 
     def test_delete_node_validation(self) -> None:
-        self.assertEqual(
-            len(self.story.story_contents.nodes), 2)
+        self.assertEqual(len(self.story.story_contents.nodes), 2)
         with self.assertRaisesRegex(
-            ValueError, 'The node with id %s is the '
-                    'starting node for the story, change the starting '
-                    'node before deleting it.' % self.NODE_ID_1):
+            ValueError, 
+            'The node with id %s is the starting node for the story, '
+            'change the starting node before deleting it.' % self.NODE_ID_1):
             self.story.delete_node(self.NODE_ID_1)
         self.story.delete_node(self.NODE_ID_2)
         self.assertEqual(len(self.story.story_contents.nodes), 1)
@@ -1039,8 +1038,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'next_node_id': 'node_4'
         }
         self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_filename'],
-            'image.svg')
+            story_contents_dict_1['nodes'][0]['thumbnail_filename'], 'image.svg')
         self.assertEqual(
             story_contents_dict_1['nodes'][0]['thumbnail_bg_color'],
             constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
@@ -1052,8 +1050,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_contents_dict_1['nodes'][0]['thumbnail_bg_color'], None)
 
         self.assertEqual(
-            story_contents_dict_1['nodes'][0]['description'],
-            'Description 1')
+            story_contents_dict_1['nodes'][0]['description'], 'Description 1')
         story_domain.Story._convert_story_contents_v2_dict_to_v3_dict(
             story_contents_dict_1)
         self.assertEqual(
@@ -1067,13 +1064,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_contents_dict_1['nodes'][0]['outline'], 'a')
 
         self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_size_in_bytes'],
-            21131)
+            story_contents_dict_1['nodes'][0]['thumbnail_size_in_bytes'], 21131)
         story_domain.Story._convert_story_contents_v4_dict_to_v5_dict(
             'node_1', story_contents_dict_1)
         self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_size_in_bytes'],
-            None)
+            story_contents_dict_1['nodes'][0]['thumbnail_size_in_bytes'], None)
 
     def test_update_story_contents_from_model(self) -> None:
         node_1: story_domain.StoryNodeDict = {
@@ -1798,8 +1793,7 @@ class StorySummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_title(self) -> None:
         self.story_summary.title = 0  # type: ignore[assignment]
         with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected title to be a string, received 0'):
+            utils.ValidationError, 'Expected title to be a string, received 0'):
             self.story_summary.validate()
 
     def test_validation_fails_with_empty_title(self) -> None:
