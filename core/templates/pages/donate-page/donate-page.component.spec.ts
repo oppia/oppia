@@ -247,4 +247,16 @@ describe('Donate page', () => {
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
+
+  it('should show thank you modal on init', () => {
+    windowRef.nativeWindow.location.hash = '#nothing';
+    component.ngOnInit();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+
+    windowRef.nativeWindow.location.hash = '#thank-you';
+    component.ngOnInit();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
 });
