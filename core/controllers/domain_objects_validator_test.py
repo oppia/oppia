@@ -282,3 +282,31 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
             ) as f:
                 files[filename] = f.read()
         domain_objects_validator.validate_suggestion_images(files)
+
+
+class ValidateEmailDashboardDataTests(test_utils.GenericTestBase):
+    """Tests to validates email dashboard data."""
+
+    def test_invalid_email_raises_exception(self) -> None:
+        data: Dict[str, Optional[Union[bool, int]]] = {
+            'inactive_in_last_n_days': True,
+            'has_not_logged_in_for_n_days': None,
+            'created_fewer_than_n_exps': False,
+            'created_collection': 6,
+            'have_fun': 6,
+            'explore': True,
+            }
+        with self.assertRaisesRegex(Exception, '400 Invalid input for query.'):
+            domain_objects_validator.validate_email_dashboard_data(data)
+
+    def test_valid_email_do_not_raise_exception(self) -> None:
+        data: Dict[str, Optional[Union[bool, int]]] = {
+            'inactive_in_last_n_days': False,
+            'has_not_logged_in_for_n_days': False,
+            'created_at_least_n_exps': True,
+            'created_fewer_than_n_exps': None,
+            'edited_at_least_n_exps': True,
+            'edited_fewer_than_n_exps': None,
+            'created_collection': 7,
+            }
+        domain_objects_validator.validate_email_dashboard_data(data)
