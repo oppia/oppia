@@ -133,7 +133,6 @@ export class AudioTranslationManagerService {
     while (cleanChoiceLabel.includes('<')) {
       cleanChoiceLabel = cleanChoiceLabel.replace(/<[^>]+>/g, '');
     }
-
     // Add a stop for the voiceover with a dot. Useful for multiple choices.
     return cleanChoiceLabel + '. ';
   }
