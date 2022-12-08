@@ -26,12 +26,12 @@ class LearnerGroupTest(test_utils.GenericTestBase):
     """Tests for LearnerGroup domain object."""
 
     VALID_LEARNER_GROUP = learner_group_domain.LearnerGroup(
-            '3232', 'title', 'description',
-            ['user_1'],
-            ['user_2', 'user_3', 'user_4'],
-            ['user_5', 'user_6'],
-            ['subtopic_1', 'subtopic_2'],
-            ['story_1', 'story_2'])
+        '3232', 'title', 'description',
+        ['user_1'],
+        ['user_2', 'user_3', 'user_4'],
+        ['user_5', 'user_6'],
+        ['subtopic_1', 'subtopic_2'],
+        ['story_1', 'story_2'])
 
     def test_initialization(self) -> None:
         learner_group = self.VALID_LEARNER_GROUP
