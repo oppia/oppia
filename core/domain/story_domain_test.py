@@ -290,8 +290,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         try:
             story_domain.Story.require_valid_story_id('abc')
         except utils.ValidationError:
-            self.fail('require_valid_story_id() ' \
-                    'raised ExceptionType unexpectedly!')
+            self.fail(
+                'require_valid_story_id() raised ExceptionType unexpectedly!')
 
     def _assert_valid_thumbnail_filename_for_story(
         self, expected_error_substring: str, thumbnail_filename: str
@@ -504,7 +504,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_get_acquired_skill_ids_for_node_ids_not_found(
         self
     ) -> None:
-        # Test cases when node_id not in node_ids
+        # Test cases when node_id not in node_ids.
         self.story.story_contents.nodes[0].acquired_skill_ids = [
             'skill_1', 'skill_2']
         self.story.story_contents.nodes[1].acquired_skill_ids = [
