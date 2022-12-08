@@ -649,7 +649,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(self.story.story_contents.nodes), 2)
         with self.assertRaisesRegex(
-            ValueError, 'The node with id %s is thev'
+            ValueError, 'The node with id %s is the'
                     'starting node for the story, change the starting '
                     'node before deleting it.' % self.NODE_ID_1):
             self.story.delete_node(self.NODE_ID_1)
