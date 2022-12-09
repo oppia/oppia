@@ -29,7 +29,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 from firebase_admin import auth as firebase_auth
-from typing import Optional
+from typing import Optional, Dict
 import webapp2
 
 MYPY = False
@@ -250,10 +250,10 @@ class Stub:
     ]
 
     def __init__(self) -> None:
-        self.users_by_uid = {}
-        self.uid_by_session_cookie = {}
-        self.swap_function = None
-        self.test = None
+        self.users_by_uid: Dict[str, firebase_auth.UserRecord] = {}
+        self.uid_by_session_cookie: Dict[str, str] = {}
+        self.swap_function: Optional[contextlib.ExitStack] = None
+        self.test: Optional[test_utils.TestBase] = None
 
     def install(self, test: test_utils.TestBase) -> None:
         """Installs the stub on the given test instance. Idempotent."""
@@ -282,13 +282,9 @@ class Stub:
         self.uid_by_session_cookie[id_token] = claims['sub']
         return id_token
 
-    def get_user(self, uid: str) -> firebase_auth.UserRecord:
-        """Get user from the userid dictionary."""
-        return self.users_by_uid[uid]
-
     def dump_user(self, uid: str) -> str:
         """Get claims based on the given username."""
-        user = self.get_user(uid)
+        user = self.users_by_uid[uid]
         claims = {'sub': user.uid}
         if user.email:
             claims['email'] = user.email
@@ -336,14 +332,14 @@ class AuthSuperAdminTests(test_utils.AppEngineTestBase):
     def test_super_admin_privilage(self) -> None:
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id='aid').put()
         self.stub.create_test_object('aid')
-        claims = self.stub.get_user('aid').custom_claims or {}
+        claims = self.stub.users_by_uid['aid'].custom_claims or {}
         self.assertNotEqual(
             claims.get('role', None), 'super_admin')
         auth_services.grant_super_admin_privileges('uid')
-        claims = self.stub.get_user('aid').custom_claims or {}
+        claims = self.stub.users_by_uid['aid'].custom_claims or {}
         self.assertEqual(
             claims.get('role', None), 'super_admin')
         auth_services.revoke_super_admin_privileges('uid')
-        claims = self.stub.get_user('aid').custom_claims or {}
+        claims = self.stub.users_by_uid['aid'].custom_claims or {}
         self.assertNotEqual(
             claims.get('role', None), 'super_admin')
