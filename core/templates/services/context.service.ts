@@ -179,6 +179,18 @@ export class ContextService {
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
+  isExplorationPage(): boolean {
+    let pathnameArray = this.urlService.getPathname().split('/');
+    for (let i = 0; i < pathnameArray.length; i++) {
+      if (pathnameArray[i] === 'explore' ||
+          pathnameArray[i] === 'create' ||
+          pathnameArray[i] === 'skill_editor' ||
+          pathnameArray[i] === 'embed') {
+        return true;
+      }
+    }
+  }
+
   // This function is used in cases where the URL does not specify the
   // correct context for some case. eg: Viewing a skill's concept card on
   // any page via the RTE.
