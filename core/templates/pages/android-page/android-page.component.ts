@@ -102,40 +102,11 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    if (this.windowDimensionsService.getWidth() < 1000) {
-      this.featuresShown = 1;
-    }
+    this.featuresShown = 1;
   }
 
   ngAfterViewInit(): void {
     this.setPageTitle();
-
-    const featuresSectionObserver = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        ++this.featuresShown;
-      }
-    });
-    const androidUpdatesSectionObserver = (
-      new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting && !this.androidUpdatesSectionIsSeen) {
-          this.androidUpdatesSectionIsSeen = true;
-        }
-      })
-    );
-    const featuresMainTextObserver = (
-      new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting && !this.featuresMainTextIsSeen) {
-          this.featuresMainTextIsSeen = true;
-        }
-      })
-    );
-    featuresSectionObserver.observe(this.featureRef1.nativeElement);
-    featuresSectionObserver.observe(this.featureRef2.nativeElement);
-    featuresSectionObserver.observe(this.featureRef3.nativeElement);
-    featuresSectionObserver.observe(this.featureRef4.nativeElement);
-    androidUpdatesSectionObserver.observe(
-      this.androidUpdatesSectionRef.nativeElement);
-    featuresMainTextObserver.observe(this.featuresMainTextRef.nativeElement);
   }
 
   changeFeaturesShown(featureNumber: number): void {
