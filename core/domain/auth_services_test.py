@@ -29,7 +29,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Optional, Union, cast
+from typing import Optional
 from firebase_admin import auth as firebase_auth
 import webapp2
 
@@ -241,7 +241,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
 class Stub:
     """Write Stub for replacing some function with easier access.
-    Adopted from firebase_auth_services_test
+    Adopted from firebase_auth_services_test.
     """
 
     modified_functions = [
