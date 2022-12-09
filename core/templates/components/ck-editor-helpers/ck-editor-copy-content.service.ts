@@ -22,7 +22,6 @@ import { Injectable, EventEmitter } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { Subscription } from 'rxjs';
-import { Decomment } from 'decomment';
 
 interface CkEditorCopyEvent {
   rootElement?: HTMLElement;
@@ -128,10 +127,9 @@ export class CkEditorCopyContentService {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
-    // While (html.includes('<!--')) {
-    //   html = html.replace(/<!--[^>]*-*-*>*/gm, '');
-    // }
-    html = Decomment(html);
+    while (html.includes('<!--')) {
+      html = html.replace(/<!--[^>]*-*-*>*/gm, '');
+    }
     if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
