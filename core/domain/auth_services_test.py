@@ -40,6 +40,7 @@ if MYPY: # pragma: no cover
 auth_models, = (
     models.Registry.import_models([models.Names.AUTH]))
 
+
 class AuthServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -237,7 +238,11 @@ class AuthServicesTests(test_utils.GenericTestBase):
         # Should not raise.
         auth_services.delete_external_auth_associations('does_not_exist')
 
+
 class Stub:
+    """Write Stub for replacing some function with easier access.
+    Adopted from firebase_auth_services_test
+    """
 
     modified_functions = [
         'modified_set_custom_user_claims',
@@ -264,24 +269,26 @@ class Stub:
     def modified_set_custom_user_claims(
             self, uid: str, custom_claims: Optional[str]
     ) -> str:
-        USER_1 = firebase_auth.UserRecord({
+        """Modified set_custom_user_claims."""
+        user = firebase_auth.UserRecord({
             'localId': uid,
             'customAttributes': custom_claims,
         })
-        self.users_by_uid[uid] = USER_1
+        self.users_by_uid[uid] = user
         return uid
 
-    def modified_create_session_cookie(self, id_token: str, a: int) -> str:
-        claims = cast(
-                Dict[str, Optional[Union[str, bool]]],
-                json.loads(id_token))
+    def modified_create_session_cookie(self, id_token: str, _: int) -> str:
+        """Modified create_session_cookie."""
+        claims = json.loads(id_token)
         self.uid_by_session_cookie[id_token] = claims['sub']
         return id_token
 
     def get_user(self, uid: str) -> firebase_auth.UserRecord:
+        """Get user from the userid dictionary."""
         return self.users_by_uid[uid]
 
     def dump_user(self, uid: str) -> str:
+        """Get claims based on the given username."""
         user = self.get_user(uid)
         claims = {'sub': user.uid}
         if user.email:
@@ -293,10 +300,12 @@ class Stub:
     def modified_revoke_refresh_tokens(self, uid: str) -> None:
         """Revokes all refresh tokens for an existing user."""
         self.uid_by_session_cookie = {
-            key: value for key, value in self.uid_by_session_cookie.items() if value != uid
+            key: value for key, value in
+            self.uid_by_session_cookie.items() if value != uid
         }
 
     def create_test_object(self, uid: str) -> firebase_auth.UserRecord:
+        """Create a firebase user for testing."""
         user = firebase_auth.UserRecord({
             'localId': uid, 'email': 'email', 'disabled': False,
         })
@@ -310,9 +319,6 @@ class AuthSuperAdminTests(test_utils.AppEngineTestBase):
         super().setUp()
         self.stub = Stub()
         self.stub.install(self)
-
-    def tearDown(self) -> None:
-        super().tearDown()
 
     def test_auth_session(self) -> None:
         req = webapp2.Request.blank('/')
