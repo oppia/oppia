@@ -87,13 +87,14 @@ class CommonTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
         def mock_context_manager() -> MockCompilerContextManager:
             return MockCompilerContextManager()
         self.swap_ng_build = self.swap(
             servers, 'managed_ng_build', mock_context_manager)
-        print_arr = []
+        self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
-            print_arr.append(msg)
+            self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def test_run_ng_compilation_successfully(self) -> None:
