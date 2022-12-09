@@ -11,7 +11,9 @@ async function deleteDraftAsBlogPostAdmin() {
   await blogPostAdmin.signInWithEmail("testadmin@example.com");
   await blogPostAdmin.waitForPageToLoad(homePage);
   await blogPostAdmin.goto(blogDashboardUrl);
+  await blogPostAdmin.expectNumberOfDraftOrPublishedBlogPostsGreaterThan(0);
   await blogPostAdmin.createDraftBlogPostByTitle("Test Blog Post");
+  await blogPostAdmin.expectDraftBlogPostWithTitleToExist("Test Blog Post");
   
   await blogPostAdmin.closeBrowser();
 }

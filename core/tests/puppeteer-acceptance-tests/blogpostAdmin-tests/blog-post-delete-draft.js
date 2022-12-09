@@ -13,7 +13,7 @@ async function deleteDraftAsBlogPostAdmin() {
   await blogPostAdmin.goto(blogDashboardUrl);
   await blogPostAdmin.deleteDraftBlogPostByTitle("Test Blog Post");
   
-  await blogPostAdmin.closeBrowser();
+  // await blogPostAdmin.closeBrowser();
 }
 
 deleteDraftAsBlogPostAdmin();

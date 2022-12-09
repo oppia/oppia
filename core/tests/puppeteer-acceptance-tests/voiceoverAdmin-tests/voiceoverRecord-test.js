@@ -7,7 +7,7 @@ const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 
 
-async function recordingAudioAsVoiceoverAdmin() {
+async function recordAudioAsVoiceoverAdmin() {
   const voiceoverAdmin = await new e2eVoiceoverAdmin();
   await voiceoverAdmin.openBrowser();
   
@@ -15,10 +15,10 @@ async function recordingAudioAsVoiceoverAdmin() {
   await voiceoverAdmin.waitForPageToLoad(homePage);
   await voiceoverAdmin.goto(creatorDashboardUrl);
   await voiceoverAdmin.gotoTranslationTabInNewExploration();
-  await voiceoverAdmin.record3secAudio();
+  await voiceoverAdmin.record3SecAudio();
   await voiceoverAdmin.playAudio();
   
   await voiceoverAdmin.closeBrowser();
 };
 
-recordingAudioAsVoiceoverAdmin();
+recordAudioAsVoiceoverAdmin();

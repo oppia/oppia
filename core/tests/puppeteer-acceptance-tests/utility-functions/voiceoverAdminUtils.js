@@ -25,7 +25,7 @@ module.exports = class e2eVoiceoverAdmin extends browser {
     await this.clickOn("li", translationTab);
   }
 
-  async record3secAudio() {
+  async record3SecAudio() {
     await this.clickOn("button", startRecording);
     await (this.page).waitForSelector("button", stopRecording);
     await (this.page).waitForTimeout(3000);  // recording for 3sec

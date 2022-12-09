@@ -6,7 +6,7 @@ module.exports = class browser {
   browserObject;
 
   // change this to openBrowser
-  async initialize(){
+  async openBrowser(){
    /* currently, headless is set to false and the page viewport
        is maximized so that it would be easy for the developers
        to debug easily while testing.
@@ -28,11 +28,11 @@ module.exports = class browser {
   }
 
   async signInWithEmail(email) {
-    await (this.page).goto(testConstants.URLs.home);
-    await (this.page).clickOn("button", "OK");
-    await (this.page).clickOn("span", "Sign in");
-    await (this.page).type(testConstants.SignInDetails.inputField, email);
-    await (this.page).clickOn("span", "Sign In");
+    await this.goto(testConstants.URLs.home);
+    await this.clickOn("button", "OK");
+    await this.clickOn("span", "Sign in");
+    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.clickOn("span", "Sign In");
   }
   
   async clickOn(tag, selector, time = 0) {
