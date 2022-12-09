@@ -1011,66 +1011,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.story_contents.get_all_linked_exp_ids(),
             ['exp_1', 'exp_2', 'exp_4'])
 
-    def test_convert_story_contents_dict(self) -> None:
-        self.story.story_contents.next_node_id = 'node_4'
-        node_1: story_domain.StoryNodeDict = {
-            'id': 'node_1',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'thumbnail_size_in_bytes': 21131,
-            'title': 'Title 1',
-            'description': 'Description 1',
-            'destination_node_ids': ['node_3'],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': 'a',
-            'outline_is_finalized': False,
-            'exploration_id': 'exp_1'
-        }
-        self.story.story_contents.initial_node_id = 'node_1'
-        self.story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(node_1)
-        ]
-        story_contents_dict_1: story_domain.StoryContentsDict = {
-            'nodes': [node_1],
-            'initial_node_id': 'node_1',
-            'next_node_id': 'node_4'
-        }
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_filename'],
-            'image.svg')
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_bg_color'],
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
-        story_domain.Story._convert_story_contents_v1_dict_to_v2_dict(
-            story_contents_dict_1)
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_filename'], None)
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_bg_color'], None)
-
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['description'], 'Description 1')
-        story_domain.Story._convert_story_contents_v2_dict_to_v3_dict(
-            story_contents_dict_1)
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['description'], '')
-
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['outline'], 'a')
-        story_domain.Story._convert_story_contents_v3_dict_to_v4_dict(
-            story_contents_dict_1)
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['outline'], 'a')
-
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_size_in_bytes'], 21131)
-        story_domain.Story._convert_story_contents_v4_dict_to_v5_dict(
-            'node_1', story_contents_dict_1)
-        self.assertEqual(
-            story_contents_dict_1['nodes'][0]['thumbnail_size_in_bytes'], None)
-
     def test_update_story_contents_from_model(self) -> None:
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
@@ -1099,11 +1039,37 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(version_dict['schema_version'], 0)
         story_domain.Story.update_story_contents_from_model(
-            version_dict, 4, 'node_1')
-        self.assertEqual(version_dict['schema_version'], 5)
+            version_dict, 1, 'node_1')
+        self.assertEqual(version_dict['schema_version'], 2)
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0]['thumbnail_filename'],
+            None)
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0]['thumbnail_bg_color'],
+            None)
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0]['description'],
+            'Description 1')
+        story_domain.Story.update_story_contents_from_model(
+            version_dict, 2, 'node_1')
+        self.assertEqual(version_dict['schema_version'], 3)
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0]['description'],
+            '')
         story_domain.Story.update_story_contents_from_model(
             version_dict, 3, 'node_1')
         self.assertEqual(version_dict['schema_version'], 4)
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0]
+            ['thumbnail_size_in_bytes'],
+            21131)
+        story_domain.Story.update_story_contents_from_model(
+            version_dict, 4, 'node_1')
+        self.assertEqual(version_dict['schema_version'], 5)
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0]
+            ['thumbnail_size_in_bytes'],
+            None)
 
     def test_info_update(self) -> None:
         topic_id = utils.generate_random_string(12)
@@ -1116,7 +1082,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(story.thumbnail_bg_color, None)
         story.update_thumbnail_bg_color('Updated thumbnail_bg_color')
-        self.assertEqual(story.thumbnail_bg_color, 'Updated thumbnail_bg_color')
+        self.assertEqual(
+            story.thumbnail_bg_color, 'Updated thumbnail_bg_color')
 
         self.assertEqual(story.description, 'Description')
         story.update_description('Updated Description')
