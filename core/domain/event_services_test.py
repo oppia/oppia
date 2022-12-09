@@ -454,6 +454,9 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         all_models = stats_models.ExplorationStatsModel.get_all()
         self.assertEqual(all_models.count(), 1)
         model = all_models.get()
+        self.assertIsNotNone(model)
+        # Ruling out the possibility of None for mypy type checking.
+        assert model is not None
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.exp_version, exploration.version)
 
