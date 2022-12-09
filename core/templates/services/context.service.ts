@@ -189,6 +189,7 @@ export class ContextService {
         return true;
       }
     }
+    return false;
   }
 
   // This function is used in cases where the URL does not specify the
