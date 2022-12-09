@@ -28,9 +28,8 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Optional
 from firebase_admin import auth as firebase_auth
+from typing import Optional
 import webapp2
 
 MYPY = False
