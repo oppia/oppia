@@ -56,14 +56,18 @@ class UserQueryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.curriculum_user_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.user_query_params = user_query_domain.UserQueryParams(
             inactive_in_last_n_days=20
         )
         self.user_query = user_query_domain.UserQuery(
             query_id='user_query_id',
             query_params=self.user_query_params,
-            submitter_id=self.user_id,
+            submitter_id=self.curriculum_user_id,
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
             user_ids=[],
             sent_email_model_id=None,
@@ -90,6 +94,7 @@ class UserQueryTests(test_utils.GenericTestBase):
     def test_validate_query_with_non_user_id_values_in_user_ids_raises(
         self
     ) -> None:
+        # Testing with invalid user_id.
         self.user_query.user_ids = ['aaa']
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -97,19 +102,35 @@ class UserQueryTests(test_utils.GenericTestBase):
         ):
             self.user_query.validate()
 
+        # Testing with correct user_id.
+        self.user_query.user_ids = [self.new_user_id]
+        self.user_query.validate()
+        self.assertEqual(self.user_query.user_ids, [self.new_user_id])
+
     def test_create_default_returns_correct_user_query(self) -> None:
         default_user_query = user_query_domain.UserQuery.create_default(
-            'id', self.user_query_params, self.user_id)
+            'id', self.user_query_params, self.curriculum_user_id
+        )
         self.assertEqual(default_user_query.params, self.user_query_params)
-        self.assertEqual(default_user_query.submitter_id, self.user_id)
+        self.assertEqual(
+            default_user_query.submitter_id, self.curriculum_user_id
+        )
         self.assertEqual(
             default_user_query.status, feconf.USER_QUERY_STATUS_PROCESSING)
         self.assertEqual(default_user_query.user_ids, [])
 
-    def test_archive_returns_correct_dict(self) -> None:
+    def test_archive_returns_correct_dict_with_email_model_id(self) -> None:
         self.user_query.archive(sent_email_model_id='sent_email_model_id')
         self.assertEqual(
             self.user_query.sent_email_model_id, 'sent_email_model_id')
         self.assertEqual(
             self.user_query.status, feconf.USER_QUERY_STATUS_ARCHIVED)
+        self.assertTrue(self.user_query.deleted)
+
+    def test_archive_returns_correct_dict_without_email_model_id(self) -> None:
+        self.user_query.archive()
+        self.assertEqual(self.user_query.sent_email_model_id, None)
+        self.assertEqual(
+            self.user_query.status, feconf.USER_QUERY_STATUS_ARCHIVED
+        )
         self.assertTrue(self.user_query.deleted)

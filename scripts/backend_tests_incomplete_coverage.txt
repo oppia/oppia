@@ -35,7 +35,6 @@ core.domain.collection_services_test
 core.domain.config_domain_test
 core.domain.draft_upgrade_services_test
 core.domain.email_manager_test
-core.domain.event_services_test
 core.domain.exp_domain_test
 core.domain.exp_services_test
 core.domain.feedback_domain_test
@@ -76,7 +75,6 @@ core.domain.summary_services_test
 core.domain.topic_services_test
 core.domain.translation_domain_test
 core.domain.user_domain_test
-core.domain.user_query_domain_test
 core.domain.user_query_services_test
 core.domain.user_services_test
 core.domain.visualization_registry_test
