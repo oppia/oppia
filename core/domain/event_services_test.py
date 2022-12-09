@@ -435,7 +435,7 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         assert model is not None
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.exp_version, exploration.version)
-        
+
     def test_nothing_updated_for_old_exploration_version(self) -> None:
         all_models = (
             stats_models.ExplorationStatsModel.get_all())
