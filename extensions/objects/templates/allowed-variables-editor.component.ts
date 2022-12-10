@@ -67,7 +67,7 @@ export class AllowedVariablesEditorComponent implements OnInit {
   currentTab: (
     typeof AppConstants.CUSTOM_LETTERS_LATIN_TAB |
     typeof AppConstants.CUSTOM_LETTERS_GREEK_TAB
-   ) = this.latinTab;
+  ) = this.latinTab;
 
   constructor(
     private guppyInitializationService: GuppyInitializationService,

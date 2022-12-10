@@ -11,10 +11,6 @@ interface Window {
     Base64Binary: Base64Binary;
     jQuery: JQueryStatic;
     dataLayer: object[];
-    // eslint-disable-next-line oppia/disallow-flags
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    GifFrames: any;
-    // eslint-disable-next-line oppia/disallow-flags
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Guppy: any;
+    Guppy: Guppy;
+    webkitAudioContext: typeof AudioContext;
 }

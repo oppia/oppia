@@ -16,7 +16,12 @@
  * @fileoverview This is a webpack loader that replaces templateUrl: './html'
  * with template: require('./html'). This is needed for our webpack based
  * compilation and not the angular compiler. Angular compiler parses the html
- * and converts it to js instructions.
+ * and converts it to js instructions. For the style urls, the angular compiler
+ * uses styleUrls while webpack uses imports. Hence, currently we put the
+ * stylesheet as import and as a styleUrl in the component. Once we have moved
+ * away from separate rtl css files, we will remove the import statements and
+ * just keep styleUrls. Until then, for webpack, we need remove styleUrls for
+ * webpack compilation.
  */
 
 /**

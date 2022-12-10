@@ -79,6 +79,7 @@ import { StoryViewerBackendApiService } from
 import { ServicesConstants } from 'services/services.constants';
 // Relative path used as an work around to get the angular compiler and webpack
 // build to not complain.
+// TODO(#16309): Fix relative imports.
 import '../third-party-imports/ckeditor.import';
 
 import { NoninteractiveCollapsible } from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
@@ -125,6 +126,10 @@ export const registerCustomElements = (injector: Injector): void => {
     const rteElement = createCustomElement(
       componentMap[rteKey].component_class,
       {injector});
+    // Check if the custom elements have been previously defined. We can't
+    // redefine custom elements with the same id. Root cause for the element
+    // being already defined is not yet known. Can possibly be a side effect of
+    // webpack and AoT bundles co-existing.
     if (
       customElements.get(
         'oppia-noninteractive-ckeditor-' +
