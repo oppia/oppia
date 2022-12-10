@@ -36,7 +36,6 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.domain import translation_domain
-from core.domain import param_domain
 from core.tests import test_utils
 from extensions.interactions import base
 
@@ -1958,8 +1957,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.swap(state_answer_group, 'rule_specs', {}):
             with self.assertRaisesRegex(
-                utils.ValidationError, 'Expected answer group rules to be a list, received {}'):
-                    state_answer_group.validate(interaction, exp_param_specs_dict)
+                utils.ValidationError,
+                'Expected answer group rules to be a list, received {}'):
+                state_answer_group.validate(interaction, exp_param_specs_dict)
 
     def test_answer_group_validation_with_unrecognized_rule(self) -> None:
         """Test validating answer group with unrecognized rule type."""
@@ -1985,7 +1985,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             None
         )
 
-        with self.swap(state_answer_group, 'rule_specs', [state_domain.RuleSpec(
+        with self.swap(state_answer_group, 'rule_specs', [
+            state_domain.RuleSpec(
                     'X',
                     {
                         'x': {
@@ -1993,8 +1994,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'normalizedStrSet': ['Test']
                             }
                     })]):
-            with self.assertRaisesRegex(utils.ValidationError, 'Unrecognized rule type: X'):
-                    state_answer_group.validate(interaction, exp_param_specs_dict)
+            with self.assertRaisesRegex(
+                utils.ValidationError, 'Unrecognized rule type: X'):
+                state_answer_group.validate(interaction, exp_param_specs_dict)
 
     def test_answer_group_validation_with_empty_rule_specs(self) -> None:
         """Test validating answer group with empty rule_specs."""
@@ -2019,15 +2021,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
-    
-        with self.swap(state_answer_group, 'rule_specs', []):
-            with self.swap(state_answer_group, 'tagged_skill_misconception_id', '111111111111-1'):
-                with self.assertRaisesRegex(
-                    utils.ValidationError, 'There must be at least one rule for each answer group.'):
-                        state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
 
-    def test_answer_group_validation_with_invalid_tagged_skill_misconception_ids(self) -> None:
-        """Test validating answer group with invalid tagged_skill_misconception_id's."""
+        with self.swap(state_answer_group, 'rule_specs', []):
+            with self.swap(
+                state_answer_group,
+                'tagged_skill_misconception_id',
+                '111111111111-1'):
+                with self.assertRaisesRegex(
+                    utils.ValidationError,
+                    'There must be at least one rule for each answer group.'):
+                    state_answer_group.validate(
+                        interaction, exp_param_specs_dict,
+                        tagged_skill_misconception_id_required=True)
+
+    def test_answer_group_validation_with_invalid_taggedskillmisconceptionids(
+        self) -> None:
+        """Test validating answer group with
+        invalid tagged_skill_misconception_id's.
+        """
+
         exploration = exp_domain.Exploration.create_default_exploration('0')
         exp_param_specs_dict = exploration.param_specs_dict
         interaction = (
@@ -2050,21 +2062,40 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             None
         )
 
-        with self.swap(state_answer_group, 'tagged_skill_misconception_id', '1-1'):
+        with self.swap(
+            state_answer_group, 'tagged_skill_misconception_id', '1-1'):
             with self.assertRaisesRegex(
-                utils.ValidationError, 'Expected tagged skill misconception id to be None, received 1-1'):
-                    state_answer_group.validate(interaction, exp_param_specs_dict)
+                utils.ValidationError,
+                (
+                    'Expected tagged skill misconception id to be None, '
+                    'received 1-1'
+                )):
+                state_answer_group.validate(
+                    interaction, exp_param_specs_dict)
 
         with self.swap(state_answer_group, 'tagged_skill_misconception_id', 20):
             with self.assertRaisesRegex(
-                utils.ValidationError, 'Expected tagged skill misconception id to be a str, received 20'):
-                    state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
+                utils.ValidationError,
+                (
+                    'Expected tagged skill misconception id to be a str,'
+                    'received 20'
+                )):
+                state_answer_group.validate(
+                        interaction, exp_param_specs_dict,
+                        tagged_skill_misconception_id_required=True)
 
-        with self.swap(state_answer_group, 'tagged_skill_misconception_id', 'Id'):
+        with self.swap(
+            state_answer_group, 'tagged_skill_misconception_id', 'Id'):
             with self.assertRaisesRegex(
-                utils.ValidationError, 'Expected the format of tagged skill misconception id to be <skill_id>-<misconception_id>, received Id'):
-                    state_answer_group.validate(interaction, exp_param_specs_dict, tagged_skill_misconception_id_required=True)
-    
+            utils.ValidationError,
+            (
+                'Expected the format of tagged skill misconception id'
+                ' to be <skill_id>-<misconception_id>, received Id'
+            )):
+                state_answer_group.validate(
+                    interaction, exp_param_specs_dict,
+                    tagged_skill_misconception_id_required=True)
+
     def test_convert_html_fields_in_state_with_drag_and_drop_interaction(
         self
     ) -> None:
