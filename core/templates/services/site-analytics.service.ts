@@ -76,8 +76,6 @@ export class SiteAnalyticsService {
   }
 
   registerNewSignupEvent(srcElement: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'OnboardingEngagement', 'signup', 'AccountSignUp');
     this._sendEventToGoogleAnalytics('sign_up', {
       source_element: srcElement
     });
@@ -404,7 +402,7 @@ export class SiteAnalyticsService {
       totalScore: number
   ): void {
     this._sendEventToGoogleAnalytics(
-      'practice_session_end', {
+      'practice_session_complete', {
         classroom_name: classroomName,
         topic_name: topicName,
         practice_session_id: stringifiedSubtopicIds,
