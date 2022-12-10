@@ -692,10 +692,10 @@ written_translations:
         self.assertEqual(
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename)
-        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(
-            zf_saved.namelist(),
-            ['The title for ZIP download handler test!.yaml'])
+        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
+            self.assertEqual(
+                zf_saved.namelist(),
+                ['The title for ZIP download handler test!.yaml'])
 
         # Load golden zip file.
         golden_zip_filepath = os.path.join(
@@ -704,13 +704,16 @@ written_translations:
         with utils.open_file(
             golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
-        zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
-        # Compare saved with golden file.
-        self.assertEqual(
-            zf_saved.open(
-                'The title for ZIP download handler test!.yaml').read(),
-            zf_gold.open(
-                'The title for ZIP download handler test!.yaml').read())
+        with zipfile.ZipFile(io.BytesIO(golden_zipfile)) as zf_gold:
+            # Compare saved with golden file.
+            with zf_saved.open(
+                'The title for ZIP download handler test!.yaml'
+                ) as zf_saved_open, zf_gold.open(
+                'The title for ZIP download handler test!.yaml'
+                ) as zf_gold_open:
+                self.assertEqual(
+                    zf_saved_open.read(),
+                    zf_gold_open.read())
 
         # Check download to JSON.
         exp_services.update_exploration(
@@ -762,8 +765,8 @@ written_translations:
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename)
 
-        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
+        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
+            self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
 
         self.logout()
 
@@ -790,8 +793,11 @@ written_translations:
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename)
 
-        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(zf_saved.namelist(), ['Unpublished_exploration.yaml'])
+        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
+            self.assertEqual(
+                zf_saved.namelist(),
+                ['Unpublished_exploration.yaml']
+            )
 
         self.logout()
 
