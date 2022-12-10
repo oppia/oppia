@@ -255,7 +255,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                     Exception, 'Is triggered'):
                 auth_services.establish_auth_session(
-                    webapp2.Request, webapp2.Response)
+                    webapp2.Request, webapp2.Response)  # type: ignore[arg-type]
         with self.swap(
                 platform_auth_services,
                 'destroy_auth_session',
@@ -263,7 +263,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
         ):
             with self.assertRaisesRegex(
                     Exception, 'Is triggered'):
-                auth_services.destroy_auth_session(webapp2.Response)
+                auth_services.destroy_auth_session(webapp2.Response)  # type: ignore[arg-type]
 
     def test_super_admin_triggered(self) -> None:
         def mock_grant_super_admin_privileges(uid: str) -> None:
