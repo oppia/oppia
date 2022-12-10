@@ -18,9 +18,6 @@
 
 from __future__ import annotations
 
-import contextlib
-import json
-
 from core.constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
@@ -29,16 +26,17 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from firebase_admin import auth as firebase_auth
-from typing import Dict, Optional
 import webapp2
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import auth_models
+    from mypy_imports import platform_auth_services
 
 auth_models, = (
     models.Registry.import_models([models.Names.AUTH]))
+
+platform_auth_services = models.Registry.import_auth_services()
 
 
 class AuthServicesTests(test_utils.GenericTestBase):
@@ -238,109 +236,45 @@ class AuthServicesTests(test_utils.GenericTestBase):
         # Should not raise.
         auth_services.delete_external_auth_associations('does_not_exist')
 
+    def test_auth_session_triggered(self) -> None:
+        def mock_establish_auth_session(
+                _: webapp2.Request,
+                __: webapp2.Response
+        ) -> None:
+            raise Exception('Is triggered')
+        def mock_destroy_auth_session(
+                _: webapp2.Response) -> None:
+            raise Exception('Is triggered')
 
-class Stub:
-    """Write Stub for replacing some function with easier access.
-    Adopted from firebase_auth_services_test.
-    """
+        with self.swap(platform_auth_services,
+                       'establish_auth_session',
+                       mock_establish_auth_session):
+            with self.assertRaisesRegex(
+                    Exception, 'Is triggered'):
+                auth_services.establish_auth_session(
+                    webapp2.Request, webapp2.Response)
+        with self.swap(platform_auth_services,
+                       'destroy_auth_session',
+                       mock_destroy_auth_session):
+            with self.assertRaisesRegex(
+                    Exception, 'Is triggered'):
+                auth_services.destroy_auth_session(webapp2.Response)
 
-    modified_functions = [
-        'modified_set_custom_user_claims',
-        'modified_revoke_refresh_tokens',
-        'modified_create_session_cookie',
-    ]
+    def test_super_admin_triggered(self) -> None:
+        def mock_grant_super_admin_privileges(uid: str) -> None:
+            raise Exception(uid)
+        def mock_revoke_super_admin_privileges(uid: str) -> None:
+            raise Exception(uid)
 
-    def __init__(self) -> None:
-        self.users_by_uid: Dict[str, firebase_auth.UserRecord] = {}
-        self.uid_by_session_cookie: Dict[str, str] = {}
-        self.swap_function: Optional[contextlib.ExitStack] = None
-        self.test: Optional[test_utils.TestBase] = None
-
-    def install(self, test: test_utils.TestBase) -> None:
-        """Installs the stub on the given test instance. Idempotent."""
-        self.test = test
-
-        with contextlib.ExitStack() as swap_function:
-            for name in self.modified_functions:
-                swap_function.enter_context(
-                    test.swap(firebase_auth, name[9:], getattr(self, name)))
-            self.swap_function = swap_function.pop_all()
-
-    def modified_set_custom_user_claims(
-            self, uid: str, custom_claims: Optional[str]
-    ) -> str:
-        """Modified set_custom_user_claims."""
-        user = firebase_auth.UserRecord({
-            'localId': uid,
-            'customAttributes': custom_claims,
-        })
-        self.users_by_uid[uid] = user
-        return uid
-
-    def modified_create_session_cookie(self, id_token: str, _: int) -> str:
-        """Modified create_session_cookie."""
-        claims = json.loads(id_token)
-        self.uid_by_session_cookie[id_token] = claims['sub']
-        return id_token
-
-    def dump_user(self, uid: str) -> str:
-        """Get claims based on the given username."""
-        user = self.users_by_uid[uid]
-        claims = {'sub': user.uid}
-        if user.email:
-            claims['email'] = user.email
-        if user.custom_claims:
-            claims.update(user.custom_claims)
-        return json.dumps(claims)
-
-    def modified_revoke_refresh_tokens(self, uid: str) -> None:
-        """Revokes all refresh tokens for an existing user."""
-        self.uid_by_session_cookie = {
-            key: value for key, value in
-            self.uid_by_session_cookie.items() if value != uid
-        }
-
-    def create_test_object(self, uid: str) -> firebase_auth.UserRecord:
-        """Create a firebase user for testing."""
-        user = firebase_auth.UserRecord({
-            'localId': uid, 'email': 'email', 'disabled': False,
-        })
-        self.users_by_uid[uid] = user
-        return user
-
-
-class AuthSuperAdminTests(test_utils.AppEngineTestBase):
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.stub = Stub()
-        self.stub.install(self)
-
-    def test_auth_session(self) -> None:
-        req = webapp2.Request.blank('/')
-        res = webapp2.Response()
-        self.stub.create_test_object('aid')
-        id_token = self.stub.dump_user('aid')
-        req.headers['Authorization'] = 'Bearer %s' % id_token
-        auth_services.establish_auth_session(req, res)
-        self.assert_matches_regexps(
-            res.headers.get_all('Set-Cookie'), ['session=.*;'])
-        auth_services.destroy_auth_session(res)
-        self.assertEqual(
-            res.headers.get_all('Set-Cookie')[-1][18],
-            '0')
-
-    def test_super_admin_privilage(self) -> None:
-        auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id='aid').put()
-        self.stub.create_test_object('aid')
-        claims = self.stub.users_by_uid['aid'].custom_claims or {}
-        self.assertNotEqual(
-            claims.get('role', None), 'super_admin')
-        auth_services.grant_super_admin_privileges('uid')
-        claims = self.stub.users_by_uid['aid'].custom_claims or {}
-        self.assertEqual(
-            claims.get('role', None), 'super_admin')
-        auth_services.revoke_super_admin_privileges('uid')
-        claims = self.stub.users_by_uid['aid'].custom_claims or {}
-        self.assertNotEqual(
-            claims.get('role', None), 'super_admin')
+        with self.swap(platform_auth_services,
+                       'grant_super_admin_privileges',
+                       mock_grant_super_admin_privileges):
+            with self.assertRaisesRegex(
+                    Exception, 'uid1'):
+                auth_services.grant_super_admin_privileges('uid1')
+        with self.swap(platform_auth_services,
+                       'revoke_super_admin_privileges',
+                       mock_revoke_super_admin_privileges):
+            with self.assertRaisesRegex(
+                    Exception, 'uid2'):
+                auth_services.revoke_super_admin_privileges('uid2')
