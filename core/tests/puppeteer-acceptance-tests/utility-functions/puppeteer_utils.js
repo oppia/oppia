@@ -1,11 +1,10 @@
 const puppeteer = require("puppeteer");
 const testConstants = require("./testConstants.js");
-// change this to puppeteer_utils or puppeteer utility
-module.exports = class browser {
+
+module.exports = class puppeteerUtilities {
   page;
   browserObject;
 
-  // change this to openBrowser
   async openBrowser(){
    /* currently, headless is set to false and the page viewport
        is maximized so that it would be easy for the developers

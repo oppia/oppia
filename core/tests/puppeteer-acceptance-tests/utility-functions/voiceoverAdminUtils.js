@@ -1,4 +1,4 @@
-const browser = require("./puppeteer_utils.js");
+const puppeteerUtilities = require("./puppeteer_utils.js");
 const testConstants = require("./testConstants.js");
 
 
@@ -10,11 +10,7 @@ const audioPause = "fa-pause";
 const uploadAudio = 'e2e-test-accessibility-translation-upload-audio';
 
 
-module.exports = class e2eVoiceoverAdmin extends browser {
-
-  async openBrowser() {
-    await this.initialize()
-  }
+module.exports = class e2eVoiceoverAdmin extends puppeteerUtilities {
 
   async waitForPageToLoad(selector) {
     await (this.page).waitForSelector(selector);
@@ -28,7 +24,7 @@ module.exports = class e2eVoiceoverAdmin extends browser {
   async record3SecAudio() {
     await this.clickOn("button", startRecording);
     await (this.page).waitForSelector("button", stopRecording);
-    await (this.page).waitForTimeout(3000);  // recording for 3sec
+    await (this.page).waitForTimeout(3000);
     await this.clickOn("button", stopRecording);
     await this.clickOn("button", " Confirm ");
 
