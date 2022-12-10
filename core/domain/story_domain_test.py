@@ -1101,14 +1101,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story.update_meta_tag_content('Updated meta_tag_content')
         self.assertEqual(story.meta_tag_content, 'Updated meta_tag_content')
 
-    def test_validate_with_non_url_fragment(self) -> None:
-        self.story.url_fragment = None
-        self.story.meta_tag_content = None
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected meta tag content to be a string, received None'):
-            self.story.validate()
-
     def test_get_node_with_corresponding_exp_id_with_valid_exp_id(
         self
     ) -> None:
@@ -1775,15 +1767,6 @@ class StorySummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Story Url Fragment field should not be empty'):
-            self.story_summary.validate()
-
-    def test_validate_with_non_url_fragment(self) -> None:
-        self.story_summary.url_fragment = None
-        self.story_summary.title = None
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected title to be a string, '
-            'received %s' % self.story_summary.title):
             self.story_summary.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
