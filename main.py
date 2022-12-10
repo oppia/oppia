@@ -568,8 +568,8 @@ URLS = [
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(
-        r'/androidlistsubscriptionhandler',
-        profile.AndroidListSubscriptionHandler),
+        r'/mailinglistsubscriptionhandler',
+        profile.MailingListSubscriptionHandler),
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
@@ -1090,8 +1090,6 @@ URLS = [
     get_redirect_route(
         r'/user_progress_in_stories_chapters_handler/<username>',
         learner_group.LearnerStoriesChaptersProgressHandler),
-    get_redirect_route(
-        r'/fix_commit_commands/', editor.FixCommitCommandsHandler),
     get_redirect_route(
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler)

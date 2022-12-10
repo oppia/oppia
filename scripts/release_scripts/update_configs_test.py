@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import builtins
 import getpass
 import os
 import tempfile
@@ -28,7 +27,7 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_configs
 
-from typing import Final, List
+from typing import Final
 
 import github  # isort:skip pylint: disable=wrong-import-position
 
@@ -104,81 +103,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         self.url_open_swap = self.swap(utils, 'url_open', mock_url_open)
 
-    def test_missing_terms_page(self) -> None:
-        def mock_url_open(unused_url: str) -> None:
-            raise Exception('Not found.')
-        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
-        with url_open_swap, self.assertRaisesRegex(
-            Exception, 'Terms mainpage does not exist on Github.'
-        ):
-            update_configs.main(
-                args=[
-                    '--release_dir_path', 'test-release-dir',
-                    '--deploy_data_path', 'test-deploy-dir',
-                    '--personal_access_token', 'test-token',
-                    '--prompt_for_mailgun_and_terms_update'
-                ]
-            )
-
-    def test_invalid_user_input(self) -> None:
-        print_msgs: List[str] = []
-        def mock_input() -> str:
-            if print_msgs:
-                return 'n'
-            else:
-                return 'invalid'
-        def mock_print(msg: str) -> None:
-            if 'Invalid Input' in msg:
-                print_msgs.append(msg)
-        input_swap = self.swap(builtins, 'input', mock_input)
-        print_swap = self.swap(builtins, 'print', mock_print)
-        with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
-            with self.open_tab_swap, input_swap, print_swap:
-                update_configs.check_updates_to_terms_of_service(
-                    MOCK_LOCAL_FECONF_PATH, 'test-token')
-        self.assertEqual(
-            print_msgs, ['Invalid Input: invalid. Please enter yes or no.'])
-
-    def test_update_to_registration_updated_date(self) -> None:
-        def mock_input() -> str:
-            return 'y'
-        def mock_get_commit(
-            unused_self: str, unused_sha: str
-        ) -> github.Commit.Commit:
-            return github.Commit.Commit(
-                requester=MOCK_REQUESTER,
-                headers={},
-                attributes={
-                    'commit': {'committer': {'date': '2016-11-15T3:41:01Z'}}},
-                completed=False
-            )
-        input_swap = self.swap(builtins, 'input', mock_input)
-        get_commit_swap = self.swap(
-            github.Repository.Repository, 'get_commit', mock_get_commit)
-
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        expected_feconf_text = feconf_text.replace(
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)',
-            'datetime.datetime(2016, 11, 15, 3, 41, 1)')
-        with utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-
-        with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
-            with self.open_tab_swap, input_swap, get_commit_swap:
-                update_configs.check_updates_to_terms_of_service(
-                    temp_feconf_path, 'test-token')
-        with utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
-
     def test_missing_mailgun_api_key_line(self) -> None:
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
         def mock_getpass(prompt: str) -> str:  # pylint: disable=unused-argument
@@ -189,7 +113,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         feconf_text = (
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -200,7 +124,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             f.write(feconf_text)
 
         with getpass_swap, self.assertRaisesRegex(
-            AssertionError, 'Missing mailgun API key'):
+            AssertionError, 'Missing mailgun API key'
+        ):
             update_configs.add_mailgun_api_key(temp_feconf_path)
 
     def test_missing_mailchimp_api_key_line(self) -> None:
@@ -213,7 +138,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         feconf_text = (
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -224,7 +149,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             f.write(feconf_text)
 
         with getpass_swap, self.assertRaisesRegex(
-            AssertionError, 'Missing mailchimp API key'):
+            AssertionError, 'Missing mailchimp API key'
+        ):
             update_configs.add_mailchimp_api_key(temp_feconf_path)
 
     def test_invalid_mailgun_api_key(self) -> None:
@@ -251,7 +177,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'REDISHOST = \'192.13.2.1\'\n'
             'MAILGUN_API_KEY = None\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -262,7 +188,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'REDISHOST = \'192.13.2.1\'\n'
             'MAILGUN_API_KEY = \'%s\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -304,7 +230,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'MAILGUN_API_KEY = None\n'
             'MAILCHIMP_API_KEY = None\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -316,7 +242,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'MAILGUN_API_KEY = None\n'
             'MAILCHIMP_API_KEY = \'%s\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -344,7 +270,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'REDISHOST = \'192.13.2.1\'\n'
             'MAILGUN_API_KEY = None\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -355,7 +281,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'REDISHOST = \'192.13.2.1\'\n'
             'MAILGUN_API_KEY = \'%s\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -383,7 +309,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'MAILGUN_API_KEY = None\n'
             'MAILCHIMP_API_KEY = None\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -395,7 +321,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'MAILGUN_API_KEY = None\n'
             'MAILCHIMP_API_KEY = \'%s\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -422,7 +348,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'MAILCHIMP_API_KEY = \'%s\'\n'
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -442,7 +368,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         feconf_text = (
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -466,7 +392,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'MAILGUN_API_KEY = \'%s\'\n'
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -491,7 +417,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         feconf_text = (
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -513,7 +439,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'MAILGUN_API_KEY = \'%s\'\n'
             'MAILCHIMP_API_KEY = \'%s\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -539,7 +465,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'MAILCHIMP_API_KEY = \'%s\'\n'
             'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'TERMS_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
             '# Format of string for dashboard statistics logs.\n'
             '# NOTE TO DEVELOPERS: This format should not be changed, '
@@ -614,8 +540,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             f.write(app_yaml_text)
 
         with self.assertRaisesRegex(
-            Exception,
-            'Error: No OPPIA_SITE_URL key found.'
+            Exception, 'Error: No OPPIA_SITE_URL key found.'
         ):
             update_configs.update_app_yaml(
                 temp_app_yaml_path, temp_feconf_config_path)
@@ -661,7 +586,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         check_function_calls = {
-            'check_updates_to_terms_of_service_gets_called': False,
             'add_mailgun_api_key_gets_called': False,
             'add_mailchimp_api_key_gets_called': False,
             'apply_changes_based_on_config_gets_called': False,
@@ -672,7 +596,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'update_analytics_constants_based_on_config': False
         }
         expected_check_function_calls = {
-            'check_updates_to_terms_of_service_gets_called': True,
             'add_mailgun_api_key_gets_called': True,
             'add_mailchimp_api_key_gets_called': True,
             'apply_changes_based_on_config_gets_called': True,
@@ -682,12 +605,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'mailchimp_api_key_is_to_be_verified': True,
             'update_analytics_constants_based_on_config': True
         }
-
-        def mock_check_updates(
-            unused_release_feconf_path: str, unused_personal_access_token: str
-        ) -> None:
-            check_function_calls[
-                'check_updates_to_terms_of_service_gets_called'] = True
 
         def mock_add_mailgun_api_key(unused_release_feconf_path: str) -> None:
             check_function_calls['add_mailgun_api_key_gets_called'] = True
@@ -728,9 +645,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 'update_analytics_constants_based_on_config'
             ] = True
 
-        check_updates_swap = self.swap(
-            update_configs, 'check_updates_to_terms_of_service',
-            mock_check_updates)
         add_mailgun_api_key_swap = self.swap(
             update_configs, 'add_mailgun_api_key', mock_add_mailgun_api_key)
         add_mailchimp_api_key_swap = self.swap(
@@ -746,9 +660,9 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'update_analytics_constants_based_on_config',
             mock_update_analytics_constants_based_on_config)
 
-        with self.url_open_swap, check_updates_swap, add_mailgun_api_key_swap:
-            with apply_changes_swap, verify_config_files_swap:
-                with add_mailchimp_api_key_swap, update_app_yaml_swap:
+        with self.url_open_swap, add_mailgun_api_key_swap, apply_changes_swap:
+            with verify_config_files_swap, add_mailchimp_api_key_swap:
+                with update_app_yaml_swap:
                     with update_analytics_constants_based_on_config_swap:
                         update_configs.main(
                             args=[
@@ -893,8 +807,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
         with self.assertRaisesRegex(
-            Exception,
-            'Error: No UA_ANALYTICS_ID key found.'
+            Exception, 'Error: No UA_ANALYTICS_ID key found.'
         ):
             update_configs.update_analytics_constants_based_on_config(
                 temp_analytics_constants_config_path,
@@ -911,8 +824,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
         with self.assertRaisesRegex(
-            Exception,
-            'Error: No GA_ANALYTICS_ID key found.'
+            Exception, 'Error: No GA_ANALYTICS_ID key found.'
         ):
             update_configs.update_analytics_constants_based_on_config(
                 temp_analytics_constants_config_path,
@@ -929,8 +841,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
         with self.assertRaisesRegex(
-            Exception,
-            'Error: No SITE_NAME_FOR_ANALYTICS key found.'
+            Exception, 'Error: No SITE_NAME_FOR_ANALYTICS key found.'
         ):
             update_configs.update_analytics_constants_based_on_config(
                 temp_analytics_constants_config_path,
@@ -947,8 +858,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with utils.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
         with self.assertRaisesRegex(
-            Exception,
-            'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'
+            Exception, 'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'
         ):
             update_configs.update_analytics_constants_based_on_config(
                 temp_analytics_constants_config_path,

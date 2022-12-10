@@ -233,7 +233,6 @@
 /core/templates/services/exploration-features*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/exploration-html-formatter.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/favicon.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/fix-commit-command-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/image-upload-helper.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/staleness-detection.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/validators.service*.ts @oppia/lace-frontend-reviewers
@@ -677,8 +676,8 @@
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @oppia/lace-backend-reviewers
 
-# Android Updates
-/core/templates/domain/android-updates/android-updates-backend-api.service*.ts @oppia/lace-frontend-reviewers
+# Mailing List
+/core/templates/domain/mailing-list/mailing-list-backend-api.service*.ts @oppia/lace-frontend-reviewers
 
 # Data stability.
 /core/controllers/domain_objects_validator*.py @oppia/data-and-stability-reviewers
