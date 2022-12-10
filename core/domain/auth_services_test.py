@@ -247,16 +247,20 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 _: webapp2.Response) -> None:
             raise Exception('Is triggered')
 
-        with self.swap(platform_auth_services, \
-                       'establish_auth_session', \
-                       mock_establish_auth_session):
+        with self.swap(
+                platform_auth_services,
+                'establish_auth_session',
+                mock_establish_auth_session
+        ):
             with self.assertRaisesRegex(
                     Exception, 'Is triggered'):
                 auth_services.establish_auth_session(
                     webapp2.Request, webapp2.Response)
-        with self.swap(platform_auth_services, \
-                       'destroy_auth_session', \
-                       mock_destroy_auth_session):
+        with self.swap(
+                platform_auth_services,
+                'destroy_auth_session',
+                mock_destroy_auth_session
+        ):
             with self.assertRaisesRegex(
                     Exception, 'Is triggered'):
                 auth_services.destroy_auth_session(webapp2.Response)
@@ -268,13 +272,19 @@ class AuthServicesTests(test_utils.GenericTestBase):
         def mock_revoke_super_admin_privileges(uid: str) -> None:
             raise Exception(uid)
 
-        with self.swap(platform_auth_services, \
-                       'grant_super_admin_privileges', \
-                       mock_grant_super_admin_privileges):
-            with self.assertRaisesRegex(Exception, 'uid1'):
+        with self.swap(
+                platform_auth_services,
+                'grant_super_admin_privileges',
+                mock_grant_super_admin_privileges
+        ):
+            with self.assertRaisesRegex(
+                    Exception, 'uid1'):
                 auth_services.grant_super_admin_privileges('uid1')
-        with self.swap(platform_auth_services, \
-                       'revoke_super_admin_privileges', \
-                       mock_revoke_super_admin_privileges):
-            with self.assertRaisesRegex(Exception, 'uid2'):
+        with self.swap(
+                platform_auth_services,
+                'revoke_super_admin_privileges',
+                mock_revoke_super_admin_privileges
+        ):
+            with self.assertRaisesRegex(
+                    Exception, 'uid2'):
                 auth_services.revoke_super_admin_privileges('uid2')
