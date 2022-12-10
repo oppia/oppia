@@ -958,7 +958,7 @@ class StoryDict(TypedDict):
     language_code: str
     corresponding_topic_id: str
     version: int
-    url_fragment: Optional[str]
+    url_fragment: str
     meta_tag_content: str
 
 
@@ -993,7 +993,7 @@ class Story:
         language_code: str,
         corresponding_topic_id: str,
         version: int,
-        url_fragment: Optional[str],
+        url_fragment: str,
         meta_tag_content: str,
         created_on: Optional[datetime.datetime] = None,
         last_updated: Optional[datetime.datetime] = None
@@ -1024,7 +1024,7 @@ class Story:
             thumbnail_bg_color: str|None. The thumbnail background color of
                 the story.
             thumbnail_size_in_bytes: int|None. The size of thumbnail in bytes.
-            url_fragment: str|None. The url fragment for the story.
+            url_fragment: str. The url fragment for the story.
             meta_tag_content: str. The meta tag content in the topic viewer
                 page.
         """
@@ -1104,10 +1104,9 @@ class Story:
         self.require_valid_title(self.title)
         self.require_valid_description(self.description)
 
-        if self.url_fragment is not None:
-            utils.require_valid_url_fragment(
-                self.url_fragment, 'Story Url Fragment',
-                constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
+        utils.require_valid_url_fragment(
+            self.url_fragment, 'Story Url Fragment',
+            constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
         utils.require_valid_meta_tag_content(self.meta_tag_content)
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
@@ -1380,7 +1379,7 @@ class Story:
         title: str,
         description: str,
         corresponding_topic_id: str,
-        url_fragment: Optional[str]
+        url_fragment: str
     ) -> Story:
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
@@ -1392,7 +1391,7 @@ class Story:
             description: str. The high level description of the story.
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
-            url_fragment: str|None. The url fragment of the story.
+            url_fragment: str. The url fragment of the story.
 
         Returns:
             Story. The Story domain object with the default values.
@@ -1904,7 +1903,7 @@ class HumanReadableStorySummaryDict(TypedDict):
     node_titles: List[str]
     thumbnail_bg_color: Optional[str]
     thumbnail_filename: Optional[str]
-    url_fragment: Optional[str]
+    url_fragment: str
 
 
 class StorySummaryDict(HumanReadableStorySummaryDict):
@@ -1929,7 +1928,7 @@ class StorySummary:
         node_titles: List[str],
         thumbnail_bg_color: Optional[str],
         thumbnail_filename: Optional[str],
-        url_fragment: Optional[str],
+        url_fragment: str,
         story_model_created_on: datetime.datetime,
         story_model_last_updated: datetime.datetime
     ) -> None:
@@ -1945,7 +1944,7 @@ class StorySummary:
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 story.
             thumbnail_filename: str|None. The thumbnail filename of the story.
-            url_fragment: str|None. The url fragment for the story.
+            url_fragment: str. The url fragment for the story.
             story_model_created_on: datetime.datetime. Date and time when
                 the story model is created.
             story_model_last_updated: datetime.datetime. Date and time
@@ -1970,10 +1969,9 @@ class StorySummary:
             ValidationError. One or more attributes of story summary are
                 invalid.
         """
-        if self.url_fragment is not None:
-            utils.require_valid_url_fragment(
-                self.url_fragment, 'Story Url Fragment',
-                constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
+        utils.require_valid_url_fragment(
+            self.url_fragment, 'Story Url Fragment',
+            constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
 
         if not isinstance(self.title, str):
             raise utils.ValidationError(
@@ -2071,7 +2069,7 @@ class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
     completed_node_titles: List[str]
     all_node_dicts: List[StoryNodeDict]
     topic_name: str
-    topic_url_fragment: Optional[str]
+    topic_url_fragment: str
     classroom_url_fragment: Optional[str]
 
 
