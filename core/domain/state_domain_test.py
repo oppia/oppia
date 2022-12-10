@@ -32,6 +32,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import interaction_registry
+from core.domain import param_domain
 from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
@@ -1934,7 +1935,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_answer_group_validation_with_invalid_rule_spec_type(self) -> None:
         """Test validating answer group with invalid rule_spec type."""
         exploration = exp_domain.Exploration.create_default_exploration('0')
-        exp_param_specs_dict = exploration.param_specs_dict
+        temp = exploration.param_specs_dict
+        exp_param_specs_dict = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in temp.items()
+        }
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(
                 'DragAndDropSortInput'))
@@ -1964,7 +1969,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_answer_group_validation_with_unrecognized_rule(self) -> None:
         """Test validating answer group with unrecognized rule type."""
         exploration = exp_domain.Exploration.create_default_exploration('0')
-        exp_param_specs_dict = exploration.param_specs_dict
+        temp = exploration.param_specs_dict
+        exp_param_specs_dict = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in temp.items()
+        }
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(
                 'DragAndDropSortInput'))
@@ -2001,7 +2010,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_answer_group_validation_with_empty_rule_specs(self) -> None:
         """Test validating answer group with empty rule_specs."""
         exploration = exp_domain.Exploration.create_default_exploration('0')
-        exp_param_specs_dict = exploration.param_specs_dict
+        temp = exploration.param_specs_dict
+        exp_param_specs_dict = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in temp.items()
+        }
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(
                 'DragAndDropSortInput'))
@@ -2041,7 +2054,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """
 
         exploration = exp_domain.Exploration.create_default_exploration('0')
-        exp_param_specs_dict = exploration.param_specs_dict
+        temp = exploration.param_specs_dict
+        exp_param_specs_dict = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in temp.items()
+        }
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(
                 'DragAndDropSortInput'))
@@ -2067,8 +2084,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 utils.ValidationError,
                 (
-                    'Expected tagged skill misconception id to be None, '
-                    'received 1-1'
+                    'Expected tagged skill misconception id to be None,'
+                    ' received 1-1'
                 )):
                 state_answer_group.validate(
                     interaction, exp_param_specs_dict)
@@ -2078,7 +2095,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 utils.ValidationError,
                 (
                     'Expected tagged skill misconception id to be a str,'
-                    'received 20'
+                    ' received 20'
                 )):
                 state_answer_group.validate(
                         interaction, exp_param_specs_dict,
