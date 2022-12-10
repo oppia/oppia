@@ -255,7 +255,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                     Exception, 'Is triggered'):
                 auth_services.establish_auth_session(
-                    webapp2.Request(), webapp2.Response())
+                    webapp2.Request.blank('/'), webapp2.Response())
         with self.swap(
                 platform_auth_services,
                 'destroy_auth_session',
