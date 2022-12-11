@@ -277,7 +277,7 @@ export class ConversationSkinComponent {
       this.skipButtonIsShown = true;
     }
 
-    if (!this.contextService.isExplorationPage()) {
+    if (!this.contextService.isInExplorationPlayerPage()) {
       this.checkpointCelebrationModalIsEnabled = false;
     }
 
