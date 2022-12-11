@@ -97,7 +97,7 @@ describe('AlgebraicExpressionEditor', () => {
     fixture = TestBed.createComponent(
       AlgebraicExpressionEditorComponent);
     component = fixture.componentInstance;
-    windowRef.nativeWindow.Guppy = MockGuppy;
+    windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
   });
 
   it('should add the change handler to guppy', () => {

@@ -48,7 +48,7 @@ describe('Browser Checker Service', function() {
   it('should support speech synthesis when device is desktop', () => {
     spyOnProperty(wrs.nativeWindow, 'speechSynthesis').and.returnValue({
       getVoices: () => [{ lang: 'en-US' }]
-    });
+    } as SpeechSynthesis);
     expect(bcs.supportsSpeechSynthesis()).toBe(true);
   });
 
@@ -56,7 +56,7 @@ describe('Browser Checker Service', function() {
     mockUserAgent(mobileAgent);
     spyOnProperty(window, 'speechSynthesis').and.returnValue({
       getVoices: () => [{ lang: 'en_US' }]
-    });
+    } as SpeechSynthesis);
     expect(bcs.supportsSpeechSynthesis()).toBe(true);
   });
 

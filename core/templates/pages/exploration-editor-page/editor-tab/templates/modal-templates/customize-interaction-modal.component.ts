@@ -89,7 +89,7 @@ interface DefaultValueGraph {
   isLabeled: boolean;
 }
 
-interface CustomizationArgSpecsInterface {
+export interface CustomizationArgSpecsInterface {
   name: string;
   default_value: DefaultValueHtml[] |
                  DefaultValueHtml |
@@ -161,7 +161,7 @@ export class CustomizeInteractionModalComponent
     private ngbModal: NgbModal,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
-    private stateInteractionIdService: StateInteractionIdService,
+    public stateInteractionIdService: StateInteractionIdService,
     private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private urlInterpolationService: UrlInterpolationService,
   ) {

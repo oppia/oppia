@@ -64,8 +64,8 @@ describe('Collection Creation service', () => {
         location: {
           href: ''
         },
-        gtag: () => {}
-      });
+        gtag: () => { }
+      } as unknown as Window);
 
       collectionCreationService.createNewCollection();
 
@@ -119,8 +119,8 @@ describe('Collection Creation service', () => {
         location: {
           href: ''
         },
-        gtag: () => {}
-      });
+        gtag: () => { }
+      } as unknown as Window);
 
       collectionCreationService.createNewCollection();
       collectionCreationService.createNewCollection();

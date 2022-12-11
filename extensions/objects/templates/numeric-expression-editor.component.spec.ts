@@ -65,7 +65,7 @@ describe('NumericExpressionEditor', () => {
     component = fixture.componentInstance;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
-    window.Guppy = MockGuppy;
+    window.Guppy = MockGuppy as unknown as Guppy;
   })));
 
   afterEach(() => {

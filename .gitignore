@@ -21,7 +21,11 @@ local_compiled_js_for_test/*
 core/templates/prod/*
 webpack_bundles/*
 core/tests/.browserstack.env
-node_modules/*
+node_modules
+# .angular is temp folder used by angular to put logs and other artefacts.
+.angular
+# dist is our angular build folder output.
+dist
 .coverage*
 !.coveragerc
 coverage.xml

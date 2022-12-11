@@ -153,7 +153,10 @@ export class ContributionAndReviewBackendApiService {
     if (explorationId !== undefined) {
       params.exploration_id = explorationId;
     }
-    return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
+    return this.http.get<FetchSuggestionsResponse>(
+      url,
+      { params } as Object
+    ).toPromise();
   }
 
   async reviewExplorationSuggestionAsync(

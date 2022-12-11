@@ -77,7 +77,7 @@ describe('MathEquationEditor', () => {
     fixture = TestBed.createComponent(
       MathEquationEditorComponent);
     component = fixture.componentInstance;
-    window.Guppy = MockGuppy;
+    window.Guppy = MockGuppy as unknown as Guppy;
   });
 
   afterEach(() => {

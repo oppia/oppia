@@ -95,7 +95,7 @@ describe('MathEquationInputInteractive', () => {
 
   beforeEach(() => {
     windowRef = TestBed.inject(WindowRef);
-    windowRef.nativeWindow.Guppy = MockGuppy;
+    windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     mockCurrentInteractionService = TestBed.inject(CurrentInteractionService);
     deviceInfoService = TestBed.inject(DeviceInfoService);

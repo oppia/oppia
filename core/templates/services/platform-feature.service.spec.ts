@@ -89,7 +89,7 @@ describe('PlatformFeatureService', () => {
           return userAgent;
         }
       }
-    });
+    } as unknown as Window);
     mockSessionStore = (obj: object) => {
       Object.assign(store, obj);
     };

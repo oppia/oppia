@@ -124,7 +124,12 @@ export class ResponsesService {
       stateSolutionSavedMemento.correctAnswer !== null);
 
     const activeStateName = this.stateEditorService.getActiveStateName();
-    if (interactionCanHaveSolution && solutionExists && activeStateName) {
+    if (
+      interactionCanHaveSolution &&
+      stateSolutionSavedMemento &&
+      solutionExists &&
+      activeStateName
+    ) {
       const interaction = this.stateEditorService.getInteraction();
       interaction.answerGroups = cloneDeep(this._answerGroups);
       interaction.defaultOutcome = cloneDeep(this._defaultOutcome);
