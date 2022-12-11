@@ -501,19 +501,15 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             ['skill_1', 'skill_2']
         )
 
-    def test_get_acquired_skill_ids_for_node_ids_not_found(
+    def test_get_acquired_skill_ids_with_empty_node_ids_ids_is_empty_list(
         self
     ) -> None:
-        # Test cases when node.id not in node_ids.
         self.story.story_contents.nodes[0].acquired_skill_ids = [
             'skill_1', 'skill_2']
         self.story.story_contents.nodes[1].acquired_skill_ids = [
             'skill_1']
         self.assertEqual(
-            self.story.get_acquired_skill_ids_for_node_ids(
-                []),
-            []
-        )
+            self.story.get_acquired_skill_ids_for_node_ids([]), [])
 
     def test_get_prerequisite_skill_ids(self) -> None:
         self.story.story_contents.nodes[0].prerequisite_skill_ids = ['skill_1']
@@ -650,12 +646,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             ValueError,
             'The node with id %s is the starting node for the story, '
-            'change the starting node before deleting it.' % self.NODE_ID_1):
+            'change the starting node before deleting it.' % self.NODE_ID_1
+        ):
             self.story.delete_node(self.NODE_ID_1)
         self.story.delete_node(self.NODE_ID_2)
-        self.assertEqual(len(self.story.story_contents.nodes), 1)
+        self.assertEqual(self.story.story_contents.nodes[0].id, 'node_1')
         self.story.delete_node(self.NODE_ID_1)
-        self.assertEqual(self.story.story_contents.initial_node_id, None)
+        self.assertIsNone(self.story.story_contents.initial_node_id)
 
     def test_get_number_from_node_id(self) -> None:
         self.assertEqual(
@@ -794,10 +791,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected acquired skill ids to be a list, received 1')
         self.story.story_contents.nodes[0].acquired_skill_ids = ['3']
         self.assertEqual(
-            len(self.story.story_contents.nodes[0].acquired_skill_ids), 1)
+            self.story.story_contents.nodes[0].acquired_skill_ids, ['3'])
         self.story.update_node_acquired_skill_ids('node_1', ['3', '4'])
         self.assertEqual(
-            len(self.story.story_contents.nodes[0].acquired_skill_ids), 2)
+            self.story.story_contents.nodes[0].acquired_skill_ids, ['3', '4'])
 
         self.story.story_contents.nodes[0].prerequisite_skill_ids = [
             'skill_id', 'skill_id', 'skill_id_1']
@@ -820,7 +817,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].prerequisite_skill_ids = ['1']
         self.story.update_node_prerequisite_skill_ids('node_1', ['1', '2'])
         self.assertEqual(
-            len(self.story.story_contents.nodes[0].prerequisite_skill_ids), 2)
+            self.story.story_contents.nodes[0].prerequisite_skill_ids,
+            ['1', '2'])
         self.story.mark_node_outline_as_finalized('node_1')
         self.assertTrue(
             self.story.story_contents.nodes[0].outline_is_finalized)
@@ -1000,7 +998,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.story_contents.get_all_linked_exp_ids(),
             ['exp_1', 'exp_2', 'exp_3'])
         with self.assertRaisesRegex(
-                ValueError, 'A node with exploration id exp_3 already exists.'):
+            ValueError, 'A node with exploration id exp_3 already exists.'
+        ):
             self.story.update_node_exploration_id('node_4', 'exp_3')
         self.story.update_node_exploration_id('node_3', 'exp_3')
         self.assertEqual(
@@ -1011,7 +1010,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.story_contents.get_all_linked_exp_ids(),
             ['exp_1', 'exp_2', 'exp_4'])
 
-    def test_update_story_contents_from_model(self) -> None:
+    def test_update_story_contents_from_model_with_all_versions(self) -> None:
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
@@ -1041,12 +1040,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story_domain.Story.update_story_contents_from_model(
             version_dict, 1, 'node_1')
         self.assertEqual(version_dict['schema_version'], 2)
-        self.assertEqual(
-            version_dict['story_contents']['nodes'][0]['thumbnail_filename'],
-            None)
-        self.assertEqual(
-            version_dict['story_contents']['nodes'][0]['thumbnail_bg_color'],
-            None)
+        self.assertIsNone(
+            version_dict['story_contents']['nodes'][0]['thumbnail_filename'])
+        self.assertIsNone(
+            version_dict['story_contents']['nodes'][0]['thumbnail_bg_color'])
         self.assertEqual(
             version_dict['story_contents']['nodes'][0]['description'],
             'Description 1')
@@ -1054,24 +1051,21 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             version_dict, 2, 'node_1')
         self.assertEqual(version_dict['schema_version'], 3)
         self.assertEqual(
-            version_dict['story_contents']['nodes'][0]['description'],
-            '')
+            version_dict['story_contents']['nodes'][0]['description'], '')
         story_domain.Story.update_story_contents_from_model(
             version_dict, 3, 'node_1')
         self.assertEqual(version_dict['schema_version'], 4)
         self.assertEqual(
-            version_dict['story_contents']['nodes'][0]
-            ['thumbnail_size_in_bytes'],
-            21131)
+            version_dict['story_contents']['nodes'][0][
+                'thumbnail_size_in_bytes'], 21131)
         story_domain.Story.update_story_contents_from_model(
             version_dict, 4, 'node_1')
         self.assertEqual(version_dict['schema_version'], 5)
-        self.assertEqual(
-            version_dict['story_contents']['nodes'][0]
-            ['thumbnail_size_in_bytes'],
-            None)
+        self.assertIsNone(
+            version_dict['story_contents']['nodes'][0][
+                'thumbnail_size_in_bytes'])
 
-    def test_info_update(self) -> None:
+    def test_story_info_update(self) -> None:
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'Title', 'Description', topic_id,
@@ -1080,7 +1074,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story.update_title('Updated title')
         self.assertEqual(story.title, 'Updated title')
 
-        self.assertEqual(story.thumbnail_bg_color, None)
+        self.assertIsNone(story.thumbnail_bg_color)
         story.update_thumbnail_bg_color('Updated thumbnail_bg_color')
         self.assertEqual(
             story.thumbnail_bg_color, 'Updated thumbnail_bg_color')

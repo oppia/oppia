@@ -1103,7 +1103,7 @@ class Story:
         """
         self.require_valid_title(self.title)
         self.require_valid_description(self.description)
-
+        assert self.url_fragment is not None
         utils.require_valid_url_fragment(
             self.url_fragment, 'Story Url Fragment',
             constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
@@ -1969,6 +1969,7 @@ class StorySummary:
             ValidationError. One or more attributes of story summary are
                 invalid.
         """
+        assert self.url_fragment is not None
         utils.require_valid_url_fragment(
             self.url_fragment, 'Story Url Fragment',
             constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
