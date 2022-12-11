@@ -1001,7 +1001,7 @@ class ContributorCertificateHandler(
             raise self.InvalidInputException(
                 'To date should not be a future date.')
 
-        response = suggestion_services.generate_contributor_certificate(
+        response = suggestion_services.generate_contributor_certificate_data(
             username, suggestion_type, language, from_datetime,
             to_datetime)
 

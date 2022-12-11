@@ -31,8 +31,8 @@ interface FetchSuggestionsResponse {
 }
 
 export interface ContributorCertificateResponse {
-  'from': string;
-  'to': string;
+  'from_date': string;
+  'to_date': string;
   'contribution_hours': number;
   'team_lead': string;
   'language': string | null;

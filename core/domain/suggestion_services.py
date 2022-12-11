@@ -2962,13 +2962,13 @@ def enqueue_contributor_ranking_notification_email_task(
         payload, 0)
 
 
-def generate_contributor_certificate(
+def generate_contributor_certificate_data(
     username: str,
     suggestion_type: str,
     language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime
-) -> Dict[str, Union[str, None]]:
+) -> suggestion_registry.ContributorCertificateInfoDict:
     """Returns data to generate the certificate.
 
     Args:
@@ -2983,7 +2983,7 @@ def generate_contributor_certificate(
             contributions were created.
 
     Returns:
-        Dict[str, Union[str, None]]. Data to generate the certificate.
+        ContributorCertificateInfoDict. Data to generate the certificate.
 
     Raises:
         Exception. The suggestion type is invalid.
@@ -2992,28 +2992,30 @@ def generate_contributor_certificate(
     user_id = user_services.get_user_id_from_username(username)
     if user_id is None:
         raise Exception('There is no user for the given username.')
-    data: Dict[str, Union[str, None]] = {}
+    data_dict: suggestion_registry.ContributorCertificateInfoDict = {}
 
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        data = _generate_translation_contributor_certificate(
+        data = _generate_translation_contributor_certificate_data(
             language_code, from_date, to_date, user_id)
+        data_dict = data.to_dict()
 
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        data = _generate_question_contributor_certificate(
+        data = _generate_question_contributor_certificate_data(
             from_date, to_date, user_id)
+        data_dict = data.to_dict()
 
     else:
         raise Exception('The suggestion type is invalid.')
 
-    return data
+    return data_dict
 
 
-def _generate_translation_contributor_certificate(
+def _generate_translation_contributor_certificate_data(
     language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
-) -> Dict[str, Union[str, None]]:
+) -> suggestion_registry.ContributorCertificateInfo:
     """Returns data to generate translation submitter certificate.
 
     Args:
@@ -3026,7 +3028,7 @@ def _generate_translation_contributor_certificate(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        Dict[str, Union[str, None]]. Data to generate translation submitter
+        ContributorCertificateInfo. Data to generate translation submitter
         certificate.
 
     Raises:
@@ -3087,20 +3089,17 @@ def _generate_translation_contributor_certificate(
         raise Exception(
             'There are no contributions for the given time range.')
 
-    return {
-        'from': from_date.strftime('%d %b %Y'),
-        'to': to_date.strftime('%d %b %Y'),
-        'contribution_hours': str(hours_contributed),
-        'team_lead': signature,
-        'language': language_description
-    }
+    return suggestion_registry.ContributorCertificateInfo(
+        from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),
+        signature, str(hours_contributed), language_description
+    )
 
 
-def _generate_question_contributor_certificate(
+def _generate_question_contributor_certificate_data(
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
-) -> Dict[str, Union[str, None]]:
+) -> suggestion_registry.ContributorCertificateInfo:
     """Returns data to generate question submitter certificate.
 
     Args:
@@ -3111,7 +3110,7 @@ def _generate_question_contributor_certificate(
         user_id: str. The user ID of the contributor.
 
     Returns:
-        Dict[str, Union[str, None]]. Data to generate question submitter
+        ContributorCertificateInfo. Data to generate question submitter
         certificate.
 
     Raises:
@@ -3153,10 +3152,7 @@ def _generate_question_contributor_certificate(
         raise Exception(
             'There are no contributions for the given time range.')
 
-    return {
-        'from': from_date.strftime('%d %b %Y'),
-        'to': to_date.strftime('%d %b %Y'),
-        'team_lead': signature,
-        'contribution_hours': str(hours_contributed),
-        'language': None
-    }
+    return suggestion_registry.ContributorCertificateInfo(
+        from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),
+        signature, str(hours_contributed), None
+    )

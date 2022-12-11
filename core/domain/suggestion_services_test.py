@@ -6033,7 +6033,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         from_date = datetime.datetime.today() - datetime.timedelta(days=1)
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
-        response = suggestion_services.generate_contributor_certificate(
+        response = suggestion_services.generate_contributor_certificate_data(
             username,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             'hi',
@@ -6067,7 +6067,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         from_date = datetime.datetime.today() - datetime.timedelta(days=1)
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
-        response = suggestion_services.generate_contributor_certificate(
+        response = suggestion_services.generate_contributor_certificate_data(
             username,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             'en',
@@ -6119,7 +6119,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         from_date = datetime.datetime.today() - datetime.timedelta(days=1)
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
-        response = suggestion_services.generate_contributor_certificate(
+        response = suggestion_services.generate_contributor_certificate_data(
             username,
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             None,
@@ -6174,7 +6174,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         from_date = datetime.datetime.today() - datetime.timedelta(days=1)
         to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
-        response = suggestion_services.generate_contributor_certificate(
+        response = suggestion_services.generate_contributor_certificate_data(
             username,
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             None,
@@ -6195,7 +6195,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             Exception,
             'There are no contributions for the given time range.'
         ):
-            suggestion_services.generate_contributor_certificate(
+            suggestion_services.generate_contributor_certificate_data(
                 username,
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'hi',
@@ -6214,7 +6214,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             Exception,
             'There are no contributions for the given time range.'
         ):
-            suggestion_services.generate_contributor_certificate(
+            suggestion_services.generate_contributor_certificate_data(
                 username,
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 None,
@@ -6233,7 +6233,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             Exception,
             'The provided language is invalid.'
         ):
-            suggestion_services.generate_contributor_certificate(
+            suggestion_services.generate_contributor_certificate_data(
                 username,
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'test',
@@ -6252,7 +6252,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             Exception,
             'There is no user for the given username.'
         ):
-            suggestion_services.generate_contributor_certificate(
+            suggestion_services.generate_contributor_certificate_data(
                 username,
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'hi',
@@ -6271,7 +6271,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             Exception,
             'The suggestion type is invalid.'
         ):
-            suggestion_services.generate_contributor_certificate(
+            suggestion_services.generate_contributor_certificate_data(
                 username,
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 'test',

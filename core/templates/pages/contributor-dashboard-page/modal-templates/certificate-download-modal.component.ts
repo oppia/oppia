@@ -263,7 +263,7 @@ export class CertificateDownloadModalComponent {
     linePosition += 40;
 
     ctx.fillText(
-      `translations from ${response.from} to ${response.to}`,
+      `translations from ${response.from_date} to ${response.to_date}`,
       this.CERTIFICATE_MID_POINT,
       860
     );
@@ -279,7 +279,8 @@ export class CertificateDownloadModalComponent {
       response: ContributorCertificateResponse
   ): number {
     ctx.fillText(
-      'has contributed practice questions to Oppia\'s',
+      'for their dedication and time in contributing practice questions ' +
+      'to Oppia\'s',
       this.CERTIFICATE_MID_POINT,
       linePosition
     );
@@ -303,7 +304,8 @@ export class CertificateDownloadModalComponent {
     linePosition += 80;
 
     ctx.fillText(
-      `We confirm that ${this.username} has contributed`,
+      `We confirm that ${this.username} has contributed ` +
+      response.contribution_hours + ' hours',
       this.CERTIFICATE_MID_POINT,
       linePosition
     );
@@ -311,26 +313,12 @@ export class CertificateDownloadModalComponent {
     linePosition += 40;
 
     ctx.fillText(
-      `${response.contribution_hours} hours`,
+      `to Oppia from ${response.from_date} to ${response.to_date}`,
       this.CERTIFICATE_MID_POINT,
       linePosition
     );
     // Increase y coordinate by 40.
     linePosition += 40;
-
-    ctx.fillText(
-      `to Oppia from ${response.from}`,
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 40.
-    linePosition += 40;
-
-    ctx.fillText('to', this.CERTIFICATE_MID_POINT, linePosition);
-    // Increase y coordinate by 40.
-    linePosition += 40;
-
-    ctx.fillText(response.to, this.CERTIFICATE_MID_POINT, linePosition);
 
     return linePosition;
   }
