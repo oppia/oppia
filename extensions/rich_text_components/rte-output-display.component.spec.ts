@@ -110,4 +110,37 @@ describe('RTE display component', () => {
       component.ngAfterViewInit();
     }).toThrowError();
   }));
+
+  it('should not display type 3 nodes', () => {
+    const removeChildSpy = jasmine.createSpy('Remove child node');
+
+    component.elementRef = {
+      nativeElement: {
+        childNodes: [
+          {
+            nodeType: 3,
+            parentElement: {
+              removeChild: removeChildSpy
+            }
+          }
+        ]
+      }
+    };
+    let rteString = (
+      '<p>Hi<em>Hello</em>Hello</p>' +
+      '<pre> Hello </pre>');
+
+    let changes: SimpleChanges = {
+      rteString: {
+        previousValue: '',
+        currentValue: rteString,
+        firstChange: true,
+        isFirstChange: () => true
+      }
+    };
+
+    component.ngOnChanges(changes);
+
+    expect(removeChildSpy).toHaveBeenCalled();
+  });
 });
