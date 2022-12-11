@@ -127,6 +127,10 @@ describe('Content language selector component', () => {
     ]);
   });
 
+  it('should correcly initialize newLanguageCode', () => {
+    expect(component.newLanguageCode).toBe('fr');
+  });
+
   it('should correctly select an option when refresh is not needed', () => {
     const setCurrentContentLanguageCodeSpy = spyOn(
       contentTranslationLanguageService,
