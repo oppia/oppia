@@ -184,6 +184,16 @@ export class RteOutputDisplayComponent implements AfterViewInit {
        * cycle and hence, we will still have the problem.
        */
       this.show = false;
+      const textNodes: Text[] = [];
+
+      for (const node of this.elementRef.nativeElement.childNodes) {
+        if ((node as Node).nodeType === 3) {
+          textNodes.push(node);
+        }
+      }
+
+      textNodes.forEach(node => node.parentElement.removeChild(node));
+
       this._updateNode();
       setTimeout(() => this.show = true, 0);
     }
