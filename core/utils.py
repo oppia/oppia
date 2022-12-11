@@ -129,9 +129,13 @@ def open_file(
     """
     # Here we use cast because we are narrowing down the type from IO[Any]
     # to Union[BinaryIO, TextIO].
+    # The pylint ignore will disable the Consider using 'with' for
+    # resource-allocating operations error message. This is because the
+    # file needs to be returned and cannot be closed within the scope
+    # of a "with" clause.
     file = cast(
         Union[BinaryIO, TextIO],
-        open(filename, mode, encoding=encoding, newline=newline)
+        open(filename, mode, encoding=encoding, newline=newline)# pylint: disable=consider-using-with
     )
     return file
 
