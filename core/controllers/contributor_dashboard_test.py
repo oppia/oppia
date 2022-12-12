@@ -1919,8 +1919,8 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response,
             {
-                'from': from_date.strftime('%d %b %Y'),
-                'to': to_date.strftime('%d %b %Y'),
+                'from_date': from_date.strftime('%d %b %Y'),
+                'to_date': to_date.strftime('%d %b %Y'),
                 'contribution_hours': '0.01',
                 'team_lead': feconf.TRANSLATION_TEAM_LEAD,
                 'language': 'Hindi'
