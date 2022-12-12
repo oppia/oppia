@@ -267,8 +267,8 @@ describe('Contribution and review service', () => {
         cars.downloadContributorCertificateAsync(
           'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02')
           .then((response) => {
-            expect(response.from).toEqual('1 Nov 2022');
-            expect(response.to).toEqual('1 Dec 2022');
+            expect(response.from_date).toEqual('1 Nov 2022');
+            expect(response.to_date).toEqual('1 Dec 2022');
             expect(response.contribution_hours).toEqual(1.0);
             expect(response.team_lead).toEqual('Test User');
             expect(response.language).toEqual('Hindi');

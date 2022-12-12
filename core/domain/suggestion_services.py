@@ -2992,22 +2992,22 @@ def generate_contributor_certificate_data(
     user_id = user_services.get_user_id_from_username(username)
     if user_id is None:
         raise Exception('There is no user for the given username.')
-    data_dict: suggestion_registry.ContributorCertificateInfoDict = {}
+    data: suggestion_registry.ContributorCertificateInfo = (
+        suggestion_registry.ContributorCertificateInfo('', '', '', '', None)
+    )
 
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         data = _generate_translation_contributor_certificate_data(
             language_code, from_date, to_date, user_id)
-        data_dict = data.to_dict()
 
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         data = _generate_question_contributor_certificate_data(
             from_date, to_date, user_id)
-        data_dict = data.to_dict()
 
     else:
         raise Exception('The suggestion type is invalid.')
 
-    return data_dict
+    return data.to_dict()
 
 
 def _generate_translation_contributor_certificate_data(

@@ -1835,7 +1835,7 @@ class ContributorCertificateInfoDict(TypedDict):
 
 class ContributorCertificateInfo:
     """Encapsulates key information that is used to generate contributor
-    certificate
+    certificate.
     """
 
     def __init__(
@@ -1852,7 +1852,7 @@ class ContributorCertificateInfo:
         self.contribution_hours = contribution_hours
         self.language = language
 
-    def to_dict(self) -> QuestionReviewStatsDict:
+    def to_dict(self) -> ContributorCertificateInfoDict:
         """Returns a dict representation of a ContributorCertificateInfo
         domain object.
 
