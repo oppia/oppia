@@ -75,6 +75,9 @@ export class NumberWithUnits {
     // which isn't allowed. Refer objects.py L#956.
     let unitsString = (new UnitsObjectFactory()).fromList(
       this.units).toString();
+    // A while loop is used here to ensure multiple passes through the string
+    // for complete sanitization of tags. See https://codeql.github.com/codeql-
+    // query-help/javascript/js-incomplete-multi-character-sanitization/
     if (unitsString.includes('$')) {
       while (unitsString.includes('$')) {
         unitsString = unitsString.replace('$', '');
