@@ -79,13 +79,13 @@ class AuthServicesTests(test_utils.GenericTestBase):
         self.assertFalse(user_auth_details.deleted)
 
     def test_create_profile_user_auth_details_with_self_as_parent_is_error(
-            self
+        self
     ) -> None:
         with self.assertRaisesRegex(ValueError, 'cannot be its own parent'):
             auth_services.create_profile_user_auth_details('uid', 'uid')
 
     def test_get_all_profiles_for_parent_user_id_returns_all_profiles(
-            self
+        self
     ) -> None:
         self.assertItemsEqual(
             auth_services.get_all_profiles_by_parent_user_id(self.full_user_id),
@@ -185,7 +185,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
     def test_associate_multi_auth_ids_with_user_ids_without_collisions(
-            self
+        self
     ) -> None:
         auth_services.associate_multi_auth_ids_with_user_ids(
             [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
@@ -199,7 +199,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
             ['uid1', 'uid2', 'uid3'])
 
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
-            self
+        self
     ) -> None:
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
@@ -236,36 +236,41 @@ class AuthServicesTests(test_utils.GenericTestBase):
         # Should not raise.
         auth_services.delete_external_auth_associations('does_not_exist')
 
-    def test_auth_session_triggered(self) -> None:
+    def test_auth_session_established_or_destoryed(self) -> None:
         def mock_establish_auth_session(
-                _: webapp2.Request,
-                __: webapp2.Response
+            _: webapp2.Request,
+            __: webapp2.Response
         ) -> None:
-            raise Exception('Is triggered')
+            raise Exception('Is Established')
 
         def mock_destroy_auth_session(
-                _: webapp2.Response) -> None:
-            raise Exception('Is triggered')
+            _: webapp2.Response
+        ) -> None:
+            raise Exception('Is Destroyed')
 
         with self.swap(
-                platform_auth_services,
-                'establish_auth_session',
-                mock_establish_auth_session
+            platform_auth_services,
+            'establish_auth_session',
+            mock_establish_auth_session
         ):
             with self.assertRaisesRegex(
-                    Exception, 'Is triggered'):
+                Exception, 'Is Established'
+            ):
                 auth_services.establish_auth_session(
-                    webapp2.Request.blank('/'), webapp2.Response())
+                    webapp2.Request.blank('/'),
+                    webapp2.Response()
+                )
         with self.swap(
-                platform_auth_services,
-                'destroy_auth_session',
-                mock_destroy_auth_session
+            platform_auth_services,
+            'destroy_auth_session',
+            mock_destroy_auth_session
         ):
             with self.assertRaisesRegex(
-                    Exception, 'Is triggered'):
+                Exception, 'Is Destroyed'
+            ):
                 auth_services.destroy_auth_session(webapp2.Response())
 
-    def test_super_admin_triggered(self) -> None:
+    def test_super_admin_granted_or_revoked(self) -> None:
         def mock_grant_super_admin_privileges(uid: str) -> None:
             raise Exception(uid)
 
@@ -273,18 +278,20 @@ class AuthServicesTests(test_utils.GenericTestBase):
             raise Exception(uid)
 
         with self.swap(
-                platform_auth_services,
-                'grant_super_admin_privileges',
-                mock_grant_super_admin_privileges
+            platform_auth_services,
+            'grant_super_admin_privileges',
+            mock_grant_super_admin_privileges
         ):
             with self.assertRaisesRegex(
-                    Exception, 'uid1'):
+                Exception, 'uid1'
+            ):
                 auth_services.grant_super_admin_privileges('uid1')
         with self.swap(
-                platform_auth_services,
-                'revoke_super_admin_privileges',
-                mock_revoke_super_admin_privileges
+            platform_auth_services,
+            'revoke_super_admin_privileges',
+            mock_revoke_super_admin_privileges
         ):
             with self.assertRaisesRegex(
-                    Exception, 'uid2'):
+                Exception, 'uid2'
+            ):
                 auth_services.revoke_super_admin_privileges('uid2')
