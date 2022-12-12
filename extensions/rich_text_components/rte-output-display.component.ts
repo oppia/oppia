@@ -184,6 +184,8 @@ export class RteOutputDisplayComponent implements AfterViewInit {
        * cycle and hence, we will still have the problem.
        */
       this.show = false;
+      // The text node we inserted outside angulars influence is causing some
+      // leaks. So we are manually removing the text nodes we attached.
       const textNodes: Text[] = [];
 
       for (const node of this.elementRef.nativeElement.childNodes) {

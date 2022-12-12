@@ -17,7 +17,7 @@
  */
 
 import { DebugElement, SimpleChanges } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { OppiaRteParserService } from 'services/oppia-rte-parser.service';
 import { RichTextComponentsModule } from './rich-text-components.module';
@@ -111,24 +111,9 @@ describe('RTE display component', () => {
     }).toThrowError();
   }));
 
-  it('should not display type 3 nodes', () => {
-    const removeChildSpy = jasmine.createSpy('Remove child node');
-
-    component.elementRef = {
-      nativeElement: {
-        childNodes: [
-          {
-            nodeType: 3,
-            parentElement: {
-              removeChild: removeChildSpy
-            }
-          }
-        ]
-      }
-    };
+  it('should not display type 3 nodes', fakeAsync(() => {
     let rteString = (
-      '<p>Hi<em>Hello</em>Hello</p>' +
-      '<pre> Hello </pre>');
+      '<p>Hi<em>Hello</em>Hello</p>');
 
     let changes: SimpleChanges = {
       rteString: {
@@ -139,8 +124,19 @@ describe('RTE display component', () => {
       }
     };
 
+    const node = document.createTextNode('Congratulations! You have finished');
+    component.elementRef.nativeElement.parentNode.insertBefore(
+      node, component.elementRef.nativeElement);
+    component.rteString = rteString;
+
+    fixture.detectChanges();
+
     component.ngOnChanges(changes);
 
-    expect(removeChildSpy).toHaveBeenCalled();
-  });
+    tick();
+    fixture.detectChanges();
+
+    expect(component.elementRef.nativeElement.innerText).toEqual(
+      'HiHelloHello');
+  }));
 });
