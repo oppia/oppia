@@ -720,7 +720,7 @@ VALID_MODERATOR_ACTIONS: Dict[
 }
 
 # When the site terms were last updated, in UTC.
-REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
+TERMS_PAGE_LAST_UPDATED_UTC = datetime.datetime(2020, 10, 19)
 
 # Format of string for dashboard statistics logs.
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in
