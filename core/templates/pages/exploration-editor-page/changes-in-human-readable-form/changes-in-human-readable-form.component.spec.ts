@@ -37,7 +37,7 @@ describe('Changes in Human Readable Form Component', () => {
     // Removes Comments.
     // A while loop is used here to ensure multiple passes through the string
     // for complete sanitization of tags. See https://codeql.github.com/codeql-
-    // query-help/javascript/js-incomplete-multi-character-sanitization/
+    // query-help/javascript/js-incomplete-multi-character-sanitization/.
     while (HTML.includes('<!--')) {
       HTML = HTML.replace(/<!--[^>]*-*-*>*/gm, '');
     }

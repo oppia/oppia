@@ -132,7 +132,7 @@ export class AudioTranslationManagerService {
     let cleanChoiceLabel = html;
     // A while loop is used here to ensure multiple passes through the string
     // for complete sanitization of tags. See https://codeql.github.com/codeql-
-    // query-help/javascript/js-incomplete-multi-character-sanitization/
+    // query-help/javascript/js-incomplete-multi-character-sanitization/.
     while (cleanChoiceLabel.includes('<')) {
       cleanChoiceLabel = cleanChoiceLabel.replace(/<[^>]+>/g, '');
     }

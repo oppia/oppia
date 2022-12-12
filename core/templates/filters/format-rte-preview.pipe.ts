@@ -37,7 +37,7 @@ export class FormatRtePreviewPipe {
     // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
     // A while loop is used here to ensure multiple passes through the string
     // for complete sanitization of tags. See https://codeql.github.com/codeql-
-    // query-help/javascript/js-incomplete-multi-character-sanitization/
+    // query-help/javascript/js-incomplete-multi-character-sanitization/.
     while ((/<(?!oppia-noninteractive\s*?)[^>]+>/).test(html)) {
       html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
     }

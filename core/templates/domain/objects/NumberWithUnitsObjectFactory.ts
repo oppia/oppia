@@ -77,7 +77,7 @@ export class NumberWithUnits {
       this.units).toString();
     // A while loop is used here to ensure multiple passes through the string
     // for complete sanitization of tags. See https://codeql.github.com/codeql-
-    // query-help/javascript/js-incomplete-multi-character-sanitization/
+    // query-help/javascript/js-incomplete-multi-character-sanitization/.
     if (unitsString.includes('$')) {
       while (unitsString.includes('$')) {
         unitsString = unitsString.replace('$', '');
