@@ -33,23 +33,71 @@ import { Outcome } from
 })
 export class MusicNotesInputValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance:
+      baseInteractionValidationService) { }
 
+  // validate input is array of ReadbleMusicNotes
+  // check invariants for ReadbleMusicNote custom type
   getCustomizationArgsWarnings(
-      customizationArgs: MusicNotesInputCustomizationArgs): Warning[] {
+    customizationArgs: MusicNotesInputCustomizationArgs): Warning[] {
     // TODO(juansaba): Implement customization args validations.
-        //working
-    return [];
-  }
 
-  getAllWarnings(
-      stateName: string, customizationArgs: MusicNotesInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    return this.getCustomizationArgsWarnings(customizationArgs).concat(
-      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+    // customization args: sequenceToGuess, initialSequence
+    let warningsList = []
+    this.baseInteractionValidationService.requireCustomizationArugments(
+      customizationArgs,
+      ['sequenceToGuess', 'initialSequence']);
+
+    let stg = customizationArgs.sequenceToGuess.value; 
+    let initSeq = customizationArgs.initialSequence.value;
+
+    // check that input is nonempty or does not exist
+    if (stg === undefined || stg.length === 0){
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        type: 'sequence to guess is not defined'
+      });
+
+    }
+
+    if (initSeq === undefined || initSeq.length === 0){
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        type: 'sequence to guess is not defined'
+      });
+
+    }
+
+    let readableNoteName = stg[0].readableNoteName;
+    let noteDuration = stg[0].readableNoteName;
+
+     // check whether readableNoteName is a string
+     if (!(typeof readableNoteName === 'string')) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        type: 'readableNoteName must be a string'
+      });
+     }
+
+     // check whether noteDuration is correct type
+     if (!(typeof noteDuration.num === 'number') || !(typeof noteDuration.den === 'number')) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        type: 'noteDuration member components must be numbers'
+      });
+    }
+    
   }
+    return warningsList;
+}
+
+getAllWarnings(
+  stateName: string, customizationArgs: MusicNotesInputCustomizationArgs,
+  answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+  return this.getCustomizationArgsWarnings(customizationArgs).concat(
+    this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+      answerGroups, defaultOutcome, stateName));
+}
 }
 
 angular.module('oppia').factory(

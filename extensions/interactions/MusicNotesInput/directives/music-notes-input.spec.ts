@@ -23,27 +23,27 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 
-describe('MusicNotesInput interaction', function() {
-  beforeEach(angular.mock.module('oppia', function($provide) {
+describe('MusicNotesInput interaction', function () {
+  beforeEach(angular.mock.module('oppia', function ($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  describe('MusicNotesInput tests', function() {
+  describe('MusicNotesInput tests', function () {
     var $httpBackend, $templateCache;
     var elt, scope, ctrlScope;
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(angular.mock.module(
-      'oppia', TranslatorProviderForTests, function($provide) {
+      'oppia', TranslatorProviderForTests, function ($provide) {
         $provide.value('ExplorationEngineService', {});
       }
     ));
 
     beforeEach(
-      angular.mock.inject(function($compile, $rootScope, _$templateCache_) {
+      angular.mock.inject(function ($compile, $rootScope, _$templateCache_) {
         $templateCache = _$templateCache_;
         var templatesHtml = $templateCache.get(
           '/extensions/interactions/MusicNotesInput/MusicNotesInput.html');
@@ -52,7 +52,7 @@ describe('MusicNotesInput interaction', function() {
       }));
 
     beforeEach(
-      angular.mock.inject(function($compile, _$httpBackend_, $rootScope) {
+      angular.mock.inject(function ($compile, _$httpBackend_, $rootScope) {
         $httpBackend = _$httpBackend_;
 
         var TAG_NAME = 'oppia-interactive-music-notes-input';
@@ -64,23 +64,58 @@ describe('MusicNotesInput interaction', function() {
         ctrlScope = elt[0].getControllerScope();
       }));
 
-    afterEach(function() {
+    afterEach(function () {
       scope.$apply();
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('should load the music staff template', function() {
+
+    interface('should catch incorrect value for sequenceToGuess and initial sequence', () => {
+      var statename = 'Introduction';
+      var customizationArgs = {
+        initialCode: {
+          value: 1
+        }
+      };
+      inputBackend = {
+        x: [['<p>one</p>']]
+      };
+      const testOutcome = oof.createNew(
+        'Introduction', 'feedback_0', '<p>YES</p>', []);
+      let rulesDict = rof.createNew('CodeEquals', inputBackend, {
+        x: 'CodeString'
+      });
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
+      const testOutcome2 = oof.createNew(
+        'Introduction', 'default_outcome',
+        '<p>no</p>', []);
+      var partialWarningsList = [];
+      partialWarningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The input must be of type readableMusicNote'
+      });
+
+      expect(pcevs.getAllWarnings(
+        // Here we are assigning the wrong type of value to
+        // "customizationArguments" in order to test validations.
+        // @ts-expect-error
+        statename, customizationArgs, [answergroup2], testOutcome2)
+      ).toEqual(partialWarningsList);
+    });
+
+
+    it('should load the music staff template', function () {
       expect(elt.html()).toContain('oppia-music-input-valid-note-area');
       expect(elt.html()).toContain('I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE');
       expect(elt.html()).toContain('playCurrentSequence()');
     });
 
-    it('should load the palette when initialized', function() {
+    it('should load the palette when initialized', function () {
       expect(elt.html()).toContain('oppia-music-input-natural-note');
     });
 
-    it('should add notes to note sequence in the correct order', function() {
+    it('should add notes to note sequence in the correct order', function () {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -136,7 +171,7 @@ describe('MusicNotesInput interaction', function() {
       }]);
     });
 
-    it('should clear the sequence', function() {
+    it('should clear the sequence', function () {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -156,7 +191,7 @@ describe('MusicNotesInput interaction', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
     });
 
-    it('should remove notes with particular ids', function() {
+    it('should remove notes with particular ids', function () {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -188,7 +223,7 @@ describe('MusicNotesInput interaction', function() {
     });
 
     it('should not do anything when asked to remove a note that does not exist',
-      function() {
+      function () {
         expect(ctrlScope.noteSequence).toEqual([]);
 
         ctrlScope._addNoteToNoteSequence({
@@ -215,7 +250,7 @@ describe('MusicNotesInput interaction', function() {
       }
     );
 
-    it('should correctly handles duplicate removals', function() {
+    it('should correctly handles duplicate removals', function () {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -230,12 +265,12 @@ describe('MusicNotesInput interaction', function() {
   });
 });
 
-describe('Music phrase player service', function() {
-  describe('music phrase player service', function() {
+describe('Music phrase player service', function () {
+  describe('music phrase player service', function () {
     var mpps = null;
     beforeEach(
       angular.mock.module('oppia', TranslatorProviderForTests));
-    beforeEach(angular.mock.inject(function($injector, $window) {
+    beforeEach(angular.mock.inject(function ($injector, $window) {
       mpps = $injector.get('MusicPhrasePlayerService');
       // This is here so that, if the test environment is modified
       // to include MIDI in the future, we will remember to swap
@@ -246,29 +281,29 @@ describe('Music phrase player service', function() {
 
       $window.MIDI = {
         Player: {
-          stop: function() {}
+          stop: function () { }
         },
-        chordOn: function() {},
-        chordOff: function() {}
+        chordOn: function () { },
+        chordOff: function () { }
       };
       spyOn($window.MIDI.Player, 'stop');
       spyOn($window.MIDI, 'chordOn');
       spyOn($window.MIDI, 'chordOff');
     }));
 
-    afterEach(angular.mock.inject(function($window) {
+    afterEach(angular.mock.inject(function ($window) {
       $window.MIDI = undefined;
     }));
 
     it('should stop any existing playthroughs when a new play is requested',
-      function() {
+      function () {
         mpps.playMusicPhrase([]);
         expect(MIDI.Player.stop).toHaveBeenCalled();
       }
     );
 
     it('should play all the notes in a music phrase',
-      angular.mock.inject(function($timeout) {
+      angular.mock.inject(function ($timeout) {
         mpps.playMusicPhrase([{
           midiValue: 69,
           duration: 2,
