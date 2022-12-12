@@ -1018,7 +1018,7 @@ def get_reviewable_translation_suggestions_by_offset(
 
     # No language means all languages.
     if language is not None:
-        languages_codes = [language] if language in language_codes else []
+        language_codes = [language] if language in language_codes else []
 
     # The user cannot review any translations, so return early.
     if len(language_codes) == 0:
