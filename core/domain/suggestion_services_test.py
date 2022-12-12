@@ -1779,12 +1779,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
         self.assertEqual(len(suggestions), 2)
-        actual_language_code_list = [
-            suggestion.change.language_code
-            for suggestion in suggestions
-        ]
-        expected_language_code_list = ['hi', 'hi']
-        self.assertEqual(actual_language_code_list, expected_language_code_list)
+        self.assertEqual(suggestions[0].change.language_code, 'hi')
+        self.assertEqual(suggestions[1].change.language_code, 'hi')
 
         # Get reviewable translation suggestions in Spanish (there are none).
         language_to_filter = 'es'
