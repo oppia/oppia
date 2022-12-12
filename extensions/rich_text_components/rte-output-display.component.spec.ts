@@ -112,8 +112,23 @@ describe('RTE display component', () => {
   }));
 
   it('should not display type 3 nodes', fakeAsync(() => {
+    const removeChildSpy = jasmine.createSpy('Remove child node');
+
+    component.elementRef = {
+      nativeElement: {
+        childNodes: [
+          {
+            nodeType: 3,
+            parentElement: {
+              removeChild: removeChildSpy
+            }
+          }
+        ]
+      }
+    };
     let rteString = (
-      '<p>Hi<em>Hello</em>Hello</p>');
+      '<p>Hi<em>Hello</em>Hello</p>' +
+      '<pre> Hello </pre>');
 
     let changes: SimpleChanges = {
       rteString: {
@@ -124,19 +139,40 @@ describe('RTE display component', () => {
       }
     };
 
-    const node = document.createTextNode('Congratulations! You have finished');
-    component.elementRef.nativeElement.parentNode.insertBefore(
-      node, component.elementRef.nativeElement);
-    component.rteString = rteString;
-
-    fixture.detectChanges();
-
     component.ngOnChanges(changes);
+    tick(100);
 
-    tick();
-    fixture.detectChanges();
-
-    expect(component.elementRef.nativeElement.innerText).toEqual(
-      'HiHelloHello');
+    expect(removeChildSpy).toHaveBeenCalled();
   }));
+
+  it('should remove text nodes which are outside ng container bounds',
+    fakeAsync(() => {
+      let rteString = (
+        '<p>Hi<em>Hello</em>Hello</p>');
+
+      let changes: SimpleChanges = {
+        rteString: {
+          previousValue: '',
+          currentValue: rteString,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      };
+
+      const node = document.createTextNode(
+        'Congratulations! You have finished');
+      component.elementRef.nativeElement.parentNode.insertBefore(
+        node, component.elementRef.nativeElement);
+      component.rteString = rteString;
+
+      fixture.detectChanges();
+
+      component.ngOnChanges(changes);
+
+      tick(100);
+      fixture.detectChanges();
+
+      expect(component.elementRef.nativeElement.innerText).toEqual(
+        'HiHelloHello');
+    }));
 });
