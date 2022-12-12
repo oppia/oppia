@@ -73,7 +73,7 @@ export class LoginPageComponent implements OnInit {
       }
 
       try {
-        await this.authService.signInWithRedirectAsync();
+        await this.authService.signInWithPopupAsync();
       } catch (error: unknown) {
         this.onSignInError(error as firebase.auth.Error);
       }

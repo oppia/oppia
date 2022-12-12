@@ -42,7 +42,7 @@ export class AppErrorHandler extends ErrorHandler {
     'auth/user-disabled',
     // In emulator mode we use signInWithEmailAndPassword() and, if that throws
     // an 'auth/user-not-found' error, createUserWithEmailAndPassword() for
-    // convenience. In production mode we use signInWithRedirect(), which
+    // convenience. In production mode we use signInWithPopup(), which
     // doesn't throw 'auth/user-not-found' because it handles both signing in
     // and creating users in the same way.
     'auth/user-not-found',

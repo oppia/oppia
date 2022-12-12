@@ -31,14 +31,14 @@ abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<
     firebase.auth.UserCredential | null
   >;
-  abstract signInWithRedirectAsync(): Promise<void>;
+  abstract signInWithPopupAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
 
 class NullAuthServiceImpl extends AuthServiceImpl {
   private error = new Error('AngularFireAuth is not available');
 
-  async signInWithRedirectAsync(): Promise<void> {
+  async signInWithPopupAsync(): Promise<void> {
     throw this.error;
   }
 
@@ -56,7 +56,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
     super();
   }
 
-  async signInWithRedirectAsync(): Promise<void> {
+  async signInWithPopupAsync(): Promise<void> {
   }
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null> {
@@ -81,8 +81,15 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
   }
 
   /** Returns a promise that never resolves or rejects. */
-  async signInWithRedirectAsync(): Promise<void> {
-    return this.angularFireAuth.signInWithRedirect(this.provider);
+  async signInWithPopupAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      firebase.auth().signInWithPopup(this.provider).then(() => {
+        resolve();
+      }).catch((error) => {
+        console.log(error);
+        reject();
+      });
+    });
   }
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
@@ -181,8 +188,8 @@ export class AuthService {
     }
   }
 
-  async signInWithRedirectAsync(): Promise<void> {
-    return this.authServiceImpl.signInWithRedirectAsync();
+  async signInWithPopupAsync(): Promise<void> {
+    return this.authServiceImpl.signInWithPopupAsync();
   }
 
   async signOutAsync(): Promise<void> {
