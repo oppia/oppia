@@ -1797,7 +1797,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion.change.language_code
             for suggestion in suggestions
         ]
-        expected_language_code_list = []
+        expected_language_code_list: List[str] = []
         self.assertEqual(actual_language_code_list, expected_language_code_list)
 
     def test_get_reviewable_question_suggestions(self) -> None:
