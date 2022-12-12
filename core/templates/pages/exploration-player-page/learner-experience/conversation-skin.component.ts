@@ -277,6 +277,10 @@ export class ConversationSkinComponent {
       this.skipButtonIsShown = true;
     }
 
+    if (!this.contextService.isInExplorationPlayerPage()) {
+      this.checkpointCelebrationModalIsEnabled = false;
+    }
+
     this.explorationId = this.explorationEngineService.getExplorationId();
     this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
     this.isIframed = this.urlService.isIframed();
