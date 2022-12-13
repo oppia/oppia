@@ -328,11 +328,7 @@
       "never"
     ],
     "quotes": [
-      "error",
-      "single",
-      {
-        "avoidEscape": true
-      }
+      "off"
     ],
     "quote-props": [
       "error",
@@ -462,7 +458,15 @@
         "exceptAfterSingleLine": true
       }
     ],
+    "@typescript-eslint/quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
     "no-dupe-class-members": "off",
-    "@typescript-eslint/no-dupe-class-members": ["error"]
+    "@typescript-eslint/no-dupe-class-members": ["error"],
+    "@typescript-eslint/no-namespace": ["error"]
   }
 }
