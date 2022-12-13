@@ -418,7 +418,7 @@ URLS = [
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ID_HANDLER_URL,
+        r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
@@ -426,6 +426,10 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_URL_FRAGMENT_HANDLER,
         classroom.ClassroomUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_ID_HANDLER_URL,
+        classroom.ClassroomIdHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -564,8 +568,8 @@ URLS = [
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(
-        r'/androidlistsubscriptionhandler',
-        profile.AndroidListSubscriptionHandler),
+        r'/mailinglistsubscriptionhandler',
+        profile.MailingListSubscriptionHandler),
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),

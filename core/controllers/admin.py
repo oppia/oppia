@@ -825,27 +825,123 @@ class AdminHandler(
             topic_id_3 = topic_fetchers.get_new_topic_id()
             topic_id_4 = topic_fetchers.get_new_topic_id()
             topic_id_5 = topic_fetchers.get_new_topic_id()
-            topic_id_6 = topic_fetchers.get_new_topic_id()
 
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
             skill_id_4 = skill_services.get_new_skill_id()
             skill_id_5 = skill_services.get_new_skill_id()
-            skill_id_6 = skill_services.get_new_skill_id()
+
+            question_id_1 = question_services.get_new_question_id()
+            question_id_2 = question_services.get_new_question_id()
+            question_id_3 = question_services.get_new_question_id()
+            question_id_4 = question_services.get_new_question_id()
+            question_id_5 = question_services.get_new_question_id()
+            question_id_6 = question_services.get_new_question_id()
+            question_id_7 = question_services.get_new_question_id()
+            question_id_8 = question_services.get_new_question_id()
+            question_id_9 = question_services.get_new_question_id()
+            question_id_10 = question_services.get_new_question_id()
+            question_id_11 = question_services.get_new_question_id()
+            question_id_12 = question_services.get_new_question_id()
+            question_id_13 = question_services.get_new_question_id()
+            question_id_14 = question_services.get_new_question_id()
+            question_id_15 = question_services.get_new_question_id()
+
+            question_1 = self._create_dummy_question(
+                question_id_1, 'Question 1', [skill_id_1])
+            question_2 = self._create_dummy_question(
+                question_id_2, 'Question 2', [skill_id_1])
+            question_3 = self._create_dummy_question(
+                question_id_3, 'Question 3', [skill_id_1])
+            question_4 = self._create_dummy_question(
+                question_id_4, 'Question 4', [skill_id_2])
+            question_5 = self._create_dummy_question(
+                question_id_5, 'Question 5', [skill_id_2])
+            question_6 = self._create_dummy_question(
+                question_id_6, 'Question 6', [skill_id_2])
+            question_7 = self._create_dummy_question(
+                question_id_7, 'Question 7', [skill_id_3])
+            question_8 = self._create_dummy_question(
+                question_id_8, 'Question 8', [skill_id_3])
+            question_9 = self._create_dummy_question(
+                question_id_9, 'Question 9', [skill_id_3])
+            question_10 = self._create_dummy_question(
+                question_id_10, 'Question 10', [skill_id_4])
+            question_11 = self._create_dummy_question(
+                question_id_11, 'Question 11', [skill_id_4])
+            question_12 = self._create_dummy_question(
+                question_id_12, 'Question 12', [skill_id_4])
+            question_13 = self._create_dummy_question(
+                question_id_13, 'Question 13', [skill_id_5])
+            question_14 = self._create_dummy_question(
+                question_id_14, 'Question 14', [skill_id_5])
+            question_15 = self._create_dummy_question(
+                question_id_15, 'Question 15', [skill_id_5])
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Topic1', 'topic-one', 'description', 'fragm')
+                topic_id_1, 'Addition', 'add', 'description', 'fragm')
+            topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
+            topic_1.thumbnail_filename = 'thumbnail.svg'
+            topic_1.thumbnail_bg_color = '#C6DCDA'
+            topic_1.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_1], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_1.next_subtopic_id = 2
+
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Topic2', 'topic-two', 'description', 'fragm')
+                topic_id_2, 'Subtraction', 'subtraction',
+                'description', 'fragm'
+            )
+            topic_2.skill_ids_for_diagnostic_test = [skill_id_2]
+            topic_2.thumbnail_filename = 'thumbnail.svg'
+            topic_2.thumbnail_bg_color = '#C6DCDA'
+            topic_2.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_2], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_2.next_subtopic_id = 2
+
             topic_3 = topic_domain.Topic.create_default_topic(
-                topic_id_3, 'Topic3', 'topic-three', 'description', 'fragm')
+                topic_id_3, 'Multiplication', 'multiplication',
+                'description', 'fragm'
+            )
+            topic_3.skill_ids_for_diagnostic_test = [skill_id_3]
+            topic_3.thumbnail_filename = 'thumbnail.svg'
+            topic_3.thumbnail_bg_color = '#C6DCDA'
+            topic_3.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_3], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_3.next_subtopic_id = 2
+
             topic_4 = topic_domain.Topic.create_default_topic(
-                topic_id_4, 'Topic4', 'topic-four', 'description', 'fragm')
+                topic_id_4, 'Division', 'division', 'description', 'fragm')
+            topic_4.skill_ids_for_diagnostic_test = [skill_id_4]
+            topic_4.thumbnail_filename = 'thumbnail.svg'
+            topic_4.thumbnail_bg_color = '#C6DCDA'
+            topic_4.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_4], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_4.next_subtopic_id = 2
+
             topic_5 = topic_domain.Topic.create_default_topic(
-                topic_id_5, 'Topic5', 'topic-five', 'description', 'fragm')
-            topic_6 = topic_domain.Topic.create_default_topic(
-                topic_id_6, 'Topic6', 'topic-six', 'description', 'fragm')
+                topic_id_5, 'Fraction', 'fraction', 'description', 'fragm')
+            topic_5.skill_ids_for_diagnostic_test = [skill_id_5]
+            topic_5.thumbnail_filename = 'thumbnail.svg'
+            topic_5.thumbnail_bg_color = '#C6DCDA'
+            topic_5.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Title', [skill_id_5], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'dummy-subtopic-three')]
+            topic_5.next_subtopic_id = 2
 
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
@@ -857,48 +953,87 @@ class AdminHandler(
                 skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>')
             skill_5 = self._create_dummy_skill(
                 skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
-            skill_6 = self._create_dummy_skill(
-                skill_id_6, 'Skill6', '<p>Dummy Explanation 6</p>')
+
+            question_services.add_question(self.user_id, question_1)
+            question_services.add_question(self.user_id, question_2)
+            question_services.add_question(self.user_id, question_3)
+            question_services.add_question(self.user_id, question_4)
+            question_services.add_question(self.user_id, question_5)
+            question_services.add_question(self.user_id, question_6)
+            question_services.add_question(self.user_id, question_7)
+            question_services.add_question(self.user_id, question_8)
+            question_services.add_question(self.user_id, question_9)
+            question_services.add_question(self.user_id, question_10)
+            question_services.add_question(self.user_id, question_11)
+            question_services.add_question(self.user_id, question_12)
+            question_services.add_question(self.user_id, question_13)
+            question_services.add_question(self.user_id, question_14)
+            question_services.add_question(self.user_id, question_15)
 
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
             skill_services.save_new_skill(self.user_id, skill_3)
             skill_services.save_new_skill(self.user_id, skill_4)
             skill_services.save_new_skill(self.user_id, skill_5)
-            skill_services.save_new_skill(self.user_id, skill_6)
-
-            topic_1.add_uncategorized_skill_id(skill_id_1)
-            topic_2.add_uncategorized_skill_id(skill_id_2)
-            topic_3.add_uncategorized_skill_id(skill_id_3)
-            topic_4.add_uncategorized_skill_id(skill_id_4)
-            topic_5.add_uncategorized_skill_id(skill_id_5)
-            topic_6.add_uncategorized_skill_id(skill_id_6)
 
             topic_services.save_new_topic(self.user_id, topic_1)
+            topic_services.publish_topic(topic_id_1, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_2)
+            topic_services.publish_topic(topic_id_2, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_3)
+            topic_services.publish_topic(topic_id_3, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_4)
+            topic_services.publish_topic(topic_id_4, self.user_id)
+
             topic_services.save_new_topic(self.user_id, topic_5)
-            topic_services.save_new_topic(self.user_id, topic_6)
+            topic_services.publish_topic(topic_id_5, self.user_id)
+
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_1, skill_id_1, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_2, skill_id_1, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_3, skill_id_1, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_4, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_5, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_6, skill_id_2, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_7, skill_id_3, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_8, skill_id_3, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_9, skill_id_3, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_10, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_11, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_12, skill_id_4, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_13, skill_id_5, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_14, skill_id_5, 0.5)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id_15, skill_id_5, 0.5)
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
-            classroom_id_2 = classroom_config_services.get_new_classroom_id()
 
-            classroom_name_1 = 'Dummy Classroom with 5 topics'
-            classroom_name_2 = 'Dummy Classroom with 1 topic'
+            classroom_name_1 = 'Math'
 
-            classroom_url_fragment_1 = 'first-classroom'
-            classroom_url_fragment_2 = 'second-classroom'
+            classroom_url_fragment_1 = 'math'
 
             topic_dependency_for_classroom_1: Dict[str, list[str]] = {
                 topic_id_1: [],
                 topic_id_2: [topic_id_1],
                 topic_id_3: [topic_id_1],
                 topic_id_4: [topic_id_2],
-                topic_id_5: [topic_id_3]
-            }
-            topic_dependency_for_classroom_2: Dict[str, List[str]] = {
-                topic_id_6: []
+                topic_id_5: [topic_id_2, topic_id_3]
             }
 
             classroom_dict_1: classroom_config_domain.ClassroomDict = {
@@ -910,25 +1045,28 @@ class AdminHandler(
                 'topic_id_to_prerequisite_topic_ids': (
                     topic_dependency_for_classroom_1)
             }
-            classroom_dict_2: classroom_config_domain.ClassroomDict = {
-                'classroom_id': classroom_id_2,
-                'name': classroom_name_2,
-                'url_fragment': classroom_url_fragment_2,
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_id_to_prerequisite_topic_ids': (
-                    topic_dependency_for_classroom_2)
-            }
 
             classroom_1 = classroom_config_domain.Classroom.from_dict(
                 classroom_dict_1)
-            classroom_2 = classroom_config_domain.Classroom.from_dict(
-                classroom_dict_2)
 
             classroom_config_services.update_or_create_classroom_model(
                 classroom_1)
-            classroom_config_services.update_or_create_classroom_model(
-                classroom_2)
+
+            classroom_pages_data = [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'course_details': '',
+                'topic_list_intro': '',
+                'topic_ids': [
+                    topic_id_1,
+                    topic_id_2,
+                    topic_id_3,
+                    topic_id_4,
+                    topic_id_5
+                ],
+            }]
+            config_services.set_property(
+                self.user_id, 'classroom_pages_data', classroom_pages_data)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 

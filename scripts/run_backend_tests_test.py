@@ -422,7 +422,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 tasks, task_to_taskspec, True)
 
         self.assertIn(
-            'INCOMPLETE COVERAGE (98%%): %s' % test_target, self.print_arr)
+            'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
+            test_target, self.print_arr)
 
     def test_successfull_test_run_message_is_printed_correctly(self) -> None:
         with self.swap_install_third_party_libs:
@@ -479,7 +480,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 tasks, task_to_taskspec, True)
 
         self.assertNotIn(
-            'INCOMPLETE COVERAGE (98%%): %s' % test_target, self.print_arr)
+            'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
+            test_target, self.print_arr)
         self.assertIn(
             'SUCCESS   %s: 9 tests (1.2 secs)' % test_target,
             self.print_arr)
