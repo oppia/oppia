@@ -673,7 +673,8 @@ def build_using_ng() -> None:
     dist/oppia-angular-prod folder.
     """
     print('Building using angular cli')
-    managed_ng_build_process = servers.managed_ng_build(use_prod_env=True, watch_mode=False)
+    managed_ng_build_process = servers.managed_ng_build(
+        use_prod_env=True, watch_mode=False)
     with managed_ng_build_process as p:
         p.wait()
     assert get_file_count('dist/oppia-angular-prod') > 0, (

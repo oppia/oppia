@@ -67,8 +67,13 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 const gifshot = require('gifshot');
 import * as gifFrames from 'gif-frames';
-interface Window {
-  GifFrames: gifFrames;
+
+// The "declare global" is needed as we want to augment GifFrames to the
+// global scope Window.
+declare global {
+  interface Window {
+    GifFrames: gifFrames;
+  }
 }
 
 interface FilepathData {
