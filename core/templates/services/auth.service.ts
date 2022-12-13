@@ -68,7 +68,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   }
 }
 
-class ProdAuthServiceImpl extends AuthServiceImpl {
+export class ProdAuthServiceImpl extends AuthServiceImpl {
   private provider: firebase.auth.GoogleAuthProvider;
 
   constructor(private angularFireAuth: AngularFireAuth) {
@@ -80,7 +80,6 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
     this.provider.setCustomParameters({prompt: 'select_account'});
   }
 
-  /** Returns a promise that never resolves or rejects. */
   async signInWithPopupAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       firebase.auth().signInWithPopup(this.provider).then(() => {
