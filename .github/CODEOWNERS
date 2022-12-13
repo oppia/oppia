@@ -73,9 +73,7 @@
 /angular-template-style-url-replacer.webpack-loader.js @oppia/angular-migration-reviewers
 /hashes.json @oppia/angular-migration-reviewers
 /angular.json @oppia/angular-migration-reviewers
-/src/*.html @oppia/frontend-infrastructure-reviewers
-/src/*.ts @oppia/frontend-infrastructure-reviewers
-/src/environments/*.ts @oppia/frontend-infrastructure-reviewers
+/src @oppia/frontend-infrastructure-reviewers
 
 # TS typing
 /typings/ @oppia/data-and-stability-reviewers

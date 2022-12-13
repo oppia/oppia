@@ -263,7 +263,7 @@ def mock_load_template(
         filename, os.path.join('core', 'templates', 'pages'))
     if template_is_aot_compiled:
         filepath = get_filepath_from_filename(
-            filename, os.path.join('src'))
+            filename, 'src')
     if filepath is None:
         raise Exception(
             'No file exists for the given file name.'

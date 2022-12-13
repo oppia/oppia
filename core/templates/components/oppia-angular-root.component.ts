@@ -130,6 +130,7 @@ export const registerCustomElements = (injector: Injector): void => {
     // redefine custom elements with the same id. Root cause for the element
     // being already defined is not yet known. Can possibly be a side effect of
     // webpack and AoT bundles co-existing.
+    // TODO(#16718): Investigate custom element already defined error.
     if (
       customElements.get(
         'oppia-noninteractive-ckeditor-' +

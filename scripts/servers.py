@@ -398,7 +398,7 @@ def create_managed_web_browser(
 
 @contextlib.contextmanager
 def managed_ng_build(
-    use_prod_env: bool = False, watch_mode: bool = False
+    *, use_prod_env: bool = False, watch_mode: bool = False
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the ng compiler gracefully.
 

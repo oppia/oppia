@@ -35,7 +35,7 @@ from urllib import request as urlrequest
 from core import constants
 
 from typing import Dict, Generator, List, Optional, Union
-from scripts import servers  # isort:skip
+from scripts import servers
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.

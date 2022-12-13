@@ -87,6 +87,14 @@ const loader = (sourceString) => {
       return 'template:' + replaceStringsWithRequiresStatement(url);
     }
   ).replace(STYLES_URL_REGEX, () => {
+    /**
+     * For the style urls, the angular compiler
+     * uses styleUrls while webpack uses imports. Hence, currently we put the
+     * stylesheet as import and as a styleUrl in the component. Once we have
+     * moved away from separate rtl css files, we will remove the import
+     * statements and just keep styleUrls. Until then, for webpack, we need
+     * remove styleUrls property for webpack compilation.
+     */
     return 'styleUrl: []';
   });
 
