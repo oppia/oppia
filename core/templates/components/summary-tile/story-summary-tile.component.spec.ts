@@ -21,7 +21,6 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummaryTileComponent } from './story-summary-tile.component';
 
@@ -31,7 +30,6 @@ describe('StorySummaryTileComponent', () => {
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -48,7 +46,6 @@ describe('StorySummaryTileComponent', () => {
     component = fixture.componentInstance;
     wds = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
