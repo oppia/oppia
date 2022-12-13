@@ -4814,3 +4814,250 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
                 node)
+
+            
+class FrontIndentCheckerTests(unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = pylint_extensions.FrontIndentationChecker
+        self.checker_test_object.setup_method()
+    
+    def func_code_less_than_four(self):
+        node_break_under_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('def func():\n  pass')
+        node_break_under_four_spaces.file = filename
+        node_break_under_four_spaces.path = filename
+        
+        self.checker_test_object.checker.process_tokens(
+            pylint_utils.tokenize_module(node_break_under_four_spaces))
+
+        message = testutils.Message(
+            msg_id='function-line-indent-less-than-4', line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    
+    def func_code_more_than_four(self) -> None:
+        node_break_over_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func():\n      pass
+                """)
+        node_break_over_four_spaces.file = filename
+        node_break_over_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_break_over_four_spaces))
+
+        message = testutils.Message(
+            msg_id='function-line-indent-more-than-4', line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    
+    def func_no_break_is_four(self) -> None:
+        node_no_break_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def func():\n   pass
+                """)
+        node_no_break_four_spaces.file = filename
+        node_no_break_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_no_break_four_spaces))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def cond_code_less_than_four(self):
+        node_break_under_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('if hello:\n  pass')
+        node_break_under_four_spaces.file = filename
+        node_break_under_four_spaces.path = filename
+        
+        self.checker_test_object.checker.process_tokens(
+            pylint_utils.tokenize_module(node_break_under_four_spaces))
+
+        message = testutils.Message(
+            msg_id='cond-line-indent-less-than-4', line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    
+    def cond_code_more_than_four(self) -> None:
+        node_break_over_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('if hello:\n      pass')
+
+        node_break_over_four_spaces.file = filename
+        node_break_over_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_break_over_four_spaces))
+
+        message = testutils.Message(
+            msg_id='cond-line-indent-more-than-4', line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+    
+    def cond_no_break_is_four(self) -> None:
+        node_no_break_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('if hello:\n    pass')
+        node_no_break_four_spaces.file = filename
+        node_no_break_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_no_break_four_spaces))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def cond_clause_more_than_eight(self) -> None:
+        node_break_over_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('if (\n    hello):\n    pass')
+
+        node_break_over_four_spaces.file = filename
+        node_break_over_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_break_over_four_spaces))
+
+        message = testutils.Message(
+            msg_id='cond-line-indent-8', line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def list_closing_is_not_zero(self) -> None:
+        node_break_over_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('myList = [\n    2,\n    3,\n    ]')
+
+        node_break_over_four_spaces.file = filename
+        node_break_over_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_break_over_four_spaces))
+
+        message = testutils.Message(
+            msg_id='end-list-bracket-indent', line=4)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def dict_closing_is_not_zero(self) -> None:
+        node_break_over_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('myList = {\n    10:1,\n    11:3,\n    }')
+
+        node_break_over_four_spaces.file = filename
+        node_break_over_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_break_over_four_spaces))
+
+        message = testutils.Message(
+            msg_id='end-dictionary-bracket-indent', line=4)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def dict_elements_less_than_four(self) -> None:
+        node_break_over_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('myList = {\n   10:1,\n  11:3,\n}')
+
+        node_break_over_four_spaces.file = filename
+        node_break_over_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_break_over_four_spaces))
+
+        message = testutils.Message(
+            msg_id='list-dict-line-indent-less-than-4', line=4)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def dict_elements_more_than_four(self) -> None:
+        node_break_over_four_spaces = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write('myList = [\n     10,\n      11:3]')
+
+        node_break_over_four_spaces.file = filename
+        node_break_over_four_spaces.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_break_over_four_spaces))
+
+        message = testutils.Message(
+            msg_id='list-dict-line-indent-more-than-4', line=4)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+
+
+
+
+
+
+
+
+
+
+
