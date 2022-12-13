@@ -703,35 +703,5 @@ describe('Site Analytics Service', () => {
         'event', 'discovery_start_learning', {}
       );
     });
-
-    it('should register topic start event', () => {
-      sas.registerTopicStartEvent(
-        'math', 'Fractions', 'ch1', '2', 'exp_id');
-
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'topic_start', {
-          classroom_name: 'math',
-          topic_name: 'Fractions',
-          chapter_name: 'ch1',
-          topic_chapter_count: '2',
-          exploration_id: 'exp_id'
-        }
-      );
-    });
-
-    it('should register topic end event', () => {
-      sas.registerTopicEndEvent(
-        'math', 'Fractions', 'ch1', '2', 'exp_id');
-
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'topic_end', {
-          classroom_name: 'math',
-          topic_name: 'Fractions',
-          chapter_name: 'ch1',
-          topic_chapter_count: '2',
-          exploration_id: 'exp_id'
-        }
-      );
-    });
   });
 });
