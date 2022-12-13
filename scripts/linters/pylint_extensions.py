@@ -3115,7 +3115,150 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
             if name == 'Text':
                 self.add_message('disallowed-text-import', node=node)
 
+                
+class FrontIndentationChecker(checkers.BaseChecker):
+    __implements__ = interfaces.ITokenChecker
+    
+    name = 'front-space-indentation-checker'
 
+    priority = -1
+    msgs = {
+        'C0041': (
+            'Please do not indent lines less than 4 spaces within a function',
+            'function-line-indent-less-than-4',
+            'All code within a function must be 4 spaces, only 8 if within another logic statement',
+        ),
+        'C0042': (
+            'Please do not indent lines more than 4 spaces within a function',
+            'function-line-indent-more-than-4',
+            'All code within a function must be 4 spaces, has to be 8 when within another logic statement',
+        ),
+        'C0043': (
+            'Please do not indent lines less than 4 spaces within a conditional statement',
+            'cond-line-indent-less-than-4',
+            'All code within a function must be 4 spaces, only 8 if within another conditional statement',
+        ),
+        'C0044': (
+            'Please do not indent lines more than 4 spaces within a conditional function',
+            'cond-line-indent-more-than-4',
+            'All code within a function must be 4 spaces, has to be 8 when within another conditional statement',
+        ),
+        'C0045': (
+            'For clarity, if multiple lines within the clause of a conditional statement, indent 8 spaces',
+            'cond-line-indent-8',
+            'If a conditional statement has multiple lines in its clause, indent subsequent lines 8 spaces instead of 4',
+        ),
+        'C0046': (
+            'Closing bracket of list has to be indented same as name of list on a new line or at end of the line above',
+            'end-list-bracket-indent',
+            'Closing bracket of a list has to be indented the same as the name of list on a new line or at end of the line above',
+        ),
+        'C0047': (
+            'Closing bracket of dictionary has to be indented same as name of dictionary on a new line or at end of the line above',
+            'end-dictionary-bracket-indent',
+            'Closing bracket of a dictionary has to be indented the same as the name of dictionary on a new line or at end of the line above',
+        ),
+        'C0048': (
+            'Values within a list or dictionary need to be indented at least 4 spaces',
+            'list-dict-line-indent-less-than-4',
+            'Values can only be indented 4 spaces from the name of the respective list/dict. If all elements on same line as list/dict name it is fine',
+        ),
+        'C0049': (
+            'Values within a list or dictionary cannot be indented more than 4 spaces',
+            'list-dict-line-indent-more-than-4',
+            'Values can only be indented 4 spaces from the name of the respective list/dict. If all elements on same line as list/dict name it is fine',
+        ),
+    }
+
+    def process_tokens(self, tokens):
+        # (row, column)
+        funcStartingPos = (0,0)
+        listCondStatementsStartPos = []
+
+        currentFuncLine = 0
+        currentCondLine = 0
+        currentBrackLine = 0
+
+        listBracketStartPos = []
+        
+        for index, token in enumerate(tokens):
+        # for token in tokens:
+            currLine = token.line.split()
+
+            #functions indentation
+            if token.type == tokenize.NAME and token.string == 'def':
+                funcStartingPos = token.start
+            if token.start[0] > funcStartingPos[0] and token.start[1] > funcStartingPos[1] and token.start[0] > currentFuncLine:
+                currentFuncLine = token.start[0]
+                if token.start[1] < funcStartingPos[1] + 4:
+                    self.add_message('function-line-indent-less-than-4', line = token.start[0])
+                elif token.start[1] > funcStartingPos[1] + 4 and token.start[1] < funcStartingPos[1] + 8:
+                    self.add_message('function-line-indent-more-than-4', line = token.start[0])
+
+            #condtional statements indentation
+            if token.type == tokenize.NAME and (
+                    token.string == 'if' or 
+                    token.string == 'elif' or 
+                    token.string == 'else' or 
+                    token.string == 'for' or 
+                    token.string == 'while'):
+                if token.start[1] <= listCondStatementsStartPos[-1][1]:
+                    listCondStatementsStartPos.pop()
+                listCondStatementsStartPos.append(token.start)
+            
+            if token.start[0] > listCondStatementsStartPos[-1][0] and token.start[1] <= listCondStatementsStartPos[-1][1]:
+                listCondStatementsStartPos.pop()
+
+            if len(listCondStatementsStartPos) != 0 and token.start[0] > listCondStatementsStartPos[-1][0] and token.start[1] > listCondStatementsStartPos[-1][1] and token.start[0] > currentCondLine:
+                currentCondLine = token.start[0]
+
+                if token.start[1] < listCondStatementsStartPos[-1][1] + 4:
+                    self.add_message('cond-line-indent-less-than-4', line = token.start[0])
+                elif (token.start[1] > listCondStatementsStartPos[-1][1] + 4 and token.start[1] < listCondStatementsStartPos[-1][1] + 8) or token.start[1] > listCondStatementsStartPos[-1][1] + 8:
+                    self.add_message('cond-line-indent-more-than-4', line = token.start[0])
+                elif token.start[1] == listCondStatementsStartPos[-1][1] + 4 and (
+                        ':' in currLine or
+                        '==' in currLine or
+                        '<=' in currLine or
+                        '>=' in currLine or
+                        '<' in currLine or
+                        '>' in currLine or
+                        'or' in currLine or
+                        'and' in currLine):
+                        self.add_message('cond-line-indent-8', line = token.start[0])
+            
+
+            #only check indentation for multi line lists and dictionaries
+            if token.type == tokenize.OP and ((token.string == '[' and ']' not in currLine) or (token.string == '{' and '}' not in currLine)):
+                #go back 2 tokens to find starting pos of name of list or dictionary - will always be 2 tokens back
+                prevIndex = index - 2
+                #ex of one element below: ( '[', (4,5) )
+                nameStartingPos = tokens[prevIndex].start
+                listBracketStartPos.append((token.string, nameStartingPos))
+
+            if token.start[0] > listBracketStartPos[-1][1][0] and token.start[0] > currentBrackLine:
+                currentBrackLine = token.start[0]
+
+                if token.start[1] > listBracketStartPos[-1][1][1]:
+                    if token.start[1] < listBracketStartPos[-1][1][1] + 4:
+                        self.add_message('list-dict-line-indent-less-than-4', line = token.start[0])
+                    elif token.start[1] > listBracketStartPos[-1][1][1] + 4 and token.start[1] < funcStartingPos[1] + 8:
+                        self.add_message('list-dict-line-indent-more-than-4', line = token.start[0])
+                
+                # new line and first token is ] then columns have to match up
+                if listBracketStartPos[-1][0] == '[' and token.string == ']' and listBracketStartPos[-1][1] != token.start[1]:
+                    self.add_message('end-list-bracket-indent', line = token.start[0])
+                
+                # new line and first token is } then columns have to match up
+                elif listBracketStartPos[-1][0] == '{' and token.string == '}' and listBracketStartPos[-1][1] != token.start[1]:
+                    self.add_message('end-dictionary-bracket-indent', line = token.start[0])
+                
+
+            #new line from opening [ or { and the closing ] or } does exist here
+            if token.start[0] > listBracketStartPos[-1][1][0] and ((listBracketStartPos[-1][0] == '[' and ']' in currLine) or (listBracketStartPos[-1][0] == '{' and '}' in currLine)):
+                listBracketStartPos.pop()
+
+                
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
 
@@ -3141,3 +3284,4 @@ def register(linter: lint.PyLinter) -> None:
     linter.register_checker(DisallowedFunctionsChecker(linter))
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
     linter.register_checker(DisallowedImportsChecker(linter))
+    # linter.register_checker(FrontIndentationChecker(linter))
