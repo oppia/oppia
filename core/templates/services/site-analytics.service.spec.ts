@@ -463,10 +463,14 @@ describe('Site Analytics Service', () => {
     it('should register finish curated lesson event', () => {
       sas.registerCuratedLessonStarted('Fractions', '123');
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
-        event_category: 'CuratedLessonStarted',
-        event_label: '123'
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'classroom_lesson_started',
+        {
+          topic_name: 'Fractions',
+          exploration_id: '123'
+        }
+      );
     });
 
     it('should register finish curated lesson event', () => {
@@ -480,10 +484,19 @@ describe('Site Analytics Service', () => {
         'en'
       );
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
-        event_category: 'CuratedLessonCompleted',
-        event_label: '123'
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'classroom_lesson_completed',
+        {
+          classroom_name: 'math',
+          topic_name: 'Fractions',
+          chapter_name: 'ch1',
+          exploration_id: '123',
+          chapter_number: '2',
+          chapter_card_count: '3',
+          exploration_language: 'en'
+        }
+      );
     });
 
     it('should register open collection from landing page event', () => {
@@ -610,10 +623,19 @@ describe('Site Analytics Service', () => {
       sas.registerClassroomLessonEngagedWithEvent(
         'math', 'Fractions', 'ch1', explorationId, '2', '3', 'en');
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
-        event_category: 'ClassroomActiveUserStartAndSawCards',
-        event_label: explorationId
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'classroom_lesson_engaged_with',
+        {
+          classroom_name: 'math',
+          topic_name: 'Fractions',
+          chapter_name: 'ch1',
+          exploration_id: '123',
+          chapter_number: '2',
+          chapter_card_count: '3',
+          exploration_language: 'en'
+        }
+      );
     });
 
     it('should register classroom header click event', () => {
