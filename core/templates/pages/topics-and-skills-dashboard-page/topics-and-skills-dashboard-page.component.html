@@ -125,9 +125,13 @@
               <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
             </div>
             <div *ngIf="activeTab === TAB_NAME_SKILLS">
-              <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
-              <span class="dashboard-list-pagination-active">{{ skillPageNumber + 1 }}</span>
-              <i class="fa fa-angle-right topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
+              <i class="fa fa-angle-left topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_PREV_PAGE)"></i>
+              <span class="dashboard-list-pagination-value"
+                    *ngFor="let n of generateNumbersTillRange(currentCount/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                <span *ngIf="pageNumber === idx" class="dashboard-list-pagination-active">{{ idx + 1 }}</span>
+                <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
+              </span>
+              <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
             </div>
           </div>
         </div>
