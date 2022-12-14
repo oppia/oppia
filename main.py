@@ -81,7 +81,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import google.cloud.logging
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Dict, Optional, Type, TypeVar
 import webapp2
 from webapp2_extras import routes
 
@@ -110,57 +110,74 @@ if not constants.EMULATOR_MODE:
 logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
-class InternetConnectivityHandler(base.BaseHandler):
+class InternetConnectivityHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles the get request to the server from the
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Here we use type Any because this class inherits this attribute
-    # from core.controllers.base.BaseModel.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Here we use type Any because this class inherits this attribute
-    # from core.controllers.base.BaseModel.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
         self.render_json({'is_internet_connected': True})
 
 
-class FrontendErrorHandler(base.BaseHandler):
+class FrontendErrorHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles errors arising from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'error': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "post" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access
     def post(self) -> None:
         """Records errors reported by the frontend."""
-        logging.error('Frontend error: %s' % self.payload.get('error'))
+        assert self.normalized_payload is not None
+        logging.error(
+            'Frontend error: %s' % self.normalized_payload.get('error')
+        )
         self.render_json(self.values)
 
 
-class WarmupPage(base.BaseHandler):
+class WarmupPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles warmup requests."""
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access # type: ignore[misc]
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET warmup requests."""
         pass
 
 
-class SplashRedirectPage(base.BaseHandler):
+class SplashRedirectPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    # Here we use MyPy ignore because untyped decorator makes function
-    # "get" also untyped.
-    @acl_decorators.open_access  # type: ignore[misc]
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
     def get(self) -> None:
         self.redirect('/')
 
@@ -169,7 +186,7 @@ class SplashRedirectPage(base.BaseHandler):
 # backend. Should be changed in future as per the requirements.
 def get_redirect_route(
         regex_route: str,
-        handler: Type[base.BaseHandler],
+        handler: Type[webapp2.RequestHandler],
         defaults: Optional[Dict[str, str]] = None
 ) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
@@ -179,7 +196,7 @@ def get_redirect_route(
 
     Args:
         regex_route: unicode. A raw string representing a route.
-        handler: BaseHandler. A callable to handle the route.
+        handler: RequestHandler. A callable to handle the route.
         defaults: dict. Optional defaults parameter to be passed
             into the RedirectRoute object.
 
@@ -222,6 +239,11 @@ URLS = [
         r'%s/can_access_blog_post_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.BlogPostPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_blog_author_profile_page/<author_username>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.BlogAuthorProfilePageAccessValidationHandler),
 
     get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
@@ -386,13 +408,17 @@ URLS = [
         diagnostic_test_player.DiagnosticTestPlayerPage
     ),
     get_redirect_route(
+        r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
+        diagnostic_test_player.DiagnosticTestQuestionsHandler
+    ),
+    get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
         classroom.ClassroomAdminPage),
     get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ID_HANDLER_URL,
+        r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
@@ -400,6 +426,10 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_URL_FRAGMENT_HANDLER,
         classroom.ClassroomUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_ID_HANDLER_URL,
+        classroom.ClassroomIdHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -499,7 +529,7 @@ URLS = [
         blog_homepage.BlogPostDataHandler),
     get_redirect_route(
         r'%s/<author_username>' %
-        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_DATA_URL_PREFIX,
+        feconf.BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX,
         blog_homepage.AuthorsPageHandler),
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
@@ -537,6 +567,9 @@ URLS = [
 
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
+    get_redirect_route(
+        r'/mailinglistsubscriptionhandler',
+        profile.MailingListSubscriptionHandler),
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
@@ -1111,6 +1144,10 @@ URLS.extend((
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
         oppia_root.OppiaRootPage
     ),
+    get_redirect_route(
+        r'%s/<author_username>' % feconf.BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    )
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work

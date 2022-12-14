@@ -114,6 +114,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
 
+    def test_raises_error_if_guest_user_trying_to_deassign_roles_from_topic(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest users are not allowed to deassing users from all topics.'
+        ):
+            topic_services.deassign_user_from_all_topics(guest_user, 'user_id')
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest users are not allowed to deassing manager role from topic.'
+        ):
+            topic_services.deassign_manager_role_from_topic(
+                guest_user, 'user_id', 'topic_id'
+            )
+
     def test_get_story_titles_in_topic(self) -> None:
         story_titles = topic_services.get_story_titles_in_topic(
             self.topic)
@@ -1437,6 +1455,28 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             user_y, topic_rights))
 
+    def test_guest_user_cannot_assign_roles(self) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Guest user is not allowed to assign roles to a user.'
+        ):
+            topic_services.assign_role(
+                guest_user, self.user_b,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
+    def test_roles_of_guest_user_cannot_be_changed_until_guest_is_logged_in(
+        self
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        with self.assertRaisesRegex(
+            Exception,
+            'Cannot change the role of the Guest user.'
+        ):
+            topic_services.assign_role(
+                self.user_admin, guest_user,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
     def test_role_cannot_be_assigned_to_non_topic_manager(self) -> None:
         with self.assertRaisesRegex(
             Exception,
@@ -2018,6 +2058,167 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, error_msg):
             topic_services.get_topic_id_to_topic_name_dict(
                 [additions_id, 'incorrect_topic_id'])
+
+    def test_populate_topic_model_fields(self) -> None:
+        model = topic_models.TopicModel(
+            id='dummy_topic_id',
+            name='dummy_name',
+            abbreviated_name='dn',
+            url_fragment='name-one',
+            description='dummy description1',
+            canonical_name='dummy_canonical_name',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopic_schema_version=1,
+            story_reference_schema_version=2,
+            page_title_fragment_for_web='fragm1'
+        )
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        populated_model = topic_services.populate_topic_model_fields(
+            model, topic)
+        self.assertEqual(populated_model.description, topic.description)
+        self.assertEqual(populated_model.name, topic.name)
+        self.assertEqual(populated_model.canonical_name, topic.canonical_name)
+        self.assertEqual(
+            populated_model.abbreviated_name,
+            topic.abbreviated_name
+        )
+        self.assertEqual(populated_model.url_fragment, topic.url_fragment)
+        self.assertEqual(
+            populated_model.thumbnail_bg_color,
+            topic.thumbnail_bg_color
+        )
+        self.assertEqual(
+            populated_model.thumbnail_filename,
+            topic.thumbnail_filename
+        )
+        self.assertEqual(
+            populated_model.thumbnail_size_in_bytes,
+            topic.thumbnail_size_in_bytes
+        )
+        for model_reference, topic_reference in zip(
+            populated_model.canonical_story_references,
+            topic.canonical_story_references
+        ):
+            self.assertEqual(model_reference, topic_reference.to_dict())
+
+        for model_reference, topic_reference in zip(
+            populated_model.additional_story_references,
+            topic.additional_story_references
+        ):
+            self.assertEqual(model_reference, topic_reference.to_dict())
+        self.assertEqual(
+            populated_model.uncategorized_skill_ids,
+            topic.uncategorized_skill_ids
+        )
+        for model_subtopic, topic_subtopic in zip(
+            populated_model.subtopics,
+            topic.subtopics):
+            self.assertEqual(model_subtopic, topic_subtopic.to_dict())
+        self.assertEqual(
+            populated_model.subtopic_schema_version,
+            topic.subtopic_schema_version
+        )
+        self.assertEqual(
+            populated_model.story_reference_schema_version,
+            topic.story_reference_schema_version
+        )
+        self.assertEqual(
+            populated_model.next_subtopic_id,
+            topic.next_subtopic_id
+        )
+        self.assertEqual(populated_model.language_code, topic.language_code)
+        self.assertEqual(
+            populated_model.meta_tag_content,
+            topic.meta_tag_content
+        )
+        self.assertEqual(
+            populated_model.practice_tab_is_displayed,
+            topic.practice_tab_is_displayed
+        )
+        self.assertEqual(
+            populated_model.page_title_fragment_for_web,
+            topic.page_title_fragment_for_web
+        )
+        self.assertEqual(
+            populated_model.skill_ids_for_diagnostic_test,
+            topic.skill_ids_for_diagnostic_test)
+
+    def test_populate_topic_summary_model_fields(self) -> None:
+        model = topic_models.TopicSummaryModel(
+            id=self.TOPIC_ID,
+            name='dummy topic summary',
+            canonical_name='dummy topic summary',
+            language_code='cs',
+            description=' dummy description',
+            url_fragment='/fragm',
+            canonical_story_count=0,
+            additional_story_count=0,
+            total_skill_count=0,
+            total_published_node_count=0,
+            uncategorized_skill_count=0,
+            subtopic_count=0,
+            version=1
+        )
+        topic_summary = topic_services.compute_summary_of_topic(self.topic)
+        populated_model = topic_services.populate_topic_summary_model_fields(
+            model, topic_summary)
+        self.assertEqual(populated_model.name, topic_summary.name)
+        self.assertEqual(
+            populated_model.description,
+            topic_summary.description
+        )
+        self.assertEqual(
+            populated_model.canonical_name,
+            topic_summary.canonical_name
+        )
+        self.assertEqual(
+            populated_model.language_code,
+            topic_summary.language_code
+        )
+        self.assertEqual(populated_model.version, topic_summary.version)
+        self.assertEqual(
+            populated_model.additional_story_count,
+            topic_summary.additional_story_count
+        )
+        self.assertEqual(
+            populated_model.canonical_story_count,
+            topic_summary.canonical_story_count
+        )
+        self.assertEqual(
+            populated_model.uncategorized_skill_count,
+            topic_summary.uncategorized_skill_count
+        )
+        self.assertEqual(
+            populated_model.subtopic_count,
+            topic_summary.subtopic_count)
+        self.assertEqual(
+            populated_model.total_skill_count,
+            topic_summary.total_skill_count
+        )
+        self.assertEqual(
+            populated_model.total_published_node_count,
+            topic_summary.total_published_node_count
+        )
+        self.assertEqual(
+            populated_model.thumbnail_filename,
+            topic_summary.thumbnail_filename
+        )
+        self.assertEqual(
+            populated_model.thumbnail_bg_color,
+            topic_summary.thumbnail_bg_color
+        )
+        self.assertEqual(
+            populated_model.topic_model_last_updated,
+            topic_summary.topic_model_last_updated
+        )
+        self.assertEqual(
+            populated_model.topic_model_created_on,
+            topic_summary.topic_model_created_on)
+        self.assertEqual(
+            populated_model.url_fragment,
+            topic_summary.url_fragment
+        )
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class

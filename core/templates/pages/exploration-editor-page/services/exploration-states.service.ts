@@ -53,6 +53,7 @@ import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { TextInputRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -160,7 +161,7 @@ export class ExplorationStatesService {
   };
 
   private _CONTENT_ID_EXTRACTORS = {
-    answer_groups: (answerGroups) => {
+    answer_groups: (answerGroups: AnswerGroup[]) => {
       let contentIds = new Set();
       answerGroups.forEach((answerGroup) => {
         contentIds.add(answerGroup.outcome.feedback.contentId);
@@ -171,49 +172,54 @@ export class ExplorationStatesService {
             // BaseTranslatableObject having dict structure with contentId
             // as a key.
             if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-              contentIds.add(ruleInput.contentId);
+              contentIds.add((ruleInput as TextInputRuleInputs).contentId);
             }
           });
         });
       });
       return contentIds;
     },
-    default_outcome: (defaultOutcome) => {
+    default_outcome: (defaultOutcome: Outcome) => {
       let contentIds = new Set();
       if (defaultOutcome) {
         contentIds.add(defaultOutcome.feedback.contentId);
       }
       return contentIds;
     },
-    hints: (hints) => {
+    hints: (hints: Hint[]) => {
       let contentIds = new Set();
       hints.forEach((hint) => {
         contentIds.add(hint.hintContent.contentId);
       });
       return contentIds;
     },
-    solution: (solution) => {
+    solution: (solution: Solution) => {
       let contentIds = new Set();
       if (solution) {
         contentIds.add(solution.explanation.contentId);
       }
       return contentIds;
     },
-    widget_customization_args: (customizationArgs) => {
+    widget_customization_args: (
+        customizationArgs: InteractionCustomizationArgs
+    ) => {
       return new Set(
         Interaction.getCustomizationArgContentIds(customizationArgs));
     }
   };
 
-  private _getElementsInFirstSetButNotInSecond(setA, setB): string[] {
+  private _getElementsInFirstSetButNotInSecond(
+      setA: Set<unknown>, setB: Set<unknown>
+  ): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
     return diffList as string[];
   }
 
-  private _setState(stateName: string, stateData, refreshGraph: boolean): void {
-    this._states.setState(stateName, cloneDeep(stateData));
+  private _setState(
+      stateName: string, stateData: State, refreshGraph: boolean): void {
+    (this._states as States).setState(stateName, cloneDeep(stateData));
     if (refreshGraph) {
       this._refreshGraphEventEmitter.emit();
     }
@@ -257,8 +263,8 @@ export class ExplorationStatesService {
   getStatePropertyMemento(
       stateName: string, backendName: StatePropertyNames
   ): StatePropertyValues {
-    let accessorList = this.PROPERTY_REF_DATA[backendName];
-    let propertyRef = this._states.getState(stateName);
+    let accessorList: string[] = this.PROPERTY_REF_DATA[backendName];
+    let propertyRef = (this._states as States).getState(stateName);
     try {
       accessorList.forEach((key: string) => {
         propertyRef = propertyRef[key];

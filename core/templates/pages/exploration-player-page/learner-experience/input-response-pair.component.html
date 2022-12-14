@@ -31,7 +31,7 @@
   </div>
 </div>
 
-<div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== ''">
+<div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== '' && feedbackIsEnabled">
   <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
      [href]="OPPIA_AVATAR_LINK_URL"
      target="_blank"

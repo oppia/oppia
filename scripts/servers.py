@@ -483,7 +483,7 @@ def managed_webpack_compiler(
         yield proc
 
 
-def get_chrome_verison() -> str:
+def get_chrome_version() -> str:
     """Returns the version of Chrome installed on the system."""
 
     # Although there are spaces between Google and Chrome in the path, we
@@ -616,7 +616,7 @@ def managed_webdriverio_server(
         raise ValueError('Sharding instance should be larger than 0')
 
     if chrome_version is None:
-        chrome_version = get_chrome_verison()
+        chrome_version = get_chrome_version()
 
     if mobile:
         os.environ['MOBILE'] = 'true'
