@@ -401,8 +401,8 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
                 'update_type': 'profile_picture_data_url',
                 'data': user_services.DEFAULT_IDENTICON_DATA_URL},
             csrf_token=csrf_token)
-        profile_data = utils.convert_png_binary_to_data_url(
-            fs.get('profile_picture.png'))
+        profile_data = utils.convert_image_binary_to_data_url(
+            fs.get('profile_picture.png'), 'png')
         self.assertEqual(profile_data, user_services.DEFAULT_IDENTICON_DATA_URL)
         self.logout()
 
@@ -1240,7 +1240,8 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 zf_saved.namelist(),
                 [
                     'oppia_takeout_data.json',
-                    'images/user_settings_profile_picture.png'
+                    'images/user_settings_profile_picture.png',
+                    'images/user_settings_profile_picture.webp'
                 ]
             )
 
@@ -1291,10 +1292,17 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             'rb',
             encoding=None
         ) as f:
-            raw_image = f.read()
+            raw_image_png = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image_webp = f.read()
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, user_settings.username)
-        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+        fs.commit('profile_picture.png', raw_image_png, mimetype='image/png')
+        fs.commit('profile_picture.webp', raw_image_webp, mimetype='image/webp')
 
         time_swap = self.swap(
             user_services, 'record_user_logged_in', lambda *args: None)

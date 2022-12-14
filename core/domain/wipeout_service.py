@@ -408,12 +408,6 @@ def delete_user(
 
     auth_services.delete_external_auth_associations(user_id)
 
-    # Remove profile picture.
-    user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-    username = user_settings_model.username
-    if username is not None:
-        _delete_profile_picture(username)
-
     _delete_models(user_id, models.Names.AUTH)
     _delete_models(user_id, models.Names.USER)
     _pseudonymize_config_models(pending_deletion_request)
@@ -485,6 +479,10 @@ def delete_user(
             ['manager_ids'])
         _pseudonymize_blog_post_models(pending_deletion_request)
         _pseudonymize_version_history_models(pending_deletion_request)
+        # Remove profile picture.
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        username = user_settings_model.username
+        _delete_profile_picture(username)
     _delete_models(user_id, models.Names.EMAIL)
     _delete_models(user_id, models.Names.LEARNER_GROUP)
 
@@ -498,14 +496,18 @@ def _verify_profile_picture_is_deleted(username: str) -> bool:
     Returns:
         bool. True when the profile picture is deleted else False.
     """
-    if username is None:
-        return True
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'
-    if fs.isfile(filename_png) or fs.isfile(filename_webp):
+    if fs.isfile(filename_png):
         logging.error(
-            '%s Profile picture is not deleted of user having '
+            '%s Profile picture in .png format is not deleted for user having '
+            'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
+        )
+        return False
+    elif fs.isfile(filename_webp):
+        logging.error(
+            '%s Profile picture in .webp format is not deleted for user having '
             'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
         )
         return False
@@ -539,8 +541,9 @@ def verify_user_deleted(
 
         # Verify if user profile picture is deleted.
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        if user_settings_model:
-            username = user_settings_model.username
+        username = user_settings_model.username
+        user_roles = user_settings_model.roles
+        if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
             if not _verify_profile_picture_is_deleted(username):
                 return False
 

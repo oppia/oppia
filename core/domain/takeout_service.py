@@ -109,10 +109,16 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
             fs = fs_services.GcsFileSystem(
                 feconf.ENTITY_TYPE_USER, user_settings.username)
             filename_png = 'profile_picture.png'
-            image_data = utils.convert_png_binary_to_data_url(
-                fs.get(filename_png))
+            filename_webp = 'profile_picture.webp'
+            image_data_png = utils.convert_image_binary_to_data_url(
+                fs.get(filename_png), 'png')
+            image_data_webp = utils.convert_image_binary_to_data_url(
+                fs.get(filename_webp), 'webp')
             takeout_image_files.append(
                 takeout_domain.TakeoutImage(
-                    image_data, 'user_settings_profile_picture.png'))
+                    image_data_png, 'user_settings_profile_picture.png'))
+            takeout_image_files.append(
+                takeout_domain.TakeoutImage(
+                    image_data_webp, 'user_settings_profile_picture.webp'))
 
     return takeout_domain.TakeoutData(exported_data, takeout_image_files)
