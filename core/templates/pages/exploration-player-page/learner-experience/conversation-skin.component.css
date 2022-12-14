@@ -12,7 +12,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
   bottom: 40px;
   padding: 0;
   pointer-events: none;
-  position: fixed;
+  position: absolute;
   width: 100%;
   z-index: 16;
 }
