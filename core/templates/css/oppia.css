@@ -2967,7 +2967,7 @@ oppia-noninteractive-link {
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: normal;
   -ms-hyphens: auto;
   -moz-hyphens: auto;
@@ -3119,6 +3119,7 @@ oppia-noninteractive-link {
   overflow: hidden;
   padding: 12px;
   text-overflow: ellipsis;
+  word-break: break-word;
 }
 .oppia-activity-summary-tile-pre-hover-preview {
   margin-bottom: 35px;
