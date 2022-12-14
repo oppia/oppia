@@ -213,7 +213,7 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set([]))
 
-    def test_possible_exc_types_with_undefined_function_call(self):
+    def test_possible_exc_types_with_undefined_function_call(self) -> None:
         raise_node = astroid.extract_node(
             """
         def func():
