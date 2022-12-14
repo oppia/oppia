@@ -1,4 +1,4 @@
-name: "CodeQL Analysis File Ignoring Config"
+name: "CodeQL Security Analysis"
 
 paths-ignore:
   - core/tests/data
