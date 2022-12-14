@@ -85,7 +85,6 @@ export class ProdAuthServiceImpl extends AuthServiceImpl {
       firebase.auth().signInWithPopup(this.provider).then(() => {
         resolve();
       }).catch((error) => {
-        console.log(error);
         reject();
       });
     });
