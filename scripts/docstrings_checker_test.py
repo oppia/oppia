@@ -303,7 +303,7 @@ class DocstringsCheckerTest(unittest.TestCase):
                 test_value: bool. Just a test argument.
             """
         is_okey = isinstance(
-            docstrings_checker.docstringify(okeyDocString),
+            docstrings_checker.docstringify(okey_docstring),
             docstrings_checker.GoogleDocstring)
 
         self.assertEqual(is_okey, True)
@@ -313,7 +313,7 @@ class DocstringsCheckerTest(unittest.TestCase):
             formated according to the Google Python Style Guide.
             """
         is_okey = isinstance(
-            docstrings_checker.docstringify(notOkeyDockstring),
+            docstrings_checker.docstringify(not_okey_dockstring),
             docstrings_checker.GoogleDocstring)
 
         self.assertEqual(is_okey, False)
