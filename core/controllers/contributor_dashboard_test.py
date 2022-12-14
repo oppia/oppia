@@ -81,6 +81,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         user_services.allow_user_to_review_translation_in_language(
             self.admin_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.admin_id, 'es')
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -445,6 +447,65 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # suggestions in review (exploration 0).
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
+
+    def test_get_reviewable_translation_opportunities_filtering_language( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        # Create a translation suggestion in Hindi.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.owner_id, change_dict, 'description')
+
+        # Create a translation suggestion in Spanish.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'es',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content 2.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '1', 1, self.owner_id, change_dict, 'description 2')
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'language_code': 'es'})
+        # Should only return opportunities in Spanish.
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_2])
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'language_code': 'hi'})
+        # Should only return opportunities in Hindi.
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_1])
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'language_code': 'pt'})
+        # Should be empty.
+        self.assertEqual(
+            response['opportunities'], [])
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL)
+        # Should return all opportunities.
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_1, self.expected_opportunity_dict_2])
 
     def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
         # Create a new exploration and linked story.

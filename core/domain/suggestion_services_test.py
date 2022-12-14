@@ -1752,6 +1752,54 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 0)
         self.assertEqual(offset, 0)
 
+    def test_get_reviewable_translation_suggestions_with_language_filter(
+        self
+    ) -> None:
+        # Add a few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'pt')
+
+        # Get reviewable translation suggestions in Hindi.
+        language_to_filter = 'hi'
+        suggestions, _ = (
+            suggestion_services.
+            get_reviewable_translation_suggestions_by_offset(
+                self.reviewer_id_1, self.opportunity_summary_ids,
+                constants.OPPORTUNITIES_PAGE_SIZE, 0, language_to_filter))
+
+        # Expect that the results correspond to translation suggestions that the
+        # user has rights to review.
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].change.language_code, 'hi')
+        self.assertEqual(suggestions[1].change.language_code, 'hi')
+
+        # Get reviewable translation suggestions in Spanish (there are none).
+        language_to_filter = 'es'
+        suggestions, _ = (
+            suggestion_services.
+            get_reviewable_translation_suggestions_by_offset(
+                self.reviewer_id_1, self.opportunity_summary_ids,
+                constants.OPPORTUNITIES_PAGE_SIZE, 0, language_to_filter))
+
+        # Expect that the results correspond to translation suggestions that the
+        # user has rights to review.
+        self.assertEqual(len(suggestions), 0)
+        actual_language_code_list = [
+            suggestion.change.language_code
+            for suggestion in suggestions
+        ]
+        expected_language_code_list: List[str] = []
+        self.assertEqual(actual_language_code_list, expected_language_code_list)
+
     def test_get_reviewable_question_suggestions(self) -> None:
         # Add a few translation suggestions in different languages.
         self._create_translation_suggestion_with_language_code('hi')
