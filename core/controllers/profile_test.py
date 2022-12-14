@@ -982,11 +982,11 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
-class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
+class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
     def test_put_function(self) -> None:
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_android_list', lambda *args: True)
+            user_services, 'add_user_to_mailing_list', lambda *args: True)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -994,9 +994,10 @@ class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             json_response = self.put_json(
-                '/androidlistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token)
             self.assertEqual(json_response, {'status': True})
 
@@ -1006,7 +1007,7 @@ class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
         def raise_exception() -> None:
             raise Exception('Backend error')
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_android_list', raise_exception)
+            user_services, 'add_user_to_mailing_list', raise_exception)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -1014,16 +1015,17 @@ class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             self.put_json(
-                '/androidlistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token, expected_status_int=500)
 
         self.logout()
 
     def test_invalid_inputs(self) -> None:
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_android_list', lambda *args: True)
+            user_services, 'add_user_to_mailing_list', lambda *args: True)
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -1031,15 +1033,24 @@ class AndroidListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             self.put_json(
-                '/androidlistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler', {
                     'email': 'invalidemail.com',
-                    'name': 'Name'
+                    'name': 'Name',
+                    'tag': 'Web'
                 }, csrf_token=csrf_token, expected_status_int=400)
 
             self.put_json(
-                '/androidlistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler', {
                     'email': 'email@example.com',
-                    'name': ''
+                    'name': '',
+                    'tag': 'Web'
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+            self.put_json(
+                '/mailinglistsubscriptionhandler', {
+                    'email': 'email@example.com',
+                    'name': 'Name',
+                    'tag': ''
                 }, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
@@ -1115,8 +1126,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                         'type': 'subscribe'
                     }, use_payload=False, expected_status_int=404)
                 self.assertIn(
-                    'Invalid Mailchimp webhook request received with secret: '
-                    'invalid_secret', captured_logs)
+                    'Received invalid Mailchimp webhook secret', captured_logs)
 
     def test_post(self) -> None:
         with self.swap_secret, self.swap_audience_id:
@@ -1162,7 +1172,7 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
 
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
-    GENERIC_DATE: Final = datetime.datetime(2019, 5, 20)
+    GENERIC_DATE: Final = datetime.datetime(2021, 5, 20)
     GENERIC_EPOCH: Final = utils.get_time_in_millisecs(GENERIC_DATE)
 
     def setUp(self) -> None:
