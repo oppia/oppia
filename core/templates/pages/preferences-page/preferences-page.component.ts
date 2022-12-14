@@ -207,7 +207,7 @@ export class PreferencesPageComponent {
     reader.onload = () => {
       const imageData = reader.result as string;
       this.imageLocalStorageService.saveImage(
-        'profile_image.png', imageData);
+        'profile_picture.png', imageData);
     };
     reader.readAsDataURL(image);
   }

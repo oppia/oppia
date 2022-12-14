@@ -195,7 +195,7 @@ export class UserBackendApiService {
       userInfo => userInfo.getUsername());
     
     if (this.profileImageCache !== undefined) {
-      return new ImageFile('profile_image.png', this.profileImageCache);
+      return new ImageFile('profile_picture.png', this.profileImageCache);
     }
     return this._fetchProfileImage(username);
   }
@@ -217,9 +217,9 @@ export class UserBackendApiService {
     try {
       const blob = await blobPromise;
       this.profileImageCache = blob;
-      return new ImageFile('profile_image.png', blob);
+      return new ImageFile('profile_picture.png', blob);
     } catch {
-      return Promise.reject('profile_image.png');
+      return Promise.reject('profile_picture.png');
     }  
   }
 }

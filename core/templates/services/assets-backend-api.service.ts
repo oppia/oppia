@@ -68,7 +68,7 @@ export class AssetsBackendApiService {
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
     this.profileImageUrlTemplate = (
-      urlPrefix + '/user/<username>/profile_image.png');
+      urlPrefix + '/<entity_type>/<entity_id>/assets/user/<username>/profile_picture.png');
   }
 
   static get EMULATOR_MODE(): boolean {
