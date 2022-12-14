@@ -41,7 +41,8 @@ class DocstringsCheckerTest(unittest.TestCase):
         def func():
             pass
         """)
-        property_name = docstrings_checker.get_setters_property_name(setter_node)
+        property_name = docstrings_checker.get_setters_property_name(
+            setter_node)
         self.assertEqual(property_name, 'test')
 
     def test_get_setters_property_name_without_setter(self):
