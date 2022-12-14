@@ -2,7 +2,7 @@ const e2eVoiceoverAdmin = require("../utility-functions/voiceoverAdminUtils.js")
 const testConstants = require("../utility-functions/testConstants.js");
 
 
-const homePage = testConstants.Dashboard.MainDashboard;
+const homePage = testConstants.Dashboard.LearnerDashboard;
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 

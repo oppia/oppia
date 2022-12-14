@@ -1,7 +1,7 @@
 const e2eBlogPostAdmin = require("../utility-functions/blogPostAdminUtils.js");
 const testConstants = require("../utility-functions/testConstants.js");
 
-const homePage = testConstants.Dashboard.MainDashboard;
+const homePage = testConstants.Dashboard.LearnerDashboard;
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 
 async function publishBlogAsBlogPostAdmin() {

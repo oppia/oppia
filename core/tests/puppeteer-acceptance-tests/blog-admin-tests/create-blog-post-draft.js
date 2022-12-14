@@ -2,7 +2,7 @@ const e2eBlogPostAdmin = require("../utility-functions/blogPostAdminUtils.js");
 const testConstants = require("../utility-functions/testConstants.js");
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
-const homePage = testConstants.Dashboard.MainDashboard;
+const homePage = testConstants.Dashboard.LearnerDashboard;
 
 async function createDraftAsBlogPostAdmin() {
   const blogPostAdmin = await new e2eBlogPostAdmin();

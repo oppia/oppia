@@ -12,10 +12,6 @@ const uploadAudio = 'e2e-test-accessibility-translation-upload-audio';
 
 module.exports = class e2eVoiceoverAdmin extends puppeteerUtilities {
 
-  async waitForPageToLoad(selector) {
-    await (this.page).waitForSelector(selector);
-  }
-
   async gotoTranslationTabInNewExploration() {
     await this.clickOn("button", " + Create Exploration ");
     await this.clickOn("li", translationTab);

@@ -1,3 +1,4 @@
+const { thomsonCrossSectionDependencies } = require("mathjs");
 const puppeteer = require("puppeteer");
 const testConstants = require("./testConstants.js");
 
@@ -28,10 +29,17 @@ module.exports = class puppeteerUtilities {
 
   async signInWithEmail(email) {
     await this.goto(testConstants.URLs.home);
-    await this.clickOn("button", "OK");
     await this.clickOn("span", "Sign in");
     await this.type(testConstants.SignInDetails.inputField, email);
     await this.clickOn("span", "Sign In");
+  }
+
+  async waitForPageToLoad(selector) {
+    await (this.page).waitForSelector(selector);
+  }
+
+  async reloadPage() {
+    await (this.page).reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   }
   
   async clickOn(tag, selector, time = 0) {
@@ -63,6 +71,11 @@ module.exports = class puppeteerUtilities {
     const inputUploadHandle = await (this.page).$('input[type=file]');
     let fileToUpload = filePath;
     inputUploadHandle.uploadFile(fileToUpload);
+  }
+
+  async logout() {
+    await this.goto(testConstants.URLs.logout);
+    await this.waitForPageToLoad(testConstants.Dashboard.MainDashboard);
   }
 
   async closeBrowser() {

@@ -9,10 +9,6 @@ const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
-  async waitForPageToLoad(selector) {
-    await (this.page).waitForSelector(selector);
-  }
-
   async createDraftBlogPostByTitle(draftBlogPostTitle) {
     await this.clickOn("span", "NEW POST");
     await this.type(blogTitleInput, draftBlogPostTitle);
