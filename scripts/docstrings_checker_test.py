@@ -34,6 +34,205 @@ class DocstringsCheckerTest(unittest.TestCase):
         sample_string = '     This is a sample string.'
         self.assertEqual(docstrings_checker.space_indentation(sample_string), 5)
 
+    def test_get_setters_property_name_with_setter(self):
+        setter_node = astroid.extract_node(
+            """
+        @test.setter
+        def func():
+            pass
+        """)
+        property_name = docstrings_checker.get_setters_property_name(setter_node)
+        self.assertEqual(property_name, "test")
+
+    def test_get_setters_property_name_without_setter(self):
+        none_node = astroid.extract_node(
+            """
+        @attribute
+        def func():
+            pass
+        """)
+        none_return = docstrings_checker.get_setters_property_name(none_node)
+        self.assertEqual(none_return, None)
+
+    def test_get_setters_property_with_setter_and_property(self):
+        node = astroid.extract_node(
+            """
+        class TestClass():
+            @test.setter
+            @property
+            def func():
+                pass
+        """)
+
+        temp = node.getattr('func')
+        setter_property = docstrings_checker.get_setters_property(temp[0])
+        self.assertEqual(isinstance(setter_property, astroid.FunctionDef), True)
+
+    def test_get_setters_property_with_setter_no_property(self):
+        testnode2 = astroid.extract_node(
+            """
+        class TestClass():
+            @test.setter
+            def func():
+                pass
+        """)
+
+        temp = testnode2.getattr('func')
+        setter_property = docstrings_checker.get_setters_property(temp[0])
+        self.assertEqual(setter_property, None)
+
+    def test_get_setters_property_no_class(self):
+        testnode3 = astroid.extract_node(
+            """
+        @test.setter
+        def func():
+            pass
+        """)
+
+        setter_property = docstrings_checker.get_setters_property(testnode3)
+        self.assertEqual(setter_property, None)
+
+    def test_get_setters_property_no_setter_no_property(self):
+        testnode4 = astroid.extract_node(
+            """
+        class TestClass():
+            def func():
+                pass
+        """)
+
+        temp = testnode4.getattr('func')
+        setter_property = docstrings_checker.get_setters_property(temp[0])
+        self.assertEqual(setter_property, None)
+
+    
+    def test_returns_something_with_value_retur(self):
+        return_node = astroid.extract_node(
+            '''
+        return True
+        ''')
+
+        self.assertEqual(
+            docstrings_checker.returns_something(return_node), 
+            True)
+
+    def test_returns_something_with_none_return(self):
+        return_none_node = astroid.extract_node(
+            '''
+        return None
+        ''')
+
+        self.assertEqual(
+            docstrings_checker.returns_something(return_none_node), 
+            False)
+
+    def test_returns_something_with_empty_return(self):
+        none_return_node = astroid.extract_node(
+            '''
+        return
+        ''')
+
+        self.assertEqual(
+            docstrings_checker.returns_something(none_return_node),
+            False)
+
+    def test_possible_exc_types_with_valid_name(self):
+        raise_node = astroid.extract_node(
+            """
+        def func():
+            raise IndexError #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set(['IndexError']))
+
+    def test_possible_exc_types_with_invalid_name(self):
+        raise_node = astroid.extract_node(
+            """
+        def func():
+            raise AInvalidError #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
+    def test_possible_exc_types_with_function_call_no_return(self):
+        raise_node = astroid.extract_node(
+            """
+        def testFunc():
+            pass
+
+        def func():
+            raise testFunc() #@
+        """)
+
+        excpetions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(excpetions, set([]))
+
+    def test_possible_exc_types_with_function_call_valid_errors(self):
+        raise_node = astroid.extract_node(
+            """
+        def testFunc():
+            if True:
+                return IndexError
+            else:
+                return ValueError
+
+        def func():
+            raise testFunc() #@
+        """)
+
+        excpetions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(excpetions, set(['IndexError', 'ValueError']))
+
+    def test_possible_exc_types_with_function_call_invalid_error(self):
+        raise_node = astroid.extract_node(
+            """
+        def testFunc():
+            return AInvalidError
+
+        def func():
+            raise testFunc() #@
+        """)
+
+        excpetions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(excpetions, set([]))
+
+    def test_possible_exc_types_with_function_return_out_of_frame(self):
+        raise_node = astroid.extract_node(
+            """
+        def testFunc():
+            def inner():
+                return IndexError
+            
+            pass
+            
+        def func():
+            raise testFunc() #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
+    def test_possible_exc_types_with_undefined_function_call(self):
+        raise_node = astroid.extract_node(
+            """
+        def func():
+            raise testFunc() #@
+        """)
+        
+        excpetions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(excpetions, set([]))
+        
+    def test_possible_exc_types_with_constaint_raise(self):
+        raise_node = astroid.extract_node(
+            """
+        def func():
+            raise True #@
+        """)
+
+        exceptions = docstrings_checker.possible_exc_types(raise_node)
+        self.assertEqual(exceptions, set([]))
+
     def test_possible_exc_types_with_inference_error(self):
 
         @contextlib.contextmanager
@@ -96,3 +295,26 @@ class DocstringsCheckerTest(unittest.TestCase):
 
         exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set(['Exception']))
+
+    def test_docstringify_with_okey_docstring(self):
+        okeyDocString = """Docstring that is correctly formated 
+            according to the Google Python Style Guide.
+
+            Args:
+                test_value: bool. Just a test argument.
+            """
+        is_okey = isinstance(
+            docstrings_checker.docstringify(okeyDocString), 
+            docstrings_checker.GoogleDocstring)
+
+        self.assertEqual(is_okey, True)
+        
+    def test_docstringify_with_bad_docstring(self):
+        notOkeyDockstring = """Docstring that is incorrectly 
+            formated according to the Google Python Style Guide.
+            """
+        is_okey = isinstance(
+            docstrings_checker.docstringify(notOkeyDockstring), 
+            docstrings_checker.GoogleDocstring)
+
+        self.assertEqual(is_okey, False)
