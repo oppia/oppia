@@ -29,10 +29,14 @@ from core.tests import test_utils
 import webapp2
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import auth_models
+    from mypy_imports import platform_auth_services
 
-auth_models, = models.Registry.import_models([models.Names.AUTH])
+auth_models, = (
+    models.Registry.import_models([models.Names.AUTH]))
+
+platform_auth_services = models.Registry.import_auth_services()
 
 
 class AuthServicesTests(test_utils.GenericTestBase):
@@ -231,3 +235,57 @@ class AuthServicesTests(test_utils.GenericTestBase):
     def test_delete_association_when_it_is_missing_does_not_raise(self) -> None:
         # Should not raise.
         auth_services.delete_external_auth_associations('does_not_exist')
+
+    def test_auth_session_established_or_destoryed(self) -> None:
+        auth_section = []
+        def mock_establish_auth_session(
+            _: webapp2.Request,
+            __: webapp2.Response
+        ) -> None:
+            auth_section.append('established')
+
+        def mock_destroy_auth_session(
+            _: webapp2.Response
+        ) -> None:
+            auth_section.remove('established')
+
+        with self.swap(
+            platform_auth_services,
+            'establish_auth_session',
+            mock_establish_auth_session
+        ):
+            auth_services.establish_auth_session(
+                webapp2.Request.blank('/'),
+                webapp2.Response()
+            )
+            self.assertEqual(['established'], auth_section)
+        with self.swap(
+            platform_auth_services,
+            'destroy_auth_session',
+            mock_destroy_auth_session
+        ):
+            auth_services.destroy_auth_session(webapp2.Response())
+            self.assertEqual([], auth_section)
+
+    def test_super_admin_granted_or_revoked(self) -> None:
+        super_admin_privilage = []
+        def mock_grant_super_admin_privileges(uid: str) -> None:
+            super_admin_privilage.append(uid)
+
+        def mock_revoke_super_admin_privileges(uid: str) -> None:
+            super_admin_privilage.remove(uid)
+
+        with self.swap(
+            platform_auth_services,
+            'grant_super_admin_privileges',
+            mock_grant_super_admin_privileges
+        ):
+            auth_services.grant_super_admin_privileges('uid1')
+            self.assertEqual(['uid1'], super_admin_privilage)
+        with self.swap(
+            platform_auth_services,
+            'revoke_super_admin_privileges',
+            mock_revoke_super_admin_privileges
+        ):
+            auth_services.revoke_super_admin_privileges('uid1')
+            self.assertEqual([], super_admin_privilage)
