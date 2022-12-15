@@ -92,7 +92,7 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
-EXTENSIONS_DIR_PREFIX = ('setup' if not constants.DEV_MODE else '')
+EXTENSIONS_DIR_PREFIX = ('build' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -111,7 +111,7 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
     os.path.join('webpack_bundles') if constants.DEV_MODE else
-    os.path.join('setup', 'webpack_bundles'))
+    os.path.join('build', 'webpack_bundles'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
