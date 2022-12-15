@@ -118,9 +118,9 @@ class ChangedBranch:
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as task:
+        out, err = task.communicate()
     return out, err
 
 
@@ -137,26 +137,27 @@ def get_remote_name() -> Optional[bytes]:
     remote_name = b''
     remote_num = 0
     get_remotes_name_cmd = 'git remote'.split()
-    task = subprocess.Popen(
-        get_remotes_name_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    remotes = out[:-1].split(b'\n')
-    if not err:
-        for remote in remotes:
-            get_remotes_url_cmd = (
-                b'git config --get remote.%s.url' % remote).split()
-            task = subprocess.Popen(
-                get_remotes_url_cmd, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            remote_url, err = task.communicate()
-            if not err:
-                if remote_url.endswith(b'oppia/oppia.git\n'):
-                    remote_num += 1
-                    remote_name = remote
-            else:
-                raise ValueError(err)
-    else:
-        raise ValueError(err)
+    with subprocess.Popen(
+        get_remotes_name_cmd, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE) as task:
+        out, err = task.communicate()
+        remotes = out[:-1].split(b'\n')
+        if not err:
+            for remote in remotes:
+                get_remotes_url_cmd = (
+                    b'git config --get remote.%s.url' % remote).split()
+                with subprocess.Popen(
+                    get_remotes_url_cmd, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE) as task:
+                    remote_url, err = task.communicate()
+                    if not err:
+                        if remote_url.endswith(b'oppia/oppia.git\n'):
+                            remote_num += 1
+                            remote_name = remote
+                    else:
+                        raise ValueError(err)
+        else:
+            raise ValueError(err)
 
     if not remote_num:
         raise Exception(
@@ -355,9 +356,9 @@ def start_linter(files: List[bytes]) -> int:
     ]
     for file in files:
         cmd_list.append(file.decode('utf-8'))
-    task = subprocess.Popen(cmd_list)
-    task.communicate()
-    return task.returncode
+    with subprocess.Popen(cmd_list) as task:
+        task.communicate()
+        return task.returncode
 
 
 def execute_mypy_checks() -> int:
@@ -366,10 +367,11 @@ def execute_mypy_checks() -> int:
     Returns:
         int. The return code from mypy checks.
     """
-    task = subprocess.Popen(
-        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install'])
-    task.communicate()
-    return task.returncode
+    with subprocess.Popen(
+        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install']
+        ) as task:
+        task.communicate()
+        return task.returncode
 
 
 def run_script_and_get_returncode(cmd_list: List[str]) -> int:
@@ -381,10 +383,10 @@ def run_script_and_get_returncode(cmd_list: List[str]) -> int:
     Returns:
         int. The return code from the task executed.
     """
-    task = subprocess.Popen(cmd_list)
-    task.communicate()
-    task.wait()
-    return task.returncode
+    with subprocess.Popen(cmd_list) as task:
+        task.communicate()
+        task.wait()
+        return task.returncode
 
 
 def has_uncommitted_files() -> bool:

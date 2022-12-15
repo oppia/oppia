@@ -54,8 +54,9 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
 
         os.symlink('/dummy_dir/file1.py', 'dummy_dir/symlink_file.py')
 
-        self.dummy_file_object = open(
-            'dummy_dir/file1.py', 'r', encoding='utf-8')
+        with open(
+            'dummy_dir/file1.py', 'r', encoding='utf-8') as f:
+            self.dummy_file_object = f
 
     def tearDown(self) -> None:
         super().tearDown()
