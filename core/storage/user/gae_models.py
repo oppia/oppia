@@ -1139,8 +1139,12 @@ class UserSubscriptionsModel(base_models.BaseModel):
         for user_subscribers_model in user_subscriptions_models:
             user_subscribers_model.creator_ids.remove(user_id)
 
+        # Delete the references to this user from other user subscriptions
+        # models.
         cls.update_timestamps_multi(user_subscriptions_models)
         cls.put_multi(user_subscriptions_models)
+
+        # Delete the model for the user.
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -1235,8 +1239,11 @@ class UserSubscribersModel(base_models.BaseModel):
         for user_subscribers_model in user_subscribers_models:
             user_subscribers_model.subscriber_ids.remove(user_id)
 
+        # Delete the references to this user from other user subscribers models.
         cls.update_timestamps_multi(user_subscribers_models)
         cls.put_multi(user_subscribers_models)
+
+        # Delete the model for the user.
         cls.delete_by_id(user_id)
 
     @classmethod
