@@ -641,7 +641,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'next node id for the story'):
             self.story.add_node('node_4', 'Title 4')
 
-    def test_delete_node_validation(self) -> None:
+    def test_delete_node_with_two_nodes_must_in_order(self) -> None:
         self.assertEqual(len(self.story.story_contents.nodes), 2)
         with self.assertRaisesRegex(
             ValueError,
