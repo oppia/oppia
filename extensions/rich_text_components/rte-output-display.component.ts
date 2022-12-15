@@ -184,6 +184,19 @@ export class RteOutputDisplayComponent implements AfterViewInit {
        * cycle and hence, we will still have the problem.
        */
       this.show = false;
+      // The rte text node is inserted outside the bounds of ng container.
+      // Hence, it needs to be removed manually otherwise resdiual text will
+      // appear when rte text changes.
+      const textNodes: Text[] = [];
+
+      for (const node of this.elementRef.nativeElement.childNodes) {
+        if ((node as Node).nodeType === Node.TEXT_NODE) {
+          textNodes.push(node);
+        }
+      }
+
+      textNodes.forEach(node => node.parentElement.removeChild(node));
+
       this._updateNode();
       setTimeout(() => this.show = true, 0);
     }
