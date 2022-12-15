@@ -586,66 +586,68 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_directory_tree(TEST_DIR)
 
     def test_re_build_recently_changed_files_at_dev_dir(self) -> None:
-        temp_file = tempfile.NamedTemporaryFile()
-        temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(temp_file, 'name', temp_file_name)
-        with utils.open_file(
-            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
-            tmp.write(u'Some content.')
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
+            # Here MyPy assumes that the 'name' attribute is read-only. In
+            # order to silence the MyPy complaints `setattr` is used to
+            # set the attribute.
+            setattr(temp_file, 'name', temp_file_name)
+            with utils.open_file(
+                '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
+                tmp.write(u'Some content.')
 
-        extensions_dirnames_to_dirpaths = {
-            'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
-            'staging_dir': os.path.join(
-                TEST_DIR, 'backend_prod_files', 'extensions', ''),
-            'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', '')
-        }
+            extensions_dirnames_to_dirpaths = {
+                'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
+                'staging_dir': os.path.join(
+                    TEST_DIR, 'backend_prod_files', 'extensions', ''),
+                'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', '')
+            }
 
-        build_dir_tasks: Deque[threading.Thread] = collections.deque()
-        build_all_files_tasks = (
-            build.generate_build_tasks_to_build_all_files_in_directory(
-                MOCK_EXTENSIONS_DEV_DIR,
-                extensions_dirnames_to_dirpaths['out_dir']))
-        self.assertGreater(len(build_all_files_tasks), 0)
+            build_dir_tasks: Deque[threading.Thread] = collections.deque()
+            build_all_files_tasks = (
+                build.generate_build_tasks_to_build_all_files_in_directory(
+                    MOCK_EXTENSIONS_DEV_DIR,
+                    extensions_dirnames_to_dirpaths['out_dir']))
+            self.assertGreater(len(build_all_files_tasks), 0)
 
-        # Test for building all files when staging dir does not exist.
-        self.assertEqual(len(build_dir_tasks), 0)
-        build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            extensions_dirnames_to_dirpaths)
-        self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
+            # Test for building all files when staging dir does not exist.
+            self.assertEqual(len(build_dir_tasks), 0)
+            build_dir_tasks += build.generate_build_tasks_to_build_directory(
+                extensions_dirnames_to_dirpaths)
+            self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
-        build.safe_delete_directory_tree(TEST_DIR)
-        build_dir_tasks.clear()
+            build.safe_delete_directory_tree(TEST_DIR)
+            build_dir_tasks.clear()
 
-        # Test for building only new files when staging dir exists.
-        build.ensure_directory_exists(
-            extensions_dirnames_to_dirpaths['staging_dir'])
-        self.assertEqual(len(build_dir_tasks), 0)
+            # Test for building only new files when staging dir exists.
+            build.ensure_directory_exists(
+                extensions_dirnames_to_dirpaths['staging_dir'])
+            self.assertEqual(len(build_dir_tasks), 0)
 
-        build_dir_tasks = build.generate_build_tasks_to_build_directory(
-            extensions_dirnames_to_dirpaths)
-        file_extensions_to_always_rebuild = ('.py', '.js', '.html')
-        always_rebuilt_filepaths = build.get_filepaths_by_extensions(
-            MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
-        self.assertEqual(
-            sorted(always_rebuilt_filepaths), sorted(
-                ['base.py', 'CodeRepl.py', '__init__.py', 'some_file.js',
-                 'DragAndDropSortInput.py', 'code_repl_prediction.html']))
-        self.assertGreater(len(always_rebuilt_filepaths), 0)
+            build_dir_tasks = build.generate_build_tasks_to_build_directory(
+                extensions_dirnames_to_dirpaths)
+            file_extensions_to_always_rebuild = ('.py', '.js', '.html')
+            always_rebuilt_filepaths = build.get_filepaths_by_extensions(
+                MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
+            self.assertEqual(
+                sorted(always_rebuilt_filepaths), sorted(
+                    ['base.py', 'CodeRepl.py', '__init__.py', 'some_file.js',
+                    'DragAndDropSortInput.py', 'code_repl_prediction.html']))
+            self.assertGreater(len(always_rebuilt_filepaths), 0)
 
-        # Test that 'some_file.js' is not rebuilt, i.e it is built for the first
-        # time.
-        self.assertEqual(len(build_dir_tasks), len(always_rebuilt_filepaths))
-        self.assertIn('some_file.js', always_rebuilt_filepaths)
-        self.assertNotIn('some_file.js', build_dir_tasks)
+            # Test that 'some_file.js' is not rebuilt, i.e it is built for the
+            # first time.
+            self.assertEqual(
+                len(build_dir_tasks), len(always_rebuilt_filepaths))
+            self.assertIn('some_file.js', always_rebuilt_filepaths)
+            self.assertNotIn('some_file.js', build_dir_tasks)
 
-        build.safe_delete_directory_tree(TEST_DIR)
-        temp_file.close()
+            build.safe_delete_directory_tree(TEST_DIR)
+            temp_file.close()
 
-        if os.path.isfile(temp_file_name):
-            # On Windows system, occasionally this temp file is not deleted.
-            os.remove(temp_file_name)
+            if os.path.isfile(temp_file_name):
+                # On Windows system, occasionally this temp file is not deleted.
+                os.remove(temp_file_name)
 
     def test_get_recently_changed_filenames(self) -> None:
         """Test get_recently_changed_filenames detects file recently added."""
@@ -693,37 +695,36 @@ class BuildTests(test_utils.GenericTestBase):
             ['FIREBASE_AUTH_EMULATOR_HOST']
         )
 
-        app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
-            tmp.write('version: default')
+        with tempfile.NamedTemporaryFile() as app_dev_yaml_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only. In
+            # order to silence the MyPy complaints `setattr` is used to set
+            # the attribute.
+            setattr(
+                app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
+            with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+                tmp.write('Some content in mock_app_dev.yaml\n')
+                tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+                tmp.write('version: default')
 
-        app_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
-        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
-            tmp.write(u'Initial content in mock_app.yaml')
+            with tempfile.NamedTemporaryFile() as app_yaml_temp_file:
+                # Here MyPy assumes that the 'name' attribute is read-only. In
+                # order to silence the MyPy complaints `setattr` is used to
+                # set the attribute.
+                setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
+                with utils.open_file(mock_yaml_filepath, 'w') as tmp:
+                    tmp.write(u'Initial content in mock_app.yaml')
 
-        with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
-            with env_vars_to_remove_from_deployed_app_yaml_swap:
-                build.generate_app_yaml(deploy_mode=True)
+                with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
+                    with env_vars_to_remove_from_deployed_app_yaml_swap:
+                        build.generate_app_yaml(deploy_mode=True)
 
-        with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
-            content = yaml_file.read()
+                with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
+                    content = yaml_file.read()
 
-        self.assertEqual(
-            content,
-            '# THIS FILE IS AUTOGENERATED, DO NOT MODIFY\n'
-            'Some content in mock_app_dev.yaml\n')
-
-        app_yaml_temp_file.close()
-        app_dev_yaml_temp_file.close()
+                self.assertEqual(
+                    content,
+                    '# THIS FILE IS AUTOGENERATED, DO NOT MODIFY\n'
+                    'Some content in mock_app_dev.yaml\n')
 
     def test_generate_app_yaml_with_deploy_mode_with_nonexistent_var_raises(
         self
@@ -740,39 +741,38 @@ class BuildTests(test_utils.GenericTestBase):
             ['DATASTORE_HOST']
         )
 
-        app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
-            tmp.write('version: default')
+        with tempfile.NamedTemporaryFile() as app_dev_yaml_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only. In
+            # order to silence the MyPy complaints `setattr` is used to set
+            # the attribute.
+            setattr(
+                app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
+            with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+                tmp.write('Some content in mock_app_dev.yaml\n')
+                tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+                tmp.write('version: default')
 
-        app_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
-        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
-            tmp.write('Initial content in mock_app.yaml')
+            with tempfile.NamedTemporaryFile() as app_yaml_temp_file:
+                # Here MyPy assumes that the 'name' attribute is read-only.
+                # In order to silence the MyPy complaints `setattr` is used
+                # to set the attribute.
+                setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
+                with utils.open_file(mock_yaml_filepath, 'w') as tmp:
+                    tmp.write('Initial content in mock_app.yaml')
 
-        with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
-            with env_vars_to_remove_from_deployed_app_yaml_swap:
-                with self.assertRaisesRegex(
-                        Exception,
-                        'Environment variable \'DATASTORE_HOST\' to be '
-                        'removed does not exist.'
-                ):
-                    build.generate_app_yaml(deploy_mode=True)
+                with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
+                    with env_vars_to_remove_from_deployed_app_yaml_swap:
+                        with self.assertRaisesRegex(
+                                Exception,
+                                'Environment variable \'DATASTORE_HOST\' to be '
+                                'removed does not exist.'
+                        ):
+                            build.generate_app_yaml(deploy_mode=True)
 
-        with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
-            content = yaml_file.read()
+                with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
+                    content = yaml_file.read()
 
-        self.assertEqual(content, 'Initial content in mock_app.yaml')
-
-        app_yaml_temp_file.close()
-        app_dev_yaml_temp_file.close()
+                self.assertEqual(content, 'Initial content in mock_app.yaml')
 
     def test_modify_constants(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
@@ -781,53 +781,56 @@ class BuildTests(test_utils.GenericTestBase):
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
-        constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write('export = {\n')
-            tmp.write('  "DEV_MODE": true,\n')
-            tmp.write('  "EMULATOR_MODE": false,\n')
-            tmp.write('};')
+        with tempfile.NamedTemporaryFile() as constants_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only. In
+            # order to silence the MyPy complaints `setattr` is used to set
+            # the attribute.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": true,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('};')
 
-        feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+            with tempfile.NamedTemporaryFile() as feconf_temp_file:
+                # Here MyPy assumes that the 'name' attribute is read-only.
+                # In order to silence the MyPy complaints `setattr` is used
+                # to set the attribute.
+                setattr(feconf_temp_file, 'name', mock_feconf_path)
+                with utils.open_file(mock_feconf_path, 'w') as tmp:
+                    tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
-        with constants_path_swap, feconf_path_swap:
-            build.modify_constants(prod_env=True, maintenance_mode=False)
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": false,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+                with constants_path_swap, feconf_path_swap:
+                    build.modify_constants(
+                        prod_env=True, maintenance_mode=False)
+                    with utils.open_file(
+                        mock_constants_path, 'r') as constants_file:
+                        self.assertEqual(
+                            constants_file.read(),
+                            'export = {\n'
+                            '  "DEV_MODE": false,\n'
+                            '  "EMULATOR_MODE": true,\n'
+                            '};')
+                    with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                        self.assertEqual(
+                            feconf_file.read(),
+                            'ENABLE_MAINTENANCE_MODE = False')
 
-            build.modify_constants(prod_env=False, maintenance_mode=True)
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
-
-        constants_temp_file.close()
-        feconf_temp_file.close()
+                    build.modify_constants(
+                        prod_env=False, maintenance_mode=True)
+                    with utils.open_file(
+                        mock_constants_path, 'r') as constants_file:
+                        self.assertEqual(
+                            constants_file.read(),
+                            'export = {\n'
+                            '  "DEV_MODE": true,\n'
+                            '  "EMULATOR_MODE": true,\n'
+                            '};')
+                    with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                        self.assertEqual(
+                            feconf_file.read(),
+                            'ENABLE_MAINTENANCE_MODE = True')
 
     def test_set_constants_to_default(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
@@ -836,67 +839,69 @@ class BuildTests(test_utils.GenericTestBase):
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
-        constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write('export = {\n')
-            tmp.write('  "DEV_MODE": false,\n')
-            tmp.write('  "EMULATOR_MODE": false,\n')
-            tmp.write('};')
+        with tempfile.NamedTemporaryFile() as constants_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only. In
+            # order to silence the MyPy complaints `setattr` is used to set
+            # the attribute.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": false,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('};')
 
-        feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
+            with tempfile.NamedTemporaryFile() as feconf_temp_file:
+                # Here MyPy assumes that the 'name' attribute is read-only. In
+                # order to silence the MyPy complaints `setattr` is used to set
+                # the attribute.
+                setattr(feconf_temp_file, 'name', mock_feconf_path)
+                with utils.open_file(mock_feconf_path, 'w') as tmp:
+                    tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
 
-        with constants_path_swap, feconf_path_swap:
-            build.set_constants_to_default()
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
-
-        constants_temp_file.close()
-        feconf_temp_file.close()
+                with constants_path_swap, feconf_path_swap:
+                    build.set_constants_to_default()
+                    with utils.open_file(
+                        mock_constants_path, 'r') as constants_file:
+                        self.assertEqual(
+                            constants_file.read(),
+                            'export = {\n'
+                            '  "DEV_MODE": true,\n'
+                            '  "EMULATOR_MODE": true,\n'
+                            '};')
+                    with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                        self.assertEqual(
+                            feconf_file.read(),
+                            'ENABLE_MAINTENANCE_MODE = False')
 
     def test_safe_delete_file(self) -> None:
         """Test safe_delete_file with both existent and non-existent
         filepath.
         """
-        temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(temp_file, 'name', 'some_file.txt')
-        with utils.open_file('some_file.txt', 'w') as tmp:
-            tmp.write(u'Some content.')
-        self.assertTrue(os.path.isfile('some_file.txt'))
+        with tempfile.NamedTemporaryFile() as temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only. In
+            # order to silence the MyPy complaints `setattr` is used to set
+            # the attribute.
+            setattr(temp_file, 'name', 'some_file.txt')
+            with utils.open_file('some_file.txt', 'w') as tmp:
+                tmp.write(u'Some content.')
+            self.assertTrue(os.path.isfile('some_file.txt'))
 
-        build.safe_delete_file('some_file.txt')
-        self.assertFalse(os.path.isfile('some_file.txt'))
+            build.safe_delete_file('some_file.txt')
+            self.assertFalse(os.path.isfile('some_file.txt'))
 
-        non_existent_filepaths = [INVALID_INPUT_FILEPATH]
-        # Escape the special characters, like '\', in the file paths.
-        # The '\' character is usually seem in Windows style path.
-        # https://docs.python.org/2/library/os.html#os.sep
-        # https://docs.python.org/2/library/re.html#regular-expression-syntax
-        error_message = ('File %s does not exist.') % re.escape(
-            non_existent_filepaths[0])
-        # Exception will be raised at first file determined to be non-existent.
-        with self.assertRaisesRegex(
-            OSError, error_message):
-            build.safe_delete_file(non_existent_filepaths[0])
+            non_existent_filepaths = [INVALID_INPUT_FILEPATH]
+            # Escape the special characters, like '\', in the file paths.
+            # The '\' character is usually seem in Windows style path.
+            # https://docs.python.org/2/library/os.html#os.sep
+            # https://docs.python.org/2/library/re.html#regular-expression-syntax
+            error_message = ('File %s does not exist.') % re.escape(
+                non_existent_filepaths[0])
+            # Exception will be raised at first file determined to be
+            # non-existent.
+            with self.assertRaisesRegex(
+                OSError, error_message):
+                build.safe_delete_file(non_existent_filepaths[0])
 
     def test_minify_third_party_libs(self) -> None:
 
