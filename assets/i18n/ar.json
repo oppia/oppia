@@ -223,6 +223,8 @@
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "رفع ملف",
 	"I18N_DONATE_PAGE_BREADCRUMB": "تبرع",
 	"I18N_DONATE_PAGE_IMAGE_TITLE": "هديتك الكريمة تمول :",
+	"I18N_DONATE_PAGE_READ_BLOG_BUTTON_TEXT": "اقرأ مدونتنا",
+	"I18N_DONATE_PAGE_SUBSCRIBE_SECTION_EMAIL_LABEL_TEXT": "عنوان البريد الإلكتروني",
 	"I18N_DONATE_PAGE_TITLE": "تبرع ل مؤسسة اوبيا",
 	"I18N_DONATE_PAGE_VIDEO_SUBTITLE": "استمع من مجتمع أوبيا",
 	"I18N_ERROR_DISABLED_EXPLORATION": "تعطيل الاستكشاف",
