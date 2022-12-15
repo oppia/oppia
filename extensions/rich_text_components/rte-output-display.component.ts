@@ -184,12 +184,13 @@ export class RteOutputDisplayComponent implements AfterViewInit {
        * cycle and hence, we will still have the problem.
        */
       this.show = false;
-      // The text node we inserted outside angulars influence is causing some
-      // leaks. So we are manually removing the text nodes we attached.
+      // The rte text node is inserted outside the bounds of ng container.
+      // Hence, it needs to be removed manually otherwise resdiual text will
+      // appear when rte text changes.
       const textNodes: Text[] = [];
 
       for (const node of this.elementRef.nativeElement.childNodes) {
-        if ((node as Node).nodeType === 3) {
+        if ((node as Node).nodeType === Node.TEXT_NODE) {
           textNodes.push(node);
         }
       }
