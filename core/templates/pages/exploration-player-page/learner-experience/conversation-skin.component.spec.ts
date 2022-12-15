@@ -1527,8 +1527,14 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'init').and.callFake((callb) => {
       callb();
     });
-    spyOn(urlService, 'getUrlParams').and.returnValue({
+    spyOn(urlService, 'getUrlParams').and.returnValues({
       lang: 'en'
+    }, {
+      lang: 'en'
+    }, {
+      lang: 'en'
+    }, {
+      lang: 'pq'
     });
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
