@@ -49,7 +49,7 @@ jobs:
           echo $GITHUB_WORKSPACE
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.8.16'
+          python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: Cache node modules
