@@ -215,7 +215,7 @@ class TestingTaskSpec:
                 # We sometimes get a UnicodeDecodeError with an "invalid start
                 # byte" message, and this can sometimes happen when trying to
                 # read a non-unicode file. To help debug this issue, print some
-                # more information before failing.
+                # more information before failing. See #16600 for details.
                 print('[Debug invalid start byte flake] Command:', exc_list)
                 print('[Debug invalid start byte flake] Environment:', env)
                 raise e
