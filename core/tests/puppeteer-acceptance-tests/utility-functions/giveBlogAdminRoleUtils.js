@@ -7,12 +7,12 @@ const roleEditorButtonSelector = "e2e-test-role-edit-button";
 const rolesSelectDropdown = "mat-select-trigger";
 const blogdDashboardAuthorDetailsModal = "div.modal-dialog";
 
-class e2eGuestUser extends puppeteerUtilities {
+class e2eBlogAdmin extends puppeteerUtilities {
 
   async expectBlogDashboardAccessToBeUnauthorized() {
     try {
       await (this.page).waitForSelector(unauthErrorContainer);
-      console.log("Guest User unauthorized to access blog dashboard!");
+      console.log("Blog Admin unauthorized to access blog dashboard!");
     } catch(err) {
       throw new Error("No unauthorization error found for the blog dashboard page!");
     }
@@ -23,11 +23,12 @@ class e2eGuestUser extends puppeteerUtilities {
      * guest user after giving the blog admin role to it. There is a modal dialog box 
      * asking for the user name and bio for the users given blog admin role 
      * as they first time opens the blog-dashboard. */
+    await this.reloadPage();
     try {
       await this.waitForPageToLoad(blogdDashboardAuthorDetailsModal);
-      console.log("Guest User authorized to access blog dashboard!");
+      console.log("Blog Admin authorized to access blog dashboard!");
     } catch(err) {
-      throw new Error("Guest User unauthorized to access blog dashboard!");
+      throw new Error("Blog Admin unauthorized to access blog dashboard!");
     }
   }
   
@@ -35,7 +36,7 @@ class e2eGuestUser extends puppeteerUtilities {
 
 class e2eSuperAdmin extends puppeteerUtilities {
 
-  async assignGuestUserWithUserNameBlogAdminRole(userName) {
+  async assignBlogAdminRoleToUserWithUserName(userName) {
     await this.type(roleEditorInputField, userName);
     await this.clickOn("button", roleEditorButtonSelector);
     await this.clickOn("h4", "Add role");
@@ -53,7 +54,7 @@ class e2eSuperAdmin extends puppeteerUtilities {
     });
   }
 
-  async expectGuestUserToHaveBlogAdminRole() {
+  async expectUserToHaveBlogAdminRole() {
     await (this.page).evaluate(() => {
       const userRoles = document.getElementsByClassName('oppia-user-role-description');
       for(let i = 0; i < userRoles.length; i++) {
@@ -62,13 +63,13 @@ class e2eSuperAdmin extends puppeteerUtilities {
           return;
         }
       }
-      throw new Error("Guest User does not have blog admin role!");
+      throw new Error("Blog Admin does not have blog admin role!");
     });
-    console.log("Guest User given blog admin role successfully!");
+    console.log("Blog Admin given blog admin role successfully!");
   }
 };
 
 module.exports = {
-  e2eGuestUser,
+  e2eBlogAdmin,
   e2eSuperAdmin
 }

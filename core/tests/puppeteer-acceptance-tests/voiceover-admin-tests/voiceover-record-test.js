@@ -12,7 +12,6 @@ async function recordAudioAsVoiceoverAdmin() {
   await voiceoverAdmin.openBrowser();
   
   await voiceoverAdmin.signInWithEmail("testadmin@example.com");
-  await voiceoverAdmin.waitForPageToLoad(homePage);
   await voiceoverAdmin.goto(creatorDashboardUrl);
   await voiceoverAdmin.gotoTranslationTabInNewExploration();
   await voiceoverAdmin.record3SecAudio();

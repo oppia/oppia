@@ -6,7 +6,7 @@ let testConstants = {
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     AdminPage: 'http://localhost:8181/admin',
-    RolesEditorPage: 'http://localhost:8181/admin#/roles',
+    RolesEditorTab: 'http://localhost:8181/admin#/roles',
     logout: 'http://localhost:8181/logout'
   },
   Dashboard: {

@@ -1,6 +1,8 @@
-const { thomsonCrossSectionDependencies } = require("mathjs");
 const puppeteer = require("puppeteer");
 const testConstants = require("./testConstants.js");
+
+
+const homePage = testConstants.Dashboard.LearnerDashboard;
 
 module.exports = class puppeteerUtilities {
   page;
@@ -32,6 +34,7 @@ module.exports = class puppeteerUtilities {
     await this.clickOn("span", "Sign in");
     await this.type(testConstants.SignInDetails.inputField, email);
     await this.clickOn("span", "Sign In");
+    await this.waitForPageToLoad(homePage);
   }
 
   async waitForPageToLoad(selector) {

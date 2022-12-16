@@ -11,7 +11,6 @@ async function playUploadedAudioAsVoiceoverAdmin() {
   await voiceoverAdmin.openBrowser();
   
   await voiceoverAdmin.signInWithEmail("testadmin@example.com");
-  await voiceoverAdmin.waitForPageToLoad(homePage);
   await voiceoverAdmin.goto(creatorDashboardUrl);
   await voiceoverAdmin.gotoTranslationTabInNewExploration();
   await voiceoverAdmin.uploadAudioFile('A4.mp3');
