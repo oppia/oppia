@@ -23,7 +23,6 @@ core.controllers.voice_artist_test
 core.domain.action_registry_test
 core.domain.app_feedback_report_domain_test
 core.domain.app_feedback_report_services_test
-core.domain.auth_services_test
 core.domain.beam_job_services_test
 core.domain.blog_domain_test
 core.domain.blog_services_test
@@ -46,13 +45,11 @@ core.domain.html_validation_service_test
 core.domain.image_validation_services_test
 core.domain.interaction_registry_test
 core.domain.learner_goals_services_test
-core.domain.learner_group_domain_test
 core.domain.learner_group_fetchers_test
 core.domain.learner_group_services_test
 core.domain.learner_playlist_services_test
 core.domain.learner_progress_services_test
 core.domain.opportunity_services_test
-core.domain.param_domain_test
 core.domain.platform_parameter_domain_test
 core.domain.platform_parameter_registry_test
 core.domain.playthrough_issue_registry_test
