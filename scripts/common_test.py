@@ -81,17 +81,14 @@ class MockCompilerContextManager():
     def __exit__(self, *unused_args: str) -> None:
         pass
 
+def mock_context_manager() -> MockCompilerContextManager:
+            return MockCompilerContextManager()
 
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
 
     def setUp(self) -> None:
         super().setUp()
-        self.swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
-        def mock_context_manager() -> MockCompilerContextManager:
-            return MockCompilerContextManager()
-        self.swap_ng_build = self.swap(
-            servers, 'managed_ng_build', mock_context_manager)
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
@@ -100,8 +97,9 @@ class CommonTests(test_utils.GenericTestBase):
     def test_run_ng_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: True, expected_kwargs=[])
-
-        with self.print_swap, self.swap_ng_build, swap_isdir:
+        swap_ng_build = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_context_manager, expected_args=[])
+        with self.print_swap, swap_ng_build, swap_isdir:
             common.run_ng_compilation()
 
         self.assertNotIn(
@@ -112,9 +110,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_run_ng_compilation_failed(self) -> None:
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: False, expected_kwargs=[])
-
-        with self.print_swap, self.swap_ng_build, swap_isdir:
-            with self.swap_sys_exit:
+        swap_ng_build = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_context_manager, expected_args=[])
+        with self.print_swap, swap_ng_build, swap_isdir:
+            with self.assertRaisesRegexp(SystemExit, '1'):
                 common.run_ng_compilation()
 
         self.assertIn(
@@ -141,16 +140,29 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_failed_context_manager() -> MockFailedCompilerContextManager:
             return MockFailedCompilerContextManager()
 
-        self.swap_ng_build = self.swap_with_checks(
+        swap_ng_build = self.swap_with_checks(
             servers,
             'managed_ng_build',
             mock_failed_context_manager
         )
-        swap_isdir = self.swap_with_checks(os.path, 'isdir', lambda _: False)
-
-        with self.print_swap, self.swap_ng_build, swap_isdir:
-            with self.swap_sys_exit:
-                common.run_ng_compilation()
+        swap_isdir = self.swap_with_checks(
+            os.path,
+            'isdir',
+            lambda _: False,
+            expected_args=[
+                ('dist/oppia-angular',),
+                ('dist/oppia-angular',),
+                ('dist/oppia-angular',)
+            ]
+        )
+        swap_sys_exit = self.swap_with_checks(
+            sys,
+            'exit',
+            lambda _: None,
+            expected_args=[(1,), (1,), (1,)]
+        )
+        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+            common.run_ng_compilation()
 
     @contextlib.contextmanager
     def open_tcp_server_port(self) -> Generator[int, None, None]:

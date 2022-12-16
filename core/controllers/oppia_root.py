@@ -61,9 +61,10 @@ class OppiaLightweightRootPage(
         # 2. Url params
         # In the case we don't find a language direction from the above two,
         # we default to AoT bundle.
-        # TODO(#16300): Refactor how we handle RTL CSS.
-        # After the aforementioned issue is solved, the AoT bundle will be the
-        # only bundle that is returned.
+        # TODO(#16300): Refactor the RTL css generation to add RTL CSS to the
+        #   original CSS files instead of creating a new rtl CSS file
+        # NOTE: After the aforementioned issue is solved, the AoT bundle will be
+        #   the only bundle that is returned.
         if self.request.cookies.get('dir') == 'rtl':
             self.render_template('lightweight-oppia-root.mainpage.html')
             return
