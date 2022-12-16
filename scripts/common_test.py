@@ -81,8 +81,10 @@ class MockCompilerContextManager():
     def __exit__(self, *unused_args: str) -> None:
         pass
 
+
 def mock_context_manager() -> MockCompilerContextManager:
     return MockCompilerContextManager()
+
 
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
