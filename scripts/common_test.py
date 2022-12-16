@@ -82,7 +82,7 @@ class MockCompilerContextManager():
         pass
 
 def mock_context_manager() -> MockCompilerContextManager:
-            return MockCompilerContextManager()
+    return MockCompilerContextManager()
 
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
@@ -112,9 +112,14 @@ class CommonTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: False, expected_kwargs=[])
         swap_ng_build = self.swap_with_checks(
             servers, 'managed_ng_build', mock_context_manager, expected_args=[])
-        with self.print_swap, swap_ng_build, swap_isdir:
-            with self.assertRaisesRegexp(SystemExit, '1'):
-                common.run_ng_compilation()
+        swap_sys_exit = self.swap_with_checks(
+            sys,
+            'exit',
+            lambda _: None,
+            expected_args=[(1,)]
+        )
+        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+            common.run_ng_compilation()
 
         self.assertIn(
             'Failed to complete ng build compilation, exiting...',

@@ -69,7 +69,8 @@ const gifshot = require('gifshot');
 import * as gifFrames from 'gif-frames';
 
 // The "declare global" is needed as we want to augment GifFrames to the
-// global scope Window.
+// global scope Window as Window is a global object. Typescript interfaces only
+// union the interfaces with the same name when presented in the same scope.
 declare global {
   interface Window {
     GifFrames: gifFrames;
