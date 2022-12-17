@@ -484,20 +484,21 @@ def _run_pip_command(cmd_parts: List[str]) -> None:
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
-    process = subprocess.Popen(
+    with subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        encoding='utf-8')
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        print(stdout)
-    elif 'can\'t combine user with prefix' in stderr:
-        print('Trying by setting --user and --prefix flags.')
-        subprocess.check_call(
-            command + ['--user', '--prefix=', '--system'])
-    else:
-        print(stderr)
-        print('Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
-        raise Exception('Error installing package')
+        encoding='utf-8') as process:
+        stdout, stderr = process.communicate()
+        if process.returncode == 0:
+            print(stdout)
+        elif 'can\'t combine user with prefix' in stderr:
+            print('Trying by setting --user and --prefix flags.')
+            subprocess.check_call(
+                command + ['--user', '--prefix=', '--system'])
+        else:
+            print(stderr)
+            print(
+                'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+            raise Exception('Error installing package')
 
 
 def pip_install(
