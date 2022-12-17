@@ -429,10 +429,10 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
         full_error_messages = []
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         proc_args = htmllint_cmd_args + self.html_filepaths
-        proc = subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        encoded_linter_stdout, _ = proc.communicate()
+        with subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as proc:
+            encoded_linter_stdout, _ = proc.communicate()
         # Standard output is in bytes, we need to decode the line to
         # print it.
         linter_stdout = encoded_linter_stdout.decode('utf-8')
