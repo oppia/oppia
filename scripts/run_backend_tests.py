@@ -209,6 +209,16 @@ class TestingTaskSpec:
             # see that.
             if 'ev_epollex_linux.cc' in str(e):
                 result = run_shell_cmd(exc_list, env=env)
+            # We exempt this block from coverage since it's just added for
+            # debugging a backend flake.
+            elif 'invalid start byte' in str(e):  # pragma: no cover
+                # We sometimes get a UnicodeDecodeError with an "invalid start
+                # byte" message, and this can sometimes happen when trying to
+                # read a non-unicode file. To help debug this issue, print some
+                # more information before failing. See #16600 for details.
+                print('[Debug invalid start byte flake] Command:', exc_list)
+                print('[Debug invalid start byte flake] Environment:', env)
+                raise e
             else:
                 raise e
 
@@ -442,7 +452,7 @@ def check_test_results(
                 if (
                         spec.test_target not in coverage_exclusions
                         and float(coverage) != 100.0):
-                    print('INCOMPLETE COVERAGE (%s%%): %s' % (
+                    print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
                         coverage, spec.test_target))
                     incomplete_coverage += 1
                     print(task.task_results[0].get_report()[-3])
