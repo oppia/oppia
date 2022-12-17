@@ -326,17 +326,17 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.CREDITS_END_LINE) + 1
             existing_developer_names = about_page_lines[start_index:end_index]
 
-        tmp_file = tempfile.NamedTemporaryFile()
-        # Here we use MyPy ignore because here 'name' is a read-only property
-        # but for testing purposes, we are assigning a value to this 'name'
-        # property which causes MyPy to throw an error. Thus, to avoid the
-        # error, we used ignore here.
-        tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH  # type: ignore[misc]
-        with utils.open_file(
-            MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
-        ) as f:
-            for line in about_page_lines:
-                f.write(str(line))
+        with tempfile.NamedTemporaryFile() as tmp_file:
+            # Here we use MyPy ignore because here 'name' is a read-only
+            # property but for testing purposes, we are assigning a value to
+            # this 'name' property which causes MyPy to throw an error. Thus,
+            # to avoid the error, we used ignore here.
+            tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH  # type: ignore[misc]
+            with utils.open_file(
+                MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
+            ) as f:
+                for line in about_page_lines:
+                    f.write(str(line))
 
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         new_developer_names = update_changelog_and_credits.get_new_contributors(
@@ -365,7 +365,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
             self.assertEqual(actual_developer_names, expected_developer_names)
 
-        tmp_file.close()
         if os.path.isfile(MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH):
             # Occasionally this temp file is not deleted.
             os.remove(MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH)
