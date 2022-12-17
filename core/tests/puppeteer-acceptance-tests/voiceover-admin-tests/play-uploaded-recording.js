@@ -1,5 +1,5 @@
-const e2eVoiceoverAdmin = require("../utility-functions/voiceoverAdminUtils.js");
-const testConstants = require("../utility-functions/testConstants.js");
+const e2eVoiceoverAdmin = require("../puppeteer-testing-utilities/voiceoverAdminUtils.js");
+const testConstants = require("../puppeteer-testing-utilities/testConstants.js");
 
 
 const homePage = testConstants.Dashboard.LearnerDashboard;

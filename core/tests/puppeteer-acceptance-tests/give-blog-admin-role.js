@@ -1,5 +1,5 @@
-const { e2eBlogAdmin, e2eSuperAdmin } = require("./utility-functions/giveBlogAdminRoleUtils.js");
-const testConstants = require("./utility-functions/testConstants.js");
+const { e2eBlogAdmin, e2eSuperAdmin } = require("./puppeteer-testing-utilities/giveBlogAdminRoleUtils.js");
+const testConstants = require("./puppeteer-testing-utilities/testConstants.js");
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const RolesEditorTab = testConstants.URLs.RolesEditorTab;

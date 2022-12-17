@@ -1,5 +1,5 @@
-const e2eBlogPostAdmin = require("../utility-functions/blogPostAdminUtils.js");
-const testConstants = require("../utility-functions/testConstants.js");
+const e2eBlogPostAdmin = require("../puppeteer-testing-utilities/blogPostAdminUtils.js");
+const testConstants = require("../puppeteer-testing-utilities/testConstants.js");
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const homePage = testConstants.Dashboard.LearnerDashboard;

@@ -1,5 +1,4 @@
 const puppeteerUtilities = require("./puppeteer_utils.js");
-const testConstants = require("./testConstants.js");
 
 const unauthErrorContainer = "div.e2e-test-error-container";
 const roleEditorInputField = "input.e2e-test-username-for-role-editor"

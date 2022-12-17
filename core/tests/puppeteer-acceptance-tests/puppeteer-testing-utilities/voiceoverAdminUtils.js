@@ -1,5 +1,4 @@
 const puppeteerUtilities = require("./puppeteer_utils.js");
-const testConstants = require("./testConstants.js");
 
 
 const translationTab = "e2e-test-translation-tab";
