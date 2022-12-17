@@ -436,7 +436,9 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.exp_version, exploration.version)
 
-    def test_nothing_updated_for_old_exploration_version(self) -> None:
+    def test_no_stats_events_updated_for_old_exploration_version(
+        self
+    ) -> None:
         all_models = (
             stats_models.ExplorationStatsModel.get_all())
         self.assertEqual(all_models.count(), 0)
@@ -444,6 +446,7 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         exp_id = 'eid1'
         self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(exploration.version, 1)
         event_services.StatsEventsHandler.record(
             exp_id, 0, {
                 'state_stats_mapping': {
@@ -454,10 +457,7 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         all_models = stats_models.ExplorationStatsModel.get_all()
         self.assertEqual(all_models.count(), 1)
         model = all_models.get()
-        self.assertIsNotNone(model)
-        # Ruling out the possibility of None for mypy type checking.
         assert model is not None
-        self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.exp_version, exploration.version)
 
 
