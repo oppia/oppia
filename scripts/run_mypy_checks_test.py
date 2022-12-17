@@ -61,27 +61,29 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             install_third_party_libs, 'main',
             mock_install_third_party_libs_main)
 
-        process_success = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        def mock_popen_success(
-            unused_cmd: str,
-            stdout: Optional[str] = None,  # pylint: disable=unused-argument
-            stdin: Optional[str] = None,  # pylint: disable=unused-argument
-            stderr: Optional[str] = None,  # pylint: disable=unused-argument
-            env: Optional[str] = None  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
-            return process_success
+        with subprocess.Popen(
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as process_success:
+            def mock_popen_success(
+                unused_cmd: str,
+                stdout: Optional[str] = None,  # pylint: disable=unused-argument
+                stdin: Optional[str] = None,  # pylint: disable=unused-argument
+                stderr: Optional[str] = None,  # pylint: disable=unused-argument
+                env: Optional[str] = None  # pylint: disable=unused-argument
+            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+                return process_success
 
-        process_failure = subprocess.Popen(
-            ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        def mock_popen_failure(
-            unused_cmd: str,
-            stdout: Optional[str] = None,  # pylint: disable=unused-argument
-            stdin: Optional[str] = None,  # pylint: disable=unused-argument
-            stderr: Optional[str] = None,  # pylint: disable=unused-argument
-            env: Optional[str] = None  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
-            return process_failure
+        with subprocess.Popen(
+            ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as process_failure:
+            def mock_popen_failure(
+                unused_cmd: str,
+                stdout: Optional[str] = None,  # pylint: disable=unused-argument
+                stdin: Optional[str] = None,  # pylint: disable=unused-argument
+                stderr: Optional[str] = None,  # pylint: disable=unused-argument
+                env: Optional[str] = None  # pylint: disable=unused-argument
+            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+                return process_failure
 
         self.popen_swap_success = self.swap(
             subprocess, 'Popen', mock_popen_success)
@@ -203,17 +205,19 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_running_script_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
-            process = subprocess.Popen(
-                [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
-            output = process.communicate()
-            self.assertEqual(output[0], b'test\n')
+            with subprocess.Popen(
+                [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE
+            ) as process:
+                output = process.communicate()
+                self.assertEqual(output[0], b'test\n')
 
     def test_running_script_with_mypy_errors(self) -> None:
         with self.popen_swap_failure:
-            process = subprocess.Popen(
-                [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
-            output = process.communicate()
-            self.assertEqual(output[0], b'')
+            with subprocess.Popen(
+                [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE
+            ) as process:
+                output = process.communicate()
+                self.assertEqual(output[0], b'')
 
     def test_main_with_files_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
