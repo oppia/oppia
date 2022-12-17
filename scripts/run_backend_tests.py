@@ -146,8 +146,8 @@ def run_shell_cmd(
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
-    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env)
-    last_stdout_bytes, last_stderr_bytes = p.communicate()
+    with subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env) as p:
+        last_stdout_bytes, last_stderr_bytes = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
     # compatible with rest of the code.
     last_stdout_str = last_stdout_bytes.decode('utf-8')
