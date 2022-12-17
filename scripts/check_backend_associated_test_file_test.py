@@ -46,8 +46,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             self) -> None:
         with tempfile.TemporaryDirectory(
             prefix=os.getcwd() + '/core/') as tempdir:
-            backend_file = os.path.join(tempdir.name, 'backend_file.py')
-            frontend_file = os.path.join(tempdir.name, 'frontend_file.ts')
+            backend_file = os.path.join(tempdir, 'backend_file.py')
+            frontend_file = os.path.join(tempdir, 'frontend_file.ts')
 
             with open(backend_file, 'w', encoding='utf8') as f:
                 f.write('Example code')
@@ -70,7 +70,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             self) -> None:
         with tempfile.TemporaryDirectory(
             prefix=os.getcwd() + '/core/') as tempdir:
-            backend_file = os.path.join(tempdir.name, 'backend_file.py')
+            backend_file = os.path.join(tempdir, 'backend_file.py')
             with open(backend_file, 'w', encoding='utf8') as f:
                 f.write('Example code')
             (
@@ -90,9 +90,9 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             self) -> None:
         with tempfile.TemporaryDirectory(
             prefix=os.getcwd() + '/core/') as tempdir:
-            backend_file = os.path.join(tempdir.name, 'backend_file.py')
+            backend_file = os.path.join(tempdir, 'backend_file.py')
             backend_test_file = os.path.join(
-                tempdir.name, 'backend_file_test.py')
+                tempdir, 'backend_file_test.py')
 
             with open(backend_file, 'w', encoding='utf8') as f:
                 f.write('Example code')
@@ -101,7 +101,6 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             with self.print_swap, self.swap_logging, self.swap_exit:
                 check_backend_associated_test_file.main()
 
-            tempdir.cleanup()
             self.assertIn(
                 'Backend associated test file checks passed.', self.print_arr)
             self.assertEqual(self.error_arr, [])
