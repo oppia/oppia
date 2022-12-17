@@ -209,6 +209,16 @@ class TestingTaskSpec:
             # see that.
             if 'ev_epollex_linux.cc' in str(e):
                 result = run_shell_cmd(exc_list, env=env)
+            # We exempt this block from coverage since it's just added for
+            # debugging a backend flake.
+            elif 'invalid start byte' in str(e):  # pragma: no cover
+                # We sometimes get a UnicodeDecodeError with an "invalid start
+                # byte" message, and this can sometimes happen when trying to
+                # read a non-unicode file. To help debug this issue, print some
+                # more information before failing. See #16600 for details.
+                print('[Debug invalid start byte flake] Command:', exc_list)
+                print('[Debug invalid start byte flake] Environment:', env)
+                raise e
             else:
                 raise e
 
