@@ -150,7 +150,8 @@ class CommonTests(test_utils.GenericTestBase):
         swap_ng_build = self.swap_with_checks(
             servers,
             'managed_ng_build',
-            mock_failed_context_manager
+            mock_failed_context_manager,
+            expected_args=[]
         )
         swap_isdir = self.swap_with_checks(
             os.path,

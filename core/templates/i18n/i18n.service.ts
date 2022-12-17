@@ -90,7 +90,7 @@ export class I18nService {
           this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
         const langDirection = (
           this.i18nLanguageCodeService.isLanguageRTL(code) ? 'rtl' : 'ltr');
-        const prevLangDirection = (
+        let prevLangDirection = (
           this.i18nLanguageCodeService.isLanguageRTL(
             I18nLanguageCodeService.prevLangCode
           ) ? 'rtl' : 'ltr');
@@ -99,6 +99,7 @@ export class I18nService {
         if (!!cookieSetDateMsecs &&
           +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
         ) {
+          prevLangDirection = this.cookieService.get('dir');
           this.cookieService.put(
             'dir',
             langDirection
