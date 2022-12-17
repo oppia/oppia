@@ -88,23 +88,24 @@ def run_dtslint_type_tests() -> None:
            DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
            '--localTs',
            TYPESCRIPT_DIR_RELATIVE_PATH]
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    output_lines = []
-    # The value of `process.stdout` should not be None since we passed
-    # the `stdout=subprocess.PIPE` argument to `Popen`.
-    assert task.stdout is not None
-    # Reads and prints realtime output from the subprocess until it terminates.
-    while True:
-        line = task.stdout.readline()
-        # No more output from the subprocess, and the subprocess has ended.
-        if len(line) == 0 and task.poll() is not None:
-            break
-        if line:
-            print(line, end='')
-            output_lines.append(line)
-    print('Done!')
-    if task.returncode:
-        sys.exit('The dtslint (type tests) failed.')
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE) as task:
+        output_lines = []
+        # The value of `process.stdout` should not be None since we passed
+        # the `stdout=subprocess.PIPE` argument to `Popen`.
+        assert task.stdout is not None
+        # Reads and prints realtime output from the subprocess until it
+        # terminates.
+        while True:
+            line = task.stdout.readline()
+            # No more output from the subprocess, and the subprocess has ended.
+            if len(line) == 0 and task.poll() is not None:
+                break
+            if line:
+                print(line, end='')
+                output_lines.append(line)
+        print('Done!')
+        if task.returncode:
+            sys.exit('The dtslint (type tests) failed.')
 
 
 def main(args: Optional[Sequence[str]] = None) -> None:
@@ -140,42 +141,45 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if parsed_args.verbose:
         cmd.append('--terminalEnabled')
 
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    output_lines = []
-    # The value of `process.stdout` should not be None since we passed
-    # the `stdout=subprocess.PIPE` argument to `Popen`.
-    assert task.stdout is not None
-    # Prevents the wget command from running multiple times.
-    combined_spec_file_started_downloading = False
-    # This variable will be used to define the wget command to download
-    # the combined-test.spec.js file.
-    download_task = None
-    # Reads and prints realtime output from the subprocess until it terminates.
-    while True:
-        line = task.stdout.readline()
-        # No more output from the subprocess, and the subprocess has ended.
-        if len(line) == 0 and task.poll() is not None:
-            break
-        # Suppressing the karma web-server logs.
-        if line and not '[web-server]:' in line.decode('utf-8'):
-            # Standard output is in bytes, we need to decode
-            # the line to print it.
-            print(line.decode('utf-8'), end='')
-            output_lines.append(line)
-        # Download the combined-tests.js file from the web-server.
-        if ('Executed' in line.decode('utf-8') and
-            not combined_spec_file_started_downloading and
-            parsed_args.download_combined_frontend_spec_file):
-            download_task = subprocess.Popen(
-                ['wget',
-                'http://localhost:9876/base/core/templates/' +
-                'combined-tests.spec.js',
-                '-P',
-                os.path.join('../karma_coverage_reports')])
-            # Wait for the wget command to download the combined-tests.spec.js
-            # file to complete.
-            download_task.wait()
-            combined_spec_file_started_downloading = True
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE) as task:
+        output_lines = []
+        # The value of `process.stdout` should not be None since we passed
+        # the `stdout=subprocess.PIPE` argument to `Popen`.
+        assert task.stdout is not None
+        # Prevents the wget command from running multiple times.
+        combined_spec_file_started_downloading = False
+        # This variable will be used to define the wget command to download
+        # the combined-test.spec.js file.
+        download_task = None
+        # Reads and prints realtime output from the subprocess until it
+        # terminates.
+        while True:
+            line = task.stdout.readline()
+            # No more output from the subprocess, and the subprocess has ended.
+            if len(line) == 0 and task.poll() is not None:
+                break
+            # Suppressing the karma web-server logs.
+            if line and not '[web-server]:' in line.decode('utf-8'):
+                # Standard output is in bytes, we need to decode
+                # the line to print it.
+                print(line.decode('utf-8'), end='')
+                output_lines.append(line)
+            # Download the combined-tests.js file from the web-server.
+            if ('Executed' in line.decode('utf-8') and
+                not combined_spec_file_started_downloading and
+                parsed_args.download_combined_frontend_spec_file):
+                with subprocess.Popen(
+                    ['wget',
+                    'http://localhost:9876/base/core/templates/' +
+                    'combined-tests.spec.js',
+                    '-P',
+                    os.path.join('../karma_coverage_reports')]
+                ) as open_process:
+                    download_task = open_process
+                # Wait for the wget command to download the
+                # combined-tests.spec.js file to complete.
+                download_task.wait()
+                combined_spec_file_started_downloading = True
     # Standard output is in bytes, we need to decode the line to print it.
     concatenated_output = ''.join(
         line.decode('utf-8') for line in output_lines)
