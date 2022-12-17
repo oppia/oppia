@@ -55,14 +55,14 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn("div", thumbnailPhotoBox);
     await this.uploadFile('collection.svg');
     await this.clickOn("button", " Add Thumbnail Image ");
-    await (this.page).waitForTimeout(500);
+    await (this.page).waitForSelector("body.modal-open", {hidden: true});
 
-    await this.clickOn("span", " International ");
+    await this.clickOn("button", "mat-button-toggle-button");
     await this.clickOn("span", " DONE ");
   }
 
   async publishNewBlogPost() {
-    await this.clickOn("span", "PUBLISH");
+    await this.clickOn("span", "PUBLISH", 1000);
     await this.clickOn("button", " Confirm ", 1000);
     
     console.log("Successfully published a blog!");
