@@ -41,12 +41,13 @@ class SetupTests(test_utils.GenericTestBase):
         with open('dummy_requirements.txt', 'w', encoding='utf-8') as f:
             f.write(packages)
 
-        dummy_file_object = open('dummy_requirements.txt', encoding='utf-8')
+        with open(
+            'dummy_requirements.txt', encoding='utf-8') as dummy_file_object:
 
-        swap_open = self.swap_with_checks(
-            builtins, 'open',
-            lambda *unused_args, **unused_kwargs: dummy_file_object,
-            expected_args=(('requirements.txt',),))
+            swap_open = self.swap_with_checks(
+                builtins, 'open',
+                lambda *unused_args, **unused_kwargs: dummy_file_object,
+                expected_args=(('requirements.txt',),))
 
         required_packages = packages.split('\n')[:-1]
 
@@ -76,5 +77,4 @@ class SetupTests(test_utils.GenericTestBase):
             import setup # pylint: disable=syntax-error
             setup.main()
 
-        dummy_file_object.close()
         os.remove('dummy_requirements.txt')
