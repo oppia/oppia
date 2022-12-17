@@ -30,7 +30,6 @@ import re
 
 from typing import Final, List, Optional
 
-
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
