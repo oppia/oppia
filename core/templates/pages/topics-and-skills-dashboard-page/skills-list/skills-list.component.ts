@@ -259,7 +259,7 @@ export class SkillsListComponent {
           this.alertsService.addSuccessMessage(successToast, 1000);
         }, 100);
       }, (errorResponse) => {
-        this.alertsService.addWarning(errorResponse.error.error);
+        this.alertsService.addWarning(errorResponse);
       });
     }, () => {
       // Note to developers:
