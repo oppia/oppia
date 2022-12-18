@@ -83,6 +83,9 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
             data = storage_services.get(self.bucket, file_path)
         except Exception:
             data = 'The file does not exists.'
+            # Ruling out the possibility of different types for mypy
+            # type checking.
+            assert isinstance(data, str)
         return (file_path, data)
 
 
