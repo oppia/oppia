@@ -81,7 +81,7 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         """
         try:
             data = storage_services.get(self.bucket, file_path)
-        except:
+        except Exception:
             data = 'The file does not exists.'
         return (file_path, data)
 
