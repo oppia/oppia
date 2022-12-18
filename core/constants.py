@@ -90,10 +90,12 @@ def get_package_file_contents(
     try:
         if mode == 'r':
             with io.open(
-                os.path.join(package, filepath), 'r', encoding='utf-8'
+                os.path.join(package, filepath), mode, encoding='utf-8'
             ) as file:
                 return file.read()
-        with io.open(os.path.join(package, filepath), mode) as file:
+        with io.open(
+            os.path.join(package, filepath), mode, encoding=None
+        ) as file:
             return file.read()
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)
