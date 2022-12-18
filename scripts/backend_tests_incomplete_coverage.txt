@@ -23,7 +23,6 @@ core.controllers.voice_artist_test
 core.domain.action_registry_test
 core.domain.app_feedback_report_domain_test
 core.domain.app_feedback_report_services_test
-core.domain.auth_services_test
 core.domain.beam_job_services_test
 core.domain.blog_domain_test
 core.domain.blog_services_test
@@ -67,7 +66,6 @@ core.domain.skill_services_test
 core.domain.state_domain_test
 core.domain.stats_domain_test
 core.domain.stats_services_test
-core.domain.story_domain_test
 core.domain.story_fetchers_test
 core.domain.story_services_test
 core.domain.subtopic_page_domain_test
