@@ -80,13 +80,11 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
             data: Tuple[str, bytes]. The file data.
         """
         try:
-            data = storage_services.get(self.bucket, file_path)
+            file_data = storage_services.get(self.bucket, file_path)
+            return (file_path, file_data)
         except Exception:
-            data = 'The file does not exists.'
-            # Ruling out the possibility of different types for mypy
-            # type checking.
-            assert isinstance(data, str)
-        return (file_path, data)
+            err_message: str = 'The file does not exists.'
+            return (file_path, err_message)
 
 
 class FileObjectDict(TypedDict):
