@@ -191,41 +191,35 @@ export class PreferencesPageComponent {
     }
   }
 
-  private saveProfileImage(image: Blob): void {
+  private saveProfileImage(newProfilePictureDataUrl: string): void {
+    console.log(this.contextService.getImageSaveDestination());
     if (
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     ) {
-      this._saveProfileImageToLocalStorage(image);
+      this._saveProfileImageToLocalStorage(newProfilePictureDataUrl);
     } else {
-      this._postProfileImageToServer(image);
+      this._postProfileImageToServer(newProfilePictureDataUrl);
     }
   }
 
-  private _saveProfileImageToLocalStorage(image: Blob): void {
+  private _saveProfileImageToLocalStorage(image: string): void {
+    this.profilePictureDataUrl = image;
+    const newImageFile = (
+      this.imageUploadHelperService.convertImageDataToImageFile(image));
     const reader = new FileReader();
     reader.onload = () => {
       const imageData = reader.result as string;
       this.imageLocalStorageService.saveImage(
         'profile_picture.png', imageData);
     };
-    reader.readAsDataURL(image);
+    reader.readAsDataURL(newImageFile);
   }
 
-  private _postProfileImageToServer(image: Blob): void {
-    let form = new FormData();
-    form.append('image', image);
-    this.http.post<ImageUploadBackendResponse>(
-      this.urlInterpolationService.interpolateUrl(
-        AppConstants.PROFILE_PHOTO_UPLOAD_URL_TEMPLATE, {
-          username: this.username
-        }
-      ), form
-    ).toPromise().then(() => {
-        // The reload is needed in order to update the profile picture
-        // in the top-right corner.
-        this.windowRef.nativeWindow.location.reload();
-    });
+  private _postProfileImageToServer(image: string): void {
+    this.profilePictureDataUrl = image;
+    this.userService.setProfileImageDataUrlAsync(image)
+      .then(() => {});
   }
 
   showEditProfilePictureModal(): void {
@@ -234,10 +228,7 @@ export class PreferencesPageComponent {
     });
 
     modalRef.result.then((newProfilePictureDataUrl) => {
-      const newImageFile = (
-        this.imageUploadHelperService.convertImageDataToImageFile(
-          newProfilePictureDataUrl));
-      this.saveProfileImage(newImageFile);
+      this.saveProfileImage(newProfilePictureDataUrl);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -265,6 +256,8 @@ export class PreferencesPageComponent {
     this.hasPageLoaded = false;
 
     let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
+    console.log('******************************');
+    console.log(this.contextService.getImageSaveDestination());
     preferencesPromise.then((data) => {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
@@ -288,6 +281,8 @@ export class PreferencesPageComponent {
       });
       this.hasPageLoaded = true;
     });
+
+    // this.contextService.setImageSaveDestinationToLocalStorage();
 
     let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
     profileImagePromise.then(data => {

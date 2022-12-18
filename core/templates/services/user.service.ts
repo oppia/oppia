@@ -19,6 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -30,6 +31,7 @@ import { UpdatePreferencesResponse, UserBackendApiService, UserContributionRight
 })
 export class UserService {
   constructor(
+    private imageLocalStorageService: ImageLocalStorageService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
@@ -57,19 +59,31 @@ export class UserService {
   }
 
   async getProfileImageDataUrlAsync(): Promise<string> {
+    let localStoredImage = (
+      this.imageLocalStorageService.getRawImageData('profile_picture.png'));
+    if (localStoredImage !== null) {
+      return localStoredImage
+    }
     let defaultUrl = (
       this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-    return this.getUserInfoAsync().then(
-      async(userInfo) => {
-        if (userInfo.isLoggedIn()) {
-          return this.userBackendApiService.getProfileImageDataUrlAsync();
-        } else {
-          return new Promise((resolve, reject) => {
-            resolve(defaultUrl);
-          });
-        }
-      });
+    // return this.getUserInfoAsync().then(
+    //   async(userInfo) => {
+    //     if (userInfo.isLoggedIn()) {
+    //       return this.userBackendApiService.getProfileImageDataUrlAsync();
+    //     } else {
+    //       return new Promise((resolve, reject) => {
+    //         resolve(defaultUrl);
+    //       });
+    //     }
+    //   });
+    return defaultUrl;
+  }
+
+  async setProfileImageDataUrlAsync(
+      newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
+    return this.userBackendApiService.setProfileImageDataUrlAsync(
+      newProfileImageDataUrl);
   }
 
   async getLoginUrlAsync(): Promise<string> {

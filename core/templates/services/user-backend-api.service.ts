@@ -107,8 +107,8 @@ export class UserBackendApiService {
       });
   }
 
-  async getProfileImageDataUrlAsync(): Promise<string> {
-    return this.loadProfileImage().then(image => {
+  async getProfileImageDataUrlAsync(username: string = ''): Promise<string> {
+    return this.loadProfileImage(username).then(image => {
       return new Promise(resolve => {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -165,36 +165,13 @@ export class UserBackendApiService {
     }).toPromise();
   }
 
-  async loadProfileImage(username: string = ''): Promise<ImageFile> {
-    // Artificially load an image from a random exploration where you
-    // uploaded an image. We'll pretend that it is the profile image
-    // that is retrieved from the backend.
-
-    // Test image 1.
-    const image_1 = this.assetsBackendApiService.loadImage(
-      AppConstants.ENTITY_TYPE.EXPLORATION, 'lOZraTUa1x8b',
-      'img_20221108_210419_1pse2cowr9_height_275_width_237.png');
-
-    // Test image 2.
-    const image_2 = this.assetsBackendApiService.loadImage(
-      AppConstants.ENTITY_TYPE.EXPLORATION, 'sIW3TNaiFWQD',
-      'img_20221108_111758_k26g4dj4h7_height_201_width_203.png');
-
-    username = username || await this.getUserInfoAsync().then(
-      userInfo => userInfo.getUsername());
-    // All of this logic is just for testing.
-    if (username === 'eric') {
-      return image_1;
-    } else {
-      return image_2;
-    }
-    // ^^^ Delete everything above this line once merged with Hitesh's changes.
-
+  async loadProfileImage(username: string): Promise<ImageFile> {
     // Fetch profile image for the current user if not specified.
-    username = username || await this.getUserInfoAsync().then(
+    let loginUserUsername = await this.getUserInfoAsync().then(
       userInfo => userInfo.getUsername());
-    
-    if (this.profileImageCache !== undefined) {
+    username = username || loginUserUsername;
+
+    if (this.profileImageCache !== undefined && username === loginUserUsername) {
       return new ImageFile('profile_picture.png', this.profileImageCache);
     }
     return this._fetchProfileImage(username);
@@ -220,7 +197,7 @@ export class UserBackendApiService {
       return new ImageFile('profile_picture.png', blob);
     } catch {
       return Promise.reject('profile_picture.png');
-    }  
+    }
   }
 }
 angular.module('oppia').factory(
