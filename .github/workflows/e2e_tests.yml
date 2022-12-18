@@ -28,13 +28,15 @@ jobs:
             requirements_dev.in
             requirements_dev.txt
       - uses: ./.github/actions/merge
-      - name: Cache node modules
+      - name: Cache node modules and third_party/static
         uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
-          path: /home/runner/work/oppia/yarn_cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          path: |
+            /home/runner/work/oppia/yarn_cache
+            /home/runner/work/oppia/oppia/third_party/static
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock', 'dependencies.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
