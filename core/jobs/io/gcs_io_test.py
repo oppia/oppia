@@ -42,13 +42,15 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
         string = b'testing'
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         storage_services.commit(bucket, 'dummy_file', string, None)
-        filepaths = ['dummy_file']
+        filepaths = ['dummy_file', 'new_dummy_file']
         filepath_p_collec = (
             self.pipeline
             | 'Create pcoll of filepaths' >> beam.Create(filepaths)
             | 'Read file from GCS' >> gcs_io.ReadFile()
         )
-        self.assert_pcoll_equal(filepath_p_collec, [('dummy_file', string)])
+        self.assert_pcoll_equal(filepath_p_collec, [
+            ('dummy_file', string),
+            ('new_dummy_file', 'The file does not exists.')])
 
 
 class WriteFileTest(job_test_utils.PipelinedTestBase):
