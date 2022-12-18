@@ -22,6 +22,7 @@ import io
 import logging
 import os
 
+from core import constants
 from core import utils
 from core.domain import image_services
 from core.domain import user_services
@@ -161,13 +162,10 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             user_services.DEFAULT_IDENTICON_DATA_URL or (
                 width == 76 and height == 76)
         ):
-            with utils.open_file(
-                os.path.join(
-                    'assets', 'images', 'avatar', 'user_blue_150px.png'),
-                'rb',
-                encoding=None
-            ) as f:
-                raw_image_png = f.read()
+            default_image_path = os.path.join(
+                'images', 'avatar', 'user_blue_150px.png')
+            raw_image_png = constants.get_package_file_contents(
+                'assets', default_image_path, mode='rb')
             user_model.profile_picture_data_url = (
                 utils.convert_png_binary_to_data_url(raw_image_png))
 

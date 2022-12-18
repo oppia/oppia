@@ -66,7 +66,9 @@ def remove_comments(text: str) -> str:
 # the chronology of our files execution. utils imports constants and constants
 # need utils.get_package_file_contents but it does not have it loaded to memory
 # yet. If called from utils we get error as `module has no attribute`.
-def get_package_file_contents(package: str, filepath: str) -> str:
+def get_package_file_contents(
+    package: str, filepath: str, mode: str = 'r'
+) -> str:
     """Open file and return its contents. This needs to be used for files that
     are loaded by the Python code directly, like constants.ts or
     rich_text_components.json. This function is needed to make loading these
@@ -77,6 +79,7 @@ def get_package_file_contents(package: str, filepath: str) -> str:
             For Oppia the package is usually the folder in the root folder,
             like 'core' or 'extensions'.
         filepath: str. The path to the file in the package.
+        mode: str. The mode in which we want to read from file.
 
     Returns:
         str. The contents of the file.
@@ -85,9 +88,12 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         FileNotFoundError. The file does not exist.
     """
     try:
-        with io.open(
-            os.path.join(package, filepath), 'r', encoding='utf-8'
-        ) as file:
+        if mode == 'r':
+            with io.open(
+                os.path.join(package, filepath), 'r', encoding='utf-8'
+            ) as file:
+                return file.read()
+        with io.open(os.path.join(package, filepath), mode) as file:
             return file.read()
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)
