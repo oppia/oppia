@@ -71,7 +71,9 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
             | 'Read the file' >> beam.Map(self._read_file)
         )
 
-    def _read_file(self, file_path: str) -> Tuple[str, Union[bytes, str]]:
+    def _read_file(
+        self, file_path: str
+    ) -> result.Result[Tuple[str, Union[bytes, str]]]:
         """Helper function to read the contents of a file.
 
         Args:
