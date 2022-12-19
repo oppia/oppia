@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core.jobs.transforms import job_result_transforms
 from core.platform import models
 
 import apache_beam as beam
