@@ -99,7 +99,9 @@ export class I18nService {
         if (!!cookieSetDateMsecs &&
           +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
         ) {
-          prevLangDirection = this.cookieService.get('dir');
+          prevLangDirection = (
+            this.cookieService.get('dir') || prevLangDirection
+          );
           this.cookieService.put(
             'dir',
             langDirection
