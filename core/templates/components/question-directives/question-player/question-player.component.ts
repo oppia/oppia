@@ -565,7 +565,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
           this.testIsPassed = this.hasUserPassedTest();
           this.siteAnalyticsService.registerPracticeSessionEndEvent(
-            this.urlService.getClassroomUrlFragmentFromUrl(),
+            this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
             this.urlService.getTopicUrlFragmentFromLearnerUrl(),
             Object.keys(this.scorePerSkillMapping).toString(),
             Object.keys(questionStateData).length,
