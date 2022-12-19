@@ -23,6 +23,8 @@ import shutil
 import subprocess
 import sys
 
+from typing import List, Optional, Sequence
+
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
 # we migrate to Python 3.8.
@@ -32,8 +34,6 @@ from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-i
 from core import utils # isort:skip
 
 import yaml # isort:skip
-
-from typing import List, Optional, Sequence
 
 
 # Contains the name of all files that are not strictly typed.
