@@ -30,7 +30,11 @@ import { AppConstants } from 'app.constants';
 // Webpack absolute import is just "hashes.json".
 // AoT version is "assets/hashes.json".
 // TODO(#16309): Fix relative imports.
-import hashes from '../../../../assets/hashes.json';
+import resourceHashes from '../../../../assets/hashes.json';
+
+const hashes: Record<string, string> = (
+  resourceHashes as Record<string, string>
+);
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.

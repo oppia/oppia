@@ -22,8 +22,13 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 
+import resourceHashes from '../../../../assets/hashes.json';
+
+const hashes: Record<string, string> = (
+  resourceHashes as Record<string, string>
+);
+
 describe('URL Interpolation Service', () => {
-  let hashes = require('hashes.json');
   let uis: UrlInterpolationService;
   let urlService: UrlService;
   let mockLocation: Pick<Location, 'origin'>;
