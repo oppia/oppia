@@ -30,7 +30,6 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { StoryNode } from 'domain/story/story-node.model';
 
 import './story-summary-tile.component.css';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 
 @Component({
@@ -71,33 +70,10 @@ export class StorySummaryTileComponent implements OnInit {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   checkTabletView(): boolean {
     return this.windowDimensionsService.getWidth() < 768;
-  }
-
-  onChapterClick(index: number): void {
-    if (index === 0) {
-      this.siteAnalyticsService.registerTopicStartEvent(
-        this.classroomUrlFragment,
-        this.topicUrlFragment,
-        this.nodeTitles[0],
-        this.nodeCount.toString(),
-        this.storySummary.getAllNodes()[0].getExplorationId() || 'NA'
-      );
-    } else if (index === this.nodeCount - 1) {
-      this.siteAnalyticsService.registerTopicEndEvent(
-        this.classroomUrlFragment,
-        this.topicUrlFragment,
-        this.nodeTitles[this.nodeCount - 1],
-        this.nodeCount.toString(),
-        this.storySummary.getAllNodes()[
-          this.nodeCount - 1
-        ].getExplorationId() || 'NA'
-      );
-    }
   }
 
   getStoryLink(): string {
