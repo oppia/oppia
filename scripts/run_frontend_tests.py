@@ -119,19 +119,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         install_third_party_libs.main()
 
     common.setup_chrome_bin_env_variable()
-    # We need to create an empty hashes.json file for the build so that
-    # we don't get the error "assets/hashes.json file doesn't exist".
-    build.save_hashes_to_file({
-        "/hash_test.html": "ijklmopq",
-        "/path_test/hash_test.html": "123456789",
-        "/hash_test.min.js": "zyx12345",
-        "/assets_test/hash_test.json": "987654321",
-        "/pages_test/hash_test.html": "abcd12345",
-        "/images/hash_test.png": "98765fghij",
-        "/videos/hash_test.mp4": "12345cxz",
-        "/audio/hash_test.mp3": "12345abc",
-        "/interactions/interTest/static/interTest.png": "123654789"
-    })
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',
         '../karma_coverage_reports',
