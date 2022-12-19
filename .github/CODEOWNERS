@@ -71,7 +71,6 @@
 /core/templates/utility/string-utility*.ts @oppia/angular-migration-reviewers
 /proxy.conf.json @oppia/angular-migration-reviewers
 /angular-template-style-url-replacer.webpack-loader.js @oppia/angular-migration-reviewers
-/hashes.json @oppia/angular-migration-reviewers
 /angular.json @oppia/angular-migration-reviewers
 /src @oppia/frontend-infrastructure-reviewers
 

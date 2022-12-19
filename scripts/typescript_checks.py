@@ -32,7 +32,9 @@ from core import utils # isort:skip
 
 import yaml # isort:skip
 
-from typing import List, Optional, Sequence  # isort:skip
+from typing import List, Optional, Sequence
+
+from scripts.build import save_hashes_to_file  # isort:skip
 
 # Contains the name of all files that are not strictly typed.
 # This list must be kept up-to-date; the changes (only remove) should be done
@@ -437,6 +439,9 @@ def compile_and_check_typescript(config_path: str) -> None:
         config_path: str. The config that should be used to run the typescript
             checks.
     """
+    # We need to create an empty hashes.json file for the build so that
+    # we don't get the error "assets/hashes.json file doesn't exist".
+    save_hashes_to_file({})
     # Set strict TS config include property to ["core", "extensions", "typings"]
     # This make sure to restore include property to its original value after the
     # checks get aborted mid-way.
