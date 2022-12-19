@@ -64,6 +64,20 @@ class ConstantsTests(test_utils.GenericTestBase):
                 'File data'
             )
 
+        with utils.open_file(
+            os.path.join(
+                'assets', 'images', 'avatar', 'user_blue_150px.png'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image_png = f.read()
+        default_image_path = os.path.join(
+            'images', 'avatar', 'user_blue_150px.png')
+        self.assertEqual(
+            constants.get_package_file_contents(
+                'assets', default_image_path, mode='rb'), raw_image_png
+        )
+
     def test_loading_file_in_non_existent_package_throws_error(self) -> None:
         """Test get_package_file_contents with imaginary file."""
         with self.swap_to_always_return(pkgutil, 'get_data', None):
