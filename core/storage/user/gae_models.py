@@ -2213,6 +2213,9 @@ class UserQueryModel(base_models.BaseModel):
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model contains data to delete corresponding to a user:
         user_ids and submitter_id fields.
+
+        This model is marked as deleted 4 weeks after its creation.
+        See mark_outdated_models_as_deleted() in cron_services.py.
         """
         return base_models.DELETION_POLICY.DELETE
 

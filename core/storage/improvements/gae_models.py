@@ -125,7 +125,7 @@ class TaskEntryModel(base_models.BaseModel):
         only act as a historical record. The removal just removes the historical
         record.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
