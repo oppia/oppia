@@ -117,20 +117,17 @@ describe('Content language selector component', () => {
     fixture.detectChanges();
   }));
 
-  it('should correctly initialize selectedLanguageCode and ' +
-     'languagesInExploration', () => {
+  it('should correctly initialize selectedLanguageCode, ' +
+     'newLanguageCode and languagesInExploration', () => {
     expect(component.selectedLanguageCode).toBe('fr');
+    expect(component.newLanguageCode).toBe('fr');
     expect(component.languageOptions).toEqual([
       {value: 'fr', displayed: 'français (French)'},
       {value: 'zh', displayed: '中文 (Chinese)'},
       {value: 'en', displayed: 'English'}
     ]);
   });
-
-  it('should correcly initialize newLanguageCode', () => {
-    expect(component.newLanguageCode).toBe('fr');
-  });
-
+    
   it('should correctly select an option when refresh is not needed', () => {
     const setCurrentContentLanguageCodeSpy = spyOn(
       contentTranslationLanguageService,
