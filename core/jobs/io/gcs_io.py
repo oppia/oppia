@@ -18,9 +18,11 @@
 
 from __future__ import annotations
 
+from core.jobs.transforms import job_result_transforms
 from core.platform import models
 
 import apache_beam as beam
+import result
 from typing import List, Optional, Tuple, TypedDict, Union
 
 MYPY = False
@@ -81,10 +83,10 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         """
         try:
             file_data = storage_services.get(self.bucket, file_path)
-            return (file_path, file_data)
+            return result.Ok((file_path, file_data))
         except Exception:
             err_message: str = 'The file does not exists.'
-            return (file_path, err_message)
+            return result.Err((file_path, err_message))
 
 
 class FileObjectDict(TypedDict):

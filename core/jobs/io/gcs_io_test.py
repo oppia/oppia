@@ -25,6 +25,7 @@ from core.jobs.io import gcs_io
 from core.platform import models
 
 import apache_beam as beam
+import result
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -49,8 +50,8 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
             | 'Read file from GCS' >> gcs_io.ReadFile()
         )
         self.assert_pcoll_equal(filepath_p_collec, [
-            ('dummy_file', string),
-            ('new_dummy_file', 'The file does not exists.')])
+            result.Ok(('dummy_file', b'testing')),
+            result.Err(('new_dummy_file', 'The file does not exists.'))])
 
 
 class WriteFileTest(job_test_utils.PipelinedTestBase):
