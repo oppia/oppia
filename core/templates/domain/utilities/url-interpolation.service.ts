@@ -25,16 +25,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 
 import { AppConstants } from 'app.constants';
-// Relative path used as an work around to get the angular compiler and webpack
-// build to not complain.
-// Webpack absolute import is just "hashes.json".
-// AoT version is "assets/hashes.json".
-// TODO(#16309): Fix relative imports.
-import resourceHashes from '../../../../assets/hashes.json';
-
-const hashes: Record<string, string> = (
-  resourceHashes as Record<string, string>
-);
+import resourceHashes from 'utility/hashes';
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.
@@ -78,6 +69,7 @@ export class UrlInterpolationService {
    * @return {string} The resource path with cache slug.
    */
   _getUrlWithSlug(resourcePath: string): string {
+    const hashes = resourceHashes.hashes;
     if (!this.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');

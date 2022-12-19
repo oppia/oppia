@@ -22,23 +22,18 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 
-import resourceHashes from '../../../../assets/hashes.json';
-
-const hashes: Record<string, string> = {...(
-  resourceHashes as Record<string, string>
-), ...{
-  '/hash_test.html': '',
-  '/path_test/hash_test.html': '',
-  '/hash_test.min.js': '',
-  '/assets_test/hash_test.json': '',
-  '/pages_test/hash_test.html': '',
-  '/images/hash_test.png': '',
-  '/videos/hash_test.mp4': '',
-  '/audio/hash_test.mp3': '',
-  '/interactions/interTest/static/interTest.png': ''
-}
+import resourceHashes from 'utility/hashes';
+const hashes = {
+  '/hash_test.html': 'ijklmopq',
+  '/path_test/hash_test.html': '123456789',
+  '/hash_test.min.js': 'zyx12345',
+  '/assets_test/hash_test.json': '987654321',
+  '/pages_test/hash_test.html': 'abcd12345',
+  '/images/hash_test.png': '98765fghij',
+  '/videos/hash_test.mp4': '12345cxz',
+  '/audio/hash_test.mp3': '12345abc',
+  '/interactions/interTest/static/interTest.png': '123654789'
 };
-
 describe('URL Interpolation Service', () => {
   let uis: UrlInterpolationService;
   let urlService: UrlService;
@@ -46,6 +41,7 @@ describe('URL Interpolation Service', () => {
   let _alertsService: AlertsService;
   let alertsObject: Record<'alertsService', AlertsService>;
   beforeEach(() => {
+    spyOnProperty(resourceHashes, 'hashes', 'get').and.returnValue(hashes);
     mockLocation = {
       origin: 'http://sample.com'
     };
@@ -61,30 +57,30 @@ describe('URL Interpolation Service', () => {
 
   it('should add hash to url if hash is set', () => {
     expect(uis._getUrlWithSlug('/hash_test.html')).toBe(
-      '/hash_test.' + hashes['/hash_test.html'] + 'html'
+      '/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
     expect(uis._getUrlWithSlug('/path_test/hash_test.html')).toBe(
-      '/path_test/hash_test.' + hashes['/path_test/hash_test.html'] + 'html'
+      '/path_test/hash_test.' + hashes['/path_test/hash_test.html'] + '.html'
     );
     expect(uis._getUrlWithSlug('/hash_test.min.js')).toBe(
-      '/hash_test.min.' + hashes['/hash_test.min.js'] + 'js'
+      '/hash_test.min.' + hashes['/hash_test.min.js'] + '.js'
     );
   });
 
   it('should build complete URL with prefixes and hash', () => {
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.html')).toBe(
-      '/build/test_folder/hash_test.' + hashes['/hash_test.html'] + 'html'
+      '/build/test_folder/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
     expect(
       uis._getCompleteUrl('/test_folder', '/path_test/hash_test.html')).toBe(
       '/build/test_folder/path_test/hash_test.' +
-        hashes['/path_test/hash_test.html'] + 'html'
+        hashes['/path_test/hash_test.html'] + '.html'
     );
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.min.js')).toBe(
-      '/build/test_folder/hash_test.min.' + hashes['/hash_test.min.js'] + 'js'
+      '/build/test_folder/hash_test.min.' + hashes['/hash_test.min.js'] + '.js'
     );
     expect(uis._getCompleteUrl('', '/hash_test.html')).toBe(
-      '/build/hash_test.' + hashes['/hash_test.html'] + 'html'
+      '/build/hash_test.' + hashes['/hash_test.html'] + '.html'
     );
   });
 
@@ -289,7 +285,7 @@ describe('URL Interpolation Service', () => {
       '/build/assets/images/test_url/test.png');
     expect(uis.getStaticImageUrl('/hash_test.png')).toBe(
       '/build/assets/images/hash_test.' + hashes['/images/hash_test.png'] +
-        'png');
+        '.png');
 
     expect(uis.getStaticAudioUrl('/test.mp3')).toBe(
       '/build/assets/audio/test.mp3');
@@ -297,7 +293,7 @@ describe('URL Interpolation Service', () => {
       '/build/assets/audio/test_url/test.mp3');
     expect(uis.getStaticAudioUrl('/hash_test.mp3')).toBe(
       '/build/assets/audio/hash_test.' + hashes['/audio/hash_test.mp3'] +
-        'mp3');
+        '.mp3');
 
     expect(uis.getStaticVideoUrl('/test.mp4')).toBe(
       '/build/assets/videos/test.mp4');
@@ -305,11 +301,11 @@ describe('URL Interpolation Service', () => {
       '/build/assets/videos/test_url/test.mp4');
     expect(uis.getStaticVideoUrl('/hash_test.mp4')).toBe(
       '/build/assets/videos/hash_test.' + hashes['/videos/hash_test.mp4'] +
-        'mp4');
+        '.mp4');
 
     expect(uis.getInteractionThumbnailImageUrl('interTest')).toBe(
       '/build/extensions/interactions/interTest/static/interTest.' +
-        hashes['/interactions/interTest/static/interTest.png'] + 'png');
+        hashes['/interactions/interTest/static/interTest.png'] + '.png');
 
     expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
       '/build/templates/test.html');
@@ -317,7 +313,7 @@ describe('URL Interpolation Service', () => {
       '/build/templates/test_url/test.html');
     expect(uis.getDirectiveTemplateUrl('/pages_test/hash_test.html')).toBe(
       '/build/templates/pages_test/hash_test.' +
-        hashes['/pages_test/hash_test.html'] + 'html');
+        hashes['/pages_test/hash_test.html'] + '.html');
 
     expect(uis.getStaticAssetUrl('/test.json')).toBe(
       '/build/assets/test.json');
@@ -325,7 +321,7 @@ describe('URL Interpolation Service', () => {
       '/build/assets/test_url/test.json');
     expect(uis.getStaticAssetUrl('/assets_test/hash_test.json')).toBe(
       '/build/assets/assets_test/hash_test.' +
-        hashes['/assets_test/hash_test.json'] + 'json');
+        hashes['/assets_test/hash_test.json'] + '.json');
 
     expect(uis.getFullStaticAssetUrl(
       '/assets/msapplication-large.png')).toBe(
@@ -343,7 +339,7 @@ describe('URL Interpolation Service', () => {
       '/build/extensions/test_url/test.html');
     expect(uis.getExtensionResourceUrl('/path_test/hash_test.html')).toBe(
       '/build/extensions/path_test/hash_test.' +
-        hashes['/path_test/hash_test.html'] + 'html');
+        hashes['/path_test/hash_test.html'] + '.html');
   });
 
   it('should throw an error for empty path', () => {

@@ -68,6 +68,7 @@
 /core/templates/services/request-interceptor.service*.ts @oppia/angular-migration-reviewers
 /core/templates/services/UpgradedServices.ts @oppia/angular-migration-reviewers
 /core/templates/hybrid-router-module-provider*.ts @oppia/angular-migration-reviewers
+/core/templates/utility/hashes.ts @oppia/angular-migration-reviewers
 /core/templates/utility/string-utility*.ts @oppia/angular-migration-reviewers
 /proxy.conf.json @oppia/angular-migration-reviewers
 /angular-template-style-url-replacer.webpack-loader.js @oppia/angular-migration-reviewers
