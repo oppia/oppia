@@ -47,7 +47,8 @@ interface MobileLibraryGroupProperties {
 
 @Component({
   selector: 'oppia-library-page',
-  templateUrl: './library-page.component.html'
+  templateUrl: './library-page.component.html',
+  styleUrls: ['./library-page.component.css']
 })
 export class LibraryPageComponent {
   possibleBannerFilenames: string[] = [

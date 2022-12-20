@@ -182,7 +182,9 @@ export class RatingsAndRecommendationsComponent {
     this.siteAnalyticsService.registerNewSignupEvent(srcElement);
     this.userService.getLoginUrlAsync().then((loginUrl) => {
       if (loginUrl) {
-        this.windowRef.nativeWindow.location = loginUrl;
+        (
+          this.windowRef.nativeWindow as {location: string | Location}
+        ).location = loginUrl;
       } else {
         this.windowRef.nativeWindow.location.reload();
       }

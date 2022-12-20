@@ -24,6 +24,7 @@ import './story-viewer-page-root.component.css';
 @Component({
   selector: 'oppia-story-viewer-page-root',
   templateUrl: './story-viewer-page-root.component.html',
+  styleUrls: ['./story-viewer-page-root.component.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class StoryViewerPageRootComponent {}
