@@ -164,9 +164,11 @@ class Registry:
             )
             spec_file_contents: Optional[str]
             try:
-                spec_file_contents = constants.get_package_file_contents(
-                    'extensions', spec_file_path
-                )
+                package_content = constants.get_package_file_contents(
+                    'extensions', spec_file_path)
+                # Ruling out the possibility of different types for mypy type checking.
+                assert isinstance(package_content, str)
+                spec_file_contents = package_content
             except FileNotFoundError:
                 spec_file_contents = None
 

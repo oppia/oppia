@@ -73,8 +73,10 @@ class Registry:
         cls._rte_components.clear()
         package, filepath = os.path.split(
             feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
-        cls._rte_components = constants.parse_json_from_ts(
-            constants.get_package_file_contents(package, filepath))
+        package_content = constants.get_package_file_contents(package, filepath)
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(package_content, str)
+        cls._rte_components = constants.parse_json_from_ts(package_content)
 
     @classmethod
     def get_all_rte_components(cls) -> Dict[str, RteComponentDict]:

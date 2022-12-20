@@ -167,8 +167,10 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
                 'images', 'avatar', 'user_blue_150px.png')
             raw_image_png = constants.get_package_file_contents(
                 'assets', default_image_path, mode='rb')
+            # Ruling out the possibility of different types for mypy type checking.
+            assert isinstance(raw_image_png, bytes)
             user_model.profile_picture_data_url = (
-                utils.convert_png_binary_to_data_url(bytes(raw_image_png)))
+                utils.convert_png_binary_to_data_url(raw_image_png))
 
         # Here we need to check for the default image again because there is a
         # possibility that in the above check we are not able to generate the

@@ -39,8 +39,10 @@ class BaseRteComponent:
     """
 
     package, filepath = os.path.split(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
-    rich_text_component_specs = constants.parse_json_from_ts(
-        constants.get_package_file_contents(package, filepath))
+    package_content = constants.get_package_file_contents(package, filepath)
+    # Ruling out the possibility of different types for mypy type checking.
+    assert isinstance(package_content, str)
+    rich_text_component_specs = constants.parse_json_from_ts(package_content)
 
     obj_types_to_obj_classes = {
         'unicode': objects.UnicodeString,

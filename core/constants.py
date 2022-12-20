@@ -24,7 +24,7 @@ import os
 import pkgutil
 import re
 
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 
 # Here we use type Any because we need to parse and return the generic JSON
@@ -68,7 +68,7 @@ def remove_comments(text: str) -> str:
 # yet. If called from utils we get error as `module has no attribute`.
 def get_package_file_contents(
     package: str, filepath: str, mode: str = 'r'
-) -> str:
+) -> Union[str, bytes]:
     """Open file and return its contents. This needs to be used for files that
     are loaded by the Python code directly, like constants.ts or
     rich_text_components.json. This function is needed to make loading these
@@ -97,7 +97,7 @@ def get_package_file_contents(
         with io.open(
             os.path.join(package, filepath), mode, encoding=None
         ) as file:
-            read_binary_mode_data: str = file.read()
+            read_binary_mode_data: bytes = file.read()
             return read_binary_mode_data
     except FileNotFoundError as e:
         file_data = pkgutil.get_data(package, filepath)
@@ -126,8 +126,10 @@ class Constants(dict):  # type: ignore[type-arg]
         return self[name]
 
 
-constants = Constants(parse_json_from_ts(  # pylint:disable=invalid-name
-    get_package_file_contents('assets', 'constants.ts')))
+package_content = get_package_file_contents('assets', 'constants.ts')
+# Ruling out the possibility of different types for mypy type checking.
+assert isinstance(package_content, str)
+constants = Constants(parse_json_from_ts(package_content)) # pylint:disable=invalid-name
 
 release_constants = Constants( # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
