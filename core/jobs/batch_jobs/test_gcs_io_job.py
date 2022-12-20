@@ -51,6 +51,9 @@ class TestGCSIoWriteJob(base_jobs.JobBase):
                     ]
                 ))
             | 'Write files to GCS' >> gcs_io.WriteFile()
+            | 'Filter the results with OK status' >> beam.Filter(
+                lambda result: result.is_ok())
+            | 'Unwrap the data' >> beam.Map(lambda result: result.unwrap())
         )
 
         total_files_write = (
