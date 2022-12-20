@@ -565,7 +565,7 @@ def convert_to_hash(input_string: str, max_length: int) -> str:
     # Prefixing altchars with b' to ensure that all characters in encoded_string
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
-        hashlib.sha224(input_string.encode('utf-8')).digest(),
+        hashlib.sha1(input_string.encode('utf-8')).digest(),
         altchars=b'ab'
     ).replace(b'=', b'c')
 

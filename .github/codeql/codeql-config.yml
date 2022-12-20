@@ -2,7 +2,11 @@ name: "CodeQL Security Analysis"
 
 paths-ignore:
   - core/tests/data
-  # TODO(#16641): These files cause CodeQL to throw the error "Clear text
+  # This file causes CodeQL to throw the error "Use of a broken or weak
+  # cryptographic hashing algorithm on sensitive data," (line 568), but sha1 is
+  # not used for enciphering so preimage attacks are not a risk.
+  - core/utils.py
+  # TODO(#16641): This file causes CodeQL to throw the error "Clear text
   # storage of sensitive information." Remove the following two lines once we
   # store the API key in a secrets manager on production.
   - scripts/release_scripts/update_configs.py
