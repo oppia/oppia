@@ -102,38 +102,6 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics('view_search_results');
   }
 
-  registerTopicStartEvent(
-      classroomName: string,
-      topicName: string,
-      chapterName: string,
-      topicChapterCount: string,
-      explorationId: string
-  ): void {
-    this._sendEventToGoogleAnalytics('topic_start', {
-      classroom_name: classroomName,
-      topic_name: topicName,
-      chapter_name: chapterName,
-      topic_chapter_count: topicChapterCount,
-      exploration_id: explorationId
-    });
-  }
-
-  registerTopicEndEvent(
-      classroomName: string,
-      topicName: string,
-      chapterName: string,
-      topicChapterCount: string,
-      explorationId: string
-  ): void {
-    this._sendEventToGoogleAnalytics('topic_end', {
-      classroom_name: classroomName,
-      topic_name: topicName,
-      chapter_name: chapterName,
-      topic_chapter_count: topicChapterCount,
-      exploration_id: explorationId
-    });
-  }
-
   registerClickGuideParentsButtonEvent(): void {
     this._sendEventToLegacyGoogleAnalytics(
       'GuideParentsButton', 'click',
@@ -494,8 +462,6 @@ export class SiteAnalyticsService {
 
   registerCuratedLessonStarted(
       topicName: string, explorationId: string): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'CuratedLessonStarted', `start ${topicName}`, explorationId);
     this._sendEventToGoogleAnalytics(
       'classroom_lesson_started', {
         topic_name: topicName,
@@ -513,8 +479,6 @@ export class SiteAnalyticsService {
       chapterCardCount: string,
       explorationLanguage: string
   ): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'CuratedLessonCompleted', `start ${topicName}`, explorationId);
     this._sendEventToGoogleAnalytics(
       'classroom_lesson_completed', {
         classroom_name: classroomName,
@@ -553,10 +517,6 @@ export class SiteAnalyticsService {
       chapterCardCount: string,
       explorationLanguage: string
   ): void {
-    this._sendEventToLegacyGoogleAnalytics(
-      'ClassroomActiveUserStartAndSawCards',
-      `start ${topicName}`,
-      explorationId);
     this._sendEventToGoogleAnalytics(
       'classroom_lesson_engaged_with', {
         classroom_name: classroomName,
