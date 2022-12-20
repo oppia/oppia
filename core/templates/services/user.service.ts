@@ -66,17 +66,16 @@ export class UserService {
     }
     let defaultUrl = (this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-    // return this.getUserInfoAsync().then(
-    //   async(userInfo) => {
-    //     if (userInfo.isLoggedIn()) {
-    //       return this.userBackendApiService.getProfileImageDataUrlAsync();
-    //     } else {
-    //       return new Promise((resolve, reject) => {
-    //         resolve(defaultUrl);
-    //       });
-    //     }
-    //   });
-    return defaultUrl;
+    return this.getUserInfoAsync().then(
+      async(userInfo) => {
+        if (userInfo.isLoggedIn()) {
+          return this.userBackendApiService.getProfileImageDataUrlAsync();
+        } else {
+          return new Promise((resolve, reject) => {
+            resolve(defaultUrl);
+          });
+        }
+      });
   }
 
   async setProfileImageDataUrlAsync(
