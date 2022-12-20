@@ -41,6 +41,7 @@ import { InteractionCustomizationArgs, ItemSelectionInputCustomizationArgs } fro
 @Component({
   selector: 'oppia-progress-nav',
   templateUrl: './progress-nav.component.html',
+  styleUrls: ['./progress-nav.component.css'],
   animations: [
     trigger('fadeInOut', [
       transition('void => *', []),

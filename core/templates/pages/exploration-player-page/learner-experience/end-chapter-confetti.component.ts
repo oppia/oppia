@@ -21,7 +21,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 
 @Component({
   selector: 'oppia-end-chapter-confetti',
-  template: require('./end-chapter-confetti.component.html'),
+  templateUrl: './end-chapter-confetti.component.html',
 })
 export class EndChapterConfettiComponent implements OnInit {
   confettiIsShown: boolean = false;

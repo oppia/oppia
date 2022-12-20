@@ -29,7 +29,7 @@ import { ClassroomPageRoutingModule } from './classroom-page-routing.module';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { SearchBarModule } from 'pages/library-page/search-bar/search-bar.module';
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
-import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary-tile.component';
+import { SummaryTilesModule } from 'components/summary-tile/summary-tile.module';
 
 @NgModule({
   imports: [
@@ -41,17 +41,16 @@ import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary
     RichTextComponentsModule,
     SearchBarModule,
     StringUtilityPipesModule,
+    SummaryTilesModule,
     TranslateModule,
   ],
   declarations: [
     ClassroomPageComponent,
     ClassroomPageRootComponent,
-    TopicSummaryTileComponent,
   ],
   entryComponents: [
     ClassroomPageComponent,
-    ClassroomPageRootComponent,
-    TopicSummaryTileComponent
+    ClassroomPageRootComponent
   ]
 })
 export class ClassroomPageModule {}
