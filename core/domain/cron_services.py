@@ -43,7 +43,7 @@ datastore_services = models.Registry.import_datastore_services()
 # Only non-versioned models should be included in this list. Activities that
 # use versioned models should have their own delete functions.
 MODEL_CLASSES_TO_MARK_AS_DELETED = {
-    user_models.UserQueryModel: datetime.timedelta(weeks=8),
+    user_models.UserQueryModel: datetime.timedelta(weeks=4),
     beam_job_models.BeamJobRunModel: datetime.timedelta(weeks=24),
     job_models.JobModel: datetime.timedelta(weeks=24),
 }
