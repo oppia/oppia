@@ -93,6 +93,7 @@ module.exports = function(config) {
         seed: jasmineSeed,
       },
     },
+    crossOriginAttribute: true,
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
