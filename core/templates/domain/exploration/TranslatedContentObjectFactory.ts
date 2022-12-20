@@ -47,6 +47,21 @@ export class TranslatedContent {
       public needsUpdate: boolean
   ) {}
 
+  isHtml(): boolean {
+    return this.dataFormat === TRANSLATION_DATA_FORMAT_HTML;
+  }
+
+  isUnicode(): boolean {
+    return this.dataFormat === TRANSLATION_DATA_FORMAT_UNICODE;
+  }
+
+  isSetOfStrings(): boolean {
+    return [
+      TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+      TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING
+    ].indexOf(this.dataFormat) !== -1;
+  }
+
   markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }

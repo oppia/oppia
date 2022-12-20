@@ -78,8 +78,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
   @Output() navigateToState = new EventEmitter<string>();
   @Output() refreshWarnings = new EventEmitter<void>();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
-    new EventEmitter<string[]>());
 
   @Output() onSaveInapplicableSkillMisconceptionIds = (
     new EventEmitter<string[]>());
@@ -113,10 +111,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   sendOnSaveNextContentIdIndex(event: number): void {
     this.onSaveNextContentIdIndex.emit(event);
-  }
-
-  sendshowMarkAllAudioAsNeedingUpdateModalIfRequired(event: string[]): void {
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(event);
   }
 
   drop(event: CdkDragSortEvent<AnswerGroup[]>): void {

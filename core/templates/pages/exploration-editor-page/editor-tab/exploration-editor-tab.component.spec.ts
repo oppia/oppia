@@ -25,7 +25,6 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -43,7 +42,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { ExplorationEditorTabComponent } from './exploration-editor-tab.component';
 import { DomRefService, JoyrideDirective, JoyrideOptionsService, JoyrideService, JoyrideStepsContainerService, JoyrideStepService, LoggerService, TemplatesService } from 'ngx-joyride';
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { Router } from '@angular/router';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
@@ -57,7 +55,6 @@ import { VersionHistoryBackendApiService } from '../services/version-history-bac
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
   let fixture: ComponentFixture<ExplorationEditorTabComponent>;
-  let ngbModal: NgbModal;
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let editabilityService: EditabilityService;
   let explorationFeaturesService: ExplorationFeaturesService;
@@ -83,14 +80,6 @@ describe('Exploration editor tab component', () => {
   let stateObjectFactory: StateObjectFactory;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
-
-  class MockNgbModal {
-    open() {
-      return {
-        result: Promise.resolve()
-      };
-    }
-  }
 
   class MockJoyrideService {
     startTour() {
@@ -162,7 +151,6 @@ describe('Exploration editor tab component', () => {
       declarations: [
         JoyrideDirective,
         ExplorationEditorTabComponent,
-        MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
       ],
       providers: [
         JoyrideStepService,
@@ -182,10 +170,6 @@ describe('Exploration editor tab component', () => {
         {
           provide: JoyrideService,
           useClass: MockJoyrideService,
-        },
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal
         },
         {
           provide: ExplorationDataService,
@@ -213,7 +197,6 @@ describe('Exploration editor tab component', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
-    ngbModal = TestBed.inject(NgbModal);
     stateEditorService = TestBed.inject(StateEditorService);
     stateCardIsCheckpointService = TestBed.inject(
       StateCardIsCheckpointService);
@@ -788,49 +771,6 @@ describe('Exploration editor tab component', () => {
 
     expect(stateEditorService.cardIsCheckpoint).toBe(true);
   });
-
-  it('should mark all audio as needing update when closing modal',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve()
-      } as NgbModalRef);
-      stateEditorService.setActiveStateName('First State');
-
-      expect(
-        explorationStatesService.getState('First State')
-          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-        false);
-
-      component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
-      tick();
-
-      expect(
-        explorationStatesService.getState('First State')
-          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-        true);
-
-      flush();
-    }));
-
-  it('should not mark all audio as needing update when dismissing modal',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject()
-      } as NgbModalRef);
-      stateEditorService.setActiveStateName('First State');
-
-      expect(
-        explorationStatesService.getState('First State')
-          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-        false);
-
-      component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
-
-      expect(
-        explorationStatesService.getState('First State')
-          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-        false);
-    }));
 
   it('should navigate to main tab in specific state name', () => {
     spyOn(routerService, 'navigateToMainTab');

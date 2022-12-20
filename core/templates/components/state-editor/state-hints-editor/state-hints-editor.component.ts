@@ -54,8 +54,6 @@ interface AddHintModalResponse {
 export class StateHintsEditorComponent implements OnInit {
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
   @Output() onSaveSolution = new EventEmitter<Solution | null>();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
-    new EventEmitter<string[]>();
 
   @Output() onSaveHints = new EventEmitter<Hint[]>();
 
@@ -199,10 +197,6 @@ export class StateHintsEditorComponent implements OnInit {
   onSaveInlineHint(): void {
     this.stateHintsService.saveDisplayedValue();
     this.onSaveHints.emit(this.stateHintsService.displayed);
-  }
-
-  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(value: string[]): void {
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
   }
 
   toggleHintCard(): void {

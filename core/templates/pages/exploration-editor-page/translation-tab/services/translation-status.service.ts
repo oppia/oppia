@@ -179,8 +179,6 @@ export class TranslationStatusService implements OnInit {
             });
           }
 
-          console.error(stateName, allContentIds);
-
           this.explorationTranslationContentRequiredCount += (
             allContentIds.length);
 
@@ -329,20 +327,25 @@ export class TranslationStatusService implements OnInit {
     }
   }
 
-  refresh(): void {
-    if (this.translationTabActiveModeService.isTranslationModeActive()) {
-      this.langCode = this.translationLanguageService.getActiveLanguageCode();
-      this.loaderService.showLoadingScreen('Loading');
-      this.entityTranslationsService.refreshEntityTranslationsAsync(
-        this.langCode).then((entityTranslationObject) => {
-        this.loaderService.hideLoadingScreen();
-        this.entityTranslation = entityTranslationObject;
+  refresh(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.translationTabActiveModeService.isTranslationModeActive()) {
+        this.langCode = this.translationLanguageService.getActiveLanguageCode();
+        this.loaderService.showLoadingScreen('Loading');
+        this.entityTranslationsService.refreshEntityTranslationsAsync(
+          this.langCode
+        ).then((entityTranslationObject) => {
+          this.entityTranslation = entityTranslationObject;
+          this._computeAllStatesStatus();
+          resolve();
+          this.loaderService.hideLoadingScreen();
+          this.stateEditorService.onRefreshStateTranslation.emit();
+        });
+      } else {
         this._computeAllStatesStatus();
-        this.stateEditorService.onRefreshStateTranslation.emit();
-      });
-    } else {
-      this._computeAllStatesStatus();
-    }
+        resolve();
+      }
+    });
   }
 
   getAllStatesNeedUpdatewarning(): Record<string, string[]> {

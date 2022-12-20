@@ -432,6 +432,7 @@ export class StateTranslationComponent
       this.translationTabActiveContentIdService.setActiveContent(
         activeContentId, TRANSLATION_DATA_FORMAT_HTML);
     }
+    this.updateTranslatedContent();
   }
 
   tabStatusColorStyle(tabId: string): object {

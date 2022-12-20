@@ -19,7 +19,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
@@ -31,18 +30,9 @@ import { EditabilityService } from 'services/editability.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { QuestionEditorComponent } from './question-editor.component';
 
-class MockNgbModal {
-  open() {
-    return {
-      result: Promise.resolve()
-    };
-  }
-}
-
 describe('Question Editor Component', () => {
   let component: QuestionEditorComponent;
   let fixture: ComponentFixture<QuestionEditorComponent>;
-  let ngbModal: NgbModal;
   let questionObjectFactory: QuestionObjectFactory;
   let editabilityService: EditabilityService;
   let stateEditorService: StateEditorService;
@@ -63,11 +53,7 @@ describe('Question Editor Component', () => {
         StateEditorService,
         StateInteractionIdService,
         QuestionUpdateService,
-        GenerateContentIdService,
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal
-        }
+        GenerateContentIdService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -82,7 +68,6 @@ describe('Question Editor Component', () => {
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     editabilityService = TestBed.inject(EditabilityService);
     questionUpdateService = TestBed.inject(QuestionUpdateService);
-    ngbModal = TestBed.inject(NgbModal);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
 
     question = questionObjectFactory.createFromBackendDict({
@@ -414,17 +399,4 @@ describe('Question Editor Component', () => {
     expect(component.nextContentIdIndexDisplayedValue).toBe(1);
     expect(component.nextContentIdIndexMemento).toBe(1);
   });
-
-  it('should show mark all audio needing update modal and mark all unflagged' +
-    ' voiceovers and translations as needing update', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
-    } as NgbModalRef);
-
-    component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['content']);
-    tick();
-
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(questionUpdateService.setQuestionStateData).toHaveBeenCalled();
-  }));
 });

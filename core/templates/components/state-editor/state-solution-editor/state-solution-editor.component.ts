@@ -55,8 +55,6 @@ export class StateSolutionEditorComponent implements OnInit {
   @Output() saveSolution: EventEmitter<Solution | null> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
   @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
-  EventEmitter<Solution> = (new EventEmitter());
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -159,10 +157,6 @@ export class StateSolutionEditorComponent implements OnInit {
 
   onSaveSolution(value: Solution | null): void {
     this.saveSolution.emit(value);
-  }
-
-  openMarkAllAudioAsNeedingUpdateModalIfRequired(value: Solution): void {
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
   }
 
   openAddOrUpdateSolutionModal(): void {

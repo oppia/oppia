@@ -18,10 +18,8 @@
 
 import { Component, ChangeDetectorRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
@@ -67,40 +65,12 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     private editabilityService: EditabilityService,
     private generateContentIdService: GenerateContentIdService,
     private loaderService: LoaderService,
-    private ngbModal: NgbModal,
     private questionUpdateService: QuestionUpdateService,
     private solutionValidityService: SolutionValidityService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
     private urlInterpolationService: UrlInterpolationService,
   ) { }
-
-  showMarkAllAudioAsNeedingUpdateModalIfRequired(contentIds: string[]): void {
-    const state = this.question.getStateData();
-    const recordedVoiceovers = state.recordedVoiceovers;
-
-    const shouldPrompt = contentIds.some(
-      (contentId) =>
-        recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
-    if (shouldPrompt) {
-      this.ngbModal.open(
-        MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
-          backdrop: 'static'
-        }).result.then(() => {
-        this._updateQuestion(() => {
-          contentIds.forEach(contentId => {
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-              recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                contentId);
-            }
-          });
-        });
-      }, () => {
-        // This callback is triggered when the Cancel button is
-        // clicked. No further action is needed.
-      });
-    }
-  }
 
   saveInteractionId(displayedValue: string): void {
     this._updateQuestion(() => {

@@ -331,16 +331,6 @@ describe('State Solution Editor Component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-  it('should open showMarkAllAudioAsNeedingUpdateModalIfRequired when' +
-    ' user clicks', () => {
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-
-    component.openMarkAllAudioAsNeedingUpdateModalIfRequired(solution);
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
-  });
-
   it('should save solution when user click', () => {
     spyOn(component.saveSolution, 'emit');
 

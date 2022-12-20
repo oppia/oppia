@@ -67,8 +67,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() recomputeGraph = new EventEmitter<void>();
   @Output() refreshWarnings = new EventEmitter<void>();
   @Output() navigateToState = new EventEmitter<string>();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
-    new EventEmitter<string[]>());
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -159,10 +157,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
 
   sendOnSaveInteractionId($event: string): void {
     this.onSaveInteractionId.emit($event);
-  }
-
-  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event: string[]): void {
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit($event);
   }
 
   sendOnSaveStateContent($event: SubtitledHtml): void {

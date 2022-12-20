@@ -95,7 +95,7 @@ export class BaseTranslatableObject {
       const contentId = translatableField.contentId as string;
       let writtenTranslation = entityTranslations.getWrittenTranslation(
         contentId);
-      if (writtenTranslation !== null && !writtenTranslation.needsUpdate) {
+      if (writtenTranslation !== null) {
         let dataFormat: string = writtenTranslation.dataFormat;
         if (CONTENT_REPLACERS.hasOwnProperty(dataFormat)) {
           CONTENT_REPLACERS[dataFormat](

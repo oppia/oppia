@@ -586,34 +586,6 @@ describe('Outcome Editor Component', () => {
     }).toThrowError('The content ID is null in the outcome editor.');
   });
 
-  it('should emit showMarkAllAudioAsNeedingUpdateModalIfRequired', () => {
-    component.savedOutcome = new Outcome(
-      'Dest',
-      null,
-      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
-      false,
-      [],
-      'ExpId',
-      'SkillId',
-    );
-    component.outcome = new Outcome(
-      'Dest',
-      null,
-      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
-      true,
-      [],
-      '',
-      '',
-    );
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-
-    component.saveThisFeedback(true);
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalledWith(['contentId']);
-  });
-
   it('should set refresher exploration ID as null on saving destination' +
     ' when state is not in self loop', () => {
     component.savedOutcome = new Outcome(

@@ -22,7 +22,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { JoyrideService } from 'ngx-joyride';
 import cloneDeep from 'lodash/cloneDeep';
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { StateTutorialFirstTimeService } from '../services/state-tutorial-first-time.service';
 import { EditabilityService } from 'services/editability.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -249,35 +248,6 @@ export class ExplorationEditorTabComponent
 
       this.stateEditorService.setSolicitAnswerDetails(
         cloneDeep(displayedValue));
-    }
-
-    showMarkAllAudioAsNeedingUpdateModalIfRequired(
-        contentIds: string[]): void {
-      let stateName = this.stateEditorService.getActiveStateName();
-      let state = this.explorationStatesService.getState(stateName);
-      let recordedVoiceovers = state.recordedVoiceovers;
-      const shouldPrompt = contentIds.some(contentId => {
-        return recordedVoiceovers.hasUnflaggedVoiceovers(contentId);
-      });
-
-      if (shouldPrompt) {
-        this.ngbModal.open(
-          MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
-            backdrop: 'static',
-          }).result.then(() => {
-          contentIds.forEach(contentId => {
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-              recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                contentId);
-              this.explorationStatesService.saveRecordedVoiceovers(
-                stateName, recordedVoiceovers);
-            }
-          });
-        }, () => {
-          // This callback is triggered when the Cancel button is
-          // clicked. No further action is needed.
-        });
-      }
     }
 
     navigateToState(stateName: string): void {

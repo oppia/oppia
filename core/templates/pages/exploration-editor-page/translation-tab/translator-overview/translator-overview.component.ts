@@ -108,10 +108,10 @@ export class TranslatorOverviewComponent implements OnInit {
     }
 
     this.refreshDirectiveScope();
-    this.translationStatusService.refresh();
-
-    setTimeout(() => {
-      this.graphDataService.recompute();
+    this.translationStatusService.refresh().then(() => {
+      setTimeout(() => {
+        this.graphDataService.recompute();
+      });
     });
   }
 
@@ -151,7 +151,6 @@ export class TranslatorOverviewComponent implements OnInit {
       this.LAST_SELECTED_TRANSLATION_LANGUAGE, this.languageCode);
 
     this.routerService.onCenterGraph.emit();
-    this.graphDataService.updateGraphData.emit();
   }
 
   getTranslationProgressAriaLabel(): string {

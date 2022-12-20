@@ -20,7 +20,9 @@
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 
 @Component({
   selector: 'oppia-mark-translations-as-needing-update-modal',
@@ -32,18 +34,37 @@ export class MarkTranslationsAsNeedingUpdateModalComponent
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private changeListService: ChangeListService
+    private changeListService: ChangeListService,
+    private stateEditorService: StateEditorService,
+    private explorationStatesService: ExplorationStatesService
   ) {
     super(ngbActiveModal);
   }
 
   markNeedsUpdate(): void {
     this.changeListService.markTranslationsAsNeedingUpdate(this.contentId);
+    let stateName = this.stateEditorService.getActiveStateName();
+    let state = this.explorationStatesService.getState(stateName);
+    let recordedVoiceovers = state.recordedVoiceovers;
+    if (recordedVoiceovers.hasUnflaggedVoiceovers(this.contentId)) {
+      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+        this.contentId);
+      this.explorationStatesService.saveRecordedVoiceovers(
+        stateName, recordedVoiceovers);
+    }
     this.ngbActiveModal.close();
   }
 
   removeTranslations(): void {
     this.changeListService.removeTranslations(this.contentId);
+    let stateName = this.stateEditorService.getActiveStateName();
+    let state = this.explorationStatesService.getState(stateName);
+    let recordedVoiceovers = state.recordedVoiceovers;
+    if (recordedVoiceovers.hasUnflaggedVoiceovers(this.contentId)) {
+      recordedVoiceovers.deleteContentId(this.contentId);
+      this.explorationStatesService.saveRecordedVoiceovers(
+        stateName, recordedVoiceovers);
+    }
     this.ngbActiveModal.close();
   }
 

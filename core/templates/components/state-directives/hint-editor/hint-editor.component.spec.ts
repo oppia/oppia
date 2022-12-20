@@ -75,9 +75,6 @@ describe('HintEditorComponent', () => {
     let onExternalSaveEmitter = new EventEmitter();
     spyOnProperty(externalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
-      .and.callThrough();
-
     component.ngOnInit();
 
     component.hintEditorIsOpen = true;
@@ -88,9 +85,6 @@ describe('HintEditorComponent', () => {
 
     onExternalSaveEmitter.emit();
     tick();
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
   }));
 
   it('should open hint editor when user clicks on \'Edit hint\'', () => {

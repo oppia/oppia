@@ -46,9 +46,7 @@ class MockNgbModal {
     if (this.modal === 'add_interaction') {
       return {
         result: {
-          componentInstance: {
-            showMarkAllAudioAsNeedingUpdateModalIfRequired: EventEmitter
-          },
+          componentInstance: {},
           then: (
               successCallback: (result) => void,
               cancelCallback: () => void
@@ -275,10 +273,9 @@ describe('State Interaction component', () => {
 
     spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
       return (
-        { componentInstance: {
-          showMarkAllAudioAsNeedingUpdateModalIfRequired: mockEventEmitter
-        },
-        result: Promise.reject('reject')
+        {
+          componentInstance: {},
+          result: Promise.reject('reject')
         }
       ) as NgbModalRef;
     });
@@ -320,14 +317,12 @@ describe('State Interaction component', () => {
       }
     };
 
-    const mockEventEmitter = new EventEmitter();
     mockNgbModal.modal = 'add_interaction';
     spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
       return (
-        { componentInstance: {
-          showMarkAllAudioAsNeedingUpdateModalIfRequired: mockEventEmitter
-        },
-        result: Promise.resolve('success')
+        {
+          componentInstance: {},
+          result: Promise.resolve('success')
         }
       ) as NgbModalRef;
     });

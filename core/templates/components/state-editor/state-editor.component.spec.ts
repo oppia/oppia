@@ -84,8 +84,6 @@ describe('State Editor Component', () => {
     spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
     spyOn(component.onSaveInteractionCustomizationArgs, 'emit').and.stub();
     spyOn(component.onSaveInteractionId, 'emit').and.stub();
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
-      .and.stub();
     spyOn(component.onSaveStateContent, 'emit').and.stub();
 
     component.sendRecomputeGraph();
@@ -133,8 +131,6 @@ describe('State Editor Component', () => {
     expect(component.onSaveInteractionCustomizationArgs.emit)
       .toHaveBeenCalled();
     expect(component.onSaveInteractionId.emit).toHaveBeenCalled();
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
     expect(component.onSaveStateContent.emit).toHaveBeenCalled();
   });
 

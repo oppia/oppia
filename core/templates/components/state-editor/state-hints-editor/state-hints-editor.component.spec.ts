@@ -161,16 +161,6 @@ describe('StateHintsEditorComponent', () => {
     component.ngOnInit();
   });
 
-  it('should emit showMarkAllAudioAsNeedingUpdateModalIfRequired', () => {
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-
-    component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(
-      ['data', 'data']);
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
-  });
-
   it('should change list oder', () => {
     spyOn(stateHintsService, 'saveDisplayedValue').and.callThrough();
     spyOn(component.onSaveHints, 'emit').and.callThrough();

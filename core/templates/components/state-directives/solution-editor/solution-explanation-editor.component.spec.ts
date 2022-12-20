@@ -147,16 +147,12 @@ describe('Solution explanation editor', () => {
   });
 
   it('should save the explanation', fakeAsync(() => {
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
-      .and.stub();
     spyOn(component.saveSolution, 'emit').and.stub();
 
     component.explanationEditorIsOpen = true;
     externalSaveServiceEmitter.emit();
     tick();
 
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
     expect(component.saveSolution.emit).toHaveBeenCalled();
     expect(component.explanationEditorIsOpen).toBe(false);
   }));

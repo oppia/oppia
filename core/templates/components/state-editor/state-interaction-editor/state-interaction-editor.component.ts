@@ -200,13 +200,6 @@ export class StateInteractionEditorComponent
           windowClass: 'customize-interaction-modal'
         });
 
-      modalRef.componentInstance
-        .showMarkAllAudioAsNeedingUpdateModalIfRequired.subscribe(
-          (value: string[]) => {
-            this.markAllAudioAsNeedingUpdateModalIfRequired.emit(
-              value);
-          });
-
       modalRef.result.then(
         () => {
           this.onCustomizationModalSavePostHook();

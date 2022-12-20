@@ -57,8 +57,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Output() onSaveAnswerGroupDestIfStuck = new EventEmitter<Outcome>();
   @Output() onSaveAnswerGroupFeedback = new EventEmitter<Outcome>();
   @Output() onSaveTaggedMisconception = new EventEmitter<TaggedMisconception>();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
-    new EventEmitter<string[]>();
 
   rulesMemento: Rule[];
   directiveSubscriptions = new Subscription();

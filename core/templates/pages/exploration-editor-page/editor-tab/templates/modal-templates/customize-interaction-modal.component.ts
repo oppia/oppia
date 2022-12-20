@@ -16,7 +16,7 @@
  * @fileoverview Component for the Customize Interaction Modal Component.
  */
 
-import { AfterContentChecked, ChangeDetectorRef, EventEmitter, Component, Injector, OnInit, Output } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, Injector, OnInit } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { SchemaConstants } from 'components/forms/schema-based-editors/schema.constants';
@@ -139,9 +139,6 @@ const INTERACTION_SERVICE_MAPPING = {
 })
 export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal implements OnInit, AfterContentChecked {
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
-    EventEmitter<string[]> = new EventEmitter();
-
   customizationArgSpecs: CustomizationArgSpecsInterface[];
   originalContentIdToContent: object;
   hasCustomizationArgs: boolean;
@@ -401,22 +398,6 @@ export class CustomizeInteractionModalComponent
   }
 
   save(): void {
-    const contentIdsWithModifiedContent = [];
-    const updatedContentIdToContent = this.getContentIdToContent();
-
-    Object.keys(this.originalContentIdToContent).forEach(contentId => {
-      if (
-        this.originalContentIdToContent.hasOwnProperty(contentId) &&
-        updatedContentIdToContent.hasOwnProperty(contentId) &&
-        (this.originalContentIdToContent[contentId] !==
-          updatedContentIdToContent[contentId])
-      ) {
-        contentIdsWithModifiedContent.push(contentId);
-      }
-    });
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
-      contentIdsWithModifiedContent);
-
     this.populateNullContentIds();
     this.editorFirstTimeEventsService.registerFirstSaveInteractionEvent();
     this.ngbActiveModal.close();

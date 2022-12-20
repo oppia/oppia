@@ -20,11 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
+import { AlertsService } from 'services/alerts.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
@@ -54,7 +54,7 @@ export class ContentTranslationManagerService {
   private version!: number;
 
   constructor(
-    private ngbModal: NgbModal,
+    private alertsService: AlertsService,
     private playerTranscriptService: PlayerTranscriptService,
     private extensionTagAssemblerService: ExtensionTagAssemblerService,
     private entityTranslationBackendApiService: (
@@ -62,6 +62,7 @@ export class ContentTranslationManagerService {
   ) {}
 
   fetchAndDisplayTranslations(languageCode: string): void {
+    this.alertsService.addInfoMessage('Fetching translations.');
     this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
       this.entityId,
       this.entityType,
@@ -69,6 +70,8 @@ export class ContentTranslationManagerService {
       languageCode
     ).then((entityTranslation) => {
       this.languageCodeToEntityTranslations[languageCode] = entityTranslation;
+      this.alertsService.clearMessages();
+      this.alertsService.addSuccessMessage('Translations fetched.');
       this.displayTranslations(languageCode);
     }, () => { });
   }
