@@ -1230,24 +1230,26 @@ def _remove_user_id_from_contributors_in_summary_models(
 def _pseudonymize_one_model_class(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
     model_class: Type[base_models.BaseModel],
-    property_containing_user_id_name: str,
+    name_of_property_containing_user_ids: str,
     module_name: models.Names
 ) -> None:
-    """Pseudonymize one model class for the user with user_id.
+    """Pseudonymize one model class for the user with the user_id associated
+    with the given pending deletion request
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object.
         model_class: class. The model class that contains the entity IDs.
-        property_containing_user_id_name: str. The property that contains
-            the user IDs. We fetch the models using this property.
+        name_of_property_containing_user_ids: str. The name of property that
+            contains the user IDs. We fetch the models corresponding to the
+            user IDs stored in this property.
         module_name: models.Names. The name of the module containing the models
             that are being pseudonymized.
     """
     user_id = pending_deletion_request.user_id
 
     models_to_pseudonymize: Sequence[base_models.BaseModel] = model_class.query(
-        getattr(model_class, property_containing_user_id_name) == user_id
+        getattr(model_class, name_of_property_containing_user_ids) == user_id
     ).fetch()
     model_ids = set(model.id for model in models_to_pseudonymize)
 
@@ -1278,7 +1280,7 @@ def _pseudonymize_one_model_class(
         for model in models_to_pseudonymize:
             setattr(
                 model,
-                property_containing_user_id_name,
+                name_of_property_containing_user_ids,
                 report_ids_to_pids[model.id]
             )
         model_class.update_timestamps_multi(models_to_pseudonymize)

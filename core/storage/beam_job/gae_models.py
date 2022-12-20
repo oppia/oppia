@@ -203,8 +203,9 @@ class BeamJobRunResultModel(base_models.BaseModel):
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user.
 
-        This model is marked as deleted 24 weeks after its creation.
-        See mark_outdated_models_as_deleted() in cron_services.py.
+        This model is marked as deleted after a period of time after its
+        creation. See MODEL_CLASSES_TO_MARK_AS_DELETED and
+        mark_outdated_models_as_deleted() in cron_services.py.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 

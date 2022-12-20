@@ -118,12 +118,8 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data to delete corresponding to a user:
+        """Model contains data to pseudonymize corresponding to a user:
         resolver_id field.
-
-        It is okay to delete task entries since, after they are resolved, they
-        only act as a historical record. The removal just removes the historical
-        record.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
