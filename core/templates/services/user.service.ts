@@ -64,8 +64,7 @@ export class UserService {
     if (localStoredImage !== null) {
       return localStoredImage
     }
-    let defaultUrl = (
-      this.urlInterpolationService.getStaticImageUrl(
+    let defaultUrl = (this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
     // return this.getUserInfoAsync().then(
     //   async(userInfo) => {
