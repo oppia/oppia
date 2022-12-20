@@ -250,10 +250,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.changeActiveRuleIndex(this.rules.length - 1);
   }
 
-  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(event: string[]): void {
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(event);
-  }
-
   deleteRule(index: number): void {
     this.rules.splice(index, 1);
     this.saveRules();
@@ -293,9 +289,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           contentIdsWithModifiedContent.push(contentId);
         }
       });
-
-      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
-        contentIdsWithModifiedContent);
     }
 
     this.changeActiveRuleIndex(-1);
