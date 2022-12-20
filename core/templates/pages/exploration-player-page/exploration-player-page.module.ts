@@ -19,10 +19,8 @@
 import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
-
+import { ExplorationPlayerViewerCommonModule } from './exploration-player-viewer-common.module';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
-import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
@@ -53,13 +51,12 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
+    ExplorationPlayerViewerCommonModule,
     SharedComponentsModule,
     ToastrModule,
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
-    TranslationsFetchingMessageModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
@@ -71,8 +68,6 @@ import { toastrConfig } from 'pages/oppia-root/app.module';
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
-    TranslationsFetchingMessageModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,

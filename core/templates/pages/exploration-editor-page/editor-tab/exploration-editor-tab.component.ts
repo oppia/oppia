@@ -18,7 +18,6 @@
 
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { JoyrideService } from 'ngx-joyride';
 import cloneDeep from 'lodash/cloneDeep';
@@ -91,7 +90,6 @@ export class ExplorationEditorTabComponent
       private stateEditorService: StateEditorService,
       private explorationFeaturesService: ExplorationFeaturesService,
       private routerService: RouterService,
-      private ngbModal: NgbModal,
       private stateCardIsCheckpointService: StateCardIsCheckpointService,
       private explorationInitStateNameService: ExplorationInitStateNameService,
       private explorationWarningsService: ExplorationWarningsService,

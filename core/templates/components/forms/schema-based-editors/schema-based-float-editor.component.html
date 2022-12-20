@@ -1,6 +1,6 @@
 <div class="schema-based-float-editor">
   <form #floatform="ngForm">
-    <span *ngIf="!expressionMode">
+    <span>
       <input type="text"
              step="any"
              ngControl="floatValue"
@@ -18,7 +18,7 @@
       <span *ngIf="errorStringI18nKey" class="oppia-form-error oppia-numeric-input-error">
         {{ errorStringI18nKey | translate }}
       </span>
-      <span *ngIf="hasLoaded && !serCurrentlyTyping && userHasFocusedAtLeastOnce"
+      <span *ngIf="hasLoaded && !userIsCurrentlyTyping && userHasFocusedAtLeastOnce"
             class="oppia-form-container"
             tabindex="-1"
             [oppiaFocusOn]="labelForErrorFocusTarget">

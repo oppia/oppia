@@ -283,6 +283,7 @@ class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     """
 
     topic_name: Optional[str]
+    language_code: str
 
 
 class ReviewableOpportunitiesHandler(
@@ -301,6 +302,12 @@ class ReviewableOpportunitiesHandler(
                     'type': 'basestring'
                 },
                 'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -310,12 +317,13 @@ class ReviewableOpportunitiesHandler(
         """Handles GET requests."""
         assert self.normalized_request is not None
         topic_name = self.normalized_request.get('topic_name')
+        language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
         ] = []
         if self.user_id:
             for opp in self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name
+                self.user_id, topic_name, language
             ):
                 if opp is not None:
                     opportunity_dicts.append(opp.to_dict())
@@ -325,7 +333,7 @@ class ReviewableOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_reviewable_exploration_opportunity_summaries(
-        self, user_id: str, topic_name: Optional[str]
+        self, user_id: str, topic_name: Optional[str], language: Optional[str]
     ) -> List[Optional[opportunity_domain.ExplorationOpportunitySummary]]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
@@ -336,6 +344,9 @@ class ReviewableOpportunitiesHandler(
                 translation suggestions.
             topic_name: str or None. A topic name for which to filter the
                 exploration opportunity summaries. If 'All' is supplied, all
+                available exploration opportunity summaries will be returned.
+            language: str. ISO 639-1 language code for which to filter the
+                exploration opportunity summaries. If it is None, all
                 available exploration opportunity summaries will be returned.
 
         Returns:
@@ -379,7 +390,7 @@ class ReviewableOpportunitiesHandler(
         in_review_suggestions, _ = (
             suggestion_services
             .get_reviewable_translation_suggestions_by_offset(
-                user_id, topic_exp_ids, None, 0))
+                user_id, topic_exp_ids, None, 0, language))
         # Filter out suggestions that should not be shown to the user.
         # This is defined as a set as we only care about the unique IDs.
         in_review_suggestion_target_ids = {

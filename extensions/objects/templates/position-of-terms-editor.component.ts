@@ -24,7 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
 export interface PositionOfTerm {
-  readonly name: 'string';
+  name: 'string';
   readonly humanReadableName: 'string';
 }
 
