@@ -143,8 +143,9 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             user_model: user_models.UserSettingsModel. The UserSettingsModel.
 
         Returns:
-            user_model: Tuple[user_models.UserSettingsModel, bool]. The updated
-            UserSettingsModel.
+            Tuple[user_models.UserSettingsModel, bool]. The tuple containing
+            updated UserSettingsModel and a bool value that tells whether the
+            profile picture present is the default data url or not.
         """
         profile_picture_data = user_model.profile_picture_data_url
         width, height = 0, 0

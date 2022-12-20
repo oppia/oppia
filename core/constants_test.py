@@ -86,6 +86,8 @@ class ConstantsTests(test_utils.GenericTestBase):
                 'No such file or directory: \'assets/non_exist.xy\''
             ):
                 constants.get_package_file_contents('assets', 'non_exist.xy')
+                constants.get_package_file_contents(
+                    'assets', 'non_exist.xy', mode='rb')
 
     def test_difficulty_values_are_matched(self) -> None:
         """Tests that the difficulty values and strings are matched in the
