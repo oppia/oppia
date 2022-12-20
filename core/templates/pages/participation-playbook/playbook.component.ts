@@ -31,7 +31,7 @@ import './playbook.component.css';
 @Component({
   selector: 'participation-playbook',
   templateUrl: './playbook.component.html',
-  styleUrls: []
+  styleUrls: ['./playbook.component.css']
 })
 export class PlaybookPageComponent implements OnInit {
   TAB_ID_PARTICIPATION: string = 'participation';

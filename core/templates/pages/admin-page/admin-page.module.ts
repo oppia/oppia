@@ -37,7 +37,6 @@ import { OppiaAdminProdModeActivitiesTabComponent } from
   './activities-tab/admin-prod-mode-activities-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
 import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
 import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
 import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
@@ -61,6 +60,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     RouterModule.forRoot([]),
     SharedComponentsModule,
     SharedFormsModule,
+    AdminBlogAdminCommonModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
@@ -72,7 +72,6 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     AdminPageComponent,
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent,
     TopicManagerRoleEditorModalComponent
   ],
   entryComponents: [
@@ -84,7 +83,6 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     AdminPageComponent,
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent,
     TopicManagerRoleEditorModalComponent
   ],
   providers: [
@@ -117,6 +115,7 @@ class AdminPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { AdminBlogAdminCommonModule } from './admin-blog-admin-common.module';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {

@@ -101,30 +101,26 @@
                     (mouseenter)="activateProfileDropdown()"
                     (mouseleave)="deactivateProfileDropdown()">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="profileUrl"
+                    <a [href]="profileUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       <strong>{{ username }}</strong>
                     </a>
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/creator-dashboard"
+                    <a href="/creator-dashboard"
                        class="dropdown-item oppia-dropdown-item-text">
                       Creator Dashboard
                     </a>
                   </li>
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/notifications"
+                    <a href="/notifications"
                        class="dropdown-item oppia-dropdown-item-text">
                       Notifications
                     </a>
                   </li>
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/preferences"
+                    <a href="/preferences"
                        [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
@@ -132,8 +128,7 @@
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="logoutUrl"
+                    <a [href]="logoutUrl"
                        [smartRouterLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout

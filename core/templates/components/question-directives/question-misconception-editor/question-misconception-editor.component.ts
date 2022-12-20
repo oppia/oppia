@@ -35,6 +35,7 @@ export interface MisconceptionUpdatedValues {
 
 interface Outcome {
   feedback: SubtitledHtmlBackendDict;
+  labelledAsCorrect: boolean;
 }
 
 @Component({

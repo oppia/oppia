@@ -23,11 +23,12 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 
 @Component({
   selector: 'oppia-collection-editor-save-modal',
-  templateUrl: 'collection-editor-save-modal.component.html'
+  templateUrl: './collection-editor-save-modal.component.html'
 })
 export class CollectionEditorSaveModalComponent extends ConfirmOrCancelModal {
   collectionIsPrivate: boolean = false;
   MAX_COMMIT_MESSAGE_LENGTH = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
+  commitMessage: string = '';
 
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);

@@ -30,7 +30,7 @@ import { CkEditorCopyContentService } from
 })
 export class CkEditorCopyToolbarComponent {
   constructor(
-      private ckEditorCopyContentService: CkEditorCopyContentService,
+      public ckEditorCopyContentService: CkEditorCopyContentService,
       @Inject(DOCUMENT) private document: Document
   ) {
     ckEditorCopyContentService.copyModeActive = false;

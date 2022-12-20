@@ -23,6 +23,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { Answer } from './oppia-response-code-repl.component';
 
 @Component({
   selector: 'oppia-short-response-code-repl',
@@ -33,13 +34,13 @@ export class ShortResponseCodeRepl implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() answer!: string;
-  escapedAnswer!: string;
+  @Input('answer') answerWithValue!: string;
+  escapedAnswer!: Answer;
   constructor(private htmlEscaperService: HtmlEscaperService) { }
 
   ngOnInit(): void {
     this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as string;
+      this.answerWithValue) as Answer;
   }
 }
 angular.module('oppia').directive(

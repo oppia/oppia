@@ -5,7 +5,7 @@
       <i>This is the name of the skill as visible to learners and other creators.</i>
     </div>
     <br>
-    <p [ngClass]="{'has-error': !tmpSkillDescription.length > 0}">
+    <p [ngClass]="{'has-error': !(tmpSkillDescription.length > 0)}">
       <input type="text" aria-label="Skill Description" class="form-control e2e-test-skill-description-field" *ngIf="canEditSkillDescription()"
              [(ngModel)]="tmpSkillDescription" (change)="resetErrorMsg()" (blur)="saveSkillDescription(tmpSkillDescription)"
              [attr.maxlength]="MAX_CHARS_IN_SKILL_DESCRIPTION" ng-trim="false">

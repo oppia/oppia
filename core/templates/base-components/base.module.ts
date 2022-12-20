@@ -48,6 +48,7 @@ import {
 // Miscellaneous.
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 
 @NgModule({
   imports: [
@@ -55,6 +56,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
     CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
+    NgBootstrapModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,

@@ -44,7 +44,7 @@ export class SkillSelectorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() sortedSkillSummaries!: GroupedSkillSummaries;
   @Input() selectedSkillId!: string;
-  @Input() countOfSkillsToPrioritize!: number;
+  @Input() countOfSkillsToPrioritize: number = 0;
   @Input() categorizedSkills!: CategorizedSkills;
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() allowSkillsFromOtherTopics!: boolean;

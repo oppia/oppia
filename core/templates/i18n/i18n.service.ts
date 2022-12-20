@@ -25,6 +25,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, LanguageInfo } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
+import { CookieService } from 'ngx-cookie';
 import { UserService } from 'services/user.service';
 
 @Injectable({
@@ -34,6 +35,7 @@ export class I18nService {
   private _directionChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
 
+  COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   url!: URL;
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
@@ -62,6 +64,7 @@ export class I18nService {
   constructor(
     private documentAttributeCustomizationService:
     DocumentAttributeCustomizationService,
+    private cookieService: CookieService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private userBackendApiService: UserBackendApiService,
     private userService: UserService,
@@ -83,14 +86,49 @@ export class I18nService {
   initialize(): void {
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => {
+        const cookieSetDateMsecs = this.cookieService.get(
+          this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
+        const langDirection = (
+          this.i18nLanguageCodeService.isLanguageRTL(code) ? 'rtl' : 'ltr');
+        let prevLangDirection = (
+          this.i18nLanguageCodeService.isLanguageRTL(
+            I18nLanguageCodeService.prevLangCode
+          ) ? 'rtl' : 'ltr');
         this.translateService.use(code);
         this.documentAttributeCustomizationService.addAttribute('lang', code);
+        if (!!cookieSetDateMsecs &&
+          +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
+        ) {
+          prevLangDirection = (
+            this.cookieService.get('dir') || prevLangDirection
+          );
+          this.cookieService.put(
+            'dir',
+            langDirection
+          );
+          this.cookieService.put('lang', code);
+          if (prevLangDirection !== langDirection) {
+            this.windowRef.nativeWindow.location.reload();
+          }
+        } else {
+          const parser = new URL(this.windowRef.nativeWindow.location.href);
+          let urlParamDir = parser.searchParams.get('dir');
+          if (urlParamDir === null) {
+            urlParamDir = 'ltr';
+          }
+          if (urlParamDir === langDirection) {
+            return;
+          }
+          parser.searchParams.set('dir', langDirection);
+          this.windowRef.nativeWindow.location.href = (
+            parser.href);
+        }
       }
     );
 
     // Loads site language according to the language parameter in URL
     // if present.
-    this.url = new URL(this.windowRef.nativeWindow.location.toString());
+    this.url = new URL(this.windowRef.nativeWindow.location.href);
     const searchParams = this.url.searchParams;
 
     if (searchParams.has('lang')) {
@@ -140,17 +178,8 @@ export class I18nService {
 
   updateUserPreferredLanguage(newLangCode: string): void {
     this.siteAnalyticsService.registerSiteLanguageChangeEvent(newLangCode);
-    let oldLangDirection = (
-      this.i18nLanguageCodeService.getCurrentLanguageDirection());
-    let reloadPage = (
-      oldLangDirection !== this.supportedSiteLanguageCodes[newLangCode]);
     this.setLocalStorageKeys(newLangCode);
 
-    // When we know that the page will be reloaded we don't need to switch
-    // the language now.
-    if (!reloadPage) {
-      this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
-    }
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       // If user is logged in first save the language and then reload,
@@ -159,16 +188,10 @@ export class I18nService {
         this.userBackendApiService.updatePreferredSiteLanguageAsync(
           newLangCode
         ).then(() => {
-          if (reloadPage) {
-            this.windowRef.nativeWindow.location.reload();
-            return;
-          }
+          this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
         });
       } else {
-        if (reloadPage) {
-          this.windowRef.nativeWindow.location.reload();
-          return;
-        }
+        this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
       }
     });
 

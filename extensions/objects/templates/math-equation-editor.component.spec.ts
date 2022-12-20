@@ -77,7 +77,16 @@ describe('MathEquationEditor', () => {
     fixture = TestBed.createComponent(
       MathEquationEditorComponent);
     component = fixture.componentInstance;
-    window.Guppy = MockGuppy;
+    // TODO(#16734): Introduce the "as unknown as X" convention for testing
+    // and remove comments that explain it.
+    // We need to mock guppy for the test. The mock guppy only has partial
+    // functionality when compared to the Guppy. This is because we only use
+    // certain methods or data from the Guppy in the test we are testing.
+    // Mocking the full object is a waste of time and effort. However,
+    // the typescript strict checks will complain about this assignment. In
+    // order to get around this, we typecast the Mock to unknown and then
+    // to the type which we are mocking.
+    window.Guppy = MockGuppy as unknown as Guppy;
   });
 
   afterEach(() => {

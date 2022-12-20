@@ -27,7 +27,7 @@ import './profile-page-navbar.component.css';
 @Component({
   selector: 'profile-page-navbar',
   templateUrl: './profile-page-navbar.component.html',
-  styleUrls: []
+  styleUrls: ['./profile-page-navbar.component.css']
 })
 export class ProfilePageNavbarComponent implements OnInit {
   constructor(

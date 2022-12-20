@@ -13,8 +13,8 @@
     Please do not upload watermarked images.
   </span>
   <label for="image-file-input" class="image-uploader-upload-label-button" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
-  <!-- The onclick="this.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
-  <input type="file" id="image-file-input" (click)="this.value = null"
+  <!-- The onclick="this.imageInputRef.nativeElement.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
+  <input type="file" id="image-file-input" (click)="this.imageInputRef.nativeElement.value = null"
          (change)="handleFile()"
          class="image-uploader-file-input e2e-test-photo-upload-input"
          accept=".jpg,.jpeg,.png,.svg"

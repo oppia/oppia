@@ -29,7 +29,7 @@ import { StorySummary } from 'domain/story/story-summary.model';
 
 @Component({
   selector: 'oppia-learner-topic-goals-summary-tile',
-  templateUrl: 'learner-topic-goals-summary-tile.component.html'
+  templateUrl: './learner-topic-goals-summary-tile.component.html'
 })
 export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

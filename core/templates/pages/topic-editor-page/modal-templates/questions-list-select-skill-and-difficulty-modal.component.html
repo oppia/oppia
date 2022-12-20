@@ -68,10 +68,11 @@
       You can only set difficulty after selecting skills linked to the question. Please go back and link skill(s) to this question.
     </div>
     <div class="list-group">
-      <div class="list-group-item"  *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; trackBy: index">
+      <div class="list-group-item"  *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let idx = index;">
         <label class="list-group-item-heading skill-description">{{ skillWithDifficulty.getDescription() }}</label>
         <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject"
-                                            [(skillWithDifficulty)]="skillWithDifficulty">
+                                            [skillWithDifficulty]="skillWithDifficulty"
+                                            (skillWithDifficultyChange)="changeSkillWithDifficulty($event, idx)">
         </oppia-question-difficulty-selector>
       </div>
     </div>

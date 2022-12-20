@@ -47,6 +47,11 @@ handlers:
   static_dir: webpack_bundles
   secure: always
   expiration: "0"
+# /dist is the build output folder for angular.
+- url: /dist
+  static_dir: dist/
+  secure: always
+  expiration: "0"
 - url: /assets
   static_dir: assets
   secure: always

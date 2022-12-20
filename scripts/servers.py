@@ -397,6 +397,67 @@ def create_managed_web_browser(
 
 
 @contextlib.contextmanager
+def managed_ng_build(
+    *, use_prod_env: bool = False, watch_mode: bool = False
+) -> Iterator[psutil.Process]:
+    """Returns context manager to start/stop the ng compiler gracefully.
+
+    Args:
+        use_prod_env: bool. Whether to compile for use in production.
+        watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
+            change.
+
+    Yields:
+        psutil.Process. The ng compiler process.
+
+    Raises:
+        OSError. First build never completed.
+    """
+    compiler_args = [common.NG_BIN_PATH, 'build']
+    if use_prod_env:
+        compiler_args.append('--prod')
+    if watch_mode:
+        compiler_args.append('--watch')
+    with contextlib.ExitStack() as exit_stack:
+        # OK to use shell=True here because we are passing string literals and
+        # constants, so there is no risk of a shell-injection attack.
+        proc = exit_stack.enter_context(managed_process(
+            compiler_args,
+            human_readable_name='Angular Compiler',
+            shell=True,
+            # Capture compiler's output to detect when builds have completed.
+            stdout=subprocess.PIPE
+        ))
+
+        read_line_func: Callable[[], Optional[bytes]] = (
+            lambda: proc.stdout.readline() or None
+        )
+        if watch_mode:
+            for line in iter(read_line_func, None):
+                common.write_stdout_safe(line)
+                # Message printed when a compilation has succeeded. We break
+                # after the first one to ensure the site is ready to be visited.
+                if b'Build at: ' in line:
+                    break
+            else:
+                # If none of the lines contained the string 'Built at',
+                # raise an error because a build hasn't finished successfully.
+                raise IOError('First build never completed')
+
+        def print_proc_output() -> None:
+            """Prints the proc's output until it is exhausted."""
+            for line in iter(read_line_func, None):
+                common.write_stdout_safe(line)
+
+        # Start a thread to print the rest of the compiler's output to stdout.
+        printer_thread = threading.Thread(target=print_proc_output)
+        printer_thread.start()
+        exit_stack.callback(printer_thread.join)
+
+        yield proc
+
+
+@contextlib.contextmanager
 def managed_webpack_compiler(
     config_path: Optional[str] = None,
     use_prod_env: bool = False,
@@ -446,14 +507,16 @@ def managed_webpack_compiler(
         compiler_args.insert(1, '--max-old-space-size=%d' % max_old_space_size)
     if watch_mode:
         compiler_args.extend(['--color', '--watch', '--progress'])
-
     with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
-            compiler_args, human_readable_name='Webpack Compiler', shell=True,
+            compiler_args,
+            human_readable_name='Webpack Compiler',
+            shell=True,
             # Capture compiler's output to detect when builds have completed.
-            stdout=subprocess.PIPE))
+            stdout=subprocess.PIPE
+        ))
 
         read_line_func: Callable[[], Optional[bytes]] = (
             lambda: proc.stdout.readline() or None

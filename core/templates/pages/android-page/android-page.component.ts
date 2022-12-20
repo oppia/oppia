@@ -34,7 +34,7 @@ import './android-page.component.css';
 @Component({
   selector: 'android-page',
   templateUrl: './android-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./android-page.component.css'],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -78,6 +78,7 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   featuresMainTextIsSeen = false;
   emailAddress: string | null = null;
   name: string | null = null;
+  userCanSubscribe: boolean = false;
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));

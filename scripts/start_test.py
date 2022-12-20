@@ -44,7 +44,7 @@ class MockCompilerContextManager():
         pass
 
 
-class SetupTests(test_utils.GenericTestBase):
+class StartTests(test_utils.GenericTestBase):
     """Unit tests for scripts/start.py."""
 
     def setUp(self) -> None:
@@ -73,6 +73,12 @@ class SetupTests(test_utils.GenericTestBase):
                 'use_source_maps': False,
                 'watch_mode': True
             }])
+        self.swap_ng_build = self.swap_with_checks(
+            servers,
+            'managed_ng_build',
+            lambda **unused_kwargs: MockCompilerContextManager(),
+            expected_kwargs=[{'watch_mode': True}]
+        )
         self.swap_redis_server = self.swap(
             servers, 'managed_redis_server', mock_context_manager)
         self.swap_elasticsearch_dev_server = self.swap(
@@ -105,11 +111,11 @@ class SetupTests(test_utils.GenericTestBase):
         swap_build = self.swap_with_checks(
             build, 'main', lambda **unused_kwargs: None,
             expected_kwargs=[{'args': []}])
-        with self.swap_cloud_datastore_emulator, self.swap_webpack_compiler:
+        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
-                    with self.swap_extend_index_yaml, swap_build:
-                        with self.swap_create_server, self.swap_print:
+                with self.swap_create_server, self.swap_webpack_compiler:
+                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
+                        with self.swap_firebase_auth_emulator, self.swap_print:
                             start.main(args=[])
 
         self.assertIn(
@@ -155,11 +161,11 @@ class SetupTests(test_utils.GenericTestBase):
             expected_kwargs=[{
                 'args': ['--maintenance_mode']
             }])
-        with self.swap_cloud_datastore_emulator, self.swap_webpack_compiler:
+        with self.swap_cloud_datastore_emulator, swap_build, self.swap_ng_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
-                    with self.swap_extend_index_yaml, swap_build:
-                        with self.swap_create_server, self.swap_print:
+                with self.swap_create_server, self.swap_webpack_compiler:
+                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
+                        with self.swap_firebase_auth_emulator, self.swap_print:
                             start.main(args=['--maintenance_mode'])
 
         self.assertIn(
@@ -185,10 +191,9 @@ class SetupTests(test_utils.GenericTestBase):
         with self.swap_cloud_datastore_emulator, self.swap_webpack_compiler:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
-                    with self.swap_extend_index_yaml:
-                        with self.swap_print, swap_build:
-                            with swap_check_port_in_use:
-                                start.main(args=['--no_browser'])
+                    with self.swap_extend_index_yaml, swap_check_port_in_use:
+                        with self.swap_print, swap_build, self.swap_ng_build:
+                            start.main(args=['--no_browser'])
 
         self.assertIn(
             [
@@ -230,7 +235,7 @@ class SetupTests(test_utils.GenericTestBase):
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with swap_emulator_mode, self.swap_dev_appserver:
                     with self.swap_extend_index_yaml, swap_build:
-                        with self.swap_print:
+                        with self.swap_print, self.swap_ng_build:
                             start.main(args=['--source_maps'])
 
         self.assertIn(
@@ -256,11 +261,11 @@ class SetupTests(test_utils.GenericTestBase):
             contributor_dashboard_debug.ContributorDashboardDebugInitializer,
             'populate_debug_data'
         )
-        with self.swap_cloud_datastore_emulator, self.swap_webpack_compiler:
+        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
-                    with self.swap_extend_index_yaml, swap_build:
-                        with self.swap_create_server, self.swap_print:
+                with self.swap_create_server, self.swap_webpack_compiler:
+                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
+                        with self.swap_firebase_auth_emulator, self.swap_print:
                             with populate_data_swap as populate_data_counter:
                                 start.main(args=['--contributor_dashboard'])
 

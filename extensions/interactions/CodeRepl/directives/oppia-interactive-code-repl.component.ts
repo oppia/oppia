@@ -188,7 +188,7 @@ export class InteractiveCodeReplComponent implements
 
   runCode(
       codeInput: string,
-      onFinishRunCallback: (x: string, error: string) => void
+      onFinishRunCallback?: (x: string, error: string) => void
   ): void {
     this.code = codeInput;
     this.output = '';

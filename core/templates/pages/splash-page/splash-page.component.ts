@@ -26,9 +26,7 @@ import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-
 import './splash-page.component.css';
-
 
 export interface Testimonial {
   quote: string;
@@ -41,7 +39,7 @@ export interface Testimonial {
 @Component({
   selector: 'oppia-splash-page',
   templateUrl: './splash-page.component.html',
-  styleUrls: []
+  styleUrls: ['./splash-page.component.css']
 })
 export class SplashPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -667,6 +667,20 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
             dependency_filepaths['fonts'], webfonts_dir))
 
 
+def build_using_ng() -> None:
+    """Execute angular build process. This runs the angular compiler and
+    generates an ahead of time compiled bundle. This bundle can be found in the
+    dist/oppia-angular-prod folder.
+    """
+    print('Building using angular cli')
+    managed_ng_build_process = servers.managed_ng_build(
+        use_prod_env=True, watch_mode=False)
+    with managed_ng_build_process as p:
+        p.wait()
+    assert get_file_count('dist/oppia-angular-prod') > 0, (
+        'angular generated bundle should be non-empty')
+
+
 def build_using_webpack(config_path: str) -> None:
     """Execute webpack build process. This takes all TypeScript files we have in
     /templates and generates JS bundles according the require() imports
@@ -1414,6 +1428,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
         else:
             build_using_webpack(WEBPACK_PROD_CONFIG)
+        build_using_ng()
         generate_app_yaml(
             deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)

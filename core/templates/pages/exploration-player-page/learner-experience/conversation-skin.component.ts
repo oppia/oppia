@@ -94,6 +94,7 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 @Component({
   selector: 'oppia-conversation-skin',
   templateUrl: './conversation-skin.component.html',
+  styleUrls: ['./conversation-skin.component.css']
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
@@ -1010,7 +1011,9 @@ export class ConversationSkinComponent {
             storyUrlFragment, nodeId
           ).then((returnObject) => {
             if (returnObject.readyForReviewTest) {
-              this.windowRef.nativeWindow.location =
+              (
+                this.windowRef.nativeWindow as {location: string | Location}
+              ).location =
                 this.urlInterpolationService.interpolateUrl(
                   TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE, {
                     topic_url_fragment: topicUrlFragment,

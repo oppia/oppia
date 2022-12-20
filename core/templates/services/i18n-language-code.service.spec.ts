@@ -51,10 +51,12 @@ describe('I18nLanguageCodeService', () => {
 
   it('should get whether the current language is RTL correctly', () => {
     i18nLanguageCodeService.setI18nLanguageCode('es');
+    expect(i18nLanguageCodeService.getCurrentLanguageDirection()).toBe('ltr');
     expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(false);
     i18nLanguageCodeService.setI18nLanguageCode('en');
     expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(false);
     i18nLanguageCodeService.setI18nLanguageCode('ar');
+    expect(i18nLanguageCodeService.getCurrentLanguageDirection()).toBe('rtl');
     expect(i18nLanguageCodeService.isCurrentLanguageRTL()).toBe(true);
   });
 

@@ -131,15 +131,15 @@ export class ExplorationPropertyService {
 
     let newBackendValue = cloneDeep(this.displayed);
     let oldBackendValue = cloneDeep(this.savedMemento);
-
+    const that = this;
     if (this.BACKEND_CONVERSIONS.hasOwnProperty(this.propertyName)) {
       newBackendValue =
         this.BACKEND_CONVERSIONS[
-          this.propertyName as keyof typeof this.BACKEND_CONVERSIONS
+          this.propertyName as keyof typeof that.BACKEND_CONVERSIONS
         ](this.displayed as ParamChange[] & ParamChange);
       oldBackendValue =
         this.BACKEND_CONVERSIONS[
-          this.propertyName as keyof typeof this.BACKEND_CONVERSIONS
+          this.propertyName as keyof typeof that.BACKEND_CONVERSIONS
         ](this.savedMemento as ParamChange[] & ParamChange);
     }
 

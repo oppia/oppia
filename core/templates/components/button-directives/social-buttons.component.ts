@@ -26,7 +26,7 @@ import './social-buttons.component.css';
 @Component({
   selector: 'oppia-social-buttons',
   templateUrl: './social-buttons.component.html',
-  styleUrls: []
+  styleUrls: ['./social-buttons.component.css']
 })
 export class SocialButtonsComponent {
   androidAppButtonIsShown = (

@@ -28,7 +28,6 @@ import { JoyrideModule } from 'ngx-joyride';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatMenuModule } from '@angular/material/menu';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
@@ -36,7 +35,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
 import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
@@ -119,13 +117,13 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     RouterModule.forRoot([]),
     JoyrideModule.forRoot(),
     SharedComponentsModule,
+    ExplorationPlayerViewerCommonModule,
+    OppiaCkEditorCopyToolBarModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
@@ -190,10 +188,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     StateVersionHistoryComponent
   ],
   entryComponents: [
-    CkEditorCopyToolbarComponent,
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
@@ -290,6 +286,8 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
+import { ExplorationPlayerViewerCommonModule } from 'pages/exploration-player-page/exploration-player-viewer-common.module';
 import { StateVersionHistoryModalComponent } from './modal-templates/state-version-history-modal.component';
 import { MetadataVersionHistoryModalComponent } from './modal-templates/metadata-version-history-modal.component';
 import { StateVersionHistoryComponent } from './editor-tab/state-version-history/state-version-history.component';

@@ -33,7 +33,7 @@ import './attribution-guide.component.css';
 @Component({
   selector: 'attribution-guide',
   templateUrl: './attribution-guide.component.html',
-  styleUrls: []
+  styleUrls: ['./attribution-guide.component.css']
 })
 export class AttributionGuideComponent implements OnInit {
   deviceUsedIsMobile: boolean = false;

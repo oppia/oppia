@@ -73,6 +73,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
+    const that = this;
     this.skillId = this.urlService.getSkillIdFromUrl();
     this.skillEditorStateService.loadSkill(this.skillId);
     this.questionTextFilter = '';
@@ -81,7 +82,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     for (let interaction in this.INTERACTION_TYPES) {
       this.ALLOWED_QUESTION_INTERACTIONS.push(
         this.INTERACTION_TYPES[
-          interaction as keyof typeof this.INTERACTION_TYPES]);
+          interaction as keyof typeof that.INTERACTION_TYPES]);
     }
     this.skill = this.skillEditorStateService.getSkill();
     this.htmlData = (

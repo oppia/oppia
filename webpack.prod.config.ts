@@ -16,11 +16,11 @@
  * @fileoverview Production environment config file for Webpack.
  */
 
-const { merge } = require('webpack-merge');
-const common = require('./webpack.common.config.ts');
-const path = require('path');
-const webpack = require('webpack');
-const analyticsConstants = require('./assets/analytics-constants.json');
+var { merge } = require('webpack-merge');
+var common = require('./webpack.common.config.ts');
+var path = require('path');
+var webpack = require('webpack');
+var analyticsConstants = require('./assets/analytics-constants.json');
 
 
 module.exports = merge(common, {

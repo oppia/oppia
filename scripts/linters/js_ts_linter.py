@@ -141,7 +141,7 @@ def compile_all_ts_files() -> None:
     run. For more details, please see issue #9458.
     """
     cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
-        './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
+        './tsconfig-lint.json', COMPILED_TYPESCRIPT_TMP_PATH)
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 

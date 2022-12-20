@@ -34,7 +34,7 @@ export class ExplorationObjectiveEditorComponent {
   @Output() onInputFieldBlur = new EventEmitter<void>();
 
   constructor(
-    private explorationObjectiveService: ExplorationObjectiveService
+    public explorationObjectiveService: ExplorationObjectiveService
   ) {}
 
   inputFieldBlur(): void {

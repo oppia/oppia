@@ -37,6 +37,7 @@ import './exploration-summary-tile.component.css';
 @Component({
   selector: 'oppia-exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
+  styleUrls: ['./exploration-summary-tile.component.css']
 })
 export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

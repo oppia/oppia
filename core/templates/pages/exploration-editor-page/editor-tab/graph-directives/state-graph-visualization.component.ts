@@ -375,6 +375,7 @@ export class StateGraphVisualization
   drawGraph(
       nodes: GraphNodes, originalLinks: GraphLink[],
       initStateId: string, finalStateIds: string[]): void {
+    const that = this;
     this.initStateId = initStateId;
     this.finalStateIds = finalStateIds;
     let links = cloneDeep(originalLinks);
@@ -415,7 +416,7 @@ export class StateGraphVisualization
         if (linkProperty in this.linkPropertyMapping) {
           this.augmentedLinks[i].style = (
             this.linkPropertyMapping[
-              linkProperty as keyof typeof this.linkPropertyMapping]);
+              linkProperty as keyof typeof that.linkPropertyMapping]);
         }
       }
     }

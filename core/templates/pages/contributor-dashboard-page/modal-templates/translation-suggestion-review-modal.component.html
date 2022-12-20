@@ -135,7 +135,7 @@
     <textarea class="e2e-test-suggestion-review-message w-100"
               rows="3"
               [(ngModel)]="reviewMessage"
-              [maxlength]="MAX_REVIEW_MESSAGE_LENGTH">
+              [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH">
     </textarea>
     <div class="alert alert-danger"
          [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
