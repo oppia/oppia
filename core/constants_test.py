@@ -75,7 +75,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             'images', 'avatar', 'user_blue_150px.png')
         self.assertEqual(
             constants.get_package_file_contents(
-                'assets', default_image_path, mode='rb'), raw_image_png
+                'assets', default_image_path, is_binary=True), raw_image_png
         )
 
     def test_loading_file_in_non_existent_package_throws_error(self) -> None:
@@ -87,7 +87,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             ):
                 constants.get_package_file_contents('assets', 'non_exist.xy')
                 constants.get_package_file_contents(
-                    'assets', 'non_exist.xy', mode='rb')
+                    'assets', 'non_exist.xy', is_binary=True)
 
     def test_difficulty_values_are_matched(self) -> None:
         """Tests that the difficulty values and strings are matched in the
