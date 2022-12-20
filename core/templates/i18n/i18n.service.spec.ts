@@ -320,6 +320,7 @@ describe('I18n service', () => {
       I18nLanguageCodeService.prevLangCode = 'en';
       spyOn(windowRef.nativeWindow.location, 'reload');
       i18nService.initialize();
+      mockI18nLanguageCodeServiceSubject.emit('en');
       expect(windowRef.nativeWindow.location.href).toBe('http://localhost:8181');
       mockI18nLanguageCodeServiceSubject.emit('ar');
       I18nLanguageCodeService.prevLangCode = prevLangCode;
