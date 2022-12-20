@@ -653,21 +653,6 @@ def _update_reading_time_stats_transactional(
         author_blog_post_reading_time_stats
     )
 
-
-@overload
-def _increment_reading_time_bucket_count(
-    stats: blog_statistics_domain.BlogPostReadingTime,
-    time_taken: int
-) -> None: ...
-
-
-@overload
-def _increment_reading_time_bucket_count(
-    stats: blog_statistics_domain.AuthorBlogPostsReadingTime,
-    time_taken: int
-) -> None: ...
-
-
 def _increment_reading_time_bucket_count(
     stats: Union[
         blog_statistics_domain.BlogPostReadingTime,
@@ -683,28 +668,23 @@ def _increment_reading_time_bucket_count(
             The stats domain object for which weekly reads are to be generated.
         time_taken: int. Time taken by the user to read the blog post.
     """
-    if time_taken == 0:
-        stats.zero_to_one_min += 1
-    elif time_taken == 1:
-        stats.one_to_two_min += 1
-    elif time_taken == 2:
-        stats.two_to_three_min += 1
-    elif time_taken == 3:
-        stats.three_to_four_min += 1
-    elif time_taken == 4:
-        stats.four_to_five_min += 1
-    elif time_taken == 5:
-        stats.five_to_six_min += 1
-    elif time_taken == 6:
-        stats.six_to_seven_min += 1
-    elif time_taken == 7:
-        stats.seven_to_eight_min += 1
-    elif time_taken == 8:
-        stats.eight_to_nine_min += 1
-    elif time_taken == 9:
-        stats.nine_to_ten_min += 1
+    time_taken_keys = [
+        'zero_to_one_min',
+        'one_to_two_min',
+        'two_to_three_min',
+        'three_to_four_min',
+        'four_to_five_min',
+        'five_to_six_min',
+        'six_to_seven_min',
+        'seven_to_eight_min',
+        'eight_to_nine_min',
+        'nine_to_ten_min',
+    ]
+    if time_taken <= 9 :
+        key = time_taken_keys[time_taken]
     else:
-        stats.more_than_ten_min += 1
+        key = 'more_than_ten_min'
+    stats[key] += 1
 
 
 def create_aggregated_stats_models_for_newly_published_blog_post(
