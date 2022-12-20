@@ -77,9 +77,6 @@ class TestGCSIoReadJob(base_jobs.JobBase):
                     ]
                 ))
             | 'Read files from the GCS' >> gcs_io.ReadFile()
-            | 'Filter the results with OK status' >> beam.Filter(
-                lambda result: result.is_ok())
-            | 'Unwrap the data' >> beam.Map(lambda result: result.unwrap())
         )
 
         total_files_read = (
@@ -91,6 +88,9 @@ class TestGCSIoReadJob(base_jobs.JobBase):
 
         output_files = (
             read_files_from_gcs
+            | 'Filter the results with OK status' >> beam.Filter(
+                lambda result: result.is_ok())
+            | 'Unwrap the data' >> beam.Map(lambda result: result.unwrap())
             | 'Output the data' >> beam.Map(lambda data: (
                 job_run_result.JobRunResult.as_stdout(
                     f'The data for file \'{data[0]}\' is "{data[1]}"')
