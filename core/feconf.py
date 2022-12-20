@@ -25,8 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, List, Union
-from typing_extensions import Final, TypedDict
+from typing import Callable, Dict, Final, List, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -93,11 +92,7 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
-# backend_prod_files contain processed JS and HTML files that are served by
-# Jinja, we are moving away from Jinja so this folder might not be needed later
-# (#6964)
-EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if not constants.DEV_MODE else '')
+EXTENSIONS_DIR_PREFIX = ('build' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -116,7 +111,7 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
     os.path.join('webpack_bundles') if constants.DEV_MODE else
-    os.path.join('backend_prod_files', 'webpack_bundles'))
+    os.path.join('build', 'webpack_bundles'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -253,7 +248,9 @@ ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
-ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
+
+DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
+DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
 
 IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
 IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
@@ -337,7 +334,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 52
+CURRENT_STATE_SCHEMA_VERSION = 54
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -547,13 +544,16 @@ MAILCHIMP_API_KEY = None
 MAILCHIMP_USERNAME = None
 # Mailchimp secret, used to authenticate webhook requests.
 MAILCHIMP_WEBHOOK_SECRET = None
+# Valid Mailchimp merge keys.
+VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
+# Valid Mailchimp tags.
+VALID_MAILCHIMP_TAGS = ['Android', 'Web']
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
 ES_CLOUD_ID = None
 ES_USERNAME = None
-ES_PASSWORD = None
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
@@ -676,7 +676,6 @@ EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
 EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
     'add_contributor_dashboard_reviewers'
 )
-EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
     'notify_contributor_dashboard_achievements'
@@ -717,7 +716,7 @@ VALID_MODERATOR_ACTIONS: Dict[
 }
 
 # When the site terms were last updated, in UTC.
-REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
+TERMS_PAGE_LAST_UPDATED_UTC = datetime.datetime(2020, 10, 19)
 
 # Format of string for dashboard statistics logs.
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in
@@ -763,7 +762,7 @@ MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
 
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
-MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE = 12
 
 # The maximum number of blog post cards to be visible as suggestions on the
 # blog post page.
@@ -838,14 +837,16 @@ LINEAR_INTERACTION_IDS = ['Continue']
 DEMO_EXPLORATIONS = {
     u'0': 'welcome',
     u'1': 'multiples.yaml',
-    u'2': 'binary_search',
+    # Exploration with ID 2 was removed as it contained string values inside
+    # NumericInput interaction.
     u'3': 'root_linear_coefficient_theorem',
     u'4': 'three_balls',
     # TODO(bhenning): Replace demo exploration '5' with a new exploration
     # described in #1376.
     u'6': 'boot_verbs.yaml',
     u'7': 'hola.yaml',
-    u'8': 'adventure.yaml',
+    # Exploration with ID 8 was removed as it contained string values inside
+    # NumericInput interaction.
     u'9': 'pitch_perfect.yaml',
     u'10': 'test_interactions',
     u'11': 'modeling_graphs',
@@ -896,8 +897,6 @@ TASK_URL_FLAG_EXPLORATION_EMAILS = (
     '%s/email/flagexplorationemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
-TASK_URL_SUGGESTION_EMAILS = (
-    '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS = (
     '%s/email/contributordashboardachievementnotificationemailhandler' % (
         TASKQUEUE_URL_PREFIX))
@@ -909,15 +908,18 @@ ABOUT_FOUNDATION_PAGE_URL = '/about-foundation'
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 BLOG_ADMIN_PAGE_URL = '/blog-admin'
+CLASSROOM_ADMIN_PAGE_URL = '/classroom-admin'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
+DIAGNOSTIC_TEST_PLAYER_PAGE_URL = '/diagnostic-test-player'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
 BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
-AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
+BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX = '/blog/author'
+BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX = '/blog/author/data'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -1036,6 +1038,7 @@ SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
     '/diagnostic_test_skill_assignment_handler')
+DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL = '/diagnostic_test_questions_handler_url'
 STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
@@ -1061,6 +1064,7 @@ SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
+TOPIC_ID_TO_TOPIC_NAME = '/topic_id_to_topic_name_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_NAME_HANDLER = '/topic_name_handler'
@@ -1081,11 +1085,15 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
+LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
+    '/learner_dashboard_learner_groups_handler')
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
-CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
+NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
+CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
+CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1242,8 +1250,8 @@ DEPRECATED_ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-USER_FILTER_CRITERION_ROLE = 'role'
-USER_FILTER_CRITERION_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE: Final = 'role'
+USER_FILTER_CRITERION_USERNAME: Final = 'username'
 
 # Max questions allowed in a session of practice questions.
 QUESTION_BATCH_SIZE = 10

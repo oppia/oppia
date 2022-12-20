@@ -22,6 +22,7 @@ import collections
 import copy
 import itertools
 import logging
+import math
 import re
 
 from core import android_validation_constants
@@ -32,12 +33,13 @@ from core.constants import constants
 from core.domain import customization_args_util
 from core.domain import param_domain
 from core.domain import translation_domain
+from extensions import domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, cast, overload
+    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Tuple, Type,
+    TypedDict, TypeVar, Union, cast, overload
 )
-from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -48,6 +50,8 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from extensions.interactions import base
 
+_GenericCustomizationArgType = TypeVar('_GenericCustomizationArgType')
+
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
@@ -57,16 +61,15 @@ if MYPY:  # pragma: no cover
 AllowedRuleSpecInputTypes = Union[
     str,
     int,
+    float,
     List[str],
     List[List[str]],
-    Dict[str, Union[str, List[str]]],
+    # Here we use type Any because some rule specs have deeply nested types,
+    # such as for the `NumberWithUnits` interaction.
+    Mapping[
+        str, Union[str, List[str], int, bool, float, Dict[str, int], List[Any]]
+    ],
 ]
-
-# TODO(#15982): Here we use type Any because `CustomizationArgsDictType` is a
-# type for customization_args dictionary, and we used Any type here because
-# it accepts the values of customization args and that values can be of type
-# str, int, bool, List and other types too.
-CustomizationArgsDictType = Dict[str, Dict[str, Any]]
 
 
 class TrainingDataDict(TypedDict):
@@ -94,7 +97,7 @@ class StateVersionHistoryDict(TypedDict):
 
 
 AcceptableCorrectAnswerTypes = Union[
-    List[List[str]], List[str], str, Dict[str, str], int, List[int]
+    List[List[str]], List[str], str, Dict[str, str], int, None
 ]
 
 
@@ -172,19 +175,27 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             'tagged_skill_misconception_id': self.tagged_skill_misconception_id
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # answer group is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
-    def from_dict(cls, answer_group_dict: AnswerGroupDict) -> AnswerGroup:
+    def from_dict(
+        cls, answer_group_dict: AnswerGroupDict, validate: bool = True
+    ) -> AnswerGroup:
         """Return a AnswerGroup domain object from a dict.
 
         Args:
             answer_group_dict: dict. The dict representation of AnswerGroup
                 object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             AnswerGroup. The corresponding AnswerGroup domain object.
         """
         return cls(
-            Outcome.from_dict(answer_group_dict['outcome']),
+            Outcome.from_dict(answer_group_dict['outcome'], validate=validate),
             [RuleSpec.from_dict(rs)
              for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
@@ -194,7 +205,9 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
     def validate(
         self,
         interaction: base.BaseInteraction,
-        exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
+        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        *,
+        tagged_skill_misconception_id_required: bool = False,
     ) -> None:
         """Verifies that all rule classes are valid, and that the AnswerGroup
         only has one classifier rule.
@@ -204,23 +217,38 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
 
         Raises:
             ValidationError. One or more attributes of the AnswerGroup are
                 invalid.
             ValidationError. The AnswerGroup contains more than one classifier
                 rule.
+            ValidationError. The tagged_skill_misconception_id is not valid.
         """
         if not isinstance(self.rule_specs, list):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
 
-        if self.tagged_skill_misconception_id is not None:
+        if (
+            self.tagged_skill_misconception_id is not None and
+            not tagged_skill_misconception_id_required
+        ):
+            raise utils.ValidationError(
+                'Expected tagged skill misconception id to be None, '
+                'received %s' % self.tagged_skill_misconception_id)
+
+        if (
+            self.tagged_skill_misconception_id is not None and
+            tagged_skill_misconception_id_required
+        ):
             if not isinstance(self.tagged_skill_misconception_id, str):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
                     'received %s' % self.tagged_skill_misconception_id)
+
             if not re.match(
                     constants.VALID_SKILL_MISCONCEPTION_ID_REGEX,
                     self.tagged_skill_misconception_id):
@@ -229,17 +257,16 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                     'to be <skill_id>-<misconception_id>, received %s'
                     % self.tagged_skill_misconception_id)
 
-        if len(self.rule_specs) == 0 and len(self.training_data) == 0:
+        if len(self.rule_specs) == 0:
             raise utils.ValidationError(
-                'There must be at least one rule or training data for each'
-                ' answer group.')
+                'There must be at least one rule for each answer group.')
 
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
             rule_spec.validate(
-                interaction.get_rule_param_list(rule_spec.rule_type),  # type: ignore[no-untyped-call]
+                interaction.get_rule_param_list(rule_spec.rule_type),
                 exp_param_specs_dict)
 
         self.outcome.validate()
@@ -408,18 +435,25 @@ class Hint(translation_domain.BaseTranslatableObject):
             'hint_content': self.hint_content.to_dict(),
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # hint is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
-    def from_dict(cls, hint_dict: HintDict) -> Hint:
+    def from_dict(cls, hint_dict: HintDict, validate: bool = True) -> Hint:
         """Return a Hint domain object from a dict.
 
         Args:
             hint_dict: dict. The dict representation of Hint object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             Hint. The corresponding Hint domain object.
         """
         hint_content = SubtitledHtml.from_dict(hint_dict['hint_content'])
-        hint_content.validate()
+        if validate:
+            hint_content.validate()
         return cls(hint_content)
 
     def validate(self) -> None:
@@ -488,7 +522,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         """
         self.answer_is_exclusive = answer_is_exclusive
         self.correct_answer = (
-            interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+            interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).normalize_answer(correct_answer))
         self.explanation = explanation
 
@@ -522,27 +556,35 @@ class Solution(translation_domain.BaseTranslatableObject):
             'explanation': self.explanation.to_dict(),
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # solution is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
     def from_dict(
         cls,
         interaction_id: str,
-        solution_dict: SolutionDict
+        solution_dict: SolutionDict,
+        validate: bool = True
     ) -> Solution:
         """Return a Solution domain object from a dict.
 
         Args:
             interaction_id: str. The interaction id.
             solution_dict: dict. The dict representation of Solution object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             Solution. The corresponding Solution domain object.
         """
         explanation = SubtitledHtml.from_dict(solution_dict['explanation'])
-        explanation.validate()
+        if validate:
+            explanation.validate()
         return cls(
             interaction_id,
             solution_dict['answer_is_exclusive'],
-            interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+            interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).normalize_answer(
                     solution_dict['correct_answer']),
             explanation)
@@ -561,7 +603,7 @@ class Solution(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected answer_is_exclusive to be bool, received %s' %
                 self.answer_is_exclusive)
-        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+        interaction_registry.Registry.get_interaction_by_id(
             interaction_id).normalize_answer(self.correct_answer)
         self.explanation.validate()
 
@@ -674,6 +716,27 @@ class InteractionInstanceDict(TypedDict):
 
 class InteractionInstance(translation_domain.BaseTranslatableObject):
     """Value object for an instance of an interaction."""
+
+    class RangeVariableDict(TypedDict):
+        """Dictionary representing the range variable for the NumericInput
+        interaction.
+        """
+
+        ans_group_index: int
+        rule_spec_index: int
+        lower_bound: Optional[float]
+        upper_bound: Optional[float]
+        lb_inclusive: bool
+        ub_inclusive: bool
+
+    class MatchedDenominatorDict(TypedDict):
+        """Dictionary representing the matched denominator variable for the
+        FractionInput interaction.
+        """
+
+        ans_group_index: int
+        rule_spec_index: int
+        denominator: int
 
     # The default interaction used for a new state.
     _DEFAULT_INTERACTION_ID = None
@@ -796,26 +859,34 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'solution': self.solution.to_dict() if self.solution else None,
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # interaction is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
     def from_dict(
-        cls, interaction_dict: InteractionInstanceDict
+        cls, interaction_dict: InteractionInstanceDict, validate: bool = True
     ) -> InteractionInstance:
         """Return a InteractionInstance domain object from a dict.
 
         Args:
             interaction_dict: dict. The dict representation of
                 InteractionInstance object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             InteractionInstance. The corresponding InteractionInstance domain
             object.
         """
         default_outcome_dict = (
-            Outcome.from_dict(interaction_dict['default_outcome'])
+            Outcome.from_dict(
+                interaction_dict['default_outcome'], validate=validate)
             if interaction_dict['default_outcome'] is not None else None)
         solution_dict = (
             Solution.from_dict(
-                interaction_dict['id'], interaction_dict['solution'])
+                interaction_dict['id'], interaction_dict['solution'],
+                validate=validate)
             if (
                 interaction_dict['solution'] is not None and
                 interaction_dict['id'] is not None
@@ -833,11 +904,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         return cls(
             interaction_dict['id'],
             customization_args,
-            [AnswerGroup.from_dict(h)
-             for h in interaction_dict['answer_groups']],
+            (
+                [AnswerGroup.from_dict(h, validate=validate)
+                for h in interaction_dict['answer_groups']]
+            ),
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
-            [Hint.from_dict(h) for h in interaction_dict['hints']],
+            (
+                [Hint.from_dict(h, validate=validate)
+                for h in interaction_dict['hints']]
+            ),
             solution_dict)
 
     @property
@@ -853,6 +929,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 self.id
             ).is_terminal
         )
+
+    @property
+    def is_linear(self) -> bool:
+        """Determines if this interaction type is linear.
+
+        Returns:
+            bool. Whether the interaction is linear.
+        """
+        return interaction_registry.Registry.get_interaction_by_id(
+            self.id).is_linear
 
     def is_supported_on_android_app(self) -> bool:
         """Determines whether the interaction is a valid interaction that is
@@ -916,8 +1002,1030 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             outcomes.append(self.default_outcome)
         return outcomes
 
+    def _validate_continue_interaction(self) -> None:
+        """Validates Continue interaction."""
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
+        button_text_subtitled_unicode = cast(
+            SubtitledUnicode,
+            self.customization_args['buttonText'].value
+        )
+        text_value = button_text_subtitled_unicode.unicode_str
+        if len(text_value) > 20:
+            raise utils.ValidationError(
+                'The `continue` interaction text length should be atmost '
+                '20 characters.'
+            )
+
+    def _validate_end_interaction(self) -> None:
+        """Validates End interaction."""
+        # Here we use cast because we are narrowing down the type
+        # from various customization args value types to List[str]
+        # type, and this is done because here we are accessing
+        # 'recommendedExplorationIds' key from EndExploration
+        # customization arg whose value is always of List[str] type.
+        recc_exp_ids = cast(
+            List[str],
+            self.customization_args['recommendedExplorationIds'].value
+        )
+        if len(recc_exp_ids) > 3:
+            raise utils.ValidationError(
+                'The total number of recommended explorations inside End '
+                'interaction should be atmost 3.'
+            )
+
+    def _validates_choices_should_be_unique_and_nonempty(
+        self, choices: List[SubtitledHtml]
+    ) -> None:
+        """Validates that the choices should be unique and non empty.
+
+        Args:
+            choices: List[state_domain.SubtitledHtml]. Choices that needs to
+                be validated.
+
+        Raises:
+            utils.ValidationError. Choice is empty.
+            utils.ValidationError. Choice is duplicate.
+        """
+        seen_choices = []
+        for choice in choices:
+            if html_cleaner.is_html_empty(choice.html):
+                raise utils.ValidationError(
+                    'Choices should be non empty.'
+                )
+
+            if choice.html not in seen_choices:
+                seen_choices.append(choice.html)
+            else:
+                raise utils.ValidationError(
+                    'Choices should be unique.'
+                )
+
+    def _set_lower_and_upper_bounds(
+        self,
+        range_var: RangeVariableDict,
+        lower_bound: float,
+        upper_bound: float,
+        *,
+        lb_inclusive: bool,
+        ub_inclusive: bool
+    ) -> None:
+        """Sets the lower and upper bounds for the range_var.
+
+        Args:
+            range_var: RangeVariableDict. Variable used to keep track of each
+                range.
+            lower_bound: float. The lower bound.
+            upper_bound: float. The upper bound.
+            lb_inclusive: bool. If lower bound is inclusive.
+            ub_inclusive: bool. If upper bound is inclusive.
+        """
+        range_var['lower_bound'] = lower_bound
+        range_var['upper_bound'] = upper_bound
+        range_var['lb_inclusive'] = lb_inclusive
+        range_var['ub_inclusive'] = ub_inclusive
+
+    def _is_enclosed_by(
+        self, test_range: RangeVariableDict, base_range: RangeVariableDict
+    ) -> bool:
+        """Returns `True` when `test_range` variable lies within
+        `base_range` variable.
+
+        Args:
+            test_range: RangeVariableDictDict. It represents the variable for
+                which we have to check the range.
+            base_range: RangeVariableDictDict. It is the variable to which
+                the range is compared.
+
+        Returns:
+            bool. Returns True if test_range lies
+            within base_range.
+        """
+        if (
+            base_range['lower_bound'] is None or
+            test_range['lower_bound'] is None or
+            base_range['upper_bound'] is None or
+            test_range['upper_bound'] is None
+        ):
+            return False
+
+        lb_satisfied = (
+            base_range['lower_bound'] < test_range['lower_bound'] or
+            (
+                base_range['lower_bound'] == test_range['lower_bound'] and
+                (not test_range['lb_inclusive'] or base_range['lb_inclusive'])
+            )
+        )
+        ub_satisfied = (
+            base_range['upper_bound'] > test_range['upper_bound'] or
+            (
+                base_range['upper_bound'] == test_range['upper_bound'] and
+                (not test_range['ub_inclusive'] or base_range['ub_inclusive'])
+            )
+        )
+        return lb_satisfied and ub_satisfied
+
+    def _should_check_range_criteria(
+        self, earlier_rule: RuleSpec, later_rule: RuleSpec
+    ) -> bool:
+        """Compares the rule types of two rule specs to determine whether
+        to check for range enclosure.
+
+        Args:
+            earlier_rule: RuleSpec. Previous rule.
+            later_rule: RuleSpec. Current rule.
+
+        Returns:
+            bool. Returns True if the rules passes the range criteria check.
+        """
+        if earlier_rule.rule_type in (
+            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan',
+            'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
+        ):
+            return True
+
+        return later_rule.rule_type in (
+            'HasDenominatorEqualTo', 'IsLessThan', 'IsGreaterThan'
+        )
+
+    def _get_rule_value_of_fraction_interaction(
+        self, rule_spec: RuleSpec
+    ) -> float:
+        """Returns rule value of the rule_spec of FractionInput interaction so
+        that we can keep track of rule's range.
+
+        Args:
+            rule_spec: RuleSpec. Rule spec of an answer group.
+
+        Returns:
+            rule_value_f: float. The value of the rule spec.
+        """
+        rule_value_f = rule_spec.inputs['f']
+        value: float = (
+            rule_value_f['wholeNumber'] +
+            float(rule_value_f['numerator']) / rule_value_f['denominator']
+        )
+        return value
+
+    def _validate_numeric_input(self, strict: bool = False) -> None:
+        """Validates the NumericInput interaction.
+
+        Args:
+            strict: bool. If True, the exploration is assumed to be published.
+
+        Raises:
+            ValidationError. Duplicate rules are present.
+            ValidationError. Rule having a solution that is subset of previous
+                rules' solution.
+            ValidationError. The 'tol' value in 'IsWithinTolerance' is negetive.
+            ValidationError. The 'a' is greater than or equal to 'b' in
+                'IsInclusivelyBetween' rule.
+        """
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        ranges: List[InteractionInstance.RangeVariableDict] = []
+        rule_spec_till_now: List[RuleSpecDict] = []
+
+        for ans_group_index, answer_group in enumerate(self.answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group.rule_specs
+            ):
+                # Rule should not be duplicate.
+                if rule_spec.to_dict() in rule_spec_till_now and strict:
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' of answer group '
+                        f'\'{ans_group_index}\' of NumericInput '
+                        f'interaction is already present.'
+                    )
+                rule_spec_till_now.append(rule_spec.to_dict())
+                # All rules should have solutions that is not subset of
+                # previous rules' solutions.
+                range_var: InteractionInstance.RangeVariableDict = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+
+                if rule_spec.rule_type == 'IsLessThanOrEqualTo':
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        lower_infinity,
+                        rule_value,
+                        lb_inclusive=False,
+                        ub_inclusive=True
+                    )
+
+                elif rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value,
+                        upper_infinity,
+                        lb_inclusive=True,
+                        ub_inclusive=False
+                    )
+
+                elif rule_spec.rule_type == 'Equals':
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value,
+                        rule_value,
+                        lb_inclusive=True,
+                        ub_inclusive=True
+                    )
+
+                elif rule_spec.rule_type == 'IsLessThan':
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        lower_infinity,
+                        rule_value,
+                        lb_inclusive=False,
+                        ub_inclusive=False
+                    )
+
+                elif rule_spec.rule_type == 'IsGreaterThan':
+                    rule_value = float(rule_spec.inputs['x'])
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value,
+                        upper_infinity,
+                        lb_inclusive=False,
+                        ub_inclusive=False
+                    )
+
+                elif rule_spec.rule_type == 'IsWithinTolerance':
+                    rule_value_x = float(rule_spec.inputs['x'])
+                    rule_value_tol = float(rule_spec.inputs['tol'])
+                    if rule_value_tol <= 0.0:
+                        raise utils.ValidationError(
+                            f'The rule \'{rule_spec_index}\' of answer '
+                            f'group \'{ans_group_index}\' having '
+                            f'rule type \'IsWithinTolerance\' '
+                            f'have \'tol\' value less than or equal to '
+                            f'zero in NumericInput interaction.'
+                        )
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value_x - rule_value_tol,
+                        rule_value_x + rule_value_tol,
+                        lb_inclusive=True,
+                        ub_inclusive=True
+                    )
+
+                elif rule_spec.rule_type == 'IsInclusivelyBetween':
+                    rule_value_a = float(rule_spec.inputs['a'])
+                    rule_value_b = float(rule_spec.inputs['b'])
+                    if rule_value_a >= rule_value_b and strict:
+                        raise utils.ValidationError(
+                            f'The rule \'{rule_spec_index}\' of answer '
+                            f'group \'{ans_group_index}\' having '
+                            f'rule type \'IsInclusivelyBetween\' '
+                            f'have `a` value greater than `b` value '
+                            f'in NumericInput interaction.'
+                        )
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value_a,
+                        rule_value_b,
+                        lb_inclusive=True,
+                        ub_inclusive=True
+                    )
+
+                for range_ele in ranges:
+                    if self._is_enclosed_by(range_var, range_ele) and strict:
+                        raise utils.ValidationError(
+                            f'Rule \'{rule_spec_index}\' from answer '
+                            f'group \'{ans_group_index}\' will never be '
+                            f'matched because it is made redundant '
+                            f'by the above rules'
+                        )
+
+                ranges.append(range_var)
+
+    def _validate_fraction_input(self, strict: bool = False) -> None:
+        """Validates the FractionInput interaction.
+
+        Args:
+            strict: bool. If True, the exploration is assumed to be published.
+
+        Raises:
+            ValidationError. Duplicate rules are present.
+            ValidationError. Solution is not in simplest form when the
+                'simplest form' setting is turned on.
+            ValidationError. Solution is not in proper form, having values
+                like 1 2/3 when the 'proper form' setting is turned on.
+            ValidationError. Solution is not in proper form, when the 'proper
+                form' setting is turned on.
+            ValidationError. The 'IsExactlyEqualTo' rule have integral value
+                when 'allow non zero integers' setting is off.
+            ValidationError. Rule have solution that is subset of previous
+                rules' solutions.
+            ValidationError. The 'HasFractionalPartExactlyEqualTo' rule comes
+                after 'HasDenominatorEqualTo' rule where the fractional
+                denominator is equal to 'HasDenominatorEqualTo' rule value.
+        """
+        ranges: List[InteractionInstance.RangeVariableDict] = []
+        matched_denominator_list: List[
+            InteractionInstance.MatchedDenominatorDict] = []
+        rule_spec_till_now: List[RuleSpecDict] = []
+        inputs_without_fractions = [
+            'HasDenominatorEqualTo',
+            'HasNumeratorEqualTo',
+            'HasIntegerPartEqualTo',
+            'HasNoFractionalPart'
+        ]
+        rules_that_can_have_improper_fractions = [
+            'IsExactlyEqualTo',
+            'HasFractionalPartExactlyEqualTo'
+        ]
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        allow_non_zero_integ_part = (
+            self.customization_args['allowNonzeroIntegerPart'].value)
+        allow_imp_frac = self.customization_args['allowImproperFraction'].value
+        require_simple_form = (
+            self.customization_args['requireSimplestForm'].value)
+
+        for ans_group_index, answer_group in enumerate(self.answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group.rule_specs
+            ):
+                # Rule should not be duplicate.
+                if rule_spec.to_dict() in rule_spec_till_now and strict:
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' of answer group '
+                        f'\'{ans_group_index}\' of FractionInput '
+                        f'interaction is already present.'
+                    )
+                rule_spec_till_now.append(rule_spec.to_dict())
+
+                if rule_spec.rule_type not in inputs_without_fractions:
+                    num = rule_spec.inputs['f']['numerator']
+                    den = rule_spec.inputs['f']['denominator']
+                    whole = rule_spec.inputs['f']['wholeNumber']
+
+                    # Solution should be in simplest form if the `simplest form`
+                    # setting is turned on.
+                    if require_simple_form and strict:
+                        d = math.gcd(num, den)
+                        val_num = num // d
+                        val_den = den // d
+                        if val_num != num and val_den != den:
+                            raise utils.ValidationError(
+                                f'The rule \'{rule_spec_index}\' of '
+                                f'answer group \'{ans_group_index}\' do '
+                                f'not have value in simple form '
+                                f'in FractionInput interaction.'
+                            )
+
+                    if (
+                        strict and
+                        not allow_imp_frac and
+                        den <= num and
+                        (
+                            rule_spec.rule_type in
+                            rules_that_can_have_improper_fractions
+                        )
+                    ):
+                        raise utils.ValidationError(
+                            f'The rule \'{rule_spec_index}\' of '
+                            f'answer group \'{ans_group_index}\' do '
+                            f'not have value in proper fraction '
+                            f'in FractionInput interaction.'
+                        )
+
+                # All rules should have solutions that is not subset of
+                # previous rules' solutions.
+                range_var: InteractionInstance.RangeVariableDict = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+                matched_denominator: (
+                    InteractionInstance.MatchedDenominatorDict
+                ) = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'denominator': 0
+                }
+
+                if rule_spec.rule_type in (
+                    'IsEquivalentTo', 'IsExactlyEqualTo',
+                    'IsEquivalentToAndInSimplestForm'
+                ):
+                    if (
+                        rule_spec.rule_type == 'IsExactlyEqualTo' and
+                        not allow_non_zero_integ_part and
+                        whole != 0 and
+                        strict
+                    ):
+                        raise utils.ValidationError(
+                            f'The rule \'{rule_spec_index}\' of '
+                            f'answer group \'{ans_group_index}\' has '
+                            f'non zero integer part '
+                            f'in FractionInput interaction.'
+                        )
+                    rule_value_f = (
+                        self._get_rule_value_of_fraction_interaction(rule_spec))
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value_f,
+                        rule_value_f,
+                        lb_inclusive=True,
+                        ub_inclusive=True
+                    )
+
+                if rule_spec.rule_type == 'IsGreaterThan':
+                    rule_value_f = (
+                        self._get_rule_value_of_fraction_interaction(rule_spec))
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        rule_value_f,
+                        upper_infinity,
+                        lb_inclusive=False,
+                        ub_inclusive=False
+                    )
+
+                if rule_spec.rule_type == 'IsLessThan':
+                    rule_value_f = (
+                        self._get_rule_value_of_fraction_interaction(rule_spec))
+                    self._set_lower_and_upper_bounds(
+                        range_var,
+                        lower_infinity,
+                        rule_value_f,
+                        lb_inclusive=False,
+                        ub_inclusive=False
+                    )
+
+                if rule_spec.rule_type == 'HasDenominatorEqualTo':
+                    rule_value_x = int(rule_spec.inputs['x'])
+                    matched_denominator['denominator'] = rule_value_x
+
+                for range_ele in ranges:
+                    earlier_rule = (
+                        self.answer_groups[range_ele['ans_group_index']]
+                        .rule_specs[range_ele['rule_spec_index']]
+                    )
+                    if (
+                        self._should_check_range_criteria(
+                            earlier_rule, rule_spec) and
+                        self._is_enclosed_by(range_var, range_ele) and
+                        strict
+                    ):
+                        raise utils.ValidationError(
+                            f'Rule \'{rule_spec_index}\' from answer '
+                            f'group \'{ans_group_index}\' of '
+                            f'FractionInput interaction will '
+                            f'never be matched because it is '
+                            f'made redundant by the above rules'
+                        )
+
+                # `HasFractionalPartExactlyEqualTo` rule should always come
+                # before `HasDenominatorEqualTo` rule where the fractional
+                # denominator is equal to `HasDenominatorEqualTo` rule value.
+                for den in matched_denominator_list:
+                    if (
+                        den is not None and rule_spec.rule_type ==
+                        'HasFractionalPartExactlyEqualTo' and
+                        den['denominator'] ==
+                        rule_spec.inputs['f']['denominator']
+                    ):
+                        raise utils.ValidationError(
+                            f'Rule \'{rule_spec_index}\' from answer '
+                            f'group \'{ans_group_index}\' of '
+                            f'FractionInput interaction having '
+                            f'rule type HasFractionalPart'
+                            f'ExactlyEqualTo will '
+                            f'never be matched because it is '
+                            f'made redundant by the above rules'
+                        )
+
+                ranges.append(range_var)
+                matched_denominator_list.append(matched_denominator)
+
+    def _validate_number_with_units_input(self, strict: bool = False) -> None:
+        """Validates the NumberWithUnitsInput interaction.
+
+        Args:
+            strict: bool. If True, the exploration is assumed to be published.
+
+        Raises:
+            ValidationError. Duplicate rules are present.
+            ValidationError. The 'IsEqualTo' rule comes after 'IsEquivalentTo'
+                rule having same values.
+        """
+        number_with_units_rules = []
+        rule_spec_till_now: List[RuleSpecDict] = []
+
+        for ans_group_index, answer_group in enumerate(self.answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group.rule_specs
+            ):
+                # Rule should not be duplicate.
+                if rule_spec.to_dict() in rule_spec_till_now and strict:
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' of answer group '
+                        f'\'{ans_group_index}\' of NumberWithUnitsInput '
+                        f'interaction is already present.'
+                    )
+                rule_spec_till_now.append(rule_spec.to_dict())
+
+                # `IsEqualTo` rule should not come after `IsEquivalentTo` rule.
+                if rule_spec.rule_type == 'IsEquivalentTo':
+                    number_with_units_rules.append(rule_spec.inputs['f'])
+                if (
+                    rule_spec.rule_type == 'IsEqualTo' and
+                    rule_spec.inputs['f'] in number_with_units_rules and
+                    strict
+                ):
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' of answer '
+                        f'group \'{ans_group_index}\' has '
+                        f'rule type equal is coming after '
+                        f'rule type equivalent having same value '
+                        f'in FractionInput interaction.'
+                    )
+
+    def _validate_multi_choice_input(self, strict: bool = False) -> None:
+        """Validates the MultipleChoiceInput interaction.
+
+        Args:
+            strict: bool. If True, the exploration is assumed to be published.
+
+        Raises:
+            ValidationError. Duplicate rules are present.
+            ValidationError. Answer choices are empty or duplicate.
+        """
+        rule_spec_till_now: List[RuleSpecDict] = []
+
+        # Here we use cast because we are narrowing the down the
+        # type from various types of cust. args values, and here
+        # we sure that the type is always going to be List[SubtitledHtml]
+        # because 'MultipleChoiceInput' cust. arg objects always contain
+        # 'choices' key with List[SubtitledHtml] types of values.
+        choices = cast(
+            List[SubtitledHtml],
+            self.customization_args['choices'].value
+        )
+        self._validates_choices_should_be_unique_and_nonempty(choices)
+
+        for ans_group_index, answer_group in enumerate(self.answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group.rule_specs
+            ):
+                # Rule should not be duplicate.
+                if rule_spec.to_dict() in rule_spec_till_now and strict:
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' of answer group '
+                        f'\'{ans_group_index}\' of MultipleChoiceInput '
+                        f'interaction is already present.'
+                    )
+                rule_spec_till_now.append(rule_spec.to_dict())
+
+    def _validate_item_selec_input(self, strict: bool = False) -> None:
+        """Validates the ItemSelectionInput interaction.
+
+        Args:
+            strict: bool. If True, the exploration is assumed to be published.
+
+        Raises:
+            ValidationError. Duplicate rules are present.
+            ValidationError. The 'Equals' rule does not have value between min
+                and max number of selections.
+            ValidationError. Minimum number of selections value is greater
+                than maximum number of selections value.
+            ValidationError. Not enough choices to have minimum number of
+                selections.
+            ValidationError. Answer choices are empty or duplicate.
+        """
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'int', and here we are sure
+        # that the type is always going to be int because 'ItemInputSelection'
+        # customization args always contains 'minAllowableSelectionCount' key
+        # with int type of values.
+        min_value = cast(
+            int,
+            self.customization_args['minAllowableSelectionCount'].value
+        )
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'int', and here we are sure
+        # that the type is always going to be int because 'ItemInputSelection'
+        # customization args always contains 'maxAllowableSelectionCount' key
+        # with int type of values.
+        max_value = cast(
+            int,
+            self.customization_args['maxAllowableSelectionCount'].value
+        )
+        rule_spec_till_now: List[RuleSpecDict] = []
+
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'List[SubtitledHtml]',
+        # and here we are sure that the type is always going to be
+        # List[SubtitledHtml] because 'ItemInputSelection' customization
+        # args always contains 'choices' key with List[SubtitledHtml]
+        # type of values.
+        choices = cast(
+            List[SubtitledHtml], self.customization_args['choices'].value
+        )
+        self._validates_choices_should_be_unique_and_nonempty(choices)
+
+        # Minimum number of selections should be no greater than maximum
+        # number of selections.
+        if min_value > max_value:
+            raise utils.ValidationError(
+                f'Min value which is {str(min_value)} '
+                f'is greater than max value '
+                f'which is {str(max_value)} '
+                f'in ItemSelectionInput interaction.'
+            )
+
+        # There should be enough choices to have minimum number
+        # of selections.
+        if len(choices) < min_value:
+            raise utils.ValidationError(
+                f'Number of choices which is {str(len(choices))} '
+                f'is lesser than the '
+                f'min value selection which is {str(min_value)} '
+                f'in ItemSelectionInput interaction.'
+            )
+
+        for ans_group_index, answer_group in enumerate(self.answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group.rule_specs
+            ):
+                # Rule should not be duplicate.
+                if rule_spec.to_dict() in rule_spec_till_now and strict:
+                    raise utils.ValidationError(
+                        f'The rule {rule_spec_index} of answer group '
+                        f'{ans_group_index} of ItemSelectionInput interaction '
+                        f'is already present.'
+                    )
+                rule_spec_till_now.append(rule_spec.to_dict())
+
+                # `Equals` should have between min and max number of selections.
+                if rule_spec.rule_type == 'Equals':
+                    if (
+                        strict and
+                        (
+                            len(rule_spec.inputs['x']) < min_value or
+                            len(rule_spec.inputs['x']) > max_value
+                        )
+                    ):
+                        raise utils.ValidationError(
+                            f'Selected choices of rule \'{rule_spec_index}\' '
+                            f'of answer group \'{ans_group_index}\' '
+                            f'either less than min_selection_value '
+                            f'or greater than max_selection_value '
+                            f'in ItemSelectionInput interaction.'
+                        )
+
+    def _validate_drag_and_drop_input(self, strict: bool = False) -> None:
+        """Validates the DragAndDropInput interaction.
+
+        Args:
+            strict: bool. If True, the exploration is assumed to be published.
+
+        Raises:
+            ValidationError. Duplicate rules are present.
+            ValidationError. Multiple items at the same place when the setting
+                is turned off.
+            ValidationError. The 'IsEqualToOrderingWithOneItemAtIncorrect
+                Position' rule present when 'multiple items at same place'
+                setting turned off.
+            ValidationError. In 'HasElementXBeforeElementY' rule, 'X' value
+                is equal to 'Y' value.
+            ValidationError. The 'IsEqualToOrdering' rule have empty values.
+            ValidationError. The 'IsEqualToOrdering' rule comes after
+                'HasElementXAtPositionY' where element 'X' is present at
+                position 'Y' in 'IsEqualToOrdering' rule.
+            ValidationError. Less than 2 items are present.
+            ValidationError. Answer choices are empty or duplicate.
+        """
+        multi_item_value = (
+            self.customization_args
+            ['allowMultipleItemsInSamePosition'].value)
+        ele_x_at_y_rules = []
+        rule_spec_till_now: List[RuleSpecDict] = []
+        equal_ordering_one_at_incorec_posn = []
+
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'List[SubtitledHtml]',
+        # and here we are sure that the type is always going to be
+        # List[SubtitledHtml] because 'DragAndDrop' customization
+        # args always contains 'choices' key with List[SubtitledHtml]
+        # type of values.
+        choices = cast(
+            List[SubtitledHtml],
+            self.customization_args['choices'].value
+        )
+        if len(choices) < 2:
+            raise utils.ValidationError(
+                'There should be atleast 2 values inside DragAndDrop '
+                'interaction.'
+            )
+
+        self._validates_choices_should_be_unique_and_nonempty(choices)
+
+        for ans_group_index, answer_group in enumerate(self.answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group.rule_specs
+            ):
+                # Rule should not be duplicate.
+                if rule_spec.to_dict() in rule_spec_till_now and strict:
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' of answer group '
+                        f'\'{ans_group_index}\' of DragAndDropInput '
+                        f'interaction is already present.'
+                    )
+                rule_spec_till_now.append(rule_spec.to_dict())
+
+                if (
+                    strict and
+                    not multi_item_value and (
+                    rule_spec.rule_type ==
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition')
+                ):
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' '
+                        f'of answer group \'{ans_group_index}\' '
+                        f'having rule type - IsEqualToOrderingWith'
+                        f'OneItemAtIncorrectPosition should not '
+                        f'be there when the '
+                        f'multiple items in same position '
+                        f'setting is turned off '
+                        f'in DragAndDropSortInput interaction.'
+                    )
+
+                # Multiple items cannot be in the same place iff the
+                # `allow multiple items at same place` setting is turned off.
+                if not multi_item_value and strict:
+                    for ele in rule_spec.inputs['x']:
+                        if len(ele) > 1:
+                            raise utils.ValidationError(
+                                f'The rule \'{rule_spec_index}\' of '
+                                f'answer group \'{ans_group_index}\' '
+                                f'have multiple items at same place '
+                                f'when multiple items in same '
+                                f'position settings is turned off '
+                                f'in DragAndDropSortInput interaction.'
+                            )
+
+                if (
+                    rule_spec.rule_type == 'HasElementXBeforeElementY' and
+                    rule_spec.inputs['x'] == rule_spec.inputs['y'] and
+                    strict
+                ):
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_index}\' of '
+                        f'answer group \'{ans_group_index}\', '
+                        f'the value 1 and value 2 cannot be '
+                        f'same when rule type is '
+                        f'HasElementXBeforeElementY '
+                        f'of DragAndDropSortInput interaction.'
+                    )
+
+                if rule_spec.rule_type == 'HasElementXAtPositionY':
+                    element = rule_spec.inputs['x']
+                    position = rule_spec.inputs['y']
+                    ele_x_at_y_rules.append(
+                        {'element': element, 'position': position}
+                    )
+
+                if (
+                    rule_spec.rule_type ==
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                ):
+                    equal_ordering_one_at_incorec_posn.append(
+                        rule_spec.inputs['x']
+                    )
+
+                if rule_spec.rule_type == 'IsEqualToOrdering':
+                    # `IsEqualToOrdering` rule should not have empty values.
+                    if len(rule_spec.inputs['x']) <= 0:
+                        raise utils.ValidationError(
+                            f'The rule \'{rule_spec_index}\'of '
+                            f'answer group \'{ans_group_index}\', '
+                            f'having rule type IsEqualToOrdering '
+                            f'should not have empty values.'
+                        )
+                    if strict:
+                        # `IsEqualToOrdering` rule should always come before
+                        # `HasElementXAtPositionY` where element `X` is present
+                        # at position `Y` in `IsEqualToOrdering` rule.
+                        for ele in ele_x_at_y_rules:
+                            ele_position = ele['position']
+                            ele_element = ele['element']
+
+                            if ele_position > len(rule_spec.inputs['x']):
+                                continue
+
+                            rule_choice = rule_spec.inputs['x'][
+                                ele_position - 1]
+                            for choice in rule_choice:
+                                if choice == ele_element:
+                                    raise utils.ValidationError(
+                                        f'Rule - {rule_spec_index} of '
+                                        f'answer group {ans_group_index} '
+                                        f'will never be match '
+                                        f'because it is made redundant by the '
+                                        f'HasElementXAtPositionY rule above.'
+                                    )
+                        # `IsEqualToOrdering` should always come before
+                        # `IsEqualToOrderingWithOneItemAtIncorrectPosition` when
+                        # they are off by one value.
+                        item_to_layer_idx = {}
+                        for layer_idx, layer in enumerate(
+                            rule_spec.inputs['x']
+                        ):
+                            for item in layer:
+                                item_to_layer_idx[item] = layer_idx
+
+                        for ele in equal_ordering_one_at_incorec_posn:
+                            wrong_positions = 0
+                            for layer_idx, layer in enumerate(ele):
+                                for item in layer:
+                                    if layer_idx != item_to_layer_idx[item]:
+                                        wrong_positions += 1
+                            if wrong_positions <= 1:
+                                raise utils.ValidationError(
+                                    f'Rule - {rule_spec_index} of answer '
+                                    f'group {ans_group_index} will never '
+                                    f'be match because it is made '
+                                    f'redundant by the IsEqualToOrdering'
+                                    f'WithOneItemAtIncorrectPosition '
+                                    f'rule above.'
+                                )
+
+    def _validate_text_input(self, strict: bool = False) -> None:
+        """Validates the TextInput interaction.
+
+        Args:
+            strict: bool. If True, the exploration is assumed to be published.
+
+        Raises:
+            ValidationError. Text input height is not >= 1 and <= 10.
+            ValidationError. Duplicate rules are present.
+            ValidationError. The 'Contains' rule comes before another 'Contains'
+                rule, where 'Contains' rule string is a substring of other
+                rules string.
+            ValidationError. The 'Contains' rule comes before 'StartsWith'
+                rule, where 'Contains' rule string is a substring of other
+                rules string.
+            ValidationError. The 'Contains' rule comes before 'Equals'
+                rule, where 'Contains' rule string is a substring of other
+                rules string.
+            ValidationError. The 'StartsWith' rule comes before the 'Equals'
+                rule where the 'StartsWith' rule string is a prefix of other
+                rules string.
+            ValidationError. The 'StartsWith' rule comes before the another
+                'StartsWith' rule where the 'StartsWith' rule string is
+                a prefix of other rules string.
+        """
+        rule_spec_till_now: List[RuleSpecDict] = []
+        seen_strings_contains: List[List[str]] = []
+        seen_strings_startswith: List[List[str]] = []
+
+        # Here we use cast because we are narrowing down the type from
+        # various allowed cust. arg types to 'int', and here we are sure
+        # that the type is always going to be int because 'TextInput'
+        # customization args always contain 'rows' key with int type
+        # of values.
+        rows_value = cast(int, self.customization_args['rows'].value)
+        if rows_value < 1 or rows_value > 10:
+            raise utils.ValidationError(
+                'Rows value in Text interaction should be between 1 and 10.'
+            )
+
+        for ans_group_idx, answer_group in enumerate(self.answer_groups):
+            for rule_spec_idx, rule_spec in enumerate(answer_group.rule_specs):
+                # Rule should not be duplicate.
+                if rule_spec.to_dict() in rule_spec_till_now and strict:
+                    raise utils.ValidationError(
+                        f'The rule \'{rule_spec_idx}\' of answer group '
+                        f'\'{ans_group_idx}\' of TextInput interaction '
+                        f'is already present.'
+                    )
+                rule_spec_till_now.append(rule_spec.to_dict())
+
+                if rule_spec.rule_type == 'Contains':
+                    if not strict:
+                        continue
+                    rule_values = rule_spec.inputs['x']['normalizedStrSet']
+                    # `Contains` should always come after another
+                    # `Contains` rule where the first contains rule
+                    # strings is a substring of the other contains
+                    # rule strings.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    raise utils.ValidationError(
+                                        f'Rule - \'{rule_spec_idx}\' of answer '
+                                        f'group - \'{ans_group_idx}\' having '
+                                        f'rule type \'{rule_spec.rule_type}\' '
+                                        f'will never be matched because it '
+                                        f'is made redundant by the above '
+                                        f'\'contains\' rule.'
+                                    )
+
+                    seen_strings_contains.append(
+                        rule_spec.inputs['x']['normalizedStrSet'])
+
+                if rule_spec.rule_type == 'StartsWith':
+                    if not strict:
+                        continue
+                    rule_values = rule_spec.inputs['x']['normalizedStrSet']
+                    # `StartsWith` rule should always come after another
+                    # `StartsWith` rule where the first starts-with string
+                    # is the prefix of the other starts-with string.
+                    for start_with_rule_ele in seen_strings_startswith:
+                        for start_with_rule_string in start_with_rule_ele:
+                            for rule_value in rule_values:
+                                if rule_value.startswith(
+                                    start_with_rule_string
+                                ):
+                                    raise utils.ValidationError(
+                                        f'Rule - \'{rule_spec_idx}\' of answer '
+                                        f'group - \'{ans_group_idx}\' having '
+                                        f'rule type \'{rule_spec.rule_type}\' '
+                                        f'will never be matched because it '
+                                        f'is made redundant by the above '
+                                        f'\'StartsWith\' rule.'
+                                    )
+
+                    # `Contains` should always come after `StartsWith` rule
+                    # where the contains rule strings is a substring
+                    # of the `StartsWith` rule string.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    raise utils.ValidationError(
+                                        f'Rule - \'{rule_spec_idx}\' of answer '
+                                        f'group - \'{ans_group_idx}\' having '
+                                        f'rule type \'{rule_spec.rule_type}\' '
+                                        f'will never be matched because it '
+                                        f'is made redundant by the above '
+                                        f'\'contains\' rule.'
+                                    )
+
+                    seen_strings_startswith.append(rule_values)
+
+                if rule_spec.rule_type == 'Equals':
+                    if not strict:
+                        continue
+                    rule_values = rule_spec.inputs['x']['normalizedStrSet']
+                    # `Contains` should always come after `Equals` rule
+                    # where the contains rule strings is a substring
+                    # of the `Equals` rule string.
+                    for contain_rule_ele in seen_strings_contains:
+                        for contain_rule_string in contain_rule_ele:
+                            for rule_value in rule_values:
+                                if contain_rule_string in rule_value:
+                                    raise utils.ValidationError(
+                                        f'Rule - \'{rule_spec_idx}\' of answer '
+                                        f'group - \'{ans_group_idx}\' having '
+                                        f'rule type \'{rule_spec.rule_type}\' '
+                                        f'will never be matched because it '
+                                        f'is made redundant by the above '
+                                        f'\'contains\' rule.'
+                                    )
+
+                    # `Startswith` should always come after the `Equals`
+                    # rule where a `starts-with` string is a prefix of the
+                    # `Equals` rule's string.
+                    for start_with_rule_ele in seen_strings_startswith:
+                        for start_with_rule_string in start_with_rule_ele:
+                            for rule_value in rule_values:
+                                if rule_value.startswith(
+                                    start_with_rule_string
+                                ):
+                                    raise utils.ValidationError(
+                                        f'Rule - \'{rule_spec_idx}\' of answer '
+                                        f'group - \'{ans_group_idx}\' having '
+                                        f'rule type \'{rule_spec.rule_type}\' '
+                                        f'will never be matched because it '
+                                        f'is made redundant by the above '
+                                        f'\'StartsWith\' rule.'
+                                    )
+
     def validate(
-        self, exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
+        self,
+        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
+        *,
+        tagged_skill_misconception_id_required: bool = False,
+        strict: bool = False
     ) -> None:
         """Validates various properties of the InteractionInstance.
 
@@ -926,6 +2034,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 the exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property(obj_type).
                 Is used to validate AnswerGroup objects.
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
+            strict: bool. Tells if the validation is strict or not.
 
         Raises:
             ValidationError. One or more attributes of the InteractionInstance
@@ -957,9 +2068,15 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if self.is_terminal and self.answer_groups:
             raise utils.ValidationError(
                 'Terminal interactions must not have any answer groups.')
+        if self.is_linear and self.answer_groups:
+            raise utils.ValidationError(
+                'Linear interactions must not have any answer groups.')
 
         for answer_group in self.answer_groups:
-            answer_group.validate(interaction, exp_param_specs_dict)
+            answer_group.validate(
+                interaction, exp_param_specs_dict,
+                tagged_skill_misconception_id_required=(
+                    tagged_skill_misconception_id_required))
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
@@ -973,9 +2090,32 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if self.solution:
             self.solution.validate(self.id)
 
-        if self.solution and not self.hints:
-            raise utils.ValidationError(
-                'Hint(s) must be specified if solution is specified')
+        # TODO(#16236): Find a way to encode these checks more declaratively.
+        # Conceptually the validation code should go in each interaction
+        # and as inside the interaction the code is very declarative we need
+        # to figure out a way to put these validations following the
+        # same format.
+        # TODO(#16490): Move the validations with strict mode together in every
+        # interaction.
+        interaction_id_to_strict_validation_func = {
+            'NumericInput': self._validate_numeric_input,
+            'FractionInput': self._validate_fraction_input,
+            'NumberWithUnits': self._validate_number_with_units_input,
+            'MultipleChoiceInput': self._validate_multi_choice_input,
+            'ItemSelectionInput': self._validate_item_selec_input,
+            'DragAndDropSortInput': self._validate_drag_and_drop_input,
+            'TextInput': self._validate_text_input
+        }
+        interaction_id_to_non_strict_validation_func = {
+            'Continue': self._validate_continue_interaction,
+            'EndExploration': self._validate_end_interaction
+        }
+
+        if self.id in interaction_id_to_strict_validation_func:
+            interaction_id_to_strict_validation_func[self.id](strict)
+
+        elif self.id in interaction_id_to_non_strict_validation_func:
+            interaction_id_to_non_strict_validation_func[self.id]()
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
@@ -1101,11 +2241,21 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                         if (
                                 html_type ==
                                 feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
-                            for value in self.solution.correct_answer:
-                                html_list += value
+                            # Here we use cast because above 'if' clause forces
+                            # 'correct_answer' to be of type List[List[str]].
+                            list_of_set_of_html_answer = cast(
+                                List[List[str]], self.solution.correct_answer
+                            )
+                            for set_of_html_value in list_of_set_of_html_answer:
+                                html_list += set_of_html_value
                         elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
-                            for value in self.solution.correct_answer:
-                                html_list += [value]
+                            # Here we use cast because above 'elif' clause
+                            # forces 'correct_answer' to be of type List[str].
+                            set_of_html_answer = cast(
+                                List[str], self.solution.correct_answer
+                            )
+                            for html_value in set_of_html_answer:
+                                html_list += [html_value]
                         else:
                             raise Exception(
                                 'The solution does not have a valid '
@@ -1119,7 +2269,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     @staticmethod
     def convert_html_in_interaction(
         interaction_dict: InteractionInstanceDict,
-        ca_specs_dict: List[base.CustomizationArgSpecsDict],
+        ca_specs_dict: List[domain.CustomizationArgSpecsDict],
         conversion_fn: Callable[[str], str]
     ) -> InteractionInstanceDict:
         """Checks for HTML fields in the interaction and converts it
@@ -1209,7 +2359,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             dict. A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
-        if interaction_id is None:
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        interaction_id_is_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_valid or interaction_id is None:
             return {}
 
         ca_specs_dict = (
@@ -1233,10 +2387,12 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     SubtitledHtml dict or SubtitledUnicode dict.
     """
 
-    # Here we use type Any because values in schema dictionary can be of type
-    # str, List, Dict and other types too.
     def __init__(
-        self, value: Union[str, Dict[str, str]], schema: Dict[str, Any]
+        self,
+        value: UnionOfCustomizationArgsDictValues,
+        schema: Dict[
+            str, Union[SubtitledHtmlDict, SubtitledUnicodeDict, str]
+        ]
     ) -> None:
         """Initializes a InteractionCustomizationArg domain object.
 
@@ -1279,11 +2435,9 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                 subtitled_unicode.unicode_str)
         return translatable_contents_collection
 
-    # Here we use type Any because this method returns the values of
-    # customization args and that values can be of type str, int, bool,
-    # List and other types too. So to make the return type generalize
-    # for every type of values, we used Any here.
-    def to_customization_arg_dict(self) -> Dict[str, Any]:
+    def to_customization_arg_dict(self) -> Dict[
+        str, UnionOfCustomizationArgsDictValues
+    ]:
         """Converts a InteractionCustomizationArgument domain object to a
         customization argument dictionary. This is done by
         traversing the customization argument schema, and converting
@@ -1332,7 +2486,9 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     # types too.
     @classmethod
     def from_customization_arg_dict(
-        cls, ca_dict: CustomizationArgsDictType, ca_schema: Dict[str, Any]
+        cls,
+        ca_dict: Dict[str, UnionOfCustomizationArgsDictValues],
+        ca_schema: Dict[str, Any]
     ) -> InteractionCustomizationArg:
         """Converts a customization argument dictionary to an
         InteractionCustomizationArgument domain object. This is done by
@@ -1470,17 +2626,15 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             validate_html
         )
 
-    # TODO(#15982): Here we use type Any because `value` argument can accept
-    # values of customization arg and that values can be of type Dict[Dict[..]],
-    # str, int, bool and other types too, and for argument `schema` we used Any
-    # type because values in schema dictionary can be of type str, List, Dict
-    # and other types too.
+    # Here we use type Any because the argument `schema` can accept
+    # schema dicts and those schema dictionaries can have nested dict
+    # structure.
     @staticmethod
     def traverse_by_schema_and_convert(
         schema: Dict[str, Any],
-        value: Any,
+        value: _GenericCustomizationArgType,
         conversion_fn: AcceptableConversionFnType
-    ) -> Any:
+    ) -> _GenericCustomizationArgType:
         """Helper function that recursively traverses an interaction
         customization argument spec to locate any SubtitledHtml or
         SubtitledUnicode objects, and applies a conversion function to the
@@ -1510,9 +2664,15 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
 
         if is_subtitled_html_spec or is_subtitled_unicode_spec:
-            value = conversion_fn(value, schema['obj_type'])
+            # Here we use MyPy ignore because here we are assigning
+            # Optional[str] type to generic type variable, and passing
+            # generic variable to conversion function.
+            value = conversion_fn(value, schema['obj_type'])  # type: ignore[assignment, arg-type]
         elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
-            value = [
+            assert isinstance(value, list)
+            # Here we use MyPy ignore because here we are assigning List type
+            # to generic type variable.
+            value = [  # type: ignore[assignment]
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
                     schema['items'],
                     value_element,
@@ -1520,6 +2680,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
                 ) for value_element in value
             ]
         elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
+            assert isinstance(value, dict)
             for property_spec in schema['properties']:
                 name = property_spec['name']
                 value[name] = (
@@ -1598,7 +2759,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
     @staticmethod
     def convert_cust_args_dict_to_cust_args_based_on_specs(
         ca_dict: CustomizationArgsDictType,
-        ca_specs_dict: List[base.CustomizationArgSpecsDict]
+        ca_specs_dict: List[domain.CustomizationArgSpecsDict]
     ) -> Dict[str, InteractionCustomizationArg]:
         """Converts customization arguments dictionary to customization
         arguments. This is done by converting each customization argument to a
@@ -1731,18 +2892,27 @@ class Outcome(translation_domain.BaseTranslatableObject):
             'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # outcome is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
-    def from_dict(cls, outcome_dict: OutcomeDict) -> Outcome:
+    def from_dict(
+        cls, outcome_dict: OutcomeDict, validate: bool = True
+    ) -> Outcome:
         """Return a Outcome domain object from a dict.
 
         Args:
             outcome_dict: dict. The dict representation of Outcome object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             Outcome. The corresponding Outcome domain object.
         """
         feedback = SubtitledHtml.from_dict(outcome_dict['feedback'])
-        feedback.validate()
+        if validate:
+            feedback.validate()
         return cls(
             outcome_dict['dest'],
             outcome_dict['dest_if_really_stuck'],
@@ -2044,13 +3214,22 @@ class WrittenTranslation:
         translatable_obj_class = (
             translatable_object_registry.Registry.get_object_class(
                 translatable_class_name))
-        self.translation = translatable_obj_class.normalize_value(  # type: ignore[no-untyped-call]
+        self.translation = translatable_obj_class.normalize_value(
             self.translation)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
+
+        # Validate translations.
+        if self.data_format == 'html':
+            # Ruling out the possibility of different types for mypy
+            # type checking.
+            assert isinstance(self.translation, str)
+            html_cleaner.validate_rte_tags(self.translation)
+            html_cleaner.validate_tabs_and_collapsible_rte_tags(
+                self.translation)
 
 
 class WrittenTranslationsDict(TypedDict):
@@ -2652,7 +3831,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
 
     def validate(
         self,
-        rule_params_list: List[Tuple[str, objects.BaseObject]],
+        rule_params_list: List[Tuple[str, Type[objects.BaseObject]]],
         exp_param_specs_dict: Dict[str, param_domain.ParamSpec]
     ) -> None:
         """Validates a RuleSpec value object. It ensures the inputs dict does
@@ -2721,7 +3900,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
             else:
                 # Otherwise, a simple parameter value needs to be normalizable
                 # by the parameter object in order to be valid.
-                param_obj.normalize(param_value)  # type: ignore[no-untyped-call]
+                param_obj.normalize(param_value)
 
     @staticmethod
     def convert_html_in_rule_spec(
@@ -2918,6 +4097,9 @@ class SubtitledHtml:
                 'Invalid content HTML: %s' % self.html)
 
         self.html = html_cleaner.clean(self.html)
+
+        html_cleaner.validate_rte_tags(self.html)
+        html_cleaner.validate_tabs_and_collapsible_rte_tags(self.html)
 
     @classmethod
     def create_default_subtitled_html(cls, content_id: str) -> SubtitledHtml:
@@ -3209,8 +4391,11 @@ class State(translation_domain.BaseTranslatableObject):
 
     def validate(
         self,
-        exp_param_specs_dict: Dict[str, param_domain.ParamSpec],
-        allow_null_interaction: bool
+        exp_param_specs_dict: Optional[Dict[str, param_domain.ParamSpec]],
+        allow_null_interaction: bool,
+        *,
+        tagged_skill_misconception_id_required: bool = False,
+        strict: bool = False
     ) -> None:
         """Validates various properties of the State.
 
@@ -3222,11 +4407,18 @@ class State(translation_domain.BaseTranslatableObject):
                 question.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
+            tagged_skill_misconception_id_required: bool. The 'tagged_skill_
+                misconception_id' is required or not.
+            strict: bool. Tells if the exploration is strict or not.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.
         """
         self.content.validate()
+        if exp_param_specs_dict:
+            param_specs_dict = exp_param_specs_dict
+        else:
+            param_specs_dict = {}
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
@@ -3239,7 +4431,11 @@ class State(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         if self.interaction.id is not None:
-            self.interaction.validate(exp_param_specs_dict)
+            self.interaction.validate(
+                param_specs_dict,
+                tagged_skill_misconception_id_required=(
+                    tagged_skill_misconception_id_required),
+                strict=strict)
 
         content_id_list = []
         content_id_list.append(self.content.content_id)
@@ -3253,7 +4449,7 @@ class State(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group.rule_specs:
                 for param_name, value in rule_spec.inputs.items():
                     param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+                        interaction_registry.Registry.get_interaction_by_id(
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
@@ -3629,7 +4825,7 @@ class State(translation_domain.BaseTranslatableObject):
                 for rule_spec in answer_group.rule_specs:
                     for param_name, value in rule_spec.inputs.items():
                         param_type = (
-                            interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+                            interaction_registry.Registry.get_interaction_by_id(
                                 self.interaction.id
                             ).get_rule_param_type(
                                 rule_spec.rule_type, param_name))
@@ -3653,25 +4849,39 @@ class State(translation_domain.BaseTranslatableObject):
         """
         self.next_content_id_index = next_content_id_index
 
-    def update_linked_skill_id(self, linked_skill_id: str) -> None:
+    def update_linked_skill_id(self, linked_skill_id: Optional[str]) -> None:
         """Update the state linked skill id attribute.
 
         Args:
-            linked_skill_id: str. The linked skill id to state.
+            linked_skill_id: str|None. The linked skill id to state.
         """
         self.linked_skill_id = linked_skill_id
 
     def update_interaction_customization_args(
-        self, customization_args_dict: CustomizationArgsDictType
+        self,
+        customization_args_mapping: Mapping[
+            str, Mapping[str, UnionOfCustomizationArgsDictValues]
+        ]
     ) -> None:
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args_dict: dict. The new customization_args to set.
+            customization_args_mapping: dict. The new customization_args to set.
 
         Raises:
             Exception. The customization arguments are not unique.
         """
+        # Here we use cast because for argument 'customization_args_mapping'
+        # we have used Mapping type because we want to allow
+        # 'update_interaction_customization_args' method to accept different
+        # subtypes of customization_arg dictionaries, but the problem with
+        # Mapping is that the Mapping does not allow to update(or set) values
+        # because Mapping is a read-only type. To overcome this issue, we
+        # narrowed down the type from Mapping to Dict by using cast so that
+        # while updating or setting a new value MyPy will not throw any error.
+        customization_args_dict = cast(
+            CustomizationArgsDictType, customization_args_mapping
+        )
         customization_args = (
             InteractionInstance.
             convert_customization_args_dict_to_customization_args(
@@ -3725,7 +4935,7 @@ class State(translation_domain.BaseTranslatableObject):
             for rule_spec in answer_group.rule_specs:
                 for param_name, value in rule_spec.inputs.items():
                     param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+                        interaction_registry.Registry.get_interaction_by_id(
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
@@ -3754,7 +4964,7 @@ class State(translation_domain.BaseTranslatableObject):
                         % rule_inputs)
                 for param_name, value in rule_inputs.items():
                     param_type = (
-                        interaction_registry.Registry.get_interaction_by_id(  # type: ignore[no-untyped-call]
+                        interaction_registry.Registry.get_interaction_by_id(
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
@@ -4027,9 +5237,11 @@ class State(translation_domain.BaseTranslatableObject):
             subtitled_htmls = ca_dict.get_subtitled_html()
             for subtitled_html in subtitled_htmls:
                 html_string = subtitled_html.html
-                # Make sure we don't include content that only consists of
-                # numbers. See issue #13055.
-                if html_string != '' and not html_string.isnumeric():
+                stripped_html_string = html_cleaner.strip_html_tags(html_string)
+                if (
+                    stripped_html_string != '' and
+                    not stripped_html_string.isnumeric()
+                ):
                     content_id_to_translatable_item[
                         subtitled_html.content_id
                     ] = TranslatableItem(
@@ -4111,23 +5323,31 @@ class State(translation_domain.BaseTranslatableObject):
             'next_content_id_index': self.next_content_id_index
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all Question
+    # states by writing a migration and audit job. As the validation for
+    # states is common between Exploration and Question and the Question
+    # data is not yet migrated, we do not want to call the validations
+    # while we load the Question.
     @classmethod
-    def from_dict(cls, state_dict: StateDict) -> State:
+    def from_dict(cls, state_dict: StateDict, validate: bool = True) -> State:
         """Return a State domain object from a dict.
 
         Args:
             state_dict: dict. The dict representation of State object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             State. The corresponding State domain object.
         """
         content = SubtitledHtml.from_dict(state_dict['content'])
-        content.validate()
+        if validate:
+            content.validate()
         return cls(
             content,
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
-            InteractionInstance.from_dict(state_dict['interaction']),
+            InteractionInstance.from_dict(
+                state_dict['interaction'], validate=validate),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['solicit_answer_details'],
@@ -4233,19 +5453,11 @@ class State(translation_domain.BaseTranslatableObject):
                 Hint.convert_html_in_hint(hint, conversion_fn))
 
         interaction_id = state_dict['interaction']['id']
-        if interaction_id is None:
-            return state_dict
-
-        # TODO(#11950): Drop the following 'if' clause once all snapshots have
-        # been migrated. This is currently causing issues in migrating old
-        # snapshots to schema v34 because MathExpressionInput was still around
-        # at the time. It is conceptually OK to ignore customization args here
-        # because the MathExpressionInput has no customization arg fields.
-        if interaction_id == 'MathExpressionInput':
-            if state_dict['interaction']['solution'] is not None:
-                state_dict['interaction']['solution']['explanation']['html'] = (
-                    conversion_fn(state_dict['interaction']['solution'][
-                        'explanation']['html']))
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        interaction_id_is_valid = interaction_id not in all_interaction_ids
+        if interaction_id_is_valid or interaction_id is None:
             return state_dict
 
         if state_dict['interaction']['solution'] is not None:
@@ -4289,14 +5501,20 @@ class State(translation_domain.BaseTranslatableObject):
 
             if interaction_customization_arg_has_html:
                 if 'choices' in (
-                        state_dict['interaction']['customization_args'].keys()):
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value'] = ([
-                            conversion_fn(html)
-                            for html in state_dict[
-                                'interaction']['customization_args'][
-                                    'choices']['value']
-                        ])
+                    state_dict['interaction']['customization_args'].keys()
+                ):
+                    # Here we use cast because the above 'if' condition
+                    # forces every cust. args' 'choices' key to have type
+                    # Dict[str, List[str]].
+                    html_choices_ca_dict = cast(
+                        Dict[str, List[str]],
+                        state_dict['interaction']['customization_args'][
+                            'choices']
+                    )
+                    html_choices_ca_dict['value'] = ([
+                        conversion_fn(html)
+                        for html in html_choices_ca_dict['value']
+                    ])
         else:
             ca_specs_dict = (
                 interaction_registry.Registry
@@ -4397,3 +5615,30 @@ class StateVersionHistory:
             state_version_history_dict['state_name_in_previous_version'],
             state_version_history_dict['committer_id']
         )
+
+
+# Note: This union type depends on several classes like SubtitledHtml,
+# SubtitledHtmlDict, SubtitledUnicode and SubtitledUnicodeDict. So, it
+# has to be defined after those classes are defined, otherwise backend
+# tests will fail with 'module has no attribute' error.
+UnionOfCustomizationArgsDictValues = Union[
+    str,
+    int,
+    bool,
+    List[str],
+    List[SubtitledHtml],
+    List[SubtitledHtmlDict],
+    SubtitledHtmlDict,
+    SubtitledUnicode,
+    SubtitledUnicodeDict,
+    domain.ImageAndRegionDict,
+    domain.GraphDict
+]
+
+
+# Note: This Dict type depends on UnionOfCustomizationArgsDictValues so it
+# has to be defined after UnionOfCustomizationArgsDictValues is defined,
+# otherwise backend tests will fail with 'module has no attribute' error.
+CustomizationArgsDictType = Dict[
+    str, Dict[str, UnionOfCustomizationArgsDictValues]
+]

@@ -1,0 +1,33 @@
+<div class="modal-header">
+  <h3 *ngIf="prerequisiteTopics.length === 0">
+    Are you sure to delete {{topicName}} from the classroom?
+  </h3>
+  <h3 *ngIf="prerequisiteTopics.length > 0">
+    Can't perform topic deletion from the classroom.
+  </h3>
+</div>
+<div class="modal-body" *ngIf="prerequisiteTopics.length > 0">
+  <p>
+    The following
+    <span *ngIf="prerequisiteTopics.length > 1">topics</span>
+    <span *ngIf="prerequisiteTopics.length === 1">topic</span>
+    depends on {{ topicName }}.
+  </p>
+  <ul *ngFor="let topic of prerequisiteTopics">
+    <li>
+      <strong>{{topic}}</strong>
+    </li>
+  </ul>
+  <p>Please fix the above topics, then try to perform this operation.</p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary"
+          (click)="cancel()">
+    Cancel
+  </button>
+  <button class="btn btn-danger"
+          (click)="close()"
+          *ngIf="prerequisiteTopics.length === 0">
+    <span>Delete Topic</span>
+  </button>
+</div>

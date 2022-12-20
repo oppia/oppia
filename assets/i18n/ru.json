@@ -36,7 +36,7 @@
 	"I18N_ADD_NEW_SYLLABUS_CANCEL_BUTTON_TEXT": "Отмена",
 	"I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT": "Готово",
 	"I18N_ANDROID_PAGE_AVAILABLE_FOR_DOWNLOAD_TEXT": "доступно для скачивания.",
-	"I18N_ANDROID_PAGE_BETA_DESCRIPTION": "Бета-версия приложения для Android теперь доступна на <strong>английском</strong>, <strong>бразильском</strong> и <strong>португальском</strong> языках. Приложение бесплатное и не требует подписки.",
+	"I18N_ANDROID_PAGE_BETA_DESCRIPTION": "Бета-версия приложения для Android теперь доступна на <strong>английском</strong>,<br><strong>бразильском</strong> и <strong>португальском</strong> языках. Приложение бесплатное и<br>не требует подписки.",
 	"I18N_ANDROID_PAGE_CONSENT_CHECKBOX_LABEL": "Вы подтверждаете, что вам исполнилось 18 лет, или что у вас есть согласие и одобрение вашего родителя или опекуна.",
 	"I18N_ANDROID_PAGE_EMAIL_FIELD_LABEL": "Адрес электронной почты",
 	"I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER": "Образование<br>для каждого.",

@@ -69,7 +69,7 @@ export class StorySummaryTileComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private assetsBackendApiService: AssetsBackendApiService
+    private assetsBackendApiService: AssetsBackendApiService,
   ) {}
 
   checkTabletView(): boolean {

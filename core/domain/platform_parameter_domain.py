@@ -27,8 +27,8 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import Callable, Dict, List, Optional, Pattern, Union
-from typing_extensions import Final, TypedDict
+from typing import (
+    Callable, Dict, Final, List, Optional, Pattern, TypedDict, Union)
 
 
 class ServerMode(enum.Enum):
@@ -111,7 +111,7 @@ class EditRulesPlatformParameterCmd(PlatformParameterChange):
 class ClientSideContextDict(TypedDict):
     """Dictionary representing the client's side Context object."""
 
-    platform_type: str
+    platform_type: Optional[str]
     browser_type: Optional[str]
     app_version: Optional[str]
 
@@ -127,7 +127,7 @@ class EvaluationContext:
 
     def __init__(
         self,
-        platform_type: str,
+        platform_type: Optional[str],
         browser_type: Optional[str],
         app_version: Optional[str],
         server_mode: ServerMode
@@ -138,11 +138,11 @@ class EvaluationContext:
         self._server_mode = server_mode
 
     @property
-    def platform_type(self) -> str:
+    def platform_type(self) -> Optional[str]:
         """Returns platform type.
 
         Returns:
-            str. The platform type, e.g. 'Web', 'Android', 'Backend'.
+            str|None. The platform type, e.g. 'Web', 'Android', 'Backend'.
         """
         return self._platform_type
 

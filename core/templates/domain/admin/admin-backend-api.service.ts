@@ -499,6 +499,12 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateDummyClassroomDataAsync(): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_classroom'
+    });
+  }
+
   async reloadCollectionAsync(collectionId: string):
   Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {

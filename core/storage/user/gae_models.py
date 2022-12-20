@@ -27,8 +27,9 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, overload
-from typing_extensions import Final, Literal, TypedDict
+from typing import (
+    Dict, Final, List, Literal, Optional, Sequence, Tuple, TypedDict, Union,
+    overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1129,8 +1130,21 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.creator_ids == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(keys)
+        user_subscriptions_models: List[UserSubscriptionsModel] = list(
+            cls.query(
+                cls.creator_ids == user_id
+            ).fetch()
+        )
+
+        for user_subscribers_model in user_subscriptions_models:
+            user_subscribers_model.creator_ids.remove(user_id)
+
+        # Delete the references to this user from other user subscriptions
+        # models.
+        cls.update_timestamps_multi(user_subscriptions_models)
+        cls.put_multi(user_subscriptions_models)
+
+        # Delete the model for the user.
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -1146,8 +1160,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
         """
         return (
             cls.query(
-                cls.creator_ids == user_id).get(keys_only=True) is not None or
-            cls.get_by_id(user_id) is not None)
+                cls.creator_ids == user_id
+            ).get(keys_only=True) is not None or
+            cls.get_by_id(user_id) is not None
+        )
 
     @staticmethod
     def export_data(user_id: str) -> Dict[str, Union[List[str], float, None]]:
@@ -1216,8 +1232,18 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(keys)
+        user_subscribers_models: List[UserSubscribersModel] = list(cls.query(
+            cls.subscriber_ids == user_id
+        ).fetch())
+
+        for user_subscribers_model in user_subscribers_models:
+            user_subscribers_model.subscriber_ids.remove(user_id)
+
+        # Delete the references to this user from other user subscribers models.
+        cls.update_timestamps_multi(user_subscribers_models)
+        cls.put_multi(user_subscribers_models)
+
+        # Delete the model for the user.
         cls.delete_by_id(user_id)
 
     @classmethod

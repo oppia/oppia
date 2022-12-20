@@ -69,28 +69,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
-        ] = {
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>state customization arg html 2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>state customization arg html 4</p>'
+            }
+        ]
+        state_customization_args_dict: (
+            state_domain.CustomizationArgsDictType
+        ) = {
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>state customization arg html 1</p>'
-                    }, {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>state customization arg html 2</p>'
-                    }, {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>state customization arg html 3</p>'
-                    }, {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>state customization arg html 4</p>'
-                    }
-                ]
+                'value': choices_subtitled_dicts
             },
             'allowMultipleItemsInSamePosition': {
-                'value': False
+                'value': True
             }
         }
         state_answer_group = state_domain.AnswerGroup(
@@ -469,16 +470,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        state_interaction_cust_args: Dict[
-            str, Dict[str, Union[Dict[str, str], int]]
-        ] = {
+        state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
                     'unicode_str': ''
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         }
 
         state.update_next_content_id_index(3)
@@ -524,8 +524,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>init_state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>init_state customization arg html 2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>init_state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>init_state customization arg html 4</p>'
+            },
+        ]
         state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], int]]
+            str, Dict[str, Union[int, List[state_domain.SubtitledHtmlDict]]]
         ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
@@ -534,21 +549,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': 1
             },
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>init_state customization arg html 1</p>'
-                    }, {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>init_state customization arg html 2</p>'
-                    }, {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>init_state customization arg html 3</p>'
-                    }, {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>init_state customization arg html 4</p>'
-                    },
-                ]
+                'value': choices_subtitled_dicts
             }
         }
         state_answer_group = state_domain.AnswerGroup(
@@ -765,13 +766,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         state.update_interaction_id('ItemSelectionInput')
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected content id to be a string, received None'
         ):
             state.update_interaction_customization_args(
-                state_customization_args_dict)
+                state_customization_args_dict) # type: ignore[arg-type]
 
     def test_rule_spec_with_html_having_invalid_input_variable(self) -> None:
         """Test the method for extracting all the HTML from a state
@@ -797,8 +801,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
+
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>init_state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>init_state customization arg html 2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>init_state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>init_state customization arg html 4</p>'
+            }
+        ]
+
         state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], int]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], int]]
         ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
@@ -807,21 +828,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'value': 1
             },
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>init_state customization arg html 1</p>'
-                    }, {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>init_state customization arg html 2</p>'
-                    }, {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>init_state customization arg html 3</p>'
-                    }, {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>init_state customization arg html 4</p>'
-                    }
-                ]
+                'value': choices_subtitled_dicts
             }
         }
 
@@ -867,25 +874,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>state customization arg html 2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>state customization arg html 4</p>'
+            }
+        ]
         state_customization_args_dict: Dict[
-            str, Dict[str, Union[List[Dict[str, str]], bool]]
+            str, Dict[str, Union[List[state_domain.SubtitledHtmlDict], bool]]
         ] = {
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '<p>state customization arg html 1</p>'
-                    }, {
-                        'content_id': 'ca_choices_1',
-                        'html': '<p>state customization arg html 2</p>'
-                    }, {
-                        'content_id': 'ca_choices_2',
-                        'html': '<p>state customization arg html 3</p>'
-                    }, {
-                        'content_id': 'ca_choices_3',
-                        'html': '<p>state customization arg html 4</p>'
-                    }
-                ]
+                'value': choices_subtitled_dicts
             },
             'allowMultipleItemsInSamePosition': {
                 'value': False
@@ -1436,7 +1444,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }))
         init_state.update_interaction_id('TextInput')
         state_interaction_cust_args: Dict[
-            str, Dict[str, Union[Dict[str, str], int]]
+            str, Dict[str, Union[state_domain.SubtitledUnicodeDict, int]]
         ] = {
             'placeholder': {
                 'value': {
@@ -1444,7 +1452,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': 'Placeholder'
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         }
         init_state.update_interaction_customization_args(
             state_interaction_cust_args)
@@ -1626,25 +1635,36 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }))
         # Set the multiple choice interaction.
         init_state.update_interaction_id('MultipleChoiceInput')
+
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '\u003cp\u003eoption 1\u003c/p\u003e'
+            },
+            {
+                'content_id': 'ca_choices_1',
+                'html': '1,000'
+            },
+            {
+                'content_id': 'ca_choices_2',
+                'html': '100'
+            },
+            {
+                'content_id': 'ca_choices_3',
+                'html': '<p>1,000</p>'
+            },
+            {
+                'content_id': 'ca_choices_4',
+                'html': '<p>100</p>'
+            }
+        ]
+
         state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
             'showChoicesInShuffledOrder': {
                 'value': True
             },
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': '\u003cp\u003eoption 1\u003c/p\u003e'
-                    },
-                    {
-                        'content_id': 'ca_choices_1',
-                        'html': '1,000'
-                    },
-                    {
-                        'content_id': 'ca_choices_2',
-                        'html': '100'
-                    }
-                ]
+                'value': choices_subtitled_dicts
             }
         }
         init_state.update_interaction_customization_args(
@@ -1663,14 +1683,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {},
                 'ca_choices_0': {},
                 'ca_choices_1': {},
-                'ca_choices_2': {}
+                'ca_choices_2': {},
+                'ca_choices_3': {},
+                'ca_choices_4': {}
             }
         }
         written_translations = state_domain.WrittenTranslations.from_dict(
             written_translations_dict)
         init_state.update_written_translations(written_translations)
 
-        # Choice 2 should not be returned as its value is numeric.
+        # Choice 2 and 4 should not be returned as its value is numeric.
         content_id_mapping_needing_translations = (
             init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
@@ -1691,6 +1713,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ].content, '1,000')
         self.assertFalse(
             'ca_choices_2' in content_id_mapping_needing_translations)
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_3'
+            ].content, '<p>1,000</p>')
+        self.assertFalse(
+            'ca_choices_4' in content_id_mapping_needing_translations)
 
     def test_content_id_existance_checks_work_correctly(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -2064,6 +2092,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': html_with_old_math_schema
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>4</p>'
+            }
+        ]
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
@@ -2095,19 +2138,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [{
-                            'content_id': 'ca_choices_0',
-                            'html': html_with_old_math_schema
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
-                        }, {
-                            'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
-                        }]
+                        'value': choices_subtitled_dicts
                     },
                     'allowMultipleItemsInSamePosition': {'value': True}
                 },
@@ -2334,6 +2365,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': '<p>init_state customization arg html 1</p>'
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': html_with_old_math_schema
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>init_state customization arg html 3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>init_state customization arg html 4</p>'
+            }
+        ]
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
@@ -2384,19 +2430,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     },
                     'choices': {
-                        'value': [{
-                            'content_id': 'ca_choices_0',
-                            'html': '<p>init_state customization arg html 1</p>'
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': html_with_old_math_schema
-                        }, {
-                            'content_id': 'ca_choices_2',
-                            'html': '<p>init_state customization arg html 3</p>'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': '<p>init_state customization arg html 4</p>'
-                        }]
+                        'value': choices_subtitled_dicts
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -2599,6 +2633,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],
@@ -2666,189 +2703,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'content_id': 'ca_placeholder_0',
                             'unicode_str': ''
                         }
+                    },
+                    'catchMisspellings': {
+                        'value': False
                     }
                 },
                 'confirmed_unclassified_answers': [],
                 'id': 'TextInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_new_math_schema
-                        }
-                    },
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_new_math_schema
-                        }
-                    }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
-        }
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict_with_old_math_schema,
-                html_validation_service.
-                add_math_content_to_math_rte_components),
-            state_dict_with_new_math_schema)
-
-    def test_convert_html_fields_in_state_with_math_expression_input(
-        self
-    ) -> None:
-        """Test the method for converting all the HTML in a state having
-        MathExpressionInput interaction.
-        """
-        html_with_old_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
-        html_with_new_math_schema = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
-        answer_group_with_old_math_schema: state_domain.AnswerGroupDict = {
-            'outcome': {
-                'dest': 'Introduction',
-                'dest_if_really_stuck': None,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': html_with_old_math_schema
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Equals'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        answer_group_with_new_math_schema = {
-            'outcome': {
-                'dest': 'Introduction',
-                'dest_if_really_stuck': None,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': html_with_new_math_schema
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Equals'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-
-        state_dict_with_old_math_schema: state_domain.StateDict = {
-            'content': {
-                'content_id': 'content', 'html': html_with_old_math_schema
-            },
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'card_is_checkpoint': False,
-            'linked_skill_id': None,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': '42',
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': html_with_old_math_schema
-                    }
-                },
-                'answer_groups': [answer_group_with_old_math_schema],
-                'default_outcome': {
-                    'param_changes': [],
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': html_with_old_math_schema
-                    },
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': 'MathExpressionInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': html_with_old_math_schema
-                        }
-                    },
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': html_with_old_math_schema
-                        }
-                    }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {}
-            },
-            'next_content_id_index': 0
-        }
-
-        state_dict_with_new_math_schema = {
-            'content': {
-                'content_id': 'content', 'html': html_with_new_math_schema
-            },
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'card_is_checkpoint': False,
-            'linked_skill_id': None,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': '42',
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': html_with_new_math_schema
-                    }
-                },
-                'answer_groups': [answer_group_with_new_math_schema],
-                'default_outcome': {
-                    'param_changes': [],
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': html_with_new_math_schema
-                    },
-                    'dest': 'Introduction',
-                    'dest_if_really_stuck': None,
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': 'MathExpressionInput',
                 'hints': [
                     {
                         'hint_content': {
@@ -3023,6 +2884,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': html_with_old_math_schema
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>4</p>'
+            }
+        ]
         state_dict_with_old_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
@@ -3054,19 +2930,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [{
-                            'content_id': 'ca_choices_0',
-                            'html': html_with_old_math_schema
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
-                        }, {
-                            'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
-                        }]
+                        'value': choices_subtitled_dicts
                     },
                     'allowMultipleItemsInSamePosition': {'value': True}
                 },
@@ -3107,7 +2971,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'written_translations': (
                 written_translations_dict_with_old_math_schema_and_old_format)
         }
-
+        choices_subtitled_dicts = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': html_with_new_math_schema
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': '<p>4</p>'
+            }
+        ]
         state_dict_with_new_math_schema: state_domain.StateDict = {
             'content': {
                 'content_id': 'content', 'html': 'Hello!'
@@ -3139,19 +3017,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 },
                 'customization_args': {
                     'choices': {
-                        'value': [{
-                            'content_id': 'ca_choices_0',
-                            'html': html_with_new_math_schema
-                        }, {
-                            'content_id': 'ca_choices_1',
-                            'html': '<p>2</p>'
-                        }, {
-                            'content_id': 'ca_choices_2',
-                            'html': '<p>3</p>'
-                        }, {
-                            'content_id': 'ca_choices_3',
-                            'html': '<p>4</p>'
-                        }]
+                        'value': choices_subtitled_dicts
                     },
                     'allowMultipleItemsInSamePosition': {'value': True}
                 },
@@ -3892,19 +3758,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'MultipleChoiceInput')
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'non-unique-content-id',
+                'html': '1'
+            }, {
+                'content_id': 'non-unique-content-id',
+                'html': '2'
+            }
+        ]
         with self.assertRaisesRegex(
             Exception,
             'All customization argument content_ids should be unique.'
         ):
             init_state.update_interaction_customization_args({
                 'choices': {
-                    'value': [{
-                        'content_id': 'non-unique-content-id',
-                        'html': '1'
-                    }, {
-                        'content_id': 'non-unique-content-id',
-                        'html': '2'
-                    }]
+                    'value': choices_subtitled_dicts
                 },
                 'showChoicesInShuffledOrder': {'value': True}
             })
@@ -3926,9 +3795,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         ]
         init_state.update_interaction_hints(hints_list)
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
-            'correct_answer': [0, 0],
+            'correct_answer': [0, 0],  # type: ignore[typeddict-item]
             'explanation': {
                 'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
@@ -3963,12 +3836,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('MultipleChoiceInput')
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': '',
+                'html': 'one'
+            }
+        ]
         init_state.update_interaction_customization_args({
             'choices': {
-                'value': [{
-                    'content_id': '',
-                    'html': 'one'
-                }]
+                'value': choices_subtitled_dicts
             },
             'showChoicesInShuffledOrder': {'value': True}
         })
@@ -3992,12 +3868,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('MultipleChoiceInput')
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_10',
+                'html': 'one'
+            }
+        ]
         init_state.update_interaction_customization_args({
             'choices': {
-                'value': [{
-                    'content_id': 'ca_choices_10',
-                    'html': 'one'
-                }]
+                'value': choices_subtitled_dicts
             },
             'showChoicesInShuffledOrder': {'value': True}
         })
@@ -4177,7 +4056,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'x': {
                             'contentId': 'rule_input_Contains',
-                            'normalizedStrSet': ['Test1']
+                            'normalizedStrSet': ['Temp']
                             }
                     })
             ],
@@ -4857,7 +4736,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'unicode_str': 'Translatable cust args.'
                 }
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         }
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)
@@ -4874,17 +4754,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_all_translatable_content_for_html_in_cust_args(self) -> None:
         state = state_domain.State.create_default_state('state_1')
         state.update_interaction_id('MultipleChoiceInput')
+        choices_subtitled_dicts: List[state_domain.SubtitledHtmlDict] = [
+            {
+                'content_id': 'ca_choices_0',
+                'html': 'Hello world!'
+            }
+        ]
         state_interaction_cust_args: state_domain.CustomizationArgsDictType = {
             'showChoicesInShuffledOrder': {
                 'value': True
             },
             'choices': {
-                'value': [
-                    {
-                        'content_id': 'ca_choices_0',
-                        'html': 'Hello world!'
-                    }
-                ]
+                'value': choices_subtitled_dicts
             }
         }
         state.update_interaction_customization_args(state_interaction_cust_args)

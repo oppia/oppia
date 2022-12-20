@@ -20,35 +20,45 @@ from __future__ import annotations
 
 from extensions.interactions import base
 
+from typing import List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from extensions import domain
+
 
 class ImageClickInput(base.BaseInteraction):
     """Interaction allowing multiple-choice selection on an image."""
 
-    name = 'Image Region'
-    description = 'Allows learners to click on regions of an image.'
-    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    _dependency_ids = []
-    answer_type = 'ClickOnImage'
-    instructions = 'I18N_INTERACTIONS_IMAGE_CLICK_INSTRUCTION'
-    narrow_instructions = 'View image'
-    needs_summary = False
+    name: str = 'Image Region'
+    description: str = 'Allows learners to click on regions of an image.'
+    display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
+    _dependency_ids: List[str] = []
+    answer_type: str = 'ClickOnImage'
+    instructions: str = 'I18N_INTERACTIONS_IMAGE_CLICK_INSTRUCTION'
+    narrow_instructions: str = 'View image'
+    needs_summary: bool = False
     # It is required to show which region is being clicked on while specifying
     # a solution. Once this issue is fixed, ImageClickInput interaction can be
     # supported by the solution feature.
-    can_have_solution = False
-    show_generic_submit_button = False
+    can_have_solution: bool = False
+    show_generic_submit_button: bool = False
 
-    _customization_arg_specs = [{
+    _labeled_regions_list: List[domain.LabeledRegionDict] = []
+
+    _image_and_regions_default_value: domain.ImageAndRegionDict = {
+        'imagePath': '',
+        'labeledRegions': _labeled_regions_list
+    }
+
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'imageAndRegions',
         'description': 'Image',
         'schema': {
             'type': 'custom',
             'obj_type': 'ImageWithRegions',
         },
-        'default_value': {
-            'imagePath': '',
-            'labeledRegions': []
-        },
+        'default_value': _image_and_regions_default_value,
     }, {
         'name': 'highlightRegionsOnHover',
         'description': 'Highlight regions when the learner hovers over them',
@@ -58,7 +68,7 @@ class ImageClickInput(base.BaseInteraction):
         'default_value': False
     }]
 
-    _answer_visualization_specs = [{
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
         # Bar chart with answer counts.
         'id': 'ClickHexbins',
         'options': {},

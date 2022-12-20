@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
@@ -55,6 +55,10 @@ interface NewClassroomIdBackendDict {
   'classroom_id': string;
 }
 
+interface ClassroomIdBackendDict {
+  'classroom_id': string;
+}
+
 export interface ClassroomBackendDict {
   'classroom_id': string;
   'name': string;
@@ -83,6 +87,10 @@ interface FetchClassroomDataBackendDict {
 
 interface ClassroomDataResponse {
   classroomDict: ClassroomDict;
+}
+
+interface DoesClassroomWithUrlFragmentExistBackendResponse {
+  'classroom_url_fragment_exists': boolean;
 }
 
 @Injectable({
@@ -167,7 +175,7 @@ export class ClassroomBackendApiService {
   async getNewClassroomIdAsync(): Promise<string> {
     return new Promise((resolve, reject) => {
       this.http.get<NewClassroomIdBackendDict>(
-        '/classroom_id_handler').toPromise().then(response => {
+        '/new_classroom_id_handler').toPromise().then(response => {
         resolve(response.classroom_id);
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -245,6 +253,49 @@ export class ClassroomBackendApiService {
       this.http.get<ClassroomIdToClassroomNameBackendDict>(
         '/classroom_admin_data_handler').toPromise().then(response => {
         resolve(response.classroom_id_to_classroom_name);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  private _doesClassroomWithUrlFragmentExist(
+      classroomUrlFragment: string,
+      successCallback: (value: boolean) => void,
+      errorCallback: (errorResponse: HttpErrorResponse) => void
+  ): void {
+    const classroomUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
+      '/classroom_url_fragment_handler/<classroom_url_fragment>', {
+        classroom_url_fragment: classroomUrlFragment
+      });
+
+    this.http.get<DoesClassroomWithUrlFragmentExistBackendResponse>(
+      classroomUrlFragmentUrl).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback(response.classroom_url_fragment_exists);
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse);
+    });
+  }
+
+  async doesClassroomWithUrlFragmentExistAsync(classroomUrlFragment: string):
+       Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._doesClassroomWithUrlFragmentExist(
+        classroomUrlFragment, resolve, reject);
+    });
+  }
+
+  async getClassroomIdAsync(classroomUrlFragment: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const classroomIdUrl = this.urlInterpolationService.interpolateUrl(
+        '/classroom_id_handler/<classroom_url_fragment>', {
+          classroom_url_fragment: classroomUrlFragment
+        });
+      this.http.get<ClassroomIdBackendDict>(
+        classroomIdUrl).toPromise().then(response => {
+        resolve(response.classroom_id);
       }, errorResponse => {
         reject(errorResponse.error.error);
       });

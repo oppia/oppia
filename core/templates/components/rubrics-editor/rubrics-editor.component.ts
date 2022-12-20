@@ -53,10 +53,17 @@ interface SkillDescriptionStatusValuesInterface {
   templateUrl: './rubrics-editor.component.html'
 })
 export class RubricsEditorComponent {
-  @Input() rubrics: Rubric[];
-  @Input() newSkillBeingCreated: boolean;
   @Output() saveRubric: EventEmitter<unknown> = (
     new EventEmitter());
+
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() rubrics!: Rubric[];
+  @Input() newSkillBeingCreated!: boolean;
+  selectedRubricIndex!: number;
+  rubricsOptions!: RubricsOptions[];
+  rubric!: Rubric;
 
   skillDescriptionStatusValues: SkillDescriptionStatusValuesInterface = (
     TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
@@ -64,15 +71,12 @@ export class RubricsEditorComponent {
   skillDifficultyMedium: string = (
     constants.SKILL_DIFFICULTY_MEDIUM);
 
-  explanationsMemento: object = {};
-  explanationEditorIsOpen: object = {};
+  explanationsMemento: Record<string, string[]> = {};
+  explanationEditorIsOpen: Record<string, boolean[]> = {};
   editableExplanations: Explanation = {};
-  selectedRubricIndex: number;
   EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {type: 'html',
     ui_config: {}};
 
-  rubricsOptions: RubricsOptions[];
-  rubric: Rubric;
   maximumNumberofExplanations: number = 10;
   maximumCharacterLengthOfExplanation: number = 300;
   MEDIUM_EXPLANATION_INDEX: number = 1;
@@ -212,7 +216,6 @@ export class RubricsEditorComponent {
         Array(explanations.length).fill(false));
       this.editableExplanations[difficulty] = [...explanations];
     }
-    this.selectedRubricIndex = null;
     this.rubricsOptions = [
       {id: 0, difficulty: 'Easy'},
       {id: 1, difficulty: 'Medium'},

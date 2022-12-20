@@ -148,7 +148,13 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_specs: []
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_11
+              normalizedStrSet:
+              - combinations
+          rule_type: StartsWith
         tagged_skill_misconception_id: null
         training_data:
         - Permutation and combination
@@ -199,7 +205,13 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_specs: []
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_12
+              normalizedStrSet:
+              - factorial
+          rule_type: StartsWith
         tagged_skill_misconception_id: null
         training_data:
         - 3 balls that can be first with 2 possible variations in position for the
@@ -1085,7 +1097,13 @@ states:
           missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-        rule_specs: []
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_13
+              normalizedStrSet:
+              - colors
+          rule_type: StartsWith
         tagged_skill_misconception_id: null
         training_data:
         - red blue yellow red yellow blue blue red yellow blue yellow red yellow blue
@@ -1347,7 +1365,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 11
+    next_content_id_index: 14
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -1363,6 +1381,9 @@ states:
         rule_input_10: {}
         rule_input_8: {}
         rule_input_9: {}
+        rule_input_11: {}
+        rule_input_12: {}
+        rule_input_13: {}
     solicit_answer_details: false
     card_is_checkpoint: true
     written_translations:
@@ -1379,6 +1400,9 @@ states:
         rule_input_10: {}
         rule_input_8: {}
         rule_input_9: {}
+        rule_input_11: {}
+        rule_input_12: {}
+        rule_input_13: {}
 states_schema_version: 42
 tags: []
 title: ''

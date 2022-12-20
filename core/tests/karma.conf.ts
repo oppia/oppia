@@ -93,6 +93,7 @@ module.exports = function(config) {
         seed: jasmineSeed,
       },
     },
+    crossOriginAttribute: true,
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
@@ -126,7 +127,7 @@ module.exports = function(config) {
           '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=2048'
+          '--js-flags=--max-old-space-size=4096'
         ]
       }
     },

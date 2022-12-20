@@ -63,6 +63,11 @@ oppia-tutor-card .oppia-learner-view-card.animate-card-width {
   transition: width 500ms;
 }
 
+.mat-checkbox p {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
 oppia-tutor-card .oppia-learner-view-card-top-content p:not(:last-child) {
   line-height: 1.5;
   margin-bottom: 18px;
@@ -261,6 +266,11 @@ oppia-tutor-card .conversation-skin-oppia-completed-state-card .conversation-ski
 
 oppia-tutor-card .checkpoint-celebration-modal-container {
   position: absolute;
+}
+
+oppia-tutor-card .oppia-mcq-question-description-text {
+  display: block;
+  padding: 0 20px;
 }
 
 /* When the size of the browser is reduced, and the answer submitted is

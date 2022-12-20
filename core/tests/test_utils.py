@@ -77,11 +77,10 @@ from proto_files import text_classifier_pb2
 import elasticsearch
 import requests_mock
 from typing import (
-    IO, Any, Callable, Collection, Dict, Iterable, Iterator, List, Mapping,
-    Optional, OrderedDict, Pattern, Sequence, Set, Tuple, Type,
-    Union, cast, overload
+    IO, Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
+    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set, Tuple,
+    Type, TypedDict, Union, cast, overload
 )
-from typing_extensions import Final, Literal, TypedDict
 import webapp2
 import webtest
 
@@ -285,13 +284,15 @@ def get_storage_model_module_names() -> Iterator[models.Names]:
         yield name
 
 
-def get_storage_model_classes() -> Iterator[base_models.BaseModel]:
+def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
     """Get all model classes in storage."""
     for module_name in get_storage_model_module_names():
         (module,) = models.Registry.import_models([module_name])
         for member_name, member_obj in inspect.getmembers(module):
             if inspect.isclass(member_obj):
-                clazz: base_models.BaseModel = getattr(module, member_name)
+                clazz: Type[base_models.BaseModel] = getattr(
+                    module, member_name
+                )
                 all_base_classes = [
                     base_class.__name__ for base_class in inspect.getmro(
                         clazz)]
@@ -1230,7 +1231,7 @@ class TestBase(unittest.TestCase):
 
             raw_value = param_change.get_value(new_param_dict)
             new_param_dict[param_change.name] = (
-                object_registry.Registry.get_object_class_by_type(  # type: ignore[no-untyped-call]
+                object_registry.Registry.get_object_class_by_type(
                     obj_type).normalize(raw_value))
         return new_param_dict
 
@@ -2448,14 +2449,24 @@ title: Title
             self.assertEqual(response.status_int, 200)
             self.assertNotIn('<oppia-maintenance-page>', response)
 
-            response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
-                'csrf_token': self.get_new_csrf_token(),
-                'payload': json.dumps({
-                    'username': username,
-                    'agreed_to_terms': True,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }),
-                })
+            response = self.testapp.post(
+                feconf.SIGNUP_DATA_URL,
+                params={
+                    'csrf_token': self.get_new_csrf_token(),
+                    'payload': json.dumps(
+                        {
+                            'username': username,
+                            'agreed_to_terms': True,
+                            'default_dashboard': (
+                                constants.DASHBOARD_TYPE_LEARNER
+                            ),
+                            'can_receive_email_updates': (
+                                feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                            )
+                        }
+                    )
+                }
+            )
             self.assertEqual(response.status_int, 200)
 
     def signup_superadmin_user(self) -> None:
@@ -2463,7 +2474,9 @@ title: Title
         self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
 
     def set_config_property(
-        self, config_obj: config_domain.ConfigProperty, new_config_value: str
+        self,
+        config_obj: config_domain.ConfigProperty,
+        new_config_value: Union[str, List[str], bool, float]
     ) -> None:
         """Sets a given configuration object's value to the new value specified
         using a POST request.
@@ -2645,7 +2658,7 @@ title: Title
         self,
         url: str,
         expected_content_type: str,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Union[str, int, bool]]] = None,
         expected_status_int: int = 200
     ) -> webtest.TestResponse:
         """Get a response, transformed to a Python object.
@@ -2697,7 +2710,7 @@ title: Title
 
     def get_html_response(
         self, url: str,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Union[str, int, bool]]] = None,
         expected_status_int: int = 200
     ) -> webtest.TestResponse:
         """Get a HTML response, transformed to a Python object.
@@ -2719,7 +2732,7 @@ title: Title
         self,
         url: str,
         expected_content_type: str,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Union[str, int, bool]]] = None,
         expected_status_int: int = 200
     ) -> webtest.TestResponse:
         """Get a response other than HTML or JSON as a Python object.
@@ -2791,16 +2804,19 @@ title: Title
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    # Here we use type Any because this method can return JSON response Dict
-    # whose values can contain any type of values, like int, bool, str and
-    # other types too.
+    # Here we use type Any because this method can return a JSON response
+    # whose value can be of any type, like int, bool, str, and other
+    # types too. Also, the 'params' argument can accept different types
+    # of dictionaries that need to be sent over to the handler, those
+    # dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def get_json(
         self,
         url: str,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Any]] = None,
         expected_status_int: int = 200,
         headers: Optional[Dict[str, str]] = None
-    ) -> Dict[str, Any]:
+    ) -> Any:
         """Get a JSON response, transformed to a Python object."""
         if params is not None:
             self.assertIsInstance(params, dict)
@@ -2821,14 +2837,10 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
-        # Here we use type Any because response is a JSON response dict
-        # which can contain different types of values. So, to allow every
-        # type of value we used Any here.
-        response: Dict[str, Any] = self._parse_json_response(
+        return self._parse_json_response(
             json_response,
             expect_errors
         )
-        return response
 
     # Here we use type Any because this method can return JSON response Dict
     # whose values can contain different types of values, like int, bool,
@@ -2836,11 +2848,11 @@ title: Title
     def post_json(
         self,
         url: str,
-        data: Dict[str, Any],
+        data: Any,
         headers: Optional[Dict[str, str]] = None,
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200,
-        upload_files: Optional[List[Tuple[str, ...]]] = None,
+        upload_files: Optional[List[Tuple[str, str, bytes]]] = None,
         use_payload: bool = True,
         source: Optional[str] = None
     ) -> Dict[str, Any]:
@@ -2902,14 +2914,20 @@ title: Title
 
     # Here we use type Any because this method can return JSON response Dict
     # whose values can contain different types of values, like int, bool,
-    # str and other types too.
+    # str and other types too. Also, the 'params' argument can accept different
+    # types of dictionaries that need to be sent over to the handler, those
+    # dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def delete_json(
         self,
         url: str,
-        params: str = '',
+        params: Optional[Dict[str, Any]] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
         """Delete object on the server using a JSON call."""
+        if params is None:
+            params = {}
+
         if params:
             self.assertIsInstance(
                 params, dict,
@@ -2946,7 +2964,7 @@ title: Title
         expect_errors: bool,
         expected_status_int: int = 200,
         upload_files: Optional[
-            Union[List[Tuple[str, ...]],
+            Union[List[Tuple[str, str, bytes]],
             Tuple[Tuple[bytes, ...], ...]]
         ] = None,
         headers: Optional[Dict[str, str]] = None
@@ -2975,7 +2993,7 @@ title: Title
         """
         # Convert the files to bytes.
         if upload_files is not None:
-            upload_files = tuple(
+            encoded_upload_files = tuple(
                 tuple(
                     f.encode('utf-8') if isinstance(f, str) else f
                     for f in upload_file
@@ -2984,7 +3002,9 @@ title: Title
 
         return app.post(
             url, params=data, headers=headers, status=expected_status_int,
-            upload_files=upload_files, expect_errors=expect_errors)
+            upload_files=(encoded_upload_files if upload_files else None),
+            expect_errors=expect_errors
+        )
 
     def post_task(
         self,
@@ -3007,11 +3027,14 @@ title: Title
 
     # Here we use type Any because this method can return JSON response Dict
     # whose values can contain different types of values, like int, bool,
-    # str and other types too.
+    # str and other types too. Also, the 'payload' argument can accept
+    # different types of dictionaries that need to be sent over to the handler,
+    # those dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def put_json(
         self,
         url: str,
-        payload: Mapping[str, Union[str, int]],
+        payload: Mapping[str, Any],
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
@@ -3135,7 +3158,12 @@ title: Title
             ca_value = ca_spec.default_value
             traverse_schema_and_assign_content_ids(
                 ca_value, ca_spec.schema, 'ca_%s' % ca_name)
-            customization_args[ca_name] = {'value': ca_value}
+            # Here we use cast because these ca_values are fetched dynamically
+            # and contain only default types.
+            customization_args_value = cast(
+                state_domain.UnionOfCustomizationArgsDictValues, ca_value
+            )
+            customization_args[ca_name] = {'value': customization_args_value}
 
         state.update_interaction_id(interaction_id)
         state.update_interaction_customization_args(customization_args)
@@ -4131,7 +4159,8 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1}
+            'rows': {'value': 1},
+            'catchMisspellings': {'value': False}
         })
         state.update_next_content_id_index(2)
         # Here, state is a State domain object and it is created using
@@ -4425,13 +4454,9 @@ class ClassifierTestBase(GenericEmailTestBase):
         )
         return result
 
-    # TODO(#15451): Here we use type Any because currently, the stubs of
-    # protobuf in typeshed are not fully type annotated yet and because of
-    # this MyPy is not able to fetch the return type of this method and
-    # assuming it as Any type.
     def _get_classifier_data_from_classifier_training_job(
         self, classifier_training_job: classifier_domain.ClassifierTrainingJob
-    ) -> Any:
+    ) -> text_classifier_pb2.TextClassifierFrozenModel:
         """Retrieves classifier training job from GCS using metadata stored in
         classifier_training_job.
 

@@ -1702,25 +1702,9 @@ pre.oppia-pre-wrapped-text {
   line-height: 1.846;
 }
 
-/* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+/* Add inter-paragraph spacing to the tutorial contents. */
 .popover-content {
   padding: 10px;
-}
-.popover.ng-joyride {
-  padding: 1px;
-  width: 245px;
-}
-.popover.ng-joyride .col-md-8 {
-  padding: 0;
-}
-.popover.ng-joyride .col-md-8 > div {
-  float: left !important;
-}
-.pop-over-text.joyride-popover-text {
-  font-size: 14px;
-}
-.ng-joyride .popover-content p {
-  margin-top: 10px;
 }
 
 .popover-body.container-fluid {
@@ -1738,7 +1722,6 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rte-viewer > p:first-child {
-  margin-left: 15px;
   margin-top: 0;
 }
 .oppia-rte-viewer > p:last-child {
@@ -2406,13 +2389,6 @@ oppia-expression-error-tag:after {
 /* Adjust the z-index for the tutorial components so that they do not go
    above the navbar.
 */
-.ng-joyride-element-static[data-original-title],
-div.ng-joyride-title {
-  z-index: 999;
-}
-.ng-joyride.uib-popover.sharp-borders {
-  z-index: 1002;
-}
 div#ng-curtain {
   z-index: 997;
 }
@@ -2991,7 +2967,7 @@ oppia-noninteractive-link {
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: normal;
   -ms-hyphens: auto;
   -moz-hyphens: auto;
@@ -3143,6 +3119,7 @@ oppia-noninteractive-link {
   overflow: hidden;
   padding: 12px;
   text-overflow: ellipsis;
+  word-break: break-word;
 }
 .oppia-activity-summary-tile-pre-hover-preview {
   margin-bottom: 35px;
@@ -3280,9 +3257,10 @@ oppia-noninteractive-link {
 }
 
 .bullet-separator {
-  font-size: 10px;
+  font-size: 9px;
   margin: -3px 13px 0 16px;
   opacity: 30%;
+  vertical-align: middle;
 }
 
 .mobile-activity-card-summary-elements li::marker {

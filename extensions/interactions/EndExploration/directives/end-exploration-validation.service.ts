@@ -59,22 +59,17 @@ export class EndExplorationValidationService {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: 'Recommended exploration ID must be a string.'
         });
+        break;
       }
-    }
-    // Validate invalid exploration ids given in author recommended
-    // explorations ids.
-    let warningMessageElement = document.querySelector(
-      'oppia-interactive-end-exploration .oppia-error-message-text span'
-    );
-    if (warningMessageElement) {
-      let warningMessage = warningMessageElement.textContent;
-      if (warningMessage) {
+      if (recommendedExplorationIds[i].trim().length === 0) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: warningMessage
+          message: 'Recommended exploration ID must be non-empty.'
         });
+        break;
       }
     }
+
     return warningsList;
   }
 

@@ -54,6 +54,8 @@ import { NonExistentCollections } from 'domain/learner_dashboard/non-existent-co
 import { NonExistentExplorations } from 'domain/learner_dashboard/non-existent-explorations.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -117,6 +119,8 @@ describe('Learner dashboard page', () => {
   let userService: UserService = null;
   let translateService: TranslateService = null;
   let pageTitleService: PageTitleService = null;
+  let learnerGroupBackendApiService: LearnerGroupBackendApiService;
+  let urlService: UrlService;
 
   let profilePictureDataUrl = 'profile-picture-url';
 
@@ -132,7 +136,23 @@ describe('Learner dashboard page', () => {
     version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
-
+    auto_tts_enabled: true,
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    }
   };
 
   let titleList = [
@@ -385,6 +405,9 @@ describe('Learner dashboard page', () => {
       userService = TestBed.inject(UserService);
       translateService = TestBed.inject(TranslateService);
       pageTitleService = TestBed.inject(PageTitleService);
+      urlService = TestBed.inject(UrlService);
+      learnerGroupBackendApiService = TestBed.inject(
+        LearnerGroupBackendApiService);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
         return Promise.resolve('sample-csrf-token');
@@ -507,6 +530,13 @@ describe('Learner dashboard page', () => {
                 .createFromBackendDict(threadSummary))),
           paginatedThreadsList: []
         }));
+
+      spyOn(learnerGroupBackendApiService, 'isLearnerGroupFeatureEnabledAsync')
+        .and.returnValue(Promise.resolve(true));
+
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        active_tab: 'learner-groups',
+      });
 
       component.ngOnInit();
       flush();
