@@ -320,6 +320,13 @@ describe('I18n service', () => {
       I18nLanguageCodeService.prevLangCode = 'en';
       spyOn(windowRef.nativeWindow.location, 'reload');
       i18nService.initialize();
+      // In our code, we check if the dir cookie is set and use it to determine
+      // the window reload. If this test is run after a test that emits a rtl
+      // language in the end, we get a failed expectation. The failed expect is
+      // because we emit 'ar' which is also a 'rtl' language and hence we don't
+      // reload. To get around this in the short term we emit 'en' first and
+      // then 'ar' so that the dir value in cookie changes.
+      mockI18nLanguageCodeServiceSubject.emit('en');
       expect(windowRef.nativeWindow.location.href).toBe('http://localhost:8181');
       mockI18nLanguageCodeServiceSubject.emit('ar');
       I18nLanguageCodeService.prevLangCode = prevLangCode;
