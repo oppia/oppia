@@ -68,12 +68,16 @@
 /core/templates/services/request-interceptor.service*.ts @oppia/angular-migration-reviewers
 /core/templates/services/UpgradedServices.ts @oppia/angular-migration-reviewers
 /core/templates/hybrid-router-module-provider*.ts @oppia/angular-migration-reviewers
+/core/templates/utility/hashes.ts @oppia/angular-migration-reviewers
 /core/templates/utility/string-utility*.ts @oppia/angular-migration-reviewers
+/proxy.conf.json @oppia/angular-migration-reviewers
+/angular-template-style-url-replacer.webpack-loader.js @oppia/angular-migration-reviewers
+/angular.json @oppia/angular-migration-reviewers
+/src @oppia/frontend-infrastructure-reviewers
 
 # TS typing
 /typings/ @oppia/data-and-stability-reviewers
-/tsconfig.json @oppia/data-and-stability-reviewers
-/tsconfig-strict.json @oppia/data-and-stability-reviewers
+/tsconfig*.json @oppia/data-and-stability-reviewers
 /scripts/typescript_checks*.py @oppia/data-and-stability-reviewers
 
 
@@ -573,6 +577,7 @@
 /core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @oppia/interaction-and-rte-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @oppia/interaction-and-rte-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module.ts @oppia/interaction-and-rte-reviewers
 /core/templates/services/autoplayed-videos.service*.ts @oppia/interaction-and-rte-reviewers
 /core/templates/services/external-save.service*.ts @oppia/angular-migration-reviewers
 /core/templates/services/external-rte-save.service*.ts @oppia/angular-migration-reviewers

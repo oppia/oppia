@@ -32,7 +32,7 @@ export class CreateNewClassroomModalComponent
   extends ConfirmOrCancelModal {
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
-    private classroomAdminDataService: ClassroomAdminDataService,
+    public classroomAdminDataService: ClassroomAdminDataService,
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);

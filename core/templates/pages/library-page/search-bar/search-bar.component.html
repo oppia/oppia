@@ -38,7 +38,7 @@
     <ul ngbDropdownMenu
         class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
         role="menu">
-      <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
+      <ng-container *ngFor="let item of selectionDetails.categories.masterList">
         <li ngbDropdownItem *ngIf="selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
@@ -61,7 +61,7 @@
         <a (click)="deselectAll('categories')" class="dropdown-item"><i>Deselect All</i></a>
       </li>
       <hr *ngIf="selectionDetails.categories.numSelections > 0" class="oppia-search-bar-hr">
-      <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
+      <ng-container *ngFor="let item of selectionDetails.categories.masterList">
         <li ngbDropdownItem *ngIf="!selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
@@ -97,7 +97,7 @@
     </button>
     <ul ngbDropdownMenu class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
         role="menu">
-      <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; trackBy: index">
+      <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
         <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
@@ -118,7 +118,7 @@
         <a (click)="deselectAll('languageCodes')" class="dropdown-item"><i>Deselect All</i></a>
       </li>
       <hr *ngIf="selectionDetails.languageCodes.numSelections > 0" class="oppia-search-bar-hr">
-      <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList trackBy: index">
+      <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
         <li ngbDropdownItem *ngIf="!selectionDetails.languageCodes.selections[item.id]">
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
