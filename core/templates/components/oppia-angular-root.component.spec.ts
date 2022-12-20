@@ -21,9 +21,9 @@ import { ComponentFixture, TestBed, async } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { CookieModule } from 'ngx-cookie';
-import { OppiaAngularRootComponent } from './oppia-angular-root.component';
+import { OppiaAngularRootComponent, registerCustomElements } from './oppia-angular-root.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { Injector, NO_ERRORS_SCHEMA } from '@angular/core';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
@@ -50,6 +50,12 @@ class MockWindowRef {
       pushState(data, title: string, url?: string | null) {}
     }
   };
+}
+
+class WordCount extends HTMLParagraphElement {
+  constructor() {
+    super();
+  }
 }
 
 describe('OppiaAngularRootComponent', function() {
@@ -98,8 +104,11 @@ describe('OppiaAngularRootComponent', function() {
 
   it('should only intialize rteElements once', () => {
     expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBeTrue();
-    expect(TestBed.createComponent(
-      OppiaAngularRootComponent).componentInstance).toBeDefined();
+    const componentInstance = TestBed.createComponent(
+      OppiaAngularRootComponent).componentInstance;
+    expect(componentInstance).toBeDefined();
+    spyOn(customElements, 'get').and.callFake(() => WordCount);
+    registerCustomElements(TestBed.inject(Injector));
   });
 
   it('should emit once ngAfterViewInit is called', () => {
