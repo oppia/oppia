@@ -1528,7 +1528,7 @@ describe('Conversation skin component', () => {
       callb();
     });
     spyOn(urlService, 'getUrlParams').and.returnValues({
-      lang: 'en'
+      lang: 'pq'
     }, {
       lang: 'en'
     }, {
@@ -1545,7 +1545,7 @@ describe('Conversation skin component', () => {
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(explorationPlayerStateService, 'getLanguageCode')
-      .and.returnValues('en', 'en', 'en', 'pq');
+      .and.returnValues('pq', 'en', 'en', 'pq');
     spyOn(explorationPlayerStateService, 'initializeQuestionPlayer')
       .and.callFake((config, callb, questionAreAvailable) => {
         callb(displayedCard, 'label');
