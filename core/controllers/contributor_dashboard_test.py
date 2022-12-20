@@ -455,9 +455,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion in Hindi.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
@@ -469,9 +469,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion in Spanish.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'es',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content 2.</p>'
         }
