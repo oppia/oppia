@@ -248,7 +248,7 @@ describe('Embedding', function() {
     await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
   });
 
-  it('should use the exploration language as site language.',
+  it('should use the url language as site language.',
     async function() {
       // Opens the test file and checks the placeholder in the exploration is
       // correct.
@@ -311,15 +311,6 @@ describe('Embedding', function() {
 
       // Publish changes.
       await workflow.publishExploration();
-
-      // Change language to Thai, which is not a supported site language.
-      await general.openEditor(explorationId, false);
-      await explorationEditorPage.navigateToSettingsTab();
-      await explorationEditorSettingsTab.setLanguage('ภาษาไทย (Thai)');
-      await explorationEditorPage.publishChanges(
-        'Changing the language to a not supported one.');
-      // We expect the default language, English.
-      await checkPlaceholder('Type a number');
 
       // Change language to Spanish, which is a supported site language.
       await general.openEditor(explorationId, false);

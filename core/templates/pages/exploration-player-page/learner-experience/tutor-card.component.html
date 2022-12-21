@@ -155,7 +155,7 @@
       </div>
     </div>
 
-    <oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+    <oppia-ratings-and-recommendations *ngIf="!isIframed && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
                                        [userIsLoggedIn]="userIsLoggedIn"
                                        [explorationIsInPreviewMode]="explorationIsInPreviewMode"
                                        [questionPlayerConfig]="questionPlayerConfig"

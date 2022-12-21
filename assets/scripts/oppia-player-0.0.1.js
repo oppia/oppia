@@ -187,9 +187,11 @@
       var VERSION_KEY = 'version=';
       var SECRET_KEY = 'secret=';
       var versionString = explorationVersion ? '&v=' + explorationVersion : '';
+      var langCode = this.oppiaNode.getAttribute('exp-language') || '';
+      var languageString = langCode ? '&lang=' + langCode : '';
       this.iframe.src = encodeURI(
-        this.targetDomain + '/explore/' + this.oppiaNode.getAttribute('oppia-id') +
-        '?iframed=true&locale=en' + versionString +
+        this.targetDomain + '/embed/exploration/' + this.oppiaNode.getAttribute('oppia-id') +
+        '?iframed=true&locale=en' + versionString + languageString +
         '#' + VERSION_KEY + OPPIA_EMBED_GLOBALS.version +
         '&' + SECRET_KEY + secret);
 

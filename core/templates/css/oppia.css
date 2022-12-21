@@ -131,6 +131,14 @@ why they need to be overriden.  */
   transform: none !important;
 }
 
+.embedded-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
 .md-button {
   font-size: 16px;
   line-height: 22px;
