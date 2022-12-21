@@ -48,6 +48,7 @@ export class I18nLanguageCodeService {
    * In order to keep the variables same, static is used until migration is
    * complete.
    */
+  static prevLangCode: string = 'en';
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
   static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
   // TODO(#9154): Remove this variable when translation service is extended.
@@ -187,6 +188,7 @@ export class I18nLanguageCodeService {
 
   setI18nLanguageCode(code: string): void {
     // TODO(#9154): Change I18nLanguageCodeService to "this".
+    I18nLanguageCodeService.prevLangCode = I18nLanguageCodeService.languageCode;
     I18nLanguageCodeService.languageCode = code;
     I18nLanguageCodeService.languageCodeChangeEventEmitter.emit(code);
   }
