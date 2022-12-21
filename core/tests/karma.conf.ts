@@ -107,7 +107,7 @@ module.exports = function(config) {
     browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 210000,
-    browserNoActivityTimeout: 210000,
+    browserNoActivityTimeout: 300000,
     browserDisconnectTimeout: 300000,
     browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
