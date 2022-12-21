@@ -286,6 +286,12 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         self._assert_valid_story_id('Story id should be a string', 10)  # type: ignore[arg-type]
         self._assert_valid_story_id('Invalid story id', 'abc')
+        constants.STORY_ID_LENGTH = 3
+        try:
+            story_domain.Story.require_valid_story_id('abc')
+        except utils.ValidationError:
+            self.fail(
+                'require_valid_story_id() raised ExceptionType unexpectedly!')
 
     def _assert_valid_thumbnail_filename_for_story(
         self, expected_error_substring: str, thumbnail_filename: str
@@ -495,6 +501,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             ['skill_1', 'skill_2']
         )
 
+    def test_get_acquired_skill_ids_with_empty_node_ids_ids_is_empty_list(
+        self
+    ) -> None:
+        self.story.story_contents.nodes[0].acquired_skill_ids = [
+            'skill_1', 'skill_2']
+        self.story.story_contents.nodes[1].acquired_skill_ids = [
+            'skill_1']
+        self.assertEqual(
+            self.story.get_acquired_skill_ids_for_node_ids([]), [])
+
     def test_get_prerequisite_skill_ids(self) -> None:
         self.story.story_contents.nodes[0].prerequisite_skill_ids = ['skill_1']
         self.story.story_contents.nodes[0].exploration_id = 'exp_id'
@@ -625,6 +641,19 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'next node id for the story'):
             self.story.add_node('node_4', 'Title 4')
 
+    def test_delete_node_with_two_nodes_must_in_order(self) -> None:
+        self.assertEqual(len(self.story.story_contents.nodes), 2)
+        with self.assertRaisesRegex(
+            ValueError,
+            'The node with id %s is the starting node for the story, '
+            'change the starting node before deleting it.' % self.NODE_ID_1
+        ):
+            self.story.delete_node(self.NODE_ID_1)
+        self.story.delete_node(self.NODE_ID_2)
+        self.assertEqual(self.story.story_contents.nodes[0].id, 'node_1')
+        self.story.delete_node(self.NODE_ID_1)
+        self.assertIsNone(self.story.story_contents.initial_node_id)
+
     def test_get_number_from_node_id(self) -> None:
         self.assertEqual(
             story_domain.StoryNode.get_number_from_node_id('node_10'), 10)
@@ -636,6 +665,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].outline_is_finalized = 'abs'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected outline_is_finalized to be a boolean')
+        self.story.update_node_outline('node_1', 'new outline')
+        self.assertEqual(
+            self.story.story_contents.nodes[0].outline, 'new outline')
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
@@ -668,6 +700,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Chapter description should be less than 152 chars')
 
+        self.story.update_node_description('node_1', 'new description')
+        self.assertEqual(
+            self.story.story_contents.nodes[0].description, 'new description')
+
+        self.story.update_node_title('node_1', 'new title')
+        self.assertEqual(self.story.story_contents.nodes[0].title, 'new title')
+
     def test_node_thumbnail_bg_validation(self) -> None:
         self.story.story_contents.nodes[0].thumbnail_bg_color = '#FFFFFF'
         self._assert_validation_error(
@@ -692,6 +731,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Invalid node_id: node_id_1')
         self.story.story_contents.initial_node_id = 'node_abc'
         self._assert_validation_error('Invalid node_id: node_abc')
+        self.story.update_initial_node('node_1')
 
         self.story.story_contents.initial_node_id = 'node_1'
 
@@ -749,6 +789,12 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].acquired_skill_ids = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected acquired skill ids to be a list, received 1')
+        self.story.story_contents.nodes[0].acquired_skill_ids = ['3']
+        self.assertEqual(
+            self.story.story_contents.nodes[0].acquired_skill_ids, ['3'])
+        self.story.update_node_acquired_skill_ids('node_1', ['3', '4'])
+        self.assertEqual(
+            self.story.story_contents.nodes[0].acquired_skill_ids, ['3', '4'])
 
         self.story.story_contents.nodes[0].prerequisite_skill_ids = [
             'skill_id', 'skill_id', 'skill_id_1']
@@ -769,6 +815,19 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected prerequisite skill ids to be a list, received 1')
         self.story.story_contents.nodes[0].prerequisite_skill_ids = ['1']
+        self.story.update_node_prerequisite_skill_ids('node_1', ['1', '2'])
+        self.assertEqual(
+            self.story.story_contents.nodes[0].prerequisite_skill_ids,
+            ['1', '2'])
+        self.story.mark_node_outline_as_finalized('node_1')
+        self.assertTrue(
+            self.story.story_contents.nodes[0].outline_is_finalized)
+        self.story.mark_node_outline_as_unfinalized('node_1')
+        self.assertFalse(
+            self.story.story_contents.nodes[0].outline_is_finalized)
+        self.story.update_node_thumbnail_bg_color('node_1', 'Red')
+        self.assertEqual(
+            self.story.story_contents.nodes[0].thumbnail_bg_color, 'Red')
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
@@ -856,7 +915,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(calculated_list, [])
 
     def test_get_all_linked_exp_ids(self) -> None:
-        self.story.story_contents.next_node_id = 'node_4'
+        self.story.story_contents.next_node_id = 'node_5'
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
@@ -902,10 +961,33 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': 'exp_3'
         }
+        node_4: story_domain.StoryNodeDict = {
+            'id': 'node_4',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
         self.story.story_contents.initial_node_id = 'node_2'
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(node_1),
             story_domain.StoryNode.from_dict(node_2),
+        ]
+        self.assertEqual(
+            self.story.story_contents.get_all_linked_exp_ids(),
+            ['exp_1', 'exp_2'])
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_4),
         ]
         self.assertEqual(
             self.story.story_contents.get_all_linked_exp_ids(),
@@ -915,6 +997,103 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.story.story_contents.get_all_linked_exp_ids(),
             ['exp_1', 'exp_2', 'exp_3'])
+        with self.assertRaisesRegex(
+            ValueError, 'A node with exploration id exp_3 already exists.'
+        ):
+            self.story.update_node_exploration_id('node_4', 'exp_3')
+        self.story.update_node_exploration_id('node_3', 'exp_3')
+        self.assertEqual(
+            self.story.story_contents.get_all_linked_exp_ids(),
+            ['exp_1', 'exp_2', 'exp_3'])
+        self.story.update_node_exploration_id('node_3', 'exp_4')
+        self.assertEqual(
+            self.story.story_contents.get_all_linked_exp_ids(),
+            ['exp_1', 'exp_2', 'exp_4'])
+
+    def test_update_story_contents_from_model_with_all_versions(self) -> None:
+        node_1: story_domain.StoryNodeDict = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': 'a',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1'
+        }
+        story_contents_dict_1: story_domain.StoryContentsDict = {
+            'nodes': [node_1],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_4'
+        }
+        version_dict: story_domain.VersionedStoryContentsDict = {
+            'schema_version': 0,
+            'story_contents': story_contents_dict_1
+        }
+
+        self.assertEqual(version_dict['schema_version'], 0)
+        story_domain.Story.update_story_contents_from_model(
+            version_dict, 1, 'node_1')
+        self.assertEqual(version_dict['schema_version'], 2)
+        self.assertIsNone(
+            version_dict['story_contents']['nodes'][0]['thumbnail_filename'])
+        self.assertIsNone(
+            version_dict['story_contents']['nodes'][0]['thumbnail_bg_color'])
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0]['description'],
+            'Description 1')
+        story_domain.Story.update_story_contents_from_model(
+            version_dict, 2, 'node_1')
+        self.assertEqual(version_dict['schema_version'], 3)
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0]['description'], '')
+        story_domain.Story.update_story_contents_from_model(
+            version_dict, 3, 'node_1')
+        self.assertEqual(version_dict['schema_version'], 4)
+        self.assertEqual(
+            version_dict['story_contents']['nodes'][0][
+                'thumbnail_size_in_bytes'], 21131)
+        story_domain.Story.update_story_contents_from_model(
+            version_dict, 4, 'node_1')
+        self.assertEqual(version_dict['schema_version'], 5)
+        self.assertIsNone(
+            version_dict['story_contents']['nodes'][0][
+                'thumbnail_size_in_bytes'])
+
+    def test_story_info_update(self) -> None:
+        topic_id = utils.generate_random_string(12)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Title', 'Description', topic_id,
+            'story-frag-default')
+        self.assertEqual(story.title, 'Title')
+        story.update_title('Updated title')
+        self.assertEqual(story.title, 'Updated title')
+
+        self.assertIsNone(story.thumbnail_bg_color)
+        story.update_thumbnail_bg_color('Updated thumbnail_bg_color')
+        self.assertEqual(
+            story.thumbnail_bg_color, 'Updated thumbnail_bg_color')
+
+        self.assertEqual(story.description, 'Description')
+        story.update_description('Updated Description')
+        self.assertEqual(story.description, 'Updated Description')
+
+        self.assertEqual(story.notes, '')
+        story.update_notes('Updated notes')
+        self.assertEqual(story.notes, 'Updated notes')
+
+        self.assertEqual(story.language_code, 'en')
+        story.update_language_code('Updated language_code')
+        self.assertEqual(story.language_code, 'Updated language_code')
+
+        self.assertEqual(story.meta_tag_content, '')
+        story.update_meta_tag_content('Updated meta_tag_content')
+        self.assertEqual(story.meta_tag_content, 'Updated meta_tag_content')
 
     def test_get_node_with_corresponding_exp_id_with_valid_exp_id(
         self
@@ -1511,7 +1690,7 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'language_code': 'en',
             'id': 'story_id',
-            'url_fragment': 'story-summary-frag'
+            'url_fragment': 'story-summary-frag',
         }
 
         self.story_summary = story_domain.StorySummary(
