@@ -17,7 +17,7 @@
  * proper source maps.
  */
 
-const { merge } = require('webpack-merge');
+var { merge } = require('webpack-merge');
 const dev = require('./webpack.dev.config.ts');
 
 module.exports = merge(dev, {

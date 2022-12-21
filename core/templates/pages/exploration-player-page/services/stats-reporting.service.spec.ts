@@ -310,7 +310,7 @@ describe('Stats reporting service ', () => {
     expect(statsReportingService.currentStateName).toBe('firstState');
   });
 
-  it('should record stats when an exploration is finished', () => {
+  it('should record stats for classroom lesson when finished', () => {
     spyOn(urlService, 'getUrlParams')
       .and.returnValue({classroom_url_fragment: 'classroom'});
     let recordExplorationCompletedSpy = spyOn(
@@ -323,6 +323,30 @@ describe('Stats reporting service ', () => {
     statsReportingService.recordExplorationCompleted(
       'firstState', {}, '1', '2', 'en');
 
+    expect(
+      siteAnalyticsService.registerCuratedLessonCompleted
+    ).toHaveBeenCalled();
+    expect(recordExplorationCompletedSpy).toHaveBeenCalled();
+    expect(statsReportingService.explorationIsComplete).toBe(true);
+    expect(statsReportingBackendApiService.postsStatsAsync).toHaveBeenCalled();
+  });
+
+  it('should record stats for community lesson when finished', () => {
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
+    let recordExplorationCompletedSpy = spyOn(
+      statsReportingBackendApiService, 'recordExplorationCompletedAsync')
+      .and.returnValue(Promise.resolve({}));
+    spyOn(statsReportingBackendApiService, 'postsStatsAsync')
+      .and.returnValue(Promise.resolve({}));
+    spyOn(siteAnalyticsService, 'registerCommunityLessonCompleted');
+    expect(statsReportingService.explorationIsComplete).toBe(false);
+
+    statsReportingService.recordExplorationCompleted(
+      'firstState', {}, '1', '2', 'en');
+
+    expect(
+      siteAnalyticsService.registerCommunityLessonCompleted
+    ).toHaveBeenCalled();
     expect(recordExplorationCompletedSpy).toHaveBeenCalled();
     expect(statsReportingService.explorationIsComplete).toBe(true);
     expect(statsReportingBackendApiService.postsStatsAsync).toHaveBeenCalled();
