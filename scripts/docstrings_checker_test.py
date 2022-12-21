@@ -284,24 +284,24 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         self.assertEqual(exceptions, set(['Exception']))
 
     def test_docstringify_with_okey_docstring(self) -> None:
-        okey_docstring = """Docstring that is correctly formated
+        valid_docstring = """Docstring that is correctly formated
             according to the Google Python Style Guide.
 
             Args:
                 test_value: bool. Just a test argument.
             """
         is_okey = isinstance(
-            docstrings_checker.docstringify(okey_docstring),
+            docstrings_checker.docstringify(valid_docstring),
             docstrings_checker.GoogleDocstring)
 
         self.assertEqual(is_okey, True)
 
     def test_docstringify_with_bad_docstring(self) -> None:
-        not_okey_dockstring = """Docstring that is incorrectly
+        invalid_docstring = """Docstring that is incorrectly
             formated according to the Google Python Style Guide.
             """
         is_okey = isinstance(
-            docstrings_checker.docstringify(not_okey_dockstring),
+            docstrings_checker.docstringify(invalid_docstring),
             docstrings_checker.GoogleDocstring)
 
         self.assertEqual(is_okey, False)
