@@ -152,7 +152,7 @@ describe('Android page', () => {
       flushMicrotasks();
 
       expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-        'Done!', 1000);
+        'Successfully added to mailing list!', 1000);
     }));
 
   it('should fail to add user to android mailing list and return status',
