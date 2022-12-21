@@ -843,7 +843,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        improvements_models.TaskEntryModel(
+        improvements_models.ExplorationStatsTaskEntryModel(
             id=self.GENERIC_MODEL_ID,
             composite_entity_id=self.GENERIC_MODEL_ID,
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,

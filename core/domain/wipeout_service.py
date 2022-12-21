@@ -405,7 +405,7 @@ def delete_user(
             pending_deletion_request.user_id)
         _pseudonymize_one_model_class(
             pending_deletion_request,
-            improvements_models.TaskEntryModel,
+            improvements_models.ExplorationStatsTaskEntryModel,
             'resolver_id',
             models.Names.IMPROVEMENTS
         )
@@ -1234,13 +1234,13 @@ def _pseudonymize_one_model_class(
     module_name: models.Names
 ) -> None:
     """Pseudonymize one model class for the user with the user_id associated
-    with the given pending deletion request
+    with the given pending deletion request.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object.
         model_class: class. The model class that contains the entity IDs.
-        name_of_property_containing_user_ids: str. The name of property that
+        name_of_property_containing_user_ids: str. The name of the property that
             contains the user IDs. We fetch the models corresponding to the
             user IDs stored in this property.
         module_name: models.Names. The name of the module containing the models
