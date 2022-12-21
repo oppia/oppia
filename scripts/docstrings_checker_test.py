@@ -290,18 +290,18 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
             Args:
                 test_value: bool. Just a test argument.
             """
-        is_okey = isinstance(
+        is_valid = isinstance(
             docstrings_checker.docstringify(valid_docstring),
             docstrings_checker.GoogleDocstring)
 
-        self.assertEqual(is_okey, True)
+        self.assertEqual(is_valid, True)
 
     def test_docstringify_with_bad_docstring(self) -> None:
         invalid_docstring = """Docstring that is incorrectly
             formated according to the Google Python Style Guide.
             """
-        is_okey = isinstance(
+        is_invalid = isinstance(
             docstrings_checker.docstringify(invalid_docstring),
             docstrings_checker.GoogleDocstring)
 
-        self.assertEqual(is_okey, False)
+        self.assertEqual(is_invalid, False)
