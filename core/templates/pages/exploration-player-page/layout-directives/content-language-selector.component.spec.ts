@@ -69,6 +69,14 @@ class MockI18nLanguageCodeService {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: ''
+    }
+  };
+}
+
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
@@ -118,16 +126,36 @@ describe('Content language selector component', () => {
   }));
 
   it('should correctly initialize selectedLanguageCode, ' +
-     'newLanguageCode and languagesInExploration', () => {
-    expect(component.selectedLanguageCode).toBe('fr');
+    'newLanguageCode and languagesInExploration', () => {
+      expect(component.selectedLanguageCode).toBe('fr');
+      expect(component.languageOptions).toEqual([
+        { value: 'fr', displayed: 'français (French)' },
+        { value: 'zh', displayed: '中文 (Chinese)' },
+        { value: 'en', displayed: 'English' }
+      ]);
+    });
+
+  it('should correcly initialize newLanguageCode', () => {
+    // When URL has no searchparam
+    let mockWindowRef = new MockWindowRef();
+    mockWindowRef.nativeWindow.location.href = 'http://localhost:8181/explore/wZiXFx1iV5bz';
+    let url = new URL(mockWindowRef.nativeWindow.location.href);
+    expect(url.searchParams.get('initialContentLanguageCode')).toBe('');
+
+    component.ngOnInit();
+    // newLanguageCode should be set to the currentGlobalLanguageCode
     expect(component.newLanguageCode).toBe('fr');
-    expect(component.languageOptions).toEqual([
-      {value: 'fr', displayed: 'français (French)'},
-      {value: 'zh', displayed: '中文 (Chinese)'},
-      {value: 'en', displayed: 'English'}
-    ]);
+
+    // When URL has searchparam
+    mockWindowRef = new MockWindowRef();
+    mockWindowRef.nativeWindow.location.href = 'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en';
+    url = new URL(mockWindowRef.nativeWindow.location.href);
+    expect(url.searchParams.get('initialContentLanguageCode')).toBe('en');  
+    component.ngOnInit();
+    // newLanguageCode should be set to the initialContentLanguageCode
+    expect(component.newLanguageCode).toBe('en');
   });
-    
+
   it('should correctly select an option when refresh is not needed', () => {
     const setCurrentContentLanguageCodeSpy = spyOn(
       contentTranslationLanguageService,
