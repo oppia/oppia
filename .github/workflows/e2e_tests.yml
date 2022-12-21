@@ -140,12 +140,17 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: Download build files artifact
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         uses: actions/download-artifact@v3
         with:
           name: build_files
           path: /home/runner/work/oppia/
       - name: Unzip build files
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: |
           ls -la
           unzip build_files.zip
@@ -163,9 +168,6 @@ jobs:
         working-directory: /home/runner/work/oppia
         shell: bash
       - uses: ./.github/actions/install-oppia-dependencies
-      - id: check-risk
-        name: Check if PR is low-risk
-        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: Install chrome
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
