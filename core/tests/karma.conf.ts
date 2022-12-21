@@ -108,7 +108,7 @@ module.exports = function(config) {
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 210000,
     browserNoActivityTimeout: 210000,
-    browserDisconnectTimeout: 210000,
+    browserDisconnectTimeout: 300000,
     browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
       level: 'log',
