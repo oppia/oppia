@@ -59,8 +59,9 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   }
 
   getCurrentTabName(): string {
+    const that = this;
     type TabNamesToHumanReadableNamesKeys = (
-      keyof typeof this._TAB_NAMES_TO_HUMAN_READABLE_NAMES);
+      keyof typeof that._TAB_NAMES_TO_HUMAN_READABLE_NAMES);
     if (!this.routerService.getActiveTabName()) {
       return '';
     } else {
