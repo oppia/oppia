@@ -127,32 +127,32 @@ describe('Content language selector component', () => {
 
   it('should correctly initialize selectedLanguageCode, ' +
     'newLanguageCode and languagesInExploration', () => {
-      expect(component.selectedLanguageCode).toBe('fr');
-      expect(component.languageOptions).toEqual([
-        { value: 'fr', displayed: 'français (French)' },
-        { value: 'zh', displayed: '中文 (Chinese)' },
-        { value: 'en', displayed: 'English' }
-      ]);
-    });
+    expect(component.selectedLanguageCode).toBe('fr');
+    expect(component.languageOptions).toEqual([
+      { value: 'fr', displayed: 'français (French)' },
+      { value: 'zh', displayed: '中文 (Chinese)' },
+      { value: 'en', displayed: 'English' }
+    ]);
+  });
 
   it('should correcly initialize newLanguageCode', () => {
-    // When URL has no searchparam
+    // When URL has no searchparam.
     let mockWindowRef = new MockWindowRef();
     mockWindowRef.nativeWindow.location.href = 'http://localhost:8181/explore/wZiXFx1iV5bz';
     let url = new URL(mockWindowRef.nativeWindow.location.href);
     expect(url.searchParams.get('initialContentLanguageCode')).toBe('');
 
     component.ngOnInit();
-    // newLanguageCode should be set to the currentGlobalLanguageCode
+    // The newLanguageCode should be set to the currentGlobalLanguageCode.
     expect(component.newLanguageCode).toBe('fr');
 
-    // When URL has searchparam
+    // When URL has searchparam.
     mockWindowRef = new MockWindowRef();
     mockWindowRef.nativeWindow.location.href = 'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en';
     url = new URL(mockWindowRef.nativeWindow.location.href);
-    expect(url.searchParams.get('initialContentLanguageCode')).toBe('en');  
+    expect(url.searchParams.get('initialContentLanguageCode')).toBe('en');
     component.ngOnInit();
-    // newLanguageCode should be set to the initialContentLanguageCode
+    // The newLanguageCode should be set to the initialContentLanguageCode.
     expect(component.newLanguageCode).toBe('en');
   });
 
