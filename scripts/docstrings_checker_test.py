@@ -300,8 +300,8 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         invalid_docstring = """Docstring that is incorrectly
             formated according to the Google Python Style Guide.
             """
-        is_invalid = isinstance(
+        is_valid = isinstance(
             docstrings_checker.docstringify(invalid_docstring),
             docstrings_checker.GoogleDocstring)
 
-        self.assertEqual(is_invalid, False)
+        self.assertEqual(is_valid, False)
