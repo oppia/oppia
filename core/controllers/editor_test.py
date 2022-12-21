@@ -708,9 +708,9 @@ written_translations:
             # Compare saved with golden file.
             with zf_saved.open(
                 'The title for ZIP download handler test!.yaml'
-                ) as zf_saved_open, zf_gold.open(
+            ) as zf_saved_open, zf_gold.open(
                 'The title for ZIP download handler test!.yaml'
-                ) as zf_gold_open:
+            ) as zf_gold_open:
                 self.assertEqual(
                     zf_saved_open.read(),
                     zf_gold_open.read())
