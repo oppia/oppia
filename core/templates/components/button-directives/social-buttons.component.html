@@ -27,7 +27,9 @@
       </a>
     </div>
   </div>
-  <div *ngIf="androidAppButtonIsShown" class="oppia-android-app-button">
-    <a href="https://play.google.com/store/apps/details?id=org.oppia.android" target="_blank" rel="noopener">{{ 'I18N_FOOTER_ANDROID_APP' | translate }}</a>
+  <div *ngIf="androidAppButtonIsShown">
+    <img class="oppia-android-app-button"
+         src="/assets/images/android/android-landing-google-play.svg"
+         alt="">
   </div>
 </div>

@@ -1,6 +1,6 @@
 <div class="oppia-android-page-container overflow-hidden">
   <div class="oppia-android-page">
-    <div class="container">
+    <div class="container pl-0">
       <div class="row">
         <div class="col-sm-6 col-8">
           <div class="oppia-android-main-body">
@@ -12,6 +12,9 @@
             <div class="oppia-android-beta-description-container">
               <p class="oppia-android-beta-description"
                  [innerHTML]="'I18N_ANDROID_PAGE_BETA_DESCRIPTION' | translate">
+              </p>
+              <p class="oppia-mobile-only oppia-android-support-text">
+                We support all Android versions going back to Lollipop (Android 5).
               </p>
               <a [href]="ANDROID_APP_URL" target="_blank" rel="noopener">
                 <img class="oppia-android-google-play-logo"
@@ -27,10 +30,10 @@
       </div>
     </div>
 
-    <div class="oppia-mobile-only oppia-android-features">
-      <span class="oppia-android-features-main-text"
-            [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate">
-      </span>
+    <div class="oppia-android-features oppia-android-features-tablet">
+      <p class="oppia-android-features-main-text"
+         [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate">
+    </p>
       <div class="container">
         <div class="row">
           <div class="oppia-android-key-feature-image-container">
@@ -71,8 +74,8 @@
       </div>
     </div>
 
-    <div class="oppia-web-only oppia-android-empty-div"></div>
-    <div class="oppia-android-features oppia-web-only container mb-5">
+    <div class="oppia-android-features-web oppia-android-empty-div"></div>
+    <div class="oppia-android-features oppia-android-features-web oppia-web-only container mb-5">
       <span [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate"
             class="oppia-android-features-main-text row">
       </span>
@@ -132,8 +135,9 @@
                  [innerHTML]="'I18N_ANDROID_PAGE_UPDATES_SUBTEXT' | translate">
             </div>
           </div>
-          <div class="oppia-android-updates-input-container col-md-6 col-12">
-            <div class="oppia-android-updates-input-padding">
+          <div *ngIf="!userHasSubscribed"
+               class="oppia-android-updates-input-container col-md-6 col-12">
+            <div>
               <div class="oppia-android-updates-input-label">{{ 'I18N_ANDROID_PAGE_NAME_FIELD_LABEL' | translate }}</div>
               <input class="oppia-android-updates-input w-100"
                      type="text"
@@ -150,6 +154,9 @@
                      [(ngModel)]="emailAddress"
                      [ngModelOptions]="{standalone: true}"
                      required="true">
+              <div *ngIf="emailAddress && !validateEmailAddress()" class="text-danger">
+                Please enter a valid email address.
+              </div>
             </div>
             <div class="oppia-android-updates-input-padding">
               <input class="oppia-android-updates-checkbox"
@@ -160,6 +167,9 @@
                 <span class="oppia-android-updates-asterisk-color">*</span>
               </span>
             </div>
+            <div *ngIf="emailAddress && !userCanSubscribe" class="text-danger">
+              Please confirm before subscribing.
+            </div>
             <div class="oppia-android-updates-input-padding text-center">
               <button [disabled]="!userCanSubscribe || !validateEmailAddress()"
                       (click)="subscribeToAndroidList()"
@@ -168,10 +178,14 @@
               </button>
             </div>
           </div>
+          <div *ngIf="userHasSubscribed"
+               class="oppia-android-updates-input-container col-md-6 col-12 oppia-android-sub-text">
+            You have subscribed to receive updates!
+          </div>
         </div>
       </div>
-      <div>
-        <img class="oppia-android-avatar-img" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+      <div class="container">
+        <img class="oppia-android-avatar-img mx-auto d-block" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
       </div>
     </div>
     <div class="oppia-android-app-updates-background oppia-android-otter-help-container">

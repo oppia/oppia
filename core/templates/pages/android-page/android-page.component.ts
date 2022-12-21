@@ -79,6 +79,8 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   emailAddress: string | null = null;
   name: string | null = null;
   userCanSubscribe: boolean = false;
+  userHasSubscribed: boolean = false;
+
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
@@ -127,7 +129,11 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
       AppConstants.MAILING_LIST_ANDROID_TAG
     ).then((status) => {
       if (status) {
-        this.alertsService.addInfoMessage('Done!', 1000);
+        this.alertsService.addInfoMessage(
+          'Successfully added to mailing list!',
+          1000
+        );
+        this.userHasSubscribed = true;
       } else {
         this.alertsService.addInfoMessage(
           'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +

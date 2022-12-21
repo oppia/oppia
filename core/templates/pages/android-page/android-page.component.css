@@ -48,6 +48,14 @@
   max-width: 300px;
 }
 
+.oppia-android-updates-button:disabled {
+  background: #0003;
+}
+
+.oppia-android-updates-button:hover {
+  color: #fff;
+}
+
 .oppia-android-updates-checkbox-label {
   display: block;
   font-family: 'Roboto', Arial, sans-serif;
@@ -58,7 +66,6 @@
 }
 
 .oppia-android-updates-input-padding {
-  max-width: 365px;
   padding-top: 50px;
 }
 
@@ -83,9 +90,9 @@
 
 .oppia-android-updates-main-text {
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 400;
-  line-height: 60px;
+  line-height: 52px;
 }
 
 .oppia-android-sub-text {
@@ -93,6 +100,11 @@
   font-size: 18px;
   font-weight: 400;
   line-height: 24px;
+}
+
+.oppia-android-subscribed-text {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 24px;
 }
 
 .oppia-android-updates-sub-text {
@@ -203,12 +215,7 @@
 .oppia-android-support-text {
   color: #009c8a;
   font-family: 'Roboto', Arial, sans-serif;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 16px;
-  margin-left: 8%;
-  padding: 89px 0 5px 0;
+  font-size: 11px;
 }
 
 .oppia-android-google-play-logo {
@@ -270,6 +277,60 @@
   margin-bottom: 100px;
 }
 
+.oppia-android-updates-input-container {
+  max-width: 465px;
+}
+
+.oppia-android-features-web {
+  display: block;
+}
+
+.oppia-android-features-tablet {
+  display: none;
+}
+
+
+@media only screen and (max-width: 1024px) {
+  .oppia-android-features-web {
+    display: none;
+  }
+
+  .oppia-android-features-tablet {
+    display: block;
+  }
+
+  .oppia-android-features .container {
+    margin: 100px auto;
+    max-width: 360px;
+    padding: 0 15px;
+  }
+
+  .oppia-android-features-main-text {
+    margin-left: 24px;
+    margin-top: 100px;
+  }
+
+  .oppia-android-key-feature-container {
+    display: block;
+    margin-top: 30px;
+  }
+
+  .oppia-android-key-feature-image {
+    flex: none;
+    margin-top: 10vh;
+    transform: scale(1.5);
+  }
+
+  .oppia-android-key-feature-text,
+  .oppia-android-key-feature-subtext {
+    font-size: 18px;
+  }
+
+  .oppia-android-key-feature-description {
+    height: 145px;
+  }
+}
+
 @media only screen and (max-width: 750px) {
 
   .oppia-mobile-only {
@@ -288,21 +349,13 @@
 
   .oppia-android-beta-description {
     font-size: 14px;
-    line-height: 16px;
+    line-height: 18px;
   }
 
   .oppia-android-beta-description-container {
     padding: 58px 0 0 0;
     white-space: normal;
     word-break: break-word;
-  }
-
-  .oppia-android-support-text {
-    font-size: 11px;
-    line-height: 12px;
-    margin: 0;
-    padding: 58px 0;
-    width: 170px;
   }
 
   .oppia-android-google-play-logo {
@@ -322,13 +375,13 @@
   }
 
   .oppia-android-features-main-text {
-    font-size: 18px;
+    font-size: 21px;
     line-height: 23px;
   }
 
   .oppia-android-main-text {
-    font-size: 18px;
-    line-height: 21px;
+    font-size: 21px;
+    line-height: 23px;
   }
 
   .oppia-android-logo {
@@ -346,6 +399,10 @@
     flex: none;
     margin-top: 10vh;
     transform: scale(1.5);
+  }
+
+  .oppia-android-features-tablet {
+    display: block;
   }
 
   .oppia-android-key-feature-text,
@@ -377,7 +434,7 @@
   }
 
   .oppia-android-updates-main-text {
-    font-size: 18px;
+    font-size: 21px;
     line-height: 23px;
   }
 
@@ -385,16 +442,22 @@
   .oppia-android-updates-input-label {
     font-size: 14px;
     line-height: 16px;
+  }
+
+  .oppia-android-features .container {
+    margin: unset;
+    max-width: unset;
+    padding: unset;
   }
 }
 
 @media only screen and (max-width: 575px) {
   .oppia-android-hero-image {
-    transform: scale(3) translateY(50px);
+    transform: scale(4) translateY(50px);
   }
 
   .oppia-android-updates-main-text {
-    font-size: 18px;
+    font-size: 21px;
     line-height: 23px;
   }
 
@@ -402,5 +465,15 @@
   .oppia-android-updates-input-label {
     font-size: 14px;
     line-height: 16px;
+  }
+
+  .oppia-android-features-tablet {
+    display: block;
+  }
+
+  .oppia-android-features .container {
+    margin: unset;
+    max-width: unset;
+    padding: unset;
   }
 }
