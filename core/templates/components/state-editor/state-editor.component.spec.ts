@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from './domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { State } from 'domain/state/StateObjectFactory';
@@ -112,7 +112,6 @@ describe('State Editor Component', () => {
     component.sendOnSaveNextContentIdIndex(0);
     component.sendOnSaveInteractionCustomizationArgs('');
     component.sendOnSaveInteractionId('');
-    component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired([]);
     component.sendOnSaveStateContent(
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'));
 

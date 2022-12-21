@@ -90,7 +90,7 @@ export class ExplorationEditorTabComponent
       private stateEditorService: StateEditorService,
       private explorationFeaturesService: ExplorationFeaturesService,
       private routerService: RouterService,
-      private stateCardIsCheckpointService: StateCardIsCheckpointService,
+      public stateCardIsCheckpointService: StateCardIsCheckpointService,
       private explorationInitStateNameService: ExplorationInitStateNameService,
       private explorationWarningsService: ExplorationWarningsService,
       private explorationCorrectnessFeedbackService:

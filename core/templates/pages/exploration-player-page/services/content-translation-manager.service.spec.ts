@@ -16,28 +16,16 @@
  * @fileoverview Unit tests for the content translation manager service.
  */
 
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceovers } from
-  'domain/exploration/recorded-voiceovers.model';
-import { SubtitledUnicodeObjectFactory } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { ContentTranslationManagerService } from
-  'pages/exploration-player-page/services/content-translation-manager.service';
-import { PlayerTranscriptService } from
-  'pages/exploration-player-page/services/player-transcript.service';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { ExplorationHtmlFormatterService } from
-  'services/exploration-html-formatter.service';
-import { AudioTranslationLanguageService} from
-  'pages/exploration-player-page/services/audio-translation-language.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
-import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
@@ -52,37 +40,7 @@ describe('Content translation manager service', () => {
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
 
-  class MockActiveModal {
-    open() {
-      return {
-        result: null
-      };
-    }
-
-    close(): void {
-      return;
-    }
-  }
-
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgbModule],
-      declarations: [
-        LoadingDotsComponent,
-        TranslationsFetchingMessageModalComponent
-      ],
-      providers: [
-        {
-          provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
-      ]
-    }).overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [TranslationsFetchingMessageModalComponent],
-      }
-    }).compileComponents();
-
     ctms = TestBed.inject(ContentTranslationManagerService);
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     iof = TestBed.inject(InteractionObjectFactory);
