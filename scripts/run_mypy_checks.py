@@ -145,26 +145,27 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
             MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
             '--upgrade'
         ]
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output = process.communicate()
-    if b'can\'t combine user with prefix' in output[1]:
-        uextention_text = ['--user', '--prefix=', '--system']
-        new_process = subprocess.Popen(
-            cmd + uextention_text, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-        new_process.communicate()
-        if site.USER_BASE is None:
-            raise Exception(
-                'No USER_BASE found for the user.'
-            )
-        _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
-        mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
-        return (new_process.returncode, mypy_exec_path)
-    else:
-        _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
-        mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
-        return (process.returncode, mypy_exec_path)
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE) as process:
+        output = process.communicate()
+        if b'can\'t combine user with prefix' in output[1]:
+            uextention_text = ['--user', '--prefix=', '--system']
+            with subprocess.Popen(
+                cmd + uextention_text, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE) as new_process:
+                new_process.communicate()
+                if site.USER_BASE is None:
+                    raise Exception(
+                        'No USER_BASE found for the user.'
+                    )
+                _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
+                mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
+                return (new_process.returncode, mypy_exec_path)
+        else:
+            _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
+            mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
+            return (process.returncode, mypy_exec_path)
 
 
 def main(args: Optional[List[str]] = None) -> int:
@@ -197,22 +198,23 @@ def main(args: Optional[List[str]] = None) -> int:
         env['PATH'] = '%s%s' % (path, os.pathsep) + env['PATH']
     env['PYTHONPATH'] = MYPY_TOOLS_DIR
 
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    stdout, stderr = process.communicate()
-    # Standard and error output is in bytes, we need to decode the line to
-    # print it.
-    print(stdout.decode('utf-8'))
-    print(stderr.decode('utf-8'))
-    if process.returncode == 0:
-        print('Mypy type checks successful.')
-    else:
-        print(
-            'Mypy type checks unsuccessful. Please fix the errors. '
-            'For more information, visit: '
-            'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')
-        sys.exit(2)
-    return process.returncode
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE, env=env) as process:
+        stdout, stderr = process.communicate()
+        # Standard and error output is in bytes, we need to decode the line to
+        # print it.
+        print(stdout.decode('utf-8'))
+        print(stderr.decode('utf-8'))
+        if process.returncode == 0:
+            print('Mypy type checks successful.')
+        else:
+            print(
+                'Mypy type checks unsuccessful. Please fix the errors. '
+                'For more information, visit: '
+                'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')
+            sys.exit(2)
+        return process.returncode
 
 
 if __name__ == '__main__': # pragma: no cover
