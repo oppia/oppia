@@ -59,6 +59,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     SmartRouterModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
+    FormsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
@@ -120,6 +121,7 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { FormsModule } from '@angular/forms';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
