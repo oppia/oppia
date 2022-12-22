@@ -85,10 +85,11 @@ class ThirdPartyCSSLintChecksManager(linter_utils.BaseLinter):
         stylelint_cmd_args = [
             node_path, stylelint_path, '--config=' + STYLELINT_CONFIG]
         proc_args = stylelint_cmd_args + self.all_filepaths
-        proc = subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        with subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            ) as proc:
 
-        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+            encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
         # Standard and error output is in bytes, we need to decode the line to
         # print it.
         linter_stdout = encoded_linter_stdout.decode('utf-8')

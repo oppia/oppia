@@ -657,10 +657,11 @@ class CommonTests(test_utils.GenericTestBase):
     def test_permissions_of_file(self) -> None:
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
-        temp_file = tempfile.NamedTemporaryFile(dir=temp_dirpath)
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(temp_file, 'name', 'temp_file')
+        with tempfile.NamedTemporaryFile(dir=temp_dirpath) as temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
+            setattr(temp_file, 'name', 'temp_file')
         temp_file_path = os.path.join(temp_dirpath, 'temp_file')
         with utils.open_file(temp_file_path, 'w') as f:
             f.write('content')
@@ -727,11 +728,11 @@ class CommonTests(test_utils.GenericTestBase):
             """Mocks subprocess.check_call() to create a temporary file instead
             of the actual npm library.
             """
-            temp_file = tempfile.NamedTemporaryFile()
-            # Here MyPy assumes that the 'name' attribute is read-only.
-            # In order to silence the MyPy complaints `setattr` is used to set
-            # the attribute.
-            setattr(temp_file, 'name', 'temp_file')
+            with tempfile.NamedTemporaryFile() as temp_file:
+                # Here MyPy assumes that the 'name' attribute is read-only.
+                # In order to silence the MyPy complaints `setattr` is
+                # used to set the attribute.
+                setattr(temp_file, 'name', 'temp_file')
             with utils.open_file('temp_file', 'w') as f:
                 f.write('content')
 
