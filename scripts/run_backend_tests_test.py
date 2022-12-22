@@ -187,13 +187,14 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with open('dummy_exclusion_list.txt', 'w', encoding='utf-8') as f:
             f.write(dummy_exclusion_list)
 
-        dummy_file_object = open(
-            'dummy_exclusion_list.txt', 'r', encoding='utf-8')
+        with open(
+            'dummy_exclusion_list.txt', 'r', encoding='utf-8'
+            ) as dummy_file_object:
 
-        swap_open = self.swap_with_checks(
-            builtins, 'open',
-            lambda *unused_args, **unused_kwargs: dummy_file_object,
-            expected_args=((COVERAGE_EXCLUSION_LIST_PATH, 'r'),))
+            swap_open = self.swap_with_checks(
+                builtins, 'open',
+                lambda *unused_args, **unused_kwargs: dummy_file_object,
+                expected_args=((COVERAGE_EXCLUSION_LIST_PATH, 'r'),))
 
         with swap_open:
             excluded_files = run_backend_tests.load_coverage_exclusion_list(
@@ -203,7 +204,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             'scripts.random_test', 'core.domain.new_domain_test']
         self.assertEqual(expected_excluded_files, excluded_files)
 
-        dummy_file_object.close()
         os.remove('dummy_exclusion_list.txt')
 
     def test_duplicate_test_files_in_shards_throws_error(self) -> None:
