@@ -54,7 +54,8 @@ class ConstantsTests(test_utils.GenericTestBase):
                 FileNotFoundError,
                 'No such file or directory: \'assets/non_exist.xy\''
             ):
-                constants.get_package_file_contents('assets', 'non_exist.xy')
+                constants.get_package_file_contents(
+                    'assets', 'non_exist.xy', binary_mode=False)
 
     def test_loading_file_in_package_returns_the_content(self) -> None:
         """Test get_package_file_contents with imaginary file."""
@@ -62,6 +63,12 @@ class ConstantsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 constants.get_package_file_contents('assets', 'non_exist.xy'),
                 'File data'
+            )
+
+        with self.swap_to_always_return(pkgutil, 'get_data', 'File data'):
+            self.assertEqual(
+                constants.get_package_file_contents(
+                    'assets', 'non_exist.xy', binary_mode=True), 'File data'
             )
 
         with utils.open_file(
@@ -75,7 +82,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             'images', 'avatar', 'user_blue_150px.png')
         self.assertEqual(
             constants.get_package_file_contents(
-                'assets', default_image_path, is_binary=True), raw_image_png
+                'assets', default_image_path, binary_mode=True), raw_image_png
         )
 
     def test_loading_file_in_non_existent_package_throws_error(self) -> None:
@@ -87,7 +94,7 @@ class ConstantsTests(test_utils.GenericTestBase):
             ):
                 constants.get_package_file_contents('assets', 'non_exist.xy')
                 constants.get_package_file_contents(
-                    'assets', 'non_exist.xy', is_binary=True)
+                    'assets', 'non_exist.xy', binary_mode=True)
 
     def test_difficulty_values_are_matched(self) -> None:
         """Tests that the difficulty values and strings are matched in the

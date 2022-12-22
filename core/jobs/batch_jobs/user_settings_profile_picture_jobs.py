@@ -166,7 +166,7 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             default_image_path = os.path.join(
                 'images', 'avatar', 'user_blue_150px.png')
             raw_image_png = constants.get_package_file_contents(
-                'assets', default_image_path, is_binary=True)
+                'assets', default_image_path, binary_mode=True)
             # Ruling out the possibility of different types for mypy
             # type checking.
             assert isinstance(raw_image_png, bytes)
