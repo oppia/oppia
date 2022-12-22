@@ -409,13 +409,14 @@ def compile_temp_strict_tsconfig(
         shutil.rmtree(COMPILED_JS_DIR)
 
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, encoding='utf-8')
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, encoding='utf-8'
+        ) as process:
 
-    # The value of `process.stdout` should not be None since we passed
-    # the `stdout=subprocess.PIPE` argument to `Popen`.
-    assert process.stdout is not None
-    error_messages = list(iter(process.stdout.readline, ''))
+        # The value of `process.stdout` should not be None since we passed
+        # the `stdout=subprocess.PIPE` argument to `Popen`.
+        assert process.stdout is not None
+        error_messages = list(iter(process.stdout.readline, ''))
 
     # Remove temporary strict TS config.
     if os.path.exists(TEMP_STRICT_TSCONFIG_FILEPATH):
@@ -461,12 +462,13 @@ def compile_and_check_typescript(config_path: str) -> None:
 
     print('Compiling and testing typescript...')
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, encoding='utf-8')
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, encoding='utf-8') as process:
 
-    # The value of `process.stdout` should not be None since we passed
-    # the `stdout=subprocess.PIPE` argument to `Popen`.
-    assert process.stdout is not None
-    error_messages = list(iter(process.stdout.readline, ''))
+        # The value of `process.stdout` should not be None since we passed
+        # the `stdout=subprocess.PIPE` argument to `Popen`.
+        assert process.stdout is not None
+        error_messages = list(iter(process.stdout.readline, ''))
 
     if config_path == STRICT_TSCONFIG_FILEPATH:
         compile_temp_strict_tsconfig(
