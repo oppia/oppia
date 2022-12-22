@@ -197,20 +197,23 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(exists_arr, [False])
 
     def test_get_file_contents(self) -> None:
-        temp_file = tempfile.NamedTemporaryFile().name
-        actual_text = 'Testing install third party file.'
-        with utils.open_file(temp_file, 'w') as f:
-            f.write(actual_text)
-        self.assertEqual(
-            install_third_party.get_file_contents(temp_file), actual_text)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file_name = temp_file.name
+            actual_text = 'Testing install third party file.'
+            with utils.open_file(temp_file_name, 'w') as f:
+                f.write(actual_text)
+            self.assertEqual(
+                install_third_party.get_file_contents(temp_file_name),
+                actual_text)
 
     def test_return_json(self) -> None:
-        temp_file = tempfile.NamedTemporaryFile().name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file_name = temp_file.name
         actual_text = '{"Testing": "install_third_party"}'
-        with utils.open_file(temp_file, 'w') as f:
+        with utils.open_file(temp_file_name, 'w') as f:
             f.write(actual_text)
         self.assertEqual(
-            install_third_party.return_json(temp_file),
+            install_third_party.return_json(temp_file_name),
             {'Testing': 'install_third_party'})
 
     def test_dependencies_syntax_testing_with_valid_syntax(self) -> None:

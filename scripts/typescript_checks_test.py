@@ -34,14 +34,14 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        process = subprocess.Popen(
-            ['test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
-            return process
+        with subprocess.Popen(
+            ['test'], stdout=subprocess.PIPE, encoding='utf-8') as process:
+            def mock_popen(
+                unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+            ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
+                return process
 
-        self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+            self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
     def test_compiled_js_dir_validation(self) -> None:
         """Test that typescript_checks.COMPILED_JS_DIR is validated correctly
@@ -100,12 +100,13 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
     def test_error_is_raised_for_invalid_compilation_of_tsconfig(self) -> None:
         """Test that error is produced if stdout is not empty."""
-        process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_errors(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
-        ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
-            return process
+        with subprocess.Popen(
+            ['echo', 'test'], stdout=subprocess.PIPE,
+            encoding='utf-8') as process:
+            def mock_popen_for_errors(
+                unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+            ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
+                return process
 
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'):
