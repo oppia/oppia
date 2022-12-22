@@ -72,7 +72,7 @@ class MockI18nLanguageCodeService {
 class MockWindowRef {
   nativeWindow = {
     location: {
-      href: ''
+      href: 'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=fr'
     }
   };
 }
@@ -136,24 +136,11 @@ describe('Content language selector component', () => {
   });
 
   it('should correcly initialize newLanguageCode', () => {
-    // When URL has no searchparam.
     let mockWindowRef = new MockWindowRef();
-    mockWindowRef.nativeWindow.location.href = 'http://localhost:8181/explore/wZiXFx1iV5bz';
     let url = new URL(mockWindowRef.nativeWindow.location.href);
-    expect(url.searchParams.get('initialContentLanguageCode')).toBe('');
-
+    expect(url.searchParams.get('initialContentLanguageCode')).toBe('fr');
     component.ngOnInit();
-    // The newLanguageCode should be set to the currentGlobalLanguageCode.
     expect(component.newLanguageCode).toBe('fr');
-
-    // When URL has searchparam.
-    mockWindowRef = new MockWindowRef();
-    mockWindowRef.nativeWindow.location.href = 'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en';
-    url = new URL(mockWindowRef.nativeWindow.location.href);
-    expect(url.searchParams.get('initialContentLanguageCode')).toBe('en');
-    component.ngOnInit();
-    // The newLanguageCode should be set to the initialContentLanguageCode.
-    expect(component.newLanguageCode).toBe('en');
   });
 
   it('should correctly select an option when refresh is not needed', () => {
