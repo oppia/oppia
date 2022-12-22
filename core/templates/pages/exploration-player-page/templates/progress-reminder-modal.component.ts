@@ -29,7 +29,8 @@ import './progress-reminder-modal.component.css';
 
 @Component({
   selector: 'oppia-progress-reminder-modal',
-  templateUrl: './progress-reminder-modal.component.html'
+  templateUrl: './progress-reminder-modal.component.html',
+  styleUrls: ['./progress-reminder-modal.component.css']
 })
 
 export class ProgressReminderModalComponent extends ConfirmOrCancelModal {
