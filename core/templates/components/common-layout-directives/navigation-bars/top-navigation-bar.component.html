@@ -30,17 +30,18 @@
     </picture>
   </a>
 </div>
-<div class="nav-mobile-header-text-container"
-     *ngIf="headerText?.length">
-  <span class="nav-mobile-header-editor">
+<div class="nav-mobile-header-text-container oppia-top-navigation-bar">
+  <span *ngIf="headerText?.length"
+        class="nav-mobile-header-editor">
     {{ headerText }}
   </span>
-  <span class="nav-mobile-header-text">
+  <span *ngIf="subheaderText?.length"
+        class="nav-mobile-header-text">
     {{ subheaderText }}
   </span>
 </div>
 <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
-     class="navbar-header"
+     class="navbar-header oppia-top-navigation-bar"
      *ngIf="userMenuIsShown">
   <ul class="nav oppia-navbar-nav"
       *ngIf="standardNavIsShown">
@@ -232,15 +233,15 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
-                 href="https://medium.com/oppia-org"
-                 target="_blank"
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-blog-link"
+                 [href]="getOppiaBlogUrl()"
+                 [target]="getOppiaBlogUrl() === '/blog' ? '_self' : '_blank'"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">
                   {{'I18N_TOPNAV_BLOG' | translate}}
                 </span>
-                <span class="fas fa-external-link-alt launch"></span>
+                <span class="fas fa-external-link-alt launch" *ngIf="!platformFeatureService.status.BlogPages.isEnabled"></span>
               </a>
             </li>
           </ul>
@@ -469,6 +470,13 @@
              href="/contributor-dashboard"
              class="dropdown-item nav-link e2e-test-learner-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item" *ngIf="LEARNER_GROUPS_FEATURE_IS_ENABLED">
+          <a (click)="closeSubmenuIfNotMobile($event)"
+             href="/facilitator-dashboard"
+             class="dropdown-item nav-link">
+            <span [innerHTML]="'I18N_TOPNAV_FACILITATOR_DASHBOARD' | translate"></span>
           </a>
         </li>
         <li class="nav-item">

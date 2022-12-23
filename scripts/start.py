@@ -37,6 +37,7 @@ from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-posit
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -76,6 +77,11 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--source_maps',
     help='optional; if specified, build webpack with source maps.',
+    action='store_true')
+_PARSER.add_argument(
+    '--contributor_dashboard_debug',
+    help='optional; if specified, populate sample data that can be used to help'
+         'develop for the contributor dashboard.',
     action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
@@ -166,6 +172,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
+            # We need to create an empty hashes.json file for the build so that
+            # we don't get the error "assets/hashes.json file doesn't exist".
+            build.save_hashes_to_file({})
+            stack.enter_context(servers.managed_ng_build(watch_mode=True))
             stack.enter_context(servers.managed_webpack_compiler(
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
                 watch_mode=True))
@@ -178,9 +188,17 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             skip_sdk_update_check=True,
             port=PORT_NUMBER_FOR_GAE_SERVER))
 
+        if parsed_args.contributor_dashboard_debug:
+            initializer = (
+                contributor_dashboard_debug
+                .ContributorDashboardDebugInitializer(
+                    base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER)
+            )
+            initializer.populate_debug_data()
+
         managed_web_browser = (
             None if parsed_args.no_browser else
-            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))  # type: ignore[no-untyped-call]
+            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
 
         if managed_web_browser is None:
             common.print_each_string_after_two_new_lines([

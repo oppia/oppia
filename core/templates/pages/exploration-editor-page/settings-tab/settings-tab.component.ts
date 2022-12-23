@@ -58,6 +58,10 @@ import { UserEmailPreferencesService } from '../services/user-email-preferences.
 import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
 import { ExplorationEditorPageConstants } from '../exploration-editor-page.constants';
 import { AppConstants } from 'app.constants';
+import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { MetadataDiffData, VersionHistoryService } from '../services/version-history.service';
+import { MetadataVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { MetadataVersionHistoryModalComponent } from '../modal-templates/metadata-version-history-modal.component';
 
 @Component({
   selector: 'oppia-settings-tab',
@@ -65,31 +69,44 @@ import { AppConstants } from 'app.constants';
 })
 export class SettingsTabComponent
   implements OnInit, OnDestroy {
-  @Input() currentUserIsCurriculumAdmin: boolean;
-  @Input() currentUserIsModerator: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() currentUserIsCurriculumAdmin!: boolean;
+  @Input() currentUserIsModerator!: boolean;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
+  rolesSaveButtonEnabled!: boolean;
+  errorMessage!: string;
+  isRolesFormOpen!: boolean;
+  newMemberUsername!: string;
+  newMemberRole!: { name: string; value: string};
+  isVoiceoverFormOpen!: boolean;
+  newVoiceArtistUsername!: string;
+  hasPageLoaded!: boolean;
+  basicSettingIsShown!: boolean;
+  advancedFeaturesIsShown!: boolean;
+  rolesCardIsShown!: boolean;
+  permissionsCardIsShown!: boolean;
+  feedbackCardIsShown!: boolean;
+  controlsCardIsShown!: boolean;
+  voiceArtistsCardIsShown!: boolean;
+  EXPLORATION_TITLE_INPUT_FOCUS_LABEL!: string;
+  stateNames!: string[];
+  formStyle!: string;
+  canDelete!: boolean;
+  canModifyRoles!: boolean;
+  canReleaseOwnership!: boolean;
+  canUnpublish!: boolean;
+  canManageVoiceArtist!: boolean;
+  explorationId!: string;
+  loggedInUser!: string | null;
+  TAG_REGEX!: string;
   CREATOR_DASHBOARD_PAGE_URL: string = '/creator-dashboard';
   EXPLORE_PAGE_PREFIX: string = '/explore/';
   directiveSubscriptions = new Subscription();
   explorationIsLinkedToStory: boolean = false;
   isSuperAdmin: boolean = false;
-  rolesSaveButtonEnabled: boolean;
-  errorMessage: string;
-  isRolesFormOpen: boolean;
-  newMemberUsername: string;
-  newMemberRole: { name: string; value: string};
-  isVoiceoverFormOpen: boolean;
-  newVoiceArtistUsername: string;
-  hasPageLoaded: boolean;
-  basicSettingIsShown: boolean;
-  advancedFeaturesIsShown: boolean;
-  rolesCardIsShown: boolean;
-  permissionsCardIsShown: boolean;
-  feedbackCardIsShown: boolean;
-  controlsCardIsShown: boolean;
-  voiceArtistsCardIsShown: boolean;
-  EXPLORATION_TITLE_INPUT_FOCUS_LABEL: string;
   ROLES = [{
     name: 'Manager (can edit permissions)',
     value: 'owner'
@@ -101,28 +118,20 @@ export class SettingsTabComponent
     value: 'viewer'
   }];
 
-  CATEGORY_LIST_FOR_SELECT2: {
+  CATEGORY_LIST_FOR_SELECT2!: {
     id: string;
     text: string;
   } [];
 
-  stateNames: string[];
-  formStyle: string;
-  canDelete: boolean;
-  canModifyRoles: boolean;
-  canReleaseOwnership: boolean;
-  canUnpublish: boolean;
-  canManageVoiceArtist: boolean;
-  explorationId: string;
-  loggedInUser: string;
-  TAG_REGEX: string;
   addOnBlur: boolean = true;
+
+  validationErrorIsShown: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
     private changeListService: ChangeListService,
     private contextService: ContextService,
-    private editabilityService: EditabilityService,
+    public editabilityService: EditabilityService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private explorationAutomaticTextToSpeechService:
@@ -136,10 +145,11 @@ export class SettingsTabComponent
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
+    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private explorationObjectiveService: ExplorationObjectiveService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationParamSpecsService: ExplorationParamSpecsService,
-    private explorationRightsService: ExplorationRightsService,
+    public explorationRightsService: ExplorationRightsService,
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService,
@@ -151,12 +161,18 @@ export class SettingsTabComponent
     private userExplorationPermissionsService:
       UserExplorationPermissionsService,
     private userService: UserService,
+    private versionHistoryBackendApiService: VersionHistoryBackendApiService,
+    private versionHistoryService: VersionHistoryService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
   ) {}
 
-  filteredChoices = [];
-  newCategory: {
+  filteredChoices: {
+    id: string;
+    text: string;
+  }[] = [];
+
+  newCategory!: {
     id: string;
     text: string;
   };
@@ -168,7 +184,17 @@ export class SettingsTabComponent
 
     // Add our explorationTags.
     if (value) {
-      this.explorationTags.push(value.toLowerCase());
+      if (!(this.explorationTagsService.displayed) ||
+        (this.explorationTagsService.displayed as []).length < 10) {
+        if (
+          (this.explorationTagsService.displayed as string[]).includes(value)) {
+          // Clear the input value.
+          event.input.value = '';
+          return;
+        }
+
+        this.explorationTags.push(value.toLowerCase());
+      }
     }
 
     // Clear the input value.
@@ -250,6 +276,101 @@ export class SettingsTabComponent
     });
   }
 
+  getLastEditedVersionNumber(): number {
+    const lastEditedVersionNumber = this
+      .versionHistoryService
+      .getBackwardMetadataDiffData()
+      .oldVersionNumber;
+    if (lastEditedVersionNumber === null) {
+      // A null value for lastEditedVersionNumber marks the end of the version
+      // history for the exploration metadata. This is impossible here because
+      // this function 'getLastEditedVersionNumber' is called only when
+      // canShowExploreVersionHistoryButton() returns true. This function will
+      // not return true when we reach the end of the version history list.
+      throw new Error('Last edited version number cannot be null');
+    }
+    return lastEditedVersionNumber;
+  }
+
+  getLastEditedCommitterUsername(): string {
+    return (
+      this
+        .versionHistoryService
+        .getBackwardMetadataDiffData()
+        .committerUsername
+    );
+  }
+
+  canShowExploreVersionHistoryButton(): boolean {
+    return this.versionHistoryService.canShowBackwardMetadataDiffData();
+  }
+
+  onClickExploreVersionHistoryButton(): void {
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      MetadataVersionHistoryModalComponent, {
+        backdrop: true,
+        windowClass: 'metadata-diff-modal',
+        size: 'xl'
+      });
+
+    const metadataDiffData: MetadataDiffData = this
+      .versionHistoryService
+      .getBackwardMetadataDiffData();
+
+    modalRef.componentInstance.newMetadata = metadataDiffData.newMetadata;
+    modalRef.componentInstance.oldMetadata = metadataDiffData.oldMetadata;
+    modalRef.componentInstance.committerUsername = (
+      metadataDiffData.committerUsername);
+    modalRef.componentInstance.oldVersion = metadataDiffData.oldVersionNumber;
+
+    modalRef.result.then(() => {
+      this.versionHistoryService
+        .setCurrentPositionInMetadataVersionHistoryList(0);
+    }, () => {
+      this.versionHistoryService
+        .setCurrentPositionInMetadataVersionHistoryList(0);
+    });
+  }
+
+  async updateMetadataVersionHistory(): Promise<void> {
+    this.versionHistoryService.resetMetadataVersionHistory();
+    this.validationErrorIsShown = false;
+
+    const explorationData = (
+      await this.explorationDataService.getDataAsync(() => {}));
+
+    const explorationMetadata = this
+      .explorationMetadataObjectFactory
+      .createFromBackendDict(explorationData.exploration_metadata);
+
+    this.versionHistoryService.insertMetadataVersionHistoryData(
+      this.versionHistoryService.getLatestVersionOfExploration(),
+      explorationMetadata, '');
+
+    if (
+      this.versionHistoryService.getLatestVersionOfExploration() !== null
+    ) {
+      const metadataVersionHistory = await this
+        .versionHistoryBackendApiService
+        .fetchMetadataVersionHistoryAsync(
+          this.contextService.getExplorationId(),
+          this.versionHistoryService.getLatestVersionOfExploration() as number
+        );
+      if (metadataVersionHistory !== null) {
+        this.versionHistoryService.insertMetadataVersionHistoryData(
+          (metadataVersionHistory as MetadataVersionHistoryResponse)
+            .lastEditedVersionNumber,
+          (metadataVersionHistory as MetadataVersionHistoryResponse)
+            .metadataInPreviousVersion,
+          (metadataVersionHistory as MetadataVersionHistoryResponse)
+            .lastEditedCommitterUsername
+        );
+      } else {
+        this.validationErrorIsShown = true;
+      }
+    }
+  }
+
   saveExplorationTitle(): void {
     this.explorationTitleService.saveDisplayedValue();
     if (!this.isTitlePresent()) {
@@ -306,6 +427,7 @@ export class SettingsTabComponent
     if (this.hasPageLoaded) {
       return (this.explorationDataService.data.param_changes.length > 0);
     }
+    return false;
   }
 
   enableParameters(): void {
@@ -437,7 +559,7 @@ export class SettingsTabComponent
     });
   }
 
-  editVoiseArtist(newVoiceArtistUsername: string): void {
+  editVoiceArtist(newVoiceArtistUsername: string): void {
     this.explorationRightsService.assignVoiceArtistRoleAsync(
       newVoiceArtistUsername);
     this.closeVoiceoverForm();
@@ -523,7 +645,9 @@ export class SettingsTabComponent
     }).result.then(() => {
       this.editableExplorationBackendApiService.deleteExplorationAsync(
         this.explorationId).then(() => {
-        this.windowRef.nativeWindow.location = this.CREATOR_DASHBOARD_PAGE_URL;
+        this.windowRef.nativeWindow.location = (
+          // TODO(#13015): Remove use of unknown as a type.
+          this.CREATOR_DASHBOARD_PAGE_URL as unknown as Location);
       });
     }, () => {
       this.alertsService.clearWarnings();
@@ -639,6 +763,7 @@ export class SettingsTabComponent
           () => {
             this.explorationTags = (
               this.explorationTagsService.displayed as string[]);
+            this.updateMetadataVersionHistory();
           }
         )
     );

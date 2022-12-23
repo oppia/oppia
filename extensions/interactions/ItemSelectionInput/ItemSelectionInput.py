@@ -45,7 +45,7 @@ class ItemSelectionInput(base.BaseInteraction):
 
     _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'minAllowableSelectionCount',
-        'description': 'Minimum number of selections permitted.',
+        'description': 'Minimum number of selections permitted',
         'schema': {
             'type': 'int',
             'validators': [{
@@ -70,9 +70,15 @@ class ItemSelectionInput(base.BaseInteraction):
         'description': 'Items for selection',
         'schema': {
             'type': 'list',
+            'validators': [{
+                'id': 'has_unique_subtitled_contents'
+            }],
             'items': {
                 'type': 'custom',
                 'obj_type': 'SubtitledHtml',
+                'validators': [{
+                    'id': 'has_subtitled_html_non_empty'
+                }],
                 'replacement_ui_config': {
                     'html': {
                         'hide_complex_extensions': True,

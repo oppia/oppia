@@ -3,8 +3,8 @@
     <div class="preferences-tab-title">
       <span translate="I18N_LEARNER_GROUP_PREFERENCE"></span>
     </div>
-    <div>
-      <div class="btn btn-danger delete-group-button oppia-autofocus">
+    <div class="delete-group-button-container">
+      <div class="btn btn-danger delete-group-button oppia-autofocus" (click)="deleteLearnerGroup()">
         <span translate="I18N_DELETE_LEARNER_GROUP"></span>
       </div>
     </div>
@@ -43,7 +43,7 @@
     <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_LEARNERS)" class="edit-learner-group-learners-section">
       <button class="btn btn-primary add-new-learner-button"
               (click)="openInviteLearnersModal()">
-        + <span translate="I18N_LEARNER_GROUP_ADD_NEW_LEARNER"></span>
+        + <span translate="I18N_LEARNER_GROUP_INVITE_LEARNERS"></span>
       </button>
       <div class="current-group-learners" *ngIf="learnerGroup">
         <span class="group-learners-title">Current Group Learners({{learnerGroup.learnerUsernames.length}})</span>
@@ -73,12 +73,11 @@
             <span>{{learnerInfo.username}}</span>
           </div>
           <div class="group-learners-card-buttons">
-            <span class="btn btn-primary" (click)="addLearnerToLearnerGroup(learnerInfo)">+ Add Learner</span>
             <div class="group-learners-card-button" (click)="openWithdrawLearnerInvitationModal(learnerInfo)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" fill="none">
-                <path d="M14.3158 1V5H3.22526L6.24 1.41L5.05263 0L0 6L5.05263 12L6.24 10.58L3.22526 7H16V1H14.3158Z" fill="#00609C"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M10.0234 0.871094L0.996712 9.89077" stroke="#00609C" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10.0234 9.89077L0.996712 0.871093" stroke="#00609C" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-              <span translate="I18N_LEARNER_GROUP_WITHDRAW_INVITE"></span>
             </div>
           </div>
         </div>

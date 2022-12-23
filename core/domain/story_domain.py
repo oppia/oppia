@@ -28,8 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import List, Optional, overload
-from typing_extensions import Final, Literal, TypedDict
+from typing import Final, List, Literal, Optional, TypedDict, overload
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -1104,11 +1103,10 @@ class Story:
         """
         self.require_valid_title(self.title)
         self.require_valid_description(self.description)
-
-        if self.url_fragment is not None:
-            utils.require_valid_url_fragment(
-                self.url_fragment, 'Story Url Fragment',
-                constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
+        assert self.url_fragment is not None
+        utils.require_valid_url_fragment(
+            self.url_fragment, 'Story Url Fragment',
+            constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
         utils.require_valid_meta_tag_content(self.meta_tag_content)
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
@@ -1971,10 +1969,10 @@ class StorySummary:
             ValidationError. One or more attributes of story summary are
                 invalid.
         """
-        if self.url_fragment is not None:
-            utils.require_valid_url_fragment(
-                self.url_fragment, 'Story Url Fragment',
-                constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
+        assert self.url_fragment is not None
+        utils.require_valid_url_fragment(
+            self.url_fragment, 'Story Url Fragment',
+            constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
 
         if not isinstance(self.title, str):
             raise utils.ValidationError(
@@ -2073,6 +2071,7 @@ class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
     all_node_dicts: List[StoryNodeDict]
     topic_name: str
     topic_url_fragment: str
+    classroom_url_fragment: Optional[str]
 
 
 class StoryChapterProgressSummaryDict(TypedDict):

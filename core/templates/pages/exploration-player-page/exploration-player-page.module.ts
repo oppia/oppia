@@ -19,11 +19,8 @@
 import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
-
+import { ExplorationPlayerViewerCommonModule } from './exploration-player-viewer-common.module';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
@@ -42,6 +39,8 @@ import { HintAndSolutionModalService } from './services/hint-and-solution-modal.
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
+import { ToastrModule } from 'ngx-toastr';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -52,10 +51,12 @@ import 'third-party-imports/skulpt.import';
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
+    ExplorationPlayerViewerCommonModule,
     SharedComponentsModule,
+    ToastrModule,
+    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
@@ -67,7 +68,6 @@ import 'third-party-imports/skulpt.import';
     RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,

@@ -34,7 +34,7 @@ export interface RteComponentSpecs {
   tooltip: string;
 }
 
-interface RteHelperService {
+export interface RteHelperService {
   createCustomizationArgDictFromAttrs: (attrs) => Record<string, unknown>;
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;
@@ -159,6 +159,7 @@ export class CkEditorInitializerService {
                           newWidgetSelector);
                         if (widgetElement) {
                           widgetElement.remove();
+                          editor.fire('change');
                         }
                       }
                     }
@@ -205,11 +206,13 @@ export class CkEditorInitializerService {
                   const customEl = that.element.getChild(0).$;
                   customEl[capital.join('') + 'WithValue'] = (
                     htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] || ''));
+                      that.data[spec.name] !== undefined ?
+                      that.data[spec.name] : ''));
                   that.element.getChild(0).setAttribute(
                     spec.name + '-with-value',
                     htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] || ''));
+                      that.data[spec.name] !== undefined ?
+                      that.data[spec.name] : ''));
                 });
               },
               init: function() {

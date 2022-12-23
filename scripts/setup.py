@@ -22,16 +22,18 @@ import subprocess
 import sys
 import tarfile
 
+from typing import Final, List, Optional
+
 from . import clean
 from . import common
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Python execution environent set up for all scripts.
 """)
 
 
-def create_directory(directory_path):
+def create_directory(directory_path: str) -> None:
     """Creates a new directory. Does not do anything if directory already
     exists.
 
@@ -46,10 +48,10 @@ def create_directory(directory_path):
 # This function takes a command for python as its only input.
 # It checks this input for a specific version of python and returns false
 # if it does not match the expected prefix.
-def test_python_version():
-    running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
-    if running_python_version != '3.7':
-        print('Please use Python 3.7. Exiting...')
+def test_python_version() -> None:
+    running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
+    if running_python_version != '3.8.15':
+        print('Please use Python 3.8.15. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():
@@ -85,7 +87,7 @@ def test_python_version():
         sys.exit(1)
 
 
-def download_and_install_package(url_to_retrieve, filename):
+def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     """Downloads and installs package in Oppia tools directory.
 
     Args:
@@ -101,7 +103,7 @@ def download_and_install_package(url_to_retrieve, filename):
     os.remove(filename)
 
 
-def rename_yarn_folder(filename, path):
+def rename_yarn_folder(filename: str, path: str) -> None:
     """Removes the `v` from the yarn folder name.
 
     Args:
@@ -114,7 +116,7 @@ def rename_yarn_folder(filename, path):
         os.rename(path + '/' + old_name, path + '/' + new_name)
 
 
-def download_and_install_node():
+def download_and_install_node() -> None:
     """Download and install node to Oppia tools directory."""
     outfile_name = 'node-download'
 
@@ -141,6 +143,10 @@ def download_and_install_node():
                 node_file_name = 'node-v%s-darwin-x64' % (common.NODE_VERSION)
             elif common.is_linux_os():
                 node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
+            # Oppia only suppports windows, mac and linux operating systems.
+            else:
+                raise Exception(
+                    'System\'s Operating System is not compatible.')
         else:
             node_file_name = 'node-v%s' % common.NODE_VERSION
         download_and_install_package(
@@ -156,15 +162,14 @@ def download_and_install_node():
             subprocess.check_call(['make'])
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Runs the script to setup Oppia."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     test_python_version()
 
     # The second option allows this script to also be run from deployment
     # folders.
-    if not os.getcwd().endswith('oppia') and not os.getcwd().endswith(
-            'deploy-'):
+    if not os.getcwd().endswith(('oppia', 'deploy-')):
         print('')
         print('WARNING This script should be run from the oppia/ root folder.')
         print('')
@@ -216,44 +221,6 @@ def main(args=None):
             'https://github.com/yarnpkg/yarn/releases/download/v%s/%s'
             % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
 
-    # Adjust path to support the default Chrome locations for Unix, Windows and
-    # Mac OS.
-    if os.path.isfile('/usr/bin/google-chrome'):
-        # Unix.
-        chrome_bin = '/usr/bin/google-chrome'
-    elif os.path.isfile('/usr/bin/chromium-browser'):
-        # Unix.
-        chrome_bin = '/usr/bin/chromium-browser'
-    elif os.path.isfile('/usr/bin/brave'):
-        # Arch Linux.
-        chrome_bin = '/usr/bin/brave'
-    elif os.path.isfile('/usr/bin/chromium'):
-        # Arch Linux.
-        chrome_bin = '/usr/bin/chromium'
-    elif os.path.isfile(
-            '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
-        # Windows.
-        chrome_bin = (
-            '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
-    elif os.path.isfile(
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe'):
-        chrome_bin = (
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
-    elif os.path.isfile(
-            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
-        # WSL.
-        chrome_bin = (
-            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
-    elif os.path.isfile(
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'):
-        # Mac OS.
-        chrome_bin = (
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
-    else:
-        print('Chrome is not found, stopping ...')
-        raise Exception('Chrome not found.')
-
-    os.environ['CHROME_BIN'] = chrome_bin
     print('Environment setup completed.')
 
 

@@ -32,6 +32,7 @@ export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicIsPublished!: boolean;
   MAX_COMMIT_MESSAGE_LENGTH!: number;
+  commitMessage: string = '';
   isTopicPublished: boolean = false;
 
   constructor(

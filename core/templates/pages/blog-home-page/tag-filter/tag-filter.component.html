@@ -1,7 +1,6 @@
-<div class="oppia-same-row-container tag-filter w-100">
+<div class="oppia-same-row-container tag-filter w-100 e2e-test-tag-filter-component">
   <mat-form-field appearance="fill"
-                  class="w-100"
-                  [ngClass]="{'pb-5': !isSmallScreenViewActive}">
+                  class="w-100">
     <mat-label>{{ 'I18N_BLOG_HOME_PAGE_TAG_FILTER_HOLDER_TEXT' | translate }}</mat-label>
     <mat-chip-list #chipList aria-label="Tags Filter">
       <mat-chip *ngFor="let tag of selectedTags"
@@ -16,9 +15,11 @@
              #trigger="matAutocompleteTrigger"
              [formControl]="tagFilter"
              [matAutocomplete]="auto"
-             [matChipInputFor]="chipList">
+             [matChipInputFor]="chipList"
+             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+             class="e2e-test-tag-filter-selection-input">
     </mat-chip-list>
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)" class="e2e-test-tag-filter-selection-dropdown">
       <mat-option *ngFor="let tag of filteredTags | async" [value]="tag" (click)="$event.stopPropagation(); trigger.openPanel()">
         {{ tag }}
       </mat-option>

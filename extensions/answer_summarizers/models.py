@@ -48,8 +48,7 @@ from core import utils
 from core.domain import exp_domain
 from core.domain import stats_domain
 
-from typing import Dict, FrozenSet, Iterable, List, Optional
-from typing_extensions import TypedDict
+from typing import Dict, FrozenSet, Iterable, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -475,9 +474,15 @@ class TopAnswersByCategorization(BaseCalculation):
             str, List[state_domain.AcceptableCorrectAnswerTypes]
         ] = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
-            if category in CLASSIFICATION_CATEGORIES:
-                submitted_answers_by_categorization[category].extend(
-                    d['answer'] for d in answer_dicts)
+            # The 'classification_categorization' of SubmittedAnswer cannot
+            # have a value other than those defined in
+            # CLASSIFICATION_CATEGORIES. This is made sure by validate()
+            # method in stats_domain.SubmittedAnswer class which defines
+            # valid classification categories. Hence, 'category' must be in
+            # 'CLASSIFICATION_CATEGORIES'.
+            assert category in CLASSIFICATION_CATEGORIES
+            submitted_answers_by_categorization[category].extend(
+                d['answer'] for d in answer_dicts)
 
         categorized_answer_frequency_lists = (
             stats_domain.CategorizedAnswerFrequencyLists({

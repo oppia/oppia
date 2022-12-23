@@ -321,12 +321,11 @@
 }
 
 .save-progress-menu {
-  animation: slideUp 0.8s;
   background-color: #fff;
   border-radius: 10px;
-  height: 425px;
+  height: auto;
   left: 50%;
-  max-width: 450px;
+  max-width: 495px;
   position: fixed;
   top: 8vh;
   transform: translateX(-50%);
@@ -364,7 +363,7 @@
   background-color: #00645c;
   color: #fff;
   cursor: pointer;
-  font-family: Capriola, sans-serif;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 14px;
   font-weight: 700;
   height: 38px;
@@ -378,6 +377,7 @@
   flex-direction: row;
   height: 10%;
   justify-content: space-evenly;
+  margin: 15px 0;
   width: 100%;
 }
 
@@ -396,9 +396,13 @@
   width: 100%;
 }
 
+.save-progress-menu .uid-box .oppia-tooltip-container {
+  margin-left: -25px;
+}
+
 .save-progress-menu .uid-box .guide-text {
-  margin-top: 15px;
-  text-align: center;
+  padding: 10px 20px;
+  text-align: left;
   width: 100%;
 }
 
@@ -410,36 +414,6 @@
   width: 100%;
 }
 
-.save-progress-menu .uid-box .uid-copy {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-}
-
-.save-progress-menu .uid-box .uid-copy .unique-progress-id {
-  align-items: center;
-  border: 1px solid black;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  margin-left: 20px;
-  padding: 5px;
-  width: 70%;
-  word-break: break-word;
-}
-
-.save-progress-menu .uid-box .uid-copy .uid-copy-btn {
-  box-shadow: 1px 1px 2px 0 rgba(0, 100, 92, 0.8);
-  color: #00645c;
-  font-family: Roboto, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  margin: 0 auto;
-  width: 20%;
-}
-
 .save-progress-menu .save-progress-close-button {
   background: transparent;
   border: none;
@@ -448,13 +422,4 @@
   position: absolute;
   right: 10px;
   top: 10px;
-}
-
-@keyframes slideUp {
-  0% {
-    -webkit-transform: translate(-50%, 90vh);
-  }
-  100% {
-    -webkit-transform: translate(-50%, 0);
-  }
 }

@@ -20,18 +20,21 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/co
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
 
 import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { AppConstants } from 'app.constants';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 
 import './android-page.component.css';
 
 @Component({
   selector: 'android-page',
   templateUrl: './android-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./android-page.component.css'],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -73,6 +76,9 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   featuresShown = 0;
   androidUpdatesSectionIsSeen = false;
   featuresMainTextIsSeen = false;
+  emailAddress: string | null = null;
+  name: string | null = null;
+  userCanSubscribe: boolean = false;
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
@@ -83,6 +89,8 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
 
   directiveSubscriptions = new Subscription();
   constructor(
+    private alertsService: AlertsService,
+    private mailingListBackendApiService: MailingListBackendApiService,
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
     private urlInterpolationService: UrlInterpolationService,
@@ -133,6 +141,32 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
 
   changeFeaturesShown(featureNumber: number): void {
     this.featuresShown = featureNumber;
+  }
+
+  validateEmailAddress(): boolean {
+    // A simple check for basic email validation.
+    let regex = new RegExp(AppConstants.EMAIL_REGEX);
+    return regex.test(String(this.emailAddress));
+  }
+
+  subscribeToAndroidList(): void {
+    this.mailingListBackendApiService.subscribeUserToMailingList(
+      String(this.emailAddress),
+      String(this.name),
+      AppConstants.MAILING_LIST_ANDROID_TAG
+    ).then((status) => {
+      if (status) {
+        this.alertsService.addInfoMessage('Done!', 1000);
+      } else {
+        this.alertsService.addInfoMessage(
+          'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+          'to be added to the mailing list.', 10000);
+      }
+    }).catch(errorResponse => {
+      this.alertsService.addInfoMessage(
+        'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
+        'to be added to the mailing list.', 10000);
+    });
   }
 
   setPageTitle(): void {

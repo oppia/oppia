@@ -1,5 +1,5 @@
 <div class="oppia-blog-home-page d-flex justify-content-center">
-  <mat-card class="oppia-blog-home-page-card oppia-page-card py-5">
+  <mat-card class="oppia-blog-home-page-card oppia-page-card py-5 e2e-test-oppia-blog-home-page-card">
     <div class="d-flex" [ngClass]="{'flex-column-reverse': isSmallScreenViewActive()}">
       <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen"
            class="oppia-blog-post-card-container"
@@ -15,15 +15,15 @@
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
                             [rotate]="true"
                             (pageChange)="onPageChange()"
-                            class="ml-auto">
+                            class="ml-auto e2e-test-pagination">
               <ng-template ngbPaginationPrevious >
-                <i class="fa fa-angle-left text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+                <i class="fa fa-angle-left text-center w-100 e2e-test-pagination-prev-button" aria-hidden="true" (click)="onPageChange()"></i>
               </ng-template>
               <ng-template ngbPaginationNumber let-p>
                 <button disabled class="pagination-button">{{ p }}</button>
               </ng-template>
               <ng-template ngbPaginationNext>
-                <i class="fa fa-angle-right text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+                <i class="fa fa-angle-right text-center w-100 e2e-test-pagination-next-button" aria-hidden="true" (click)="onPageChange()"></i>
               </ng-template>
             </ngb-pagination>
           </div>
@@ -59,14 +59,16 @@
             {{ 'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING' | translate }}
           </div>
         </div>
-        <div *ngFor="let blogPostSummary of blogPostSummariesToShow" class="blog-post-card">
+        <div *ngFor="let blogPostSummary of blogPostSummariesToShow" class="blog-post-card e2e-test-blog-post-list">
           <oppia-blog-card [blogPostSummary]="blogPostSummary"
                            [authorProfilePicDataUrl]="blogPostSummary.authorProfilePicUrl"
-                           [shownOnblogPostPage]="false">
+                           [shownOnblogPostPage]="false"
+                           class="e2e-test-blog-post-tile-item">
           </oppia-blog-card>
         </div>
       </div>
-      <div *ngIf="noResultsFound && !showBlogPostCardsLoadingScreen" class="col-8 posts-display-heading text-center">
+      <div *ngIf="noResultsFound && !showBlogPostCardsLoadingScreen"
+           class="col-8 posts-display-heading text-center e2e-test-no-results-found">
         <picture>
           <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
           <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
@@ -82,8 +84,8 @@
              [ngClass]="{'pl-5': !isSmallScreenViewActive(), 'mobile-view-columns-separator': isSmallScreenViewActive()}">
           <span [ngClass]="{'d-inline-flex': isSmallScreenViewActive()}">
             <img [src]="oppiaAvatarImgUrl" alt="image of Oppia Avatar"
-                 class="mr-auto ml-auto oppia-blog-home-page-card-avatar d-flex flex-grow-1">
-            <h1 class="d-flex flex-grow-1 blog-home-page-welcome"
+                 class="mr-auto ml-auto oppia-blog-home-page-card-avatar d-flex flex-grow-1 e2e-test-oppia-avatar-image">
+            <h1 class="d-flex flex-grow-1 blog-home-page-welcome e2e-test-blog-welcome-heading"
                 [ngClass]="{'mx-auto my-2': !isSmallScreenViewActive(), 'ml-5 my-auto': isSmallScreenViewActive()}">
               {{ 'I18N_BLOG_HOME_PAGE_WELCOME_HEADING' | translate }}
             </h1>
@@ -94,11 +96,11 @@
           <h4 class="d-flex flex-grow-1 search-heading">
             {{ 'I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING' | translate }}
           </h4>
-          <form class="navbar-form oppia-search-bar-form pl-0" role="search">
+          <form class="navbar-form oppia-search-bar-form pl-0 e2e-test-search-field" role="search">
             <div class="form-group d-flex"
                  [ngClass]="{'flex-row-reverse': isSmallScreenViewActive()}">
               <input type="text"
-                     class="form-control oppia-search-bar-input oppia-search-bar-text-input"
+                     class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
                      (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
                      [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"

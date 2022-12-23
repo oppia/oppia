@@ -29,8 +29,7 @@ from core.constants import constants
 from core.domain import customization_args_util
 from core.domain import exp_domain
 
-from typing import Any, Dict, List, Optional, Union
-from typing_extensions import Final, Literal, TypedDict
+from typing import Any, Dict, Final, List, Literal, Optional, TypedDict, Union
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -69,7 +68,6 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
 
-# TODO(#15995): Narrow down this Dict type to each issue customization arg type.
 IssuesCustomizationArgsDictType = Dict[
     str, Dict[str, Union[str, int, List[str]]]
 ]
@@ -188,7 +186,7 @@ class LearnerAnswerInfoDict(TypedDict):
     """Dictionary representing LearnerAnswerInfo object."""
 
     id: str
-    answer: Optional[str]
+    answer: Optional[Union[str, int, Dict[str, str], List[str]]]
     answer_details: str
     created_on: str
 
@@ -2114,7 +2112,7 @@ class LearnerAnswerInfo:
     def __init__(
         self,
         learner_answer_info_id: str,
-        answer: Optional[str],
+        answer: Optional[Union[str, int, Dict[str, str], List[str]]],
         answer_details: str,
         created_on: datetime.datetime
     ) -> None:

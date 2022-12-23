@@ -25,6 +25,7 @@ import { HttpClient, HttpXhrBackend,
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
 
+
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -499,7 +500,6 @@ import { MathInteractionsService } from './math-interactions.service';
 interface UpgradedServicesDict {
   [service: string]: unknown;
 }
-
 @Injectable({
   providedIn: 'root'
 })
@@ -817,7 +817,8 @@ export class UpgradedServices {
     upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
       upgradedServices['WorkedExampleObjectFactory']);
     upgradedServices['ContextService'] = new ContextService(
-      upgradedServices['UrlService']);
+      upgradedServices['UrlService'],
+      upgradedServices['BlogPostPageService']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
@@ -1034,7 +1035,8 @@ export class UpgradedServices {
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['QuestionObjectFactory']);
     upgradedServices['ReadOnlyCollectionBackendApiService'] =
       new ReadOnlyCollectionBackendApiService(
         upgradedServices['HttpClient'],

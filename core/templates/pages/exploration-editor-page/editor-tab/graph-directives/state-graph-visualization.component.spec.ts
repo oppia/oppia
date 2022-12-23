@@ -113,6 +113,24 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       style: 'string',
       nodeClass: 'string',
       canDelete: true
+    },
+    state_4: {
+      depth: 3,
+      offset: 0,
+      reachable: true,
+      y0: 10,
+      x0: 10,
+      yLabel: 5,
+      xLabel: 5,
+      height: 10,
+      width: 100,
+      id: 'node_1',
+      label: 'This is a label for node 4',
+      reachableFromEnd: true,
+      secondaryLabel: '2nd',
+      style: 'string',
+      nodeClass: 'string',
+      canDelete: true
     }
   };
 
@@ -157,7 +175,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     fixture = TestBed.createComponent(StateGraphVisualization);
     component = fixture.componentInstance;
 
@@ -188,14 +206,14 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       nativeElement: {
         height: {
           baseVal: {
-            convertToSpecifiedUnits(value) {
+            convertToSpecifiedUnits(value: number) {
               return 1000;
             }
           }
         },
         width: {
           baseVal: {
-            convertToSpecifiedUnits(value) {
+            convertToSpecifiedUnits(value: number) {
               return 1000;
             }
           }
@@ -203,6 +221,10 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       }
     };
 
+    // This throws "Type 'null' is not assignable to parameter of
+    // type 'State'." We need to suppress this error because of
+    // the need to test validations.
+    // @ts-ignore
     spyOn(explorationStatesService, 'getState').and.returnValue(null);
     spyOn(stateGraphLayoutService, 'computeLayout')
       .and.returnValue(nodes);
@@ -211,11 +233,11 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         'This is a label for node 1': ['red', 'green']
       });
     spyOn(stateGraphLayoutService, 'getAugmentedLinks').and.returnValue([{
-      source: null,
-      target: null,
-      d: null,
-      style: '',
-      connectsDestIfStuck: false
+      // This throws "Type 'null' is not assignable to parameter of
+      // type 'NodeData'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      source: null, target: null, d: null, style: '', connectsDestIfStuck: false
     }]);
 
     component.linkPropertyMapping = {
@@ -224,17 +246,24 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     };
     component.currentStateId = 'state_1';
     component.ngOnInit();
-  });
+    tick();
+    flush();
+  }));
 
 
-  afterEach(() => {
+  afterEach(fakeAsync(() => {
     component.ngOnDestroy();
+    flush();
     fixture.destroy();
-  });
+  }));
 
   it('should call redrawGraph when graphData has updated', fakeAsync(() => {
     spyOn(component, 'redrawGraph').and.stub();
 
+    // This throws "Type 'null' is not assignable to parameter of type
+    // 'GraphData'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     component.versionGraphData = null;
     mockUpdateGraphDataEmitter.emit(graphData);
     tick();
@@ -249,11 +278,12 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
   }));
 
   it('should initialize $scope properties after controller is initialized',
-    () => {
+    fakeAsync(() => {
       component.versionGraphData = graphData;
       component.ngOnInit();
+      tick();
 
-      expect(component.graphLoaded).toBe(false);
+      expect(component.graphLoaded).toBeTrue();
       expect(component.GRAPH_WIDTH).toBe(630);
       expect(component.GRAPH_HEIGHT).toBe(280);
       expect(component.VIEWPORT_WIDTH).toBe('10000px');
@@ -265,8 +295,10 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
 
       expect(component.augmentedLinks[0].style).toBe(
         'string');
-      expect(component.nodeList.length).toBe(2);
-    });
+      expect(component.nodeList.length).toBe(3);
+
+      flush();
+    }));
 
   it('should check if can navigate to node whenever node id is equal to' +
       ' current state id', fakeAsync(() => {
@@ -283,6 +315,8 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
 
   it('should get node complete title with its secondary label and' +
       ' warnings', () => {
+    spyOn(component, 'getNodeErrorMessage').and.returnValue('warning');
+
     expect(component.getNodeTitle(nodes.state_1)).toBe(
       'This is a label for node 1 Second label for node 1 ' +
         '(Warning: this state is unreachable.)');
@@ -291,6 +325,9 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       'This is a label for node 3 This is a secondary label for ' +
         'state_3 (Warning: there is no path from this state to the ' +
         'END state.)');
+
+    expect(component.getNodeTitle(nodes.state_4)).toBe(
+      'This is a label for node 4 2nd (warning)');
   });
 
   it('should get truncated label with truncate filter', () => {
@@ -315,6 +352,9 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
   });
 
   it('should center the graph', fakeAsync(() => {
+    component.ngOnInit();
+    tick();
+
     component.graphData = graphData;
     component.centerAtCurrentState = true;
     component.graphBounds = {
@@ -366,6 +406,14 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
     ' x and y axis to 0', fakeAsync(() => {
+    spyOn(component, 'getElementDimensions').and.returnValue({
+      w: 1000,
+      h: 1000
+    });
+
+    component.ngOnInit();
+    tick();
+
     spyOn(stateGraphLayoutService, 'getGraphBoundaries').and.returnValue({
       bottom: 20,
       left: 10,
@@ -376,7 +424,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     // Spies for d3 library.
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
-        on: (evt, callback) => {
+        on: (evt: string, callback: () => void) => {
           callback();
           return {
             apply: () => {}
@@ -396,11 +444,15 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     tick();
     flush();
 
-    expect(component.overallTransformStr).toBe('translate(0,0)');
+    expect(component.innerTransformStr).toBe(
+      'translate(10,20)');
   }));
 
   it('should center graph when centerGraph flag is broadcasted and transform' +
     ' x and y axis to 10, 20', fakeAsync(() => {
+    component.ngOnInit();
+    tick();
+
     spyOn(component, 'getElementDimensions').and.returnValue({
       w: 1000,
       h: 1000
@@ -424,7 +476,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     // Spies for d3 library.
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
-        on: (evt, callback) => {
+        on: (evt: string, callback: () => void) => {
           callback();
           return {
             apply: () => {}
@@ -446,6 +498,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
 
     expect(d3.event.transform.x).toBe(0);
     expect(d3.event.transform.y).toBe(0);
-    expect(component.overallTransformStr).toBe('translate(0,0)');
+    expect(component.overallTransformStr).toBe(
+      'translate(465,487.5)');
   }));
 });

@@ -114,11 +114,13 @@
                         <input placeholder="Add a new tag (using lowercase letters and spaces)..."
                                class="e2e-test-chip-list-tags"
                                pattern="[a-z]"
+                               [maxLength]="30"
                                [matChipInputFor]="chipList"
                                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                                [matChipInputAddOnBlur]="addOnBlur"
                                (matChipInputTokenEnd)="add($event)">
                       </mat-chip-list>
+                      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-settings-tab-error-message">Can only contain 10 tags max</mat-hint>
                     </mat-form-field>
                   </div>
                 </div>
@@ -291,7 +293,7 @@
     </div>
   </mat-card>
 
-  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames?.length > 0 && !explorationRightsService.isCloned()"
+  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()"
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('roles')">
@@ -312,7 +314,7 @@
           </span>
         </div>
 
-        <div [hidden]="!(explorationRightsService.ownerNames?.length > 0)">
+        <div [hidden]="!(explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0)">
           <strong>Managers</strong>
           <ul>
             <li *ngFor="let ownerName of explorationRightsService.ownerNames; let index = index">
@@ -325,7 +327,7 @@
           </ul>
         </div>
 
-        <div [hidden]="!(explorationRightsService.editorNames?.length > 0)">
+        <div [hidden]="!(explorationRightsService.editorNames && explorationRightsService.editorNames.length > 0)">
           <strong>Collaborators</strong>
           <ul>
             <li *ngFor="let editorName of explorationRightsService.editorNames; let index = index">
@@ -338,7 +340,7 @@
           </ul>
         </div>
 
-        <div [hidden]="!(explorationRightsService.viewerNames?.length > 0)">
+        <div [hidden]="!(explorationRightsService.viewerNames && explorationRightsService.viewerNames.length > 0)">
           <strong>Playtesters</strong>
           <ul>
             <li *ngFor="let viewerName of explorationRightsService.viewerNames; let index = index">
@@ -391,7 +393,7 @@
     </div>
   </mat-card>
 
-  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames?.length > 0 && !explorationRightsService.isCloned()"
+  <mat-card *ngIf="explorationRightsService.ownerNames && explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()"
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
@@ -407,7 +409,7 @@
       </div>
       <div class="oppia-mobile-collapsible-card-content" *ngIf="voiceArtistsCardIsShown">
         <div>
-          <div [hidden]="isVoiceoverFormOpen" class="oppia-no-voice-artist-message" *ngIf="!explorationRightsService.voiceArtistNames?.length">
+          <div [hidden]="isVoiceoverFormOpen" class="oppia-no-voice-artist-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
             No voice artists are assigned to this exploration.
           </div>
           <div *ngIf="canManageVoiceArtist" [hidden]="isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
@@ -417,7 +419,7 @@
           </div>
         </div>
 
-        <div [hidden]="!(explorationRightsService.voiceArtistNames?.length > 0)">
+        <div [hidden]="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length > 0)">
           <ul>
             <li *ngFor="let voiceArtistName of explorationRightsService.voiceArtistNames; let index = index">
               <div class="oppia-user-list-item .e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
@@ -441,7 +443,7 @@
                        placeholder="Voice artist username"
                        type="text">
               </div>
-              <button (click)="editVoiseArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
+              <button (click)="editVoiceArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
               <button type="button"
                       class="btn btn-secondary"
                       (click)="closeVoiceoverForm()">
@@ -493,7 +495,7 @@
           It is <strong>available</strong> in the Oppia library.
         </p>
 
-        <div *ngIf="explorationRightsService.ownerNames?.length === 0 && !explorationRightsService.isCloned()">
+        <div *ngIf="(explorationRightsService.ownerNames && explorationRightsService.ownerNames.length === 0) && !explorationRightsService.isCloned()">
           <h3>Permissions</h3>
           <div class="e2e-test-is-community-owned">
             This exploration is <strong>public</strong> and <strong>community-editable</strong>.
@@ -659,10 +661,10 @@
     <h3>Parameters used in this exploration</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div [hidden]="!(isEmpty(explorationParamSpecsService.savedMemento.getParamDict()))">
+        <div [hidden]="!(explorationParamSpecsService.savedMemento && explorationParamSpecsService.savedMemento.getParamDict())">
           <em>No parameters used.</em>
         </div>
-        <ol>
+        <ol *ngIf="explorationParamSpecsService.savedMemento">
           <li *ngFor="let item of explorationParamSpecsService.savedMemento.getParamDict() | keyvalue">
             <b>{{item.key}}</b> ({{item.value.getType().getName()}})
           </li>
@@ -680,16 +682,37 @@
 
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 e2e-test-exploration-edit-param-changes">
-        <param-changes-editor [paramChangesService]="explorationParamChangesService"
-                              [postSaveHook]="postSaveParamChangesHook"
+        <param-changes-editor [paramChangesServiceName]="'explorationParamChangesService'"
+                              [postSaveHook]="postSaveParamChangesHook.bind(this)"
                               [currentlyInSettingsTab]="true">
         </param-changes-editor>
       </div>
     </div>
   </mat-card>
+
+  <mat-card class="oppia-settings-card-container oppia-editor-card">
+    <div *ngIf="canShowExploreVersionHistoryButton();">
+      Metadata last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }} of the exploration</strong>.
+      <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
+    </div>
+    <div *ngIf="!canShowExploreVersionHistoryButton();">
+      <span *ngIf="!validationErrorIsShown">No changes have been made to the exploration metadata after the initial creation of the exploration.</span>
+      <span *ngIf="validationErrorIsShown" class="error-message">
+        Unable to display the metadata version history due to an error loading the exploration data.
+      </span>
+    </div>
+  </mat-card>
 </div>
 
 <style>
+  .explore-version-history-button {
+    font-weight: bold;
+  }
+
+  .oppia-settings-tab-error-message {
+    color: #f00;
+  }
+
   .mat-form-field {
     width: 100%;
   }
@@ -826,5 +849,9 @@
 
   .oppia-no-voice-artist-message {
     float: left;
+  }
+
+  .error-message {
+    color: #f00;
   }
 </style>

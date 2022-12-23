@@ -68,7 +68,10 @@ describe('Learner answer info service', () =>{
               unicode_str: ''
             }
           },
-          rows: { value: 1 }
+          rows: { value: 1 },
+          catchMisspellings: {
+            value: false
+          }
         },
         answer_groups: [{
           outcome: {
@@ -164,7 +167,7 @@ describe('Learner answer info service', () =>{
       },
       linked_skill_id: null,
       classifier_model_id: '',
-      next_content_id_index: null
+      next_content_id_index: -1
     };
 
     sof = TestBed.get(StateObjectFactory);

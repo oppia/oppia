@@ -33,31 +33,53 @@ from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import update_changelog_and_credits
 
+from typing import Final, List, Union
 import github  # isort:skip pylint: disable=wrong-import-position
 
-RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
-
-MOCK_RELEASE_SUMMARY_FILEPATH = os.path.join(
+RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
+MOCK_RELEASE_SUMMARY_FILEPATH: Final = os.path.join(
     RELEASE_TEST_DIR, 'release_summary.md')
 
-MOCK_CHANGELOG_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CHANGELOG')
-MOCK_AUTHORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'AUTHORS')
-MOCK_CONTRIBUTORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CONTRIBUTORS')
-MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH = 'about_temp_file.ts'
-MOCK_PACKAGE_JSON_PATH = os.path.join(RELEASE_TEST_DIR, 'mock_package.json')
-MOCK_FECONF_PATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
+MOCK_CHANGELOG_FILEPATH: Final = os.path.join(RELEASE_TEST_DIR, 'CHANGELOG')
+MOCK_AUTHORS_FILEPATH: Final = os.path.join(RELEASE_TEST_DIR, 'AUTHORS')
+MOCK_CONTRIBUTORS_FILEPATH: Final = os.path.join(
+    RELEASE_TEST_DIR, 'CONTRIBUTORS'
+)
+MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH: Final = 'about_temp_file.ts'
+MOCK_PACKAGE_JSON_PATH: Final = os.path.join(
+    RELEASE_TEST_DIR, 'mock_package.json'
+)
+MOCK_FECONF_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 
-MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
+MOCK_UPDATED_CHANGELOG_FILEPATH: Final = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
-MOCK_UPDATED_CHANGELOG_FILEPATH_FOR_REMOVAL_TEST = os.path.join(
+MOCK_UPDATED_CHANGELOG_FILEPATH_FOR_REMOVAL_TEST: Final = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG_FOR_REMOVAL_TEST')
-MOCK_UPDATED_AUTHORS_FILEPATH = os.path.join(
+MOCK_UPDATED_AUTHORS_FILEPATH: Final = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_AUTHORS')
-MOCK_UPDATED_CONTRIBUTORS_FILEPATH = os.path.join(
+MOCK_UPDATED_CONTRIBUTORS_FILEPATH: Final = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CONTRIBUTORS')
 
+# Here we use MyPy ignore because the pool_size argument is required by
+# Requester.__init__(), but it is missing from the typing definition in
+# Requester.pyi. We therefore disable type checking here. Here is the
+# type definition:
+# https://github.com/PyGithub/PyGithub/blob/001970d4a828017f704f6744a5775b4207a6523c/github/Requester.pyi#L97
+MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
+    login_or_token=None,
+    password=None,
+    jwt=None,
+    base_url='https://github.com',
+    timeout=0,
+    user_agent='user',
+    per_page=0,
+    verify=False,
+    retry=None,
+    pool_size=None,
+)
 
-def read_from_file(filepath):
+
+def read_from_file(filepath: str) -> List[str]:
     """Reads the lines from a file.
 
     Args:
@@ -70,12 +92,15 @@ def read_from_file(filepath):
         return f.readlines()
 
 
-def write_to_file(filepath, filelines):
+def write_to_file(
+    filepath: str, filelines: Union[str, List[str]]
+) -> None:
     """Writes a list of lines to a file.
 
     Args:
         filepath: str. The path of the file to write to.
-        filelines: list(str). The lines to write to the file.
+        filelines: Union[str, List[str]]. The line(s) to
+            write to the file.
     """
     with utils.open_file(filepath, 'w') as f:
         for line in filelines:
@@ -85,20 +110,30 @@ def write_to_file(filepath, filelines):
 class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     """Test the methods for automatic update of changelog and credits."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
-        def mock_get_current_branch_name():
+        def mock_get_current_branch_name() -> str:
             return 'release-1.2.3'
-        def mock_run_cmd(unused_cmd):
+        def mock_run_cmd(unused_cmd: str) -> None:
             pass
-        def mock_get_git_ref(unused_self, unused_ref):
+        def mock_get_git_ref(
+            unused_self: str, unused_ref: str
+        ) -> github.GitRef.GitRef:
             return github.GitRef.GitRef(
-                requester='', headers='', attributes={}, completed='')
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
+                requester=MOCK_REQUESTER,
+                headers={},
+                attributes={},
+                completed=False
+            )
+        def mock_getpass(prompt: str) -> str:  # pylint: disable=unused-argument
             return 'test-token'
 
         self.mock_repo = github.Repository.Repository(
-            requester='', headers='', attributes={}, completed='')
+            requester=MOCK_REQUESTER,
+            headers={},
+            attributes={},
+            completed=False
+        )
         self.branch_name_swap = self.swap(
             common, 'get_current_branch_name', mock_get_current_branch_name)
         self.release_summary_swap = self.swap(
@@ -113,9 +148,11 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
         self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
-    def test_get_previous_release_version_without_hotfix(self):
-        def mock_check_output(unused_cmd_tokens):
-            return b'v2.0.6\nv2.0.7\n'
+    def test_get_previous_release_version_without_hotfix(self) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v2.0.6\nv2.0.7\n'
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
@@ -125,9 +162,11 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 '2.0.7'
             )
 
-    def test_get_previous_release_version_with_hotfix(self):
-        def mock_check_output(unused_cmd_tokens):
-            return b'v2.0.6\nv2.0.7\nv2.0.8\n'
+    def test_get_previous_release_version_with_hotfix(self) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v2.0.6\nv2.0.7\nv2.0.8\n'
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
@@ -137,9 +176,13 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 '2.0.7'
             )
 
-    def test_get_previous_release_version_with_invalid_branch_type(self):
-        def mock_check_output(unused_cmd_tokens):
-            return b'v2.0.6\nv2.0.7\nv2.0.8\n'
+    def test_get_previous_release_version_with_invalid_branch_type(
+        self
+    ) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v2.0.6\nv2.0.7\nv2.0.8\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
@@ -148,9 +191,12 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'invalid', '2.0.8')
 
     def test_get_previous_release_version_with_repeated_previous_version(
-            self):
-        def mock_check_output(unused_cmd_tokens):
-            return b'v2.0.7\nv2.0.8\n'
+        self
+    ) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v2.0.7\nv2.0.8\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
@@ -160,7 +206,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.get_previous_release_version(
                 'release', '2.0.8')
 
-    def test_update_changelog_with_non_hotfix_branch(self):
+    def test_update_changelog_with_non_hotfix_branch(self) -> None:
         try:
             release_summary_lines = read_from_file(
                 MOCK_RELEASE_SUMMARY_FILEPATH)
@@ -180,9 +226,13 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         finally:
             write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
 
-    def test_update_changelog_with_current_version_changelog_present(self):
-        def mock_check_output(unused_cmd_tokens):
-            return b'v1.0.0\nv1.0.1\n'
+    def test_update_changelog_with_current_version_changelog_present(
+        self
+    ) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v1.0.0\nv1.0.1\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         try:
@@ -205,9 +255,11 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         finally:
             write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
 
-    def test_update_changelog_with_hotfix_branch(self):
-        def mock_check_output(unused_cmd_tokens):
-            return b'v1.0.0\nv1.0.1\nv1.0.2\n'
+    def test_update_changelog_with_hotfix_branch(self) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'v1.0.0\nv1.0.1\nv1.0.2\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         try:
@@ -230,7 +282,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         finally:
             write_to_file(MOCK_CHANGELOG_FILEPATH, changelog_filelines)
 
-    def test_update_authors(self):
+    def test_update_authors(self) -> None:
         try:
             release_summary_lines = read_from_file(
                 MOCK_RELEASE_SUMMARY_FILEPATH)
@@ -246,7 +298,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         finally:
             write_to_file(MOCK_AUTHORS_FILEPATH, authors_filelines)
 
-    def test_update_contributors(self):
+    def test_update_contributors(self) -> None:
         try:
             release_summary_lines = read_from_file(
                 MOCK_RELEASE_SUMMARY_FILEPATH)
@@ -263,7 +315,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         finally:
             write_to_file(MOCK_CONTRIBUTORS_FILEPATH, contributors_filelines)
 
-    def test_update_developer_names(self):
+    def test_update_developer_names(self) -> None:
         with utils.open_file(
             update_changelog_and_credits.ABOUT_PAGE_CONSTANTS_FILEPATH, 'r'
         ) as f:
@@ -275,7 +327,11 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             existing_developer_names = about_page_lines[start_index:end_index]
 
         tmp_file = tempfile.NamedTemporaryFile()
-        tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH
+        # Here we use MyPy ignore because here 'name' is a read-only property
+        # but for testing purposes, we are assigning a value to this 'name'
+        # property which causes MyPy to throw an error. Thus, to avoid the
+        # error, we used ignore here.
+        tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH  # type: ignore[misc]
         with utils.open_file(
             MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w'
         ) as f:
@@ -314,7 +370,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             # Occasionally this temp file is not deleted.
             os.remove(MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH)
 
-    def test_missing_section_in_release_summary(self):
+    def test_missing_section_in_release_summary(self) -> None:
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         invalid_ordering = {
             '### section1:\n': '### section2: \n'
@@ -327,7 +383,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.is_order_of_sections_valid(
                     release_summary_lines))
 
-    def test_invalid_ordering_of_sections_in_release_summary(self):
+    def test_invalid_ordering_of_sections_in_release_summary(self) -> None:
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         invalid_ordering = {
             constants.release_constants.NEW_AUTHORS_HEADER: '### section2: \n'
@@ -340,14 +396,14 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.is_order_of_sections_valid(
                     release_summary_lines))
 
-    def test_valid_ordering_of_sections_in_release_summary(self):
+    def test_valid_ordering_of_sections_in_release_summary(self) -> None:
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         self.assertTrue(
             update_changelog_and_credits.is_order_of_sections_valid(
                 release_summary_lines))
 
-    def test_removal_of_updates_with_no_exception(self):
-        def mock_delete(unused_self):
+    def test_removal_of_updates_with_no_exception(self) -> None:
+        def mock_delete(unused_self: str) -> None:
             pass
         delete_swap = self.swap(
             github.GitRef.GitRef, 'delete', mock_delete)
@@ -355,8 +411,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.remove_updates_and_delete_branch(
                 self.mock_repo, 'target_branch')
 
-    def test_removal_of_updates_with_unknown_object_exception(self):
-        def mock_delete(unused_self):
+    def test_removal_of_updates_with_unknown_object_exception(self) -> None:
+        def mock_delete(unused_self: str) -> None:
             raise github.UnknownObjectException(status='', data='', headers={})
         delete_swap = self.swap(
             github.GitRef.GitRef, 'delete', mock_delete)
@@ -364,8 +420,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.remove_updates_and_delete_branch(
                 self.mock_repo, 'target_branch')
 
-    def test_removal_of_updates_with_valid_exception(self):
-        def mock_delete(unused_self):
+    def test_removal_of_updates_with_valid_exception(self) -> None:
+        def mock_delete(unused_self: str) -> None:
             raise Exception('Error')
         delete_swap = self.swap(
             github.GitRef.GitRef, 'delete', mock_delete)
@@ -377,8 +433,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.remove_updates_and_delete_branch(
                     self.mock_repo, 'target_branch')
 
-    def test_invalid_branch_name(self):
-        def mock_get_current_branch_name():
+    def test_invalid_branch_name(self) -> None:
+        def mock_get_current_branch_name() -> str:
             return 'invalid'
         branch_name_swap = self.swap(
             common, 'get_current_branch_name', mock_get_current_branch_name)
@@ -388,7 +444,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'branch.')):
             update_changelog_and_credits.main()
 
-    def test_missing_github_username(self):
+    def test_missing_github_username(self) -> None:
         args_swap = self.swap(
             sys, 'argv', ['update_changelog_and_credits.py'])
         with self.branch_name_swap, self.release_summary_swap, args_swap:
@@ -399,8 +455,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                     '<Your username>')):
                 update_changelog_and_credits.main()
 
-    def test_missing_personal_access_token(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
+    def test_missing_personal_access_token(self) -> None:
+        def mock_getpass(prompt: str) -> None:  # pylint: disable=unused-argument
             return None
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
@@ -411,13 +467,23 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                     'tokens and re-run the script')):
                 update_changelog_and_credits.main()
 
-    def test_missing_release_summary_file(self):
-        def mock_get_organization(unused_self, unused_name):
+    def test_missing_release_summary_file(self) -> None:
+        def mock_get_organization(
+            unused_self: str, unused_name: str
+        ) -> github.Organization.Organization:
             return github.Organization.Organization(
-                requester='', headers='', attributes={}, completed='')
-        def mock_check_prs_for_current_release_are_released(unused_repo):
+                requester=MOCK_REQUESTER,
+                headers={},
+                attributes={},
+                completed=False
+            )
+        def mock_check_prs_for_current_release_are_released(
+            unused_repo: github.Repository.Repository
+        ) -> None:
             pass
-        def mock_get_repo(unused_self, unused_repo_name):
+        def mock_get_repo(
+            unused_self: str, unused_repo_name: str
+        ) -> github.Repository.Repository:
             return self.mock_repo
 
         get_org_swap = self.swap(
@@ -440,7 +506,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                             'Please re-run this script.')):
                         update_changelog_and_credits.main()
 
-    def test_get_release_summary_lines(self):
+    def test_get_release_summary_lines(self) -> None:
         with utils.open_file(MOCK_RELEASE_SUMMARY_FILEPATH, 'r') as f:
             correct_lines = f.readlines()
             wrong_lines = []
@@ -461,21 +527,23 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'is_order_of_sections_valid_gets_called': 2
         }
         class MockFile:
-            def readlines(self):
+            def readlines(self) -> List[str]:
                 """Read lines of the file object."""
 
                 return mock_readlines()
-        def mock_readlines():
+        def mock_readlines() -> List[str]:
             check_function_calls['readlines_gets_called'] += 1
             if check_function_calls['readlines_gets_called'] == 2:
                 return correct_lines
             return wrong_lines
 
-        def mock_open_file(unused_path, unused_mode):
+        def mock_open_file(unused_path: str, unused_mode: str) -> MockFile:
             return MockFile()
-        def mock_ask_user_to_confirm(unused_msg):
+        def mock_ask_user_to_confirm(unused_msg: str) -> None:
             check_function_calls['ask_user_to_confirm_gets_called'] += 1
-        def mock_is_order_of_sections_valid(unused_release_summary_lines):
+        def mock_is_order_of_sections_valid(
+            unused_release_summary_lines: List[str]
+        ) -> bool:
             check_function_calls[
                 'is_order_of_sections_valid_gets_called'] += 1
             if check_function_calls[
@@ -495,7 +563,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.get_release_summary_lines())
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_create_branch(self):
+    def test_create_branch(self) -> None:
         check_function_calls = {
             'get_branch_gets_called': False,
             'create_git_ref_gets_called': False,
@@ -513,26 +581,43 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'open_new_tab_in_browser_if_possible_gets_called': True
         }
         filepaths_get_contents_is_called_with = []
-        def mock_get_branch(unused_self, unused_branch_name):
+        def mock_get_branch(
+            unused_self: str, unused_branch_name: str
+        ) -> github.Branch.Branch:
             check_function_calls['get_branch_gets_called'] = True
             return github.Branch.Branch(
-                requester='', headers='',
-                attributes={'commit': {'sha': 'test'}}, completed='')
-        def mock_create_git_ref(unused_self, ref, sha):  # pylint: disable=unused-argument
+                requester=MOCK_REQUESTER,
+                headers={},
+                attributes={'commit': {'sha': 'test'}},
+                completed=False
+            )
+        def mock_create_git_ref(
+            unused_self: str, ref: str, sha: str  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['create_git_ref_gets_called'] = True
-        def mock_get_contents(unused_self, filepath, ref):  # pylint: disable=unused-argument
+        def mock_get_contents(
+            unused_self: str, filepath: str, ref: str  # pylint: disable=unused-argument
+        ) -> github.ContentFile.ContentFile:
             check_function_calls['get_contents_gets_called'] = True
             filepaths_get_contents_is_called_with.append(filepath)
             return github.ContentFile.ContentFile(
-                requester='', headers='',
-                attributes={'path': 'path', 'sha': 'sha'}, completed='')
+                requester=MOCK_REQUESTER,
+                headers={},
+                attributes={'path': 'path', 'sha': 'sha'},
+                completed=False
+            )
         def mock_update_file(
-                unused_self, unused_path, unused_msg, unused_content,
-                unused_sha, branch):  # pylint: disable=unused-argument
+            unused_self: str,
+            unused_path: str,
+            unused_msg: str,
+            unused_content: str,
+            unused_sha: str,
+            branch: str  # pylint: disable=unused-argument
+        ) -> None:
             check_function_calls['update_file_gets_called'] = True
-        def mock_run_cmd(unused_cmd):
+        def mock_run_cmd(unused_cmd: str) -> None:
             check_function_calls['run_cmd_gets_called'] = True
-        def mock_open_new_tab_in_browser_if_possible(unused_url):
+        def mock_open_new_tab_in_browser_if_possible(unused_url: str) -> None:
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_gets_called'] = True
 
@@ -560,7 +645,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits.LIST_OF_FILEPATHS_TO_MODIFY
         )
 
-    def test_update_version_in_config_files_updates_version(self):
+    def test_update_version_in_config_files_updates_version(self) -> None:
         package_json_swap = self.swap(
             update_changelog_and_credits,
             'PACKAGE_JSON_FILEPATH',
@@ -595,7 +680,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             write_to_file(MOCK_PACKAGE_JSON_PATH, package_json_content)
             write_to_file(MOCK_FECONF_PATH, feconf_content)
 
-    def test_inform_server_errors_team(self):
+    def test_inform_server_errors_team(self) -> None:
         check_function_calls = {
             'ask_user_to_confirm_gets_called': False,
             'open_new_tab_in_browser_if_possible_gets_called': False
@@ -604,10 +689,10 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'ask_user_to_confirm_gets_called': True,
             'open_new_tab_in_browser_if_possible_gets_called': True
         }
-        def mock_open_new_tab_in_browser_if_possible(unused_url):
+        def mock_open_new_tab_in_browser_if_possible(unused_url: str) -> None:
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_gets_called'] = True
-        def mock_ask_user_to_confirm(unused_msg):
+        def mock_ask_user_to_confirm(unused_msg: str) -> None:
             check_function_calls['ask_user_to_confirm_gets_called'] = True
 
         open_tab_swap = self.swap(
@@ -620,7 +705,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'rota-url', 'server-error-playbook-url')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_function_calls(self):
+    def test_function_calls(self) -> None:
         check_function_calls = {
             'check_prs_for_current_release_are_released_gets_called': False,
             'remove_updates_and_delete_branch_gets_called': False,
@@ -645,41 +730,66 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_package_json_gets_called': True,
             'inform_server_errors_team_gets_called': True,
         }
-        def mock_get_organization(unused_self, unused_name):
+        def mock_get_organization(
+            unused_self: str, unused_name: str
+        ) -> github.Organization.Organization:
             return github.Organization.Organization(
-                requester='', headers='', attributes={}, completed='')
-        def mock_check_prs_for_current_release_are_released(unused_repo):
+                requester=MOCK_REQUESTER,
+                headers={},
+                attributes={},
+                completed=False
+            )
+        def mock_check_prs_for_current_release_are_released(
+            unused_repo: github.Repository.Repository
+        ) -> None:
             check_function_calls[
                 'check_prs_for_current_release_are_released_gets_called'] = True
         def mock_remove_updates_and_delete_branch(
-                unused_repo_fork, unused_target_branch):
+            unused_repo_fork: github.Repository.Repository,
+            unused_target_branch: github.Branch.Branch
+        ) -> None:
             check_function_calls[
                 'remove_updates_and_delete_branch_gets_called'] = True
         def mock_update_changelog(
-                unused_branch_name, unused_release_summary_lines,
-                unused_current_release_version_number):
+            unused_branch_name: str,
+            unused_release_summary_lines: List[str],
+            unused_current_release_version_number: int
+        ) -> None:
             check_function_calls['update_changelog_gets_called'] = True
-        def mock_update_authors(unused_release_summary_lines):
+        def mock_update_authors(
+            unused_release_summary_lines: List[str]
+        ) -> None:
             check_function_calls['update_authors_gets_called'] = True
-        def mock_update_contributors(unused_release_summary_lines):
+        def mock_update_contributors(
+            unused_release_summary_lines: List[str]
+        ) -> None:
             check_function_calls['update_contributors_gets_called'] = True
-        def mock_update_developer_names(unused_release_summary_lines):
+        def mock_update_developer_names(
+            unused_release_summary_lines: List[str]
+        ) -> None:
             check_function_calls['update_developer_names_gets_called'] = True
-        def mock_get_release_summary_lines():
+        def mock_get_release_summary_lines() -> None:
             check_function_calls['get_release_summary_lines_gets_called'] = True
         def mock_create_branch(
-                unused_repo, unused_repo_fork, unused_target_branch,
-                unused_github_username, unused_current_release_version_number):
+            unused_repo: github.Repository.Repository,
+            unused_repo_fork: github.Repository.Repository,
+            unused_target_branch: github.Branch.Branch,
+            unused_github_username: str,
+            unused_current_release_version_number: int
+        ) -> None:
             check_function_calls['create_branch_gets_called'] = True
         def mock_inform_server_errors_team(
-                unused_release_rota_url, unused_server_error_playbook_url
-            ):
+            unused_release_rota_url: str,
+            unused_server_error_playbook_url: str
+        ) -> None:
             check_function_calls['inform_server_errors_team_gets_called'] = True
-        def mock_input():
+        def mock_input() -> str:
             return 'y'
-        def mock_get_repo(unused_self, unused_repo_name):
+        def mock_get_repo(
+            unused_self: str, unused_repo_name: str
+        ) -> github.Repository.Repository:
             return self.mock_repo
-        def mock_update_version_in_config_files():
+        def mock_update_version_in_config_files() -> None:
             check_function_calls['update_package_json_gets_called'] = True
 
         get_org_swap = self.swap(

@@ -50,7 +50,8 @@ import './lesson-information-card-modal.component.css';
 
  @Component({
    selector: 'oppia-lesson-information-card-modal',
-   templateUrl: './lesson-information-card-modal.component.html'
+   templateUrl: './lesson-information-card-modal.component.html',
+   styleUrls: ['./lesson-information-card-modal.component.css']
  })
 export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks
@@ -64,24 +65,26 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expDesc!: string;
   contributorNames!: string[];
   checkpointCount!: number;
-  expInfo: LearnerExplorationSummaryBackendDict;
+  expInfo!: LearnerExplorationSummaryBackendDict;
   completedCheckpointsCount!: number;
-  checkpointStatusArray: string[];
-  userIsLoggedIn: boolean = false;
+  checkpointStatusArray!: string[];
   infoCardBackgroundCss!: {'background-color': string};
   infoCardBackgroundImageUrl!: string;
-  averageRating: number | null;
+  averageRating!: number | null;
   numViews!: number;
-  lastUpdatedString: string;
+  lastUpdatedString!: string;
   explorationIsPrivate!: boolean;
   explorationTags!: ExplorationTagSummary;
-  lessonAuthorsSubmenuIsShown: boolean = false;
-  loggedOutProgressUniqueUrlId: string;
-  loggedOutProgressUniqueUrl: string;
-  saveProgressMenuIsShown: boolean = false;
+  // Unique progress tracking ID is null until the first state of the
+  // exploration is loaded.
+  loggedOutProgressUniqueUrlId!: string | null;
+  loggedOutProgressUniqueUrl!: string;
   // The below property is defined only when the learner is on a
   // checkpointed state, and is undefined otherwise.
-  translatedCongratulatoryCheckpointMessage: string | undefined;
+  translatedCongratulatoryCheckpointMessage!: string | undefined;
+  userIsLoggedIn: boolean = false;
+  lessonAuthorsSubmenuIsShown: boolean = false;
+  saveProgressMenuIsShown: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -96,7 +99,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private localStorageService: LocalStorageService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private checkpointCelebrationUtilityService:
-      CheckpointCelebrationUtilityService
+      CheckpointCelebrationUtilityService,
   ) {
     super(ngbActiveModal);
   }
@@ -239,15 +242,17 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.saveProgressMenuIsShown = true;
   }
 
-  copyProgressUrl(): void {
-    this.clipboard.copy(this.loggedOutProgressUniqueUrl);
-  }
-
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(
       (loginUrl) => {
+        let urlId = this.loggedOutProgressUniqueUrlId;
+        if (urlId === null) {
+          throw new Error(
+            'User should not be able to login if ' +
+            'loggedOutProgressUniqueUrlId is not null.');
+        }
         this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
-          this.loggedOutProgressUniqueUrlId);
+          urlId);
         this.windowRef.nativeWindow.location.href = loginUrl;
       });
   }

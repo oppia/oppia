@@ -31,16 +31,20 @@ from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
 
-from typing import List, Optional, Sequence, overload
-from typing_extensions import Literal
+from typing import (
+    Dict, List, Literal, Optional, Sequence, Union, cast, overload
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from core.domain import state_domain
+    from mypy_imports import base_models
     from mypy_imports import stats_models
     from mypy_imports import transaction_services
 
-(stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
+(base_models, stats_models,) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.STATISTICS]
+)
 transaction_services = models.Registry.import_transaction_services()
 
 # NOTE TO DEVELOPERS: The functions:
@@ -493,13 +497,16 @@ def create_exp_issues_for_new_exploration(
     stats_models.ExplorationIssuesModel.create(exp_id, exp_version, [])
 
 
-def update_exp_issues_for_new_exp_version(
+def get_updated_exp_issues_models_for_new_exp_version(
     exploration: exp_domain.Exploration,
     exp_versions_diff: Optional[exp_domain.ExplorationVersionsDiff],
     revert_to_version: Optional[int]
-) -> None:
+) -> List[base_models.BaseModel]:
     """Retrieves the ExplorationIssuesModel for the old exp_version and makes
     any required changes to the structure of the model.
+
+    Note: This method does not perform put operations on the models. The caller
+    of this method must do so.
 
     Args:
         exploration: Exploration. Domain object for the exploration.
@@ -511,21 +518,38 @@ def update_exp_issues_for_new_exp_version(
     Raises:
         Exception. ExplorationVersionsDiff cannot be None when the change
             is not a revert.
+
+    Returns:
+        list(BaseModel). A list of model instances related to exploration
+        issues that were updated.
     """
+    models_to_put: List[base_models.BaseModel] = []
     exp_issues = get_exp_issues(
         exploration.id, exploration.version - 1, strict=False
     )
     if exp_issues is None:
-        create_exp_issues_for_new_exploration(
-            exploration.id, exploration.version - 1)
-        return
+        instance_id = stats_models.ExplorationIssuesModel.get_entity_id(
+            exploration.id,
+            exploration.version - 1
+        )
+        models_to_put.append(
+            stats_models.ExplorationIssuesModel(
+                id=instance_id,
+                exp_id=exploration.id,
+                exp_version=exploration.version,
+                unresolved_issues=[]
+            )
+        )
+        return models_to_put
 
     if revert_to_version:
         old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
         exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
         exp_issues.exp_version = exploration.version + 1
-        create_exp_issues_model(exp_issues)
-        return
+        models_to_put.append(
+            get_exp_issues_model_from_domain_object(exp_issues)
+        )
+        return models_to_put
 
     if exp_versions_diff is None:
         raise Exception(
@@ -547,26 +571,30 @@ def update_exp_issues_for_new_exp_version(
         playthrough = get_playthrough_from_model(playthrough_model)
 
         if 'state_names' in playthrough.issue_customization_args:
-            state_names = (
-                playthrough.issue_customization_args['state_names']['value'])
-            # TODO(#15995): Currently, we are define all issue customization
-            # args in one Dict type which forces us to use assert here, but once
-            # we have a more narrower and specific type for a specific issue
-            # customization args then we can remove assert from here.
-            assert isinstance(state_names, list)
+            # Here we use cast because we need to narrow down the type from
+            # various allowed issue customization arg types to List[str] type,
+            # and here we are sure that the type is always going to be List[str]
+            # because above 'if' condition forces 'state_names' issue
+            # customization arg to have values of type List[str].
+            state_names = cast(
+                List[str],
+                playthrough.issue_customization_args['state_names']['value']
+            )
             playthrough.issue_customization_args['state_names']['value'] = [
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name] for state_name in state_names
             ]
 
         if 'state_name' in playthrough.issue_customization_args:
-            state_name = (
-                playthrough.issue_customization_args['state_name']['value'])
-            # TODO(#15995): Currently, we are define all issue customization
-            # args in one Dict type which forces us to use assert here, but once
-            # we have a more narrower and specific type for a specific issue
-            # customization args then we can remove assert from here.
-            assert isinstance(state_name, str)
+            # Here we use cast because we need to narrow down the type from
+            # various allowed issue customization arg types to str type, and
+            # here we are sure that the type is always going to be str because
+            # above 'if' condition forces 'state_name' issue customization arg
+            # to have values of type str.
+            state_name = cast(
+                str,
+                playthrough.issue_customization_args['state_name']['value']
+            )
             playthrough.issue_customization_args['state_name']['value'] = (
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name])
@@ -575,24 +603,28 @@ def update_exp_issues_for_new_exp_version(
             action_customization_args = action.action_customization_args
 
             if 'state_name' in action_customization_args:
-                state_name = action_customization_args['state_name']['value']
-                # TODO(#15995): Currently, we are define all issue customization
-                # args in one Dict type which forces us to use assert here, but
-                # once we have a more narrower and specific type for a specific
-                # issue customization args then we can remove assert from here.
-                assert isinstance(state_name, str)
+                # Here we use cast because we need to narrow down the type from
+                # various allowed action customization arg types to str type,
+                # and here we are sure that the type is always going to be str
+                # because above 'if' condition forces 'state_name' action
+                # customization arg to have values of type str.
+                state_name = cast(
+                    str, action_customization_args['state_name']['value']
+                )
                 action_customization_args['state_name']['value'] = (
                     state_name if state_name not in old_to_new_state_names else
                     old_to_new_state_names[state_name])
 
             if 'dest_state_name' in action_customization_args:
-                dest_state_name = (
-                    action_customization_args['dest_state_name']['value'])
-                # TODO(#15995): Currently, we are define all issue customization
-                # args in one Dict type which forces us to use assert here, but
-                # once we have a more narrower and specific type for a specific
-                # issue customization args then we can remove assert from here.
-                assert isinstance(dest_state_name, str)
+                # Here we use cast because we need to narrow down the type from
+                # various allowed action customization arg types to str type,
+                # and here we are sure that the type is always going to be str
+                # because above 'if' condition forces 'dest_state_name' action
+                # customization arg to have values of type str.
+                dest_state_name = cast(
+                    str,
+                    action_customization_args['dest_state_name']['value']
+                )
                 action_customization_args['dest_state_name']['value'] = (
                     dest_state_name
                     if dest_state_name not in old_to_new_state_names else
@@ -604,21 +636,19 @@ def update_exp_issues_for_new_exp_version(
             action.to_dict() for action in playthrough.actions]
         updated_playthrough_models.append(playthrough_model)
 
-    stats_models.PlaythroughModel.update_timestamps_multi(
-        updated_playthrough_models
-    )
-    stats_models.PlaythroughModel.put_multi(updated_playthrough_models)
+    models_to_put.extend(updated_playthrough_models)
 
     for exp_issue in exp_issues.unresolved_issues:
         if 'state_names' in exp_issue.issue_customization_args:
-            state_names = (
-                exp_issue.issue_customization_args['state_names']['value'])
-            # TODO(#15995): Currently, we are define all issue customization
-            # args in one Dict type which forces us to use assert here, but
-            # once we have a more narrower and specific type for a specific
-            # issue customization args then we can remove assert from here.
-            assert isinstance(state_names, list)
-
+            # Here we use cast because we need to narrow down the type from
+            # various allowed issue customization arg types to List[str] type,
+            # and here we are sure that the type is always going to be List[str]
+            # because above 'if' condition forces 'state_names' issue
+            # customization arg to have values of type List[str].
+            state_names = cast(
+                List[str],
+                exp_issue.issue_customization_args['state_names']['value']
+            )
             if any(name in deleted_state_names for name in state_names):
                 exp_issue.is_valid = False
 
@@ -629,14 +659,15 @@ def update_exp_issues_for_new_exp_version(
             ]
 
         if 'state_name' in exp_issue.issue_customization_args:
-            state_name = (
-                exp_issue.issue_customization_args['state_name']['value'])
-
-            # TODO(#15995): Currently, we are define all issue customization
-            # args in one Dict type which forces us to use assert here, but
-            # once we have a more narrower and specific type for a specific
-            # issue customization args then we can remove assert from here.
-            assert isinstance(state_name, str)
+            # Here we use cast because we need to narrow down the type from
+            # various allowed issue customization arg types to str type, and
+            # here we are sure that the type is always going to be str because
+            # above 'if' condition forces 'state_name' issue customization arg
+            # to have values of type str.
+            state_name = cast(
+                str,
+                exp_issue.issue_customization_args['state_name']['value']
+            )
             if state_name in deleted_state_names:
                 exp_issue.is_valid = False
 
@@ -645,7 +676,8 @@ def update_exp_issues_for_new_exp_version(
                 old_to_new_state_names[state_name])
 
     exp_issues.exp_version += 1
-    create_exp_issues_model(exp_issues)
+    models_to_put.append(get_exp_issues_model_from_domain_object(exp_issues))
+    return models_to_put
 
 
 @overload
@@ -847,6 +879,25 @@ def get_playthrough_from_model(
         playthrough_model.issue_customization_args, actions)
 
 
+def get_state_stats_mapping(
+    exploration_stats: stats_domain.ExplorationStats
+) -> Dict[str, Dict[str, int]]:
+    """Returns the state stats mapping of the given exploration stats.
+
+    Args:
+        exploration_stats: ExplorationStats. Exploration statistics domain
+            object.
+
+    Returns:
+        dict. The state stats mapping of the given exploration stats.
+    """
+    new_state_stats_mapping = {
+        state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
+        for state_name in exploration_stats.state_stats_mapping
+    }
+    return new_state_stats_mapping
+
+
 def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
     """Creates an ExplorationStatsModel in datastore given an ExplorationStats
     domain object.
@@ -858,10 +909,7 @@ def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
     Returns:
         str. ID of the datastore instance for ExplorationStatsModel.
     """
-    new_state_stats_mapping = {
-        state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
-        for state_name in exploration_stats.state_stats_mapping
-    }
+    new_state_stats_mapping = get_state_stats_mapping(exploration_stats)
     instance_id = stats_models.ExplorationStatsModel.create(
         exploration_stats.exp_id,
         exploration_stats.exp_version,
@@ -918,17 +966,30 @@ def save_stats_model(
     exploration_stats_model.put()
 
 
-def create_exp_issues_model(exp_issues: stats_domain.ExplorationIssues) -> None:
-    """Creates a new ExplorationIssuesModel in the datastore.
+def get_exp_issues_model_from_domain_object(
+    exp_issues: stats_domain.ExplorationIssues
+) -> stats_models.ExplorationIssuesModel:
+    """Creates a new ExplorationIssuesModel instance.
 
     Args:
         exp_issues: ExplorationIssues. The exploration issues domain object.
+
+    Returns:
+        ExplorationIssuesModel. The ExplorationIssuesModel.
     """
     unresolved_issues_dicts = [
         unresolved_issue.to_dict()
         for unresolved_issue in exp_issues.unresolved_issues]
-    stats_models.ExplorationIssuesModel.create(
-        exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
+    instance_id = stats_models.ExplorationIssuesModel.get_entity_id(
+        exp_issues.exp_id,
+        exp_issues.exp_version
+    )
+    return stats_models.ExplorationIssuesModel(
+        id=instance_id,
+        exp_id=exp_issues.exp_id,
+        exp_version=exp_issues.exp_version,
+        unresolved_issues=unresolved_issues_dicts
+    )
 
 
 def save_exp_issues_model(exp_issues: stats_domain.ExplorationIssues) -> None:
@@ -1295,7 +1356,7 @@ def record_learner_answer_info(
     entity_type: str,
     state_reference: str,
     interaction_id: str,
-    answer: str,
+    answer: Union[str, int, Dict[str, str], List[str]],
     answer_details: str
 ) -> None:
     """Records the new learner answer info received from the learner in the

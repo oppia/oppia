@@ -63,6 +63,7 @@ import './tutor-card.component.css';
 @Component({
   selector: 'oppia-tutor-card',
   templateUrl: './tutor-card.component.html',
+  styleUrls: ['./tutor-card.component.css'],
   animations: [
     trigger('expandInOut', [
       state('in', style({
@@ -93,46 +94,50 @@ import './tutor-card.component.css';
   ]
 })
 export class TutorCardComponent {
-  @ViewChild('checkMark') checkMarkComponent: EndChapterCheckMarkComponent;
-  @ViewChild('confetti') confettiComponent: EndChapterConfettiComponent;
-  @Input() displayedCard: StateCard;
-  @Input() displayedCardWasCompletedInPrevSession: boolean;
-  @Input() startCardChangeAnimation: boolean;
-  @Input() avatarImageIsShown: boolean;
-  @Input() userIsLoggedIn: boolean;
-  @Input() explorationIsInPreviewMode: boolean;
-  @Input() questionPlayerConfig: QuestionPlayerConfig;
-  @Input() collectionSummary: CollectionSummary;
-  @Input() isRefresherExploration: boolean;
-  @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
-  @Input() parentExplorationIds: string[];
-  @Input() inStoryMode: boolean;
-  // The below property will be undefined when the current chapter
-  // is the last chapter of a story.
-  @Input() nextLessonLink: string | undefined;
-  // 'completedChaptersCount' is fetched via a HTTP request.
-  // Until the response is received, it remains undefined.
-  @Input() completedChaptersCount: number | undefined;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @ViewChild('checkMark') checkMarkComponent!: EndChapterCheckMarkComponent;
+  @ViewChild('confetti') confettiComponent!: EndChapterConfettiComponent;
+  @Input() displayedCard!: StateCard;
+  @Input() displayedCardWasCompletedInPrevSession!: boolean;
+  @Input() startCardChangeAnimation!: boolean;
+  @Input() avatarImageIsShown!: boolean;
+  @Input() shouldHideInteraction!: boolean;
+  @Input() userIsLoggedIn!: boolean;
+  @Input() explorationIsInPreviewMode!: boolean;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig;
+  @Input() collectionSummary!: CollectionSummary;
+  @Input() isRefresherExploration!: boolean;
+  @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
+  @Input() parentExplorationIds!: string[];
+  @Input() inStoryMode!: boolean;
+  @Input() nextLessonLink!: string;
+  @Input() completedChaptersCount!: number;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
-  directiveSubscriptions = new Subscription();
-  private _editorPreviewMode: boolean;
-  arePreviousResponsesShown: boolean = false;
-  lastAnswer: string;
-  conceptCardIsBeingShown: boolean;
-  interactionIsActive: boolean;
+  @Input() feedbackIsEnabled!: boolean;
+  @Input() learnerCanOnlyAttemptQuestionOnce!: boolean;
+  @Input() inputOutputHistoryIsShown!: boolean;
+  @Input() checkpointCelebrationModalIsEnabled!: boolean;
+  private _editorPreviewMode!: boolean;
+  lastAnswer!: string | null;
+  conceptCardIsBeingShown!: boolean;
+  interactionIsActive!: boolean;
   waitingForOppiaFeedback: boolean = false;
-  interactionInstructions: string;
-  contentAudioTranslations: BindableVoiceovers;
-  isIframed: boolean;
-  getCanAskLearnerForAnswerInfo: () => boolean;
-  OPPIA_AVATAR_IMAGE_URL: string;
-  OPPIA_AVATAR_LINK_URL: string;
-  profilePicture: string;
+  interactionInstructions!: string | null;
+  contentAudioTranslations!: BindableVoiceovers;
+  isIframed!: boolean;
+  getCanAskLearnerForAnswerInfo!: () => boolean;
+  OPPIA_AVATAR_IMAGE_URL!: string;
+  OPPIA_AVATAR_LINK_URL!: string | null;
+  profilePicture!: string;
+  directiveSubscriptions = new Subscription();
+  arePreviousResponsesShown: boolean = false;
   nextMilestoneChapterCount: number | null = null;
   checkMarkHidden: boolean = true;
   animationHasPlayedOnce: boolean = false;
   checkMarkSkipped: boolean = false;
-  confettiAnimationTimeout: NodeJS.Timeout | null = null;
+  confettiAnimationTimeout!: NodeJS.Timeout;
   skipClickListener: Function | null = null;
 
   constructor(
@@ -153,7 +158,7 @@ export class TutorCardComponent {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private platformFeatureService: PlatformFeatureService,
+    public platformFeatureService: PlatformFeatureService,
     private renderer: Renderer2,
     private translateService: TranslateService
   ) {}
@@ -240,7 +245,9 @@ export class TutorCardComponent {
         this.checkMarkSkipped = true;
         setTimeout(() => {
           this.checkMarkHidden = true;
-          this.skipClickListener();
+          if (this.skipClickListener) {
+            this.skipClickListener();
+          }
           this.skipClickListener = null;
         }, CHECK_MARK_HIDE_DELAY_IN_MSECS);
       }, REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS);
@@ -250,7 +257,9 @@ export class TutorCardComponent {
       }, CONFETTI_ANIMATION_DELAY_IN_MSECS);
       setTimeout(() => {
         this.checkMarkHidden = true;
-        this.skipClickListener();
+        if (this.skipClickListener) {
+          this.skipClickListener();
+        }
         this.skipClickListener = null;
       }, STANDARD_ANIMATION_DURATION_IN_MSECS);
     }
@@ -376,7 +385,8 @@ export class TutorCardComponent {
     return this.displayedCard.isInteractionInline();
   }
 
-  getContentAudioHighlightClass(): Object {
+  // This function returns null if audio is not available.
+  getContentAudioHighlightClass(): string | null {
     if (this.audioTranslationManagerService
       .getCurrentComponentName() ===
       AppConstants.COMPONENT_NAME_CONTENT &&
@@ -384,6 +394,7 @@ export class TutorCardComponent {
       this.autogeneratedAudioPlayerService.isPlaying())) {
       return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     }
+    return null;
   }
 
   getContentFocusLabel(index: number): string {

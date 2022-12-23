@@ -58,9 +58,28 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import 'third-party-imports/gif-frames.import';
+
+// Relative path used as an work around to get the angular compiler and webpack
+// build to not complain.
+// TODO(#16309): Fix relative imports.
+import '../../../core/templates/third-party-imports/gif-frames.import';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 const gifshot = require('gifshot');
+import * as gifFrames from 'gif-frames';
+
+// We attach GifFrames to the window and use it in our codebase and the
+// default Window interface doesn't contain "GifFrames" property. Hence we want
+// to extend the Window definition here.
+// The "declare global" is needed as we want to augment GifFrames to the
+// global scope Window as Window is a global object. Typescript interfaces only
+// union the interfaces with the same name when presented in the same scope.
+// TODO(#16735): Remove the usage of declare globals in "non-global" files.
+declare global {
+  interface Window {
+    GifFrames: gifFrames;
+  }
+}
 
 interface FilepathData {
   mode: number;
@@ -142,6 +161,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   imageContainerStyle = {};
   allowedImageFormats = AppConstants.ALLOWED_IMAGE_FORMATS;
   HUNDRED_KB_IN_BYTES: number = 100 * 1024;
+  ONE_MB_IN_BYTES: number = 1 * 1024 * 1024;
   imageResizeRatio: number;
   cropArea: { x1: number; y1: number; x2: number; y2: number };
   mousePositionWithinCropArea: null | number;
@@ -182,7 +202,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     private imagePreloaderService: ImagePreloaderService,
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -946,11 +967,17 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     const mimeType = resampledImageData.split(';')[0];
     const imageSize = atob(
       resampledImageData.replace(`${mimeType};base64,`, '')).length;
-    // The processed image can sometimes be larger than 100 KB. This is
-    // because the output of HTMLCanvasElement.toDataURL() operation in
+    // The processed image can sometimes be larger than original file size. This
+    // is because the output of HTMLCanvasElement.toDataURL() operation in
     // getResampledImageData() is browser specific and can vary in size.
     // See https://stackoverflow.com/a/9777037.
-    this.processedImageIsTooLarge = imageSize > this.HUNDRED_KB_IN_BYTES;
+    if (
+      this.entityType === AppConstants.ENTITY_TYPE.BLOG_POST
+    ) {
+      this.processedImageIsTooLarge = imageSize > this.ONE_MB_IN_BYTES;
+    } else {
+      this.processedImageIsTooLarge = imageSize > this.HUNDRED_KB_IN_BYTES;
+    }
   }
 
   saveUploadedFile(): void {
@@ -1032,7 +1059,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
-    window.GifFrames({
+    (this.windowRef.nativeWindow as Window).GifFrames({
       url: imageDataURI,
       frames: 'all',
       outputType: 'canvas',

@@ -340,7 +340,7 @@ indexes:
   - name: commit_message
   - name: commit_type
 
-- kind: TaskEntryModel
+- kind: ExplorationStatsTaskEntryModel
   properties:
   - name: composite_entity_id
   - name: status

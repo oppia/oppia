@@ -1,4 +1,4 @@
-runtime: python37
+runtime: python38
 instance_class: F2
 # The "version" line is added here so that MR jobs can run locally (see issue
 # #6534 on oppia/oppia).
@@ -45,6 +45,11 @@ handlers:
 # DEVELOPMENT STATIC
 - url: /webpack_bundles
   static_dir: webpack_bundles
+  secure: always
+  expiration: "0"
+# /dist is the build output folder for angular.
+- url: /dist
+  static_dir: dist/
   secure: always
   expiration: "0"
 - url: /assets

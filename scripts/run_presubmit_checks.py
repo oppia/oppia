@@ -24,12 +24,14 @@ from __future__ import annotations
 import argparse
 import subprocess
 
+from typing import Final, List, Optional
+
 from . import common
 from . import run_backend_tests
 from . import run_frontend_tests
 from .linters import pre_commit_linter
 
-_PARSER = argparse.ArgumentParser(
+_PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder prior to opening a PR:
     python -m scripts.run_presubmit_checks
@@ -52,7 +54,7 @@ _PARSER.add_argument(
     help='optional; if specified, the origin branch to compare against.')
 
 
-def main(args=None) -> None:
+def main(args: Optional[List[str]] = None) -> None:
     """Run the presubmit checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
@@ -62,14 +64,19 @@ def main(args=None) -> None:
     print('Linting passed.')
     print('')
 
-    current_branch = subprocess.check_output([
-        'git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+    current_branch = subprocess.check_output(
+        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], encoding='utf-8'
+    )
 
     # If the current branch exists on remote origin, matched_branch_num=1
     # else matched_branch_num=0.
-    matched_branch_num = subprocess.check_output([
-        'git', 'ls-remote', '--heads', 'origin', current_branch, '|', 'wc',
-        '-l'])
+    matched_branch_num = subprocess.check_output(
+        [
+            'git', 'ls-remote', '--heads', 'origin', current_branch, '|',
+            'wc', '-l'
+        ],
+        encoding='utf-8'
+    )
 
     # Set the origin branch to develop if it's not specified.
     if parsed_args.branch:
@@ -81,8 +88,13 @@ def main(args=None) -> None:
 
     print('Comparing the current branch with %s' % branch)
 
-    all_changed_files = subprocess.check_output([
-        'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch])
+    all_changed_files = subprocess.check_output(
+        [
+            'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
+            branch
+        ],
+        encoding='utf-8'
+    )
 
     if common.FRONTEND_DIR in all_changed_files:
         # Run frontend unit tests.

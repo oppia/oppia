@@ -38,20 +38,21 @@ from core import constants
 from core import utils
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
+from scripts import servers
 
 import github
-from typing import Generator, List, NoReturn
-from typing_extensions import Literal
+from typing import Generator, List, Literal, NoReturn
 
 from . import common
 
 
-# The pool_size argument is required by Requester.__init__(), but it is missing
-# from the typing definition in Requester.pyi.  We therefore disable type
-# checking here. A PR was opened to PyGithub to fix this, but it was closed due
-# to inactivity (the project does not seem very active). Here is the PR:
+# Here we use MyPy ignore because the pool_size argument is required by
+# Requester.__init__(), but it is missing from the typing definition in
+# Requester.pyi. We therefore disable type checking here. A PR was opened
+# to PyGithub to fix this, but it was closed due to inactivity (the project
+# does not seem very active). Here is the PR:
 # https://github.com/PyGithub/PyGithub/pull/2151.
-_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore
+_MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
     login_or_token=None,
     password=None,
     jwt=None,
@@ -65,8 +66,111 @@ _MOCK_REQUESTER = github.Requester.Requester(  # type: ignore
 )
 
 
+class MockCompiler:
+    def wait(self) -> None: # pylint: disable=missing-docstring
+        pass
+
+
+class MockCompilerContextManager():
+    def __init__(self) -> None:
+        pass
+
+    def __enter__(self) -> MockCompiler:
+        return MockCompiler()
+
+    def __exit__(self, *unused_args: str) -> None:
+        pass
+
+
+def mock_context_manager() -> MockCompilerContextManager:
+    return MockCompilerContextManager()
+
+
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.print_arr: list[str] = []
+        def mock_print(msg: str) -> None:
+            self.print_arr.append(msg)
+        self.print_swap = self.swap(builtins, 'print', mock_print)
+
+    def test_run_ng_compilation_successfully(self) -> None:
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: True, expected_kwargs=[])
+        swap_ng_build = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_context_manager, expected_args=[])
+        with self.print_swap, swap_ng_build, swap_isdir:
+            common.run_ng_compilation()
+
+        self.assertNotIn(
+            'Failed to complete ng build compilation, exiting...',
+            self.print_arr
+        )
+
+    def test_run_ng_compilation_failed(self) -> None:
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: False, expected_kwargs=[])
+        swap_ng_build = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_context_manager, expected_args=[])
+        swap_sys_exit = self.swap_with_checks(
+            sys,
+            'exit',
+            lambda _: None,
+            expected_args=[(1,)]
+        )
+        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+            common.run_ng_compilation()
+
+        self.assertIn(
+            'Failed to complete ng build compilation, exiting...',
+            self.print_arr
+        )
+
+    def test_subprocess_error_results_in_failed_ng_build(self) -> None:
+        class MockFailedCompiler:
+            def wait(self) -> None: # pylint: disable=missing-docstring
+                raise subprocess.CalledProcessError(
+                    returncode=1, cmd='', output='Subprocess execution failed.')
+
+        class MockFailedCompilerContextManager:
+            def __init__(self) -> None:
+                pass
+
+            def __enter__(self) -> MockFailedCompiler:
+                return MockFailedCompiler()
+
+            def __exit__(self, *unused_args: str) -> None:
+                pass
+
+        def mock_failed_context_manager() -> MockFailedCompilerContextManager:
+            return MockFailedCompilerContextManager()
+
+        swap_ng_build = self.swap_with_checks(
+            servers,
+            'managed_ng_build',
+            mock_failed_context_manager,
+            expected_args=[]
+        )
+        swap_isdir = self.swap_with_checks(
+            os.path,
+            'isdir',
+            lambda _: False,
+            expected_args=[
+                ('dist/oppia-angular',),
+                ('dist/oppia-angular',),
+                ('dist/oppia-angular',)
+            ]
+        )
+        swap_sys_exit = self.swap_with_checks(
+            sys,
+            'exit',
+            lambda _: None,
+            expected_args=[(1,), (1,), (1,)]
+        )
+        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+            common.run_ng_compilation()
 
     @contextlib.contextmanager
     def open_tcp_server_port(self) -> Generator[int, None, None]:
@@ -288,16 +392,20 @@ class CommonTests(test_utils.GenericTestBase):
             common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_get_remote_alias_with_correct_alias(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'remote1 url1\nremote2 url2'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'remote1 url1\nremote2 url2'
         with self.swap(
             subprocess, 'check_output', mock_check_output
         ):
             self.assertEqual(common.get_remote_alias(['url1']), 'remote1')
 
     def test_get_remote_alias_with_incorrect_alias(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'remote1 url1\nremote2 url2'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
@@ -325,15 +433,19 @@ class CommonTests(test_utils.GenericTestBase):
             common.verify_local_repo_is_clean()
 
     def test_get_current_branch_name(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
     def test_update_branch_with_upstream(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test'
 
         def mock_run_cmd(cmd: str) -> str:
             return cmd
@@ -372,15 +484,19 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-1.2.3'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), False)
 
     def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-1.2.3-hotfix-1'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
@@ -388,8 +504,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_release_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-1.2.3'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -397,8 +515,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_hotfix_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-1.2.3-hotfix-1'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -406,8 +526,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_maintenance_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch release-maintenance-1.2.3'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-maintenance-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -415,36 +537,46 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_non_release_branch(
         self
     ) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), False)
 
     def test_is_current_branch_a_test_branch_with_test_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test-common'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test-common'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), True)
 
     def test_is_current_branch_a_test_branch_with_non_test_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch invalid-test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch invalid-test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_test_branch(), False)
 
     def test_verify_current_branch_name_with_correct_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch test'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             common.verify_current_branch_name('test')
 
     def test_verify_current_branch_name_with_incorrect_branch(self) -> None:
-        def mock_check_output(unused_cmd_tokens: List[str]) -> bytes:
-            return b'On branch invalid'
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch invalid'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegex(
@@ -899,11 +1031,6 @@ class CommonTests(test_utils.GenericTestBase):
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
 
-    def test_fix_third_party_imports_correctly_sets_up_imports(self) -> None:
-        common.fix_third_party_imports()
-        # Asserts that imports from problematic modules do not error.
-        from google.cloud import tasks_v2  # pylint: disable=unused-import
-
     def test_cd(self) -> None:
         def mock_chdir(unused_path: str) -> None:
             pass
@@ -1115,3 +1242,41 @@ class CommonTests(test_utils.GenericTestBase):
                     'https://example.com', output_path, enforce_https=False)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+    def test_chrome_bin_setup_with_google_chrome(self) -> None:
+        isfile_swap = self.swap(
+            os.path, 'isfile', lambda path: path == '/usr/bin/google-chrome'
+        )
+        with isfile_swap:
+            common.setup_chrome_bin_env_variable()
+        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/google-chrome')
+
+    def test_chrome_bin_setup_with_wsl_chrome_browser(self) -> None:
+        isfile_swap = self.swap(
+            os.path,
+            'isfile',
+            lambda path: path == (
+                '/mnt/c/Program Files (x86)/Google/'
+                'Chrome/Application/chrome.exe'
+            )
+        )
+        with isfile_swap:
+            common.setup_chrome_bin_env_variable()
+        self.assertEqual(
+            os.environ['CHROME_BIN'],
+            '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+        )
+
+    def test_chrome_bin_setup_with_error(self) -> None:
+        print_arr = []
+        def mock_print(msg: str) -> None:
+            print_arr.append(msg)
+
+        isfile_swap = self.swap(os.path, 'isfile', lambda _: False)
+        print_swap = self.swap(builtins, 'print', mock_print)
+
+        with print_swap, isfile_swap, self.assertRaisesRegex(
+            Exception, 'Chrome not found.'
+        ):
+            common.setup_chrome_bin_env_variable()
+        self.assertIn('Chrome is not found, stopping...', print_arr)
