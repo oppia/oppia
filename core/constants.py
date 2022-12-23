@@ -71,13 +71,16 @@ def get_package_file_contents(
     package: str, filepath: str, *, binary_mode: Literal[True]
 ) -> bytes: ...
 
+
 @overload
 def get_package_file_contents(package: str, filepath: str) -> str: ...
+
 
 @overload
 def get_package_file_contents(
     package: str, filepath: str, *, binary_mode: Literal[False]
 ) -> str: ...
+
 
 def get_package_file_contents(
     package: str, filepath: str, *, binary_mode: bool = False
@@ -140,10 +143,8 @@ class Constants(dict):  # type: ignore[type-arg]
         return self[name]
 
 
-package_content = get_package_file_contents('assets', 'constants.ts')
-# Ruling out the possibility of different types for mypy type checking.
-# assert isinstance(package_content, str)
-constants = Constants(parse_json_from_ts(package_content)) # pylint:disable=invalid-name
+constants = Constants(parse_json_from_ts(  # pylint:disable=invalid-name
+    get_package_file_contents('assets', 'constants.ts')))
 
 release_constants = Constants( # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
