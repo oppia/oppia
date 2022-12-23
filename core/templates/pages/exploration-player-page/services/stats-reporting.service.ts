@@ -416,6 +416,10 @@ export class StatsReportingService {
         cardCount,
         language
       );
+    } else {
+      this.siteAnalyticsService.registerCommunityLessonCompleted(
+        this.explorationId
+      );
     }
 
     this.postStatsToBackend();

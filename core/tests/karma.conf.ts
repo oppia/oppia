@@ -2,7 +2,7 @@ var argv = require('yargs').positional('terminalEnabled', {
   type: 'boolean',
   'default': false
 }).argv;
-
+var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
   generatedJs = (
@@ -93,6 +93,7 @@ module.exports = function(config) {
         seed: jasmineSeed,
       },
     },
+    crossOriginAttribute: true,
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
@@ -190,7 +191,8 @@ module.exports = function(config) {
                 }
               },
               {
-                loader: 'angular2-template-loader'
+                loader: path.resolve(
+                  'angular-template-style-url-replacer.webpack-loader')
               }
             ]
           },

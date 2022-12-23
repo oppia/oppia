@@ -34,7 +34,7 @@ class InvalidCompositeEntityErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self) -> None:
-        model = improvements_models.TaskEntryModel(
+        model = improvements_models.ExplorationStatsTaskEntryModel(
             id='23',
             entity_id='999',
             entity_type='exploration',
@@ -52,5 +52,6 @@ class InvalidCompositeEntityErrorTests(
 
         self.assertEqual(
             error.stderr,
-            'InvalidCompositeEntityError in TaskEntryModel(id="23"): model '
+            'InvalidCompositeEntityError in '
+            'ExplorationStatsTaskEntryModel(id="23"): model '
             'has invalid composite entity %s' % model.composite_entity_id)
