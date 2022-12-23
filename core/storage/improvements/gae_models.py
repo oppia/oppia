@@ -57,7 +57,7 @@ TASK_TYPES: Final = (
 )
 
 
-class TaskEntryModel(base_models.BaseModel):
+class ExplorationStatsTaskEntryModel(base_models.BaseModel):
     """Model representation of an actionable task from the improvements tab.
 
     The ID of a task has the form: "[entity_type].[entity_id].[entity_version].
@@ -106,7 +106,8 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether any TaskEntryModel references the given user.
+        """Check whether any ExplorationStatsTaskEntryModel references
+        the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -118,18 +119,14 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data to delete corresponding to a user:
+        """Model contains data to pseudonymize corresponding to a user:
         resolver_id field.
-
-        It is okay to delete task entries since, after they are resolved, they
-        only act as a historical record. The removal just removes the historical
-        record.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instances of TaskEntryModel for the user.
+        """Delete instances of ExplorationStatsTaskEntryModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -152,7 +149,8 @@ class TaskEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user:
-        TaskEntryModel contains the ID of the user that acted on a task.
+        ExplorationStatsTaskEntryModel contains the ID of the user that acted
+        on a task.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -182,18 +180,19 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id: str) -> Dict[str, List[str]]:
-        """Returns the user-relevant properties of TaskEntryModels.
+        """Returns the user-relevant properties of
+        ExplorationStatsTaskEntryModels.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. The user-relevant properties of TaskEntryModel in a dict
-            format. In this case, we are returning all the ids of the tasks
-            which were closed by this user.
+            dict. The user-relevant properties of ExplorationStatsTaskEntryModel
+            in a dict format. In this case, we are returning all the ids of the
+            tasks which were closed by this user.
         """
-        task_ids_resolved_by_user = TaskEntryModel.query(
-            TaskEntryModel.resolver_id == user_id)
+        task_ids_resolved_by_user = ExplorationStatsTaskEntryModel.query(
+            ExplorationStatsTaskEntryModel.resolver_id == user_id)
         return {
             'task_ids_resolved_by_user': (
                 [t.id for t in task_ids_resolved_by_user]),

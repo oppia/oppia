@@ -143,14 +143,15 @@ class GetTaskEntryFromModelTests(ImprovementsServicesTestBase):
     """Unit tests for the get_task_entry_from_model function."""
 
     def test_returns_same_fields_as_model(self) -> None:
-        task_id = improvements_models.TaskEntryModel.create(
+        task_id = improvements_models.ExplorationStatsTaskEntryModel.create(
             constants.TASK_ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1,
             constants.TASK_TYPE_HIGH_BOUNCE_RATE,
             constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             constants.TASK_STATUS_RESOLVED, self.owner_id,
             self.MOCK_DATE)
-        task_entry_model = improvements_models.TaskEntryModel.get_by_id(task_id)
+        task_entry_model = (
+            improvements_models.ExplorationStatsTaskEntryModel.get(task_id))
         task_entry = (
             improvements_services.get_task_entry_from_model(task_entry_model))
 
@@ -397,11 +398,14 @@ class PutTasksTests(ImprovementsServicesTestBase):
             [open_task, obsolete_task, resolved_task])
 
         open_task_model = (
-            improvements_models.TaskEntryModel.get_by_id(open_task.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                open_task.task_id))
         obsolete_task_model = (
-            improvements_models.TaskEntryModel.get_by_id(obsolete_task.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                obsolete_task.task_id))
         resolved_task_model = (
-            improvements_models.TaskEntryModel.get_by_id(resolved_task.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                resolved_task.task_id))
 
         open_task_entry = improvements_services.get_task_entry_from_model(
             open_task_model)
@@ -425,7 +429,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(
+            task_entry.task_id)
         self.assertEqual(model.resolver_id, None)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -435,7 +440,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(
+            task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, updated_on)
@@ -450,7 +456,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(
+            task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -458,7 +465,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(updated_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(
+            task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -473,7 +481,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
         with self.mock_datetime_utcnow(created_on):
             improvements_services.put_tasks([task_entry])
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(
+            task_entry.task_id)
         self.assertEqual(model.resolver_id, None)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -484,7 +493,8 @@ class PutTasksTests(ImprovementsServicesTestBase):
             improvements_services.put_tasks(
                 [task_entry], update_last_updated_time=False)
 
-        model = improvements_models.TaskEntryModel.get_by_id(task_entry.task_id)
+        model = improvements_models.ExplorationStatsTaskEntryModel.get(
+            task_entry.task_id)
         self.assertEqual(model.resolver_id, self.owner_id)
         self.assertEqual(model.created_on, created_on)
         self.assertEqual(model.last_updated, created_on)
@@ -497,7 +507,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                task_entry.task_id))
         task_entry.target_id = 'Different State'
 
         with self.assertRaisesRegex(Exception, 'Wrong model provided'):
@@ -508,7 +519,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                task_entry.task_id))
 
         self.assertFalse(
             improvements_services.apply_changes_to_model(
@@ -518,7 +530,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                task_entry.task_id))
         task_entry.issue_description = 'new issue description'
 
         self.assertTrue(
@@ -533,7 +546,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                task_entry.task_id))
         task_entry = self._new_resolved_task()
 
         self.assertTrue(
@@ -548,7 +562,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                task_entry.task_id))
         task_entry.resolver_id = self.owner_id
 
         self.assertFalse(
@@ -563,7 +578,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
         task_entry = self._new_open_task()
         improvements_services.put_tasks([task_entry])
         task_entry_model = (
-            improvements_models.TaskEntryModel.get_by_id(task_entry.task_id))
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                task_entry.task_id))
         # Here we use MyPy ignore because `resolved_on` can only accept
         # datetime values but for testing purposes here we are providing
         # string value which causes MyPy to throw an error. Thus to avoid

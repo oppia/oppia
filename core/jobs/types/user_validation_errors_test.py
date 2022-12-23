@@ -37,24 +37,6 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class ModelExpiringErrorTests(base_validation_errors_test.AuditErrorsTestBase):
-
-    def test_message(self) -> None:
-        model = user_models.UserQueryModel(
-            id='test',
-            submitter_id='submitter',
-            created_on=self.YEAR_AGO,
-            last_updated=self.YEAR_AGO
-        )
-        error = user_validation_errors.ModelExpiringError(model)
-
-        self.assertEqual(
-            error.stderr,
-            'ModelExpiringError in UserQueryModel(id="test"): mark model '
-            'as deleted when older than %s days' % (
-                feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
-
-
 class ModelIncorrectKeyErrorTests(
     base_validation_errors_test.AuditErrorsTestBase
 ):

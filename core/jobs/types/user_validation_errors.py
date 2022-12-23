@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.jobs.types import base_validation_errors
 from core.platform import models
 
@@ -41,15 +40,6 @@ class ModelIncorrectKeyError(base_validation_errors.BaseAuditError):
         incorrect_keys: List[str]
     ) -> None:
         message = 'contains keys %s are not allowed' % (incorrect_keys)
-        super().__init__(message, model)
-
-
-class ModelExpiringError(base_validation_errors.BaseAuditError):
-    """Error class for models that are expiring."""
-
-    def __init__(self, model: user_models.UserQueryModel) -> None:
-        message = 'mark model as deleted when older than %s days' % (
-            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
         super().__init__(message, model)
 
 

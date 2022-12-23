@@ -306,16 +306,19 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token())
 
-        task_entry_model = improvements_models.TaskEntryModel.get_by_id(
-            improvements_models.TaskEntryModel.generate_task_id(
+        task_id = (
+            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
                 constants.TASK_ENTITY_TYPE_EXPLORATION,
                 self.exp.id,
                 self.exp.version,
                 constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                 constants.TASK_TARGET_TYPE_STATE,
-                feconf.DEFAULT_INIT_STATE_NAME))
+                feconf.DEFAULT_INIT_STATE_NAME
+            )
+        )
+        task_entry_model = (
+            improvements_models.ExplorationStatsTaskEntryModel.get(task_id))
 
-        self.assertIsNotNone(task_entry_model)
         self.assertIsNone(task_entry_model.issue_description)
 
     def test_post_with_missing_status_returns_401_error(self) -> None:
@@ -342,16 +345,19 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token())
 
-        task_id = improvements_models.TaskEntryModel.generate_task_id(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
-            self.exp.id,
-            self.exp.version,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        task_entry_model = improvements_models.TaskEntryModel.get_by_id(task_id)
+        task_id = (
+            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
+                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                self.exp.id,
+                self.exp.version,
+                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.TASK_TARGET_TYPE_STATE,
+                feconf.DEFAULT_INIT_STATE_NAME
+            )
+        )
+        task_entry_model = (
+            improvements_models.ExplorationStatsTaskEntryModel.get(task_id))
 
-        self.assertIsNotNone(task_entry_model)
         self.assertEqual(task_entry_model.id, task_id)
         self.assertEqual(
             task_entry_model.entity_type,
@@ -385,16 +391,19 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token())
 
-        task_id = improvements_models.TaskEntryModel.generate_task_id(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
-            self.exp.id,
-            self.exp.version,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        task_entry_model = improvements_models.TaskEntryModel.get_by_id(task_id)
+        task_id = (
+            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
+                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                self.exp.id,
+                self.exp.version,
+                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.TASK_TARGET_TYPE_STATE,
+                feconf.DEFAULT_INIT_STATE_NAME
+            )
+        )
+        task_entry_model = (
+            improvements_models.ExplorationStatsTaskEntryModel.get(task_id))
 
-        self.assertIsNotNone(task_entry_model)
         self.assertEqual(task_entry_model.id, task_id)
         self.assertEqual(
             task_entry_model.entity_type,
@@ -432,16 +441,19 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                 }]
             }, csrf_token=self.get_new_csrf_token())
 
-        task_id = improvements_models.TaskEntryModel.generate_task_id(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
-            self.exp.id,
-            self.exp.version,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
-            feconf.DEFAULT_INIT_STATE_NAME)
-        task_entry_model = improvements_models.TaskEntryModel.get_by_id(task_id)
+        task_id = (
+            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
+                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                self.exp.id,
+                self.exp.version,
+                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.TASK_TARGET_TYPE_STATE,
+                feconf.DEFAULT_INIT_STATE_NAME
+            )
+        )
+        task_entry_model = (
+            improvements_models.ExplorationStatsTaskEntryModel.get(task_id))
 
-        self.assertIsNotNone(task_entry_model)
         self.assertEqual(task_entry_model.id, task_id)
         self.assertEqual(
             task_entry_model.entity_type,

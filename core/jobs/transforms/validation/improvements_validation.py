@@ -39,17 +39,19 @@ if MYPY: # pragma: no cover
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-@validation_decorators.AuditsExisting(improvements_models.TaskEntryModel)
+@validation_decorators.AuditsExisting(
+    improvements_models.ExplorationStatsTaskEntryModel
+)
 class ValidateCompositeEntityId(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate the composite entity id."""
 
     def process(
-        self, input_model: improvements_models.TaskEntryModel
+        self, input_model: improvements_models.ExplorationStatsTaskEntryModel
     ) -> Iterator[improvements_validation_errors.InvalidCompositeEntityError]:
         """Function that checks if the composite entity id is valid
 
         Args:
-            input_model: improvements_models.TaskEntryModel.
+            input_model: improvements_models.ExplorationStatsTaskEntryModel.
                 Entity to validate.
 
         Yields:
@@ -58,7 +60,8 @@ class ValidateCompositeEntityId(beam.DoFn):  # type: ignore[misc]
         """
         model = job_utils.clone_model(input_model)
         expected_composite_entity_id = (
-            improvements_models.TaskEntryModel.generate_composite_entity_id(
+            improvements_models.ExplorationStatsTaskEntryModel
+            .generate_composite_entity_id(
                 model.entity_type, model.entity_id, model.entity_version))
 
         if model.composite_entity_id != expected_composite_entity_id:
