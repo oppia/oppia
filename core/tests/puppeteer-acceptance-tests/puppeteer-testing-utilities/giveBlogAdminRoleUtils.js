@@ -11,7 +11,7 @@ class e2eBlogAdmin extends puppeteerUtilities {
   async expectBlogDashboardAccessToBeUnauthorized() {
     try {
       await (this.page).waitForSelector(unauthErrorContainer);
-      console.log("Blog Admin unauthorized to access blog dashboard!");
+      console.log("User unauthorized to access blog dashboard!");
     } catch(err) {
       throw new Error("No unauthorization error found for the blog dashboard page!");
     }
@@ -25,9 +25,9 @@ class e2eBlogAdmin extends puppeteerUtilities {
     await this.reloadPage();
     try {
       await this.waitForPageToLoad(blogdDashboardAuthorDetailsModal);
-      console.log("Blog Admin authorized to access blog dashboard!");
+      console.log("User authorized to access blog dashboard!");
     } catch(err) {
-      throw new Error("Blog Admin unauthorized to access blog dashboard!");
+      throw new Error("User unauthorized to access blog dashboard!");
     }
   }
   
@@ -62,9 +62,9 @@ class e2eSuperAdmin extends puppeteerUtilities {
           return;
         }
       }
-      throw new Error("Blog Admin does not have blog admin role!");
+      throw new Error("User does not have blog admin role!");
     });
-    console.log("Blog Admin given blog admin role successfully!");
+    console.log("User given the blog admin role successfully!");
   }
 };
 
