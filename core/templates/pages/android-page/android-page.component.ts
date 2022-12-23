@@ -27,14 +27,14 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { AppConstants } from 'app.constants';
-import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 
 import './android-page.component.css';
 
 @Component({
   selector: 'android-page',
   templateUrl: './android-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./android-page.component.css'],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -78,6 +78,7 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   featuresMainTextIsSeen = false;
   emailAddress: string | null = null;
   name: string | null = null;
+  userCanSubscribe: boolean = false;
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
@@ -89,7 +90,7 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   constructor(
     private alertsService: AlertsService,
-    private androidUpdatesBackendApiService: AndroidUpdatesBackendApiService,
+    private mailingListBackendApiService: MailingListBackendApiService,
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
     private urlInterpolationService: UrlInterpolationService,
@@ -149,8 +150,10 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   }
 
   subscribeToAndroidList(): void {
-    this.androidUpdatesBackendApiService.subscribeUserToAndroidList(
-      String(this.emailAddress), String(this.name)
+    this.mailingListBackendApiService.subscribeUserToMailingList(
+      String(this.emailAddress),
+      String(this.name),
+      AppConstants.MAILING_LIST_ANDROID_TAG
     ).then((status) => {
       if (status) {
         this.alertsService.addInfoMessage('Done!', 1000);

@@ -70,7 +70,8 @@ export interface CollectionHandler {
 
 @Component({
   selector: 'oppia-collection-player-page',
-  templateUrl: './collection-player-page.component.html'
+  templateUrl: './collection-player-page.component.html',
+  styleUrls: ['./collection-player-page.component.css']
 })
 export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

@@ -25,6 +25,7 @@ import { HttpClient, HttpXhrBackend,
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
 
+
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -499,7 +500,6 @@ import { MathInteractionsService } from './math-interactions.service';
 interface UpgradedServicesDict {
   [service: string]: unknown;
 }
-
 @Injectable({
   providedIn: 'root'
 })

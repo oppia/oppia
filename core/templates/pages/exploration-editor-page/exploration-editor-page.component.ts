@@ -129,7 +129,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
      private bottomNavbarStatusService: BottomNavbarStatusService,
      private changeListService: ChangeListService,
      private contextService: ContextService,
-     private editabilityService: EditabilityService,
+     public editabilityService: EditabilityService,
      private explorationAutomaticTextToSpeechService:
        ExplorationAutomaticTextToSpeechService,
      private explorationCategoryService: ExplorationCategoryService,
@@ -146,7 +146,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
      private explorationParamChangesService: ExplorationParamChangesService,
      private explorationParamSpecsService: ExplorationParamSpecsService,
      private explorationPropertyService: ExplorationPropertyService,
-     private explorationRightsService: ExplorationRightsService,
+     public explorationRightsService: ExplorationRightsService,
      private explorationSaveService: ExplorationSaveService,
      private explorationStatesService: ExplorationStatesService,
      private explorationTagsService: ExplorationTagsService,

@@ -172,6 +172,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
+            # We need to create an empty hashes.json file for the build so that
+            # we don't get the error "assets/hashes.json file doesn't exist".
+            build.save_hashes_to_file({})
+            stack.enter_context(servers.managed_ng_build(watch_mode=True))
             stack.enter_context(servers.managed_webpack_compiler(
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
                 watch_mode=True))
