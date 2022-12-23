@@ -138,6 +138,8 @@ export class ContributionAndReviewService {
         fetcher.offset,
         explorationId
       ).then((responseBody) => {
+        console.log('responseBody');
+        console.log(responseBody);
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
         const targetIdToDetails = responseBody.target_id_to_opportunity_dict;
@@ -159,6 +161,8 @@ export class ContributionAndReviewService {
           }
         });
         fetcher.offset = responseBody.next_offset;
+        console.log('responseSuggestionIdToDetails');
+        console.log(responseSuggestionIdToDetails);
         return {
           suggestionIdToDetails: responseSuggestionIdToDetails,
           more: Object.keys(fetcher.suggestionIdToDetails).length > 0

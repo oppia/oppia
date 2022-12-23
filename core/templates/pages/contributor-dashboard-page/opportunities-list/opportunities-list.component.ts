@@ -123,6 +123,7 @@ export class OpportunitiesListComponent {
       // This ngZone run closure will not be required after \
       // migration is complete.
       this.zone.run(() => {
+        console.log(opportunitiesDicts);
         this.opportunities = opportunitiesDicts;
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(

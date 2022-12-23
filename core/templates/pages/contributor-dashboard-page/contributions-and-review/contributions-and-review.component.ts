@@ -425,7 +425,8 @@ export class ContributionsAndReview
             id: opportunity.getExplorationId(),
             heading: opportunity.getOpportunityHeading(),
             subheading: opportunity.getOpportunitySubheading(),
-            actionButtonTitle: 'Translations'
+            actionButtonTitle: 'Translations',
+            languageCode: opportunity.languageCode
           };
           opportunitiesDicts.push(opportunityDict);
         });

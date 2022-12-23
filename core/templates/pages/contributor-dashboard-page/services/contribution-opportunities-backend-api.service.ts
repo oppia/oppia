@@ -111,7 +111,8 @@ export class ContributionOpportunitiesBackendApiService {
       opportunityDict.id, opportunityDict.topic_name,
       opportunityDict.story_title, opportunityDict.chapter_title,
       opportunityDict.content_count, opportunityDict.translation_counts,
-      opportunityDict.translation_in_review_counts);
+      opportunityDict.translation_in_review_counts,
+      opportunityDict.language_code);
   }
 
   private _getSkillOpportunityFromDict(
@@ -216,6 +217,7 @@ export class ContributionOpportunitiesBackendApiService {
       '/getreviewableopportunitieshandler', {
         params
       }).toPromise().then(data => {
+      console.log('fetchReviewableTranslationOpportunitiesAsync ', data);
       const opportunities = data.opportunities.map(
         dict => this._getExplorationOpportunityFromDict(dict));
       return {
