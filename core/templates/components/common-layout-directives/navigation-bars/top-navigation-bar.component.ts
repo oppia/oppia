@@ -44,7 +44,6 @@ import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-grou
 
 import './top-navigation-bar.component.css';
 
-
 interface LanguageInfo {
   id: string;
   text: string;
@@ -53,6 +52,7 @@ interface LanguageInfo {
 @Component({
   selector: 'oppia-top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',
+  styleUrls: ['./top-navigation-bar.component.css']
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
