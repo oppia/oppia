@@ -21,13 +21,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import { AppConstants } from 'app.constants';
-
 import './oppia-footer.component.css';
 
 
 @Component({
   selector: 'oppia-footer',
-  templateUrl: './oppia-footer.component.html'
+  templateUrl: './oppia-footer.component.html',
+  styleUrls: ['./oppia-footer.component.css']
 })
 export class OppiaFooterComponent {
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;

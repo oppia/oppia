@@ -173,7 +173,7 @@ export class VoiceoverRecordingService {
   _initRecorder(): void {
     // Browser agnostic AudioContext API check.
     this.audioContextAvailable = window.AudioContext ||
-        window.webkitAudioContext;
+        (window as Window).webkitAudioContext;
 
     if (this.audioContextAvailable) {
       // Promise required because angular is async with worker.
