@@ -38,6 +38,7 @@ import './facilitator-dashboard-page.component.css';
 @Component({
   selector: 'oppia-facilitator-dashboard-page',
   templateUrl: './facilitator-dashboard-page.component.html',
+  styleUrls: ['./facilitator-dashboard-page.component.css']
 })
 export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

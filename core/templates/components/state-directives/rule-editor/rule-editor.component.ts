@@ -319,6 +319,10 @@ export class RuleEditorComponent
         });
         this.rule.inputs.x = box;
       }
+    } else if (this.rule.inputTypes.x === 'TranslatableHtmlContentId') {
+      if (this.rule.inputs.x === null) {
+        this.rule.inputs.x = this.ruleDescriptionChoices[0].val;
+      }
     }
   }
 
