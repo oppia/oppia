@@ -1,8 +1,8 @@
-const { e2eBlogAdmin, e2eSuperAdmin } = require("../puppeteer-testing-utilities/giveBlogAdminRoleUtils.js");
+const e2eSuperAdmin = require("../puppeteer-testing-utilities/blogPostAdminUtils.js");
+const e2eBlogAdmin = require("../puppeteer-testing-utilities/blogPostAdminUtils.js");
 const testConstants = require("../puppeteer-testing-utilities/testConstants.js");
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
-const RolesEditorTab = testConstants.URLs.RolesEditorTab;
 
 async function createDraftAsBlogPostAdmin() {
   const blogAdmin = await new e2eBlogAdmin();
@@ -15,7 +15,6 @@ async function createDraftAsBlogPostAdmin() {
 
   await superAdmin.openBrowser();
   await superAdmin.signUpNewUserWithUserNameAndEmail("superAdm", "testadmin@example.com");
-  await superAdmin.goto(RolesEditorTab);
   await superAdmin.assignBlogAdminRoleToUserWithUserName("blogAdm");
   await superAdmin.expectUserToHaveBlogAdminRole();
   await superAdmin.closeBrowser();
