@@ -2502,7 +2502,7 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.improvements_model_1_id = (
-            improvements_models.TaskEntryModel.create(
+            improvements_models.ExplorationStatsTaskEntryModel.create(
                 entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
                 entity_id=self.EXP_1_ID,
                 entity_version=1,
@@ -2515,7 +2515,7 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
             )
         )
         self.improvements_model_2_id = (
-            improvements_models.TaskEntryModel.create(
+            improvements_models.ExplorationStatsTaskEntryModel.create(
                 entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
                 entity_id=self.EXP_2_ID,
                 entity_version=1,
@@ -2533,21 +2533,25 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         self.assertIsNotNone(
-            improvements_models.TaskEntryModel.get_by_id(
+            improvements_models.ExplorationStatsTaskEntryModel.get_by_id(
                 self.improvements_model_1_id))
         self.assertIsNotNone(
-            improvements_models.TaskEntryModel.get_by_id(
+            improvements_models.ExplorationStatsTaskEntryModel.get_by_id(
                 self.improvements_model_2_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-        self.assertIsNone(
-            improvements_models.TaskEntryModel.get_by_id(
+        task_entry_model1 = (
+            improvements_models.ExplorationStatsTaskEntryModel.get(
                 self.improvements_model_1_id))
-        self.assertIsNone(
-            improvements_models.TaskEntryModel.get_by_id(
+        task_entry_model2 = (
+            improvements_models.ExplorationStatsTaskEntryModel.get(
                 self.improvements_model_2_id))
+        self.assertNotEqual(task_entry_model1.resolver_id, self.user_1_id)
+        self.assertEqual(task_entry_model1.resolver_id[:3], 'pid')
+        self.assertEqual(
+            task_entry_model1.resolver_id, task_entry_model2.resolver_id)
 
 
 class WipeoutServiceVerifyDeleteImprovementsModelsTests(
@@ -2567,7 +2571,7 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        improvements_models.TaskEntryModel.create(
+        improvements_models.ExplorationStatsTaskEntryModel.create(
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_1_ID,
             entity_version=1,
@@ -2578,7 +2582,7 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
             status=constants.TASK_STATUS_RESOLVED,
             resolver_id=self.user_1_id
         )
-        improvements_models.TaskEntryModel.create(
+        improvements_models.ExplorationStatsTaskEntryModel.create(
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_2_ID,
             entity_version=1,
@@ -2604,17 +2608,22 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
-        improvements_models.TaskEntryModel.create(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
-            entity_id=self.EXP_3_ID,
-            entity_version=1,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
-            target_id='State',
-            issue_description=None,
-            status=constants.TASK_STATUS_RESOLVED,
-            resolver_id=self.user_1_id
+        task_entry_id = (
+            improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
+                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                self.EXP_2_ID,
+                1,
+                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.TASK_TARGET_TYPE_STATE,
+                'State'
+            )
         )
+        task_entry_model = (
+            improvements_models.ExplorationStatsTaskEntryModel.get(
+                task_entry_id))
+        task_entry_model.resolver_id = self.user_1_id
+        task_entry_model.update_timestamps()
+        task_entry_model.put()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 

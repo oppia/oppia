@@ -34,15 +34,16 @@ import './goals-tab.component.css';
 
  @Component({
    selector: 'oppia-goals-tab',
-   templateUrl: './goals-tab.component.html'
+   templateUrl: './goals-tab.component.html',
+   styleUrls: ['./goals-tab.component.css']
  })
 export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private learnerDashboardActivityBackendApiService: (
-      LearnerDashboardActivityBackendApiService),
+    private learnerDashboardActivityBackendApiService:
+      LearnerDashboardActivityBackendApiService,
     private deviceInfoService: DeviceInfoService) {
   }
 

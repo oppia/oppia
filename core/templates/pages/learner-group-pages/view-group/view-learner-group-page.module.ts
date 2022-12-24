@@ -25,11 +25,10 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ViewLearnerGroupPageRootComponent } from './view-learner-group-page-root.component';
 import { ViewLearnerGroupPageRoutingModule } from './view-learner-group-page-routing.module';
 import { ViewLearnerGroupPageComponent } from './view-learner-group-page.component';
-import { LearnerGroupOverviewComponent } from '../edit-group/learner-group-overview.component';
 import { LearnerGroupViewAssignedSyllabusComponent } from './learner-group-view-assigned-syllabus.component';
-import { LearnerGroupLearnerSpecificProgressComponent } from '../edit-group/learner-group-learner-specific-progress.component';
 import { LearnerGroupPreferencesModalComponent } from '../templates/learner-group-preferences-modal.component';
 import { ExitLearnerGroupModalComponent } from '../templates/exit-learner-group-modal.component';
+import { SharedLearnerGroupComponentsModule } from '../shared-learner-group-component.module';
 
 @NgModule({
   imports: [
@@ -40,23 +39,20 @@ import { ExitLearnerGroupModalComponent } from '../templates/exit-learner-group-
     // migrated to angular router.
     SmartRouterModule,
     ViewLearnerGroupPageRoutingModule,
+    SharedLearnerGroupComponentsModule,
     Error404PageModule
   ],
   declarations: [
     ViewLearnerGroupPageComponent,
     ViewLearnerGroupPageRootComponent,
-    LearnerGroupOverviewComponent,
     LearnerGroupViewAssignedSyllabusComponent,
-    LearnerGroupLearnerSpecificProgressComponent,
     ExitLearnerGroupModalComponent,
     LearnerGroupPreferencesModalComponent
   ],
   entryComponents: [
     ViewLearnerGroupPageComponent,
     ViewLearnerGroupPageRootComponent,
-    LearnerGroupOverviewComponent,
     LearnerGroupViewAssignedSyllabusComponent,
-    LearnerGroupLearnerSpecificProgressComponent,
     ExitLearnerGroupModalComponent,
     LearnerGroupPreferencesModalComponent
   ]

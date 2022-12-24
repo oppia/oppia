@@ -22,14 +22,26 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 
+import resourceHashes from 'utility/hashes';
+const hashes = {
+  '/hash_test.html': 'ijklmopq',
+  '/path_test/hash_test.html': '123456789',
+  '/hash_test.min.js': 'zyx12345',
+  '/assets_test/hash_test.json': '987654321',
+  '/pages_test/hash_test.html': 'abcd12345',
+  '/images/hash_test.png': '98765fghij',
+  '/videos/hash_test.mp4': '12345cxz',
+  '/audio/hash_test.mp3': '12345abc',
+  '/interactions/interTest/static/interTest.png': '123654789'
+};
 describe('URL Interpolation Service', () => {
-  let hashes = require('hashes.json');
   let uis: UrlInterpolationService;
   let urlService: UrlService;
   let mockLocation: Pick<Location, 'origin'>;
   let _alertsService: AlertsService;
   let alertsObject: Record<'alertsService', AlertsService>;
   beforeEach(() => {
+    spyOnProperty(resourceHashes, 'hashes', 'get').and.returnValue(hashes);
     mockLocation = {
       origin: 'http://sample.com'
     };

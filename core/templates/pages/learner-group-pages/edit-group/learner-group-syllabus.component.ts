@@ -35,7 +35,8 @@ import './learner-group-syllabus.component.css';
 
 @Component({
   selector: 'oppia-learner-group-syllabus',
-  templateUrl: './learner-group-syllabus.component.html'
+  templateUrl: './learner-group-syllabus.component.html',
+  styleUrls: ['./learner-group-syllabus.component.css']
 })
 export class LearnerGroupSyllabusComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
