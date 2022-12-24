@@ -34,7 +34,7 @@ module.exports = class puppeteerUtilities {
     await this.clickOn("span", "Sign in");
     await this.type(testConstants.SignInDetails.inputField, email);
     await this.clickOn("span", "Sign In");
-    (this.page).waitForNavigation({waitUntil: 'networkidle0'});
+    await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
   }
 
   async signUpNewUserWithUserNameAndEmail(userName, signInEmail) {
@@ -42,8 +42,7 @@ module.exports = class puppeteerUtilities {
     await this.type('input.e2e-test-username-input', userName);
     await this.clickOn("input", "e2e-test-agree-to-terms-checkbox");
     await this.clickOn("button", "Submit and start contributing");
-    (this.page).waitForNavigation({waitUntil: 'networkidle0'});
-    await this.waitForPageToLoad(homePage);
+    await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
   }
 
   async waitForPageToLoad(selector) {

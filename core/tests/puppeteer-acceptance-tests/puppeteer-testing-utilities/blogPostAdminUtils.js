@@ -5,6 +5,12 @@ const blogTitleInput = "input.e2e-test-blog-post-title-field";
 const blogBodyInput = "div.e2e-test-rte";
 const thumbnailPhotoBox = "e2e-test-photo-clickable";
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
+const unauthErrorContainer = "div.e2e-test-error-container";
+const roleEditorInputField = "input.e2e-test-username-for-role-editor"
+const roleEditorButtonSelector = "e2e-test-role-edit-button";
+const rolesSelectDropdown = "mat-select-trigger";
+const blogdDashboardAuthorDetailsModal = "div.modal-dialog";
+const RolesEditorTab = testConstants.URLs.RolesEditorTab;
 
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
@@ -166,5 +172,61 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         throw new Error("Draft blog post with title " + checkDraftBlogPostByTitle + " exists!");
       }
     }, checkBlogPostByTitle);
+  }
+
+  async assignBlogAdminRoleToUserWithUserName(userName) {
+    await this.goto(RolesEditorTab);
+    await this.type(roleEditorInputField, userName);
+    await this.clickOn("button", roleEditorButtonSelector);
+    await this.clickOn("h4", "Add role");
+    await this.clickOn("div", rolesSelectDropdown);
+    await (this.page).evaluate(async() => {
+      const allRoles = document.getElementsByClassName('mat-option-text');
+      console.log(allRoles.length);
+      for(let i = 0; i < allRoles.length; i++) {
+        console.log(allRoles[i].innerText);
+        if(allRoles[i].innerText === "blog admin") {
+          allRoles[i].click({waitUntil: "networkidle0"});
+          return;
+        }
+      }
+    });
+  }
+
+  async expectUserToHaveBlogAdminRole() {
+    await (this.page).evaluate(() => {
+      const userRoles = document.getElementsByClassName('oppia-user-role-description');
+      for(let i = 0; i < userRoles.length; i++) {
+        console.log(userRoles[i].innerText);
+        if(userRoles[i].innerText === "Blog Admin") {
+          return;
+        }
+      }
+      throw new Error("User does not have blog admin role!");
+    });
+    console.log("User given the blog admin role successfully!");
+  }
+
+  async expectBlogDashboardAccessToBeUnauthorized() {
+    try {
+      await (this.page).waitForSelector(unauthErrorContainer);
+      console.log("User unauthorized to access blog dashboard!");
+    } catch(err) {
+      throw new Error("No unauthorization error found for the blog dashboard page!");
+    }
+  }
+
+  async expectBlogDashboardAccessToBeAuthorized() {
+    /**Here we are trying to check if the blog dashboard is accessible to the 
+     * guest user after giving the blog admin role to it. There is a modal dialog box 
+     * asking for the user name and bio for the users given blog admin role 
+     * as they first time opens the blog-dashboard. */
+    await this.reloadPage();
+    try {
+      await this.waitForPageToLoad(blogdDashboardAuthorDetailsModal);
+      console.log("User authorized to access blog dashboard!");
+    } catch(err) {
+      throw new Error("User unauthorized to access blog dashboard!");
+    }
   }
 };
