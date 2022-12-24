@@ -263,7 +263,6 @@ MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
-PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.

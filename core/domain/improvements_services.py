@@ -49,34 +49,34 @@ def _yield_all_tasks_ordered_by_status(
     Args:
         composite_entity_id: str. The identifier for the specific entity being
             queried. Must be generated from:
-            TaskEntryModel.generate_composite_entity_id.
+            ExplorationStatsTaskEntryModel.generate_composite_entity_id.
 
     Yields:
         improvements_domain.TaskEntry. All of the tasks corresponding to the
         given composite_entity_id.
     """
-    results: Sequence[improvements_models.TaskEntryModel] = []
-    query = improvements_models.TaskEntryModel.query(
-        improvements_models.TaskEntryModel.composite_entity_id ==
-        composite_entity_id).order(improvements_models.TaskEntryModel.status)
+    model_class = improvements_models.ExplorationStatsTaskEntryModel
+    results: Sequence[improvements_models.ExplorationStatsTaskEntryModel] = []
+    query = model_class.query(
+        model_class.composite_entity_id == composite_entity_id
+    ).order(model_class.status)
     cursor, more = (None, True)
     while more:
         results, cursor, more = query.fetch_page(
-                feconf.MAX_TASK_MODELS_PER_FETCH,
-                start_cursor=cursor
+            feconf.MAX_TASK_MODELS_PER_FETCH, start_cursor=cursor
         )
         for task_model in results:
             yield get_task_entry_from_model(task_model)
 
 
 def get_task_entry_from_model(
-    task_entry_model: improvements_models.TaskEntryModel
+    task_entry_model: improvements_models.ExplorationStatsTaskEntryModel
 ) -> improvements_domain.TaskEntry:
     """Returns a domain object corresponding to the given task entry model.
 
     Args:
-        task_entry_model: improvements_models.TaskEntryModel. The task entry
-            model to get the corresponding domain object.
+        task_entry_model: improvements_models.ExplorationStatsTaskEntryModel.
+            The task entry model to get the corresponding domain object.
 
     Returns:
         improvements_domain.TaskEntry. The corresponding domain object.
@@ -108,9 +108,13 @@ def fetch_exploration_tasks(
                 tasks.
     """
     composite_entity_id = (
-        improvements_models.TaskEntryModel.generate_composite_entity_id(
+        improvements_models.ExplorationStatsTaskEntryModel
+        .generate_composite_entity_id(
             constants.TASK_ENTITY_TYPE_EXPLORATION,
-            exploration.id, exploration.version))
+            exploration.id,
+            exploration.version
+        )
+    )
     tasks_grouped_by_status = itertools.groupby(
         _yield_all_tasks_ordered_by_status(composite_entity_id),
         operator.attrgetter('status'))
@@ -150,26 +154,20 @@ def fetch_exploration_task_history_page(
                 this batch. If False, there are no more results; if True, there
                 are probably more results.
     """
-    results: Sequence[improvements_models.TaskEntryModel] = []
+    model_class = improvements_models.ExplorationStatsTaskEntryModel
+    results: Sequence[improvements_models.ExplorationStatsTaskEntryModel] = []
     start_cursor = (
         datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
         if urlsafe_start_cursor else None
     )
-    results, cursor, more = (
-        improvements_models.TaskEntryModel.query(
-            improvements_models.TaskEntryModel.entity_type == (
-                constants.TASK_ENTITY_TYPE_EXPLORATION
-            ),
-            improvements_models.TaskEntryModel.entity_id == exploration.id,
-            improvements_models.TaskEntryModel.status == (
-                constants.TASK_STATUS_RESOLVED
-            )
-        ).order(
-            -improvements_models.TaskEntryModel.resolved_on
-        ).fetch_page(
-            feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE,
-            start_cursor=start_cursor
-        )
+    results, cursor, more = model_class.query(
+        model_class.entity_type == constants.TASK_ENTITY_TYPE_EXPLORATION,
+        model_class.entity_id == exploration.id,
+        model_class.status == constants.TASK_STATUS_RESOLVED
+    ).order(
+        -model_class.resolved_on
+    ).fetch_page(
+        feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor
     )
     # The urlsafe returns bytes and we need to decode them to string.
     return (
@@ -195,13 +193,13 @@ def put_tasks(
         update_last_updated_time: bool. Whether to update the last_updated field
             of the task models.
     """
-    task_models = improvements_models.TaskEntryModel.get_multi(
+    task_models = improvements_models.ExplorationStatsTaskEntryModel.get_multi(
         [t.task_id for t in tasks])
     models_to_put = []
     for task, model in zip(tasks, task_models):
         if model is None:
             models_to_put.append(
-                improvements_models.TaskEntryModel(
+                improvements_models.ExplorationStatsTaskEntryModel(
                     id=task.task_id,
                     composite_entity_id=task.composite_entity_id,
                     entity_type=task.entity_type,
@@ -216,22 +214,23 @@ def put_tasks(
                     resolved_on=task.resolved_on))
         elif apply_changes_to_model(task, model):
             models_to_put.append(model)
-    improvements_models.TaskEntryModel.update_timestamps_multi(
+    improvements_models.ExplorationStatsTaskEntryModel.update_timestamps_multi(
         models_to_put, update_last_updated_time=update_last_updated_time)
-    improvements_models.TaskEntryModel.put_multi(models_to_put)
+    improvements_models.ExplorationStatsTaskEntryModel.put_multi(models_to_put)
 
 
 def apply_changes_to_model(
     task_entry: improvements_domain.TaskEntry,
-    task_entry_model: improvements_models.TaskEntryModel
+    task_entry_model: improvements_models.ExplorationStatsTaskEntryModel
 ) -> bool:
     """Makes changes to the given model when differences are found.
 
     Args:
         task_entry: improvements_domain.TaskEntry. The TaskEntry domain object
             to be check if changes made to the TaskEntry model.
-        task_entry_model: improvements_models.TaskEntryModel. The TaskEntry
-            model object to be compared with TaskEntry domain object.
+        task_entry_model: improvements_models.ExplorationStatsTaskEntryModel.
+            The TaskEntry model object to be compared with TaskEntry domain
+            object.
 
     Returns:
         bool. Whether any change was made to the model.
