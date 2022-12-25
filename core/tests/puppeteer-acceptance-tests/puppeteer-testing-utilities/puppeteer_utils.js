@@ -1,3 +1,4 @@
+const { not } = require("mathjs");
 const puppeteer = require("puppeteer");
 const testConstants = require("./testConstants.js");
 
@@ -23,6 +24,9 @@ module.exports = class puppeteerUtilities {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await (this.page).setViewport({ width: 0, height: 0 });
+        await this.page.on('dialog', async dialog => {  // accepting the alerts that appear in between the tests
+          await dialog.accept();
+        });
       });
 
     return this.page;
@@ -41,7 +45,7 @@ module.exports = class puppeteerUtilities {
     await this.signInWithEmail(signInEmail);
     await this.type('input.e2e-test-username-input', userName);
     await this.clickOn("input", "e2e-test-agree-to-terms-checkbox");
-    await this.clickOn("button", "Submit and start contributing");
+    await this.clickOn("button", "Submit and start contributing", 100);
     await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
   }
 

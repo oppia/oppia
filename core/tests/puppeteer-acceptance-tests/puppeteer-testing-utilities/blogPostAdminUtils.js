@@ -11,7 +11,9 @@ const roleEditorButtonSelector = "e2e-test-role-edit-button";
 const rolesSelectDropdown = "mat-select-trigger";
 const blogdDashboardAuthorDetailsModal = "div.modal-dialog";
 const RolesEditorTab = testConstants.URLs.RolesEditorTab;
-
+const roleUpdateUsernameInput = "input#label-target-update-form-name";
+const removeBlogEditorUsernameInput = "input#label-target-form-reviewer-username";
+const maximumTagLimitInput = "input#mat-input-0"
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
@@ -228,5 +230,93 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     } catch(err) {
       throw new Error("User unauthorized to access blog dashboard!");
     }
+  }
+
+  async assignUserAsRoleFromRoleDropdown(username, role) {
+    await this.type(roleUpdateUsernameInput, username);
+    await this.page.select('select#label-target-update-form-role-select', role);
+    await this.clickOn("button", "Update Role", 100);
+  }
+
+  async expectUserGivenTheRoleFromRoleDropdown(username, role) {
+    const statusMessage = "Role of " + username + " successfully updated to " + role;
+    try {
+      await this.page.waitForFunction((statusMessage) => {
+          return document.querySelector('.oppia-status-message-container').innerText === statusMessage;
+        },
+        {},
+        statusMessage
+      );
+    } catch(err) {
+      throw new Error(username + " not given the " + role + " role from role dropdown!");
+    }
+    console.log(username + " given the " + role + " role from role dropdown successfully!");
+  }
+
+  async removeBlogEditorRoleByUsername(username) {
+    await this.type(removeBlogEditorUsernameInput, username);
+    await this.clickOn("button", "Remove Blog Editor ");
+  }
+
+  async expectRemovedBlogEditorRoleByUsername(username) {
+    const statusMessage = "Success.";
+    try {
+      await this.page.waitForFunction((statusMessage) => {
+          return document.querySelector('.oppia-status-message-container').innerText === statusMessage;
+        },
+        {},
+        statusMessage
+      );
+    } catch(err) {
+      throw new Error(username + " not removed from the Blog Editor role!");
+    }
+    console.log(username + " removed from the Blog Editor role successfully!");
+  }
+
+  async addTagInTagListWithName(tagName) {
+    await this.clickOn("button", " Add element ");
+    // await this.page.keyboard.type(tagName);
+    await this.page.evaluate(async(tagName) => {
+      const tagList = document.getElementsByClassName('form-control');
+      tagList[tagList.length - 1].value = tagName;
+    }, tagName);
+    await this.clickOn("button", "Save");
+    console.log("Tag with name " + tagName + " added in tag list successfully!");
+  }
+
+  async expectTagWithNameToExistInTagList(tagName) {
+    await this.page.evaluate(async(tagName) => {
+      const tagList = document.getElementsByClassName('form-control');
+      for(let i = 0; i < tagList.length; i++) {
+        if(tagList[i].value === tagName) {
+          return;
+        }
+      }
+      throw new Error("Tag with name " + tagName + " does not exist in tag list!");
+    }, tagName);
+    console.log("Tag with name " + tagName + " exists in tag list!");
+  }
+
+  async setMaximumTagLimitTo(limit) {
+    // these steps are for deleting the existing value in the input field.
+    const tagInputField = await this.page.$(maximumTagLimitInput);
+    await tagInputField.click({ clickCount: 3 });
+    await this.page.keyboard.press('Backspace');
+
+    await this.type(maximumTagLimitInput, limit);
+    await this.clickOn("button", "Save");
+
+    console.log("Successfully updated the tag limit to " + limit + "!");
+  }
+
+  async expectMaximumTagLimitToBe(limit) {
+    await this.page.evaluate(async(limit) => {
+      const tagLimit = document.getElementById('mat-input-0').value;
+      console.log(tagLimit);
+      if(tagLimit.value !== limit) {
+        throw new Error("Maximum tag limit is not " + limit + "!");
+      }
+    });
+    console.log("Maximum tag limit changed to " + limit + "!");
   }
 };

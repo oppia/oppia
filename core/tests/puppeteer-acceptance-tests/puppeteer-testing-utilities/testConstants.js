@@ -4,6 +4,7 @@ let testConstants = {
   URLs: {
     home: 'http://localhost:8181/',
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
+    BlogAdmin: 'http://localhost:8181/blog-admin',
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     AdminPage: 'http://localhost:8181/admin',
     RolesEditorTab: 'http://localhost:8181/admin#/roles',
