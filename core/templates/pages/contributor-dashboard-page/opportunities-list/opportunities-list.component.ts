@@ -120,9 +120,11 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
+    console.log("🚀 ~ file: opportunities-list.component.ts:123 ~ OpportunitiesListComponent ~ ngOnInit ~ this", this)
 
-    // Calling this.fetchAndLoadOpportunities() is not needed here, as it is
-    // called from onChangeLanguage().
+    if (!this.showOpportunityButton) {
+      this.fetchAndLoadOpportunities();
+    } // Else fetchAndLoadOpportunities() will be called from onChangeLanguage.
   }
 
   fetchAndLoadOpportunities(): void {
