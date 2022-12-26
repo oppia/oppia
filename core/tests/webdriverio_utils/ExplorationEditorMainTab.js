@@ -835,8 +835,8 @@ var ExplorationEditorMainTab = function() {
       'State ' + stateName + ' takes too long to appear or does not exist');
     var deleteNode = await nodeElement.$(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
-    // Might need to use browser.pause() as webdriverio checks for visibility of 
-    // element before it even appears. 
+    // Might need to use browser.pause() – checking for visibility of
+    // element before it even appears.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2000);
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
