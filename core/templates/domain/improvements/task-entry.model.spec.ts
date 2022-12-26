@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TaskEntryModel.
+ * @fileoverview Unit tests for ExplorationStatsTaskEntryModel.
  */
 
 import { TaskEntryBackendDict, TaskEntry } from

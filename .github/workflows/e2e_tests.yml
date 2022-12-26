@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.8.12'
+          python-version: '3.8.15'
           architecture: 'x64'
           cache: 'pip'
           cache-dependency-path: |
@@ -120,7 +120,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.8.12'
+          python-version: '3.8.15'
           architecture: 'x64'
           cache: 'pip'
           cache-dependency-path: |
@@ -175,7 +175,7 @@ jobs:
       - name: Run E2E Test ${{ matrix.suite }}
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
-        env: 
+        env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
