@@ -116,6 +116,7 @@ export class OpportunitiesListComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
+
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
@@ -123,7 +124,7 @@ export class OpportunitiesListComponent {
       // This ngZone run closure will not be required after \
       // migration is complete.
       this.zone.run(() => {
-        console.log(opportunitiesDicts);
+        console.log("🚀 ~ file: opportunities-list.component.ts:128 ~ OpportunitiesListComponent ~ this.zone.run ~ opportunitiesDicts", opportunitiesDicts)
         this.opportunities = opportunitiesDicts;
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
@@ -181,6 +182,8 @@ export class OpportunitiesListComponent {
   }
 
   onChangeLanguage(languageCode: string): void {
+    console.log('🚀 ~ file: opportunities-list.component.ts:184' +
+    '~ OpportunitiesListComponent ~ onChangeLanguage ~ languageCode', languageCode);
     this.languageCode = languageCode;
   }
 }

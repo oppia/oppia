@@ -434,7 +434,8 @@ export class ContributionsAndReview
   loadReviewableTranslationOpportunities(): Promise<GetOpportunitiesResponse> {
     return this.contributionOpportunitiesService
       .getReviewableTranslationOpportunitiesAsync(
-        this.translationTopicService.getActiveTopicName())
+        this.translationTopicService.getActiveTopicName(),
+        this.languageCode)
       .then((response) => {
         const opportunitiesDicts = [];
         response.opportunities.forEach(opportunity => {
@@ -443,7 +444,6 @@ export class ContributionsAndReview
             heading: opportunity.getOpportunityHeading(),
             subheading: opportunity.getOpportunitySubheading(),
             actionButtonTitle: 'Translations',
-            languageCode: opportunity.languageCode
           };
           opportunitiesDicts.push(opportunityDict);
         });

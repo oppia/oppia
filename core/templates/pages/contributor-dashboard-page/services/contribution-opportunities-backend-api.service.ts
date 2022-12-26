@@ -167,19 +167,26 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async fetchReviewableTranslationOpportunitiesAsync(
-      topicName: string
+      topicName: string,
+      languageCode: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
     const params: {
       topic_name?: string;
+      language_code?: string;
     } = {};
     if (topicName !== constants.TOPIC_SENTINEL_NAME_ALL) {
       params.topic_name = topicName;
+    }
+    if (languageCode !== '') {
+      params.language_code = languageCode;
     }
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
       '/getreviewableopportunitieshandler', {
         params
       }).toPromise().then(data => {
-      console.log('fetchReviewableTranslationOpportunitiesAsync ', data);
+      console.log('🚀 ~ file: contribution-opportunities-backend-api.' +
+      'service.ts:183 ~' +
+      'ContributionOpportunitiesBackendApiService ~ data', data);
       const opportunities = data.opportunities.map(
         dict => this._getExplorationOpportunityFromDict(dict));
       return {
