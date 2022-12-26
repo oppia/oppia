@@ -218,7 +218,7 @@ describe('Question Player Component', () => {
 
 
   it('should get user info on initialization', fakeAsync(() => {
-    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'classroom_url_fragment');
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'topic_url_fragment');
