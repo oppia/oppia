@@ -177,7 +177,7 @@ export class ContributionOpportunitiesBackendApiService {
     if (topicName !== constants.TOPIC_SENTINEL_NAME_ALL) {
       params.topic_name = topicName;
     }
-    if (languageCode !== '') {
+    if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
     }
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(

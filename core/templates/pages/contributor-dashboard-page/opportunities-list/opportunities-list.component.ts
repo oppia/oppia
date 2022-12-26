@@ -120,6 +120,12 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
+
+    // Calling this.fetchAndLoadOpportunities() is not needed here, as it is
+    // called from onChangeLanguage().
+  }
+
+  fetchAndLoadOpportunities(): void {
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
@@ -185,6 +191,7 @@ export class OpportunitiesListComponent {
     console.log('🚀 ~ file: opportunities-list.component.ts:184' +
     '~ OpportunitiesListComponent ~ onChangeLanguage ~ languageCode', languageCode);
     this.languageCode = languageCode;
+    this.fetchAndLoadOpportunities();
   }
 }
 
