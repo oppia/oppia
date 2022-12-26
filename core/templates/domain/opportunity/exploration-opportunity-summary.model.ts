@@ -60,7 +60,6 @@ export class ExplorationOpportunitySummary {
   static createFromBackendDict(
       backendDict: ExplorationOpportunitySummaryBackendDict):
       ExplorationOpportunitySummary {
-    console.log('createFromBackendDict', backendDict);
     return new ExplorationOpportunitySummary(
       backendDict.id, backendDict.topic_name, backendDict.story_title,
       backendDict.chapter_title, backendDict.content_count,

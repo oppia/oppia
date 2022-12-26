@@ -184,9 +184,6 @@ export class ContributionOpportunitiesBackendApiService {
       '/getreviewableopportunitieshandler', {
         params
       }).toPromise().then(data => {
-      console.log('🚀 ~ file: contribution-opportunities-backend-api.' +
-      'service.ts:183 ~' +
-      'ContributionOpportunitiesBackendApiService ~ data', data);
       const opportunities = data.opportunities.map(
         dict => this._getExplorationOpportunityFromDict(dict));
       return {
