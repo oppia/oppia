@@ -222,7 +222,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts',
     'core/templates/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.spec.ts',
     'core/templates/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts',
-    'core/templates/pages/topic-editor-page/modal-templates/create-new-story-modal.controller.spec.ts',    
+    'core/templates/pages/topic-editor-page/modal-templates/create-new-story-modal.controller.spec.ts',
     'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar.component.spec.ts',
     'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar.component.ts',
     'core/templates/pages/topic-editor-page/modal-templates/rearrange-skills-in-subtopics-modal.component.spec.ts',
