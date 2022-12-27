@@ -112,6 +112,10 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 FRONTEND_TEMPLATES_DIR = (
     os.path.join('webpack_bundles') if constants.DEV_MODE else
     os.path.join('build', 'webpack_bundles'))
+# To know more about AOT visit https://angular.io/guide/glossary#aot
+FRONTEND_AOT_DIR = (
+    os.path.join('dist', 'oppia-angular') if constants.DEV_MODE else
+    os.path.join('dist', 'oppia-angular-prod'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -259,7 +263,6 @@ MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
-PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
