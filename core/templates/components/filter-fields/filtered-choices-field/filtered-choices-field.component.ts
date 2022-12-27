@@ -30,7 +30,7 @@ export class FilteredChoicesFieldComponent {
   @Input() selection!: string;
   @Input() placeholder!: string;
   @Input() searchLabel: string = 'search';
-  @Input() isSearchable: boolean = true;
+  @Input() isSearchable?: boolean = true;
   @Input() noEntriesFoundLabel: string = 'No matches found';
   @Output() selectionChange: EventEmitter<string> = (
     new EventEmitter());
