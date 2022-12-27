@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for the stories list viewer.
  */
 
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { TopicUpdateService } from 'domain/topic/topic-update.service';
+import { TopicEditorStoriesListComponent } from './topic-editor-stories-list.component';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -27,42 +30,19 @@ class MockNgbModalRef {
 }
 
 describe('topicEditorStoriesList', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
-  let $q = null;
-  let $window = null;
-  let storySummaries = null;
-  let topicUpdateService = null;
-  let undoRedoService = null;
-  let ngbModal: NgbModal = null;
+  let component: TopicEditorStoriesListComponent;
+  let fixture: ComponentFixture<TopicEditorStoriesListComponent>;
+  let storySummaries;
+  let topicUpdateService;
+  let undoRedoService;
+  let ngbModal: NgbModal;
 
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    topicUpdateService = $injector.get('TopicUpdateService');
-    undoRedoService = $injector.get('UndoRedoService');
-    $window = $injector.get('$window');
-    ngbModal = $injector.get('NgbModal');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('topicEditorStoriesList', {
-      $scope: $scope
-    }, {
-      getTopic: () => {}
-    });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopicEditorStoriesListComponent);
+    component = fixture.componentInstance;
+    topicUpdateService = TestBed.inject(TopicUpdateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    ngbModal = TestBed.inject(NgbModal);
 
     storySummaries = [StorySummary.createFromBackendDict({
       id: 'storyId',
@@ -87,78 +67,76 @@ describe('topicEditorStoriesList', () => {
       url_fragment: 'story1',
       all_node_dicts: []
     })];
-  }));
+  });
 
   it('should initialise component when list of stories is displayed', () => {
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect($scope.STORY_TABLE_COLUMN_HEADINGS).toEqual([
+    expect(component.STORY_TABLE_COLUMN_HEADINGS).toEqual([
       'title', 'node_count', 'publication_status']);
   });
 
   it('should set fromIndex when user starts moving a story in the list', () => {
-    $scope.fromIndex = 0;
+    component.fromIndex = 0;
 
-    $scope.onMoveStoryStart(2);
+    component.onMoveStoryStart(2);
 
-    expect($scope.fromIndex).toBe(2);
+    expect(component.fromIndex).toBe(2);
   });
 
   it('should move story to new location when user stops dragging', () => {
     spyOn(topicUpdateService, 'rearrangeCanonicalStory');
-    $scope.fromIndex = 1;
-    ctrl.storySummaries = storySummaries;
+    component.fromIndex = 1;
+    component.storySummaries = storySummaries;
 
-    $scope.onMoveStoryFinish(0);
+    component.onMoveStoryFinish(0);
 
-    expect($scope.toIndex).toBe(0);
+    expect(component.toIndex).toBe(0);
     expect(topicUpdateService.rearrangeCanonicalStory).toHaveBeenCalled();
-    expect(ctrl.storySummaries[0].getId()).toBe('storyId2');
-    expect(ctrl.storySummaries[1].getId()).toBe('storyId');
+    expect(component.storySummaries[0].getId()).toBe('storyId2');
+    expect(component.storySummaries[1].getId()).toBe('storyId');
   });
 
   it('should not rearrage when user does not change position of the ' +
   'story', () => {
     spyOn(topicUpdateService, 'rearrangeCanonicalStory');
-    $scope.fromIndex = 0;
-    ctrl.storySummaries = storySummaries;
+    component.fromIndex = 0;
+    component.storySummaries = storySummaries;
 
-    $scope.onMoveStoryFinish(0);
+    component.onMoveStoryFinish(0);
 
-    expect($scope.toIndex).toBe(0);
+    expect(component.toIndex).toBe(0);
     expect(topicUpdateService.rearrangeCanonicalStory).not.toHaveBeenCalled();
-    expect(ctrl.storySummaries[1].getId()).toBe('storyId2');
-    expect(ctrl.storySummaries[0].getId()).toBe('storyId');
+    expect(component.storySummaries[1].getId()).toBe('storyId2');
+    expect(component.storySummaries[0].getId()).toBe('storyId');
   });
 
   it('should delete story when user deletes story', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
-        result: $q.resolve()
+        result: Promise.resolve()
       } as NgbModalRef
     );
     spyOn(topicUpdateService, 'removeCanonicalStory');
-    ctrl.storySummaries = storySummaries;
+    component.storySummaries = storySummaries;
 
-    expect(ctrl.storySummaries.length).toBe(2);
+    expect(component.storySummaries.length).toBe(2);
 
-    $scope.deleteCanonicalStory('storyId');
-    $scope.$apply();
+    component.deleteCanonicalStory('storyId');
 
     expect(ngbModal.open).toHaveBeenCalled();
     expect(topicUpdateService.removeCanonicalStory).toHaveBeenCalled();
-    expect(ctrl.storySummaries.length).toBe(1);
-    expect(ctrl.storySummaries[0].getId()).toBe('storyId2');
+    expect(component.storySummaries.length).toBe(1);
+    expect(component.storySummaries[0].getId()).toBe('storyId2');
   });
 
   it('should close modal when user click cancel button', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
-        result: $q.reject()
+        result: Promise.reject()
       } as NgbModalRef
     );
-    $scope.deleteCanonicalStory('storyId');
-    $scope.$apply();
+    component.deleteCanonicalStory('storyId');
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
@@ -167,7 +145,7 @@ describe('topicEditorStoriesList', () => {
     spyOn($window, 'open');
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
 
-    $scope.openStoryEditor('storyId');
+    component.openStoryEditor('storyId');
 
     expect($window.open).toHaveBeenCalled();
   });
@@ -182,8 +160,7 @@ describe('topicEditorStoriesList', () => {
     });
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
-    $scope.openStoryEditor('storyId');
-    $scope.$apply();
+    component.openStoryEditor('storyId');
 
     expect(modalSpy).toHaveBeenCalled();
   });
@@ -198,8 +175,7 @@ describe('topicEditorStoriesList', () => {
     });
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
-    $scope.openStoryEditor('storyId');
-    $scope.$apply();
+    component.openStoryEditor('storyId');
 
     expect(modalSpy).toHaveBeenCalled();
   });

@@ -45,6 +45,10 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { TopicEditorNavbarComponent } from './navbar/topic-editor-navbar.component';
 import { TopicQuestionsTabComponent } from './questions-tab/topic-questions-tab.component';
 import { RearrangeSkillsInSubtopicsModalComponent } from './modal-templates/rearrange-skills-in-subtopics-modal.component';
+import { CreateNewStoryModalComponent } from './modal-templates/create-new-story-modal.component';
+import { TopicEditorStoriesListComponent } from './editor-tab/topic-editor-stories-list.component';
+import { TopicEditorTabComponent } from './editor-tab/topic-editor-tab.directive';
+import { TopicEditorPageComponent } from './topic-editor-page.component';
 import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-tab.component';
 
 @NgModule({
@@ -68,11 +72,15 @@ import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-ta
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    CreateNewStoryModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent,
     TopicEditorNavbarComponent,
     TopicQuestionsTabComponent,
+    TopicEditorStoriesListComponent,
+    TopicEditorTabComponent,
+    TopicEditorPageComponent,
     SubtopicEditorTabComponent
   ],
   entryComponents: [
@@ -82,11 +90,15 @@ import { SubtopicEditorTabComponent } from './subtopic-editor/subtopic-editor-ta
     TopicPreviewTabComponent,
     TopicEditorNavbarBreadcrumbComponent,
     CreateNewSubtopicModalComponent,
+    CreateNewStoryModalComponent,
     DeleteStoryModalComponent,
     TopicEditorSendMailComponent,
     TopicEditorSaveModalComponent,
     TopicEditorNavbarComponent,
     TopicQuestionsTabComponent,
+    TopicEditorStoriesListComponent,
+    TopicEditorTabComponent,
+    TopicEditorPageComponent,
     SubtopicEditorTabComponent
   ],
   providers: [
