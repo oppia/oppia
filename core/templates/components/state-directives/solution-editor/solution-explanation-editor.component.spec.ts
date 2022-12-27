@@ -55,7 +55,6 @@ describe('Solution explanation editor', () => {
 
   let contextService: ContextService;
   let editabilityService: EditabilityService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let stateSolutionService: StateSolutionService;
   let externalSaveService: ExternalSaveService;
   let externalSaveServiceEmitter = new EventEmitter<void>();
@@ -85,7 +84,6 @@ describe('Solution explanation editor', () => {
 
     contextService = TestBed.inject(ContextService);
     editabilityService = TestBed.inject(EditabilityService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateSolutionService = TestBed.inject(StateSolutionService);
     externalSaveService = TestBed.inject(ExternalSaveService);
 

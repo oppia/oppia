@@ -31,12 +31,6 @@ describe('Content translation language service', () => {
   let us: UrlService;
   let availableLanguageCodes: string[];
 
-  class MockActiveModal {
-    close(): void {
-      return;
-    }
-  }
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]

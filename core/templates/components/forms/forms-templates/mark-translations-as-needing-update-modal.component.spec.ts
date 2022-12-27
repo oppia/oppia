@@ -20,7 +20,6 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { MarkTranslationsAsNeedingUpdateModalComponent } from './mark-translations-as-needing-update-modal.component';
 
 class MockActiveModal {
@@ -37,7 +36,6 @@ describe('Mark Translations As Needing Update Modal Component', () => {
   let component: MarkTranslationsAsNeedingUpdateModalComponent;
   let fixture: (
         ComponentFixture<MarkTranslationsAsNeedingUpdateModalComponent>);
-  let changeListService: ChangeListService;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
@@ -58,7 +56,6 @@ describe('Mark Translations As Needing Update Modal Component', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    changeListService = TestBed.inject(ChangeListService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   }));
 
@@ -66,22 +63,24 @@ describe('Mark Translations As Needing Update Modal Component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should call markTranslationsAsNeedingUpdate', () => {
-    const changeListSpy = spyOn(
-      changeListService, 'markTranslationsAsNeedingUpdate'
-    ).and.callThrough();
+  it('should call markNeedingUpdateHandler', () => {
+    const handlerWithSpy = jasmine.createSpy();
+    component.markNeedsUpdateHandler = handlerWithSpy;
+    component.contentId = 'contentId_1';
+
     component.markNeedsUpdate();
 
-    expect(changeListSpy).toHaveBeenCalled();
+    expect(handlerWithSpy).toHaveBeenCalledOnceWith('contentId_1');
   });
 
   it('should call removeTranslations', () => {
-    const changeListSpy = spyOn(
-      changeListService, 'removeTranslations'
-    ).and.callThrough();
+    const handlerWithSpy = jasmine.createSpy();
+    component.removeHandler = handlerWithSpy;
+    component.contentId = 'contentId_1';
+
     component.removeTranslations();
 
-    expect(changeListSpy).toHaveBeenCalled();
+    expect(handlerWithSpy).toHaveBeenCalledOnceWith('contentId_1');
   });
 
   it('should dismiss the modal when cancel is called', () => {

@@ -42,7 +42,6 @@ import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 class MockContentTranslationLanguageService {

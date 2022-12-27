@@ -20,9 +20,6 @@
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 
 @Component({
   selector: 'oppia-mark-translations-as-needing-update-modal',
@@ -35,10 +32,7 @@ export class MarkTranslationsAsNeedingUpdateModalComponent
   @Input() removeHandler: (contentId: string) => void;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
-    private changeListService: ChangeListService,
-    private stateEditorService: StateEditorService,
-    private explorationStatesService: ExplorationStatesService
+    private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
