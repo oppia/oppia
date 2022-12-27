@@ -17,13 +17,20 @@ const maximumTagLimitInput = "input#mat-input-0"
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
+  async addUserBioInBlogDashboard() {
+    await this.type("textarea.e2e-test-blog-author-bio-field", "Dummy-User-Bio");
+    await this.clickOn("button", " Save ", 500);
+  }
+
   async createDraftBlogPostByTitle(draftBlogPostTitle) {
-    await this.clickOn("span", "NEW POST");
+    await this.addUserBioInBlogDashboard();
+    await this.clickOn("span", " CREATE NEW BLOG POST ");
     await this.type(blogTitleInput, draftBlogPostTitle);
+    await this.page.keyboard.press("Enter");
     await this.type(blogBodyInput, "blog post test body content");
     await this.clickOn("span", " DONE ");
     await this.clickOn("span", "SAVE AS DRAFT", 500);
-    
+
     console.log("Successfully created a draft blog post!");
   }
 
@@ -40,7 +47,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       await this.clickOn("span", "Delete", 100);
       await this.clickOn("button", " Confirm ");
 
-      console.log("draft blog post with given title deleted successfully!");
+      console.log("Draft blog post with given title deleted successfully!");
     });
     await (this.page).evaluate(async({draftBlogPostTitle}) => {
       const allDraftBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
@@ -98,13 +105,15 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }, toUnpublishBlogPostTitle);
   }
 
-  async expectNumberOfDraftOrPublishedBlogPostsGreaterThan(number) {
+  async expectNumberOfDraftOrPublishedBlogPostsToBe(number) {
     await (this.page).evaluate(async(number) => {
       const allDraftBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
-      if(allDraftBlogPosts.length <= number) {
-        throw new Error("Number of draft blog posts is not greater than " + number);
+      if(allDraftBlogPosts.length !== number) {
+        throw new Error("Number of draft/published blog posts is not equal to " + number);
       };
     }, number);
+
+    console.log("Number of draft/published blog posts is equal to " + number);
   }
 
   async expectDraftBlogPostWithTitleToExist(checkDraftBlogPostByTitle) {
@@ -123,6 +132,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         throw new Error("Draft blog post with title " + checkDraftBlogPostByTitle + " exists more than once!");
       }
     }, checkDraftBlogPostByTitle);
+    console.log("Draft blog post with title " + checkDraftBlogPostByTitle + " exists!")
   }
 
   async expectDraftBlogPostWithTitleToNotExist(checkDraftBlogPostByTitle) {
@@ -139,6 +149,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         throw new Error("Draft blog post with title " + checkDraftBlogPostByTitle + " exists!");
       }
     }, checkDraftBlogPostByTitle);
+    console.log("Draft blog post with title " + checkDraftBlogPostByTitle + " does not exist!");
   }
 
   async expectPublishedBlogPostWithTitleToExist(checkPublishBlogPostByTitle) {

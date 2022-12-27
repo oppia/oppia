@@ -10,7 +10,7 @@ async function publishBlogAsBlogPostAdmin() {
 
   await blogPostAdmin.signInWithEmail("testadmin@example.com");
   await blogPostAdmin.goto(blogDashboardUrl);
-  await blogPostAdmin.expectNumberOfDraftOrPublishedBlogPostsGreaterThan(0);
+  await blogPostAdmin.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
   await blogPostAdmin.createNewBlogPostByTitle("Test Blog Post");
   await blogPostAdmin.publishNewBlogPost();
   await blogPostAdmin.expectPublishedBlogPostWithTitleToExist("Test Blog Post");
