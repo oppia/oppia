@@ -273,8 +273,21 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log(username + " removed from the Blog Editor role successfully!");
   }
 
+  async expectTagWithNameNotExistInTagList(tagName) {
+    await (this.page).evaluate(async(tagName) => {
+      const tagList = document.getElementsByClassName('form-control');
+      for(let i = 0; i < tagList.length; i++) {
+        if(tagList[i].value === tagName) {
+          throw new Error("Tag with name " + tagName + " already exists before adding it!");
+        }
+      }
+    }, tagName);
+    console.log("Tag with name " + tagName + " does not exist in tag list!");
+  }
+
   async addTagInTagListWithName(tagName) {
     await this.clickOn("button", " Add element ");
+    //TODO: this is the bug in the /blog-admin page, use puppeteer type function instead of this after the bug is fixed.
     // await this.page.keyboard.type(tagName);
     await this.page.evaluate(async(tagName) => {
       const tagList = document.getElementsByClassName('form-control');

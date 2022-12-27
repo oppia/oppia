@@ -28,6 +28,7 @@ async function blogAdminRolesAndTagsProperties() {
   await superAdmin.removeBlogEditorRoleByUsername("blogPostEditor");
   await superAdmin.expectRemovedBlogEditorRoleByUsername("blogPostEditor");
   
+  await superAdmin.expectTagWithNameNotExistInTagList("Test_Tag");
   await superAdmin.addTagInTagListWithName("Test_Tag");
   await superAdmin.expectTagWithNameToExistInTagList("Test_Tag");
 
