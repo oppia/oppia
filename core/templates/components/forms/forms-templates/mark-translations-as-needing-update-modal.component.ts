@@ -31,6 +31,8 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
 export class MarkTranslationsAsNeedingUpdateModalComponent
   extends ConfirmOrCancelModal {
   @Input() contentId!: string;
+  @Input() markNeedsUpdateHandler: (contentId: string) => void;
+  @Input() removeHandler: (contentId: string) => void;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -42,29 +44,12 @@ export class MarkTranslationsAsNeedingUpdateModalComponent
   }
 
   markNeedsUpdate(): void {
-    this.changeListService.markTranslationsAsNeedingUpdate(this.contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.explorationStatesService.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasUnflaggedVoiceovers(this.contentId)) {
-      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-        this.contentId);
-      this.explorationStatesService.saveRecordedVoiceovers(
-        stateName, recordedVoiceovers);
-    }
+    this.markNeedsUpdateHandler(this.contentId);
     this.ngbActiveModal.close();
   }
 
   removeTranslations(): void {
-    this.changeListService.removeTranslations(this.contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.explorationStatesService.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasUnflaggedVoiceovers(this.contentId)) {
-      recordedVoiceovers.deleteContentId(this.contentId);
-      this.explorationStatesService.saveRecordedVoiceovers(
-        stateName, recordedVoiceovers);
-    }
+    this.removeHandler(this.contentId);
     this.ngbActiveModal.close();
   }
 

@@ -18,10 +18,6 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
-import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
@@ -45,24 +41,6 @@ describe('Content translation language service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgbModule],
-      declarations: [
-        LoadingDotsComponent,
-        TranslationsFetchingMessageModalComponent
-      ],
-      providers: [
-        {
-          provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
-      ]
-    }).overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [TranslationsFetchingMessageModalComponent],
-      }
-    }).compileComponents();
 
     ctls = TestBed.inject(ContentTranslationLanguageService);
     ctms = TestBed.inject(ContentTranslationManagerService);

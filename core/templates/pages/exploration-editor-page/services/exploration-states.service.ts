@@ -251,7 +251,33 @@ export class ExplorationStatesService {
           windowClass: 'forced-modal-stack'
         });
       modalRef.componentInstance.contentId = contentId;
+      modalRef.componentInstance.markNeedsUpdateHandler = (
+        this.markTranslationAndVoiceoverNeedsUpdate);
+      modalRef.componentInstance.removeHandler = (
+        this.removeTranslationAndVoiceover);
       this.initalContentsMapping[contentId] = content;
+    }
+  }
+
+  markTranslationAndVoiceoverNeedsUpdate(contentId: string): void {
+    this.changeListService.markTranslationsAsNeedingUpdate(contentId);
+    let stateName = this.stateEditorService.getActiveStateName();
+    let state = this.getState(stateName);
+    let recordedVoiceovers = state.recordedVoiceovers;
+    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
+      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
+    }
+  }
+
+  removeTranslationAndVoiceover(contentId: string): void {
+    this.changeListService.removeTranslations(contentId);
+    let stateName = this.stateEditorService.getActiveStateName();
+    let state = this.getState(stateName);
+    let recordedVoiceovers = state.recordedVoiceovers;
+    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+      recordedVoiceovers.deleteContentId(contentId);
+      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
     }
   }
 

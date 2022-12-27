@@ -17,6 +17,8 @@
  */
 
 import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
@@ -41,6 +43,9 @@ describe('Content translation manager service', () => {
   let entityTranslation: EntityTranslation;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    }).compileComponents();
     ctms = TestBed.inject(ContentTranslationManagerService);
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     iof = TestBed.inject(InteractionObjectFactory);
@@ -254,7 +259,7 @@ describe('Content translation manager service', () => {
       tick();
 
       expect(card.contentHtml).toBe('<p>fr content</p>');
-      expect(interaction.hints[0].hintContent.html).toBe('<p>en hint</p>');
+      expect(interaction.hints[0].hintContent.html).toBe('<p>fr hint</p>');
       expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
       expect(interaction.customizationArgs).toEqual(
         translatedCustomizationArgs);

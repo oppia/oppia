@@ -183,7 +183,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
     ExplorationEditorPageComponent,
-    StateVersionHistoryComponent
+    StateVersionHistoryComponent,
+    MarkTranslationsAsNeedingUpdateModalComponent
   ],
   entryComponents: [
     DeleteStateSkillModalComponent,
@@ -248,7 +249,8 @@ import { ExplorationEditorPageComponent } from './exploration-editor-page.compon
     StateTranslationStatusGraphComponent,
     TranslationTabComponent,
     ExplorationEditorPageComponent,
-    StateVersionHistoryComponent
+    StateVersionHistoryComponent,
+    MarkTranslationsAsNeedingUpdateModalComponent
   ],
   providers: [
     {
@@ -288,6 +290,7 @@ import { ExplorationPlayerViewerCommonModule } from 'pages/exploration-player-pa
 import { StateVersionHistoryModalComponent } from './modal-templates/state-version-history-modal.component';
 import { MetadataVersionHistoryModalComponent } from './modal-templates/metadata-version-history-modal.component';
 import { StateVersionHistoryComponent } from './editor-tab/state-version-history/state-version-history.component';
+import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

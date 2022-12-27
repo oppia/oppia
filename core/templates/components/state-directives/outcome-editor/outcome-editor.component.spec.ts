@@ -130,7 +130,7 @@ describe('Outcome Editor Component', () => {
 
     onExternalSaveEmitter.emit();
 
-    expect(component.saveThisFeedback).toHaveBeenCalledWith(false);
+    expect(component.saveThisFeedback).toHaveBeenCalled();
   });
 
   it('should cancel feedback edit on external save event when' +
@@ -558,32 +558,6 @@ describe('Outcome Editor Component', () => {
     expect(() => {
       component.saveThisFeedback(false);
     }).toThrowError('The active state name is null in the outcome editor.');
-  });
-
-  it('should throw error when saving feedback with invalid content id', () => {
-    component.savedOutcome = new Outcome(
-      'Dest',
-      null,
-      new SubtitledHtml('<p>Saved Outcome</p>', null),
-      false,
-      [],
-      'ExpId',
-      'SkillId',
-    );
-    component.outcome = new Outcome(
-      'Dest',
-      null,
-      new SubtitledHtml('<p>Outcome</p>', null),
-      true,
-      [],
-      '',
-      '',
-    );
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-
-    expect(() => {
-      component.saveThisFeedback(true);
-    }).toThrowError('The content ID is null in the outcome editor.');
   });
 
   it('should set refresher exploration ID as null on saving destination' +

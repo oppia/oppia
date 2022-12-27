@@ -170,21 +170,4 @@ describe('Solution explanation editor', () => {
       component.saveThisExplanation();
     }).toThrowError('Solution is undefined');
   });
-
-  it('should throw error if solution content id is invalid', () => {
-    stateSolutionService.displayed = solutionObjectFactory.createNew(
-      true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
-    );
-    stateSolutionService.savedMemento = solutionObjectFactory.createNew(
-      true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
-    );
-
-    stateSolutionService.displayed.explanation.html = '<p> Hint Index 0 </p>';
-    stateSolutionService.savedMemento.explanation.html = 'invalid_id';
-    stateSolutionService.displayed.explanation.contentId = null;
-
-    expect(() => {
-      component.saveThisExplanation();
-    }).toThrowError('Solution content id is undefined');
-  });
 });

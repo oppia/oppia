@@ -43,7 +43,6 @@ import { AudioTranslationLanguageService} from
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
-import { TranslationsFetchingMessageModalComponent } from 'pages/exploration-editor-page/modal-templates/translations-fetching-message-modal.component';
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 class MockContentTranslationLanguageService {
@@ -92,9 +91,7 @@ describe('Content language selector component', () => {
       declarations: [
         ContentLanguageSelectorComponent,
         MockTranslatePipe,
-        SwitchContentLanguageRefreshRequiredModalComponent,
-        LoadingDotsComponent,
-        TranslationsFetchingMessageModalComponent
+        SwitchContentLanguageRefreshRequiredModalComponent
       ],
       providers: [{
         provide: ContentTranslationLanguageService,
@@ -106,8 +103,7 @@ describe('Content language selector component', () => {
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
         entryComponents: [
-          SwitchContentLanguageRefreshRequiredModalComponent,
-          TranslationsFetchingMessageModalComponent
+          SwitchContentLanguageRefreshRequiredModalComponent
         ],
       }
     }).compileComponents();
