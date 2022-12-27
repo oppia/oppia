@@ -30,7 +30,7 @@
     </picture>
   </a>
 </div>
-<div class="nav-mobile-header-text-container oppia-top-navigation-bar">
+<div *ngIf="!windowIsNarrow" class="nav-mobile-header-text-container oppia-top-navigation-bar">
   <span *ngIf="headerText?.length"
         class="nav-mobile-header-editor">
     {{ headerText }}
