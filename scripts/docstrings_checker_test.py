@@ -283,7 +283,7 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set(['Exception']))
 
-    def test_docstringify_with_okey_docstring(self) -> None:
+    def test_docstringify_with_valid_docstring(self) -> None:
         valid_docstring = """Docstring that is correctly formated
             according to the Google Python Style Guide.
 
@@ -296,7 +296,7 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
 
         self.assertEqual(is_valid, True)
 
-    def test_docstringify_with_bad_docstring(self) -> None:
+    def test_docstringify_with_invalid_docstring(self) -> None:
         invalid_docstring = """Docstring that is incorrectly
             formated according to the Google Python Style Guide.
             """
