@@ -125,42 +125,6 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
         self.assert_pcoll_equal(output, [])
 
 
-class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
-
-    VALID_USER_ID: Final = 'test_user'
-    SUBMITTER_ID: Final = 'submitter_id'
-
-    def test_model_not_marked_as_deleted_when_older_than_4_weeks(self) -> None:
-        model = user_models.UserQueryModel(
-            id=self.VALID_USER_ID,
-            submitter_id=self.SUBMITTER_ID,
-            created_on=self.NOW - datetime.timedelta(weeks=5),
-            last_updated=self.NOW - datetime.timedelta(weeks=5)
-        )
-        output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(user_validation.ValidateOldModelsMarkedDeleted())
-        )
-        self.assert_pcoll_equal(output, [
-            user_validation_errors.ModelExpiringError(model)
-        ])
-
-    def test_model_not_marked_as_deleted_recently(self) -> None:
-        model = user_models.UserQueryModel(
-            id=self.VALID_USER_ID,
-            submitter_id=self.SUBMITTER_ID,
-            created_on=self.NOW - datetime.timedelta(weeks=1),
-            last_updated=self.NOW - datetime.timedelta(weeks=1)
-        )
-        output = (
-            self.pipeline
-            | beam.Create([model])
-            | beam.ParDo(user_validation.ValidateOldModelsMarkedDeleted())
-        )
-        self.assert_pcoll_equal(output, [])
-
-
 class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
 
     VALID_USER_ID: Final = 'test_user'
