@@ -18,7 +18,7 @@
         <div class="skill-id md-card"  *ngFor="let skillId of skill.getPrerequisiteSkillIds(); index as i">
           <div class="skill-description-card">
             <span class="remove-skill-icon" (click)="removeSkillId(skillId)" aria-hidden="true">
-              <i class="material-icons md-18">&#xE14C;</i>
+              <i class="fas fa-times md-18"></i>
             </span>
             <a class="skill-prerequisite-link" [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{getSkillDescription(skillId)}}</a>
           </div>

@@ -56,15 +56,15 @@
             <li ngbDropdownItem>
               <a (click)="toggleSelection('types', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="fas fa-check md-18 float-right oppia-search-bar-type-selection-symbol"></i>
               </a>
               <a (click)="toggleSelection('types', item.id)" *ngIf="first" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="fas fa-check md-18 float-right oppia-search-bar-type-selection-symbol"></i>
               </a>
               <a (click)="toggleSelection('types', item.id)" *ngIf="last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="fas fa-check md-18 float-right oppia-search-bar-type-selection-symbol"></i>
               </a>
             </li>
           </ng-container>
@@ -88,15 +88,15 @@
             <li ngbDropdownItem>
               <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="fas fa-check md-18 float-right oppia-search-bar-category-selection-symbol"></i>
               </a>
               <a (click)="toggleSelection('categories', item.id)" *ngIf="first" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="fas fa-check md-18 float-right oppia-search-bar-category-selection-symbol"></i>
               </a>
               <a (click)="toggleSelection('categories', item.id)" *ngIf="last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="fas fa-check md-18 float-right oppia-search-bar-category-selection-symbol"></i>
               </a>
             </li>
           </ng-container>
@@ -119,16 +119,16 @@
             <li ngbDropdownItem>
               <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="fas fa-check md-18  float-right oppia-search-bar-category-selection-symbol"></i>
               </a>
               <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="fas fa-check md-18  float-right oppia-search-bar-category-selection-symbol"></i>
               </a>
               <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last"
                  class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="fas fa-check md-18  float-right oppia-search-bar-category-selection-symbol"></i>
               </a>
             </li>
           </ng-container>
@@ -195,7 +195,7 @@
       </div>
     </div>
     <div *ngIf="isSearchInProgress()" class="oppia-search-spinner">
-      <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+      <i class="fas fa-sync md-18 oppia-animate-spin"></i>
     </div>
     <div *ngIf="isValidSearch() && !searchIsInProgress && storySummaries.length == 0 && subtopicSummaries.length == 0" class="no-results-container">
       <div class="no-results-message"><span translate="I18N_LEARNER_GROUP_NO_RESULTS_FOUND"></span></div>
