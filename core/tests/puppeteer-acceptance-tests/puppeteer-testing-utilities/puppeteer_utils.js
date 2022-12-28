@@ -1,5 +1,5 @@
-const puppeteer = require("puppeteer");
-const testConstants = require("./testConstants.js");
+const puppeteer = require('puppeteer');
+const testConstants = require('./testConstants.js');
 
 module.exports = class puppeteerUtilities {
   page;
@@ -15,7 +15,7 @@ module.exports = class puppeteerUtilities {
     await puppeteer
       .launch({
         headless: false,
-        args: ["--start-fullscreen", "--use-fake-ui-for-media-stream"]
+        args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
       })
       .then(async (browser) => {
         this.browserObject = browser;
@@ -32,21 +32,21 @@ module.exports = class puppeteerUtilities {
   async signInWithEmail(email) {
     await this.goto(testConstants.URLs.home);
     if (!this.isCookieAccepted) {
-      await this.clickOn("button", "OK");
+      await this.clickOn('button', 'OK');
       this.isCookieAccepted = true;
     }
-    await this.clickOn("span", "Sign in");
+    await this.clickOn('span', 'Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
-    await this.clickOn("span", "Sign In");
+    await this.clickOn('span', 'Sign In');
     await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
   }
 
   async signUpNewUserWithUserNameAndEmail(userName, signInEmail) {
     await this.signInWithEmail(signInEmail);
     await this.type('input.e2e-test-username-input', userName);
-    await this.clickOn("input", "e2e-test-agree-to-terms-checkbox");
+    await this.clickOn('input', 'e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector('button.e2e-test-register-user:not([disabled])');
-    await this.clickOn("button", "Submit and start contributing");
+    await this.clickOn('button', 'Submit and start contributing');
     await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
   }
 
@@ -55,7 +55,7 @@ module.exports = class puppeteerUtilities {
   }
 
   async reloadPage() {
-    await (this.page).reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+    await (this.page).reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
   }
   
   async clickOn(tag, selector) {
@@ -75,7 +75,7 @@ module.exports = class puppeteerUtilities {
   }
 
   async goto(url) {
-    await (this.page).goto(url, {waitUntil: "networkidle0"});
+    await (this.page).goto(url, {waitUntil: 'networkidle0'});
   }
 
   async uploadFile(filePath) {

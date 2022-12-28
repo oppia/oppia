@@ -1,48 +1,48 @@
-const puppeteerUtilities = require("./puppeteer_utils.js");
-const testConstants = require("./testConstants.js");
+const puppeteerUtilities = require('./puppeteer_utils.js');
+const testConstants = require('./testConstants.js');
 
-const blogTitleInput = "input.e2e-test-blog-post-title-field";
-const blogBodyInput = "div.e2e-test-rte";
-const thumbnailPhotoBox = "e2e-test-photo-clickable";
-const unauthErrorContainer = "div.e2e-test-error-container";
-const roleEditorInputField = "input.e2e-test-username-for-role-editor"
-const roleEditorButtonSelector = "e2e-test-role-edit-button";
-const rolesSelectDropdown = "mat-select-trigger";
-const blogdDashboardAuthorDetailsModal = "div.modal-dialog";
+const blogTitleInput = 'input.e2e-test-blog-post-title-field';
+const blogBodyInput = 'div.e2e-test-rte';
+const thumbnailPhotoBox = 'e2e-test-photo-clickable';
+const unauthErrorContainer = 'div.e2e-test-error-container';
+const roleEditorInputField = 'input.e2e-test-username-for-role-editor'
+const roleEditorButtonSelector = 'e2e-test-role-edit-button';
+const rolesSelectDropdown = 'mat-select-trigger';
+const blogdDashboardAuthorDetailsModal = 'div.modal-dialog';
 const rolesEditorTab = testConstants.URLs.RolesEditorTab;
-const roleUpdateUsernameInput = "input#label-target-update-form-name";
-const removeBlogEditorUsernameInput = "input#label-target-form-reviewer-username";
-const maximumTagLimitInput = "input#mat-input-0"
+const roleUpdateUsernameInput = 'input#label-target-update-form-name';
+const removeBlogEditorUsernameInput = 'input#label-target-form-reviewer-username';
+const maximumTagLimitInput = 'input#mat-input-0'
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
   async addUserBioInBlogDashboard() {
-    await this.type("textarea.e2e-test-blog-author-bio-field", "Dummy-User-Bio");
+    await this.type('textarea.e2e-test-blog-author-bio-field', 'Dummy-User-Bio');
     await this.page.waitForSelector('button.e2e-test-save-author-details-button:not([disabled])');
-    await this.clickOn("button", " Save ");
+    await this.clickOn('button', ' Save ');
   }
 
   async createDraftBlogPostByTitle(draftBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
     await this.page.waitForTimeout(500);  // see Note-1 below
-    await this.clickOn("span", " CREATE NEW BLOG POST ");
+    await this.clickOn('span', ' CREATE NEW BLOG POST ');
     await this.type(blogTitleInput, draftBlogPostTitle);
-    await this.page.keyboard.press("Tab");
-    await this.type(blogBodyInput, "test blog post body content");
-    await this.clickOn("span", " DONE ");
+    await this.page.keyboard.press('Tab');
+    await this.type(blogBodyInput, 'test blog post body content');
+    await this.clickOn('span', ' DONE ');
     await this.page.waitForSelector('button.e2e-test-save-as-draft-button:not([disabled])');
-    await this.clickOn("span", "SAVE AS DRAFT");
+    await this.clickOn('span', 'SAVE AS DRAFT');
 
-    console.log("Successfully created a draft blog post!");
+    console.log('Successfully created a draft blog post!');
   }
 
   async deleteDraftBlogPostByTitle(draftBlogPostTitle) {
     await this.page.exposeFunction('deleteDraftBlogPost', async() => {
       await this.page.waitForTimeout(100);  // see Note-2 below
-      await this.clickOn("span", "Delete");
+      await this.clickOn('span', 'Delete');
       await this.page.waitForSelector('div.modal-dialog');
-      await this.clickOn("button", " Confirm ");
-      console.log("Draft blog post with given title deleted successfully!");
+      await this.clickOn('button', ' Confirm ');
+      console.log('Draft blog post with given title deleted successfully!');
     });
     await this.page.evaluate(async({draftBlogPostTitle}) => {
       const allDraftBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
@@ -60,34 +60,34 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async publishNewBlogPostByTitle(newBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
     await this.page.waitForTimeout(500);  // see Note-1 below
-    await this.clickOn("span", " CREATE NEW BLOG POST ");
-    await this.clickOn("button", "mat-button-toggle-button");
+    await this.clickOn('span', ' CREATE NEW BLOG POST ');
+    await this.clickOn('button', 'mat-button-toggle-button');
 
-    await this.clickOn("div", thumbnailPhotoBox);
+    await this.clickOn('div', thumbnailPhotoBox);
     await this.uploadFile('collection.svg');
-    await this.clickOn("button", " Add Thumbnail Image ");
-    await this.page.waitForSelector("body.modal-open", {hidden: true});
+    await this.clickOn('button', ' Add Thumbnail Image ');
+    await this.page.waitForSelector('body.modal-open', {hidden: true});
 
     await this.type(blogTitleInput, newBlogPostTitle);
-    await this.page.keyboard.press("Tab");
-    await this.type(blogBodyInput, "test blog post body content");
-    await this.clickOn("span", " DONE ");
+    await this.page.keyboard.press('Tab');
+    await this.type(blogBodyInput, 'test blog post body content');
+    await this.clickOn('span', ' DONE ');
 
     await this.page.waitForSelector('button.e2e-test-publish-blog-post-button:not([disabled])');
-    await this.clickOn("span", "PUBLISH");
+    await this.clickOn('span', 'PUBLISH');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
-    await this.clickOn("button", " Confirm ");
-    console.log("Successfully published a blog post!");
+    await this.clickOn('button', ' Confirm ');
+    console.log('Successfully published a blog post!');
   }
 
   async deletePublishedBlogPostByTitle(toDeletePublishedBlogPostTitle) {
-    await this.clickOn("div", "PUBLISHED");
+    await this.clickOn('div', 'PUBLISHED');
     await this.page.exposeFunction('deletePublishedBlogPost', async() => {
       await this.page.waitForTimeout(100);  // see Note-2 below
-      await this.clickOn("span", "Delete");
+      await this.clickOn('span', 'Delete');
       await this.page.waitForSelector('button.e2e-test-confirm-button');
-      await this.clickOn("button", " Confirm ");
-      console.log("Published blog post with given title deleted successfully!");
+      await this.clickOn('button', ' Confirm ');
+      console.log('Published blog post with given title deleted successfully!');
     });
     await this.page.evaluate(async(toDeletePublishedBlogPostTitle) => {
       const allPublishedBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
@@ -106,11 +106,11 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.page.evaluate(async(number) => {
       const allDraftBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
       if(allDraftBlogPosts.length !== number) {
-        throw new Error("Number of draft/published blog posts is not equal to " + number);
+        throw new Error('Number of draft/published blog posts is not equal to ' + number);
       };
     }, number);
 
-    console.log("Number of draft/published blog posts is equal to " + number);
+    console.log('Number of draft/published blog posts is equal to ' + number);
   }
 
   async expectDraftBlogPostWithTitleToExist(checkDraftBlogPostByTitle) {
@@ -124,12 +124,12 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         }
       }
       if (count === 0) {
-        throw new Error("Draft blog post with title " + checkDraftBlogPostByTitle + " does not exist!");
+        throw new Error('Draft blog post with title ' + checkDraftBlogPostByTitle + ' does not exist!');
       } else if (count > 1) {
-        throw new Error("Draft blog post with title " + checkDraftBlogPostByTitle + " exists more than once!");
+        throw new Error('Draft blog post with title ' + checkDraftBlogPostByTitle + ' exists more than once!');
       }
     }, checkDraftBlogPostByTitle);
-    console.log("Draft blog post with title " + checkDraftBlogPostByTitle + " exists!")
+    console.log('Draft blog post with title ' + checkDraftBlogPostByTitle + ' exists!')
   }
 
   async expectDraftBlogPostWithTitleToNotExist(checkDraftBlogPostByTitle) {
@@ -143,14 +143,14 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         }
       }
       if (count > 0) {
-        throw new Error("Draft blog post with title " + checkDraftBlogPostByTitle + " exists!");
+        throw new Error('Draft blog post with title ' + checkDraftBlogPostByTitle + ' exists!');
       }
     }, checkDraftBlogPostByTitle);
-    console.log("Draft blog post with title " + checkDraftBlogPostByTitle + " does not exist!");
+    console.log('Draft blog post with title ' + checkDraftBlogPostByTitle + ' does not exist!');
   }
 
   async expectPublishedBlogPostWithTitleToExist(checkPublishBlogPostByTitle) {
-    await this.clickOn("div", "PUBLISHED");
+    await this.clickOn('div', 'PUBLISHED');
     await this.page.evaluate(async(checkPublishBlogPostByTitle) => {
       const allPublishedBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
       let count = 0;
@@ -161,12 +161,12 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         }
       }
       if (count === 0) {
-        throw new Error("Blog post with title " + checkPublishBlogPostByTitle + " does not exist!");
+        throw new Error('Blog post with title ' + checkPublishBlogPostByTitle + ' does not exist!');
       } else if (count > 1) {
-        throw new Error("Blog post with title " + checkPublishBlogPostByTitle + " exists more than once!");
+        throw new Error('Blog post with title ' + checkPublishBlogPostByTitle + ' exists more than once!');
       }
     }, checkPublishBlogPostByTitle);
-    console.log("Published blog post with title " + checkPublishBlogPostByTitle + " exists!");
+    console.log('Published blog post with title ' + checkPublishBlogPostByTitle + ' exists!');
   }
 
   async expectPublishedBlogPostWithTitleToNotExist(checkBlogPostByTitle) {
@@ -180,25 +180,25 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         }
       }
       if (count > 0) {
-        throw new Error("Published blog post with title " + checkBlogPostByTitle + " exists!");
+        throw new Error('Published blog post with title ' + checkBlogPostByTitle + ' exists!');
       }
     }, checkBlogPostByTitle);
-    console.log("Published blog post with title " + checkBlogPostByTitle + " does not exist!");
+    console.log('Published blog post with title ' + checkBlogPostByTitle + ' does not exist!');
   }
 
   async assignBlogAdminRoleToUserWithUserName(userName) {
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, userName);
-    await this.clickOn("button", roleEditorButtonSelector);
-    await this.clickOn("h4", "Add role");
-    await this.clickOn("div", rolesSelectDropdown);
+    await this.clickOn('button', roleEditorButtonSelector);
+    await this.clickOn('h4', 'Add role');
+    await this.clickOn('div', rolesSelectDropdown);
     await this.page.evaluate(async() => {
       const allRoles = document.getElementsByClassName('mat-option-text');
       console.log(allRoles.length);
       for(let i = 0; i < allRoles.length; i++) {
         console.log(allRoles[i].innerText);
-        if(allRoles[i].innerText === "blog admin") {
-          allRoles[i].click({waitUntil: "networkidle0"});
+        if(allRoles[i].innerText === 'blog admin') {
+          allRoles[i].click({waitUntil: 'networkidle0'});
           return;
         }
       }
@@ -210,21 +210,21 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       const userRoles = document.getElementsByClassName('oppia-user-role-description');
       for(let i = 0; i < userRoles.length; i++) {
         console.log(userRoles[i].innerText);
-        if(userRoles[i].innerText === "Blog Admin") {
+        if(userRoles[i].innerText === 'Blog Admin') {
           return;
         }
       }
-      throw new Error("User does not have blog admin role!");
+      throw new Error('User does not have blog admin role!');
     });
-    console.log("User given the blog admin role successfully!");
+    console.log('User given the blog admin role successfully!');
   }
 
   async expectBlogDashboardAccessToBeUnauthorized() {
     try {
       await this.page.waitForSelector(unauthErrorContainer);
-      console.log("User unauthorized to access blog dashboard!");
+      console.log('User unauthorized to access blog dashboard!');
     } catch(err) {
-      throw new Error("No unauthorization error found for the blog dashboard page!");
+      throw new Error('No unauthorization error found for the blog dashboard page!');
     }
   }
 
@@ -236,20 +236,20 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.reloadPage();
     try {
       await this.waitForPageToLoad(blogdDashboardAuthorDetailsModal);
-      console.log("User authorized to access blog dashboard!");
+      console.log('User authorized to access blog dashboard!');
     } catch(err) {
-      throw new Error("User unauthorized to access blog dashboard!");
+      throw new Error('User unauthorized to access blog dashboard!');
     }
   }
 
   async assignUserAsRoleFromRoleDropdown(username, role) {
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
-    await this.clickOn("button", "Update Role");
+    await this.clickOn('button', 'Update Role');
   }
 
   async expectUserGivenTheRoleFromRoleDropdown(username, role) {
-    const statusMessage = "Role of " + username + " successfully updated to " + role;
+    const statusMessage = 'Role of ' + username + ' successfully updated to ' + role;
     try {
       await this.page.waitForFunction((statusMessage) => {
           return document.querySelector('.oppia-status-message-container').innerText === statusMessage;
@@ -258,18 +258,18 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         statusMessage
       );
     } catch(err) {
-      throw new Error(username + " not given the " + role + " role from role dropdown!");
+      throw new Error(username + ' not given the ' + role + ' role from role dropdown!');
     }
-    console.log(username + " given the " + role + " role from role dropdown successfully!");
+    console.log(username + ' given the ' + role + ' role from role dropdown successfully!');
   }
 
   async removeBlogEditorRoleByUsername(username) {
     await this.type(removeBlogEditorUsernameInput, username);
-    await this.clickOn("button", "Remove Blog Editor ");
+    await this.clickOn('button', 'Remove Blog Editor ');
   }
 
   async expectRemovedBlogEditorRoleByUsername(username) {
-    const statusMessage = "Success.";
+    const statusMessage = 'Success.';
     try {
       await this.page.waitForFunction((statusMessage) => {
           return document.querySelector('.oppia-status-message-container').innerText === statusMessage;
@@ -278,9 +278,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         statusMessage
       );
     } catch(err) {
-      throw new Error(username + " not removed from the Blog Editor role!");
+      throw new Error(username + ' not removed from the Blog Editor role!');
     }
-    console.log(username + " removed from the Blog Editor role successfully!");
+    console.log(username + ' removed from the Blog Editor role successfully!');
   }
 
   async expectTagWithNameNotExistInTagList(tagName) {
@@ -288,23 +288,23 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       const tagList = document.getElementsByClassName('form-control');
       for(let i = 0; i < tagList.length; i++) {
         if(tagList[i].value === tagName) {
-          throw new Error("Tag with name " + tagName + " already exists before adding it!");
+          throw new Error('Tag with name ' + tagName + ' already exists before adding it!');
         }
       }
     }, tagName);
-    console.log("Tag with name " + tagName + " does not exist in tag list!");
+    console.log('Tag with name ' + tagName + ' does not exist in tag list!');
   }
 
   async addTagInTagListWithName(tagName) {
-    await this.clickOn("button", " Add element ");
+    await this.clickOn('button', ' Add element ');
     //TODO: this is the bug in the /blog-admin page, use puppeteer type function instead of this after the bug is fixed.
     // await this.page.keyboard.type(tagName);
     await this.page.evaluate(async(tagName) => {
       const tagList = document.getElementsByClassName('form-control');
       tagList[tagList.length - 1].value = tagName;
     }, tagName);
-    await this.clickOn("button", "Save");
-    console.log("Tag with name " + tagName + " added in tag list successfully!");
+    await this.clickOn('button', 'Save');
+    console.log('Tag with name ' + tagName + ' added in tag list successfully!');
   }
 
   async expectTagWithNameToExistInTagList(tagName) {
@@ -315,9 +315,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
           return;
         }
       }
-      throw new Error("Tag with name " + tagName + " does not exist in tag list!");
+      throw new Error('Tag with name ' + tagName + ' does not exist in tag list!');
     }, tagName);
-    console.log("Tag with name " + tagName + " exists in tag list!");
+    console.log('Tag with name ' + tagName + ' exists in tag list!');
   }
 
   async setMaximumTagLimitTo(limit) {
@@ -327,9 +327,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.page.keyboard.press('Backspace');
 
     await this.type(maximumTagLimitInput, limit);
-    await this.clickOn("button", "Save");
+    await this.clickOn('button', 'Save');
 
-    console.log("Successfully updated the tag limit to " + limit + "!");
+    console.log('Successfully updated the tag limit to ' + limit + '!');
   }
 
   async expectMaximumTagLimitToBe(limit) {
@@ -337,10 +337,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       const tagLimit = document.getElementById('mat-input-0').value;
       console.log(tagLimit);
       if(tagLimit.value !== limit) {
-        throw new Error("Maximum tag limit is not " + limit + "!");
+        throw new Error('Maximum tag limit is not ' + limit + '!');
       }
     });
-    console.log("Maximum tag limit changed to " + limit + "!");
+    console.log('Maximum tag limit changed to ' + limit + '!');
   }
 };
 
