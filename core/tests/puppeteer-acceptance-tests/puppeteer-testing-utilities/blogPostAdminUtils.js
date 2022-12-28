@@ -9,7 +9,7 @@ const roleEditorInputField = "input.e2e-test-username-for-role-editor"
 const roleEditorButtonSelector = "e2e-test-role-edit-button";
 const rolesSelectDropdown = "mat-select-trigger";
 const blogdDashboardAuthorDetailsModal = "div.modal-dialog";
-const RolesEditorTab = testConstants.URLs.RolesEditorTab;
+const rolesEditorTab = testConstants.URLs.RolesEditorTab;
 const roleUpdateUsernameInput = "input#label-target-update-form-name";
 const removeBlogEditorUsernameInput = "input#label-target-form-reviewer-username";
 const maximumTagLimitInput = "input#mat-input-0"
@@ -187,7 +187,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   async assignBlogAdminRoleToUserWithUserName(userName) {
-    await this.goto(RolesEditorTab);
+    await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, userName);
     await this.clickOn("button", roleEditorButtonSelector);
     await this.clickOn("h4", "Add role");
