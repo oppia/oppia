@@ -57,20 +57,16 @@ class ConstantsTests(test_utils.GenericTestBase):
                 constants.get_package_file_contents(
                     'assets', 'non_exist.xy', binary_mode=False)
 
-    def test_loading_file_in_package_returns_the_content(self) -> None:
-        """Test get_package_file_contents with imaginary file."""
-        with self.swap_to_always_return(pkgutil, 'get_data', b'File data'):
-            self.assertEqual(
-                constants.get_package_file_contents('assets', 'non_exist.xy'),
-                'File data'
-            )
-
+    def test_loading_binary_file_in_package_returns_the_content(self) -> None:
+        """Test get_package_file_contents with imaginary binary file."""
         with self.swap_to_always_return(pkgutil, 'get_data', 'File data'):
             self.assertEqual(
                 constants.get_package_file_contents(
                     'assets', 'non_exist.xy', binary_mode=True), 'File data'
             )
 
+    def test_loading_binary_file_returns_the_content(self) -> None:
+        """Test get_package_file_contents with binary file."""
         with utils.open_file(
             os.path.join(
                 'assets', 'images', 'avatar', 'user_blue_150px.png'),
@@ -84,6 +80,14 @@ class ConstantsTests(test_utils.GenericTestBase):
             constants.get_package_file_contents(
                 'assets', default_image_path, binary_mode=True), raw_image_png
         )
+
+    def test_loading_file_in_package_returns_the_content(self) -> None:
+        """Test get_package_file_contents with imaginary file."""
+        with self.swap_to_always_return(pkgutil, 'get_data', b'File data'):
+            self.assertEqual(
+                constants.get_package_file_contents('assets', 'non_exist.xy'),
+                'File data'
+            )
 
     def test_loading_file_in_non_existent_package_throws_error(self) -> None:
         """Test get_package_file_contents with imaginary file."""
