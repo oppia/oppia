@@ -37,10 +37,33 @@ import { UrlInterpolationService } from
 export class VolunteerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   mapImgPath = '';
-  art = {};
-  development = {};
-  learnerFeedback = {};
-  lessonCreation = {};
+  art!: {
+    images: string[];
+    caption: {
+      content: string;
+      name: string;
+      type: string;
+    }[];
+  };
+
+  development!: {
+    images: string[];
+    caption: {
+      content: string;
+      name: string;
+      type: string;
+    }[];
+  };
+
+  learnerFeedback!: {
+    images: string[];
+    caption: { content: string; name: string; type: string}[];
+  };
+
+  lessonCreation!: {
+    images: string[];
+    caption: { content: string; name: string; type: string}[];
+  };
 
   constructor(
     private pageTitleService: PageTitleService,
