@@ -13,15 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the conversation skin embed view.
+ * @fileoverview Module for the CkEditor4 components.
  */
 
-import { Component, ViewEncapsulation } from '@angular/core';
-import { ConversationSkinComponent } from './conversation-skin.component';
+import 'core-js/es7/reflect';
+import 'zone.js';
 
-@Component({
-  selector: 'oppia-conversation-skin-embed',
-  templateUrl: './conversation-skin-embed.component.html',
-  encapsulation: ViewEncapsulation.None
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { CkEditorCopyToolbarComponent } from './ck-editor-copy-toolbar.component';
+
+@NgModule({
+  imports: [
+    CommonModule,
+  ],
+  declarations: [
+    CkEditorCopyToolbarComponent
+  ],
+  entryComponents: [
+    CkEditorCopyToolbarComponent
+  ],
+  exports: [
+    CkEditorCopyToolbarComponent
+  ],
 })
-export class ConversationSkinEmbedComponent extends ConversationSkinComponent {}
+
+export class OppiaCkEditorCopyToolBarModule { }

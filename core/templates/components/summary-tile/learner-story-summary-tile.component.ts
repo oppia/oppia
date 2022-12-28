@@ -28,7 +28,7 @@ import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'oppia-learner-story-summary-tile',
-  templateUrl: 'learner-story-summary-tile.component.html'
+  templateUrl: './learner-story-summary-tile.component.html'
 })
 export class LearnerStorySummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -48,6 +48,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   starImageUrl!: string;
   storyCompleted: boolean = false;
   cardIsHovered: boolean = false;
+  openInNewWindow = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
