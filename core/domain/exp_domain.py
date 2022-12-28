@@ -4856,6 +4856,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 tag.decompose()
                 continue
 
+            if 'svg_filename' not in math_content_list:
+                tag.decompose()
+                continue
+            if html_cleaner.is_html_empty(math_content_list['svg_filename']):
+                tag.decompose()
+                continue
+
         if is_tags_nested_inside_tabs_or_collapsible:
             tabs_tags = soup.find_all('oppia-noninteractive-tabs')
             if len(tabs_tags) > 0:
