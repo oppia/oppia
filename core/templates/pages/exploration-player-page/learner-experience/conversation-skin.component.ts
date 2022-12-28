@@ -94,6 +94,7 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 @Component({
   selector: 'oppia-conversation-skin',
   templateUrl: './conversation-skin.component.html',
+  styleUrls: ['./conversation-skin.component.css']
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
@@ -275,6 +276,10 @@ export class ConversationSkinComponent {
       this.navigationThroughCardHistoryIsEnabled = false;
       this.checkpointCelebrationModalIsEnabled = false;
       this.skipButtonIsShown = true;
+    }
+
+    if (!this.contextService.isInExplorationPlayerPage()) {
+      this.checkpointCelebrationModalIsEnabled = false;
     }
 
     this.explorationId = this.explorationEngineService.getExplorationId();
@@ -1006,7 +1011,9 @@ export class ConversationSkinComponent {
             storyUrlFragment, nodeId
           ).then((returnObject) => {
             if (returnObject.readyForReviewTest) {
-              this.windowRef.nativeWindow.location =
+              (
+                this.windowRef.nativeWindow as {location: string | Location}
+              ).location =
                 this.urlInterpolationService.interpolateUrl(
                   TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE, {
                     topic_url_fragment: topicUrlFragment,
@@ -1142,18 +1149,18 @@ export class ConversationSkinComponent {
     this.loaderService.hideLoadingScreen();
     this.hasFullyLoaded = true;
 
-    // If the exploration is embedded, use the exploration language
-    // as site language. If the exploration language is not supported
+    // If the exploration is embedded, use the url language code
+    // as site language. If the url language code is not supported
     // as site language, English is used as default.
     let langCodes = AppConstants.SUPPORTED_SITE_LANGUAGES.map((language) => {
       return language.id;
     }) as string[];
     if (this.isIframed) {
-      let explorationLanguageCode = (
-        this.explorationPlayerStateService.getLanguageCode());
-      if (langCodes.indexOf(explorationLanguageCode) !== -1) {
+      let urlLanguageCode = (
+        this.urlService.getUrlParams().lang);
+      if (urlLanguageCode && langCodes.indexOf(urlLanguageCode) !== -1) {
         this.i18nLanguageCodeService.setI18nLanguageCode(
-          explorationLanguageCode);
+          urlLanguageCode);
       } else {
         this.i18nLanguageCodeService.setI18nLanguageCode('en');
       }

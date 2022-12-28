@@ -92,11 +92,7 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
-# backend_prod_files contain processed JS and HTML files that are served by
-# Jinja, we are moving away from Jinja so this folder might not be needed later
-# (#6964)
-EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if not constants.DEV_MODE else '')
+EXTENSIONS_DIR_PREFIX = ('build' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -115,7 +111,11 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
     os.path.join('webpack_bundles') if constants.DEV_MODE else
-    os.path.join('backend_prod_files', 'webpack_bundles'))
+    os.path.join('build', 'webpack_bundles'))
+# To know more about AOT visit https://angular.io/guide/glossary#aot
+FRONTEND_AOT_DIR = (
+    os.path.join('dist', 'oppia-angular') if constants.DEV_MODE else
+    os.path.join('dist', 'oppia-angular-prod'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -264,7 +264,6 @@ MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
-PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
