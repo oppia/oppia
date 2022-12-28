@@ -32,7 +32,9 @@ if MYPY: # pragma: no cover
 class InvalidCompositeEntityError(base_validation_errors.BaseAuditError):
     """Error class for models that have invalid composite entity id."""
 
-    def __init__(self, model: improvements_models.TaskEntryModel) -> None:
+    def __init__(
+        self, model: improvements_models.ExplorationStatsTaskEntryModel
+    ) -> None:
         message = 'model has invalid composite entity %s' % (
             model.composite_entity_id)
         super().__init__(message, model)
