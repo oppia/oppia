@@ -4,7 +4,7 @@ const testConstants = require("../puppeteer-testing-utilities/testConstants.js")
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 
-async function createDraftAsBlogPostAdmin() {
+async function superAdminAssignBlogAdminRole() {
   const blogAdmin = await new e2eBlogAdmin();
   const superAdmin = await new e2eSuperAdmin();
   
@@ -23,4 +23,4 @@ async function createDraftAsBlogPostAdmin() {
   await blogAdmin.closeBrowser();
 }
 
-createDraftAsBlogPostAdmin();
+superAdminAssignBlogAdminRole();

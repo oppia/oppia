@@ -3,7 +3,7 @@ const testConstants = require("../puppeteer-testing-utilities/testConstants.js")
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 
-async function createDraftAndDeleteDraftAsBlogPostAdmin() {
+async function publishBlogAndDeletePublishedBlogAsBlogPostAdmin() {
   const blogPostEditor = await new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
 
@@ -13,15 +13,13 @@ async function createDraftAndDeleteDraftAsBlogPostAdmin() {
 
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
-  await blogPostEditor.createDraftBlogPostByTitle("Test-Blog");
-
+  await blogPostEditor.publishNewBlogPostByTitle("Test-Blog");
   await blogPostEditor.goto(blogDashboardUrl);
-  await blogPostEditor.expectDraftBlogPostWithTitleToExist("Test-Blog");
-
-  await blogPostEditor.deleteDraftBlogPostByTitle("Test-Blog");
-  await blogPostEditor.expectDraftBlogPostWithTitleToNotExist("Test-Blog");
+  await blogPostEditor.expectPublishedBlogPostWithTitleToExist("Test-Blog");
+  await blogPostEditor.deletePublishedBlogPostByTitle("Test-Blog");
+  await blogPostEditor.expectPublishedBlogPostWithTitleToNotExist("Test-Blog");
   
   await blogPostEditor.closeBrowser();
 }
 
-createDraftAndDeleteDraftAsBlogPostAdmin();
+publishBlogAndDeletePublishedBlogAsBlogPostAdmin();
