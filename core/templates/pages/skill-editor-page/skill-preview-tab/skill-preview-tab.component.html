@@ -65,6 +65,10 @@
                             [avatarImageIsShown]="false"
                             [startCardChangeAnimation]="false">
           </oppia-tutor-card>
+          <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
+            <oppia-supplemental-card [displayedCard]="displayedCard">
+            </oppia-supplemental-card>
+          </div>
         </div>
       </div>
     </div>
