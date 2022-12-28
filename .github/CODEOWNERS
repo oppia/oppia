@@ -68,12 +68,16 @@
 /core/templates/services/request-interceptor.service*.ts @oppia/angular-migration-reviewers
 /core/templates/services/UpgradedServices.ts @oppia/angular-migration-reviewers
 /core/templates/hybrid-router-module-provider*.ts @oppia/angular-migration-reviewers
+/core/templates/utility/hashes.ts @oppia/angular-migration-reviewers
 /core/templates/utility/string-utility*.ts @oppia/angular-migration-reviewers
+/proxy.conf.json @oppia/angular-migration-reviewers
+/angular-template-style-url-replacer.webpack-loader.js @oppia/angular-migration-reviewers
+/angular.json @oppia/angular-migration-reviewers
+/src @oppia/frontend-infrastructure-reviewers
 
 # TS typing
 /typings/ @oppia/data-and-stability-reviewers
-/tsconfig.json @oppia/data-and-stability-reviewers
-/tsconfig-strict.json @oppia/data-and-stability-reviewers
+/tsconfig*.json @oppia/data-and-stability-reviewers
 /scripts/typescript_checks*.py @oppia/data-and-stability-reviewers
 
 
@@ -128,7 +132,6 @@
 /core/controllers/contributor_dashboard*.py @oppia/contributor-experience-team
 /core/domain/opportunity*.py @oppia/contributor-experience-team
 /core/domain/translation*.py @oppia/contributor-experience-team
-/core/storage/translation/ @oppia/data-and-stability-reviewers
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
@@ -573,6 +576,7 @@
 /core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @oppia/interaction-and-rte-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @oppia/interaction-and-rte-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module.ts @oppia/interaction-and-rte-reviewers
 /core/templates/services/autoplayed-videos.service*.ts @oppia/interaction-and-rte-reviewers
 /core/templates/services/external-save.service*.ts @oppia/angular-migration-reviewers
 /core/templates/services/external-rte-save.service*.ts @oppia/angular-migration-reviewers
@@ -722,17 +726,17 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
-/requirements.txt @oppia/data-and-stability-reviewers
-/requirements.in @oppia/data-and-stability-reviewers
-/requirements_dev.txt @oppia/data-and-stability-reviewers
-/requirements_dev.in @oppia/data-and-stability-reviewers
-/dependencies.json @oppia/data-and-stability-reviewers
-/package.json @oppia/data-and-stability-reviewers
-/yarn.lock @oppia/data-and-stability-reviewers
+/requirements.txt @oppia/dependency-reviewers
+/requirements.in @oppia/dependency-reviewers
+/requirements_dev.txt @oppia/dependency-reviewers
+/requirements_dev.in @oppia/dependency-reviewers
+/dependencies.json @oppia/dependency-reviewers
+/package.json @oppia/dependency-reviewers
+/yarn.lock @oppia/dependency-reviewers
 /scripts/install_third_party_libs.py @oppia/dev-workflow-reviewers
 /.github/ @oppia/dev-workflow-reviewers
 /.github/CODEOWNERS @oppia/dev-workflow-reviewers
-/.github/stale.yml @oppia/data-and-stability-reviewers
+/.github/stale.yml @oppia/dev-workflow-reviewers
 /.github/workflows/ @oppia/dev-workflow-reviewers @oppia/automated-qa-reviewers
 # Files needed by the Android team.
 /core/controllers/android_e2e_config*.py @oppia/web-android-compatibility-reviewers

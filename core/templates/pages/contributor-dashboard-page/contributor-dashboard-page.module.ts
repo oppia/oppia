@@ -28,7 +28,6 @@ import { OppiaAngularRootComponent } from
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
-import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
@@ -66,11 +65,11 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     SharedComponentsModule,
     NgbModalModule,
     SharedFormsModule,
+    OppiaCkEditorCopyToolBarModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     CertificateDownloadModalComponent,
-    CkEditorCopyToolbarComponent,
     ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -85,11 +84,11 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     TranslationModalComponent,
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
-    ContributorDashboardPageComponent
+    ContributorDashboardPageComponent,
+    ContributorBadgesComponent
   ],
   entryComponents: [
     CertificateDownloadModalComponent,
-    CkEditorCopyToolbarComponent,
     ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -138,6 +137,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
+import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import { ContributorStatsComponent } from './contributor-stats/contributor-stats.component';
 import { CertificateDownloadModalComponent } from './modal-templates/certificate-download-modal.component';
 import { ContributorBadgesComponent } from './contributor-badges/contributor-badges.component';

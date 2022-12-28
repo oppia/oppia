@@ -119,7 +119,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         install_third_party_libs.main()
 
     common.setup_chrome_bin_env_variable()
-
+    # We need to create an empty hashes.json file for the build so that
+    # we don't get the error "assets/hashes.json file doesn't exist".
+    build.save_hashes_to_file({})
     common.print_each_string_after_two_new_lines([
         'View interactive frontend test coverage reports by navigating to',
         '../karma_coverage_reports',

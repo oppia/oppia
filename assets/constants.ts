@@ -3,7 +3,7 @@
 // "eslint disable next line" for each of them.
 /* eslint-disable oppia/no-multiline-disable */
 /* eslint-disable quote-props */
-/* eslint-disable quotes */
+/* eslint-disable  @typescript-eslint/quotes */
 /* Don't modify anything outside the {} brackets.
  * Insides of the {} brackets should be formatted as a JSON object.
  * JSON rules:
