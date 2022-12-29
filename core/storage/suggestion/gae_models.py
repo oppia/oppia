@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core.constants import constants
 from core.platform import models
 
 from typing import (
@@ -635,7 +636,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     returned by the current query.
         """
 
-        if sort_key == 'Date':
+        if sort_key == constants.QUESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
