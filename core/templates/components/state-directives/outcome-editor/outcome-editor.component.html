@@ -195,12 +195,17 @@
       </div>
 
       <div>
-        <strong *ngIf="displayFeedback">(Optional) If the learner is really stuck, direct them to</strong>
+        <strong *ngIf="displayFeedback">If the learner is really stuck, direct them to...</strong>
         <strong *ngIf="!displayFeedback">(Optional) Oppia directs the stuck learner to...</strong>
         <span *ngIf="outcome && !isSelfLoopDestStuck(outcome)" class="position-relative">
           {{ outcome.destIfReallyStuck }}
         </span>
-        <span *ngIf="isSelfLoopDestStuck(outcome)" class="position-relative"></span>
+        <span *ngIf="isSelfLoopDestStuck(outcome)" class="position-relative">
+          <span *ngIf="!outcome.refresherExplorationId">(None)</span>
+          <span *ngIf="outcome.refresherExplorationId">
+            (try again, with refresher exploration "{{ outcome.refresherExplorationId }}")
+          </span>
+        </span>
       </div>
     </div>
   </div>

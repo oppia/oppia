@@ -137,10 +137,12 @@ export class OutcomeEditorComponent implements OnInit {
   }
 
   isSelfLoopDestStuck(outcome: Outcome): boolean {
+    if (outcome.destIfReallyStuck === null) {
+      outcome.destIfReallyStuck = 'Introduction';
+    }
     return Boolean (
       outcome &&
-      outcome.destIfReallyStuck === (
-        this.stateEditorService.getActiveStateName()));
+    outcome.destIfReallyStuck === this.stateEditorService.getActiveStateName());
   }
 
   getCurrentInteractionId(): string {

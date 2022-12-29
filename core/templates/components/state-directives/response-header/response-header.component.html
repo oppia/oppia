@@ -50,7 +50,7 @@
   .oppia-nested-link {
     color: #0844aa;
     cursor: pointer;
-    display: inline-block;
+    display: contents;
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -62,6 +62,7 @@
     text-decoration: underline;
   }
   .oppia-response-header {
+    display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -120,6 +121,51 @@
     }
     .oppia-response-container-desktop {
       display: none;
+    }
+  }
+  @media screen and (max-width: 1457px) {
+    .oppia-response-header {
+      width: 65%;
+    }
+  }
+  @media screen and (max-width: 953px) {
+    .oppia-response-header {
+      width: 58%;
+    }
+  }
+  @media screen and (max-width: 845px) {
+    .oppia-response-header {
+      width: 48%;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .oppia-response-header {
+      width: 60%;
+    }
+  }
+  @media screen and (max-width: 549px) {
+    .oppia-response-header {
+      width: 55%;
+    }
+  }
+  @media screen and (max-width: 461px) {
+    .oppia-response-header {
+      width: 50%;
+    }
+  }
+  @media screen and (max-width: 450px) {
+    .oppia-response-header {
+      width: 48%;
+    }
+  }
+  @media screen and (max-width: 411px) {
+    .oppia-response-header {
+      width: 39%;
+    }
+  }
+  @media screen and (max-width: 390px) {
+    .oppia-response-header {
+      width: 35%;
     }
   }
 </style>
