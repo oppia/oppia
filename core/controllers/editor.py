@@ -41,6 +41,8 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 
+from typing import Dict
+
 
 def _require_valid_version(version_from_payload, exploration_version):
     """Check that the payload version matches the given exploration version."""
