@@ -3000,9 +3000,6 @@ def generate_contributor_certificate_data(
     user_id = user_services.get_user_id_from_username(username)
     if user_id is None:
         raise Exception('There is no user for the given username.')
-    data: suggestion_registry.ContributorCertificateInfo = (
-        suggestion_registry.ContributorCertificateInfo('', '', '', '', None)
-    )
 
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         data = _generate_translation_contributor_certificate_data(
