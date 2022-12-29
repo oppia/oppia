@@ -11038,11 +11038,6 @@ states:
             x: ca_choices_27
             y: 4
           rule_type: HasElementXAtPositionY
-        - inputs:
-            x:
-            - - ca_choices_29
-            - - ca_choices_28
-          rule_type: IsEqualToOrdering
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
