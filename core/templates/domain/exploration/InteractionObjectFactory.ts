@@ -92,7 +92,7 @@ export class Interaction {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome | null;
   hints: Hint[];
-  id: string | null;
+  id: string;
   solution: Solution | null;
   constructor(
       answerGroups: AnswerGroup[],
