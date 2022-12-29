@@ -263,7 +263,7 @@ export class CertificateDownloadModalComponent {
     linePosition += 40;
 
     ctx.fillText(
-      `translations from ${response.from_date} to ${response.to_date}`,
+      `translations from ${response.from_date} to ${response.to_date}.`,
       this.CERTIFICATE_MID_POINT,
       860
     );
@@ -304,7 +304,7 @@ export class CertificateDownloadModalComponent {
     linePosition += 80;
 
     ctx.fillText(
-      `We confirm that ${this.username} has contributed ` +
+      `This certificate confirms that ${this.username} has contributed ` +
       response.contribution_hours + ' hours',
       this.CERTIFICATE_MID_POINT,
       linePosition
@@ -313,7 +313,7 @@ export class CertificateDownloadModalComponent {
     linePosition += 40;
 
     ctx.fillText(
-      `to Oppia from ${response.from_date} to ${response.to_date}`,
+      `to Oppia from ${response.from_date} to ${response.to_date}.`,
       this.CERTIFICATE_MID_POINT,
       linePosition
     );
