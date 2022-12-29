@@ -30,7 +30,7 @@
       <mat-card class="question-skill-id" *ngFor="let skill of associatedSkillSummaries">
         <div class="skill-description-card">
           <span (click)="removeSkill(skill.getId())" aria-hidden="true">
-            <i class="material-icons oppia-cross-icon md-18">&#xE14C;</i>
+            <i class="fas fa-times oppia-cross-icon md-18"></i>
           </span>
           <a [attr.href]="getSkillEditorUrl(skill.getId())" target="_blank" rel="noopener">
             {{skill.getDescription()}}
@@ -296,6 +296,7 @@
   }
   .oppia-cross-icon {
     color: #f00;
+    font-size: 1.4em;
   }
   .linked-skills-container {
     margin-top: 40px;
