@@ -1081,7 +1081,7 @@ def get_reviewable_question_suggestions_by_offset(
     suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel
         .get_in_review_question_suggestions_by_offset(
-            limit, offset, user_id, sort_key))
+            limit, offset, user_id, sort_key=sort_key))
 
     question_suggestions = []
     for suggestion_model in suggestions:

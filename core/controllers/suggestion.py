@@ -92,11 +92,7 @@ SuggestionsProviderHandlerArgsSchemaDictType = Dict[
         str,
         Dict[
             str,
-            Union[
-                Optional[
-                    Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]],
-                List[str]
-            ]
+            Optional[Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]]
         ]
     ]
 ]
@@ -780,7 +776,7 @@ class ReviewableSuggestionsHandler(
             suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key))
+                    self.user_id, limit, offset, sort_key=sort_key))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
