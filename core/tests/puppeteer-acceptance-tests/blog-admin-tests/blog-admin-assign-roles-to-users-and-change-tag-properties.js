@@ -3,10 +3,9 @@ const testConstants = require('../puppeteer-testing-utilities/testConstants.js')
 
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 
-async function blogAdminRolesAndTagsProperties() {
+async function blogAdminUpdatingRolesAndTagsProperties() {
   const superAdmin = await new e2eSuperAdmin();
 
-// test setup
   await superAdmin.openBrowser();
   await superAdmin.signUpNewUserWithUserNameAndEmail('blogAdm', 'blog_admin@example.com');
   await superAdmin.logout();
@@ -17,7 +16,6 @@ async function blogAdminRolesAndTagsProperties() {
   await superAdmin.signUpNewUserWithUserNameAndEmail('superAdm', 'testadmin@example.com');
   await superAdmin.assignBlogAdminRoleToUserWithUserName('superAdm');
   await superAdmin.expectUserToHaveBlogAdminRole();
-// test setup ends
 
   await superAdmin.goto(blogAdminUrl);
   await superAdmin.assignUserAsRoleFromRoleDropdown('blogAdm', 'BLOG_ADMIN');
@@ -38,4 +36,4 @@ async function blogAdminRolesAndTagsProperties() {
   await superAdmin.closeBrowser();
 }
 
-blogAdminRolesAndTagsProperties();
+blogAdminUpdatingRolesAndTagsProperties();
