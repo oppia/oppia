@@ -72,10 +72,10 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
 
   onFileChanged(file: File): void {
     let originalFilename = file.name;
-    // The cropper always returns a png file, thus the extension should be
-    // changed to png for the final image type to match the extension.
+    // The cropper always returns a jpeg file, thus the extension should be
+    // changed to jpeg for the final image type to match the extension.
     this.croppedFilename = (
-      originalFilename.replace(/\.([^.]*?)(?=\?|#|$)/, '.png'));
+      originalFilename.replace(/\.([^.]*?)(?=\?|#|$)/, '.jpeg'));
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
@@ -127,7 +127,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
         height: 200,
         width: 800,
         fillColor: '#fff',
-      }).toDataURL());
+      }).toDataURL('image/jpeg'));
     this.imageLocalStorageService.saveImage(
       this.croppedFilename, this.cropppedImageDataUrl);
     this.imageLocallySaved.emit(this.cropppedImageDataUrl);
