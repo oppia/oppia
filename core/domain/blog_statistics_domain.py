@@ -25,21 +25,12 @@ from core.constants import constants
 
 from typing import Dict, TypedDict, Union
 
-class ViewsStatsDomainObject(TypedDict):
-    """Domain object for views stats."""
-    viewsStatsDomainObject: Union[
-        BlogPostViewsAggregatedStats, AuthorBlogPostViewsAggregatedStats
+
+def _repack_views_stats(stats: Union[
+        BlogPostViewsAggregatedStats,
+        AuthorBlogPostViewsAggregatedStats
     ]
-
-
-class ReadsStatsDomainObject(TypedDict):
-    """Domain object for reads stats."""
-    readsStatsDomainObject: Union[
-        BlogPostReadsAggregatedStats, AuthorBlogPostReadsAggregatedStats
-    ]
-
-
-def _repack_views_stats(stats: ViewsStatsDomainObject) -> None:
+) -> None:
     """Repacks aggregated stats domain object to contain necessary keys removing
     older stats. We will only maintain views_by_hour for past 3 days
     (including the ongoing day) and views_by_date keyed to 3 months and delete
@@ -57,7 +48,11 @@ def _repack_views_stats(stats: ViewsStatsDomainObject) -> None:
     }
 
 
-def _repack_reads_stats(stats: ReadsStatsDomainObject) -> None:
+def _repack_reads_stats(stats: Union[
+        BlogPostReadsAggregatedStats,
+        AuthorBlogPostReadsAggregatedStats
+    ]
+) -> None:
     """Repacks aggregated stats domain object to contain necessary keys removing
     older stats. We will only maintain reads_by_hour for past 3 days
     (including the ongoing day) and reads_by_date keyed to 3 months and delete

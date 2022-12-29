@@ -35,13 +35,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { ToastrModule } from 'ngx-toastr';
-import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
 import { BlogStatisticsTabComponent } from './statistics-tab/blog-statistics-tab.component';
-import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
-import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
-import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
-import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
-import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
@@ -66,27 +60,11 @@ import { SharedBlogComponentsModule } from 'pages/blog-dashboard-page/shared-blo
   ],
   declarations: [
     BlogDashboardPageComponent,
-    BlogCardComponent,
-    BlogDashboardTileComponent,
-    BlogPostEditorComponent,
-    BlogPostActionConfirmationModalComponent,
-    UploadBlogPostThumbnailModalComponent,
-    BlogCardPreviewModalComponent,
-    UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent,
     BlogStatisticsTabComponent,
     BlogAuthorDetailsEditorComponent
   ],
   entryComponents: [
     BlogDashboardPageComponent,
-    BlogCardComponent,
-    BlogDashboardTileComponent,
-    BlogPostEditorComponent,
-    BlogPostActionConfirmationModalComponent,
-    UploadBlogPostThumbnailModalComponent,
-    BlogCardPreviewModalComponent,
-    UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent,
     BlogStatisticsTabComponent,
     BlogAuthorDetailsEditorComponent
   ],

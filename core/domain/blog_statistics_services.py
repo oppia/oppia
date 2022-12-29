@@ -653,6 +653,7 @@ def _update_reading_time_stats_transactional(
         author_blog_post_reading_time_stats
     )
 
+
 def _increment_reading_time_bucket_count(
     stats: Union[
         blog_statistics_domain.BlogPostReadingTime,
@@ -680,11 +681,11 @@ def _increment_reading_time_bucket_count(
         'eight_to_nine_min',
         'nine_to_ten_min',
     ]
-    if time_taken <= 9 :
+    if time_taken <= 9:
         key = time_taken_keys[time_taken]
     else:
         key = 'more_than_ten_min'
-    stats[key] += 1
+    stats[key] = stats[key] + 1
 
 
 def create_aggregated_stats_models_for_newly_published_blog_post(
