@@ -157,7 +157,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
   }
 
-  isCurrentSupplementalCardNonempty(): boolean {
+  isCurrentSupplementalCardNonEmpty(): boolean {
     return this.displayedCard && this.isSupplementalCardNonempty(
       this.displayedCard);
   }
