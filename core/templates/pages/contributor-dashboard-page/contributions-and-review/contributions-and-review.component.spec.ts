@@ -806,6 +806,7 @@ describe('Contributions and review component', () => {
       expect(component.currentQuestionsSortKey).toBeUndefined();
 
       component.setQuestionsSortKeys('Date');
+
       expect(component.currentQuestionsSortKey).toBe('Date');
     });
 

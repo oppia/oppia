@@ -529,7 +529,8 @@ export class ContributionsAndReview
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.TAB_TYPE_ACCOMPLISHMENTS = 'accomplishments';
-    this.QUESTIONS_SORT_KEYS = ['Default', 'Date'];
+    this.QUESTIONS_SORT_KEYS = ['Date'];
+    this.currentQuestionsSortKey = 'Date';
     this.activeExplorationId = null;
     this.contributions = {};
     this.userDetailsLoading = true;
