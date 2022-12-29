@@ -30,13 +30,6 @@ interface FetchSuggestionsResponse {
   next_offset: number;
 }
 
-interface FetchSuggestionsParams {
-  limit: number;
-  offset: number;
-  sortKey?: string;
-  explorationId?: string;
-}
-
 interface ReviewExplorationSuggestionRequestBody {
   action: string;
   'review_message': string;
@@ -94,12 +87,10 @@ export class ContributionAndReviewBackendApiService {
 
   async fetchSuggestionsAsync(
       fetchType: string,
-      {
-        limit,
-        offset,
-        sortKey,
-        explorationId
-      }: FetchSuggestionsParams
+      limit: number,
+      offset: number,
+      sortKey?: string,
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -111,15 +102,16 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill',
-        'add_question',
-        {limit: limit, offset: offset, sortKey: sortKey});
+        'skill', 'add_question', limit, offset, sortKey, explorationId);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
         'exploration',
         'translate_content',
-        {limit: limit, offset: offset, explorationId: explorationId});
+        limit,
+        offset,
+        sortKey,
+        explorationId);
     }
     throw new Error('Invalid fetch type');
   }
@@ -146,12 +138,10 @@ export class ContributionAndReviewBackendApiService {
   async fetchReviewableSuggestionsAsync(
       targetType: string,
       suggestionType: string,
-      {
-        limit,
-        offset,
-        sortKey,
-        explorationId
-      }: FetchSuggestionsParams
+      limit: number,
+      offset: number,
+      sortKey?: string,
+      explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {

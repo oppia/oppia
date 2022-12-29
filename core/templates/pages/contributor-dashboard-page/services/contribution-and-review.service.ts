@@ -135,12 +135,10 @@ export class ContributionAndReviewService {
         // Fetch up to two pages at a time to compute if we have more results.
         // The first page of results is returned to the caller and the second
         // page is cached.
-        {
-          limit: (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
-          offset: fetcher.offset,
-          sortKey: fetcher.sortKey,
-          explorationId: explorationId
-        }
+        (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
+        fetcher.offset,
+        fetcher.sortKey,
+        explorationId
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
