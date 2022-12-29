@@ -36,6 +36,9 @@ from core.domain import user_services
 from core.domain import wipeout_service
 
 
+from typing import Dict, TypedDict
+
+
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
 
