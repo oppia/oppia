@@ -376,6 +376,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request.get('offset')
         exploration_id = self.normalized_request.get('exploration_id')
+        exp_ids = [exploration_id] if exploration_id else []
 
         suggestions = []
         next_offset = 0
