@@ -21,7 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import AppConstants from 'assets/constants';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
