@@ -80,7 +80,6 @@ jobs:
           - additionalPlayerFeatures
           - adminPage
           - blogDashboard
-          - blog
           - checkpointFeatures
           - classroomPage
           - classroomPageFileUploadFeatures
