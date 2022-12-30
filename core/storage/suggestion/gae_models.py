@@ -647,15 +647,20 @@ class GeneralSuggestionModel(base_models.BaseModel):
             )).order(-cls.created_on)
 
             sorted_results: List[GeneralSuggestionModel] = []
+            num_suggestions_per_fetch = 1000
 
             while len(sorted_results) < limit:
-                suggestion_model: Sequence[GeneralSuggestionModel] = (
-                    suggestion_query.fetch(1, offset=offset))
-                if not suggestion_model:
+                suggestion_models: Sequence[GeneralSuggestionModel] = (
+                    suggestion_query.fetch(
+                        num_suggestions_per_fetch, offset=offset))
+                if not suggestion_models:
                     break
-                offset += 1
-                if suggestion_model[0].author_id != user_id:
-                    sorted_results.append(suggestion_model[0])
+                for suggestion_model in suggestion_models:
+                    if suggestion_model.author_id != user_id:
+                        sorted_results.append(suggestion_model)
+                        if len(sorted_results) == limit:
+                            break
+                offset += len(suggestion_models)
 
             return (
                 sorted_results,
