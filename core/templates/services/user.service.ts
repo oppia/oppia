@@ -16,6 +16,7 @@
  * @fileoverview Service for user data.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -25,17 +26,20 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UpdatePreferencesResponse, UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
     private imageLocalStorageService: ImageLocalStorageService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService
+    private userBackendApiService: UserBackendApiService,
+    private http: HttpClient
   ) {}
 
   // This property will be null when the user does not have
@@ -58,22 +62,61 @@ export class UserService {
     return this.userInfo;
   }
 
-  async getProfileImageDataUrlAsync(): Promise<string> {
+  // async getProfileImageDataUrlAsync(): Promise<string> {
+  //   let localStoredImage = (
+  //     this.imageLocalStorageService.getRawImageData('profile_picture.png'));
+  //   if (localStoredImage !== null) {
+  //     return localStoredImage
+  //   }
+  //   let defaultUrl = (this.urlInterpolationService.getStaticImageUrl(
+  //       AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
+  //   return this.getUserInfoAsync().then(
+  //     async(userInfo) => {
+  //       if (userInfo.isLoggedIn()) {
+  //         return this.userBackendApiService.getProfileImageDataUrlAsync();
+  //       } else {
+  //         return new Promise((resolve, reject) => {
+  //           resolve(defaultUrl);
+  //         });
+  //       }
+  //     });
+  // }
+
+  private async _getProfileImagePromise(imageDataBlob: Blob): Promise<string> {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+      reader.readAsDataURL(imageDataBlob);
+    });
+  }
+
+  async getProfileImageDataUrlAsync(username: string = ''): Promise<string> {
     let localStoredImage = (
       this.imageLocalStorageService.getRawImageData('profile_picture.png'));
-    if (localStoredImage !== null) {
-      return localStoredImage
+    if (localStoredImage !== null && username === '') {
+      let localImageBlob = new Blob([localStoredImage], {type: 'image/png'});
+      return this._getProfileImagePromise(localImageBlob);
     }
     let defaultUrl = (this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
+    let defaultUrlBlob = new Blob([defaultUrl], {type: 'image/png'});
     return this.getUserInfoAsync().then(
       async(userInfo) => {
         if (userInfo.isLoggedIn()) {
-          return this.userBackendApiService.getProfileImageDataUrlAsync();
+          try {
+            let userProfileImage = this.http.get(
+              this.urlInterpolationService.interpolateUrl(
+                this.assetsBackendApiService.profileImageUrlTemplate,
+                {username: username}), {responseType: 'blob'}).subscribe();
+            return this._getProfileImagePromise(userProfileImage);
+          }
+          catch {
+            return this._getProfileImagePromise(defaultUrlBlob);
+          }
         } else {
-          return new Promise((resolve, reject) => {
-            resolve(defaultUrl);
-          });
+          return this._getProfileImagePromise(defaultUrlBlob);
         }
       });
   }
