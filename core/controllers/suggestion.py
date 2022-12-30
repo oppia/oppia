@@ -92,7 +92,11 @@ SuggestionsProviderHandlerArgsSchemaDictType = Dict[
         str,
         Dict[
             str,
-            Optional[Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]]
+            Union[
+                Optional[
+                    Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]],
+                List[str]
+            ]
         ]
     ]
 ]
