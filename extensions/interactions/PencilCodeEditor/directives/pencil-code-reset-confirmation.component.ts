@@ -28,8 +28,8 @@ export class PencilCodeResetConfirmation {
     private ngbActiveModal: NgbActiveModal
   ) {}
 
-  confirm(value: string): void {
-    this.ngbActiveModal.close(value);
+  confirm(): void {
+    this.ngbActiveModal.close();
   }
 
   cancel(): void {
