@@ -803,11 +803,11 @@ describe('Contributions and review component', () => {
     });
 
     it('should change the sort key of reviewable questions', () => {
-      expect(component.currentQuestionsSortKey).toBeUndefined();
-
-      component.setQuestionsSortKeys('Date');
-
       expect(component.currentQuestionsSortKey).toBe('Date');
+
+      component.setQuestionsSortKeys('Name');
+
+      expect(component.currentQuestionsSortKey).toBe('Name');
     });
 
     it('should open question suggestion modal', fakeAsync(() => {
