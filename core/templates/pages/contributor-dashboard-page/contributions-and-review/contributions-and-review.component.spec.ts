@@ -705,7 +705,7 @@ describe('Contributions and review component', () => {
         expect(component.activeExplorationId).toBeNull();
       }));
 
-    it('should on Review Translations tab', fakeAsync(() => {
+    it('should return true on Review Translations tab', fakeAsync(() => {
       component.contributionTabs = [
         {
           tabType: 'contributions',
@@ -768,18 +768,16 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.isReviewTranslationsTab()).toBeTrue();
-      expect(component.isReviewQuestionsTab()).toBeFalse();
       expect(alertsService.addSuccessMessage)
         .toHaveBeenCalledWith('Submitted suggestion review.');
     }));
 
-    it('should on Review Questions tab', () => {
+    it('should return true on Review Questions tab', () => {
       spyOn(component, 'openQuestionSuggestionModal').and.callFake(() => {
         return;
       });
 
       component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
-      expect(component.isReviewTranslationsTab()).toBeFalse();
       expect(component.isReviewQuestionsTab()).toBeTrue();
 
       component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
