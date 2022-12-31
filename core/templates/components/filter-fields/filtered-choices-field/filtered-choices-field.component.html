@@ -2,7 +2,7 @@
   <mat-select [placeholder]="placeholder"
               [value]="selection"
               (valueChange)="updateSelection($event)">
-    <mat-option>
+    <mat-option *ngIf="isSearchable">
       <ngx-mat-select-search ngModel
                              (ngModelChange)="filterChoices($event)"
                              [placeholderLabel]="searchLabel"
