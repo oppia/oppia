@@ -79,7 +79,7 @@ angular.module('oppia').directive('topicEditorPage', [
             let topicName = TopicEditorStateService.getTopic().getName();
             PageTitleService.setDocumentTitle(
               topicName + ' - Oppia');
-            PageTitleService.setNavbarSubtitleForMobileView(topicName);
+            PageTitleService.setNavbarSubtitleForMobileView('');
             ctrl.topic = TopicEditorStateService.getTopic();
             ctrl._validateTopic();
           };
@@ -204,7 +204,7 @@ angular.module('oppia').directive('topicEditorPage', [
               )
             );
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
-            PageTitleService.setNavbarTitleForMobileView('Topic Editor');
+            PageTitleService.setNavbarTitleForMobileView('');
             PreventPageUnloadEventService.addListener(
               UndoRedoService.getChangeCount.bind(UndoRedoService));
             ctrl.validationIssues = [];
