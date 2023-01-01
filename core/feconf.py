@@ -112,6 +112,10 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 FRONTEND_TEMPLATES_DIR = (
     os.path.join('webpack_bundles') if constants.DEV_MODE else
     os.path.join('build', 'webpack_bundles'))
+# To know more about AOT visit https://angular.io/guide/glossary#aot
+FRONTEND_AOT_DIR = (
+    os.path.join('dist', 'oppia-angular') if constants.DEV_MODE else
+    os.path.join('dist', 'oppia-angular-prod'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -249,6 +253,9 @@ ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 
+DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
+DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
+
 IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
 IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
 
@@ -256,7 +263,6 @@ MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
-PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -331,7 +337,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 53
+CURRENT_STATE_SCHEMA_VERSION = 54
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -1035,6 +1041,7 @@ SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER = (
     '/diagnostic_test_skill_assignment_handler')
+DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL = '/diagnostic_test_questions_handler_url'
 STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
@@ -1086,9 +1093,10 @@ LEARNER_DASHBOARD_LEARNER_GROUPS_HANDLER = (
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 EDIT_LEARNER_GROUP_PAGE_URL = '/edit-learner-group'
 CLASSROOM_ADMIN_DATA_HANDLER_URL = '/classroom_admin_data_handler'
-CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
+NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
+CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
