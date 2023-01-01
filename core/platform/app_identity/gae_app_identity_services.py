@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-import os
+from core import feconf
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
@@ -36,7 +36,7 @@ def get_application_id() -> str:
     Raises:
         ValueError. Value can't be None for application id.
     """
-    app_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+    app_id = feconf.OPPIA_PROJECT_ID
     if app_id is None:
         raise ValueError('Value None for application id is invalid.')
     return app_id
