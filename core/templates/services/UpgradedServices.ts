@@ -834,7 +834,10 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['FocusManagerService'] = new FocusManagerService(
       upgradedServices['DeviceInfoService'],
-      upgradedServices['IdGenerationService']);
+      upgradedServices['IdGenerationService'],
+      upgradedServices['WindowRef'],
+      upgradedServices['ContextService']
+    );
     upgradedServices['HttpClient'] = new HttpClient(
       upgradedServices['HttpXhrBackend']);
     upgradedServices['LanguageUtilService'] = new LanguageUtilService(

@@ -28,7 +28,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ServicesConstants } from 'services/services.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-fdescribe('Focus Manager Service', () => {
+describe('Focus Manager Service', () => {
   let focusManagerService: FocusManagerService;
   let deviceInfoService: DeviceInfoService;
   let idGenerationService: IdGenerationService;
