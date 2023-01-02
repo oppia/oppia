@@ -24,7 +24,7 @@ import os
 import pkgutil
 import re
 
-from typing import Any, Dict
+from typing import Any, Dict, Literal, Union, overload
 
 
 # Here we use type Any because we need to parse and return the generic JSON
@@ -66,7 +66,25 @@ def remove_comments(text: str) -> str:
 # the chronology of our files execution. utils imports constants and constants
 # need utils.get_package_file_contents but it does not have it loaded to memory
 # yet. If called from utils we get error as `module has no attribute`.
-def get_package_file_contents(package: str, filepath: str) -> str:
+@overload
+def get_package_file_contents(
+    package: str, filepath: str, *, binary_mode: Literal[True]
+) -> bytes: ...
+
+
+@overload
+def get_package_file_contents(package: str, filepath: str) -> str: ...
+
+
+@overload
+def get_package_file_contents(
+    package: str, filepath: str, *, binary_mode: Literal[False]
+) -> str: ...
+
+
+def get_package_file_contents(
+    package: str, filepath: str, *, binary_mode: bool = False
+) -> Union[str, bytes]:
     """Open file and return its contents. This needs to be used for files that
     are loaded by the Python code directly, like constants.ts or
     rich_text_components.json. This function is needed to make loading these
@@ -77,6 +95,7 @@ def get_package_file_contents(package: str, filepath: str) -> str:
             For Oppia the package is usually the folder in the root folder,
             like 'core' or 'extensions'.
         filepath: str. The path to the file in the package.
+        binary_mode: bool. True when we want to read file in binary mode.
 
     Returns:
         str. The contents of the file.
@@ -85,6 +104,12 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         FileNotFoundError. The file does not exist.
     """
     try:
+        if binary_mode:
+            with io.open(
+                os.path.join(package, filepath), 'rb', encoding=None
+            ) as binary_file:
+                read_binary_mode_data: bytes = binary_file.read()
+                return read_binary_mode_data
         with io.open(
             os.path.join(package, filepath), 'r', encoding='utf-8'
         ) as file:
@@ -93,6 +118,8 @@ def get_package_file_contents(package: str, filepath: str) -> str:
         file_data = pkgutil.get_data(package, filepath)
         if file_data is None:
             raise e
+        if binary_mode:
+            return file_data
         return file_data.decode('utf-8')
 
 

@@ -314,6 +314,7 @@
         "core.jobs.batch_jobs.topic_migration_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
         "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
+        "core.jobs.batch_jobs.user_settings_profile_picture_jobs_test",
         "core.jobs.io.cache_io_test",
         "scripts.contributor_dashboard_debug_test",
         "core.platform.secrets.cloud_secrets_services_test",
