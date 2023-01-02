@@ -76,6 +76,7 @@ jobs:
         with:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
+          retention-days: 1
   report-failure:
     needs: frontend-karma-tests
     runs-on: ubuntu-22.04
