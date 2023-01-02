@@ -13,82 +13,82 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TranslatedContent class.
+ * @fileoverview Unit tests for TranslatedContent object factory.
  */
 
-import { TranslatedContent, TranslatedContentBackendDict } from './TranslatedContentObjectFactory'
+import { TranslatedContent, TranslatedContentBackendDict } from './TranslatedContentObjectFactory';
 
 describe('TranslatedContent', () => {
-	let translatedContentBackendDict: TranslatedContentBackendDict;
+  let translatedContentBackendDict: TranslatedContentBackendDict;
 
-	beforeEach(() => {
-		translatedContentBackendDict = {
-			'content_value': '<p>Translated html</p>',
-			'content_format': 'html',
-			'needs_update': false,
-		}
-	});
+  beforeEach(() => {
+    translatedContentBackendDict = {
+      content_value: '<p>Translated html</p>',
+      content_format: 'html',
+      needs_update: false,
+    };
+  });
 
-	it('should create a translated content object from backend dict', () => {
-		let translatedContent = TranslatedContent.createFromBackendDict(
-			translatedContentBackendDict
-		);
+  it('should create a translated content object from backend dict', () => {
+    let translatedContent = TranslatedContent.createFromBackendDict(
+      translatedContentBackendDict
+    );
 
-		expect(translatedContent.dataFormat).toEqual('html');
-	});
+    expect(translatedContent.dataFormat).toEqual('html');
+  });
 
-	it('should mark translated content needs update', () => {
-		let translatedContent = TranslatedContent.createFromBackendDict(
-			translatedContentBackendDict);
-		expect(translatedContent.needsUpdate).toBeFalse();
+  it('should mark translated content needs update', () => {
+    let translatedContent = TranslatedContent.createFromBackendDict(
+      translatedContentBackendDict);
+    expect(translatedContent.needsUpdate).toBeFalse();
 
-		translatedContent.markAsNeedingUpdate();
+    translatedContent.markAsNeedingUpdate();
 
-		expect(translatedContent.needsUpdate).toBeTrue();
-	});
+    expect(translatedContent.needsUpdate).toBeTrue();
+  });
 
-	it('should return correct value for isHtml function', () => {
-			let translatedContent = TranslatedContent.createFromBackendDict(
-				translatedContentBackendDict);
-			expect(translatedContent.isHtml()).toBeTrue();
+  it('should return correct value for isHtml function', () => {
+    let translatedContent = TranslatedContent.createFromBackendDict(
+      translatedContentBackendDict);
+    expect(translatedContent.isHtml()).toBeTrue();
 
-			let newTranslatedContentBackendDict = {
-				'content_value': ['<p>Translated html</p>'],
-				'content_format': 'set_of_normalized_string',
-				'needs_update': false,
-			}
-			translatedContent = TranslatedContent.createFromBackendDict(
-				newTranslatedContentBackendDict);
-			expect(translatedContent.isHtml()).toBeFalse();
-	});
+    let newTranslatedContentBackendDict = {
+      content_value: ['<p>Translated html</p>'],
+      content_format: 'set_of_normalized_string',
+      needs_update: false,
+    };
+    translatedContent = TranslatedContent.createFromBackendDict(
+      newTranslatedContentBackendDict);
+    expect(translatedContent.isHtml()).toBeFalse();
+  });
 
-	it('should return correct value for isUnicode function', () => {
-			let translatedContent = TranslatedContent.createFromBackendDict(
-				translatedContentBackendDict);
-			expect(translatedContent.isUnicode()).toBeFalse();
+  it('should return correct value for isUnicode function', () => {
+    let translatedContent = TranslatedContent.createFromBackendDict(
+      translatedContentBackendDict);
+    expect(translatedContent.isUnicode()).toBeFalse();
 
-			let newTranslatedContentBackendDict = {
-				'content_value': 'Translated unicode',
-				'content_format': 'unicode',
-				'needs_update': false,
-			}
-			translatedContent = TranslatedContent.createFromBackendDict(
-				newTranslatedContentBackendDict);
-			expect(translatedContent.isUnicode()).toBeTrue();
-	});
+    let newTranslatedContentBackendDict = {
+      content_value: 'Translated unicode',
+      content_format: 'unicode',
+      needs_update: false,
+    };
+    translatedContent = TranslatedContent.createFromBackendDict(
+      newTranslatedContentBackendDict);
+    expect(translatedContent.isUnicode()).toBeTrue();
+  });
 
-	it('should return correct value for isSetOfStrings function', () => {
-		let translatedContent = TranslatedContent.createFromBackendDict(
-			translatedContentBackendDict);
-		expect(translatedContent.isSetOfStrings()).toBeFalse();
+  it('should return correct value for isSetOfStrings function', () => {
+    let translatedContent = TranslatedContent.createFromBackendDict(
+      translatedContentBackendDict);
+    expect(translatedContent.isSetOfStrings()).toBeFalse();
 
-		let newTranslatedContentBackendDict = {
-			'content_value': ['<p>Translated html</p>'],
-			'content_format': 'set_of_normalized_string',
-			'needs_update': false,
-		}
-		translatedContent = TranslatedContent.createFromBackendDict(
-			newTranslatedContentBackendDict);
-		expect(translatedContent.isSetOfStrings()).toBeTrue();
-	});
+    let newTranslatedContentBackendDict = {
+      content_value: ['<p>Translated html</p>'],
+      content_format: 'set_of_normalized_string',
+      needs_update: false,
+    };
+    translatedContent = TranslatedContent.createFromBackendDict(
+      newTranslatedContentBackendDict);
+    expect(translatedContent.isSetOfStrings()).toBeTrue();
+  });
 });
