@@ -2,24 +2,25 @@ const e2eBlogPostEditor = require('../puppeteer-testing-utilities/blogPostAdminU
 const testConstants = require('../puppeteer-testing-utilities/testConstants.js');
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
+const ROLE_BLOG_ADMIN = 'blog admin';
 
 async function createDraftAndDeleteDraftAsBlogPostAdmin() {
   const blogPostEditor = await new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
 
-  await blogPostEditor.signUpNewUserWithUserNameAndEmail('superAdm', 'testadmin@example.com');
-  await blogPostEditor.assignBlogAdminRoleToUserWithUserName('superAdm');
+  await blogPostEditor.signUpNewUserWithUsernameAndEmail('superAdm', 'testadmin@example.com');
+  await blogPostEditor.assignRoleToUser('superAdm', ROLE_BLOG_ADMIN);
   await blogPostEditor.expectUserToHaveBlogAdminRole();
 
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
-  await blogPostEditor.createDraftBlogPostByTitle('Test-Blog');
+  await blogPostEditor.createDraftBlogPostWithTitle('Test-Blog');
 
   await blogPostEditor.goto(blogDashboardUrl);
-  await blogPostEditor.expectDraftBlogPostWithTitleToExist('Test-Blog');
+  await blogPostEditor.expectDraftBlogPostWithTitleToBePresent('Test-Blog');
 
   await blogPostEditor.deleteDraftBlogPostByTitle('Test-Blog');
-  await blogPostEditor.expectDraftBlogPostWithTitleToNotExist('Test-Blog');
+  await blogPostEditor.expectDraftBlogPostWithTitleToBeAbsent('Test-Blog');
   
   await blogPostEditor.closeBrowser();
 }

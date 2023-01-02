@@ -22,7 +22,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('button', ' Save ');
   }
 
-  async createDraftBlogPostByTitle(draftBlogPostTitle) {
+  async createDraftBlogPostWithTitle(draftBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
     await this.page.waitForTimeout(500);  // see Note-1 below
     await this.clickOn('span', ' CREATE NEW BLOG POST ');
@@ -113,7 +113,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log('Number of draft/published blog posts is equal to ' + number);
   }
 
-  async expectDraftBlogPostWithTitleToExist(checkDraftBlogPostByTitle) {
+  async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle) {
     await this.page.evaluate(async(checkDraftBlogPostByTitle) => {
       const allDraftBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
       let count = 0;
@@ -132,7 +132,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log('Draft blog post with title ' + checkDraftBlogPostByTitle + ' exists!')
   }
 
-  async expectDraftBlogPostWithTitleToNotExist(checkDraftBlogPostByTitle) {
+  async expectDraftBlogPostWithTitleToBeAbsent(checkDraftBlogPostByTitle) {
     await this.page.evaluate(async(checkDraftBlogPostByTitle) => {
       const allDraftBlogPosts = document.getElementsByClassName('blog-dashboard-tile-content');
       let count = 0;
@@ -186,23 +186,23 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log('Published blog post with title ' + checkBlogPostByTitle + ' does not exist!');
   }
 
-  async assignBlogAdminRoleToUserWithUserName(userName) {
+  async assignRoleToUser(userName, role) {
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, userName);
     await this.clickOn('button', roleEditorButtonSelector);
     await this.clickOn('h4', 'Add role');
     await this.clickOn('div', rolesSelectDropdown);
-    await this.page.evaluate(async() => {
+    await this.page.evaluate(async(role) => {
       const allRoles = document.getElementsByClassName('mat-option-text');
       console.log(allRoles.length);
       for(let i = 0; i < allRoles.length; i++) {
         console.log(allRoles[i].innerText);
-        if(allRoles[i].innerText === 'blog admin') {
+        if(allRoles[i].innerText === role) {
           allRoles[i].click({waitUntil: 'networkidle0'});
           return;
         }
       }
-    });
+    }, role);
   }
 
   async expectUserToHaveBlogAdminRole() {
@@ -248,7 +248,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('button', 'Update Role');
   }
 
-  async expectUserGivenTheRoleFromRoleDropdown(username, role) {
+  async expectRoleOfUserToBe(username, role) {
     const statusMessage = 'Role of ' + username + ' successfully updated to ' + role;
     try {
       await this.page.waitForFunction((statusMessage) => {
@@ -283,7 +283,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log(username + ' removed from the Blog Editor role successfully!');
   }
 
-  async expectTagWithNameNotExistInTagList(tagName) {
+  async expectTagToNotExistInBlogTags(tagName) {
     await (this.page).evaluate(async(tagName) => {
       const tagList = document.getElementsByClassName('form-control');
       for(let i = 0; i < tagList.length; i++) {
@@ -295,7 +295,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log('Tag with name ' + tagName + ' does not exist in tag list!');
   }
 
-  async addTagInTagListWithName(tagName) {
+  async addNewBlogTag(tagName) {
     await this.clickOn('button', ' Add element ');
     //TODO: this is the bug in the /blog-admin page, use puppeteer type function instead of this after the bug is fixed.
     // await this.page.keyboard.type(tagName);

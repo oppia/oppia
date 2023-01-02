@@ -4,7 +4,7 @@ const testConstants = require('./testConstants.js');
 module.exports = class puppeteerUtilities {
   page;
   browserObject;
-  isCookieAccepted = false;
+  userHasAcceptedCookies = false;
 
   /**
    * This is a function that opens a new browser instance for the user.
@@ -25,7 +25,8 @@ module.exports = class puppeteerUtilities {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await (this.page).setViewport({ width: 0, height: 0 });
-        await this.page.on('dialog', async dialog => {  // accepting the alerts that appear in between the tests
+        // accepting the alerts that appear in between the tests
+        await this.page.on('dialog', async dialog => {
           await dialog.accept();
         });
       });
@@ -39,9 +40,9 @@ module.exports = class puppeteerUtilities {
    */
   async signInWithEmail(email) {
     await this.goto(testConstants.URLs.home);
-    if (!this.isCookieAccepted) {
+    if (!this.userHasAcceptedCookies) {
       await this.clickOn('button', 'OK');
-      this.isCookieAccepted = true;
+      this.userHasAcceptedCookies = true;
     }
     await this.clickOn('span', 'Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
@@ -54,7 +55,7 @@ module.exports = class puppeteerUtilities {
    * @param {string} userName - The username of the user.
    * @param {string} signInEmail - The email of the user.
    */
-  async signUpNewUserWithUserNameAndEmail(userName, signInEmail) {
+  async signUpNewUserWithUsernameAndEmail(userName, signInEmail) {
     await this.signInWithEmail(signInEmail);
     await this.type('input.e2e-test-username-input', userName);
     await this.clickOn('input', 'e2e-test-agree-to-terms-checkbox');
