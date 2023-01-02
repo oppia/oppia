@@ -21,15 +21,18 @@ import { fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
+import { ContextService } from 'services/context.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ServicesConstants } from 'services/services.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-describe('Focus Manager Service', () => {
+fdescribe('Focus Manager Service', () => {
   let focusManagerService: FocusManagerService;
   let deviceInfoService: DeviceInfoService;
   let idGenerationService: IdGenerationService;
+  let contextService: ContextService;
   let windowRef: WindowRef = new WindowRef;
 
   const clearLabel = AppConstants.LABEL_FOR_CLEARING_FOCUS;
@@ -40,10 +43,11 @@ describe('Focus Manager Service', () => {
   let testSubscriptions: Subscription;
 
   beforeEach(() => {
-    focusManagerService = TestBed.get(FocusManagerService);
-    deviceInfoService = TestBed.get(DeviceInfoService);
-    idGenerationService = TestBed.get(IdGenerationService);
-    windowRef = TestBed.get(WindowRef);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    deviceInfoService = TestBed.inject(DeviceInfoService);
+    contextService = TestBed.inject(ContextService);
+    idGenerationService = TestBed.inject(IdGenerationService);
+    windowRef = TestBed.inject(WindowRef);
 
     focusOnSpy = jasmine.createSpy('focusOn');
     testSubscriptions = new Subscription();
@@ -83,12 +87,31 @@ describe('Focus Manager Service', () => {
     }
   }));
 
-  it('should set focus without scrolling', fakeAsync(() => {
-    spyOn(focusManagerService, 'setFocus');
-    spyOn(windowRef.nativeWindow, 'scrollTo');
-    focusManagerService.setFocusWithoutScroll(focusLabel);
-    flush();
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(focusLabel);
-    expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith(0, 0);
-  }));
+  it('should set focus without scrolling for exploration player', fakeAsync(
+    () => {
+      spyOn(focusManagerService, 'setFocus');
+      spyOn(windowRef.nativeWindow, 'scrollTo');
+      spyOn(contextService, 'getPageContext').and.returnValue(
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER
+      );
+      focusManagerService.setFocusWithoutScroll(focusLabel);
+      flush();
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(focusLabel);
+      expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith(0, 0);
+    })
+  );
+
+  it('should set focus without scrolling to top', fakeAsync(
+    () => {
+      spyOn(focusManagerService, 'setFocus');
+      spyOn(windowRef.nativeWindow, 'scrollTo');
+      spyOn(contextService, 'getPageContext').and.returnValue(
+        ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR
+      );
+      focusManagerService.setFocusWithoutScroll(focusLabel);
+      flush();
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(focusLabel);
+      expect(windowRef.nativeWindow.scrollTo).not.toHaveBeenCalledWith(0, 0);
+    })
+  );
 });
