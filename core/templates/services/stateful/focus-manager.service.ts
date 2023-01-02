@@ -73,9 +73,9 @@ export class FocusManagerService {
     // long explorations and questions does not scroll the page down without the
     // learner going through the exploration or question. We do not want to do
     // this for the editor pages because the user may be in the middle of the
-    // page and we do not want to scroll them to the top. Therefore, we check
-    // for the page context to be exploration or question player before
-    // scrolling to top.
+    // page and we do not want to scroll them to the top while using schema
+    // based editors. Therefore, we check for the page context to be exploration
+    // or question player before scrolling to top.
     if (
       this.contextService.getPageContext() === (
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER ||
