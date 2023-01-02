@@ -231,6 +231,32 @@ describe('Change List Service when changes are mergable', () => {
     expect(saveSpy).toHaveBeenCalled();
   }));
 
+  it('should add change for markTranslationsAsNeedingUpdate', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.markTranslationsAsNeedingUpdate('content_id_1');
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should add change for removeTranslations', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.removeTranslations('content_id_1');
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
   it('should save changes after renaming a state ' +
     'when calling \'renameState\'', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);

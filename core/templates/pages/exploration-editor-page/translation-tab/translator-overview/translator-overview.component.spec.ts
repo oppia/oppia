@@ -18,12 +18,13 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 import { TranslationLanguageService } from '../services/translation-language.service';
 import { TranslationStatusService } from '../services/translation-status.service';
 import { TranslationTabActiveModeService } from '../services/translation-tab-active-mode.service';
@@ -49,6 +50,7 @@ describe('Translator Overview component', () => {
   let stateEditorService: StateEditorService;
   let translationLanguageService: TranslationLanguageService;
   let translationStatusService: TranslationStatusService;
+  let graphDataService: GraphDataService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
   let explorationLanguageCode: string = 'hi';
   let focusManagerService: FocusManagerService;
@@ -84,6 +86,7 @@ describe('Translator Overview component', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationStatusService = TestBed.inject(TranslationStatusService);
+    graphDataService = TestBed.inject(GraphDataService);
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService);
     focusManagerService = TestBed.inject(FocusManagerService);
@@ -103,6 +106,7 @@ describe('Translator Overview component', () => {
 
   it('should initialize component properties after controller is initialized',
     () => {
+      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
       component.canShowTabModeSwitcher();
 
       expect(component.inTranslationMode).toBe(true);
@@ -118,29 +122,45 @@ describe('Translator Overview component', () => {
       });
     });
 
-  it('should show tab mode switcher when language code is different' +
-    ' from exploration\'s language code', () => {
-    spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
-    expect(component.canShowTabModeSwitcher()).toBe(true);
-  });
-
   it('should change to voiceover active mode when changing translation tab',
-    () => {
+    fakeAsync(() => {
       spyOn(translationTabActiveModeService, 'activateVoiceoverMode');
+      spyOn(graphDataService, 'recompute');
+      spyOn(translationStatusService, 'refresh').and.returnValue(
+        new Promise((callback) => {
+          callback();
+        }));
+
       component.changeActiveMode('Voiceover');
 
       expect(translationTabActiveModeService.activateVoiceoverMode)
         .toHaveBeenCalled();
-    });
+      expect(translationStatusService.refresh).toHaveBeenCalled();
+
+      tick();
+      expect(graphDataService.recompute).toHaveBeenCalled();
+    })
+  );
 
   it('should change to translation active mode when changing translation tab',
-    () => {
+    fakeAsync(() => {
       spyOn(translationTabActiveModeService, 'activateTranslationMode');
+      spyOn(graphDataService, 'recompute');
+      spyOn(translationStatusService, 'refresh').and.returnValue(
+        new Promise((callback) => {
+          callback();
+        }));
+
       component.changeActiveMode('Translate');
 
       expect(translationTabActiveModeService.activateTranslationMode)
         .toHaveBeenCalled();
-    });
+      expect(translationStatusService.refresh).toHaveBeenCalled();
+
+      tick();
+      expect(graphDataService.recompute).toHaveBeenCalled();
+    })
+  );
 
   it('should change translation language when translation tab is not busy',
     () => {

@@ -528,7 +528,7 @@ describe('Outcome Editor Component', () => {
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
 
-    component.saveThisFeedback(false);
+    component.saveThisFeedback();
 
     expect(component.savedOutcome.dest).toBe('Hola');
   });
@@ -556,7 +556,7 @@ describe('Outcome Editor Component', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
 
     expect(() => {
-      component.saveThisFeedback(false);
+      component.saveThisFeedback();
     }).toThrowError('The active state name is null in the outcome editor.');
   });
 

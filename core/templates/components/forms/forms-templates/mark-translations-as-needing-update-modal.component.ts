@@ -28,8 +28,8 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 export class MarkTranslationsAsNeedingUpdateModalComponent
   extends ConfirmOrCancelModal {
   @Input() contentId!: string;
-  @Input() markNeedsUpdateHandler: (contentId: string) => void;
-  @Input() removeHandler: (contentId: string) => void;
+  @Input() markNeedsUpdateHandler!: (contentId: string) => void;
+  @Input() removeHandler!: (contentId: string) => void;
 
   constructor(
     private ngbActiveModal: NgbActiveModal

@@ -252,9 +252,9 @@ export class ExplorationStatesService {
         });
       modalRef.componentInstance.contentId = contentId;
       modalRef.componentInstance.markNeedsUpdateHandler = (
-        this.markTranslationAndVoiceoverNeedsUpdate);
+        this.markTranslationAndVoiceoverNeedsUpdate.bind(this));
       modalRef.componentInstance.removeHandler = (
-        this.removeTranslationAndVoiceover);
+        this.removeTranslationAndVoiceover.bind(this));
       this.initalContentsMapping[contentId] = content;
     }
   }
@@ -275,8 +275,8 @@ export class ExplorationStatesService {
     let stateName = this.stateEditorService.getActiveStateName();
     let state = this.getState(stateName);
     let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-      recordedVoiceovers.deleteContentId(contentId);
+    if (recordedVoiceovers.hasVoiceovers(contentId)) {
+      recordedVoiceovers.voiceoversMapping[contentId] = {};
       this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
     }
   }
