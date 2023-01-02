@@ -27,13 +27,10 @@ import argparse
 import os
 import re
 
-from typing import Final, List, Optional
+from core import utils
+from scripts import common
 
-# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from .. import common  # isort:skip  # pylint: disable=wrong-import-position
-from core import utils  # isort:skip  # pylint: disable=wrong-import-position
+from typing import Final, List, Optional
 
 FECONF_REGEX: Final = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX: Final = '^(  "[A-Z_]+": ).*$'
@@ -150,7 +147,7 @@ def verify_config_files(
     release_feconf_path: str, release_app_dev_yaml_path: str
 ) -> None:
     """Verifies that feconf is updated correctly to include
-    redishos and app.yaml to include correct headers.
+    redishost and app.yaml to include correct headers.
 
     Args:
         release_feconf_path: str. The path to feconf file in release
