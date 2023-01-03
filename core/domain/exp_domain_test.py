@@ -1211,22 +1211,24 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration, 'SkillReview tag \'text-with-value\' '
             'attribute should not be empty.')
 
-        self.state.content.html = (
-            '<oppia-noninteractive-skillreview text-with-value=\"&amp;quot;'
-            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
-        )
-        self._assert_validation_error(
-            self.new_exploration, 'SkillReview tag does not have '
-            '\'skill_id-with-value\' attribute.')
+        # TODO(#16820): Investigate why skill_id attribute empty error occured
+        # while loading the topic-editor page.
+        # self.state.content.html = (
+        #     '<oppia-noninteractive-skillreview text-with-value=\"&amp;quot;'
+        #     'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+        # )
+        # self._assert_validation_error(
+        #     self.new_exploration, 'SkillReview tag does not have '
+        #     '\'skill_id-with-value\' attribute.')
 
-        self.state.content.html = (
-            '<oppia-noninteractive-skillreview skill_id-with-value='
-            '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
-            'text&amp;quot;\"></oppia-noninteractive-skillreview>'
-        )
-        self._assert_validation_error(
-            self.new_exploration, 'SkillReview tag \'skill_id-with-value\' '
-            'attribute should not be empty.')
+        # self.state.content.html = (
+        #     '<oppia-noninteractive-skillreview skill_id-with-value='
+        #     '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
+        #     'text&amp;quot;\"></oppia-noninteractive-skillreview>'
+        # )
+        # self._assert_validation_error(
+        #     self.new_exploration, 'SkillReview tag \'skill_id-with-value\' '
+        #     'attribute should not be empty.').
 
     def test_video_rte_tag(self) -> None:
         """Validate Video tag."""
