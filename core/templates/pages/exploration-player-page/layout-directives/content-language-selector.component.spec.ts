@@ -74,7 +74,7 @@ class MockWindowRef {
   nativeWindow = {
     location: {
       href: 'http://localhost:8181/explore/wZiXFx1iV5bz',
-      pathname: "/explore/wZiXFx1iV5bz"
+      pathname: '/explore/wZiXFx1iV5bz'
     }
   };
 }
@@ -132,7 +132,7 @@ describe('Content language selector component', () => {
   }));
 
   it('should correctly initialize selectedLanguageCode, ' +
-    'newLanguageCode and languagesInExploration', () => {
+    'and languagesInExploration', () => {
     expect(component.selectedLanguageCode).toBe('fr');
     expect(component.languageOptions).toEqual([
       { value: 'fr', displayed: 'français (French)' },
@@ -147,8 +147,10 @@ describe('Content language selector component', () => {
     component.ngOnInit();
     expect(component.newLanguageCode).toBe('fr');
 
-    windowRef.nativeWindow.location.href= "http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en";
-    windowRef.nativeWindow.location.pathname= "/explore/wZiXFx1iV5bz?initialContentLanguageCode=en"
+    windowRef.nativeWindow.location.href = (
+      'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
+    windowRef.nativeWindow.location.pathname = (
+      '/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
     component.ngOnInit();
     expect(component.newLanguageCode).toBe('en');
   });
