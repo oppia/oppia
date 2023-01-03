@@ -36,7 +36,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log('Successfully created a draft blog post!');
   }
 
-  async deleteDraftBlogPostByTitle(draftBlogPostTitle) {
+  async deleteDraftBlogPostWithTitle(draftBlogPostTitle) {
     await this.page.exposeFunction('deleteDraftBlogPost', async() => {
       await this.page.waitForTimeout(100);  // see Note-2 below
       await this.clickOn('span', 'Delete');
@@ -57,7 +57,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }, {draftBlogPostTitle});
   }
 
-  async publishNewBlogPostByTitle(newBlogPostTitle) {
+  async publishNewBlogPostWithTitle(newBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
     await this.page.waitForTimeout(500);  // see Note-1 below
     await this.clickOn('span', ' CREATE NEW BLOG POST ');
@@ -80,7 +80,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log('Successfully published a blog post!');
   }
 
-  async deletePublishedBlogPostByTitle(toDeletePublishedBlogPostTitle) {
+  async deletePublishedBlogPostWithTitle(toDeletePublishedBlogPostTitle) {
     await this.clickOn('div', 'PUBLISHED');
     await this.page.exposeFunction('deletePublishedBlogPost', async() => {
       await this.page.waitForTimeout(100);  // see Note-2 below
@@ -186,9 +186,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     console.log('Published blog post with title ' + checkBlogPostByTitle + ' does not exist!');
   }
 
-  async assignRoleToUser(userName, role) {
+  async assignRoleToUser(username, role) {
     await this.goto(rolesEditorTab);
-    await this.type(roleEditorInputField, userName);
+    await this.type(roleEditorInputField, username);
     await this.clickOn('button', roleEditorButtonSelector);
     await this.clickOn('h4', 'Add role');
     await this.clickOn('div', rolesSelectDropdown);
@@ -205,18 +205,43 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }, role);
   }
 
-  async expectUserToHaveBlogAdminRole() {
-    await this.page.evaluate(() => {
+  async expectUserToHaveRole(username, role) {
+    const currPageUrl = this.page.url();
+    await this.goto(rolesEditorTab);
+    await this.type(roleEditorInputField, username);
+    await this.clickOn('button', roleEditorButtonSelector);
+    await this.page.waitForSelector('div.justify-content-between');
+    await this.page.evaluate((role) => {
       const userRoles = document.getElementsByClassName('oppia-user-role-description');
       for(let i = 0; i < userRoles.length; i++) {
         console.log(userRoles[i].innerText);
-        if(userRoles[i].innerText === 'Blog Admin') {
+        if(userRoles[i].innerText === role) {
           return;
         }
       }
-      throw new Error('User does not have blog admin role!');
-    });
-    console.log('User given the blog admin role successfully!');
+      throw new Error('User does not have ' + role + ' role!');
+    }, role);
+    console.log('User ' + username + ' has the ' + role + ' role!');
+    await this.goto(currPageUrl);
+  }
+
+  async expectUserNotToHaveRole(username, role) {
+    const currPageUrl = this.page.url();
+    await this.goto(rolesEditorTab);
+    await this.type(roleEditorInputField, username);
+    await this.clickOn('button', roleEditorButtonSelector);
+    await this.page.waitForSelector('div.justify-content-between');
+    await this.page.evaluate((role) => {
+      const userRoles = document.getElementsByClassName('oppia-user-role-description');
+      for(let i = 0; i < userRoles.length; i++) {
+        console.log(userRoles[i].innerText);
+        if(userRoles[i].innerText === role) {
+          throw new Error('User have the ' + role + ' role!');
+        }
+      }
+    }, role);
+    console.log('User ' + username + ' doesnot have the ' + role + ' role!');
+    await this.goto(currPageUrl);
   }
 
   async expectBlogDashboardAccessToBeUnauthorized() {
@@ -248,39 +273,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('button', 'Update Role');
   }
 
-  async expectRoleOfUserToBe(username, role) {
-    const statusMessage = 'Role of ' + username + ' successfully updated to ' + role;
-    try {
-      await this.page.waitForFunction((statusMessage) => {
-          return document.querySelector('.oppia-status-message-container').innerText === statusMessage;
-        },
-        {},
-        statusMessage
-      );
-    } catch(err) {
-      throw new Error(username + ' not given the ' + role + ' role from role dropdown!');
-    }
-    console.log(username + ' given the ' + role + ' role from role dropdown successfully!');
-  }
-
-  async removeBlogEditorRoleByUsername(username) {
+  async removeBlogEditorRoleWithUsername(username) {
     await this.type(removeBlogEditorUsernameInput, username);
     await this.clickOn('button', 'Remove Blog Editor ');
-  }
-
-  async expectRemovedBlogEditorRoleByUsername(username) {
-    const statusMessage = 'Success.';
-    try {
-      await this.page.waitForFunction((statusMessage) => {
-          return document.querySelector('.oppia-status-message-container').innerText === statusMessage;
-        },
-        {},
-        statusMessage
-      );
-    } catch(err) {
-      throw new Error(username + ' not removed from the Blog Editor role!');
-    }
-    console.log(username + ' removed from the Blog Editor role successfully!');
   }
 
   async expectTagToNotExistInBlogTags(tagName) {
