@@ -529,7 +529,7 @@ MAILCHIMP_WEBHOOK_SECRET = None
 # Valid Mailchimp merge keys.
 VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
-VALID_MAILCHIMP_TAGS = ['Android', 'Web']
+VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
@@ -561,7 +561,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.8'
+OPPIA_VERSION = '3.2.9'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
