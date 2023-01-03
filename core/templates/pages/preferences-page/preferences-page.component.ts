@@ -286,8 +286,12 @@ export class PreferencesPageComponent {
     // this.contextService.setImageSaveDestinationToLocalStorage();
 
     let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
+    console.log(profileImagePromise);
     profileImagePromise.then(data => {
-      this.profilePictureDataUrl = data as string;
+      console.log("**********************************");
+      this.profilePictureDataUrl = decodeURIComponent(data as string);
+      console.log(this.profilePictureDataUrl);
+      console.log(data);
     });
 
     Promise.all([

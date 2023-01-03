@@ -83,13 +83,16 @@ export class UserService {
   // }
 
   private async _getProfileImagePromise(imageDataBlob: Blob): Promise<string> {
-    return new Promise(resolve => {
+    let promise: Promise<string> = new Promise(resolve => {
       const reader = new FileReader();
       reader.onloadend = () => {
         resolve(reader.result as string);
       };
       reader.readAsDataURL(imageDataBlob);
     });
+    console.log(imageDataBlob);
+    console.log(promise);
+    return promise;
   }
 
   async getProfileImageDataUrlAsync(username: string = ''): Promise<string> {
@@ -99,26 +102,23 @@ export class UserService {
       let localImageBlob = new Blob([localStoredImage], {type: 'image/png'});
       return this._getProfileImagePromise(localImageBlob);
     }
-    let defaultUrl = (this.urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
+    let defaultUrl = this.urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
     let defaultUrlBlob = new Blob([defaultUrl], {type: 'image/png'});
-    return this.getUserInfoAsync().then(
-      async(userInfo) => {
-        if (userInfo.isLoggedIn()) {
-          try {
-            let userProfileImage = this.http.get(
-              this.urlInterpolationService.interpolateUrl(
-                this.assetsBackendApiService.profileImageUrlTemplate,
-                {username: username}), {responseType: 'blob'}).subscribe();
-            return this._getProfileImagePromise(userProfileImage);
-          }
-          catch {
+     return this.getUserInfoAsync().then(userInfo => {
+      if (username === '') {
+        username = userInfo.getUsername();
+        console.log(username);
+      }
+      return this.http.get(this.urlInterpolationService.interpolateUrl(
+        this.assetsBackendApiService.profileImageUrlTemplate,
+        {username: username}), {responseType: 'blob'}).toPromise().then(
+          (response) => {
+            return this._getProfileImagePromise(response);
+          }, () => {
             return this._getProfileImagePromise(defaultUrlBlob);
-          }
-        } else {
-          return this._getProfileImagePromise(defaultUrlBlob);
-        }
-      });
+          });
+    });
   }
 
   async setProfileImageDataUrlAsync(

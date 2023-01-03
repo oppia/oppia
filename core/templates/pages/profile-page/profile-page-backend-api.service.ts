@@ -29,6 +29,7 @@ import { UserBackendApiService } from
   'services/user-backend-api.service';
 import { UserProfile, UserProfileBackendDict } from
   'domain/user/user-profile.model';
+import { UserService } from 'services/user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,9 +37,9 @@ import { UserProfile, UserProfileBackendDict } from
 export class ProfilePageBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private userBackendApiService: UserBackendApiService,
     private http: HttpClient,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private userService: UserService
   ) {}
 
   async _postSubscribeAsync(creatorUsername: string): Promise<void> {
@@ -74,15 +75,11 @@ export class ProfilePageBackendApiService {
   }
 
   async _fetchProfileImageDataUrlAsync(): Promise<string> {
-    return this.userBackendApiService.loadProfileImage(
+    return this.userService.getProfileImageDataUrlAsync(
       this.urlService.getUsernameFromProfileUrl()).then(image => {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result as string);
-        };
-        reader.readAsDataURL(image.data);
-      });
+        return new Promise(resolve => {
+          resolve(image as string);
+        });
     });
   }
 

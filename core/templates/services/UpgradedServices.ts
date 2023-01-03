@@ -1031,7 +1031,8 @@ export class UpgradedServices {
       new ProfilePageBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient'],
-        upgradedServices['UrlService']);
+        upgradedServices['UrlService'],
+        upgradedServices['UserService']);
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
@@ -1118,12 +1119,17 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['UserBackendApiService'] =
       new UserBackendApiService(
+        upgradedServices['AssetsBackendApiService'],
+        upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient']);
     upgradedServices['UserService'] = new UserService(
+      upgradedServices['AssetsBackendApiService'],
+      upgradedServices['ImageLocalStorageService'],
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
       upgradedServices['WindowRef'],
-      upgradedServices['UserBackendApiService']
+      upgradedServices['UserBackendApiService'],
+      upgradedServices['HttpClient']
     );
 
     // Topological level: 4.
