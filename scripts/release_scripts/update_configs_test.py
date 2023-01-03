@@ -308,16 +308,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'apply_changes_based_on_config_gets_called': False,
             'verify_config_files_gets_called': False,
             'update_app_yaml_gets_called': False,
-            'mailgun_api_key_is_to_be_verified': False,
-            'mailchimp_api_key_is_to_be_verified': False,
             'update_analytics_constants_based_on_config': False
         }
         expected_check_function_calls = {
             'apply_changes_based_on_config_gets_called': True,
             'verify_config_files_gets_called': True,
             'update_app_yaml_gets_called': True,
-            'mailgun_api_key_is_to_be_verified': False,
-            'mailchimp_api_key_is_to_be_verified': False,
             'update_analytics_constants_based_on_config': True
         }
 
@@ -332,13 +328,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_verify_config_files(
             unused_release_feconf_path: str,
             unused_release_app_dev_yaml_path: str,
-            verify_email_api_keys: bool
         ) -> None:
             check_function_calls['verify_config_files_gets_called'] = True
-            check_function_calls['mailgun_api_key_is_to_be_verified'] = (
-                verify_email_api_keys)
-            check_function_calls['mailchimp_api_key_is_to_be_verified'] = (
-                verify_email_api_keys)
 
         def mock_update_app_yaml(
             unused_release_app_dev_yaml_path: str,
