@@ -836,7 +836,6 @@ export class UpgradedServices {
       upgradedServices['DeviceInfoService'],
       upgradedServices['IdGenerationService'],
       upgradedServices['WindowRef'],
-      upgradedServices['ContextService']
     );
     upgradedServices['HttpClient'] = new HttpClient(
       upgradedServices['HttpXhrBackend']);

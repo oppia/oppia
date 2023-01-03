@@ -24,10 +24,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { IdGenerationService } from 'services/id-generation.service';
-import { ServicesConstants } from 'services/services.constants';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ContextService } from 'services/context.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -35,12 +33,12 @@ export class FocusManagerService {
   // This property can be undefined but not null because we need to emit it.
   private nextLabelToFocusOn: string | undefined;
   private focusEventEmitter: EventEmitter<string> = new EventEmitter();
+  private _schemaBasedListEditorIsActive: boolean = false;
 
   constructor(
       private deviceInfoService: DeviceInfoService,
       private idGenerationService: IdGenerationService,
       private windowRef: WindowRef = new WindowRef(),
-      private contextService: ContextService,
   ) {}
 
   clearFocus(): void {
@@ -67,21 +65,15 @@ export class FocusManagerService {
     return this.idGenerationService.generateNewId();
   }
 
+  set schemaBasedListEditorIsActive(listEditorIsActive: boolean) {
+    this._schemaBasedListEditorIsActive = listEditorIsActive;
+  }
+
   setFocusWithoutScroll(name: string): void {
     this.setFocus(name);
-    // We need to scroll to the top of the page to ensure that the autofocus in
-    // long explorations and questions does not scroll the page down without the
-    // learner going through the exploration or question. We do not want to do
-    // this for the editor pages because the user may be in the middle of the
-    // page and we do not want to scroll them to the top while using schema
-    // based editors. Therefore, we check for the page context to be exploration
-    // or question player before scrolling to top.
-    if (
-      this.contextService.getPageContext() === (
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER ||
-        ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER
-      )
-    ) {
+    // We do not want to scroll back to top of the page when schema based list
+    // editor is being used due to autofocus in subsequent input fields.
+    if (!this._schemaBasedListEditorIsActive) {
       setTimeout(() => {
         this.windowRef.nativeWindow.scrollTo(0, 0);
       }, 5);
