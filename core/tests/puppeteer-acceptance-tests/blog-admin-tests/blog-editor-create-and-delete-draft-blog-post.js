@@ -19,7 +19,7 @@ async function createDraftAndDeleteDraftAsBlogPostAdmin() {
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectDraftBlogPostWithTitleToBePresent('Test-Blog');
 
-  await blogPostEditor.deleteDraftBlogPostByTitle('Test-Blog');
+  await blogPostEditor.deleteDraftBlogPostWithTitle('Test-Blog');
   await blogPostEditor.expectDraftBlogPostWithTitleToBeAbsent('Test-Blog');
   
   await blogPostEditor.closeBrowser();

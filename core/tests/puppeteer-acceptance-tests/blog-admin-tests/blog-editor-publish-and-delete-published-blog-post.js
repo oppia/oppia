@@ -14,10 +14,10 @@ async function publishBlogAndDeletePublishedBlogAsBlogPostAdmin() {
 
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
-  await blogPostEditor.publishNewBlogPostByTitle('Test-Blog');
+  await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectPublishedBlogPostWithTitleToExist('Test-Blog');
-  await blogPostEditor.deletePublishedBlogPostByTitle('Test-Blog');
+  await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
   await blogPostEditor.expectPublishedBlogPostWithTitleToNotExist('Test-Blog');
   
   await blogPostEditor.closeBrowser();

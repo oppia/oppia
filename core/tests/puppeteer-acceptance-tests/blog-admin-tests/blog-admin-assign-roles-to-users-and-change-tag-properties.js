@@ -17,17 +17,17 @@ async function blogAdminUpdatingRolesAndTagsProperties() {
 
   await superAdmin.signUpNewUserWithUsernameAndEmail('superAdm', 'testadmin@example.com');
   await superAdmin.assignRoleToUser('superAdm', 'blog admin');
-  await superAdmin.expectUserToHaveBlogAdminRole();
+  await superAdmin.expectUserToHaveRole('superAdm', 'Blog Admin');
 
   await superAdmin.goto(blogAdminUrl);
   await superAdmin.assignUserAsRoleFromRoleDropdown('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.expectRoleOfUserToBe('blogAdm', ROLE_BLOG_ADMIN);
+  await superAdmin.expectUserToHaveRole('blogAdm', 'Blog Admin');
   await superAdmin.assignUserAsRoleFromRoleDropdown('blogPostEditor', ROLE_BLOG_POST_EDITOR);
-  await superAdmin.expectRoleOfUserToBe('blogPostEditor', ROLE_BLOG_POST_EDITOR);
+  await superAdmin.expectUserToHaveRole('blogPostEditor', 'Blog Post Editor');
 
-  await superAdmin.removeBlogEditorRoleByUsername('blogPostEditor');
-  await superAdmin.expectRemovedBlogEditorRoleByUsername('blogPostEditor');
-  
+  await superAdmin.removeBlogEditorRoleWithUsername('blogPostEditor');
+  await superAdmin.expectUserNotToHaveRole('blogPostEditor', 'Blog Post Editor');
+
   await superAdmin.expectTagToNotExistInBlogTags('Test_Tag');
   await superAdmin.addNewBlogTag('Test_Tag');
   await superAdmin.expectTagWithNameToExistInTagList('Test_Tag');
