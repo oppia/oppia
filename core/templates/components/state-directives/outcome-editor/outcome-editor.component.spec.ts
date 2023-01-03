@@ -416,7 +416,6 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = outcome;
     expect(component.isSelfLoopDestStuck(outcome)).toBeTrue();
-
   });
 
   it('should open feedback editor if it is editable', () => {
