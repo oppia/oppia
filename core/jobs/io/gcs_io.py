@@ -21,7 +21,8 @@ from __future__ import annotations
 from core.platform import models
 
 import apache_beam as beam
-from typing import List, Optional, Tuple, TypedDict
+import result
+from typing import List, Optional, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -70,7 +71,9 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
             | 'Read the file' >> beam.Map(self._read_file)
         )
 
-    def _read_file(self, file_path: str) -> Tuple[str, bytes]:
+    def _read_file(
+        self, file_path: str
+    ) -> result.Result[Tuple[str, Union[bytes, str]]]:
         """Helper function to read the contents of a file.
 
         Args:
@@ -79,8 +82,12 @@ class ReadFile(beam.PTransform): # type: ignore[misc]
         Returns:
             data: Tuple[str, bytes]. The file data.
         """
-        data = storage_services.get(self.bucket, file_path)
-        return (file_path, data)
+        try:
+            file_data = storage_services.get(self.bucket, file_path)
+            return result.Ok((file_path, file_data))
+        except Exception:
+            err_message: str = 'The file does not exists.'
+            return result.Err((file_path, err_message))
 
 
 class FileObjectDict(TypedDict):
