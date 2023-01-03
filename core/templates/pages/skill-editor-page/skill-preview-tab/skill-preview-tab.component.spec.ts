@@ -117,7 +117,7 @@ class MockQuestionBackendApiService {
   }
 }
 
-fdescribe('Skill Preview Tab Component', () => {
+describe('Skill Preview Tab Component', () => {
   let component: SkillPreviewTabComponent;
   let fixture: ComponentFixture<SkillPreviewTabComponent>;
   let urlService: UrlService;
