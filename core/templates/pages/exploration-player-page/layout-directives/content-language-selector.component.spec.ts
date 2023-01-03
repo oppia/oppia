@@ -150,7 +150,7 @@ describe('Content language selector component', () => {
     windowRef.nativeWindow.location.href= "http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en";
     windowRef.nativeWindow.location.pathname= "/explore/wZiXFx1iV5bz?initialContentLanguageCode=en"
     component.ngOnInit();
-    expect(component.newLanguageCode).toBe('en');');
+    expect(component.newLanguageCode).toBe('en');
   });
 
   it('should correctly select an option when refresh is not needed', () => {
