@@ -406,7 +406,7 @@ describe('Outcome Editor Component', () => {
     expect(component.isSelfLoopDestStuck(outcome)).toBeFalse();
   });
 
-  it('should check null' , () => {
+  it('should check if a destination for stuck learner is null', () => {
     let outcome = new Outcome(
       'Me Llamo',
       null,
