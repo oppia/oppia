@@ -10,7 +10,7 @@ async function publishBlogAndDeletePublishedBlogAsBlogPostAdmin() {
 
   await blogPostEditor.signUpNewUserWithUsernameAndEmail('superAdm', 'testadmin@example.com');
   await blogPostEditor.assignRoleToUser('superAdm', ROLE_BLOG_ADMIN);
-  await blogPostEditor.expectUserToHaveBlogAdminRole();
+  await blogPostEditor.expectUserToHaveRole('superAdm', 'Blog Admin');
 
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);

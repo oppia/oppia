@@ -61,8 +61,17 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.addUserBioInBlogDashboard();
     await this.page.waitForTimeout(500);  // see Note-1 below
     await this.clickOn('span', ' CREATE NEW BLOG POST ');
-    await this.clickOn('button', 'mat-button-toggle-button');
 
+    await this.page.waitForSelector('button.e2e-test-publish-blog-post-button');
+    await this.page.evaluate(() => {
+      const publishedButtonIsDisabled = document.getElementsByClassName('e2e-test-publish-blog-post-button')[0].disabled;
+      if (!publishedButtonIsDisabled) {
+          throw new Error('Published button is not disabled even if the blog post is empty');
+      }
+    });
+    console.log("Publushed button is disabled when blog post is empty.")
+
+    await this.clickOn('button', 'mat-button-toggle-button');
     await this.clickOn('div', thumbnailPhotoBox);
     await this.uploadFile('collection.svg');
     await this.clickOn('button', ' Add Thumbnail Image ');
