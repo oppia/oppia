@@ -199,6 +199,9 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
             | 'Map with filename for png' >> beam.Map(
                 lambda username: f'user/{username}/assets/profile_picture.png')
             | 'Read png files from GCS' >> gcs_io.ReadFile()
+            | 'Filter the results with OK status png' >> beam.Filter(
+                lambda result: result.is_ok())
+            | 'Unwrap the png data' >> beam.Map(lambda result: result.unwrap())
             | 'Make tuple of username and data url for png' >> beam.Map(
                 lambda data: (
                     data[0].split('/')[1],
@@ -252,6 +255,9 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
             | 'Map with filename for webp' >> beam.Map(
                 lambda username: f'user/{username}/assets/profile_picture.webp')
             | 'Read webp files from GCS' >> gcs_io.ReadFile()
+            | 'Filter the results with OK status webp' >> beam.Filter(
+                lambda result: result.is_ok())
+            | 'Unwrap the webp data' >> beam.Map(lambda result: result.unwrap())
             | 'Make tuple of username and data url for webp' >> beam.Map(
                 lambda data: (
                     data[0].split('/')[1],
