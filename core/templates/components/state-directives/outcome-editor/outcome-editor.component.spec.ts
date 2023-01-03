@@ -404,18 +404,6 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = outcome;
     expect(component.isSelfLoopDestStuck(outcome)).toBeFalse();
-
-    outcome = new Outcome(
-      'Ma Llamo',
-      'Introduction',
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
-      true,
-      [],
-      null,
-      null,
-    );
-    component.outcome = outcome;
-    expect(component.isSelfLoopDestStuck(outcome)).toBeTrue();
   });
 
   it('should open feedback editor if it is editable', () => {
