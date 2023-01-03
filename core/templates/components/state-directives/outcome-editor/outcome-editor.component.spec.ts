@@ -406,6 +406,23 @@ describe('Outcome Editor Component', () => {
     expect(component.isSelfLoopDestStuck(outcome)).toBeFalse();
   });
 
+  it('should check null' , () => {
+    let outcome = new Outcome(
+      'Me Llamo',
+      null,
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+
+    spyOn(stateEditorService, 'getActiveStateName')
+      .and.returnValue('Introduction');
+
+    expect(component.isSelfLoopDestStuck(outcome)).toBe(true);
+  });
+
   it('should open feedback editor if it is editable', () => {
     component.feedbackEditorIsOpen = false;
     component.isEditable = true;
