@@ -193,9 +193,7 @@ export class ExplorationMetadataModalComponent
     return Boolean(
       this.explorationTitleService.displayed &&
       this.explorationObjectiveService.displayed &&
-      (
-        this.explorationObjectiveService.displayed as ParamChange[]
-      ).length >= 15 &&
+      this.explorationObjectiveService.displayed.length >= 15 &&
       this.explorationCategoryService.displayed &&
       this.explorationLanguageCodeService.displayed);
   }

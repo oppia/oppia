@@ -20,7 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { QuestionMisconceptionEditorComponent } from './question-misconception-editor.component';
+import { Outcome, QuestionMisconceptionEditorComponent } from './question-misconception-editor.component';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { MisconceptionSkillMap, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -44,7 +44,7 @@ describe('Question Misconception Editor Component', () => {
       content_id: null,
       html: ''
     }
-  };
+  } as Outcome;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
