@@ -499,7 +499,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     return '1 Story';
   }
 
-  togglePreviewListCards(listType: string): void {
+  togglePreviewListCards(listType: string = null): void {
     if (!this.windowDimensionsService.isWindowNarrow()) {
       return;
     }
