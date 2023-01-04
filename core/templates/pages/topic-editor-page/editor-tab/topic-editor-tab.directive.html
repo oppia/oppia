@@ -300,7 +300,8 @@
                       <div class="edit-options-container">
                         <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
                         <i class="fa fa-ellipsis-v"
-                           (click)="showSkillEditOptions($index, $index);$event.stopPropagation()"></i>
+                           (click)="showSkillEditOptions($index, $index);$event.stopPropagation()">
+                        </i>
                       </div>
                       <div class="skill-option-box"
                            *ngIf="selectedSkillEditOptionsIndex[$index][$index]"
