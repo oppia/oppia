@@ -114,6 +114,7 @@ describe('Story Creation Backend Api Service', () => {
         filename: 'Image1',
         imageBlob: imageBlob
       }]);
+    spyOn(imageLocalStorageService, 'flushStoredImagesData').and.stub();
     spyOn(imageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
       '#f00');
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
@@ -141,6 +142,25 @@ describe('Story Creation Backend Api Service', () => {
     expect(scbas.createNewCanonicalStory()).toBeUndefined();
   });
 
+  it('should not initiate new story creation if another is in process', () => {
+    scbas.storyCreationInProgress = true;
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve({
+        isValid: () => true,
+        title: 'Title',
+        description: 'Description',
+        urlFragment: 'url'
+      })
+    } as NgbModalRef);
+
+    scbas.createNewCanonicalStory();
+
+    // Creating a new story while previous was in creation process.
+    expect(scbas.createNewCanonicalStory()).toBeUndefined();
+  });
+
+
   it('should post story data to server and change window location' +
     ' on success', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
@@ -165,6 +185,34 @@ describe('Story Creation Backend Api Service', () => {
     flushMicrotasks();
 
     expect(mockWindow.location.href).toBe('/story_editor/id');
+  }));
+
+  it('should post story data to server and change window location' +
+    ' on Error', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve({
+        isValid: () => true,
+        title: 'Title',
+        description: 'Description',
+        urlFragment: 'url'
+      })
+    } as NgbModalRef);
+
+    scbas.createNewCanonicalStory();
+    tick();
+
+    let req = httpTestingController.expectOne(
+      '/topic_editor_story_handler/' + 'id');
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      error: 'Error creating a new exploration.'
+    }, {
+      status: 500,
+      statusText: 'Error creating a new exploration.'
+    });
+
+    flush();
+    flushMicrotasks();
   }));
 
   it('should throw error if the newly created story is not valid', () => {

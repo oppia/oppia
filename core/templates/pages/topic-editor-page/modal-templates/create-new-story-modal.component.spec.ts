@@ -94,6 +94,8 @@ describe('Create New Story Modal Component', () => {
       spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
       component.story.urlFragment = '';
       component.onStoryUrlFragmentChange();
+      component.save();
+      component.cancel();
       expect(
         storyEditorStateService.updateExistenceOfStoryUrlFragment
       ).not.toHaveBeenCalled();

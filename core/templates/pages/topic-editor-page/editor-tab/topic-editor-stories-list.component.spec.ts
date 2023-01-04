@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the stories list viewer.
  */
 
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -82,6 +83,19 @@ describe('topicEditorStoriesList', () => {
       url_fragment: 'story1',
       all_node_dicts: []
     })];
+  });
+
+  it('should change list order properly', () => {
+    spyOn(topicUpdateService, 'rearrangeCanonicalStory').and.stub();
+
+    component.storySummaries = [null, null, null];
+    component.topic = null;
+    component.drop({
+      previousIndex: 1,
+      currentIndex: 2
+    } as CdkDragDrop<StorySummary[]>);
+
+    expect(topicUpdateService.rearrangeCanonicalStory).toHaveBeenCalled();
   });
 
   it('should initialise component when list of stories is displayed', () => {

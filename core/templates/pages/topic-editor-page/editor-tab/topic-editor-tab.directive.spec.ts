@@ -42,6 +42,7 @@ import { SavePendingChangesModalComponent } from 'components/save-pending-change
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 class MockNgbModal {
   open() {
@@ -206,6 +207,21 @@ describe('Topic editor tab directive', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+  });
+
+  it('should change list order properly', () => {
+    spyOn(topicUpdateService, 'rearrangeSubtopic').and.stub();
+    spyOn(component, 'initEditor').and.stub();
+
+    component.subtopics = [null, null, null];
+    component.topic = null;
+    component.drop({
+      previousIndex: 1,
+      currentIndex: 2
+    } as CdkDragDrop<Subtopic[]>);
+
+    expect(topicUpdateService.rearrangeSubtopic).toHaveBeenCalled();
+    expect(component.initEditor).toHaveBeenCalled();
   });
 
   it('should initialize the variables', () => {

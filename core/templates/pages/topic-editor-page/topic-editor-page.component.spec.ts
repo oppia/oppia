@@ -159,6 +159,9 @@ describe('Topic editor page', () => {
     expect(component.isInPreviewTab()).toBe(false);
     expect(component.isMainEditorTabSelected()).toBe(false);
     expect(component.getNavbarText()).toBe('Question Editor');
+
+    component.hideWarnings();
+    expect(component.warningsAreShown).toBe(false);
   });
 
   it('should addListener by passing getChangeCount to ' +
