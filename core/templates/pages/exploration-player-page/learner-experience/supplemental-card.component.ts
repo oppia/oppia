@@ -36,7 +36,8 @@ import './supplemental-card.component.css';
 
 @Component({
   selector: 'oppia-supplemental-card',
-  templateUrl: './supplemental-card.component.html'
+  templateUrl: './supplemental-card.component.html',
+  styleUrls: ['./supplemental-card.component.css']
 })
 export class SupplementalCardComponent implements OnInit, OnDestroy {
   @Output() clickContinueButton: EventEmitter<void> = new EventEmitter();

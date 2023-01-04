@@ -92,11 +92,7 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
-# backend_prod_files contain processed JS and HTML files that are served by
-# Jinja, we are moving away from Jinja so this folder might not be needed later
-# (#6964)
-EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if not constants.DEV_MODE else '')
+EXTENSIONS_DIR_PREFIX = ('build' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -115,7 +111,11 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 # Choose production templates folder when we are in production mode.
 FRONTEND_TEMPLATES_DIR = (
     os.path.join('webpack_bundles') if constants.DEV_MODE else
-    os.path.join('backend_prod_files', 'webpack_bundles'))
+    os.path.join('build', 'webpack_bundles'))
+# To know more about AOT visit https://angular.io/guide/glossary#aot
+FRONTEND_AOT_DIR = (
+    os.path.join('dist', 'oppia-angular') if constants.DEV_MODE else
+    os.path.join('dist', 'oppia-angular-prod'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -263,7 +263,6 @@ MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
-PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -551,7 +550,7 @@ MAILCHIMP_WEBHOOK_SECRET = None
 # Valid Mailchimp merge keys.
 VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
-VALID_MAILCHIMP_TAGS = ['Android', 'Web']
+VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
@@ -583,7 +582,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.8'
+OPPIA_VERSION = '3.2.9'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -720,7 +719,7 @@ VALID_MODERATOR_ACTIONS: Dict[
 }
 
 # When the site terms were last updated, in UTC.
-REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
+TERMS_PAGE_LAST_UPDATED_UTC = datetime.datetime(2020, 10, 19)
 
 # Format of string for dashboard statistics logs.
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in

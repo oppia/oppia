@@ -71,9 +71,8 @@ describe('Site Analytics Service', () => {
     it('should register new signup event', () => {
       sas.registerNewSignupEvent('srcElement');
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'signup', {
-        event_category: 'OnboardingEngagement',
-        event_label: 'AccountSignUp'
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'sign_up', {
+        source_element: 'srcElement'
       });
     });
 
@@ -464,10 +463,14 @@ describe('Site Analytics Service', () => {
     it('should register finish curated lesson event', () => {
       sas.registerCuratedLessonStarted('Fractions', '123');
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
-        event_category: 'CuratedLessonStarted',
-        event_label: '123'
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'classroom_lesson_started',
+        {
+          topic_name: 'Fractions',
+          exploration_id: '123'
+        }
+      );
     });
 
     it('should register finish curated lesson event', () => {
@@ -481,10 +484,19 @@ describe('Site Analytics Service', () => {
         'en'
       );
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
-        event_category: 'CuratedLessonCompleted',
-        event_label: '123'
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'classroom_lesson_completed',
+        {
+          classroom_name: 'math',
+          topic_name: 'Fractions',
+          chapter_name: 'ch1',
+          exploration_id: '123',
+          chapter_number: '2',
+          chapter_card_count: '3',
+          exploration_language: 'en'
+        }
+      );
     });
 
     it('should register open collection from landing page event', () => {
@@ -611,10 +623,19 @@ describe('Site Analytics Service', () => {
       sas.registerClassroomLessonEngagedWithEvent(
         'math', 'Fractions', 'ch1', explorationId, '2', '3', 'en');
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
-        event_category: 'ClassroomActiveUserStartAndSawCards',
-        event_label: explorationId
-      });
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'classroom_lesson_engaged_with',
+        {
+          classroom_name: 'math',
+          topic_name: 'Fractions',
+          chapter_name: 'ch1',
+          exploration_id: '123',
+          chapter_number: '2',
+          chapter_card_count: '3',
+          exploration_language: 'en'
+        }
+      );
     });
 
     it('should register classroom header click event', () => {
@@ -678,7 +699,7 @@ describe('Site Analytics Service', () => {
         'math', 'topic', '1,2,3', 10, 10);
 
       expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'practice_session_end',
+        'event', 'practice_session_complete',
         {
           classroom_name: 'math',
           topic_name: 'topic',
@@ -702,36 +723,6 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith(
         'event', 'discovery_start_learning', {}
-      );
-    });
-
-    it('should register topic start event', () => {
-      sas.registerTopicStartEvent(
-        'math', 'Fractions', 'ch1', '2', 'exp_id');
-
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'topic_start', {
-          classroom_name: 'math',
-          topic_name: 'Fractions',
-          chapter_name: 'ch1',
-          topic_chapter_count: '2',
-          exploration_id: 'exp_id'
-        }
-      );
-    });
-
-    it('should register topic end event', () => {
-      sas.registerTopicEndEvent(
-        'math', 'Fractions', 'ch1', '2', 'exp_id');
-
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'topic_end', {
-          classroom_name: 'math',
-          topic_name: 'Fractions',
-          chapter_name: 'ch1',
-          topic_chapter_count: '2',
-          exploration_id: 'exp_id'
-        }
       );
     });
   });

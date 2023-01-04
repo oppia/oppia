@@ -41,6 +41,7 @@ import { InteractionCustomizationArgs, ItemSelectionInputCustomizationArgs } fro
 @Component({
   selector: 'oppia-progress-nav',
   templateUrl: './progress-nav.component.html',
+  styleUrls: ['./progress-nav.component.css'],
   animations: [
     trigger('fadeInOut', [
       transition('void => *', []),
@@ -61,6 +62,7 @@ export class ProgressNavComponent {
   @Input() isLearnAgainButton!: boolean;
   @Input() displayedCard!: StateCard;
   @Input() submitButtonIsShown!: boolean;
+  @Input() showContinueToReviseButton!: boolean;
   @Input() navigationThroughCardHistoryIsEnabled!: boolean;
   @Input() skipButtonIsShown!: boolean;
   displayedCardIndex!: number;
@@ -79,6 +81,9 @@ export class ProgressNavComponent {
     new EventEmitter());
 
   @Output() clickContinueButton: EventEmitter<void> = (
+    new EventEmitter());
+
+  @Output() clickContinueToReviseButton: EventEmitter<void> = (
     new EventEmitter());
 
   @Output() changeCard: EventEmitter<number> = new EventEmitter();

@@ -165,7 +165,7 @@ export class CustomizeInteractionModalComponent
     private ngbModal: NgbModal,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
-    private stateInteractionIdService: StateInteractionIdService,
+    public stateInteractionIdService: StateInteractionIdService,
     private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private urlInterpolationService: UrlInterpolationService,
   ) {

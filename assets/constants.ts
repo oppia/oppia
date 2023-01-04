@@ -3,7 +3,7 @@
 // "eslint disable next line" for each of them.
 /* eslint-disable oppia/no-multiline-disable */
 /* eslint-disable quote-props */
-/* eslint-disable quotes */
+/* eslint-disable  @typescript-eslint/quotes */
 /* Don't modify anything outside the {} brackets.
  * Insides of the {} brackets should be formatted as a JSON object.
  * JSON rules:
@@ -309,6 +309,9 @@ export default {
   "ROLE_VOICE_ARTIST": "voice artist",
   "ROLE_VIEWER": "viewer",
 
+  // The supported tags for the mailing list subscriptions.
+  "MAILING_LIST_ANDROID_TAG": "Android",
+  "MAILING_LIST_WEB_TAG": "Web",
   // Regex to validate the format of Math rich-text component SVGs. If this is
   // changed in the future, the existing filenames on the server should be
   // handled as well.

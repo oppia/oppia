@@ -128,7 +128,6 @@ import { EndChapterConfettiComponent } from 'pages/exploration-player-page/learn
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
 import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
-import { ConversationSkinEmbedComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin-embed.component';
 import { ConfirmQuestionExitModalComponent } from './question-directives/modal-templates/confirm-question-exit-modal.component';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import { QuestionsListSelectSkillAndDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component';
@@ -240,6 +239,8 @@ import { MatMenuModule} from '@angular/material/menu';
 // yet.
 // @ts-ignore
 import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
+import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
+import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for-subscribing-modal.component';
 
 @NgModule({
   imports: [
@@ -297,7 +298,6 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -353,6 +353,8 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
     SupplementalCardComponent,
+    ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -424,7 +426,6 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -481,6 +482,8 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     SupplementalCardComponent,
+    ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     TutorCardComponent,
     ThumbnailUploaderComponent,
@@ -570,7 +573,6 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -623,6 +625,8 @@ import { DynamicComponentModule } from 'value_generators/templates/dynamic-compo
     SupplementalCardComponent,
     TakeBreakModalComponent,
     ThreadTableComponent,
+    ThanksForDonatingModalComponent,
+    ThanksForSubscribingModalComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,

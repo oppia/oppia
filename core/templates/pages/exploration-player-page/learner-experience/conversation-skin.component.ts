@@ -94,6 +94,7 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 @Component({
   selector: 'oppia-conversation-skin',
   templateUrl: './conversation-skin.component.html',
+  styleUrls: ['./conversation-skin.component.css']
 })
 export class ConversationSkinComponent {
   @Input() questionPlayerConfig;
@@ -132,7 +133,6 @@ export class ConversationSkinComponent {
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
-  timeout: NodeJS.Timeout | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
@@ -168,6 +168,8 @@ export class ConversationSkinComponent {
   submitButtonIsDisabled = true;
   solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
+  continueToReviseStateButtonIsVisible: boolean = false;
+  showInteraction: boolean = true;
 
   // The fields are used to customize the component for the diagnostic player,
   // question player, and exploration player page.
@@ -276,6 +278,10 @@ export class ConversationSkinComponent {
       this.skipButtonIsShown = true;
     }
 
+    if (!this.contextService.isInExplorationPlayerPage()) {
+      this.checkpointCelebrationModalIsEnabled = false;
+    }
+
     this.explorationId = this.explorationEngineService.getExplorationId();
     this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
     this.isIframed = this.urlService.isIframed();
@@ -311,6 +317,7 @@ export class ConversationSkinComponent {
           this.solutionForState = newCard.getSolution();
           this.numberOfIncorrectSubmissions = 0;
           this.nextCardIfStuck = null;
+          this.continueToReviseStateButtonIsVisible = false;
           this.triggerIfLearnerStuckAction();
         }
       )
@@ -1004,7 +1011,9 @@ export class ConversationSkinComponent {
             storyUrlFragment, nodeId
           ).then((returnObject) => {
             if (returnObject.readyForReviewTest) {
-              this.windowRef.nativeWindow.location =
+              (
+                this.windowRef.nativeWindow as {location: string | Location}
+              ).location =
                 this.urlInterpolationService.interpolateUrl(
                   TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE, {
                     topic_url_fragment: topicUrlFragment,
@@ -1060,22 +1069,20 @@ export class ConversationSkinComponent {
   }
 
   triggerIfLearnerStuckAction(): void {
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
     if (this.responseTimeout) {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
     }
     this.responseTimeout = setTimeout(() => {
-      if (this.nextCardIfStuck) {
+      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
         // Let the learner know about the redirection to a state
         // for clearing concepts.
         this.playerTranscriptService.addNewResponseToExistingFeedback(
           this.translateService.instant(
             'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
         );
+        // Enable visibility of ContinueToRevise button.
+        this.continueToReviseStateButtonIsVisible = true;
       } else if (this.solutionForState !== null &&
         this.numberOfIncorrectSubmissions >=
         ExplorationPlayerConstants.
@@ -1085,20 +1092,9 @@ export class ConversationSkinComponent {
         this.hintsAndSolutionManagerService.releaseSolution();
       }
     }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-    this.timeout = setTimeout(() => {
-      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
-        // Redirect the learner.
-        this.nextCard = this.nextCardIfStuck;
-        this.showPendingCard();
-      }
-    }, ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
   }
 
   triggerIfLearnerStuckActionDirectly(): void {
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
     if (this.responseTimeout) {
       clearTimeout(this.responseTimeout);
       this.responseTimeout = null;
@@ -1108,10 +1104,8 @@ export class ConversationSkinComponent {
       this.playerTranscriptService.addNewResponseToExistingFeedback(
         this.translateService.instant(
           'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'));
-      setTimeout(() => {
-        this.nextCard = this.nextCardIfStuck;
-        this.showPendingCard();
-      }, 10000);
+      // Enable visibility of ContinueToRevise button.
+      this.continueToReviseStateButtonIsVisible = true;
     } else if (this.solutionForState !== null &&
       this.numberOfIncorrectSubmissions >=
       ExplorationPlayerConstants.
@@ -1119,6 +1113,13 @@ export class ConversationSkinComponent {
       // Release solution if it exists.
       this.hintsAndSolutionManagerService.releaseSolution();
     }
+  }
+
+  triggerRedirectionToStuckState(): void {
+    // Redirect the learner.
+    this.nextCard = this.nextCardIfStuck;
+    this.showInteraction = false;
+    this.showPendingCard();
   }
 
   showQuestionAreNotAvailable(): void {
@@ -1148,18 +1149,18 @@ export class ConversationSkinComponent {
     this.loaderService.hideLoadingScreen();
     this.hasFullyLoaded = true;
 
-    // If the exploration is embedded, use the exploration language
-    // as site language. If the exploration language is not supported
+    // If the exploration is embedded, use the url language code
+    // as site language. If the url language code is not supported
     // as site language, English is used as default.
     let langCodes = AppConstants.SUPPORTED_SITE_LANGUAGES.map((language) => {
       return language.id;
     }) as string[];
     if (this.isIframed) {
-      let explorationLanguageCode = (
-        this.explorationPlayerStateService.getLanguageCode());
-      if (langCodes.indexOf(explorationLanguageCode) !== -1) {
+      let urlLanguageCode = (
+        this.urlService.getUrlParams().lang);
+      if (urlLanguageCode && langCodes.indexOf(urlLanguageCode) !== -1) {
         this.i18nLanguageCodeService.setI18nLanguageCode(
-          explorationLanguageCode);
+          urlLanguageCode);
       } else {
         this.i18nLanguageCodeService.setI18nLanguageCode('en');
       }
@@ -1505,19 +1506,19 @@ export class ConversationSkinComponent {
 
       this.upcomingInlineInteractionHtml = null;
       this.upcomingInteractionInstructions = null;
-    }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
+    }, 0.1 * TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
 
     setTimeout(() => {
       this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
       this.scrollToTop();
     },
-    TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
+    0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
       0.5 * TIME_FADEIN_MSEC);
 
     setTimeout(() => {
       this.startCardChangeAnimation = false;
     },
-    TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
+    0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
     this.TIME_PADDING_MSEC);
 
     this.playerPositionService.onNewCardOpened.emit(this.nextCard);

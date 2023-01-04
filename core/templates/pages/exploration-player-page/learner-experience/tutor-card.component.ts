@@ -63,6 +63,7 @@ import './tutor-card.component.css';
 @Component({
   selector: 'oppia-tutor-card',
   templateUrl: './tutor-card.component.html',
+  styleUrls: ['./tutor-card.component.css'],
   animations: [
     trigger('expandInOut', [
       state('in', style({
@@ -102,6 +103,7 @@ export class TutorCardComponent {
   @Input() displayedCardWasCompletedInPrevSession!: boolean;
   @Input() startCardChangeAnimation!: boolean;
   @Input() avatarImageIsShown!: boolean;
+  @Input() shouldHideInteraction!: boolean;
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
@@ -156,7 +158,7 @@ export class TutorCardComponent {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private platformFeatureService: PlatformFeatureService,
+    public platformFeatureService: PlatformFeatureService,
     private renderer: Renderer2,
     private translateService: TranslateService
   ) {}
