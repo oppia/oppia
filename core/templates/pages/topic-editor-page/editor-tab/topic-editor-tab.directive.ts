@@ -91,6 +91,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   storiesListIsShown: boolean;
   uncategorizedEditOptionsIndex: number;
   subtopicEditOptionsAreShown: number;
+  skillOptionDialogueBox: boolean = true;
 
   constructor(
     private contextService: ContextService,
@@ -195,7 +196,6 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     return eligibleSkillSummaries;
   }
 
-
   addSkillForDiagnosticTest(): void {
     let skillToAdd = this.selectedSkillForDiagnosticTest;
     this.selectedSkillForDiagnosticTest = null;
@@ -258,7 +258,12 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  shivam(): void {
+    console.error(this.getEligibleSkillSummariesForDiagnosticTest());
+  }
+
   toggleSubtopicCard(index: string | number): void {
+    this.skillOptionDialogueBox = true;
     if (this.subtopicCardSelectedIndexes[index]) {
       this.subtopicCardSelectedIndexes[index] = false;
       return;
@@ -445,6 +450,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
 
   removeSkillFromSubtopic(
       subtopicId: number, skillSummary: ShortSkillSummary): void {
+    this.skillOptionDialogueBox = true;
     this.selectedSkillEditOptionsIndex = {};
     this.topicUpdateService.removeSkillFromSubtopic(
       this.topic, subtopicId, skillSummary);
@@ -453,6 +459,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
 
   removeSkillFromTopic(
       subtopicId: number, skillSummary: ShortSkillSummary): void {
+    this.skillOptionDialogueBox = true;
     this.selectedSkillEditOptionsIndex = {};
     this.topicUpdateService.removeSkillFromSubtopic(
       this.topic, subtopicId, skillSummary);
@@ -526,6 +533,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   changeSubtopicAssignment(
       oldSubtopicId: number,
       skillSummary: ShortSkillSummary): void {
+    this.skillOptionDialogueBox = true;
     const modalRef: NgbModalRef = this.ngbModal.open(
       ChangeSubtopicAssignmentModalComponent, {
         backdrop: 'static',
@@ -549,8 +557,16 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   showSkillEditOptions(
-      subtopicIndex: string | number,
-      skillIndex: number): void {
+      subtopicIndex: string | number = null,
+      skillIndex: number = null): void {
+    if (subtopicIndex === null &&
+        skillIndex === null) {
+      this.skillOptionDialogueBox = true;
+      return;
+    } else {
+      this.skillOptionDialogueBox = false;
+    }
+
     if (Object.keys(this.selectedSkillEditOptionsIndex).length) {
       this.selectedSkillEditOptionsIndex = {};
       return;

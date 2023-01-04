@@ -266,10 +266,10 @@
           </div>
           <div cdkDropList
                (cdkDropListDropped)="drop($event)">
-            <div *ngFor="let subtopic of subtopics;index as $index"
+            <div *ngFor="let subtopic of subtopics;index as subtopicIndex"
                 cdkDrag>
               <div class="subtopics-list-item">
-                <div class="subtopic-name-header subtopic-name-card-header" (click)="toggleSubtopicCard($index)">
+                <div class="subtopic-name-header subtopic-name-card-header" (click)="toggleSubtopicCard(subtopicIndex)">
                   <span class="clickable-item" (click)="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
                     <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
                     <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
@@ -277,9 +277,9 @@
                   <div class="subtopic-edit-options-container edit-options-container">
                     <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
                     <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options"
-                       (click)="showSubtopicEditOptions($index);$event.stopPropagation()">
+                       (click)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()">
                     </i>
-                    <div *ngIf="subtopicEditOptionsAreShown === $index"
+                    <div *ngIf="subtopicEditOptionsAreShown === subtopicIndex"
                          class="subtopic-edit-options"
                          (click)="deleteSubtopic(subtopic.getId())"
                          (mouseleave)="showSubtopicEditOptions(null)">
@@ -288,9 +288,9 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="subtopicCardSelectedIndexes[$index]">
+                <div *ngIf="subtopicCardSelectedIndexes[subtopicIndex]">
                   <div *ngIf="subtopic.getSkillSummaries().length">
-                    <div *ngFor="let skillSummary of subtopic.getSkillSummaries(); index as $index"
+                    <div *ngFor="let skillSummary of subtopic.getSkillSummaries(); index as idx"
                          class="subtopic-skill skills-list-item skill-description-container">
                       <a [href]="getSkillEditorUrl(skillSummary.getId())"
                          target="_blank"
@@ -300,13 +300,13 @@
                       <div class="edit-options-container">
                         <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
                         <i class="fa fa-ellipsis-v"
-                           (click)="showSkillEditOptions($index, $index);$event.stopPropagation()">
+                           (click)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()">
                         </i>
                       </div>
                       <div class="skill-option-box"
-                           *ngIf="selectedSkillEditOptionsIndex[$index][$index]"
-                           (mouseleave)="showSkillEditOptions(null)"
-                           (click)="showSkillEditOptions(null)">
+                           *ngIf="!skillOptionDialogueBox && selectedSkillEditOptionsIndex && selectedSkillEditOptionsIndex[subtopicIndex] && selectedSkillEditOptionsIndex[subtopicIndex][idx]"
+                           (mouseleave)="showSkillEditOptions()"
+                           (click)="showSkillEditOptions()">
                         <div class="skill-edit-option"
                              (click)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
                           <i class="fa fa-trash"></i>
@@ -371,16 +371,17 @@
             </button>
           </div>
         </mat-list-item>
+        <button (click)="shivam()">shivam</button>
         <mat-list-item [hidden]="!diagnosticTestSkillsDropdownIsShown">
-          <!-- <mat-form-field class="oppia-diagnostic-test-skill-items">
-            <mat-select class="form-control oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
-                        [(ngModel)]="selectedSkillForDiagnosticTest"
-                        (change)="addSkillForDiagnosticTest()"
-                        aria-label="selection dropdown">
-              <mat-option  ng-options="skillSummary.getDescription() for skillSummary in availableSkillSummariesForDiagnosticTest">
-              </mat-option>
-            </mat-select>
-          </mat-form-field> -->
+          <select [(ngModel)]="selectedSkillForDiagnosticTest"
+                  class="form-control oppia-diagnostic-test-skill-items oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
+                  aria-label="selection dropdown">
+            <option *ngFor="let skillSummary of availableSkillSummariesForDiagnosticTest"
+                    (click)="addSkillForDiagnosticTest()">
+                    {{ skillSummary.getDescription()  }}
+            </option>
+          </select>
+
           <button class="oppia-remove-diagnostic-test-skill-button"
                   mat-button mat-icon-button
                   aria-label="Clear"

@@ -294,8 +294,13 @@ describe('Topic editor tab directive', () => {
   });
 
   it('should show skill edit options', () => {
+    component.showSkillEditOptions();
+    expect(component.skillOptionDialogueBox).toBe(true);
+
     component.showSkillEditOptions(0, 1);
     expect(component.selectedSkillEditOptionsIndex[0][1]).toEqual(true);
+    expect(component.skillOptionDialogueBox).toBe(false);
+
     component.showSkillEditOptions(0, 1);
     expect(component.selectedSkillEditOptionsIndex).toEqual({});
   });
