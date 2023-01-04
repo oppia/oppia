@@ -1128,12 +1128,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         handlers_checked = []
 
         for route in main.URLS:
-            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
-            # are tuples. So, below check is to handle them.
-            if isinstance(route, tuple):
-                continue
-            else:
-                handler = route.handler
+            handler = route.handler
 
             if handler.__name__ in self.UNDECORATED_HANDLERS:
                 continue
@@ -1556,9 +1551,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         Returns:
             list(RedirectRoute). A list of RedirectRoute objects.
         """
-        # TODO(#13139): Remove if condition from the list comprehension,
-        # once all the MAPREDUCE_HANDLERS are removed from the codebase.
-        return [route for route in main.URLS if not isinstance(route, tuple)]
+        return [route for route in main.URLS]
 
     def test_every_handler_class_has_schema(self) -> None:
         """This test ensures that every child class of BaseHandler
