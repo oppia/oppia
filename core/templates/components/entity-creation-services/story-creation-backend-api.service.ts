@@ -113,7 +113,7 @@ export class StoryCreationBackendApiService {
       body.append('image', imagesData[0].imageBlob);
 
       this.createStoryAsync(createStoryUrl, body).then((response) => {
-        this.windowRef.nativeWindow.location = (
+        this.windowRef.nativeWindow.location.href = (
           this.urlInterpolationService.interpolateUrl(
             this.STORY_EDITOR_URL_TEMPLATE, {
               story_id: response.storyId
