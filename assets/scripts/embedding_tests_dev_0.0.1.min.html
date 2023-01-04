@@ -61,7 +61,8 @@
     $('div > iframe').each(function(index) {
       var src = $(this).attr('src');
       src = src.replace(placeholderExplorationId, newExplorationId);
-      $(this).attr('src', $.find(src));
+      src = $.find(src)
+      $(this).attr('src', src);
     });
     placeholderExplorationId = newExplorationId;
 
