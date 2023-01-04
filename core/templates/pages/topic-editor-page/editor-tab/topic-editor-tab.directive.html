@@ -127,7 +127,8 @@
             <div class="topic-meta-tag-content"
                  [ngClass]="{'has-error': editableMetaTagContent.length === 0}">
               <label for="topicMetaTagContent"
-                     class="form-heading e2e-test-topic-meta-tag-content-label">Meta Tag Content</label>
+                     class="form-heading e2e-test-topic-meta-tag-content-label">Meta Tag Content
+              </label>
               <textarea type="text"
                         class="form-control topic-description e2e-test-topic-meta-tag-content-field"
                         [(ngModel)]="editableMetaTagContent"
@@ -217,7 +218,8 @@
             <span class="practice-tab-text"> Show Practice Tab to learners.</span>
           </label>
           <i class="fas fa-info-circle practice-tab-info-circle"
-             title="This setting show/hides the practice tab in the topic viewer page. This can only be enabled if there are at least 10 questions attached to the topic."></i>
+             title="This setting show/hides the practice tab in the topic viewer page. This can only be enabled if there are at least 10 questions attached to the topic.">
+          </i>
         </div>
         <button class="btn add-subtopic-btn e2e-test-add-subtopic-button puppeteer-test-add-subtopic-button"
                 (click)="createSubtopic()"
@@ -273,14 +275,14 @@
                     <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
                   </span>
                   <div class="subtopic-edit-options-container edit-options-container">
-                    <span>{{ subtopicQuestionCountDict[subtopic.getId()]  }}</span>
+                    <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
                     <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options"
-                      (click)="showSubtopicEditOptions($index);$event.stopPropagation()">
+                       (click)="showSubtopicEditOptions($index);$event.stopPropagation()">
                     </i>
                     <div *ngIf="subtopicEditOptionsAreShown === $index"
-                        class="subtopic-edit-options"
-                        (click)="deleteSubtopic(subtopic.getId())"
-                        (mouseleave)="showSubtopicEditOptions(null)">
+                         class="subtopic-edit-options"
+                         (click)="deleteSubtopic(subtopic.getId())"
+                         (mouseleave)="showSubtopicEditOptions(null)">
                       <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
                       <span>Delete</span>
                     </div>
@@ -289,33 +291,33 @@
                 <div *ngIf="subtopicCardSelectedIndexes[$index]">
                   <div *ngIf="subtopic.getSkillSummaries().length">
                     <div *ngFor="let skillSummary of subtopic.getSkillSummaries(); index as $index"
-                        class="subtopic-skill skills-list-item skill-description-container">
+                         class="subtopic-skill skills-list-item skill-description-container">
                       <a [href]="getSkillEditorUrl(skillSummary.getId())"
-                        target="_blank"
-                        rel="noopener">
+                         target="_blank"
+                         rel="noopener">
                         <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
                       </a>
                       <div class="edit-options-container">
                         <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
                         <i class="fa fa-ellipsis-v"
-                          (click)="showSkillEditOptions($index, $index);$event.stopPropagation()"></i>
+                           (click)="showSkillEditOptions($index, $index);$event.stopPropagation()"></i>
                       </div>
                       <div class="skill-option-box"
-                          *ngIf="selectedSkillEditOptionsIndex[$index][$index]"
-                          (mouseleave)="showSkillEditOptions(null)"
-                          (click)="showSkillEditOptions(null)">
+                           *ngIf="selectedSkillEditOptionsIndex[$index][$index]"
+                           (mouseleave)="showSkillEditOptions(null)"
+                           (click)="showSkillEditOptions(null)">
                         <div class="skill-edit-option"
-                            (click)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
+                             (click)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
                           <i class="fa fa-trash"></i>
                           <span>Remove from subtopic</span>
                         </div>
                         <div class="skill-edit-option"
-                            (click)="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
+                             (click)="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
                           <i class="fa fa-plus"></i>
                           <span>Change Subtopic</span>
                         </div>
                         <div class="skill-edit-option remove-from-topic-option"
-                            (click)="removeSkillFromTopic(subtopic.getId(), skillSummary)">
+                             (click)="removeSkillFromTopic(subtopic.getId(), skillSummary)">
                           <i class="fa fa-trash"></i>
                           <span>Remove from topic</span>
                         </div>
