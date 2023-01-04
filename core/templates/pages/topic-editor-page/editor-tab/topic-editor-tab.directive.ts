@@ -258,10 +258,6 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  shivam(): void {
-    console.error(this.getEligibleSkillSummariesForDiagnosticTest());
-  }
-
   toggleSubtopicCard(index: string | number): void {
     this.skillOptionDialogueBox = true;
     if (this.subtopicCardSelectedIndexes[index]) {
