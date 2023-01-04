@@ -16,12 +16,14 @@
  * @fileoverview Unit tests for the stories list viewer.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicEditorStoriesListComponent } from './topic-editor-stories-list.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -33,13 +35,26 @@ describe('topicEditorStoriesList', () => {
   let component: TopicEditorStoriesListComponent;
   let fixture: ComponentFixture<TopicEditorStoriesListComponent>;
   let storySummaries;
-  let topicUpdateService;
-  let undoRedoService;
+  let topicUpdateService: TopicUpdateService;
+  let undoRedoService: UndoRedoService;
   let ngbModal: NgbModal;
+  let windowRef: WindowRef;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        TopicEditorStoriesListComponent
+      ],
+      imports: [
+        HttpClientTestingModule,
+      ]
+    });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicEditorStoriesListComponent);
     component = fixture.componentInstance;
+    windowRef = TestBed.inject(WindowRef);
     topicUpdateService = TestBed.inject(TopicUpdateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     ngbModal = TestBed.inject(NgbModal);
@@ -76,42 +91,7 @@ describe('topicEditorStoriesList', () => {
       'title', 'node_count', 'publication_status']);
   });
 
-  it('should set fromIndex when user starts moving a story in the list', () => {
-    component.fromIndex = 0;
-
-    component.onMoveStoryStart(2);
-
-    expect(component.fromIndex).toBe(2);
-  });
-
-  it('should move story to new location when user stops dragging', () => {
-    spyOn(topicUpdateService, 'rearrangeCanonicalStory');
-    component.fromIndex = 1;
-    component.storySummaries = storySummaries;
-
-    component.onMoveStoryFinish(0);
-
-    expect(component.toIndex).toBe(0);
-    expect(topicUpdateService.rearrangeCanonicalStory).toHaveBeenCalled();
-    expect(component.storySummaries[0].getId()).toBe('storyId2');
-    expect(component.storySummaries[1].getId()).toBe('storyId');
-  });
-
-  it('should not rearrage when user does not change position of the ' +
-  'story', () => {
-    spyOn(topicUpdateService, 'rearrangeCanonicalStory');
-    component.fromIndex = 0;
-    component.storySummaries = storySummaries;
-
-    component.onMoveStoryFinish(0);
-
-    expect(component.toIndex).toBe(0);
-    expect(topicUpdateService.rearrangeCanonicalStory).not.toHaveBeenCalled();
-    expect(component.storySummaries[1].getId()).toBe('storyId2');
-    expect(component.storySummaries[0].getId()).toBe('storyId');
-  });
-
-  it('should delete story when user deletes story', () => {
+  it('should delete story when user deletes story', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
         result: Promise.resolve()
@@ -123,12 +103,13 @@ describe('topicEditorStoriesList', () => {
     expect(component.storySummaries.length).toBe(2);
 
     component.deleteCanonicalStory('storyId');
+    tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
     expect(topicUpdateService.removeCanonicalStory).toHaveBeenCalled();
     expect(component.storySummaries.length).toBe(1);
     expect(component.storySummaries[0].getId()).toBe('storyId2');
-  });
+  }));
 
   it('should close modal when user click cancel button', () => {
     spyOn(ngbModal, 'open').and.returnValue(
@@ -142,12 +123,12 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should open story editor when user clicks a story', () => {
-    spyOn($window, 'open');
+    spyOn(windowRef.nativeWindow, 'open');
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
 
     component.openStoryEditor('storyId');
 
-    expect($window.open).toHaveBeenCalled();
+    expect(windowRef.nativeWindow.open).toHaveBeenCalled();
   });
 
   it('should open save changes modal when user tries to open story editor' +

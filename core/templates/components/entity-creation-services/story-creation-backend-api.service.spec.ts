@@ -17,13 +17,14 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { async, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { async, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Story Creation Backend Api Service', () => {
   let scbas: StoryCreationBackendApiService;
@@ -35,10 +36,12 @@ describe('Story Creation Backend Api Service', () => {
   let httpTestingController: HttpTestingController;
   let topicObjectFactory: TopicObjectFactory;
   let topic: Topic;
+  let windowRef: WindowRef;
   let mockWindow = {
-    location: ''
+    location: {
+      href: ''
+    }
   };
-
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -52,6 +55,43 @@ describe('Story Creation Backend Api Service', () => {
   }));
 
   beforeEach(async(() => {
+    let sampleTopicBackendObject = {
+      topicDict: {
+        id: 'sample_topic_id',
+        name: 'Topic name',
+        description: 'Topic description',
+        version: 1,
+        uncategorized_skill_ids: ['skill_1'],
+        canonical_story_references: [{
+          story_id: 'story_1',
+          story_is_published: true
+        }, {
+          story_id: 'story_2',
+          story_is_published: true
+        }, {
+          story_id: 'story_3',
+          story_is_published: true
+        }],
+        additional_story_references: [{
+          story_id: 'story_2',
+          story_is_published: true
+        }],
+        subtopics: [{
+          id: 1,
+          title: 'Title',
+          skill_ids: ['skill_2']
+        }],
+        next_subtopic_id: 2,
+        language_code: 'en',
+        skill_ids_for_diagnostic_test: []
+      },
+      skillIdToDescriptionDict: {
+        skill_1: 'Description 1',
+        skill_2: 'Description 2'
+      }
+    };
+
+    windowRef = TestBed.inject(WindowRef);
     topicObjectFactory = TestBed.inject(TopicObjectFactory);
     scbas = TestBed.inject(StoryCreationBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
@@ -61,11 +101,14 @@ describe('Story Creation Backend Api Service', () => {
     csrfTokenService = TestBed.inject(CsrfTokenService);
 
     imageBlob = new Blob(['image data'], {type: 'imagetype'});
-    topic = topicObjectFactory.createInterstitialTopic();
+    topic = topicObjectFactory.create(
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
     topic.getId = () => {
       return 'id';
     };
 
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
     spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue(
       [{
         filename: 'Image1',
@@ -109,18 +152,19 @@ describe('Story Creation Backend Api Service', () => {
       })
     } as NgbModalRef);
 
-    expect(mockWindow.location).toBe('');
+    expect(mockWindow.location.href).toBe('');
     scbas.createNewCanonicalStory();
+    tick();
 
     let req = httpTestingController.expectOne(
       '/topic_editor_story_handler/' + 'id');
     expect(req.request.method).toEqual('POST');
     req.flush({storyId: 'id'});
 
-
+    flush();
     flushMicrotasks();
 
-    expect(mockWindow.location).toBe('/story_editor/id');
+    expect(mockWindow.location.href).toBe('/story_editor/id');
   }));
 
   it('should throw error if the newly created story is not valid', () => {

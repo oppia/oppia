@@ -25,7 +25,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { RearrangeSkillsInSubtopicsModalComponent } from './rearrange-skills-in-subtopics-modal.component';
 
@@ -116,6 +116,42 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   });
 
   beforeEach(() => {
+    let sampleTopicBackendObject = {
+      topicDict: {
+        id: 'sample_topic_id',
+        name: 'Topic name',
+        description: 'Topic description',
+        version: 1,
+        uncategorized_skill_ids: ['skill_1'],
+        canonical_story_references: [{
+          story_id: 'story_1',
+          story_is_published: true
+        }, {
+          story_id: 'story_2',
+          story_is_published: true
+        }, {
+          story_id: 'story_3',
+          story_is_published: true
+        }],
+        additional_story_references: [{
+          story_id: 'story_2',
+          story_is_published: true
+        }],
+        subtopics: [{
+          id: 1,
+          title: 'Title',
+          skill_ids: ['skill_2']
+        }],
+        next_subtopic_id: 2,
+        language_code: 'en',
+        skill_ids_for_diagnostic_test: []
+      },
+      skillIdToDescriptionDict: {
+        skill_1: 'Description 1',
+        skill_2: 'Description 2'
+      }
+    };
+
     fixture = TestBed.createComponent(
       RearrangeSkillsInSubtopicsModalComponent
     );
@@ -124,7 +160,9 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     topicObjectFactory = TestBed.inject(TopicObjectFactory);
     topicUpdateService = TestBed.inject(TopicUpdateService);
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    topic = topicObjectFactory.createInterstitialTopic();
+    topic = topicObjectFactory.create(
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
     topic._subtopics = [subtopic];
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
   });
