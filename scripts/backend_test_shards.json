@@ -88,7 +88,6 @@
         "core.controllers.blog_dashboard_test",
         "core.controllers.blog_homepage_test",
         "core.domain.learner_goals_services_test",
-        "scripts.check_if_pr_is_low_risk_test",
         "scripts.scripts_test_utils_test",
         "scripts.servers_test",
         "scripts.concurrent_task_utils_test",
