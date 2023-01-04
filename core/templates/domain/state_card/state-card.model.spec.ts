@@ -128,10 +128,11 @@ describe('State card object factory', () => {
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     _sampleCard2 = StateCard.createNewCard(
-      'State 2', '<p>Content</p>', '',
-      // Use unknown type conversion to test that the interaction is not
-      // required to be a string.
-      null as unknown as Interaction, null as unknown as RecordedVoiceovers,
+      // This throws "Type null is not assignable to type
+      // 'Interaction'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      'State 2', '<p>Content</p>', '', null, null,
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
   });

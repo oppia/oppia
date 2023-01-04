@@ -395,8 +395,11 @@ describe('InteractiveGraphInput', () => {
   });
 
   it('should return false when a invalid graph is passed', () => {
-    // Using unknown type conversion to check for an invalid graph.
-    component.graph = null as unknown as GraphAnswer;
+    // This throws "Type null is not assignable to type
+    // 'GraphAnswer'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
+    component.graph = null;
 
     expect(component.validityCheckFn()).toBe(false);
   });

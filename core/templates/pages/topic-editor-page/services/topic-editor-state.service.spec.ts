@@ -75,9 +75,6 @@ describe('Topic editor state service', () => {
         skillIdToDescriptionDict: {},
         skillIdToRubricsDict: {},
         classroomUrlFragment: 'url_fragment'
-      // Use unknown for test validation. This is not a real type. This is
-      // just to test the validation of the type. This is done to avoid
-      // using any.
       } as unknown as FetchTopicResponse);
     }
 

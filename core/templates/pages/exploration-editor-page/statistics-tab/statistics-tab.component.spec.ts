@@ -402,12 +402,10 @@ describe('Statistics Tab Component', () => {
           }
         };
       }
-    // Using unknown type conversion to check for an invalid graph.
     } as unknown as States;
 
     component.expStats = {
       getStateStats: (name: string) => null
-    // Using unknown type conversion to check for an invalid graph.
     } as unknown as ExplorationStats;
 
     component.ngOnInit();

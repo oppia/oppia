@@ -406,7 +406,6 @@ describe('Contribution and review service', () => {
     };
 
     let onSuccess: jasmine.Spy<() => void>;
-    // Type unknown is used as we don't know the actual type of error.
     let onFailure: jasmine.Spy<(error: unknown) => void>;
 
     beforeEach(() => {

@@ -645,9 +645,7 @@ export class SettingsTabComponent
     }).result.then(() => {
       this.editableExplorationBackendApiService.deleteExplorationAsync(
         this.explorationId).then(() => {
-        this.windowRef.nativeWindow.location = (
-          // TODO(#13015): Remove use of unknown as a type.
-          this.CREATOR_DASHBOARD_PAGE_URL as unknown as Location);
+        this.windowRef.nativeWindow.location = this.CREATOR_DASHBOARD_PAGE_URL;
       });
     }, () => {
       this.alertsService.clearWarnings();
