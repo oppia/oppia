@@ -344,7 +344,7 @@ class ExplorationHandler(
         has_viewed_lesson_info_modal_once = None
 
         displayable_language_codes = []
-        if not exp_services.get_story_id_linked_to_exploration(exploration_id):
+        if exp_services.get_story_id_linked_to_exploration(exploration_id):
             displayable_language_codes = (
                 translation_services.get_displayable_translation_languages(
                     feconf.TranslatableEntityType.EXPLORATION, exploration))
