@@ -88,7 +88,6 @@
         "core.controllers.blog_dashboard_test",
         "core.controllers.blog_homepage_test",
         "core.domain.learner_goals_services_test",
-        "scripts.check_if_pr_is_low_risk_test",
         "scripts.scripts_test_utils_test",
         "scripts.servers_test",
         "scripts.concurrent_task_utils_test",
@@ -314,6 +313,7 @@
         "core.jobs.batch_jobs.topic_migration_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
         "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
+        "core.jobs.batch_jobs.user_settings_profile_picture_jobs_test",
         "core.jobs.io.cache_io_test",
         "scripts.contributor_dashboard_debug_test",
         "core.platform.secrets.cloud_secrets_services_test",
@@ -378,6 +378,7 @@
         "core.domain.question_domain_test",
         "core.platform.bulk_email.mailchimp_bulk_email_services_test",
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
-        "core.jobs.io.job_io_test"
+        "core.jobs.io.job_io_test",
+        "core.jobs.io.gcs_io_test"
     ]
 }
