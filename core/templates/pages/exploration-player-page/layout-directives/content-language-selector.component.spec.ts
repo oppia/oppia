@@ -152,7 +152,7 @@ describe('Content language selector component', () => {
       'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
     windowRef.nativeWindow.location.pathname = (
       '/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
- 
+
     component.ngOnInit();
 
     expect(component.newLanguageCode).toBe('en');
