@@ -706,13 +706,20 @@ class WorkedExample:
             'explanation': self.explanation.to_dict()
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all the Skills
+    # by writing audit and migration job. Currently `explanation` and `question`
+    # fields are not fully validated and calling `validate` method raises error
+    # which results in breaking the page.
     @classmethod
-    def from_dict(cls, worked_example_dict: WorkedExampleDict) -> WorkedExample:
+    def from_dict(
+        cls, worked_example_dict: WorkedExampleDict, validate: bool = True
+    ) -> WorkedExample:
         """Return a WorkedExample domain object from a dict.
 
         Args:
             worked_example_dict: dict. The dict representation of
                 WorkedExample object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             WorkedExample. The corresponding WorkedExample domain object.
@@ -725,8 +732,9 @@ class WorkedExample:
                 worked_example_dict['explanation']['content_id'],
                 worked_example_dict['explanation']['html'])
         )
-        worked_example.question.validate()
-        worked_example.explanation.validate()
+        if validate:
+            worked_example.question.validate()
+            worked_example.explanation.validate()
 
         return worked_example
 
@@ -827,13 +835,20 @@ class SkillContents:
             'written_translations': self.written_translations.to_dict()
         }
 
+    # TODO(#16467): Remove `validate` argument after validating all the Skills
+    # by writing audit and migration job. Currently `explanation` field of
+    # Skill is not fully validated in our datastore and calling `validate`
+    # method raises error which results in breaking the page.
     @classmethod
-    def from_dict(cls, skill_contents_dict: SkillContentsDict) -> SkillContents:
+    def from_dict(
+        cls, skill_contents_dict: SkillContentsDict, validate: bool = True
+    ) -> SkillContents:
         """Return a SkillContents domain object from a dict.
 
         Args:
             skill_contents_dict: dict. The dict representation of
                 SkillContents object.
+            validate: bool. False, when the validations should not be called.
 
         Returns:
             SkillContents. The corresponding SkillContents domain object.
@@ -842,14 +857,15 @@ class SkillContents:
             state_domain.SubtitledHtml(
                 skill_contents_dict['explanation']['content_id'],
                 skill_contents_dict['explanation']['html']),
-            [WorkedExample.from_dict(example)
+            [WorkedExample.from_dict(example, validate=False)
              for example in skill_contents_dict['worked_examples']],
             state_domain.RecordedVoiceovers.from_dict(skill_contents_dict[
                 'recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict(skill_contents_dict[
                 'written_translations'])
         )
-        skill_contents.explanation.validate()
+        if validate:
+            skill_contents.explanation.validate()
 
         return skill_contents
 

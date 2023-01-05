@@ -184,7 +184,7 @@ def get_skill_from_model(
             skill_domain.Rubric.from_dict(rubric)
             for rubric in versioned_rubrics['rubrics']
         ], skill_domain.SkillContents.from_dict(
-            versioned_skill_contents['skill_contents']),
+            versioned_skill_contents['skill_contents'], validate=False),
         versioned_misconceptions['schema_version'],
         versioned_rubrics['schema_version'],
         versioned_skill_contents['schema_version'],
