@@ -168,7 +168,7 @@ export class ContributionOpportunitiesBackendApiService {
 
   async fetchReviewableTranslationOpportunitiesAsync(
       topicName: string,
-      languageCode: string
+      languageCode?: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
     const params: {
       topic_name?: string;
@@ -182,7 +182,7 @@ export class ContributionOpportunitiesBackendApiService {
     }
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
       '/getreviewableopportunitieshandler', {
-        params
+        params: params
       }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
         dict => this._getExplorationOpportunityFromDict(dict));

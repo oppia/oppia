@@ -125,7 +125,7 @@ export class ContributionOpportunitiesService {
 
   async getReviewableTranslationOpportunitiesAsync(
       topicName: string,
-      languageCode: string):
+      languageCode?: string):
   Promise<ExplorationOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchReviewableTranslationOpportunitiesAsync(topicName, languageCode)
