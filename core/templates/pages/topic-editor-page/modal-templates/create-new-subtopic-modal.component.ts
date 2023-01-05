@@ -21,6 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import AppConstants from 'assets/constants';
+import cloneDeep from 'lodash/cloneDeep';
 import { Topic } from 'domain/topic/TopicObjectFactory';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
@@ -91,8 +92,6 @@ export class CreateNewSubtopicModalComponent
     this.subtopicTitle = '';
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
-    this.topicUpdateService
-      .addSubtopic(this.topic, this.subtopicTitle, this.editableUrlFragment);
   }
 
   getSchema(): object {
@@ -103,16 +102,23 @@ export class CreateNewSubtopicModalComponent
     this.schemaEditorIsShown = true;
   }
 
+  addSubtopic(): void {
+    this.topicUpdateService
+      .addSubtopic(this.topic, this.subtopicTitle, this.editableUrlFragment);
+
+    this.topicUpdateService.setSubtopicThumbnailFilename(
+      this.topic, this.subtopicId, this.editableThumbnailFilename);
+
+    this.topicUpdateService.setSubtopicThumbnailBgColor(
+      this.topic, this.subtopicId, this.editableThumbnailBgColor);
+  }
+
   updateSubtopicThumbnailFilename(newThumbnailFilename: string): void {
     this.editableThumbnailFilename = newThumbnailFilename;
-    this.topicUpdateService.setSubtopicThumbnailFilename(
-      this.topic, this.subtopicId, newThumbnailFilename);
   }
 
   updateSubtopicThumbnailBgColor(newThumbnailBgColor: string): void {
     this.editableThumbnailBgColor = newThumbnailBgColor;
-    this.topicUpdateService.setSubtopicThumbnailBgColor(
-      this.topic, this.subtopicId, newThumbnailBgColor);
   }
 
   resetErrorMsg(): void {
@@ -131,7 +137,6 @@ export class CreateNewSubtopicModalComponent
   cancel(): void {
     this.topicEditorStateService.deleteSubtopicPage(
       this.topic.getId(), this.subtopicId);
-    this.topicUpdateService.deleteSubtopic(this.topic, this.subtopicId);
     this.topicEditorStateService.onTopicReinitialized.emit();
     this.ngbActiveModal.dismiss('cancel');
   }
@@ -154,6 +159,8 @@ export class CreateNewSubtopicModalComponent
       return;
     }
 
+    this.addSubtopic();
+
     this.topicUpdateService.setSubtopicTitle(
       this.topic, this.subtopicId, this.subtopicTitle);
     this.topicUpdateService.setSubtopicUrlFragment(
@@ -162,7 +169,7 @@ export class CreateNewSubtopicModalComponent
     this.subtopicPage = SubtopicPage.createDefault(
       this.topic.getId(), this.subtopicId);
 
-    let subtitledHtml = angular.copy(
+    let subtitledHtml = cloneDeep(
       this.subtopicPage.getPageContents().getSubtitledHtml());
     subtitledHtml.html = this.htmlData;
     this.topicUpdateService.setSubtopicPageContentsHtml(
