@@ -422,9 +422,6 @@
   font-size: 22px;
   margin-top: -5px;
 }
-.oppia-top-navigation-bar .nav-mobile-header-text-container {
-  display: none;
-}
 .oppia-top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
   display: block;
 }
@@ -512,6 +509,15 @@
   }
 }
 
+@media screen and (min-width: 768px) {
+  .oppia-top-navigation-bar .nav-mobile-header-editor {
+    display: none;
+  }
+  .oppia-top-navigation-bar .nav-mobile-header-text {
+    display: none;
+  }
+}
+
 @media screen and (min-width: 300px) and (max-width: 768px) {
   .oppia-top-navigation-bar .nav-mobile-header-text-container {
     display: inline-block;
@@ -540,8 +546,6 @@
   @media screen and (max-width: 600px) {
     .oppia-top-navigation-bar .oppia-logo {
       left: 0;
-      margin-left: 60px;
-      position: absolute;
     }
   }
 }
