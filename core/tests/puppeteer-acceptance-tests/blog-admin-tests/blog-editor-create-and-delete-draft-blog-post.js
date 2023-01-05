@@ -8,9 +8,9 @@ async function createDraftAndDeleteDraftAsBlogPostAdmin() {
   const blogPostEditor = await new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
 
-  await blogPostEditor.signUpNewUserWithUsernameAndEmail('superAdm', 'testadmin@example.com');
-  await blogPostEditor.assignRoleToUser('superAdm', ROLE_BLOG_ADMIN);
-  await blogPostEditor.expectUserToHaveBlogAdminRole();
+  await blogPostEditor.signUpNewUserWithUsernameAndEmail('blogEditor', 'testadmin@example.com');
+  await blogPostEditor.assignRoleToUser('blogEditor', ROLE_BLOG_ADMIN);
+  await blogPostEditor.expectUserToHaveRole('blogEditor', 'Blog Admin');
 
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);

@@ -1,4 +1,6 @@
 const e2eSuperAdmin = require('../puppeteer-testing-utilities/blogPostAdminUtils.js');
+const e2eBlogAdmin = require('../puppeteer-testing-utilities/blogPostAdminUtils.js');
+const e2eBlogPostEditor = require('../puppeteer-testing-utilities/blogPostAdminUtils.js');
 const testConstants = require('../puppeteer-testing-utilities/testConstants.js');
 
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
@@ -7,14 +9,18 @@ const ROLE_BLOG_POST_EDITOR = 'BLOG_POST_EDITOR';
 
 async function blogAdminUpdatingRolesAndTagsProperties() {
   const superAdmin = await new e2eSuperAdmin();
+  const blogAdmin = await new e2eBlogAdmin();
+  const blogPostEditor = await new e2eBlogPostEditor();
+
+  await blogAdmin.openBrowser();
+  await blogAdmin.signUpNewUserWithUsernameAndEmail('blogAdm', 'blog_admin@example.com');
+  await blogAdmin.closeBrowser();
+
+  await blogPostEditor.openBrowser();
+  await blogPostEditor.signUpNewUserWithUsernameAndEmail('blogPostEditor', 'blog_post_editor@example.com');
+  await blogPostEditor.closeBrowser();
 
   await superAdmin.openBrowser();
-  await superAdmin.signUpNewUserWithUsernameAndEmail('blogAdm', 'blog_admin@example.com');
-  await superAdmin.logout();
-
-  await superAdmin.signUpNewUserWithUsernameAndEmail('blogPostEditor', 'blog_post_editor@example.com');
-  await superAdmin.logout();
-
   await superAdmin.signUpNewUserWithUsernameAndEmail('superAdm', 'testadmin@example.com');
   await superAdmin.assignRoleToUser('superAdm', 'blog admin');
   await superAdmin.expectUserToHaveRole('superAdm', 'Blog Admin');
