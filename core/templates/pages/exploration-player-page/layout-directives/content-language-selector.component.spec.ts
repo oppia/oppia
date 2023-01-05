@@ -90,9 +90,6 @@ describe('Content language selector component', () => {
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let interactionObjectFactory: InteractionObjectFactory;
 
-  windowRef = TestBed.inject(WindowRef);
-
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -130,6 +127,7 @@ describe('Content language selector component', () => {
     audioTranslationLanguageService = TestBed.get(
       AudioTranslationLanguageService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
+    windowRef = TestBed.inject(WindowRef);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
