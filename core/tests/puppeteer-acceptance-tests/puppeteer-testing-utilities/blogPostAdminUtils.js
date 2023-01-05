@@ -57,11 +57,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }, {draftBlogPostTitle});
   }
 
-  async publishNewBlogPostWithTitle(newBlogPostTitle) {
-    await this.addUserBioInBlogDashboard();
-    await this.page.waitForTimeout(500);  // see Note-1 below
-    await this.clickOn('span', ' CREATE NEW BLOG POST ');
-
+  async expectPublishButtonToBeDisabled() {
     await this.page.waitForSelector('button.e2e-test-publish-blog-post-button');
     await this.page.evaluate(() => {
       const publishedButtonIsDisabled = document.getElementsByClassName('e2e-test-publish-blog-post-button')[0].disabled;
@@ -69,13 +65,22 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
           throw new Error('Published button is not disabled even if the blog post is empty');
       }
     });
-    console.log("Publushed button is disabled when blog post is empty.")
+    console.log("Publushed button is disabled when blog post data is completely not filled.");
+  }
 
+  async publishNewBlogPostWithTitle(newBlogPostTitle) {
+    await this.addUserBioInBlogDashboard();
+    await this.page.waitForTimeout(500);  // see Note-1 below
+    await this.clickOn('span', ' CREATE NEW BLOG POST ');
+
+    await this.expectPublishButtonToBeDisabled();
     await this.clickOn('button', 'mat-button-toggle-button');
+    await this.expectPublishButtonToBeDisabled();
     await this.clickOn('div', thumbnailPhotoBox);
     await this.uploadFile('collection.svg');
     await this.clickOn('button', ' Add Thumbnail Image ');
     await this.page.waitForSelector('body.modal-open', {hidden: true});
+    await this.expectPublishButtonToBeDisabled();
 
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
