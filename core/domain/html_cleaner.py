@@ -378,13 +378,11 @@ def validate_rte_tags(
             'SkillReview'
         )
 
-        # TODO(#16820): Investigate why skill_id attribute empty error occured
-        # while loading the topic-editor page.
-        # _raise_validation_errors_for_unescaped_html_tag(
-        #     tag,
-        #     'skill_id-with-value',
-        #     'SkillReview'
-        # ).
+        _raise_validation_errors_for_unescaped_html_tag(
+            tag,
+            'skill_id-with-value',
+            'SkillReview'
+        )
 
     for tag in soup.find_all('oppia-noninteractive-video'):
 
