@@ -84,7 +84,7 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
-      
+
       <div *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
         <review-translation-language-selector class="oppia-language-selector"
         [activeLanguageCode]="languageCode"
