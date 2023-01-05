@@ -374,9 +374,10 @@
         <mat-list-item [hidden]="!diagnosticTestSkillsDropdownIsShown">
           <select [(ngModel)]="selectedSkillForDiagnosticTest"
                   class="form-control oppia-diagnostic-test-skill-items oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
+                  (change)="addSkillForDiagnosticTest()"
                   aria-label="selection dropdown">
             <option *ngFor="let skillSummary of availableSkillSummariesForDiagnosticTest"
-                    (click)="addSkillForDiagnosticTest()">
+                    [ngValue]="skillSummary">
                     {{ skillSummary.getDescription()  }}
             </option>
           </select>
