@@ -123,7 +123,8 @@ export class OpportunitiesListComponent {
 
     if (!this.showOpportunityButton) {
       this.fetchAndLoadOpportunities();
-    } // Else fetchAndLoadOpportunities() will be called from onChangeLanguage.
+    } // Else fetchAndLoadOpportunities() will be called from onChangeLanguage
+    // to avoid multiple fetch calls and the UI blinking for the user.
   }
 
   fetchAndLoadOpportunities(): void {
