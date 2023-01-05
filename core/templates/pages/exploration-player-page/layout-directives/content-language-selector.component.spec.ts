@@ -90,6 +90,9 @@ describe('Content language selector component', () => {
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let interactionObjectFactory: InteractionObjectFactory;
 
+  windowRef = TestBed.inject(WindowRef);
+
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -142,8 +145,6 @@ describe('Content language selector component', () => {
   });
 
   it('should correcly initialize newLanguageCode', () => {
-    windowRef = TestBed.inject(WindowRef);
-
     component.ngOnInit();
     expect(component.newLanguageCode).toBe('fr');
 
