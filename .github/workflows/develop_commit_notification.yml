@@ -6,6 +6,8 @@ on:
 
 jobs:
   send_notifications:
+    if: github.repository == 'oppia/oppia'
+    steps:
     - name: Repository Dispatch
       uses: peter-evans/repository-dispatch@v2
       with:
