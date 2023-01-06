@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import builtins
+import contextlib
 import os
 import shutil
 import subprocess
@@ -28,7 +29,7 @@ import tempfile
 from core import utils
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
 from . import common
 from . import install_python_prod_dependencies
@@ -43,12 +44,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE) as process:
+            @contextlib.contextmanager
             def mock_popen(  # pylint: disable=unused-argument
                 unused_cmd_tokens: List[str],
                 stdout: int = subprocess.PIPE,
                 stderr: int = subprocess.PIPE
-            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
-                return process
+            ) -> Iterator[subprocess.Popen[bytes]]:  # pylint: disable=unsubscriptable-object
+                yield process
         def mock_get_remote_name() -> bytes:
             return b'remote'
         def mock_get_refs() -> List[str]:
@@ -142,15 +144,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
             ) as process_for_upstream_url, subprocess.Popen(
                 [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE) as process_for_origin_url:
+            @contextlib.contextmanager
             def mock_popen(
                 cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
-            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            ) -> Iterator[subprocess.Popen[bytes]]:  # pylint: disable=unsubscriptable-object
                 if b'remote.origin.url' in cmd_tokens:
-                    return process_for_origin_url
+                    yield process_for_origin_url
                 elif b'remote.upstream.url' in cmd_tokens:
-                    return process_for_upstream_url
+                    yield process_for_upstream_url
                 else:
-                    return process_for_remote
+                    yield process_for_remote
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap:
             self.assertEqual(pre_push_hook.get_remote_name(), b'upstream')
@@ -165,10 +168,11 @@ class PrePushHookTests(test_utils.GenericTestBase):
             # the 'communicate' method, and according to MyPy, assignment to a
             # method is not allowed.
             process.communicate = mock_communicate  # type: ignore[assignment]
+            @contextlib.contextmanager
             def mock_popen(
                 unused_cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
-            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
-                return process
+            ) -> Iterator[subprocess.Popen[bytes]]:  # pylint: disable=unsubscriptable-object
+                yield process
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
@@ -183,13 +187,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
         ) as process_for_remote, subprocess.Popen(
             [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ) as process_for_remote_url:
+            @contextlib.contextmanager
             def mock_popen(
                 cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
-            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            ) -> Iterator[subprocess.Popen[bytes]]:  # pylint: disable=unsubscriptable-object
                 if b'config' in cmd_tokens:
-                    return process_for_remote_url
+                    yield process_for_remote_url
                 else:
-                    return process_for_remote
+                    yield process_for_remote
 
         communicate_swap = self.swap(
             process_for_remote_url, 'communicate', mock_communicate
@@ -211,15 +216,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
             [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         ) as process_for_origin_url:
+            @contextlib.contextmanager
             def mock_popen(
                 cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
-            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            ) -> Iterator[subprocess.Popen[bytes]]:  # pylint: disable=unsubscriptable-object
                 if b'remote.origin.url' in cmd_tokens:
-                    return process_for_origin_url
+                    yield process_for_origin_url
                 elif b'remote.upstream.url' in cmd_tokens:
-                    return process_for_upstream_url
+                    yield process_for_upstream_url
                 else:
-                    return process_for_remote
+                    yield process_for_remote
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegex(
             Exception,
@@ -245,15 +251,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
             [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         ) as process_for_origin_url:
+            @contextlib.contextmanager
             def mock_popen(
                 cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
-            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            ) -> Iterator[subprocess.Popen[bytes]]:  # pylint: disable=unsubscriptable-object
                 if b'remote.origin.url' in cmd_tokens:
-                    return process_for_origin_url
+                    yield process_for_origin_url
                 elif b'remote.upstream.url' in cmd_tokens:
-                    return process_for_upstream_url
+                    yield process_for_upstream_url
                 else:
-                    return process_for_remote
+                    yield process_for_remote
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.print_swap:
             self.assertIsNone(pre_push_hook.get_remote_name())

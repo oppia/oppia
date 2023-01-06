@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/js_ts_linter.py."""
 
 from __future__ import annotations
+import contextlib
 
 import multiprocessing
 import os
@@ -29,7 +30,7 @@ from scripts import concurrent_task_utils
 
 import esprima
 
-from typing import Final, List, Tuple
+from typing import Final, Iterator, List, Tuple
 
 from . import js_ts_linter
 from . import pre_commit_linter
@@ -191,10 +192,11 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
     def test_third_party_linter_with_stderr(self) -> None:
         with subprocess.Popen(['test'], stdout=subprocess.PIPE) as process:
+            @contextlib.contextmanager
             def mock_popen(
                 unused_cmd: str, stdout: int, stderr: int  # pylint: disable=unused-argument
-            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
-                return process
+            ) -> Iterator[subprocess.Popen[bytes]]:  # pylint: disable=unsubscriptable-object
+                yield process
         def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
             return (b'Output', b'Invalid')
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)

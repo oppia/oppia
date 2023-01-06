@@ -20,6 +20,7 @@ import contextlib
 import json
 import os
 import subprocess
+from typing import Iterator
 
 from core import utils
 from core.tests import test_utils
@@ -37,10 +38,11 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         super().setUp()
         with subprocess.Popen(
             ['test'], stdout=subprocess.PIPE, encoding='utf-8') as process:
+            @contextlib.contextmanager
             def mock_popen(
                 unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
-            ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
-                return process
+            ) -> Iterator[subprocess.Popen[str]]:  # pylint: disable=unsubscriptable-object
+                yield process
 
             self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
@@ -101,14 +103,14 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
     def test_error_is_raised_for_invalid_compilation_of_tsconfig(self) -> None:
         """Test that error is produced if stdout is not empty."""
-        with subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE,
+        with subprocess.Popen(['echo', 'test'],
+            stdout=subprocess.PIPE,
             encoding='utf-8') as process:
             @contextlib.contextmanager
             def mock_popen_for_errors(
                 unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
-            ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
-                return process
+            ) -> Iterator[subprocess.Popen[str]]:  # pylint: disable=unsubscriptable-object
+                yield process
 
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegex(SystemExit, '1'):
@@ -149,10 +151,11 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
         class MockProcess:
             stdout = MockOutput()
+        @contextlib.contextmanager
         def mock_popen_for_errors(
             unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
-        ) -> MockProcess:  # pylint: disable=unsubscriptable-object
-            return MockProcess()
+        ) -> Iterator[MockProcess]:  # pylint: disable=unsubscriptable-object
+            yield MockProcess()
 
         swap_path_exists = self.swap(os.path, 'exists', lambda _: False)
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):

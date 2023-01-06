@@ -236,7 +236,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 stdout: int = subprocess.PIPE,
                 stderr: int = subprocess.PIPE
             ) -> psutil.Popen:
-                return process
+                yield process
 
         with self.swap(subprocess, 'Popen', mock_popen):
             self.assertEqual(

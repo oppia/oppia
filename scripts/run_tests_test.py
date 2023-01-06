@@ -17,7 +17,9 @@
 from __future__ import annotations
 
 import builtins
+import contextlib
 import subprocess
+from typing import Iterator
 
 from core.tests import test_utils
 
@@ -52,9 +54,11 @@ class RunTestsTests(test_utils.GenericTestBase):
             scripts_called['run_frontend_tests'] = True
         def mock_backend_tests(args: list[str]) -> None:  # pylint: disable=unused-argument
             scripts_called['run_backend_tests'] = True
-        def mock_popen(cmd: str, shell: bool) -> None:
+        @contextlib.contextmanager
+        def mock_popen(cmd: str, shell: bool) -> Iterator[None]:
             if cmd == 'bash scripts/run_e2e_tests.sh' and shell:
                 scripts_called['run_e2e_tests'] = True
+            yield
         def mock_install_third_party_libs() -> None:
             pass
 

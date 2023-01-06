@@ -17,9 +17,11 @@
 from __future__ import annotations
 
 import builtins
+import contextlib
 import os
 import subprocess
 import sys
+from typing import Iterator
 
 from core.tests import test_utils
 from scripts import common
@@ -57,11 +59,12 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'All files | 100 | 100 | 100 | 100 | ',
                     b'Path not found.')
 
+        @contextlib.contextmanager
         def mock_popen(
             cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        ) -> Iterator[MockTask]:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
-            return MockTask()
+            yield MockTask()
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
@@ -78,11 +81,12 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'1 in 125 tests failing.\n' +
                     b'All files | 100 | 100 | 100 | 100 | ', b'')
 
+        @contextlib.contextmanager
         def mock_popen(
             cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        ) -> Iterator[MockTask]:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
-            return MockTask()
+            yield MockTask()
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
@@ -99,11 +103,12 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'All tests passed\n' +
                     b'All files | 100 | 100 | 100 | 100 | ', b'')
 
+        @contextlib.contextmanager
         def mock_popen(
             cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        ) -> Iterator[MockTask]:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
-            return MockTask()
+            yield MockTask()
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
@@ -120,11 +125,12 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
                     b'All tests passed\n' +
                     b'All files | 100 | 98 | 100 | 100 | ', b'')
 
+        @contextlib.contextmanager
         def mock_popen(
             cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
+        ) -> Iterator[MockTask]:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
-            return MockTask()
+            yield MockTask()
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
         error_msg = 'Eslint test coverage is not 100%'
 
