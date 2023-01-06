@@ -88,11 +88,11 @@ describe('Event Bus Group', () => {
         // has no call signatures". We need to suppress this error because of
         // strict type checking.
         // @ts-ignore
-        // The eslint error is suppressed since we need to test if
-        // just a string was thrown.
-        // eslint-disable-next-line oppia/no-to-throw
         (f) => {
-          expect(() => f()).toThrowError('Random Error');
+          // The eslint error is suppressed since we need to test if
+          // just a string was thrown.
+          // eslint-disable-next-line oppia/no-to-throw
+          expect(() => f()).toThrow('Random Error');
           return new Subscription();
         }
       );

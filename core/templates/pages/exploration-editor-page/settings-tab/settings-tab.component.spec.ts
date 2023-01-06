@@ -520,8 +520,8 @@ describe('Settings Tab Component', () => {
       });
       spyOn(alertsService, 'clearWarnings');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-        location: {}
-      } as Window);
+        location: ''
+      } as unknown as Window);
 
       component.deleteExploration();
       tick();
