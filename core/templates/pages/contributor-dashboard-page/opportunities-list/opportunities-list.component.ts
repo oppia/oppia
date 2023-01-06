@@ -125,22 +125,24 @@ export class OpportunitiesListComponent {
   }
 
   fetchAndLoadOpportunities(): void {
-    this.loadOpportunities().then(({opportunitiesDicts, more}) => {
-      // This ngZone run closure will not be required after \
-      // migration is complete.
-      this.zone.run(() => {
-        this.opportunities = opportunitiesDicts;
-        this.more = more;
-        this.visibleOpportunities = this.opportunities.slice(
-          0, this.OPPORTUNITIES_PAGE_SIZE);
-        this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-          this.opportunities,
-          this.OPPORTUNITIES_PAGE_SIZE,
-          this.activePageNumber,
-          this.more);
-        this.loadingOpportunityData = false;
+    if (this.loadOpportunities) {
+      this.loadOpportunities().then(({opportunitiesDicts, more}) => {
+        // This ngZone run closure will not be required after \
+        // migration is complete.
+        this.zone.run(() => {
+          this.opportunities = opportunitiesDicts;
+          this.more = more;
+          this.visibleOpportunities = this.opportunities.slice(
+            0, this.OPPORTUNITIES_PAGE_SIZE);
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            this.activePageNumber,
+            this.more);
+          this.loadingOpportunityData = false;
+        });
       });
-    });
+    }
   }
 
   gotoPage(pageNumber: number): void {
