@@ -24,7 +24,6 @@ import { ReviewTranslationLanguageSelectorComponent } from
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ElementRef, EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
@@ -219,15 +218,12 @@ describe('Review Translation language selector', () => {
 
     fixture.whenStable().then(() => {
       fixture.detectChanges();
-      console.log("🚀 ~ file: review-translation-language-selector.component.spec.ts:223")
       expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
         selectedLanguage);
-      console.log("🚀 ~ file: review-translation-language-selector.component.spec.ts:226")
       expect(
         contributionOpportunitiesBackendApiServiceStub
           .savePreferredTranslationLanguageAsync).toHaveBeenCalledWith(
         selectedLanguage);
-      console.log("🚀 ~ file: review-translation-language-selector.component.spec.ts:231")
     });
   });
 
