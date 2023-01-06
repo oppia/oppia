@@ -61,8 +61,10 @@
    */
   var SECRET_LENGTH = 64;
   var secret = '';
+  var array = new Uint32Array(1)
+  var max = Math.pow(2, 32)
   for (var i = 0; i < SECRET_LENGTH; i++) {
-    secret += String.fromCharCode(65 + Math.floor(window.crypto.getRandomValues(new Uint32Array(1))[0] * 26));
+    secret += String.fromCharCode(65 + Math.floor((window.crypto.getRandomValues(array)[0] / max) * 26));
   }
 
   var OppiaEmbed = (function() {
