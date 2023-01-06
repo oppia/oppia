@@ -320,13 +320,6 @@ describe('Opportunities List Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should fetch when not showing opportunities button', fakeAsync(() => {
-    component.showOpportunityButton = false;
-    component.ngOnInit();
-    tick();
-    expect(component.opportunities).toEqual(explorationOpportunitiesLoad1);
-  }));
-
   it('should load opportunities when initialized', fakeAsync(() => {
     expect(component.opportunities).toEqual([]);
 

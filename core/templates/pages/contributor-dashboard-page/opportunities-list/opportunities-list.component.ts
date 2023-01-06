@@ -121,10 +121,7 @@ export class OpportunitiesListComponent {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
 
-    if (!this.showOpportunityButton) {
-      this.fetchAndLoadOpportunities();
-    } // Else fetchAndLoadOpportunities() will be called from onChangeLanguage
-    // to avoid multiple fetch calls and the UI blinking for the user.
+    this.fetchAndLoadOpportunities();
   }
 
   fetchAndLoadOpportunities(): void {
