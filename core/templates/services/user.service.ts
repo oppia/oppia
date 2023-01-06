@@ -75,14 +75,14 @@ export class UserService {
   async getProfileImageDataUrlAsync(username: string = ''): Promise<string> {
     let localStoredImage = (
       this.imageLocalStorageService.getRawImageData('profile_picture.png'));
-    if (localStoredImage !== null && username === '') {
-      return new Promise(resolve => {return resolve(localStoredImage)});
-    }
     let defaultUrl = this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
      return this.getUserInfoAsync().then(userInfo => {
       if (username === '') {
         username = userInfo.getUsername();
+      }
+      if (localStoredImage !== null && username === userInfo.getUsername()) {
+        return new Promise(resolve => {return resolve(localStoredImage)});
       }
       return this.http.get(this.urlInterpolationService.interpolateUrl(
         this.assetsBackendApiService.profileImageUrlTemplate,
