@@ -56,10 +56,33 @@
    * location hash. This defends against fraudulent messages being sent to the
    * child iframe by other code within the parent page.
    */
+
+  // generate a 0-1 random number using a crytographically secure method
+  // without using division, which results in biased random numbers. Reference:
+  // https://thecompetentdev.com/weeklyjstips/tips/73_generate_secure_randoms/
+  const random = () => {
+    // A buffer with just the right size to convert to Float64
+    let buffer = new ArrayBuffer(8);
+    
+    // View it as an Int8Array and fill it with 8 random ints
+    let ints = new Int8Array(buffer);
+    window.crypto.getRandomValues(ints);
+    
+    // Set the sign (ints[7][7]) to 0 and the
+    // exponent (ints[7][6]-[6][5]) to just the right size 
+    // (all ones except for the highest bit)
+    ints[7] = 63;
+    ints[6] |= 0xf0;
+    
+    // Now view it as a Float64Array, and read the one float from it
+    let float = new DataView(buffer).getFloat64(0, true) - 1;
+    return float;
+  }
+
   var SECRET_LENGTH = 64;
   var secret = '';
   for (var i = 0; i < SECRET_LENGTH; i++) {
-    secret += String.fromCharCode(65 + Math.floor(window.crypto.getRandomValues(new Uint32Array(1))[0] * 26));
+    secret += String.fromCharCode(65 + Math.floor(random() * 26));
   }
 
   var OppiaEmbed = (function() {
