@@ -97,6 +97,10 @@ export class StoryEditorNavbarComponent implements OnInit {
       this.getWarningsCount() === 0);
   }
 
+  isWarningTooltipDisabled(): boolean {
+    return this.isStorySaveable() || this.getTotalWarningsCount() === 0;
+  }
+
   discardChanges(): void {
     this.undoRedoService.clearChanges();
     this.storyEditorStateService.loadStory(this.story.getId());

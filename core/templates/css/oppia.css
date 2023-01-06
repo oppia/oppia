@@ -4103,3 +4103,13 @@ oppia-response-text-input {
     display: none;
   }
 }
+
+.mat-icon.story-save-draft-warning {
+  color: #fc0;
+  line-height: 0.8;
+}
+
+mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
+  font-size: 12px;
+  white-space: pre-wrap;
+}
