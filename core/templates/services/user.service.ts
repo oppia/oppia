@@ -62,53 +62,27 @@ export class UserService {
     return this.userInfo;
   }
 
-  // async getProfileImageDataUrlAsync(): Promise<string> {
-  //   let localStoredImage = (
-  //     this.imageLocalStorageService.getRawImageData('profile_picture.png'));
-  //   if (localStoredImage !== null) {
-  //     return localStoredImage
-  //   }
-  //   let defaultUrl = (this.urlInterpolationService.getStaticImageUrl(
-  //       AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-  //   return this.getUserInfoAsync().then(
-  //     async(userInfo) => {
-  //       if (userInfo.isLoggedIn()) {
-  //         return this.userBackendApiService.getProfileImageDataUrlAsync();
-  //       } else {
-  //         return new Promise((resolve, reject) => {
-  //           resolve(defaultUrl);
-  //         });
-  //       }
-  //     });
-  // }
-
   private async _getProfileImagePromise(imageDataBlob: Blob): Promise<string> {
-    let promise: Promise<string> = new Promise(resolve => {
+    return new Promise(resolve => {
       const reader = new FileReader();
       reader.onloadend = () => {
         resolve(reader.result as string);
       };
       reader.readAsDataURL(imageDataBlob);
     });
-    console.log(imageDataBlob);
-    console.log(promise);
-    return promise;
   }
 
   async getProfileImageDataUrlAsync(username: string = ''): Promise<string> {
     let localStoredImage = (
       this.imageLocalStorageService.getRawImageData('profile_picture.png'));
     if (localStoredImage !== null && username === '') {
-      let localImageBlob = new Blob([localStoredImage], {type: 'image/png'});
-      return this._getProfileImagePromise(localImageBlob);
+      return new Promise(resolve => {return resolve(localStoredImage)});
     }
     let defaultUrl = this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
-    let defaultUrlBlob = new Blob([defaultUrl], {type: 'image/png'});
      return this.getUserInfoAsync().then(userInfo => {
       if (username === '') {
         username = userInfo.getUsername();
-        console.log(username);
       }
       return this.http.get(this.urlInterpolationService.interpolateUrl(
         this.assetsBackendApiService.profileImageUrlTemplate,
@@ -116,7 +90,7 @@ export class UserService {
           (response) => {
             return this._getProfileImagePromise(response);
           }, () => {
-            return this._getProfileImagePromise(defaultUrlBlob);
+            return new Promise(resolve => {return resolve(defaultUrl)});
           });
     });
   }

@@ -120,23 +120,6 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should return image data', fakeAsync(() => {
-    var requestUrl = '/preferenceshandler/profile_picture';
-    var defaultUrl = urlInterpolationService.getStaticImageUrl(
-      '/avatar/user_blue_72px.webp');
-
-    userBackendApiService.getProfileImageDataUrlAsync(defaultUrl).then(
-      (dataUrl) => {
-        expect(dataUrl).toBe('image data');
-      });
-
-    const req2 = httpTestingController.expectOne(requestUrl);
-    expect(req2.request.method).toEqual('GET');
-    req2.flush({profile_picture_data_url: 'image data'});
-
-    flushMicrotasks();
-  }));
-
   it('should return the login url', fakeAsync(() => {
     const loginUrl = '/login';
     const currentUrl = 'dummy';

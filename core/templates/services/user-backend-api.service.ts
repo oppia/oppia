@@ -107,18 +107,6 @@ export class UserBackendApiService {
       });
   }
 
-  async getProfileImageDataUrlAsync(username: string = ''): Promise<string> {
-    return this.loadProfileImage(username).then(image => {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result as string);
-        };
-        reader.readAsDataURL(image.data);
-      });
-    });
-  }
-
   async setProfileImageDataUrlAsync(
       newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
     return this.updatePreferencesDataAsync(

@@ -193,11 +193,7 @@ export class PreferencesPageComponent {
   }
 
   private saveProfileImage(newProfilePictureDataUrl: string): void {
-    console.log(this.contextService.getImageSaveDestination());
-    if (
-      this.contextService.getImageSaveDestination() ===
-      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
-    ) {
+    if (AppConstants.EMULATOR_MODE) {
       this._saveProfileImageToLocalStorage(newProfilePictureDataUrl);
     } else {
       this._postProfileImageToServer(newProfilePictureDataUrl);
@@ -230,6 +226,9 @@ export class PreferencesPageComponent {
 
     modalRef.result.then((newProfilePictureDataUrl) => {
       this.saveProfileImage(newProfilePictureDataUrl);
+      // The reload is needed in order to update the profile picture
+      // in the top-right corner.
+      this.windowRef.nativeWindow.location.reload();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -257,8 +256,6 @@ export class PreferencesPageComponent {
     this.hasPageLoaded = false;
 
     let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
-    console.log('******************************');
-    console.log(this.contextService.getImageSaveDestination());
     preferencesPromise.then((data) => {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
@@ -283,15 +280,9 @@ export class PreferencesPageComponent {
       this.hasPageLoaded = true;
     });
 
-    // this.contextService.setImageSaveDestinationToLocalStorage();
-
     let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
-    console.log(profileImagePromise);
     profileImagePromise.then(data => {
-      console.log("**********************************");
       this.profilePictureDataUrl = decodeURIComponent(data as string);
-      console.log(this.profilePictureDataUrl);
-      console.log(data);
     });
 
     Promise.all([
