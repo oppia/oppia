@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import builtins
+import contextlib
 import os
 import shutil
 import subprocess
@@ -229,6 +230,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         with subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE) as process:
+            @contextlib.contextmanager
             def mock_popen(  # pylint: disable=unused-argument
                 unused_cmd_tokens: List[str],
                 stdout: int = subprocess.PIPE,
