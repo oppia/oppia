@@ -23,11 +23,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
-export interface PositionOfTerm {
-  name: 'string';
-  readonly humanReadableName: 'string';
-}
-
 @Component({
   selector: 'position-of-terms-editor',
   templateUrl: './position-of-terms-editor.component.html',
@@ -42,7 +37,7 @@ export class PositionOfTermsEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
   alwaysEditable = true;
   positionOfTerms = AppConstants.POSITION_OF_TERMS_MAPPING;
-  localValue!: typeof AppConstants.POSITION_OF_TERMS_MAPPING[number];
+  localValue!: {name: string; humanReadableName: string};
   constructor() { }
 
   ngOnInit(): void {
