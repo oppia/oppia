@@ -53,7 +53,7 @@ describe ('Prevent page unload event service', function() {
         }
       }
     }
-  };
+  } as Window;
 
   it('should adding listener', () => {
     expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();

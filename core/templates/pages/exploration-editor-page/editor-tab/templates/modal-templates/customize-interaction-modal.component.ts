@@ -102,7 +102,7 @@ interface DefaultValueGraph {
   isLabeled: boolean;
 }
 
-interface CustomizationArgSpecsInterface {
+export interface CustomizationArgSpecsInterface {
   name: string;
   default_value: DefaultCustomizationArg;
 }

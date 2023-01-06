@@ -135,7 +135,7 @@ export class ContributorDashboardAdminBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(url, {
         params
-      }
+      } as Object
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {

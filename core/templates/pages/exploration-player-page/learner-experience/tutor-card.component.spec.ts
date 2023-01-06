@@ -48,6 +48,7 @@ import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -279,7 +280,7 @@ describe('Tutor card component', () => {
           EndChapterCelebration: {
             isEnabled: false
           }
-        }
+        } as FeatureStatusChecker
       );
       spyOn(componentInstance, 'triggerCelebratoryAnimation');
       componentInstance.animationHasPlayedOnce = false;

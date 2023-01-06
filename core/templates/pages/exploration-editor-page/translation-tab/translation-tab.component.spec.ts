@@ -72,7 +72,7 @@ describe('Translation tab component', () => {
   let stateTutorialFirstTimeService: StateTutorialFirstTimeService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let refreshTranslationTabEmitter = new EventEmitter<void>();
-  let enterTranslationForTheFirstTimeEmitter = new EventEmitter<void>();
+  let enterTranslationForTheFirstTimeEmitter = new EventEmitter<string>();
 
   class MockJoyrideService {
     startTour() {

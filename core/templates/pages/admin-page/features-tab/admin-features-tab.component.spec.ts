@@ -96,7 +96,7 @@ describe('Admin page feature tab', function() {
       confirm: () => confirmResult,
       prompt: () => promptResult,
       alert: () => null
-    });
+    } as unknown as Window);
     mockConfirmResult = val => confirmResult = val;
     mockPromptResult = msg => promptResult = msg;
 

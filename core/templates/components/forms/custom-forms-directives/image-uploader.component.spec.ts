@@ -313,7 +313,9 @@ describe('ImageUploaderComponent', () => {
         document.addEventListener('mock' + eventname, callback);
       }
     };
-    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(
+      mockWindow as Window
+    );
 
     spyOn(dropEvent, 'preventDefault');
     spyOn(dragoverEvent, 'preventDefault');

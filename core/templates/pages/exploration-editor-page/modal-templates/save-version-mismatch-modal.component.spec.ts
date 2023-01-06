@@ -139,8 +139,12 @@ describe('Save Version Mismatch Modal Component', () => {
       const reloadSpy = jasmine.createSpy('reload');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
-          reload: reloadSpy
-        }
+          _hash: '',
+          _hashChange: null,
+          hash: '',
+          reload: reloadSpy,
+        },
+        onhashchange: null,
       });
 
       component.discardChanges();
@@ -197,8 +201,12 @@ describe('Save Version Mismatch Modal Component', () => {
     const reloadSpy = jasmine.createSpy('reload');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        reload: reloadSpy
-      }
+        _hash: '',
+        _hashChange: null,
+        hash: '',
+        reload: reloadSpy,
+      },
+      onhashchange: null,
     });
     spyOn(document, 'createElement').and.returnValue(spyObj);
     component.hasLostChanges = true;

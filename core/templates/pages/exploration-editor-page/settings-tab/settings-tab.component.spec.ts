@@ -419,7 +419,7 @@ describe('Settings Tab Component', () => {
         protocol: 'https:',
         host: 'oppia.org'
       }
-    });
+    } as Window);
     expect(component.getExplorePageUrl()).toBe('https://oppia.org/explore/exp1');
   });
 
@@ -503,7 +503,7 @@ describe('Settings Tab Component', () => {
         location: {
           reload: () => {}
         }
-      });
+      } as Window);
 
       component.deleteExploration();
       tick();
@@ -520,8 +520,8 @@ describe('Settings Tab Component', () => {
       });
       spyOn(alertsService, 'clearWarnings');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-        location: ''
-      });
+        location: {}
+      } as Window);
 
       component.deleteExploration();
       tick();

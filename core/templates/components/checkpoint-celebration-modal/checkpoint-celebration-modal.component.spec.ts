@@ -35,6 +35,7 @@ import { AudioTranslationLanguageService } from 'pages/exploration-player-page/s
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
@@ -545,7 +546,7 @@ describe('Checkpoint celebration modal component', function() {
         CheckpointCelebration: {
           isEnabled: false
         }
-      }
+      } as FeatureStatusChecker
     );
 
     component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
@@ -745,7 +746,7 @@ describe('Checkpoint celebration modal component', function() {
         CheckpointCelebration: {
           isEnabled: false
         }
-      }
+      } as FeatureStatusChecker
     );
 
     component.openLessonInfoModal();

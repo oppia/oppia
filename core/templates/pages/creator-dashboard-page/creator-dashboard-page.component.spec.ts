@@ -463,8 +463,13 @@ describe('Creator Dashboard Page Component', () => {
             .createFromBackendDict(dashboardData.dashboard_stats),
           // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats ? (
-            CreatorDashboardStats
-              .createFromBackendDict(dashboardData.last_week_stats)) : null,
+            CreatorDashboardStats.createFromBackendDict(
+              // This throws "Argument of type 'null' is not assignable to
+              // parameter of type 'object'." We need to suppress this error
+              // because of the need to test validations.
+              // @ts-ignore
+              dashboardData.last_week_stats)
+            ) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
             subscriber => ProfileSummary

@@ -177,7 +177,7 @@ export class ContributionOpportunitiesBackendApiService {
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
       '/getreviewableopportunitieshandler', {
         params
-      }).toPromise().then(data => {
+      } as Object).toPromise().then(data => {
       const opportunities = data.opportunities.map(
         dict => this._getExplorationOpportunityFromDict(dict));
       return {

@@ -112,7 +112,7 @@ describe('Pie Chart component', () => {
           callback();
         }
       }
-    });
+    } as unknown as typeof google);
     component.redrawChart();
     tick();
     component.ngAfterViewInit();
@@ -135,7 +135,7 @@ describe('Pie Chart component', () => {
           callback();
         }
       }
-    });
+    } as unknown as typeof google);
     component.pieChart = {
       nativeElement: null
     };
@@ -164,7 +164,7 @@ describe('Pie Chart component', () => {
           callback();
         }
       }
-    });
+    } as unknown as typeof google);
     spyOn(component, 'redrawChart').and.stub();
     component.chart = mockedChart;
 
@@ -187,7 +187,7 @@ describe('Pie Chart component', () => {
           callback();
         }
       }
-    });
+    } as unknown as typeof google);
     spyOn(component, 'redrawChart').and.stub();
 
     component.ngOnInit();
