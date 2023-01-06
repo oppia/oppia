@@ -21,11 +21,12 @@ import contextlib
 import os
 import subprocess
 import sys
-from typing import Iterator
 
 from core.tests import test_utils
 from scripts import common
 from scripts import run_custom_eslint_tests
+
+from typing import Iterator
 
 
 class RunCustomEslintTestsTests(test_utils.GenericTestBase):

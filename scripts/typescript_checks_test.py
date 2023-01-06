@@ -20,10 +20,11 @@ import contextlib
 import json
 import os
 import subprocess
-from typing import Iterator
 
 from core import utils
 from core.tests import test_utils
+
+from typing import Iterator
 
 from . import typescript_checks
 

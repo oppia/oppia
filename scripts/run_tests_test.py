@@ -19,7 +19,6 @@ from __future__ import annotations
 import builtins
 import contextlib
 import subprocess
-from typing import Iterator
 
 from core.tests import test_utils
 
@@ -27,6 +26,8 @@ from scripts import install_third_party_libs
 from scripts import run_frontend_tests
 from scripts import setup
 from scripts import setup_gae
+
+from typing import Iterator
 
 
 class RunTestsTests(test_utils.GenericTestBase):
