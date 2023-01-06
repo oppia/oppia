@@ -176,7 +176,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 FILE_CACHE).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        self.validate([], [], 0)
+        self.validate([], [], lint_task_report)
 
     def test_check_duplicate_constant_declaration_in_separate_files(
         self
