@@ -104,7 +104,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
     def test_error_is_raised_for_invalid_compilation_of_tsconfig(self) -> None:
         """Test that error is produced if stdout is not empty."""
-        with subprocess.Popen(['echo', 'test'],
+        with subprocess.Popen(
+            ['echo', 'test'],
             stdout=subprocess.PIPE,
             encoding='utf-8') as process:
             @contextlib.contextmanager
