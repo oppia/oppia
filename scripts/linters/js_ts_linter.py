@@ -459,6 +459,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
             file_content = self.file_cache.read(file_path)
             for line_num, line in enumerate(file_content.split('\n')):
+                # Check if the line has a comment.
                 if not (line.strip().startswith('//') or multiple_line_comment):
                     if 'spec' in file_path:
                         patterns = [': unknown', '| unknown', '<unknown']
@@ -494,10 +495,12 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                                     unknown_type[index]))
                                 error_messages.append(error_message)
 
-                # Checking line contains comments.
+                # Check whether previous line contains a proper comment.
+                # If it does, then skip throwing an error
                 comment_before_unknown_type = (
                     line.strip().startswith('//') or line.strip().endswith('*/'))
             
+                # Check if the line is a multi-line comment.
                 if not multiple_line_comment:
                     multiple_line_comment = line.strip().startswith('/*')
                 

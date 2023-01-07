@@ -197,7 +197,7 @@ describe('State Skill Editor Component', () => {
     fixture.detectChanges();
     componentInstance.untriagedSkillSummaries = [];
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    mockNgbModal = TestBed.inject(NgbModal) as unknown as MockNgbModal;
+    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
     userService = TestBed.inject(UserService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);

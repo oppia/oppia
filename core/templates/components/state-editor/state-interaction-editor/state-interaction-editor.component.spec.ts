@@ -143,7 +143,7 @@ describe('State Interaction component', () => {
       TestBed.inject(ExplorationHtmlFormatterService);
     interactionDetailsCacheService =
       TestBed.inject(InteractionDetailsCacheService);
-    mockNgbModal = (TestBed.inject(NgbModal)) as unknown as MockNgbModal;
+    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
     responsesService = TestBed.inject(ResponsesService);
     stateContentService = TestBed.inject(StateContentService);
     stateCustomizationArgsService =
