@@ -22,10 +22,10 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.jobs.io import ndb_io
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.transforms import results_transforms
 from core.platform import models

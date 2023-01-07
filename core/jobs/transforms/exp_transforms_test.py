@@ -29,10 +29,10 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
-from core.jobs.types import job_run_result
 from core.jobs import job_test_utils
 from core.jobs.transforms import exp_transforms
 from core.jobs.transforms import results_transforms
+from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
@@ -40,7 +40,8 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models, opportunity_models
+    from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
 
 (
     exp_models,
@@ -49,6 +50,7 @@ if MYPY: # pragma: no cover
     models.Names.EXPLORATION,
     models.Names.OPPORTUNITY
 ])
+
 
 class MigrateExplorationModelsTests(
     job_test_utils.PipelinedTestBase, test_utils.GenericTestBase):
@@ -210,7 +212,7 @@ class MigrateExplorationModelsTests(
                 self.EXP_ID_TWO, title=self.EXP_TITLE, category='category')
             exp_services.save_new_exploration(
                 feconf.SYSTEM_COMMITTER_ID, exploration)
-        
+
         unused_migrated_exps, job_run_results = (
             self.pipeline
             | exp_transforms.MigrateExplorationModels()
@@ -243,7 +245,7 @@ class MigrateExplorationModelsTests(
         )
 
         self.assert_pcoll_equal(
-            job_run_results, 
+            job_run_results,
             [job_run_result.JobRunResult(
                 stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'),
             job_run_result.JobRunResult(
