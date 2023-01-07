@@ -42,6 +42,7 @@ import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -69,10 +70,20 @@ class MockI18nLanguageCodeService {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: 'http://localhost:8181/explore/wZiXFx1iV5bz',
+      pathname: '/explore/wZiXFx1iV5bz'
+    }
+  };
+}
+
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
+  let windowRef: MockWindowRef;
   let playerTranscriptService: PlayerTranscriptService;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
@@ -92,6 +103,9 @@ describe('Content language selector component', () => {
         SwitchContentLanguageRefreshRequiredModalComponent
       ],
       providers: [{
+        provide: WindowRef,
+        useClass: MockWindowRef
+      }, {
         provide: ContentTranslationLanguageService,
         useClass: MockContentTranslationLanguageService
       }, {
@@ -113,18 +127,33 @@ describe('Content language selector component', () => {
     audioTranslationLanguageService = TestBed.get(
       AudioTranslationLanguageService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
+    windowRef = TestBed.inject(WindowRef);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
 
-  it('should correctly initialize selectedLanguageCode and ' +
-     'languagesInExploration', () => {
+  it('should correctly initialize selectedLanguageCode, ' +
+    'and languagesInExploration', () => {
     expect(component.selectedLanguageCode).toBe('fr');
     expect(component.languageOptions).toEqual([
-      {value: 'fr', displayed: 'français (French)'},
-      {value: 'zh', displayed: '中文 (Chinese)'},
-      {value: 'en', displayed: 'English'}
+      { value: 'fr', displayed: 'français (French)' },
+      { value: 'zh', displayed: '中文 (Chinese)' },
+      { value: 'en', displayed: 'English' }
     ]);
+  });
+
+  it('should correcly initialize newLanguageCode', () => {
+    component.ngOnInit();
+    expect(component.newLanguageCode).toBe('fr');
+
+    windowRef.nativeWindow.location.href = (
+      'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
+    windowRef.nativeWindow.location.pathname = (
+      '/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
+
+    component.ngOnInit();
+
+    expect(component.newLanguageCode).toBe('en');
   });
 
   it('should correctly select an option when refresh is not needed', () => {
