@@ -39,12 +39,6 @@ describe('Question Validation Service', () => {
   });
 
   beforeEach(() => {
-    // This throws "Type object is not assignable to type
-    // 'QuestionBackendDict'." We need to suppress this error
-    // because of the need to test validations. This is because
-    // the backend dict has a lot of optional fields, and we
-    // need to test validations for each of these fields.
-    // @ts-ignore
     mockQuestionDict = {
       id: 'question_1',
       question_state_data: {
@@ -151,7 +145,7 @@ describe('Question Validation Service', () => {
       version: 1,
       linked_skill_ids: ['abc'],
       inapplicable_skill_misconception_ids: ['abc-2']
-    } as QuestionBackendDict;
+    } as unknown as QuestionBackendDict;
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(

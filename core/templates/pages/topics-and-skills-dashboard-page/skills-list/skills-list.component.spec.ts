@@ -295,27 +295,15 @@ describe('Skills List Component', () => {
     componentInstance.mergeableSkillSummaries = [];
     componentInstance.untriagedSkillSummaries = [];
 
-    // This throws "Type object is not assignable to type
-    // 'opicsAndSkillsDashboardBackendApiService'." We need
-    // to suppress this error because of the need to test validations.
-    // @ts-ignore
     topicsAndSkillsDashboardBackendApiService = (
-      TestBed.inject(TopicsAndSkillsDashboardBackendApiService)
+      TestBed.inject(TopicsAndSkillsDashboardBackendApiService) as unknown
     ) as jasmine.SpyObj<MockTopicsAndSkillsDashboardBackendApiService>;
     alertsService = TestBed.inject(AlertsService);
-    alertsService = (alertsService) as jasmine.SpyObj<AlertsService>;
-    // This throws "Type object is not assignable to type
-    // 'NgbModal'." We need to suppress this error
-    // because of the need to test validations.
-    // @ts-ignore
-    mockNgbModal = (TestBed.inject(NgbModal)) as
+    alertsService = (alertsService as unknown) as jasmine.SpyObj<AlertsService>;
+    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as
       jasmine.SpyObj<MockNgbModal>;
-    // This throws "Type object is not assignable to type
-    // 'SkillBackendApiService'." We need to suppress this error
-    // because of the need to test validations.
-    // @ts-ignore
     mockSkillBackendApiService = (
-      TestBed.inject(SkillBackendApiService)
+      TestBed.inject(SkillBackendApiService) as unknown
     ) as jasmine.SpyObj<MockSkillBackendApiService>;
   });
 

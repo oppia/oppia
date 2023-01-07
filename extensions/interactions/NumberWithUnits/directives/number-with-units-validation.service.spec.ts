@@ -245,7 +245,7 @@ describe('NumberWithUnitsValidationService', () => {
         // because of the need to test validations. This
         // function is not used in the validations.
         // @ts-ignore
-        return null as string;
+        return null;
       },
       toDict: () => {
         let uof = new UnitsObjectFactory();

@@ -148,18 +148,18 @@ describe('Base Content Component', () => {
     loaderService = TestBed.inject(LoaderService);
     loaderService = loaderService as jasmine.SpyObj<LoaderService>;
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
-    keyboardShortcutService = (keyboardShortcutService) as
+    keyboardShortcutService = keyboardShortcutService as
      jasmine.SpyObj<KeyboardShortcutService>;
     windowRef = TestBed.inject(WindowRef);
-    windowRef = (windowRef) as jasmine.SpyObj<WindowRef>;
+    windowRef = windowRef as jasmine.SpyObj<WindowRef>;
     sidebarStatusService = TestBed.inject(SidebarStatusService);
-    sidebarStatusService = (sidebarStatusService) as
+    sidebarStatusService = sidebarStatusService as
      jasmine.SpyObj<SidebarStatusService>;
     bottomNavbarStatusService = TestBed.inject(BottomNavbarStatusService);
-    bottomNavbarStatusService = (bottomNavbarStatusService) as
+    bottomNavbarStatusService = bottomNavbarStatusService as
      jasmine.SpyObj<BottomNavbarStatusService>;
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
-    backgroundMaskService = (backgroundMaskService) as
+    backgroundMaskService = backgroundMaskService as
      jasmine.SpyObj<BackgroundMaskService>;
     cookieService = TestBed.inject(CookieService);
   });

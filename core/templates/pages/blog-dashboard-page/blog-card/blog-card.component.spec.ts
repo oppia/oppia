@@ -74,13 +74,7 @@ describe('Blog Dashboard Tile Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     contextService = TestBed.inject(ContextService);
     component = fixture.componentInstance;
-    // This throws "Type WindowRef is not assignable to type
-    // desire type." We need to suppress this error
-    // because of the need to test validations. We cannot
-    // do 'window.MathJax = mockMathJs' because
-    // 'MathJax' is a private class.
-    // @ts-ignore
-    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
+    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
     sampleBlogPostSummary = {
       id: 'sampleId',
       author_username: 'test_username',

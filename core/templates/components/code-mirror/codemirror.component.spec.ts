@@ -49,15 +49,9 @@ describe('Oppia CodeMirror Component', () => {
   it('should notify that it has loaded', fakeAsync(() => {
     const onLoadSpy = jasmine.createSpy('onLoadSpy');
     let subscription = component.onLoad.subscribe(onLoadSpy);
-    // This throws "Type object is not assignable to type
-    // 'CodemirrorComponent'." We need to suppress this error because
-    // 'codemirrorComponent' is of type 'any' and we cannot do
-    // 'codemirrorComponent = new CodemirrorComponent();' because
-    // 'CodemirrorComponent' is a private class.
-    // @ts-ignore
     component.codemirrorComponent = {
       codemirror: {}
-    } as CodemirrorComponent;
+    } as unknown as CodemirrorComponent;
     component.ngAfterViewInit();
     tick(1);
     expect(onLoadSpy).toHaveBeenCalled();
@@ -73,13 +67,6 @@ describe('Oppia CodeMirror Component', () => {
   }));
 
   it ('should refresh codemirror', waitForAsync(() => {
-    // This throws "Type object is not assignable to type
-    // 'CodeMirror.Editor'." We need to suppress this error
-    // because of the need to test validations. This is because
-    // 'codemirrorComponent' is of type 'any' and we cannot do
-    // 'codemirrorComponent = new CodemirrorComponent();' because
-    // 'CodemirrorComponent' is a private class.
-    // @ts-ignore
     component.codemirror = {
       refresh: () => {
         return;

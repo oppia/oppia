@@ -95,7 +95,8 @@ export class NumberWithUnitsValidationService {
       var laterInputString = laterInput.toMathjsCompatibleString();
       try {
         return unit(laterInputString).equals(unit(earlierInputString));
-      // Type unknown is used because we don't know the type of the error.
+      // Unknown type is used because we don't know which type of error
+      // is thrown.
       } catch (e: unknown) {
         var additionalInfo = (
           '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +

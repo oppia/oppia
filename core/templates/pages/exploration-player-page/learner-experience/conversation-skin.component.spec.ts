@@ -2381,8 +2381,7 @@ describe('Conversation skin component', () => {
       // throws an error only in the frontend test and
       // not in the frontend.
       // @ts-ignore
-      null as Interaction, null as RecordedVoiceovers,
-      writtenTranslationsObjectFactory.createEmpty(),
+      null, null, writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
 
     let callback = (successCallback: (nextCard: StateCard) => void) => {

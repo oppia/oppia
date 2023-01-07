@@ -110,9 +110,7 @@ angular.module('oppia').config([
       }
     }
     OppiaAngularRootComponent.contextService = (
-      // TODO(#13015): Remove use of unknown as a type.
-      // Unknown has been used here becuase of use of JQuery.
-      ugs.ContextService as unknown as ContextService);
+      ugs.ContextService as ContextService);
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from

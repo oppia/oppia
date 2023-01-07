@@ -192,8 +192,7 @@ export class ProgressNavComponent {
         InteractionSpecsConstants.INTERACTION_SPECS[
           this.interactionId as InteractionSpecsKey
         ].show_generic_submit_button);
-    // The type of error 'e' is unknown because anything can be throw
-    // in TypeScript. We need to make sure to check the type of 'e'.
+    // Unknown type is used because we don't know which type of error is thrown.
     } catch (e: unknown) {
       let additionalInfo = (
         '\nSubmit button debug logs:\ninterationId: ' +

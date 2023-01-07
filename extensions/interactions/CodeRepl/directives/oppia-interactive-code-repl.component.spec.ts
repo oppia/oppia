@@ -201,17 +201,6 @@ describe('InteractiveCodeReplComponent', () => {
 
   it('should customize editor with editor options when the exploration player' +
   ' loads', () => {
-    // The values cannot be tested since all the variables are private in the
-    // editorOptions Object. Therefore, the arguments passed to various
-    // functions tested instead. The editorOptions Object is tested in the
-    // frontend unit tests.
-
-    // This throws "Type object is not assignable to type
-    // 'QuestionBackendDict'." We need to suppress this error
-    // because of the need to test validations. This error is
-    // thrown because the type of the object is not the same as
-    // the type of the object in the actual codebase.
-    // @ts-ignore
     let cm = {
       replaceSelection: (spaces) => {
         expect(spaces).toBe('  ');
@@ -234,7 +223,7 @@ describe('InteractiveCodeReplComponent', () => {
           return 2;
         }
       }
-    } as CodeMirror.Editor;
+    } as unknown as CodeMirror.Editor;
 
     component.editorOptions.extraKeys.Tab(cm);
   });

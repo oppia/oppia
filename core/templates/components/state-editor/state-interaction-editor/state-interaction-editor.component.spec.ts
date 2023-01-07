@@ -143,13 +143,7 @@ describe('State Interaction component', () => {
       TestBed.inject(ExplorationHtmlFormatterService);
     interactionDetailsCacheService =
       TestBed.inject(InteractionDetailsCacheService);
-    // This throws "Type object is not assignable to type
-    // 'MockNgbModal'." We need to suppress this error
-    // because of the need to test validations. This is
-    // because NgbModal.open() returns NgbModalRef and
-    // we need to test validations for the same.
-    // @ts-ignore
-    mockNgbModal = (TestBed.inject(NgbModal)) as MockNgbModal;
+    mockNgbModal = (TestBed.inject(NgbModal)) as unknown as MockNgbModal;
     responsesService = TestBed.inject(ResponsesService);
     stateContentService = TestBed.inject(StateContentService);
     stateCustomizationArgsService =

@@ -498,7 +498,10 @@ import { QuestionValidationService } from './question-validation.service';
 import { MathInteractionsService } from './math-interactions.service';
 
 interface UpgradedServicesDict {
-  [service: string]: string;
+  // Type 'unknown' is used here because we don't know the exact type of
+  // the service. We are using 'unknown' because we want to avoid using
+  // 'any' as it is not type safe.
+  [service: string]: Object;
 }
 @Injectable({
   providedIn: 'root'

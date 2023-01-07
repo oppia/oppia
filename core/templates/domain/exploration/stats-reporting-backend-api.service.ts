@@ -67,7 +67,7 @@ export class StatsReportingBackendApiService {
         ], {
           exploration_id: explorationId
         });
-    // Type unknown is used because we don't know actual type of error throw.
+    // Unknown type is used because we don't know which type of error is thrown.
     } catch (e: unknown) {
       if (e instanceof Error) {
         let additionalInfo = (

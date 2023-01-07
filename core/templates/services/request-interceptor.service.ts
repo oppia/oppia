@@ -35,7 +35,7 @@ export class RequestInterceptor implements HttpInterceptor {
     var csrf = this.csrf;
     try {
       csrf.initializeToken();
-    // Unknown type is used because we don't know which type pf error thrown.
+    // Unknown type is used because we don't know which type of error is thrown.
     } catch (e: unknown) {
       if (
         e instanceof Error &&

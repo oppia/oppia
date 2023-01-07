@@ -155,7 +155,8 @@ export class NoninteractiveImage implements OnInit, OnChanges {
               entityType, this.contextService.getEntityId(), this.filepath);
           }
         }
-      // Type unknown is used because we don't know which kind of error thrown.
+      // Unknown type is used because we don't know which type of error is
+      // thrown.
       } catch (e: unknown) {
         const entityType = this.contextService.getEntityType();
         if (entityType) {

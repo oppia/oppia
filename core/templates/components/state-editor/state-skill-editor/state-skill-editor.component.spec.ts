@@ -197,13 +197,7 @@ describe('State Skill Editor Component', () => {
     fixture.detectChanges();
     componentInstance.untriagedSkillSummaries = [];
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    // This throws "Type NgbModal is not assignable to type
-    // 'Modal'." We need to suppress this error
-    // because of the need to test validations. This is because
-    // NgbModal is a generic type and we need to specify the type
-    // of the componentInstance.
-    // @ts-ignore
-    mockNgbModal = (TestBed.inject(NgbModal)) as MockNgbModal;
+    mockNgbModal = TestBed.inject(NgbModal) as unknown as MockNgbModal;
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
     userService = TestBed.inject(UserService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
