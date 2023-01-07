@@ -97,19 +97,6 @@
   </div>
 </mat-card>
 <style>
-  .oppia-skill-concept-card-preview-list {
-    display: block;
-  }
-
-  .oppia-skill-concept-card-preview {
-    list-style: none;
-    margin-bottom: 0;
-    padding-left: 0;
-    padding-right: 0;
-    position: relative;
-    vertical-align: top;
-    width: 100%;
-  }
   .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
@@ -177,6 +164,22 @@
   }
   .skill-card-header i {
     display: none;
+  }
+  .oppia-skill-concept-card-preview-list {
+    display: block;
+  }
+  .oppia-skill-concept-card-preview {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+  }
+  .oppia-skill-concept-card-preview > li {
+    display: block;
+    position: relative;
   }
   @media screen and (max-width: 768px) {
     .oppia-worked-examples-header i,
