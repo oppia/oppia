@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.8.12'
+          python-version: '3.8.15'
           architecture: 'x64'
       - name: Cache node modules and third_party/static
         uses: actions/cache@v3
@@ -59,6 +59,7 @@ jobs:
         with:
           name: ${{ format('backend_test_coverage_shard_{0}', matrix.shard) }}
           path: .coverage
+          retention-days: 1
   check_combined_coverage:
     name: Check combined backend test coverage
     needs: run_tests
@@ -67,7 +68,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.8.12'
+          python-version: '3.8.15'
           architecture: 'x64'
       - name: Cache node modules
         uses: actions/cache@v3
