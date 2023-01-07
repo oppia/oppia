@@ -58,7 +58,7 @@ export class TranslateTextBackendApiService {
       languageCode: string, contentHtml: string | string[],
       translationHtml: string | string[], imagesData: ImagesData[],
       dataFormat: string
-  ): Promise<Object> {
+  ): Promise<void> {
     const postData: Data = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
@@ -80,7 +80,7 @@ export class TranslateTextBackendApiService {
     };
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    return this.http.post(
+    return this.http.post<void>(
       '/suggestionhandler/', body).toPromise();
   }
 }
