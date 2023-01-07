@@ -5,7 +5,9 @@ on:
       - develop
 
 jobs:
-  send_notifications:
+  send_notification:
+    name: Send notification
+    runs-on: ubuntu-22.04
     if: github.repository == 'oppia/oppia'
     steps:
     - name: Repository Dispatch
