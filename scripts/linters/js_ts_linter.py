@@ -451,6 +451,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         comment_before_unknown_type = False
         ts_files_to_check = self.ts_filepaths
         for file_path in ts_files_to_check:
+            multiple_line_comment = False
             # Not showing lint errors for files present in
             # FILES_CONTAINING_UNKNOWN_TYPE.
             if file_path in FILES_CONTAINING_UNKNOWN_TYPE:
@@ -458,24 +459,31 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
             file_content = self.file_cache.read(file_path)
             for line_num, line in enumerate(file_content.split('\n')):
-                # Indexes where unknown type (: unknown) is present in a
-                # particular line.
-                unknown_type_object = (
-                    re.finditer(pattern=': unknown', string=line))
-                unknown_type = (
-                    [index.start() for index in unknown_type_object])
-                # Indexes where unknown type conversion (as unknown) is
-                # present in a particular line.
-                unknown_type_conversion_object = (
-                    re.finditer(pattern='as unknown', string=line))
-                unknown_type_conversion = (
-                    [index.start() for index in unknown_type_conversion_object])
+                if not (line.strip().startswith('//') or multiple_line_comment):
+                    if 'spec' in file_path:
+                        patterns = [': unknown', '| unknown', '<unknown']
+                        for pattern in patterns: 
+                            # Indexes where unknown type conversion (as unknown) is
+                            # present in a particular line.
+                            unknown_type_object = (
+                                re.finditer(pattern=pattern, string=line))
+                            unknown_type = (
+                                [index.start() for index in unknown_type_object])
+                    else:
+                        patterns = [': unknown', 'as unknown', '| unknown', '<unknown']
+                        for pattern in patterns: 
+                            # Indexes where unknown type conversion (as unknown) is
+                            # present in a particular line.
+                            unknown_type_object = (
+                                re.finditer(pattern=pattern, string=line))
+                            unknown_type = (
+                                [index.start() for index in unknown_type_object])
 
                 # Checking previous line contain comment, if yes then skip throw
                 # errors.
                 if not comment_before_unknown_type:
                     # Throw error if unknown type is present.
-                    if len(unknown_type):
+                    if unknown_type:
                         failed = True
                         for index, unknown in enumerate(unknown_type):
                             if unknown is None:
@@ -486,23 +494,15 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                                     unknown_type[index]))
                                 error_messages.append(error_message)
 
-                    # Throw error if unknown type conversion is present.
-                    if len(unknown_type_conversion):
-                        failed = True
-                        for index, unknown in enumerate(
-                                unknown_type_conversion):
-                            if unknown is None:
-                                error_message = (
-                                    '%s:%s:%s: unknown type conversion used.'
-                                    ' Add proper comment if unknown is needed'
-                                    ' with proper explanation.' % (
-                                    file_path, line_num + 1,
-                                    unknown_type_conversion[index]))
-                                error_messages.append(error_message)
-
                 # Checking line contains comments.
-                ts_unknown_error = re.findall(pattern=r'^ *//', string=line)
-                comment_before_unknown_type = bool(len(ts_unknown_error))
+                comment_before_unknown_type = (
+                    line.strip().startswith('//') or line.strip().endswith('*/'))
+            
+                if not multiple_line_comment:
+                    multiple_line_comment = line.strip().startswith('/*')
+                
+                if line.strip().endswith('*/'):
+                    multiple_line_comment = False
 
         return concurrent_task_utils.TaskResult(
             name, failed, sorted(error_messages), sorted(error_messages))
