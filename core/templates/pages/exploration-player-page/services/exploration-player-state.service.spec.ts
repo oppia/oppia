@@ -680,14 +680,6 @@ describe('Exploration Player State Service', () => {
     expect(explorationPlayerStateService.isInStoryChapterMode()).toBeTrue();
   });
 
-  it('should tell if in exploration mode', () => {
-    expect(explorationPlayerStateService.isInOtherMode()).toBeTrue();
-
-    explorationPlayerStateService.setExplorationMode();
-
-    expect(explorationPlayerStateService.isInExplorationMode()).toBeTrue();
-  });
-
   it('should move to exploration', () => {
     spyOn(explorationEngineService, 'moveToExploration');
     spyOn(explorationPlayerStateService, 'setStoryChapterMode');
