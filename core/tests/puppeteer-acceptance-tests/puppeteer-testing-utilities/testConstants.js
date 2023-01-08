@@ -1,4 +1,4 @@
-// this file is for exporting the constants in our tests, that can be used again-and-again..
+// This file is for exporting the constants in our tests, that can be re-used.
 
 let testConstants = {
   URLs: {

@@ -10,8 +10,8 @@ module.exports = class puppeteerUtilities {
    * This is a function that opens a new browser instance for the user.
    * @returns {Promise<puppeteer.Page>} - Returns a promise that resolves to a Page object controlled by Puppeteer.
    */
-  async openBrowser(){
-   /* currently, headless is set to false and the page viewport
+  async openBrowser() {
+    /* Currently, headless is set to false and the page viewport
        is maximized so that it would be easy for the developers
        to debug easily while testing.
        We can remove these settings before merging as we have
@@ -25,7 +25,7 @@ module.exports = class puppeteerUtilities {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await (this.page).setViewport({ width: 0, height: 0 });
-        // accepting the alerts that appear in between the tests
+        // Accepting the alerts that appear in between the tests.
         await this.page.on('dialog', async dialog => {
           await dialog.accept();
         });
@@ -78,7 +78,7 @@ module.exports = class puppeteerUtilities {
   async reloadPage() {
     await (this.page).reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
   }
-  
+
   /**
    * This function clicks on any element using its CSS selector or the text written on that element.
    * @param {string} tag - The HTML tag of the element.

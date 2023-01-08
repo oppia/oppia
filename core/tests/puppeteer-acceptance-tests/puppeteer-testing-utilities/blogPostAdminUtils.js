@@ -5,14 +5,14 @@ const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
 const thumbnailPhotoBox = 'e2e-test-photo-clickable';
 const unauthErrorContainer = 'div.e2e-test-error-container';
-const roleEditorInputField = 'input.e2e-test-username-for-role-editor'
+const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'e2e-test-role-edit-button';
 const rolesSelectDropdown = 'mat-select-trigger';
 const blogdDashboardAuthorDetailsModal = 'div.modal-dialog';
 const rolesEditorTab = testConstants.URLs.RolesEditorTab;
 const roleUpdateUsernameInput = 'input#label-target-update-form-name';
 const removeBlogEditorUsernameInput = 'input#label-target-form-reviewer-username';
-const maximumTagLimitInput = 'input#mat-input-0'
+const maximumTagLimitInput = 'input#mat-input-0';
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
