@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StoryObjectFactory.
+ * @fileoverview Tests for story-object model class.
  */
 
 import { Story } from 'domain/story/story-object.model';
