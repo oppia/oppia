@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Story-object model.
+ * @fileoverview Tests for StoryObjectFactory.
  */
 
 import { Story } from 'domain/story/story-object.model';
@@ -21,6 +21,44 @@ import { Story } from 'domain/story/story-object.model';
 describe('Story object factory', () => {
   let _sampleStory: Story;
 
+  beforeEach(() => {
+    var sampleStoryBackendDict = {
+      id: 'sample_story_id',
+      title: 'Story title',
+      description: 'Story description',
+      notes: 'Notes',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      story_contents: {
+        initial_node_id: 'node_1',
+        nodes: [{
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_filename: 'img.png',
+          thumbnail_bg_color: '#a33f40'
+        }],
+        next_node_id: 'node_3'
+      },
+      language_code: 'en',
+      url_fragment: 'story-title',
+      meta_tag_content: 'story meta tag content'
+    };
+    _sampleStory = Story.createFromBackendDict(
+      // This throws "Argument of type '{ id: string; ... }'
+      // is not assignable to parameter of type 'StoryBackendDict'.".
+      // We need to suppress this error because 'sampleStoryBackendDict'
+      // should have a property 'thumbnail' but we didn't add that property in
+      // order to test validations.
+      // @ts-expect-error
+      sampleStoryBackendDict);
+  });
 
   it('should correctly validate a valid story', () => {
     expect(_sampleStory.validate()).toEqual([]);
