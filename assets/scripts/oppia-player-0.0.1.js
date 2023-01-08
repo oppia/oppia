@@ -64,25 +64,16 @@
   // without using division, which results in biased random numbers. Reference:
   // https://thecompetentdev.com/weeklyjstips/tips/73_generate_secure_randoms/
   const random = () => {
-    // A buffer with just the right size to convert to Float64
-    let buffer = new ArrayBuffer(8);
-    
-    // View it as an Int8Array and fill it with 8 random ints
-    let ints = new Int8Array(buffer);
+    var buffer = new ArrayBuffer(8);
+    var ints = new Int8Array(buffer);
     window.crypto.getRandomValues(ints);
-    
-    // Set the sign (ints[7][7]) to 0 and the
-    // exponent (ints[7][6]-[6][5]) to just the right size 
-    // (all ones except for the highest bit)
+
     ints[7] = 63;
     ints[6] |= 0xf0;
     
-    // Now view it as a Float64Array, and read the one float from it
-    let float = new DataView(buffer).getFloat64(0, true) - 1;
+    var float = new DataView(buffer).getFloat64(0, true) - 1;
     return float;
   }
-  
-  console.log(random()); // 0 - 1, 52 bits
 
   var SECRET_LENGTH = 64;
   var secret = '';
