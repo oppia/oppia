@@ -93,7 +93,6 @@ angular.module('oppia').directive('oppiaRoot', [
               'StateClassifierMappingService', 'StateInteractionStatsService',
               'StateObjectFactory', 'StateTopAnswersStatsBackendApiService',
               'StateTopAnswersStatsService', 'StatesObjectFactory',
-              'StoryObjectFactory',
               'StoryViewerBackendApiService',
               'SubtopicViewerBackendApiService',
               'SuggestionsService', 'TextInputRulesService',
