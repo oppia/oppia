@@ -25,7 +25,7 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { Story } from 'domain/story/story-object.model'
+import { Story } from 'domain/story/story-object.model';
 
 class MockNgbModalRef {
   componentInstance: {

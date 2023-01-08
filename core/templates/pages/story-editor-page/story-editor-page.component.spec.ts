@@ -25,7 +25,7 @@ import { EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
-import { Story } from 'domain/story/story-object.model'
+import { Story } from 'domain/story/story-object.model';
 
 require('pages/story-editor-page/story-editor-page.component.ts');
 

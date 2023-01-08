@@ -19,7 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Story } from 'domain/story/story-object.model'
+import { Story } from 'domain/story/story-object.model';
 
 class MockNgbModalRef {
   componentInstance: {
