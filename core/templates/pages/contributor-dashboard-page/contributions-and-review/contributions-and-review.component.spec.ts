@@ -768,6 +768,7 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.isReviewTranslationsTab()).toBeTrue();
+      expect(component.isReviewQuestionsTab()).toBeFalse();
       expect(alertsService.addSuccessMessage)
         .toHaveBeenCalledWith('Submitted suggestion review.');
     }));
@@ -779,6 +780,7 @@ describe('Contributions and review component', () => {
 
       component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
       expect(component.isReviewQuestionsTab()).toBeTrue();
+      expect(component.isReviewTranslationsTab()).toBeFalse();
 
       component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
       component.contributions = {
