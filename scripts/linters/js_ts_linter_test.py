@@ -57,6 +57,10 @@ VALID_IGNORED_SERVICE_PATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_ignored.service.ts')
 INVALID_UNKNOWN_IN_TS_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_unknown_in_ts_file.ts')
+INVALID_UNKNOWN_IN_TEST_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_unknown_in_ts_file.spec.ts')
+VALID_UNKNOWN_IN_TS_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'valid_unknown_in_ts_file.ts')
 VALID_UNLISTED_SERVICE_PATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_unlisted.service.ts')
 
@@ -166,17 +170,46 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     INVALID_UNKNOWN_IN_TS_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    INVALID_UNKNOWN_IN_TEST_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    VALID_UNKNOWN_IN_TS_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        js_ts_linter.FILES_CONTAINING_UNKNOWN_TYPE = [
+            VALID_UNKNOWN_IN_TS_FILEPATH]
+
         compile_all_ts_files_swap = self.swap(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
         with compile_all_ts_files_swap:
             lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [INVALID_UNKNOWN_IN_TS_FILEPATH,
-                     INVALID_UNKNOWN_IN_TS_FILEPATH],
+                     INVALID_UNKNOWN_IN_TEST_FILEPATH,
+                     VALID_UNKNOWN_IN_TS_FILEPATH],
                 FILE_CACHE).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        self.validate([], [], lint_task_report)
+        expected_messages = [
+            '%s:%s:%s: unknown type used. Add proper comment explaining why '
+            'unknown type is used before the line if the type is needed '
+            'otherwise remove the unknown type and use the appropriate type.'
+            % (INVALID_UNKNOWN_IN_TS_FILEPATH, 57, 19)]
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_duplicate_constant_declaration_in_separate_files(
         self

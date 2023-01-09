@@ -465,17 +465,14 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     # Allow the use of 'as unknown' type conversion in spec
                     # files.
                     if 'spec' in file_path:
-                        unknown_types = [
-                            ': unknown', r'\| unknown', '<unknown']
+                        unknown_types = [': unknown', '<unknown']
                         for unknown_type in unknown_types:
                             unknown_type_object = re.finditer(
                                 pattern=unknown_type, string=line)
                             unknown_type_indexes.extend([
                                 index.start() for index in unknown_type_object])
                     else:
-                        unknown_types = [
-                            ': unknown', 'as unknown', r'\| unknown', '<unknown'
-                        ]
+                        unknown_types = [': unknown', 'as unknown', '<unknown']
                         for unknown_type in unknown_types:
                             unknown_type_object = re.finditer(
                                 pattern=unknown_type, string=line)
@@ -488,17 +485,15 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     # Throw error if unknown type is present.
                     if unknown_type_indexes:
                         failed = True
-                        for index, unknown in enumerate(unknown_type_indexes):
-                            if unknown is not None:
-                                error_message = (
-                                    '%s:%s:%s: unknown type used. Add proper '
-                                    'comment explaining why unknown type is '
-                                    'used before the line if the type is needed '
-                                    'otherwise remove the unknown type and use '
-                                    'the appropriate type.' % (
-                                    file_path, line_num + 1,
-                                    unknown_type_indexes[index]))
-                                error_messages.append(error_message)
+                        for unknown_type_index in unknown_type_indexes:
+                            error_message = (
+                                '%s:%s:%s: unknown type used. Add proper '
+                                'comment explaining why unknown type is '
+                                'used before the line if the type is needed '
+                                'otherwise remove the unknown type and use '
+                                'the appropriate type.' % (
+                                file_path, line_num + 1, unknown_type_index))
+                            error_messages.append(error_message)
 
                 # Check whether previous line contains a proper comment.
                 # If it does, then skip throwing an error.
