@@ -29,9 +29,9 @@
                       *ngFor="let skillSummary of uncategorizedSkillSummaries"
                       cdkDrag
                       (cdkDragStarted)="onMoveSkillStart(null, skillSummary)">
-              <div class="skill-card">
+              <div class="skill-card e2e-test-uncategorized-skill-card">
                 <a *ngIf="!isSkillDeleted(skillSummary)"
-                   class="skill-name e2e-test-uncategorized-skill-card"
+                   class="skill-name"
                    [href]="getSkillEditorUrl(skillSummary.getId())"
                    target="_blank"
                    rel="noopener">
@@ -48,7 +48,7 @@
       </div>
       <div *ngFor="let subtopic of subtopics"
            class="item-flex-container">
-        <mat-card class="subtopic item-container e2e-test-subtopic-column">
+        <mat-card class="subtopic item-container">
           <div class="subtopic-header"
                (click)="editNameOfSubtopicWithId(subtopic.getId())">
             <strong [ngbTooltip]="subtopic.getTitle()"
@@ -83,7 +83,7 @@
               Save
             </button>
           </div>
-          <div class="subtopic-container outside-container"
+          <div class="subtopic-container outside-container e2e-test-subtopic-column"
                cdkDropList
                [cdkDropListData]="subtopic?.getSkillSummaries()"
                (cdkDropListDropped)="onMoveSkillEnd($event, subtopic.getId())">
@@ -209,7 +209,7 @@
     margin: 8px
   }
   .outside-container {
-    min-height: 5px;
+    min-height: 25px;
   }
   .cdk-drag-preview {
     border-radius: 4px;
