@@ -437,9 +437,8 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
             name, failed, error_messages, error_messages)
 
     def _check_unknown_type(self) -> concurrent_task_utils.TaskResult:
-        """Prints a list of lint errors if an unknown type is used. This lint
-        check is not enabled by default. Add proper comment if unknown is
-        needed.
+        """Prints a list of lint errors if an unknown type is used. Add proper
+        comment before the line with the unknown type if the type is needed.
 
         Returns:
             TaskResult. A TaskResult object representing the result of the
@@ -448,9 +447,9 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         name = 'Unknown type'
         error_messages: List[str] = []
         failed = False
-        comment_before_unknown_type = False
         ts_files_to_check = self.ts_filepaths
         for file_path in ts_files_to_check:
+            comment_before_unknown_type = False
             multiple_line_comment = False
             # Not showing lint errors for files present in
             # FILES_CONTAINING_UNKNOWN_TYPE.
@@ -459,51 +458,59 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
             file_content = self.file_cache.read(file_path)
             for line_num, line in enumerate(file_content.split('\n')):
-                # Check if the line has a comment.
+                unknown_type_indexes: List[int] = []
+                # Check if the line has a comment. Skip the line if it has
+                # a comment.
                 if not (line.strip().startswith('//') or multiple_line_comment):
+                    # Allow the use of 'as unknown' type conversion in spec
+                    # files.
                     if 'spec' in file_path:
-                        patterns = [': unknown', '| unknown', '<unknown']
-                        for pattern in patterns: 
-                            # Indexes where unknown type conversion (as unknown) is
-                            # present in a particular line.
-                            unknown_type_object = (
-                                re.finditer(pattern=pattern, string=line))
-                            unknown_type = (
-                                [index.start() for index in unknown_type_object])
+                        unknown_types = [
+                            ': unknown', r'\| unknown', '<unknown']
+                        for unknown_type in unknown_types:
+                            unknown_type_object = re.finditer(
+                                pattern=unknown_type, string=line)
+                            unknown_type_indexes.extend([
+                                index.start() for index in unknown_type_object])
                     else:
-                        patterns = [': unknown', 'as unknown', '| unknown', '<unknown']
-                        for pattern in patterns: 
-                            # Indexes where unknown type conversion (as unknown) is
-                            # present in a particular line.
-                            unknown_type_object = (
-                                re.finditer(pattern=pattern, string=line))
-                            unknown_type = (
-                                [index.start() for index in unknown_type_object])
+                        unknown_types = [
+                            ': unknown', 'as unknown', r'\| unknown', '<unknown'
+                        ]
+                        for unknown_type in unknown_types:
+                            unknown_type_object = re.finditer(
+                                pattern=unknown_type, string=line)
+                            unknown_type_indexes.extend([
+                                index.start() for index in unknown_type_object])
 
                 # Checking previous line contain comment, if yes then skip throw
                 # errors.
                 if not comment_before_unknown_type:
                     # Throw error if unknown type is present.
-                    if unknown_type:
+                    if unknown_type_indexes:
                         failed = True
-                        for index, unknown in enumerate(unknown_type):
-                            if unknown is None:
+                        for index, unknown in enumerate(unknown_type_indexes):
+                            if unknown is not None:
                                 error_message = (
-                                    '%s:%s:%s: unknown type used. Add proper'
-                                    ' comment if Unknown is needed.' % (
+                                    '%s:%s:%s: unknown type used. Add proper '
+                                    'comment explaining why unknown type is '
+                                    'used before the line if the type is needed '
+                                    'otherwise remove the unknown type and use '
+                                    'the appropriate type.' % (
                                     file_path, line_num + 1,
-                                    unknown_type[index]))
+                                    unknown_type_indexes[index]))
                                 error_messages.append(error_message)
 
                 # Check whether previous line contains a proper comment.
-                # If it does, then skip throwing an error
+                # If it does, then skip throwing an error.
                 comment_before_unknown_type = (
-                    line.strip().startswith('//') or line.strip().endswith('*/'))
-            
+                    line.strip().startswith('//') or
+                    line.strip().endswith('*/')
+                )
+
                 # Check if the line is a multi-line comment.
                 if not multiple_line_comment:
                     multiple_line_comment = line.strip().startswith('/*')
-                
+
                 if line.strip().endswith('*/'):
                     multiple_line_comment = False
 
