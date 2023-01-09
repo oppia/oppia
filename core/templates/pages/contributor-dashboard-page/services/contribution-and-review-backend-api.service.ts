@@ -89,20 +89,20 @@ export class ContributionAndReviewBackendApiService {
       fetchType: string,
       limit: number,
       offset: number,
-      sortKey?: string,
+      sortKey: string,
       explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
-        'skill', 'add_question', limit, offset);
+        'skill', 'add_question', limit, offset, sortKey);
     }
     if (fetchType === this.SUBMITTED_TRANSLATION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
-        'exploration', 'translate_content', limit, offset);
+        'exploration', 'translate_content', limit, offset, sortKey);
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit, offset, sortKey, explorationId);
+        'skill', 'add_question', limit, offset, sortKey);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
@@ -120,7 +120,8 @@ export class ContributionAndReviewBackendApiService {
       targetType: string,
       suggestionType: string,
       limit: number,
-      offset: number
+      offset: number,
+      sortKey: string
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
@@ -130,7 +131,8 @@ export class ContributionAndReviewBackendApiService {
     );
     const params = {
       limit: limit.toString(),
-      offset: offset.toString()
+      offset: offset.toString(),
+      sort_key: sortKey
     };
     return this.http.get<FetchSuggestionsResponse>(url, { params }).toPromise();
   }
@@ -140,7 +142,7 @@ export class ContributionAndReviewBackendApiService {
       suggestionType: string,
       limit: number,
       offset: number,
-      sortKey?: string,
+      sortKey: string,
       explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
@@ -152,15 +154,13 @@ export class ContributionAndReviewBackendApiService {
     const params: {
       limit: string;
       offset: string;
-      sort_key?: string;
+      sort_key: string;
       exploration_id?: string;
     } = {
       limit: limit.toString(),
       offset: offset.toString(),
+      sort_key: sortKey
     };
-    if (sortKey !== undefined) {
-      params.sort_key = sortKey;
-    }
     if (explorationId !== undefined) {
       params.exploration_id = explorationId;
     }

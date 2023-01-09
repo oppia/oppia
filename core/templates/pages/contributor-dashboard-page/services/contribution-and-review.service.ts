@@ -38,13 +38,14 @@ class SuggestionFetcher {
   // The current offset, i.e. the number of items to skip (from the beginning of
   // all matching results) in the next fetch.
   offset: number;
-  sortKey?: string;
+  sortKey: string;
   // Cache of suggestions.
   suggestionIdToDetails: SuggestionDetailsDict;
 
   constructor(type: string) {
     this.type = type;
     this.offset = 0;
+    this.sortKey = '';
     this.suggestionIdToDetails = {};
   }
 }
@@ -170,8 +171,10 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true
+      shouldResetOffset: boolean = true,
+      sortKey: string = ''
   ): Promise<FetchSuggestionsResponse> {
+    this.userCreatedQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedQuestionFetcher,
       shouldResetOffset);
@@ -179,7 +182,7 @@ export class ContributionAndReviewService {
 
   async getReviewableQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      sortKey?: string
+      sortKey: string = ''
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
@@ -188,8 +191,10 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
-      shouldResetOffset: boolean = true
+      shouldResetOffset: boolean = true,
+      sortKey: string = ''
   ): Promise<FetchSuggestionsResponse> {
+    this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
       shouldResetOffset);
@@ -197,8 +202,10 @@ export class ContributionAndReviewService {
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
+      sortKey: string = '',
       explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
+    this.reviewableTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,

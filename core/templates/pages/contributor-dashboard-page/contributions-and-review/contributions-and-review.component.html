@@ -88,10 +88,10 @@
         <span class="sort-questions-select float-right"
               *ngIf="isReviewQuestionsTab()">
           <p class="sort-by-text">Sort By</p>
-          <select [(ngModel)]="currentQuestionsSortKey"
+          <select [(ngModel)]="reviewableQuestionsSortKey"
                   class="sort-options"
-                  (change)="setQuestionsSortKeys(currentQuestionsSortKey)">
-            <option *ngFor="let key of QUESTIONS_SORT_KEYS"
+                  (change)="setReviewableQuestionsSortKey(reviewableQuestionsSortKey)">
+            <option *ngFor="let key of REVIEWABLE_QUESTIONS_SORT_KEYS"
                     [value]="key"
                     [innerHTML]="key">
             </option>

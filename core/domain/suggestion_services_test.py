@@ -1542,7 +1542,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 user_id=self.author_id_1,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
-                offset=0))
+                offset=0,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
 
         self.assertEqual(len(translatable_suggestions), 2)
         self.assertEqual(offset, 2)
@@ -1571,7 +1572,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 user_id=self.author_id_1,
                 suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
-                offset=0))
+                offset=0,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
 
         self.assertEqual(len(question_suggestions), 2)
         self.assertEqual(offset, 2)
@@ -1661,7 +1663,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, self.opportunity_summary_ids,
-                constants.OPPORTUNITIES_PAGE_SIZE, 0))
+                constants.OPPORTUNITIES_PAGE_SIZE, 0, None))
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
@@ -1693,7 +1695,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Get all reviewable translation suggestions.
         suggestions, offset = suggestion_services.get_reviewable_translation_suggestions_by_offset(
             self.reviewer_id_1, [],
-            constants.OPPORTUNITIES_PAGE_SIZE, 0)
+            constants.OPPORTUNITIES_PAGE_SIZE, 0, None)
 
         self.assertEqual(offset, 0)
         self.assertEqual(len(suggestions), 0)
@@ -1719,7 +1721,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, None,
-                constants.OPPORTUNITIES_PAGE_SIZE, 0))
+                constants.OPPORTUNITIES_PAGE_SIZE, 0, None))
 
         self.assertEqual(len(suggestions), 3)
         self.assertEqual(offset, 3)
@@ -1745,7 +1747,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, None,
-                constants.OPPORTUNITIES_PAGE_SIZE, 0))
+                constants.OPPORTUNITIES_PAGE_SIZE, 0, None))
 
         # The user does not have rights to review any languages, so expect an
         # empty result.
@@ -1774,7 +1776,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, self.opportunity_summary_ids,
-                constants.OPPORTUNITIES_PAGE_SIZE, 0, language_to_filter))
+                constants.OPPORTUNITIES_PAGE_SIZE, 0, None, language_to_filter))
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
@@ -1788,7 +1790,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.
             get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1, self.opportunity_summary_ids,
-                constants.OPPORTUNITIES_PAGE_SIZE, 0, language_to_filter))
+                constants.OPPORTUNITIES_PAGE_SIZE, 0, None, language_to_filter))
 
         # Expect that the results correspond to translation suggestions that the
         # user has rights to review.
@@ -1823,12 +1825,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewable_question_suggestions_by_offset(
                 self.reviewer_id_1,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
-                offset=0))
+                offset=0,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)
         self.assertEqual(offset, 2)
-        expected_suggestion_type_list = ['skill1', 'skill2']
+        expected_suggestion_type_list = ['skill2', 'skill1']
         actual_suggestion_type_list = [
             suggestion.change.skill_id
             for suggestion in suggestions

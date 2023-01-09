@@ -681,7 +681,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
 
     limit: int
     offset: int
-    sort_key: Optional[str]
+    sort_key: str
     exploration_id: Optional[str]
 
 
@@ -732,8 +732,7 @@ class ReviewableSuggestionsHandler(
                 'schema': {
                     'type': 'basestring'
                 },
-                'choices': feconf.QUESTIONS_SORT_KEYS,
-                'default_value': None
+                'choices': feconf.SUGGESTIONS_SORT_KEYS,
             },
             'exploration_id': {
                 'schema': {
@@ -758,7 +757,7 @@ class ReviewableSuggestionsHandler(
             target_type, suggestion_type)
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
-        sort_key = self.normalized_request.get('sort_key')
+        sort_key = self.normalized_request['sort_key']
         exploration_id = self.normalized_request.get('exploration_id')
         exp_ids = [exploration_id] if exploration_id else []
 
@@ -768,7 +767,7 @@ class ReviewableSuggestionsHandler(
             reviewable_suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_translation_suggestions_by_offset(
-                    self.user_id, exp_ids, limit, offset))
+                    self.user_id, exp_ids, limit, offset, sort_key))
             # Filter out obsolete translation suggestions, i.e. suggestions with
             # translations that no longer match the current exploration content
             # text. See issue #16536 for more details.
@@ -780,7 +779,7 @@ class ReviewableSuggestionsHandler(
             suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key=sort_key))
+                    self.user_id, limit, offset, sort_key))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -791,6 +790,7 @@ class UserSubmittedSuggestionsHandlerNormalizedRequestDict(TypedDict):
 
     limit: int
     offset: int
+    sort_key: str
 
 
 class UserSubmittedSuggestionsHandler(
@@ -836,6 +836,12 @@ class UserSubmittedSuggestionsHandler(
                         'min_value': 0
                     }]
                 }
+            },
+            'sort_key': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': feconf.SUGGESTIONS_SORT_KEYS,
             }
         }
     }
@@ -854,9 +860,10 @@ class UserSubmittedSuggestionsHandler(
             target_type, suggestion_type)
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
+        sort_key = self.normalized_request['sort_key']
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
-                self.user_id, suggestion_type, limit, offset
+                self.user_id, suggestion_type, limit, offset, sort_key
             )
         )
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -886,7 +893,8 @@ class UserSubmittedSuggestionsHandler(
                         self.user_id,
                         feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                         limit,
-                        next_offset
+                        next_offset,
+                        sort_key
                     )
                 )
                 suggestions_with_translatable_exps = (
