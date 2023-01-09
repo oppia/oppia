@@ -29,7 +29,7 @@ require(
   'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.component.ts');
-require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
+require('pages/story-editor-page/editor-tab/story-node-editor.component.ts');
 require(
   'pages/story-editor-page/modal-templates/' +
   'new-chapter-title-modal.controller.ts');
