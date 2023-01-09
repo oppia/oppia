@@ -33,6 +33,8 @@ export interface ExplorationOpportunity {
   inReviewCount: number;
   totalCount: number;
   translationsCount: number;
+  heading?: string;
+  actionButtonTitle?: string;
 }
 
 @Component({

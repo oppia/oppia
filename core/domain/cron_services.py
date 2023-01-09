@@ -26,16 +26,28 @@ from typing import List, Sequence
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
+    from mypy_imports import beam_job_models
     from mypy_imports import datastore_services
+    from mypy_imports import job_models
     from mypy_imports import user_models
 
-(base_models, job_models, user_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.JOB, models.Names.USER])
+(
+    base_models, beam_job_models,
+    job_models, user_models
+) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.BEAM_JOB,
+    models.Names.JOB, models.Names.USER
+])
 datastore_services = models.Registry.import_datastore_services()
 
 # Only non-versioned models should be included in this list. Activities that
 # use versioned models should have their own delete functions.
-MODEL_CLASSES_TO_MARK_AS_DELETED = (user_models.UserQueryModel,)
+MODEL_CLASSES_TO_MARK_AS_DELETED = {
+    user_models.UserQueryModel: datetime.timedelta(days=30),
+    beam_job_models.BeamJobRunModel: datetime.timedelta(days=180),
+    beam_job_models.BeamJobRunResultModel: datetime.timedelta(days=180),
+    job_models.JobModel: datetime.timedelta(days=180),
+}
 
 
 def delete_models_marked_as_deleted() -> None:
@@ -65,12 +77,12 @@ def delete_models_marked_as_deleted() -> None:
 
 def mark_outdated_models_as_deleted() -> None:
     """Mark models in MODEL_CLASSES_TO_MARK_AS_DELETED, as deleted if they were
-    last updated more than four weeks ago.
+    last updated more than their deletion period ago.
     """
-    date_before_which_to_mark_as_deleted = (
-        datetime.datetime.utcnow() - feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
     models_to_mark_as_deleted: List[base_models.BaseModel] = []
-    for model_class in MODEL_CLASSES_TO_MARK_AS_DELETED:
+    for model_class, period_to_keep in MODEL_CLASSES_TO_MARK_AS_DELETED.items():
+        date_before_which_to_mark_as_deleted = (
+            datetime.datetime.utcnow() - period_to_keep)
         models_to_mark_as_deleted.extend(
             model_class.query(
                 model_class.last_updated < date_before_which_to_mark_as_deleted
