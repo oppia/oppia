@@ -516,7 +516,7 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
 # service.
 CHECKPOINTS_FEATURE_IS_ENABLED = ConfigProperty(
     'checkpoints_feature_is_enabled', BOOL_SCHEMA,
-    'Enable checkpoints feature.', False)
+    'Enable checkpoints feature.', True)
 
 CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
     'classroom_promos_are_enabled', BOOL_SCHEMA,
