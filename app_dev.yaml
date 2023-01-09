@@ -52,10 +52,6 @@ handlers:
   static_dir: dist/
   secure: always
   expiration: "0"
-- url: /.well-known/security.txt
-  static_files: assets/.well-known/security.txt
-  upload: assets/.well-known/security.txt
-  secure: always
 - url: /assets
   static_dir: assets
   secure: always
