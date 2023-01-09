@@ -22,7 +22,6 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -262,7 +261,6 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         )
 
 
-
 # TODO(#15927): This job needs to be kept in sync with
 # AuditExplorationMigrationJob and later we will unify these jobs together.
 class MigrateExplorationJob(base_jobs.JobBase):
@@ -364,7 +362,7 @@ class AuditExplorationMigrationJob(base_jobs.JobBase):
         unused_transformed_exp_objects_list, job_run_results = (
             self.pipeline
             | 'Perform migration and filter migration results' >> (
-                exp_transforms.MigrateExplorationModels())
+                MigrateExplorationModels())
         )
 
         return job_run_results
