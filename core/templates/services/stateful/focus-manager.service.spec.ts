@@ -97,7 +97,7 @@ describe('Focus Manager Service', () => {
     })
   );
 
-  it('should set focus without scrolling to top when scheam based lsit editor' +
+  it('should set focus without scrolling to top when schema based list editor' +
   'is active', fakeAsync(
     () => {
       spyOn(focusManagerService, 'setFocus');
