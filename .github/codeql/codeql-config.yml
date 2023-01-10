@@ -9,7 +9,3 @@ paths-ignore:
   # for SHA-1. We can migrate to a stronger cryptographic algorithm, replacing
   # all SHA-1, but that would require changes to the existing data we have.
   - core/utils.py
-  # TODO(#16641): This file causes CodeQL to throw the error "Clear text
-  # storage of sensitive information." Remove the following two lines once we
-  # store the API key in a secrets manager on production.
-  - scripts/release_scripts/update_configs.py
