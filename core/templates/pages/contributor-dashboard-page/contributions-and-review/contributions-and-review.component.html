@@ -84,6 +84,20 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
+      <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container">
+        <span class="sort-questions-select float-right"
+              *ngIf="isReviewQuestionsTab()">
+          <p class="sort-by-text">Sort By</p>
+          <select [(ngModel)]="reviewableQuestionsSortKey"
+                  class="sort-options"
+                  (change)="setReviewableQuestionsSortKey(reviewableQuestionsSortKey)">
+            <option *ngFor="let key of REVIEWABLE_QUESTIONS_SORT_KEYS"
+                    [value]="key"
+                    [innerHTML]="key">
+            </option>
+          </select>
+        </span>
+      </div>
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
@@ -307,6 +321,38 @@
   .oppia-login-required {
     height: 100%;
     width: 100%;
+  }
+
+  span.sort-questions-select {
+    display: inline-block;
+    margin-right: auto;
+    width: auto;
+  }
+
+  span.sort-questions-select .sort-by-text,
+  span.sort-questions-select .sort-options {
+    display: inline-block;
+  }
+
+  span.sort-questions-select .sort-by-text {
+    margin: 8px 8px 0;
+  }
+
+  span.sort-questions-select .sort-options {
+    background: #fff;
+    border-color: #ddd;
+    height: 32px;
+    margin: 7px 7px 0 0;
+  }
+
+  .oppia-contributions-tab-panel {
+    font-size: 15px;
+    padding: 5px 0 20px 10px;
+  }
+
+  .oppia-contributions-tab-panel-container {
+    padding-bottom: 46px;
+    padding-top: 13px;
   }
 
 

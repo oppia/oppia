@@ -124,7 +124,7 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-        cars.getUserCreatedQuestionSuggestionsAsync()
+        cars.getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
@@ -148,7 +148,7 @@ describe('Contribution and review service', () => {
 
       // Only the first 2 results should be returned and the extra result
       // should be cached.
-      cars.getUserCreatedQuestionSuggestionsAsync()
+      cars.getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_1)
             .toEqual(expectedSuggestionDict);
@@ -191,7 +191,7 @@ describe('Contribution and review service', () => {
 
       // Return both the cached 3rd suggestion and the new 4th suggestion to the
       // caller.
-      cars.getUserCreatedQuestionSuggestionsAsync(false)
+      cars.getUserCreatedQuestionSuggestionsAsync(false, 'sort_key')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_3)
             .toEqual(expectedSuggestion3Dict);
@@ -218,7 +218,7 @@ describe('Contribution and review service', () => {
 
       // Only the first 2 results should be returned and the extra result
       // should be cached.
-      cars.getUserCreatedQuestionSuggestionsAsync()
+      cars.getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_1)
             .toEqual(expectedSuggestionDict);
@@ -236,7 +236,7 @@ describe('Contribution and review service', () => {
         Promise.resolve(multiplePageBackendFetchResponse));
 
       // Return the first 2 results from offset 0 again.
-      cars.getUserCreatedQuestionSuggestionsAsync()
+      cars.getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_1)
             .toEqual(expectedSuggestionDict);
@@ -255,7 +255,7 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-        cars.getReviewableQuestionSuggestionsAsync()
+        cars.getReviewableQuestionSuggestionsAsync(true, 'sort_key')
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
@@ -271,7 +271,7 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-        cars.getUserCreatedTranslationSuggestionsAsync()
+        cars.getUserCreatedTranslationSuggestionsAsync(true, 'sort_key')
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
               .toEqual(expectedSuggestionDict);

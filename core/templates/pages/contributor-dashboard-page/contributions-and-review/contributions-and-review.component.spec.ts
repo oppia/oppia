@@ -768,16 +768,18 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.isReviewTranslationsTab()).toBeTrue();
+      expect(component.isReviewQuestionsTab()).toBeFalse();
       expect(alertsService.addSuccessMessage)
         .toHaveBeenCalledWith('Submitted suggestion review.');
     }));
 
-    it('should return false on Review Questions tab', () => {
+    it('should return true on Review Questions tab', () => {
       spyOn(component, 'openQuestionSuggestionModal').and.callFake(() => {
         return;
       });
 
       component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
+      expect(component.isReviewQuestionsTab()).toBeTrue();
       expect(component.isReviewTranslationsTab()).toBeFalse();
 
       component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
@@ -798,6 +800,14 @@ describe('Contributions and review component', () => {
       };
 
       component.onClickViewSuggestion('SUGGESTION');
+    });
+
+    it('should change the sort key of reviewable questions', () => {
+      expect(component.reviewableQuestionsSortKey).toBe('Date');
+
+      component.setReviewableQuestionsSortKey('Name');
+
+      expect(component.reviewableQuestionsSortKey).toBe('Name');
     });
 
     it('should open question suggestion modal', fakeAsync(() => {

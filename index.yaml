@@ -186,6 +186,12 @@ indexes:
   - name: author_id
   - name: deleted
   - name: suggestion_type
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: suggestion_type
   - name: created_on
     direction: desc
 
@@ -196,6 +202,25 @@ indexes:
   - name: status
   - name: suggestion_type
   - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: created_on
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: target_id
+  - name: created_on
+    direction: desc
 
 - kind: GeneralSuggestionModel
   properties:
@@ -224,6 +249,14 @@ indexes:
   - name: status
   - name: suggestion_type
   - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: created_on
+    direction: desc
 
 - kind: GeneralSuggestionModel
   properties:

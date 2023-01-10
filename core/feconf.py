@@ -1631,6 +1631,9 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# The sort keys of submitted questions shown on the Contributor Dashboard.
+SUGGESTIONS_SORT_KEYS = [constants.SUGGESTIONS_SORT_KEY_DATE]
+
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
 # '/access_validation_handler/<handler_name>'
