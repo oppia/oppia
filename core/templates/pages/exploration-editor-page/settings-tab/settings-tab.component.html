@@ -320,7 +320,7 @@
             <li *ngFor="let ownerName of explorationRightsService.ownerNames; let index = index">
               <div class="oppia-user-list-item e2e-test-owner-role-names">
                 <span>{{ ownerName }}</span>
-                <span [hidden]="!isRolesFormOpen || ownerName === loggedInUser" [ngbTooltip]="'Remove user'" type="button" class="material-icons oppia-delete-user-button" (click)="removeRole(ownerName, 'Managers')">highlight_off
+                <span [hidden]="!isRolesFormOpen || ownerName === loggedInUser" [ngbTooltip]="'Remove user'" type="button" class="far fa-times-circle" (click)="removeRole(ownerName, 'Managers')">
                 </span>
               </div>
             </li>
@@ -333,7 +333,7 @@
             <li *ngFor="let editorName of explorationRightsService.editorNames; let index = index">
               <div  class="oppia-user-list-item e2e-test-editor-role-names">
                 <span>{{ editorName }}</span>
-                <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="material-icons oppia-delete-user-button" (click)="removeRole(editorName, 'Collaborators')">highlight_off
+                <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" (click)="removeRole(editorName, 'Collaborators')">
                 </span>
               </div>
             </li>
@@ -346,7 +346,7 @@
             <li *ngFor="let viewerName of explorationRightsService.viewerNames; let index = index">
               <div class="oppia-user-list-item e2e-test-viewer-role-names">
                 <span>{{ viewerName }}</span>
-                <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="material-icons oppia-delete-user-button" (click)="removeRole(viewerName, 'Playtesters')">highlight_off
+                <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" (click)="removeRole(viewerName, 'Playtesters')">
                 </span>
               </div>
             </li>
@@ -424,7 +424,7 @@
             <li *ngFor="let voiceArtistName of explorationRightsService.voiceArtistNames; let index = index">
               <div class="oppia-user-list-item .e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
                 <span>{{voiceArtistName}}</span>
-                <span [hidden]="!(isVoiceoverFormOpen)" type="button" [ngbTooltip]="'Remove user'" class="material-icons" (click)="removeVoiceArtist(voiceArtistName)">highlight_off
+                <span [hidden]="!(isVoiceoverFormOpen)" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" (click)="removeVoiceArtist(voiceArtistName)">
                 </span>
               </div>
             </li>
