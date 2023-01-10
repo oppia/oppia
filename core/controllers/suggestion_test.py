@@ -2808,7 +2808,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_NULL
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 0)
         self.assertEqual(response['next_offset'], 0)
@@ -2821,7 +2821,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'exploration_id': self.EXP_ID,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_NULL
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(response['next_offset'], 1)
@@ -2909,7 +2909,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'exploration_id': exp_100.id,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_NULL
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(response['next_offset'], 1)
@@ -2943,7 +2943,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'exploration_id': exp_100.id,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_NULL
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 0)
         self.assertEqual(response['next_offset'], 1)
@@ -2953,7 +2953,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/topic/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_NULL
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(response, {})
 
@@ -3013,7 +3013,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/exploration/invalid_suggestion_type', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_NULL
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             },
             expected_status_int=404
         )
@@ -3023,7 +3023,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/invalid_target_type/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
-                'sort_key': constants.SUGGESTIONS_SORT_KEY_NULL
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             },
             expected_status_int=400
         )

@@ -172,7 +172,7 @@ export class ContributionAndReviewService {
 
   async getUserCreatedQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      sortKey: string = ''
+      sortKey: string
   ): Promise<FetchSuggestionsResponse> {
     this.userCreatedQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
@@ -182,7 +182,7 @@ export class ContributionAndReviewService {
 
   async getReviewableQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      sortKey: string = ''
+      sortKey: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
@@ -192,7 +192,7 @@ export class ContributionAndReviewService {
 
   async getUserCreatedTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      sortKey: string = ''
+      sortKey: string
   ): Promise<FetchSuggestionsResponse> {
     this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
@@ -202,7 +202,7 @@ export class ContributionAndReviewService {
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      sortKey: string = '',
+      sortKey: string,
       explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableTranslationFetcher.sortKey = sortKey;

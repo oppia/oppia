@@ -538,10 +538,7 @@ export class ContributionsAndReview
     this.reviewableQuestionsSortKey = AppConstants.SUGGESTIONS_SORT_KEY_DATE;
     this.userCreatedTranslationsSortKey = (
       AppConstants.SUGGESTIONS_SORT_KEY_DATE);
-    // Currently, the reviewable translations are not sorted by any key. The
-    // value of reviewableTranslationsSortKey should be changed when the default
-    // order of showing reviewable translations is decided.
-    this.reviewableTranslationsSortKey = AppConstants.SUGGESTIONS_SORT_KEY_NULL;
+    this.reviewableTranslationsSortKey = AppConstants.SUGGESTIONS_SORT_KEY_DATE;
     this.activeExplorationId = null;
     this.contributions = {};
     this.userDetailsLoading = true;

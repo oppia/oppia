@@ -1639,10 +1639,7 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
 ]
 
 # The sort keys of submitted questions shown on the Contributor Dashboard.
-SUGGESTIONS_SORT_KEYS = [
-    constants.SUGGESTIONS_SORT_KEY_DATE,
-    constants.SUGGESTIONS_SORT_KEY_NULL
-]
+SUGGESTIONS_SORT_KEYS = [constants.SUGGESTIONS_SORT_KEY_DATE]
 
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
