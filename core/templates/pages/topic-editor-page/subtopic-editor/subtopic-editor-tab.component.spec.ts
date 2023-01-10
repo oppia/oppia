@@ -28,7 +28,7 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { SubtopicValidationService } from '../services/subtopic-validation.service';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';

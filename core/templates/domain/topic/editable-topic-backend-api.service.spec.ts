@@ -21,7 +21,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { TopicBackendDict } from 'domain/topic/TopicObjectFactory';
+import { TopicBackendDict } from 'domain/topic/topic-object.model';
 
 describe('Editable topic backend API service', () => {
   let httpTestingController: HttpTestingController;

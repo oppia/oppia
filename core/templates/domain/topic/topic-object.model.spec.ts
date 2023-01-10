@@ -13,25 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for TopicObjectFactory.
+ * @fileoverview Tests for Topic.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { StoryReference } from './story-reference-object.model';
 import { Subtopic } from './subtopic.model';
 
 describe('Topic object factory', () => {
-  let topicObjectFactory: TopicObjectFactory;
   let _sampleTopic: Topic;
   let skillSummary1: ShortSkillSummary;
   let skillSummary2: ShortSkillSummary;
   let skillSummary3: ShortSkillSummary;
 
   beforeEach(() => {
-    topicObjectFactory = TestBed.get(TopicObjectFactory);
-
     let sampleTopicBackendObject = {
       id: 'sample_topic_id',
       name: 'Topic name',
@@ -83,7 +79,7 @@ describe('Topic object factory', () => {
     skillSummary3 = ShortSkillSummary.create(
       'skill_3', 'Description 3');
 
-    _sampleTopic = topicObjectFactory.create(
+    _sampleTopic = Topic.create(
       sampleTopicBackendObject, skillIdToDescriptionDict);
   });
 
@@ -271,7 +267,8 @@ describe('Topic object factory', () => {
   });
 
   it('should be able to copy from another topic', () => {
-    let secondTopic = topicObjectFactory.create({
+    let secondTopic: Topic;
+    secondTopic = Topic.create({
       id: 'topic_id_2',
       name: 'Another name',
       abbreviated_name: 'abbrev',

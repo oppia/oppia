@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the create new subtopic modal component.
  */
 
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { ComponentFixture, waitForAsync, TestBed, fakeAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';

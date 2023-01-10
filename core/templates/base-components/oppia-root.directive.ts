@@ -97,7 +97,7 @@ angular.module('oppia').directive('oppiaRoot', [
               'StoryViewerBackendApiService',
               'SubtopicViewerBackendApiService',
               'SuggestionsService', 'TextInputRulesService',
-              'ThreadStatusDisplayService', 'TopicObjectFactory',
+              'ThreadStatusDisplayService',
               'TopicViewerBackendApiService',
               'TranslationLanguageService', 'UrlInterpolationService',
               'UrlService',
