@@ -28,7 +28,6 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import { html } from 'd3';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -376,7 +375,8 @@ describe('State translation component', () => {
         .toHaveBeenCalledWith('content_1', 'html');
     });
 
-    it('should return original HTML when written translation is not available', () => {
+    it('should return original HTML when written translation is not' +
+      ' available', () => {
       let subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
         html: 'This is the html'
@@ -385,7 +385,7 @@ describe('State translation component', () => {
       spyOn(explorationStatesService, 'getWrittenTranslationsMemento')
         .and.returnValue({
           hasWrittenTranslation: () => false
-      });
+        });
       let html = component.getRequiredHtml(subtitledObject);
       expect(html).toEqual(subtitledObject.html);
     });
