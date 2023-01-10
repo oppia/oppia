@@ -192,7 +192,10 @@ export class ProgressNavComponent {
         InteractionSpecsConstants.INTERACTION_SPECS[
           this.interactionId as InteractionSpecsKey
         ].show_generic_submit_button);
-    // Unknown type is used because we don't know which type of error is thrown.
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch function cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (e: unknown) {
       let additionalInfo = (
         '\nSubmit button debug logs:\ninterationId: ' +

@@ -160,8 +160,7 @@ export class QuestionSuggestionEditorModalComponent
   setDifficultyString(skillDifficulty: number): void {
     // This throws "Object is possibly undefined." The type undefined
     // comes here from Object dependency. We need to suppress this
-    // error because of strict type checking. We are sure that
-    // skillDifficulty will be a number.
+    // error because of strict type checking.
     // @ts-ignore
     this.skillDifficultyString = Object.entries(
       AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(

@@ -199,7 +199,10 @@ export class MathInteractionsService {
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
-    // Unknown type is used because we don't know which type of error is thrown.
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch function cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (err: unknown) {
       if (err instanceof Error) {
         this.warningText = (
