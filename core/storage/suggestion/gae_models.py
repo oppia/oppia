@@ -535,9 +535,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 num_suggestions_per_fetch = 1000
 
                 while len(sorted_results) < limit:
-                    suggestion_models: Sequence[GeneralSuggestionModel] = (
-                        suggestion_query.fetch(
-                            num_suggestions_per_fetch, offset=offset))
+                    suggestion_models = suggestion_query.fetch(
+                        num_suggestions_per_fetch, offset=offset)
                     if not suggestion_models:
                         break
                     for suggestion_model in suggestion_models:
@@ -631,9 +630,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 num_suggestions_per_fetch = 1000
 
                 while len(sorted_results) < limit:
-                    suggestion_models: Sequence[GeneralSuggestionModel] = (
-                        suggestion_query.fetch(
-                            num_suggestions_per_fetch, offset=offset))
+                    suggestion_models = suggestion_query.fetch(
+                        num_suggestions_per_fetch, offset=offset)
                     if not suggestion_models:
                         break
                     for suggestion_model in suggestion_models:
