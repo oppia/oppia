@@ -137,7 +137,7 @@ describe('Android page', () => {
     expect(component.validateEmailAddress()).toBeTrue();
   });
 
-  fit('should add user to android mailing list and return status',
+  it('should add user to android mailing list and return status',
     fakeAsync(() => {
       spyOn(alertsService, 'addInfoMessage');
       component.ngOnInit();
