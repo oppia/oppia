@@ -741,11 +741,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 if not suggestion_models:
                     break
                 for suggestion_model in suggestion_models:
+                    offset += 1
                     if suggestion_model.author_id != user_id:
                         sorted_results.append(suggestion_model)
                         if len(sorted_results) == limit:
                             break
-                offset += len(suggestion_models)
 
             return (
                 sorted_results,
