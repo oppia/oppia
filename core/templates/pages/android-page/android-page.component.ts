@@ -129,10 +129,6 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
       AppConstants.MAILING_LIST_ANDROID_TAG
     ).then((status) => {
       if (status) {
-        this.alertsService.addInfoMessage(
-          'Successfully added to mailing list!',
-          1000
-        );
         this.userHasSubscribed = true;
       } else {
         this.alertsService.addInfoMessage(

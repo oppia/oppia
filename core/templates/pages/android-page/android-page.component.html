@@ -80,7 +80,7 @@
             class="oppia-android-features-main-text row">
       </span>
       <div class="oppia-android-key-feature-container row">
-        <div class="oppia-android-key-feature-description col-md-5">
+        <div class="oppia-android-key-feature-description col-md-5 pl-0">
           <div class="oppia-android-key-feature">
             <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_1' | translate }}</div>
             <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_1' | translate }}</div>
@@ -103,7 +103,7 @@
         <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7">
           <div class="row">
             <div class="col-md-2 align-self-center" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
-              <i class="fas fa-chevron-left oppia-android-carousel-chevron"></i>
+              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right"></i>
             </div>
             <div class="oppia-android-key-feature-image-container col-md-8">
               <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
