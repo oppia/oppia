@@ -21,16 +21,16 @@ from __future__ import annotations
 import os
 import subprocess
 
-from typing import List, Tuple
-from typing_extensions import Final
+from typing import Final, List, Tuple
 
+from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
 
 STYLELINT_CONFIG: Final = os.path.join('.stylelintrc')
 
 
-class ThirdPartyCSSLintChecksManager:
+class ThirdPartyCSSLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party Python linting functions."""
 
     def __init__(self, files_to_lint: List[str]) -> None:

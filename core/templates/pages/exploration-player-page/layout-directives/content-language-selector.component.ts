@@ -35,6 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -51,21 +52,30 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private ngbModal: NgbModal,
     private imagePreloaderService: ImagePreloaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-  ) {}
+    private windowRef: WindowRef
+  ) { }
 
-  selectedLanguageCode: string;
-  languageOptions: ExplorationLanguageInfo[];
-  currentGlobalLanguageCode: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  selectedLanguageCode!: string;
+  languageOptions!: ExplorationLanguageInfo[];
+  currentGlobalLanguageCode!: string;
+  newLanguageCode!: string;
 
   ngOnInit(): void {
+    const url = new URL(this.windowRef.nativeWindow.location.href);
     this.currentGlobalLanguageCode = (
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.selectedLanguageCode = (
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
     this.languageOptions = (
       this.contentTranslationLanguageService.getLanguageOptionsForDropdown());
+    this.newLanguageCode = (
+      url.searchParams.get('initialContentLanguageCode') ||
+      this.currentGlobalLanguageCode);
     for (let option of this.languageOptions) {
-      if (option.value === this.currentGlobalLanguageCode) {
+      if (option.value === this.newLanguageCode) {
         this.contentTranslationLanguageService.setCurrentContentLanguageCode(
           option.value);
         this.selectedLanguageCode = (
@@ -110,4 +120,4 @@ export class ContentLanguageSelectorComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaContentLanguageSelector',
-  downgradeComponent({component: ContentLanguageSelectorComponent}));
+  downgradeComponent({ component: ContentLanguageSelectorComponent }));

@@ -24,8 +24,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 
-from typing import List, Optional
-from typing_extensions import Final
+from typing import Final, List, Optional
 
 from . import common
 from . import run_backend_tests
@@ -61,7 +60,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # Run Javascript and Python linters.
     print('Linting files since the last commit')
-    pre_commit_linter.main(args=[])  # type: ignore[no-untyped-call]
+    pre_commit_linter.main(args=[])
     print('Linting passed.')
     print('')
 
@@ -110,7 +109,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # Run backend tests.
     print('Running backend tests')
-    run_backend_tests.main(args=[])  # type: ignore[no-untyped-call]
+    run_backend_tests.main(args=[])
     print('Backend tests passed.')
 
 

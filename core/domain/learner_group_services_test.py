@@ -56,9 +56,16 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.LEARNER_GROUP_ID = (
             learner_group_fetchers.get_new_learner_group_id()
         )
+        self.LEARNER_GROUP_ID_2 = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
 
         self.learner_group = learner_group_services.create_learner_group(
             self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
+            [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
+            ['story_id_1'])
+        self.learner_group_2 = learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID_2, 'Learner Group 2', 'Description 2',
             [self.FACILITATOR_ID], [self.LEARNER_ID], ['subtopic_id_1'],
             ['story_id_1'])
 
@@ -165,6 +172,21 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             learner_group_services.is_user_facilitator(
+                self.LEARNER_ID, self.LEARNER_GROUP_ID))
+
+    def test_is_user_learner(self) -> None:
+        self.assertFalse(
+            learner_group_services.is_user_learner(
+                self.FACILITATOR_ID, self.LEARNER_GROUP_ID))
+        self.assertFalse(
+            learner_group_services.is_user_learner(
+                self.LEARNER_ID, self.LEARNER_GROUP_ID))
+
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID, True)
+
+        self.assertTrue(
+            learner_group_services.is_user_learner(
                 self.LEARNER_ID, self.LEARNER_GROUP_ID))
 
     def test_get_matching_syllabus_to_add_with_default_filters(self) -> None:
@@ -326,7 +348,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
-            [self.LEARNER_GROUP_ID])
+            [self.LEARNER_GROUP_ID, self.LEARNER_GROUP_ID_2])
 
         learner_group_services.invite_learners_to_learner_group(
             'group_id_2', [self.LEARNER_ID])
@@ -335,7 +357,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
-            [self.LEARNER_GROUP_ID, 'group_id_2'])
+            [self.LEARNER_GROUP_ID, self.LEARNER_GROUP_ID_2, 'group_id_2'])
 
         learner_group_services.remove_invited_learners_from_learner_group(
             self.LEARNER_GROUP_ID, [self.LEARNER_ID], True)
@@ -344,7 +366,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model.invited_to_learner_groups_ids,
-            ['group_id_2'])
+            [self.LEARNER_GROUP_ID_2, 'group_id_2'])
 
     def test_invite_learners_to_learner_group(self) -> None:
         # Ruling out the possibility of None for mypy type checking.
@@ -355,7 +377,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model_1.invited_to_learner_groups_ids,
-            [self.LEARNER_GROUP_ID])
+            [self.LEARNER_GROUP_ID, self.LEARNER_GROUP_ID_2])
         user_model_2 = user_models.LearnerGroupsUserModel.get(
             new_learner_id, strict=False)
         self.assertIsNone(user_model_2)
@@ -367,7 +389,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             self.LEARNER_ID, strict=True)
         self.assertEqual(
             user_model_1.invited_to_learner_groups_ids,
-            [self.LEARNER_GROUP_ID, 'group_id_2'])
+            [self.LEARNER_GROUP_ID, self.LEARNER_GROUP_ID_2, 'group_id_2'])
 
         user_model_2 = user_models.LearnerGroupsUserModel.get(
             new_learner_id, strict=True)
@@ -493,3 +515,24 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert learner_group is not None
         self.assertEqual(learner_group.story_ids, ['story_id2'])
+
+    def test_update_progress_sharing_permission(self) -> None:
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID, self.LEARNER_ID, True)
+        learner_group_services.add_learner_to_learner_group(
+            self.LEARNER_GROUP_ID_2, self.LEARNER_ID, False)
+
+        self.assertEqual(
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [self.LEARNER_ID], self.LEARNER_GROUP_ID
+            ), [True]
+        )
+
+        learner_group_services.update_progress_sharing_permission(
+            self.LEARNER_ID, self.LEARNER_GROUP_ID, False)
+
+        self.assertEqual(
+            learner_group_fetchers.can_multi_learners_share_progress(
+                [self.LEARNER_ID], self.LEARNER_GROUP_ID
+            ), [False]
+        )

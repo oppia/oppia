@@ -107,7 +107,8 @@ class ManagedProcessTests(test_utils.TestBase):
             ]
             return scripts_test_utils.PopenStub(
                 pid=pid, stdout=stdout, unresponsive=unresponsive,
-                child_procs=child_procs)
+                child_procs=child_procs
+            )
 
         with self.swap(psutil, 'Popen', mock_popen):
             yield popen_calls
@@ -758,6 +759,60 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(proc.terminate_count, 1)
         self.assertEqual(proc.kill_count, 1)
 
+    def test_managed_ng_build_in_watch_mode_when_build_succeeds(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(
+            outputs=[b'abc', b'Build at: 123', b'def']))
+        str_io = io.StringIO()
+        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
+        logs = self.exit_stack.enter_context(self.capture_logging())
+
+        proc = self.exit_stack.enter_context(servers.managed_ng_build(
+            watch_mode=True))
+        self.exit_stack.close()
+
+        self.assert_proc_was_managed_as_expected(logs, proc.pid)
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn('--watch', popen_calls[0].program_args)
+        self.assert_matches_regexps(str_io.getvalue().strip().split('\n'), [
+            'Starting new Angular Compiler',
+            'abc',
+            'Build at: 123',
+            'def',
+            'Stopping Angular Compiler',
+        ])
+
+    def test_managed_ng_build_in_watch_mode_raises_when_not_built(self) -> None:
+        # NOTE: The 'Build at: ' message is never printed.
+        self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'def']))
+        str_io = io.StringIO()
+        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
+
+        with self.assertRaisesRegex(
+            IOError, 'First build never completed'
+        ):
+            self.exit_stack.enter_context(
+                servers.managed_ng_build(watch_mode=True)
+            )
+        self.assert_matches_regexps(str_io.getvalue().strip().split('\n'), [
+            'Starting new Angular Compiler',
+            'abc',
+            'def',
+            'Stopping Angular Compiler',
+        ])
+
+    def test_managed_ng_build_uses_prod_config(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen(
+            outputs=[b'Build at: 123']))
+
+        self.exit_stack.enter_context(servers.managed_ng_build(
+            use_prod_env=True))
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].program_args, '%s build --prod' % common.NG_BIN_PATH
+        )
+
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(
         self
     ) -> None:
@@ -926,7 +981,8 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_webdriverio(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(servers.managed_webdriverio_server())
+        self.exit_stack.enter_context(
+            servers.managed_webdriverio_server(chrome_version='104.0.5112.79'))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -936,9 +992,9 @@ class ManagedProcessTests(test_utils.TestBase):
         )
         program_args = popen_calls[0].program_args
         self.assertIn(
-            '%s --unhandled-rejections=strict %s %s' % (
+            '%s --unhandled-rejections=strict %s %s --suite full %s' % (
                 common.NPX_BIN_PATH, common.NODEMODULES_WDIO_BIN_PATH,
-                common.WEBDRIVERIO_CONFIG_FILE_PATH),
+                common.WEBDRIVERIO_CONFIG_FILE_PATH, '104.0.5112.79'),
             program_args)
         self.assertNotIn('DEBUG=true', program_args)
         self.assertIn('--suite full', program_args)

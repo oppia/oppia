@@ -83,3 +83,77 @@
 .oppia-edit-learner-group .oppia-dashboard-view-tabs-item.active svg path {
   fill: #00645c;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-dashboard-view-tabs-container {
+    width: 25%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-dashboard-view {
+    display: grid;
+    height: unset;
+  }
+
+  .oppia-dashboard-view-tabs-container {
+    border-bottom: solid 1px #eee;
+    width: 100%;
+  }
+
+  .oppia-dashboard-view-content-container {
+    width: 100%;
+  }
+
+  .oppia-dashboard-view-tabs-container .group-info {
+    padding: 0 20px;
+  }
+
+  .oppia-dashboard-view-tabs-container .group-info-description {
+    display: none;
+  }
+
+  .oppia-edit-learner-group .oppia-dashboard-view-tabs {
+    display: flex;
+    margin: 20px 10px 0;
+    width: 100%;
+  }
+
+  .oppia-edit-learner-group .oppia-dashboard-view-tabs hr {
+    border: 1px solid #e6e6e6;
+    height: 50px;
+    margin: 0 5px;
+    width: 0;
+  }
+
+  .oppia-edit-learner-group .oppia-dashboard-view-tabs-item {
+    display: grid;
+    font-size: 14px;
+    grid-gap: 3px;
+    justify-items: center;
+    margin-right: unset;
+    padding: 5px;
+    width: 19%;
+  }
+
+  .oppia-edit-learner-group .oppia-dashboard-view-tabs-item.progress-tab {
+    width: 28%;
+  }
+
+  .oppia-edit-learner-group .tab-icon {
+    margin-right: 0;
+  }
+
+  .oppia-edit-learner-group .oppia-dashboard-view-tabs-item.active {
+    border-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    color: #00645c;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .oppia-edit-learner-group .oppia-dashboard-view-tabs-item {
+    font-size: 12px;
+  }
+}

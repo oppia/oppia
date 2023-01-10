@@ -22,6 +22,10 @@ import { BlogCardPreviewModalComponent } from './blog-card-preview-modal.compone
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+// This throws "TS2307". We need to
+// suppress this error because rte-text-components are not strictly typed yet.
+// @ts-ignore
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { Pipe } from '@angular/core';
 import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
@@ -55,9 +59,9 @@ describe('Blog Card Preview Modal Component', () => {
   let blogPostData: BlogPostData;
   let sampleBlogPostBackendDict: BlogPostBackendDict = {
     id: 'sampleBlogId',
-    author_username: 'test_user',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
-    content: '<p>hello</p>',
+    content: '<p>hello</p><strong>HEllo</strong>',
     thumbnail_filename: 'image.png',
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
@@ -72,6 +76,7 @@ describe('Blog Card Preview Modal Component', () => {
         NgbModalModule,
         MatCardModule,
         MatIconModule,
+        RichTextComponentsModule,
       ],
       declarations: [
         BlogCardPreviewModalComponent,
@@ -101,9 +106,10 @@ describe('Blog Card Preview Modal Component', () => {
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
-      blogPostData.authorUsername,
+      '',
+      blogPostData.displayedAuthorName,
       blogPostData.title,
-      '<p>hello</p>',
+      '<p>hello</p> ',
       blogPostData.tags,
       blogPostData.thumbnailFilename,
       blogPostData.urlFragment,
@@ -125,9 +131,10 @@ describe('Blog Card Preview Modal Component', () => {
       sampleBlogPostBackendDict);
     let expectedBlogPostSummary = new BlogPostSummary (
       blogPostData.id,
-      blogPostData.authorUsername,
+      '',
+      blogPostData.displayedAuthorName,
       blogPostData.title,
-      '<p>hello</p>',
+      '<p>hello</p> ',
       blogPostData.tags,
       blogPostData.thumbnailFilename,
       blogPostData.urlFragment,

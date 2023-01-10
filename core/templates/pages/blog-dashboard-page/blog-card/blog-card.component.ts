@@ -21,6 +21,9 @@ import { AppConstants } from 'app.constants';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { BlogPostPageConstants } from 'pages/blog-post-page/blog-post-page.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
 
 @Component({
@@ -33,14 +36,18 @@ export class BlogCardComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
   @Input() authorProfilePicDataUrl!: string;
+  @Input() shownOnblogPostPage!: boolean;
   authorProfilePictureUrl!: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   thumbnailUrl: string = '';
   publishedDateString: string = '';
+  blogCardPreviewModeIsActive: boolean = false;
 
   constructor(
+    private windowRef: WindowRef,
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
+    private contextService: ContextService,
   ) {}
 
   ngOnInit(): void {
@@ -59,10 +66,22 @@ export class BlogCardComponent implements OnInit {
       throw new Error('Blog Post Summary published date is not defined');
     }
     this.publishedDateString = this.getDateStringInWords(publishedOn);
+    this.blogCardPreviewModeIsActive = (
+      this.contextService.isInBlogPostEditorPage());
   }
 
   getDateStringInWords(naiveDate: string): string {
     return dayjs(
       naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
+  }
+
+  navigateToBlogPostPage(): void {
+    if (!this.blogCardPreviewModeIsActive) {
+      let blogPostUrl = this.urlInterpolationService.interpolateUrl(
+        BlogPostPageConstants.BLOG_POST_PAGE_URL_TEMPLATE,
+        { blog_post_url: this.blogPostSummary.urlFragment }
+      );
+      this.windowRef.nativeWindow.location.href = blogPostUrl;
+    }
   }
 }

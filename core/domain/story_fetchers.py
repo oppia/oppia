@@ -27,6 +27,7 @@ import itertools
 
 from core import feconf
 from core.domain import caching_services
+from core.domain import classroom_services
 from core.domain import exp_fetchers
 from core.domain import story_domain
 from core.domain import topic_fetchers
@@ -416,7 +417,8 @@ def get_learner_group_syllabus_story_summaries(
                 topic_id_to_topic_map[story.corresponding_topic_id].name,
             'topic_url_fragment':
                 topic_id_to_topic_map[
-                    story.corresponding_topic_id].url_fragment
+                    story.corresponding_topic_id].url_fragment,
+            'classroom_url_fragment': None
         }
         for (story, summary_dict) in
         zip(all_stories, story_summaries_dicts)
@@ -603,19 +605,23 @@ def get_multi_users_progress_in_stories(
                 story.story_contents.nodes
             ],
             'topic_name': topic.name,
-            'topic_url_fragment': topic.url_fragment
+            'topic_url_fragment': topic.url_fragment,
+            'classroom_url_fragment':
+                classroom_services.get_classroom_url_fragment_for_topic_id(
+                    topic.id),
         })
 
     return all_users_stories_progress
 
 
 def get_pending_and_all_nodes_in_story(
-    user_id: str, story_id: str
+    user_id: Optional[str], story_id: str
 ) -> Dict[str, List[story_domain.StoryNode]]:
     """Returns the nodes that are pending in a story
 
     Args:
-        user_id: str. The user id of the user.
+        user_id: Optional[str]. The user id of the user, or None if
+            the user is not logged in.
         story_id: str. The id of the story.
 
     Returns:
@@ -625,7 +631,9 @@ def get_pending_and_all_nodes_in_story(
     story = get_story_by_id(story_id, strict=True)
     pending_nodes = []
 
-    completed_node_ids = get_completed_node_ids(user_id, story_id)
+    completed_node_ids = (
+        get_completed_node_ids(user_id, story_id) if user_id else []
+    )
     for node in story.story_contents.nodes:
         if node.id not in completed_node_ids:
             pending_nodes.append(node)

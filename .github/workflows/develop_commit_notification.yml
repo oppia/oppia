@@ -1,0 +1,19 @@
+name: Broadcast 'push to develop' event to our release-scripts repo
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  send_notification:
+    name: Send notification
+    runs-on: ubuntu-22.04
+    if: github.repository == 'oppia/oppia'
+    steps:
+    - name: Repository Dispatch
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        repository: oppia/release-scripts
+        event-type: develop-commit
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

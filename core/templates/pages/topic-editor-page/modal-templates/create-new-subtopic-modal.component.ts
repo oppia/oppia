@@ -21,6 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import AppConstants from 'assets/constants';
+import cloneDeep from 'lodash/cloneDeep';
 import { Topic } from 'domain/topic/TopicObjectFactory';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
@@ -34,23 +35,27 @@ import { SubtopicValidationService } from 'pages/topic-editor-page/services/subt
 
 export class CreateNewSubtopicModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  hostname: string;
-  classroomUrlFragment: string;
-  topic: Topic;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  hostname!: string;
+  classroomUrlFragment!: string;
+  topic!: Topic;
   SUBTOPIC_PAGE_SCHEMA!: object;
-  htmlData: string;
-  schemaEditorIsShown: boolean;
-  editableThumbnailFilename: string;
-  editableThumbnailBgColor: string;
-  editableUrlFragment: string;
-  allowedBgColors: readonly string[];
-  subtopicId: number;
-  subtopicTitle: string;
-  errorMsg: string;
-  subtopicUrlFragmentExists: boolean;
-  subtopicPage: SubtopicPage;
-  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT: number;
-  MAX_CHARS_IN_SUBTOPIC_TITLE: number;
+  htmlData!: string;
+  schemaEditorIsShown!: boolean;
+  editableThumbnailFilename!: string;
+  editableThumbnailBgColor!: string;
+  editableUrlFragment!: string;
+  allowedBgColors!: readonly string[];
+  subtopicId!: number;
+  subtopicTitle!: string;
+  // Null when no error is raised.
+  errorMsg!: string | null;
+  subtopicUrlFragmentExists!: boolean;
+  subtopicPage!: SubtopicPage;
+  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
+  MAX_CHARS_IN_SUBTOPIC_TITLE!: number;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -87,8 +92,6 @@ export class CreateNewSubtopicModalComponent
     this.subtopicTitle = '';
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
-    this.topicUpdateService
-      .addSubtopic(this.topic, this.subtopicTitle, this.editableUrlFragment);
   }
 
   getSchema(): object {
@@ -99,16 +102,23 @@ export class CreateNewSubtopicModalComponent
     this.schemaEditorIsShown = true;
   }
 
+  addSubtopic(): void {
+    this.topicUpdateService
+      .addSubtopic(this.topic, this.subtopicTitle, this.editableUrlFragment);
+
+    this.topicUpdateService.setSubtopicThumbnailFilename(
+      this.topic, this.subtopicId, this.editableThumbnailFilename);
+
+    this.topicUpdateService.setSubtopicThumbnailBgColor(
+      this.topic, this.subtopicId, this.editableThumbnailBgColor);
+  }
+
   updateSubtopicThumbnailFilename(newThumbnailFilename: string): void {
     this.editableThumbnailFilename = newThumbnailFilename;
-    this.topicUpdateService.setSubtopicThumbnailFilename(
-      this.topic, this.subtopicId, newThumbnailFilename);
   }
 
   updateSubtopicThumbnailBgColor(newThumbnailBgColor: string): void {
     this.editableThumbnailBgColor = newThumbnailBgColor;
-    this.topicUpdateService.setSubtopicThumbnailBgColor(
-      this.topic, this.subtopicId, newThumbnailBgColor);
   }
 
   resetErrorMsg(): void {
@@ -127,7 +137,6 @@ export class CreateNewSubtopicModalComponent
   cancel(): void {
     this.topicEditorStateService.deleteSubtopicPage(
       this.topic.getId(), this.subtopicId);
-    this.topicUpdateService.deleteSubtopic(this.topic, this.subtopicId);
     this.topicEditorStateService.onTopicReinitialized.emit();
     this.ngbActiveModal.dismiss('cancel');
   }
@@ -150,6 +159,8 @@ export class CreateNewSubtopicModalComponent
       return;
     }
 
+    this.addSubtopic();
+
     this.topicUpdateService.setSubtopicTitle(
       this.topic, this.subtopicId, this.subtopicTitle);
     this.topicUpdateService.setSubtopicUrlFragment(
@@ -158,7 +169,7 @@ export class CreateNewSubtopicModalComponent
     this.subtopicPage = SubtopicPage.createDefault(
       this.topic.getId(), this.subtopicId);
 
-    let subtitledHtml = angular.copy(
+    let subtitledHtml = cloneDeep(
       this.subtopicPage.getPageContents().getSubtitledHtml());
     subtitledHtml.html = this.htmlData;
     this.topicUpdateService.setSubtopicPageContentsHtml(

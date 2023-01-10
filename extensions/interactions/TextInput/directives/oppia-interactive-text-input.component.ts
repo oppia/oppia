@@ -31,8 +31,9 @@ import { TextInputRulesService } from './text-input-rules.service';
 interface TextInputSchema {
   type: string;
   'ui_config': {
-    placeholder?: string;
-    rows?: number;
+    placeholder: string;
+    rows: number;
+    catchMisspellings: boolean;
   };
 }
 
@@ -46,12 +47,14 @@ export class InteractiveTextInputComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() placeholderWithValue!: string;
   @Input() rowsWithValue!: string;
+  @Input() catchMisspellingsWithValue!: string;
   @Input() savedSolution!: TextInputAnswer;
   @Input() labelForFocusTarget!: string;
   answer!: TextInputAnswer;
   placeholder!: string;
   schema!: TextInputSchema;
   rows!: number;
+  catchMisspellings: boolean = false;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -64,7 +67,8 @@ export class InteractiveTextInputComponent implements OnInit {
   private _getAttrs() {
     return {
       placeholderWithValue: this.placeholderWithValue,
-      rowsWithValue: this.rowsWithValue
+      rowsWithValue: this.rowsWithValue,
+      catchMisspellingsWithValue: this.catchMisspellingsWithValue
     };
   }
 
@@ -75,12 +79,14 @@ export class InteractiveTextInputComponent implements OnInit {
   ngOnInit(): void {
     const {
       placeholder,
-      rows
+      rows,
+      catchMisspellings
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(
       'TextInput', this._getAttrs()
     ) as TextInputCustomizationArgs;
     this.placeholder = placeholder.value.unicode;
     this.rows = rows.value;
+    this.catchMisspellings = catchMisspellings.value;
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''
@@ -88,13 +94,20 @@ export class InteractiveTextInputComponent implements OnInit {
 
     this.schema = {
       type: 'unicode',
-      ui_config: {}
+      ui_config: {
+        placeholder: 'Placeholder text',
+        rows: 1,
+        catchMisspellings: false
+      }
     };
     if (this.placeholder) {
       this.schema.ui_config.placeholder = this.placeholder;
     }
     if (this.rows && this.rows !== 1) {
       this.schema.ui_config.rows = this.rows;
+    }
+    if (this.catchMisspellings) {
+      this.schema.ui_config.catchMisspellings = this.catchMisspellings;
     }
 
     this.currentInteractionService.registerCurrentInteraction(

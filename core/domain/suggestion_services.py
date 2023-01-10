@@ -43,7 +43,7 @@ from core.platform import models
 
 from typing import (
     Callable, Dict, Final, List, Literal, Mapping, Match, Optional, Sequence,
-    Set, Tuple, Type, Union, cast, overload
+    Set, Tuple, Union, cast, overload
 )
 
 MYPY = False
@@ -132,6 +132,18 @@ def create_suggestion(
     change: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str]
 ) -> suggestion_registry.SuggestionEditStateContent: ...
+
+
+@overload
+def create_suggestion(
+    suggestion_type: str,
+    target_type: str,
+    target_id: str,
+    target_version_at_submission: int,
+    author_id: str,
+    change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+    description: Optional[str]
+) -> suggestion_registry.BaseSuggestion: ...
 
 
 def create_suggestion(
@@ -894,10 +906,7 @@ def resubmit_rejected_suggestion(
     suggestion_id: str,
     summary_message: str,
     author_id: str,
-    change: Union[
-        exp_domain.ExplorationChange,
-        question_domain.QuestionSuggestionChange
-    ]
+    change: change_domain.BaseChange
 ) -> None:
     """Resubmit a rejected suggestion with the given suggestion_id.
 
@@ -906,7 +915,7 @@ def resubmit_rejected_suggestion(
         summary_message: str. The message provided by the author to
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
-        change: ExplorationChange. The new change to apply to the suggestion.
+        change: BaseChange. The new change to apply to the suggestion.
 
     Raises:
         Exception. The summary message is empty.
@@ -973,7 +982,8 @@ def get_reviewable_translation_suggestions_by_offset(
     user_id: str,
     opportunity_summary_exp_ids: Optional[List[str]],
     limit: Optional[int],
-    offset: int
+    offset: int,
+    language: Optional[str] = None
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
@@ -991,6 +1001,8 @@ def get_reviewable_translation_suggestions_by_offset(
             all available results are returned.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
+        language: str. ISO 639-1 language code for which to filter. If it is
+            None, all available languages will be returned.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1003,6 +1015,11 @@ def get_reviewable_translation_suggestions_by_offset(
         user_id)
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
+
+    # No language means all languages.
+    if language is not None:
+        language_codes = [language] if language in language_codes else []
+
     # The user cannot review any translations, so return early.
     if len(language_codes) == 0:
         return [], offset
@@ -1136,7 +1153,7 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def get_translation_suggestions_in_review_by_exploration(
     exp_id: str, language_code: str
-) -> List[Optional[suggestion_registry.BaseSuggestion]]:
+) -> List[suggestion_registry.BaseSuggestion]:
     """Returns translation suggestions in review by exploration ID.
 
     Args:
@@ -1144,8 +1161,8 @@ def get_translation_suggestions_in_review_by_exploration(
         language_code: str. Language code.
 
     Returns:
-        list(Suggestion|None). A list of translation suggestions in review with
-        target_id == exp_id, or None if suggestion model does not exists.
+        list(Suggestion). A list of translation suggestions in review with
+        target_id == exp_id.
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
@@ -1153,7 +1170,7 @@ def get_translation_suggestions_in_review_by_exploration(
             exp_id, language_code)
     )
     return [
-        get_suggestion_from_model(model) if model else None
+        get_suggestion_from_model(model)
         for model in suggestion_models_in_review
     ]
 
@@ -1187,8 +1204,8 @@ def get_translation_suggestions_in_review_by_exp_ids(
 
 
 def get_suggestions_with_translatable_explorations(
-    suggestions: List[suggestion_registry.BaseSuggestion]
-) -> List[suggestion_registry.BaseSuggestion]:
+    suggestions: Sequence[suggestion_registry.SuggestionTranslateContent]
+) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
     translatable exploration content. That is, the following are true:
     - The suggestion's change content corresponds to an existing exploration
@@ -1204,7 +1221,7 @@ def get_suggestions_with_translatable_explorations(
     """
 
     def _has_translatable_exploration(
-        suggestion: suggestion_registry.BaseSuggestion,
+        suggestion: suggestion_registry.SuggestionTranslateContent,
         suggestion_exp_id_to_exp: Dict[str, exp_domain.Exploration]
     ) -> bool:
         """Returns whether the supplied suggestion corresponds to a translatable
@@ -1489,9 +1506,37 @@ def get_submitted_suggestions(
     ])
 
 
+@overload
+def get_submitted_suggestions_by_offset(
+    user_id: str,
+    suggestion_type: Literal['add_question'],
+    limit: int,
+    offset: int
+) -> Tuple[
+    Sequence[suggestion_registry.SuggestionAddQuestion], int
+]: ...
+
+
+@overload
+def get_submitted_suggestions_by_offset(
+    user_id: str,
+    suggestion_type: Literal['translate_content'],
+    limit: int,
+    offset: int
+) -> Tuple[
+    Sequence[suggestion_registry.SuggestionTranslateContent], int
+]: ...
+
+
+@overload
 def get_submitted_suggestions_by_offset(
     user_id: str, suggestion_type: str, limit: int, offset: int
-) -> Tuple[List[suggestion_registry.BaseSuggestion], int]:
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
+
+
+def get_submitted_suggestions_by_offset(
+    user_id: str, suggestion_type: str, limit: int, offset: int
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 
@@ -1702,59 +1747,6 @@ def check_can_resubmit_suggestion(suggestion_id: str, user_id: str) -> bool:
     suggestion = get_suggestion_by_id(suggestion_id)
 
     return suggestion.author_id == user_id
-
-
-def _get_voiceover_application_class(
-    target_type: str
-) -> Type[suggestion_registry.ExplorationVoiceoverApplication]:
-    """Returns the voiceover application class for a given target type.
-
-    Args:
-        target_type: str. The target type of the voiceover application.
-
-    Returns:
-        class. The voiceover application class for the given target type.
-
-    Raises:
-        Exception. The voiceover application target type is invalid.
-    """
-    target_type_to_classes = (
-        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
-    if target_type in target_type_to_classes:
-        return target_type_to_classes[target_type]
-    else:
-        raise Exception(
-            'Invalid target type for voiceover application: %s' % target_type)
-
-
-def get_voiceover_application(
-    voiceover_application_id: str
-) -> suggestion_registry.BaseVoiceoverApplication:
-    """Returns the BaseVoiceoverApplication object for the give
-    voiceover application model object.
-
-    Args:
-        voiceover_application_id: str. The ID of the voiceover application.
-
-    Returns:
-        BaseVoiceoverApplication. The domain object out of the given voiceover
-        application model object.
-    """
-    voiceover_application_model = (
-        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
-            voiceover_application_id))
-    voiceover_application_class = _get_voiceover_application_class(
-        voiceover_application_model.target_type)
-    return voiceover_application_class(
-        voiceover_application_model.id,
-        voiceover_application_model.target_id,
-        voiceover_application_model.status,
-        voiceover_application_model.author_id,
-        voiceover_application_model.final_reviewer_id,
-        voiceover_application_model.language_code,
-        voiceover_application_model.filename,
-        voiceover_application_model.content,
-        voiceover_application_model.rejection_message)
 
 
 def create_community_contribution_stats_from_model(
@@ -2453,6 +2445,7 @@ def update_translation_contribution_stats_at_submission(
         suggestion: Suggestion. The suggestion domain object that is being
             submitted.
     """
+    content_word_count = 0
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2462,9 +2455,14 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     translation_contribution_stat_model = (
         suggestion_models.TranslationContributionStatsModel.get(
@@ -2510,6 +2508,7 @@ def update_translation_contribution_stats_at_review(
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
     """
+    content_word_count = 0
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2519,9 +2518,14 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
@@ -2587,6 +2591,7 @@ def update_translation_review_stats(
     Raises:
         Exception. The final_reviewer_id of the suggestion should not be None.
     """
+    content_word_count = 0
     if suggestion.final_reviewer_id is None:
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
@@ -2603,9 +2608,14 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
         # This function is called when reviewing a translation and hence

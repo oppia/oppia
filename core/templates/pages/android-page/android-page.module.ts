@@ -16,6 +16,7 @@
  * @fileoverview Module for the Android page.
  */
 
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { AndroidPageComponent } from './android-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -28,6 +29,7 @@ import { I18nModule } from 'i18n/i18n.module';
 @NgModule({
   imports: [
     CommonModule,
+    HttpClientModule,
     SharedComponentsModule,
     AndroidPageRoutingModule,
     Error404PageModule,

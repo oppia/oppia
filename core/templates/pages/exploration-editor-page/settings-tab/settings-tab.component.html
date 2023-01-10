@@ -114,11 +114,13 @@
                         <input placeholder="Add a new tag (using lowercase letters and spaces)..."
                                class="e2e-test-chip-list-tags"
                                pattern="[a-z]"
+                               [maxLength]="30"
                                [matChipInputFor]="chipList"
                                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                                [matChipInputAddOnBlur]="addOnBlur"
                                (matChipInputTokenEnd)="add($event)">
                       </mat-chip-list>
+                      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-settings-tab-error-message">Can only contain 10 tags max</mat-hint>
                     </mat-form-field>
                   </div>
                 </div>
@@ -441,7 +443,7 @@
                        placeholder="Voice artist username"
                        type="text">
               </div>
-              <button (click)="editVoiseArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
+              <button (click)="editVoiceArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
               <button type="button"
                       class="btn btn-secondary"
                       (click)="closeVoiceoverForm()">
@@ -687,9 +689,30 @@
       </div>
     </div>
   </mat-card>
+
+  <mat-card class="oppia-settings-card-container oppia-editor-card">
+    <div *ngIf="canShowExploreVersionHistoryButton();">
+      Metadata last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }} of the exploration</strong>.
+      <a class="text-primary explore-version-history-button" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
+    </div>
+    <div *ngIf="!canShowExploreVersionHistoryButton();">
+      <span *ngIf="!validationErrorIsShown">No changes have been made to the exploration metadata after the initial creation of the exploration.</span>
+      <span *ngIf="validationErrorIsShown" class="error-message">
+        Unable to display the metadata version history due to an error loading the exploration data.
+      </span>
+    </div>
+  </mat-card>
 </div>
 
 <style>
+  .explore-version-history-button {
+    font-weight: bold;
+  }
+
+  .oppia-settings-tab-error-message {
+    color: #f00;
+  }
+
   .mat-form-field {
     width: 100%;
   }
@@ -826,5 +849,9 @@
 
   .oppia-no-voice-artist-message {
     float: left;
+  }
+
+  .error-message {
+    color: #f00;
   }
 </style>

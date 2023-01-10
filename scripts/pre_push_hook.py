@@ -39,8 +39,7 @@ import subprocess
 import sys
 
 from types import TracebackType
-from typing import Dict, List, Optional, Tuple, Type
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional, Tuple, Type
 
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
 # the current working directory so that Git knows where to find python_utils.
@@ -491,7 +490,7 @@ def check_for_backend_python_library_inconsistencies() -> None:
     If any inconsistencies are found, the script displays the inconsistencies
     and exits.
     """
-    mismatches = install_python_prod_dependencies.get_mismatches()  # type: ignore[no-untyped-call]
+    mismatches = install_python_prod_dependencies.get_mismatches()
 
     if mismatches:
         print(

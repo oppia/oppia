@@ -20,6 +20,9 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
+// This throws "TS2307". We need to
+// suppress this error because rte-text-components are not strictly typed yet.
+// @ts-ignore
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { OppiaVisualizationEnumeratedFrequencyTableComponent } from './oppia-visualization-enumerated-frequency-table.directive';
 
@@ -63,9 +66,9 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
   it('should display first answer and hide the second answer', fakeAsync(() => {
     const bannerDe = fixture.debugElement;
     const bannerEl = bannerDe.nativeElement;
-    const answersList = [];
+    const answersList: string[] = [];
     bannerEl.querySelectorAll('.answer-rank').forEach(
-      (el) => {
+      (el: { textContent: string }) => {
         answersList.push(el.textContent);
       }
     );
@@ -82,11 +85,11 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
 
     component.toggleAnswerVisibility(2);
 
-    const hiddenRows = [];
+    const hiddenRows: boolean[] = [];
     bannerEl.querySelectorAll(
       '.item-table'
     ).forEach(
-      (el) => hiddenRows.push(el.hidden)
+      (el: { hidden: boolean }) => hiddenRows.push(el.hidden)
     );
     tick();
 
@@ -101,11 +104,11 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
     fixture.detectChanges();
     tick();
 
-    const hiddenRows = [];
+    const hiddenRows: boolean[] = [];
     bannerEl.querySelectorAll(
       '.item-table'
     ).forEach(
-      (el) => hiddenRows.push(el.hidden)
+      (el: { hidden: boolean }) => hiddenRows.push(el.hidden)
     );
     tick();
 

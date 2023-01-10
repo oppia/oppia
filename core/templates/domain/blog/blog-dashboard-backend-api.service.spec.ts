@@ -18,7 +18,13 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
+import {
+  BlogAuthorDetails,
+  BlogAuthorDetailsBackendDict,
+  BlogDashboardBackendApiService,
+  BlogDashboardBackendResponse,
+  BlogDashboardData,
+} from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
 
@@ -27,8 +33,12 @@ describe('Blog Dashboard backend api service', () => {
   let httpTestingController: HttpTestingController;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
-  let blogDashboardBackendResponse = {
-    username: 'testUsername',
+  let authorDetials: BlogAuthorDetailsBackendDict = {
+    displayed_author_name: 'test_name',
+    author_bio: 'author bio',
+  };
+  let blogDashboardBackendResponse: BlogDashboardBackendResponse = {
+    author_details: authorDetials,
     profile_picture_data_url: 'image',
     no_of_published_blog_posts: 0,
     no_of_draft_blog_posts: 0,
@@ -37,7 +47,8 @@ describe('Blog Dashboard backend api service', () => {
   };
   let blogPostSummary: BlogPostSummaryBackendDict = {
     id: 'sampleBlogId',
-    author_username: 'test_user',
+    author_username: 'test_sername',
+    displayed_author_name: 'test_user',
     title: 'sample_title',
     summary: 'hello',
     thumbnail_filename: 'image',
@@ -46,8 +57,9 @@ describe('Blog Dashboard backend api service', () => {
     last_updated: '3232323',
     published_on: '1212121',
   };
-  let blogDashboardDataObject = {
-    username: blogDashboardBackendResponse.username,
+  let blogDashboardDataObject: BlogDashboardData = {
+    displayedAuthorName: 'test_name',
+    authorBio: 'author bio',
     profilePictureDataUrl: (
       blogDashboardBackendResponse.profile_picture_data_url),
     numOfDraftBlogPosts: blogDashboardBackendResponse.no_of_draft_blog_posts,
@@ -55,6 +67,14 @@ describe('Blog Dashboard backend api service', () => {
       blogDashboardBackendResponse.no_of_published_blog_posts),
     publishedBlogPostSummaryDicts: [] as BlogPostSummary[],
     draftBlogPostSummaryDicts: [] as BlogPostSummary[],
+  };
+  let blogAuthorBackendDetails: BlogAuthorDetailsBackendDict = {
+    displayed_author_name: 'new_displayed_author_name',
+    author_bio: 'general bio'
+  };
+  let blogAuthorDetails: BlogAuthorDetails = {
+    displayedAuthorName: 'new_displayed_author_name',
+    authorBio: 'general bio'
   };
   let blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
     blogPostSummary);
@@ -162,4 +182,44 @@ describe('Blog Dashboard backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
+
+  it('should successfully update author details in the backend.', fakeAsync(
+    () => {
+      bdbas.updateAuthorDetailsAsync(
+        blogAuthorBackendDetails.displayed_author_name,
+        blogAuthorBackendDetails.author_bio
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
+      expect(req.request.method).toEqual('PUT');
+      req.flush(blogAuthorBackendDetails);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(blogAuthorDetails);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should use the rejection handler if updating author details in the' +
+  ' backend fails.', fakeAsync(
+    () => {
+      bdbas.updateAuthorDetailsAsync(
+        blogAuthorBackendDetails.displayed_author_name,
+        blogAuthorBackendDetails.author_bio
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
+      expect(req.request.method).toEqual('PUT');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Some error in the backend.');
+    }));
 });

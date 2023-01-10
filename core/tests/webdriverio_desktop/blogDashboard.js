@@ -38,6 +38,7 @@ describe('Blog dashboard functionality', function() {
 
   it('should check user profile is visible on both blog dashboard and editor,' +
   ' create, edit and delete a blog post from blog dashboard', async function() {
+    await blogDashboardPage.updateAuthorDetails('blog', 'Oppia Blog Author');
     await blogDashboardPage.expectCurrUserToHaveProfilePhoto();
     await blogDashboardPage.expectCurrUsernameToBeVisible();
     await blogDashboardPage.blogDashboardIntroMessageIsVisible();

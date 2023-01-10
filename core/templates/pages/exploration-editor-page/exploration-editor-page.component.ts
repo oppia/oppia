@@ -67,24 +67,10 @@ import { StateEditorRefreshService } from './services/state-editor-refresh.servi
 import { StateTutorialFirstTimeService } from './services/state-tutorial-first-time.service';
 import { UserEmailPreferencesService } from './services/user-email-preferences.service';
 import { UserExplorationPermissionsService } from './services/user-exploration-permissions.service';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
-import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { VersionHistoryService } from './services/version-history.service';
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 
-interface ExplorationData {
-  auto_tts_enabled: boolean;
-  correctness_feedback_enabled: boolean;
-  draft_changes: ExplorationChange[];
-  is_version_of_draft_valid: boolean;
-  init_state_name: string;
-  param_changes: ParamChangeBackendDict[];
-  param_specs: ParamSpecsBackendDict;
-  states: StateObjectsBackendDict;
-  title: string;
-  language_code: string;
-  draft_change_list_id: number;
-  version: number;
-  edits_allowed: boolean;
+interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: string;
   category: string;
   objective: string;
@@ -143,7 +129,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
      private bottomNavbarStatusService: BottomNavbarStatusService,
      private changeListService: ChangeListService,
      private contextService: ContextService,
-     private editabilityService: EditabilityService,
+     public editabilityService: EditabilityService,
      private explorationAutomaticTextToSpeechService:
        ExplorationAutomaticTextToSpeechService,
      private explorationCategoryService: ExplorationCategoryService,
@@ -160,7 +146,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
      private explorationParamChangesService: ExplorationParamChangesService,
      private explorationParamSpecsService: ExplorationParamSpecsService,
      private explorationPropertyService: ExplorationPropertyService,
-     private explorationRightsService: ExplorationRightsService,
+     public explorationRightsService: ExplorationRightsService,
      private explorationSaveService: ExplorationSaveService,
      private explorationStatesService: ExplorationStatesService,
      private explorationTagsService: ExplorationTagsService,
@@ -187,6 +173,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
        UserExplorationPermissionsService,
      private userService: UserService,
      private windowDimensionsService: WindowDimensionsService,
+     private versionHistoryService: VersionHistoryService
   ) { }
 
   setDocumentTitle(): void {
@@ -295,6 +282,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             this.editabilityService.markTranslatable();
           }
         });
+
+      this.versionHistoryService.init(explorationData.version);
 
       this.stateEditorService.updateExplorationWhitelistedStatus(
         featuresData.isExplorationWhitelisted);

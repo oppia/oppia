@@ -33,6 +33,7 @@ from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core import constants
+from scripts import servers
 
 from typing import Dict, Generator, List, Optional, Union
 
@@ -41,7 +42,7 @@ from typing import Dict, Generator, List, Optional, Union
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-from core import utils # pylint: disable=wrong-import-position
+from core import utils  # pylint: disable=wrong-import-position
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -93,6 +94,8 @@ GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
 WEBPACK_BIN_PATH = (
     os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
+NG_BIN_PATH = (
+    os.path.join(CURR_DIR, 'node_modules', '.bin', 'ng'))
 DEV_APPSERVER_PATH = (
     os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
@@ -189,6 +192,22 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(CURR_DIR, 'proto_files'),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
+]
+
+CHROME_PATHS = [
+    # Unix.
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    # Arch Linux.
+    '/usr/bin/brave',
+    '/usr/bin/chromium',
+    # Windows.
+    '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+    'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe',
+    # WSL.
+    '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+    # Mac OS.
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 ]
 
 
@@ -738,40 +757,6 @@ def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
     return not is_port_in_use(port_number)
 
 
-def fix_third_party_imports() -> None:
-    """Sets up up the environment variables and corrects the system paths so
-    that the backend tests and imports work correctly.
-    """
-    # These environmental variables are required to allow Google Cloud Tasks to
-    # operate in a local development environment without connecting to the
-    # internet. These environment variables allow Cloud APIs to be instantiated.
-    os.environ['CLOUDSDK_CORE_PROJECT'] = 'dummy-cloudsdk-project-id'
-    os.environ['APPLICATION_ID'] = 'dummy-cloudsdk-project-id'
-
-    # The devappserver function fixes the system path by adding certain google
-    # appengine libraries that we need in oppia to the python system path. The
-    # Google Cloud SDK comes with certain packages preinstalled including
-    # webapp2, jinja2, and pyyaml so this function makes sure that those
-    # libraries are installed.
-    import dev_appserver
-    dev_appserver.fix_sys_path()
-    # In the process of migrating Oppia from Python 2 to Python 3, we are using
-    # both google app engine apis that are contained in the Google Cloud SDK
-    # folder, and also google cloud apis that are installed in our
-    # 'third_party/python_libs' directory. Therefore, there is a confusion of
-    # where the google module is located and which google module to import from.
-    # The following code ensures that the google module that python looks at
-    # imports from the 'third_party/python_libs' folder so that the imports are
-    # correct.
-    if 'google' in sys.modules:
-        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-        google_module: dev_appserver = sys.modules['google']
-        google_module.__path__ = [google_path]
-        google_module.__file__ = os.path.join(google_path, '__init__.py')
-
-    sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
-
-
 class CD:
     """Context manager for changing the current working directory."""
 
@@ -890,3 +875,37 @@ def url_retrieve(
             print('Retrying download.')
         else:
             success = True
+
+
+def setup_chrome_bin_env_variable() -> None:
+    """Sets the CHROME_BIN environment variable to the path
+    of the Chrome binary.
+
+    Raises:
+        Exception. Chrome not found.
+    """
+    for path in CHROME_PATHS:
+        if os.path.isfile(path):
+            os.environ['CHROME_BIN'] = path
+            break
+    else:
+        print('Chrome is not found, stopping...')
+        raise Exception('Chrome not found.')
+
+
+def run_ng_compilation() -> None:
+    """Runs angular compilation."""
+    max_tries = 2
+    ng_bundles_dir_name = 'dist/oppia-angular'
+    for _ in range(max_tries):
+        try:
+            with servers.managed_ng_build() as proc:
+                proc.wait()
+        except subprocess.CalledProcessError as error:
+            print(error.output)
+            sys.exit(error.returncode)
+        if os.path.isdir(ng_bundles_dir_name):
+            break
+    if not os.path.isdir(ng_bundles_dir_name):
+        print('Failed to complete ng build compilation, exiting...')
+        sys.exit(1)

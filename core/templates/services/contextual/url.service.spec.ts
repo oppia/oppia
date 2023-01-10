@@ -139,6 +139,41 @@ describe('Url Service', () => {
     }).toThrowError('Invalid Blog Post Id.');
   });
 
+  it('should correctly retrieve blog post url from url', () => {
+    mockLocation.pathname = '/blog/sample-blog-post-123';
+    expect(urlService.getBlogPostUrlFromUrl()).toBe('sample-blog-post-123');
+
+    mockLocation.pathname = '/blog/invalid/blog-post-1234';
+    expect(function() {
+      urlService.getBlogPostUrlFromUrl();
+    }).toThrowError('Invalid Blog Post Url.');
+
+    mockLocation.pathname = '/invalid/blog-post-1234';
+    expect(function() {
+      urlService.getBlogPostUrlFromUrl();
+    }).toThrowError('Invalid Blog Post Url.');
+  });
+
+  it('should correctly retrieve author username from url', () => {
+    // Checking with valid blog author profile page url.
+    mockLocation.pathname = '/blog/author/username';
+    expect(urlService.getBlogAuthorUsernameFromUrl()).toBe('username');
+
+    // Checking with invalid blog author profile page url. The url has extra an
+    // url segment.
+    mockLocation.pathname = '/blog/author/invalid/username';
+    expect(function() {
+      urlService.getBlogAuthorUsernameFromUrl();
+    }).toThrowError('Invalid Blog Author Profile Page Url.');
+
+    // Checking with invalid blog author profile page url. The url does not
+    // start with 'blog/author'.
+    mockLocation.pathname = 'blog/invalid/username';
+    expect(function() {
+      urlService.getBlogAuthorUsernameFromUrl();
+    }).toThrowError('Invalid Blog Author Profile Page Url.');
+  });
+
   it('should correctly retrieve story url fragment from url', () => {
     mockLocation.pathname = '/learn/math/abcdefgijklm/story/bakery';
     expect(

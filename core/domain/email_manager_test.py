@@ -42,10 +42,12 @@ from typing import (
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import email_models
+    from mypy_imports import secrets_services
     from mypy_imports import suggestion_models
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.Names.EMAIL, models.Names.SUGGESTION])
+secrets_services = models.Registry.import_secrets_services()
 
 
 class FailedMLTest(test_utils.EmailTestBase):
@@ -623,11 +625,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that no email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -650,11 +658,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
                 # No user-facing error should surface.
                 self.post_json(
-                    feconf.SIGNUP_DATA_URL, {
+                    feconf.SIGNUP_DATA_URL,
+                    {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }, csrf_token=csrf_token)
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'can_receive_email_updates': (
+                            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                        )
+                    },
+                    csrf_token=csrf_token
+                )
 
                 # However, an error should be recorded in the logs.
                 self.assertEqual(log_new_error_counter.times_called, 1)
@@ -699,11 +713,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
                 # No user-facing error should surface.
                 self.post_json(
-                    feconf.SIGNUP_DATA_URL, {
+                    feconf.SIGNUP_DATA_URL,
+                    {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }, csrf_token=csrf_token)
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'can_receive_email_updates': (
+                            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                        )
+                    },
+                    csrf_token=csrf_token
+                )
 
                 # However, an error should be recorded in the logs.
                 self.assertEqual(log_new_error_counter.times_called, 1)
@@ -740,11 +760,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
                 # No user-facing error should surface.
                 self.post_json(
-                    feconf.SIGNUP_DATA_URL, {
+                    feconf.SIGNUP_DATA_URL,
+                    {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                    }, csrf_token=csrf_token)
+                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'can_receive_email_updates': (
+                            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                        )
+                    },
+                    csrf_token=csrf_token
+                )
 
                 # However, an error should be recorded in the logs.
                 self.assertEqual(log_new_error_counter.times_called, 1)
@@ -773,11 +799,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that an email was sent with the correct content.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -807,11 +839,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that an email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -819,11 +857,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
             # Send a second POST request.
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that no new email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -847,9 +891,14 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 {
                     'agreed_to_terms': True,
                     'username': 'BadUsername!!!',
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
                 },
-                csrf_token=csrf_token, expected_status_int=400)
+                csrf_token=csrf_token,
+                expected_status_int=400
+            )
 
             # Check that no email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -857,11 +906,17 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
             # Redo the signup process with a good username.
             self.post_json(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL,
+                {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that a new email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -892,8 +947,13 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 feconf.SIGNUP_DATA_URL, {
                     'agreed_to_terms': True,
                     'username': self.EDITOR_USERNAME,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    )
+                },
+                csrf_token=csrf_token
+            )
 
             # Check that a new email was sent.
             messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
@@ -5677,151 +5737,6 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 email_intent)
 
 
-class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
-    """Unit test related to voiceover application emails."""
-
-    APPLICANT_USERNAME: Final = 'applicant'
-    APPLICANT_EMAIL: Final = 'applicant@example.com'
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
-        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
-        user_services.update_email_preferences(
-            self.applicant_id, True, False, False, False)
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.can_not_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', False)
-
-    def test_that_email_not_sent_if_can_send_emails_is_false(self) -> None:
-        with self.can_not_send_emails_ctx:
-            email_manager.send_accepted_voiceover_application_email(
-                self.applicant_id, 'Lesson to voiceover', 'en')
-
-        messages = self._get_sent_email_messages(
-            self.APPLICANT_EMAIL)
-        self.assertEqual(len(messages), 0)
-
-    def test_that_correct_accepted_voiceover_application_email_is_sent(
-        self
-    ) -> None:
-        expected_email_subject = (
-            '[Accepted] Updates on submitted voiceover application')
-        expected_email_html_body = (
-            'Hi applicant,<br><br>'
-            'Congratulations! Your voiceover application for '
-            '"Lesson to voiceover" lesson got accepted and you have been '
-            'assigned with a voice artist role in the lesson. Now you will be '
-            'able to add voiceovers to the lesson in English '
-            'language.'
-            '<br><br>You can check the wiki page to learn'
-            '<a href="https://github.com/oppia/oppia/wiki/'
-            'Instructions-for-voice-artists">how to voiceover a lesson</a>'
-            '<br><br>'
-            'Thank you for helping improve Oppia\'s lessons!'
-            '- The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
-
-        with self.can_send_emails_ctx:
-            email_manager.send_accepted_voiceover_application_email(
-                self.applicant_id, 'Lesson to voiceover', 'en')
-
-            # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.APPLICANT_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-
-            # Make sure correct email model is stored.
-            all_models: Sequence[
-                email_models.SentEmailModel
-            ] = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.applicant_id)
-            self.assertEqual(
-                sent_email_model.recipient_email, self.APPLICANT_EMAIL)
-            self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
-            self.assertEqual(
-                sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(
-                sent_email_model.intent,
-                feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
-
-    def test_that_correct_rejected_voiceover_application_email_is_sent(
-        self
-    ) -> None:
-        expected_email_subject = 'Updates on submitted voiceover application'
-        expected_email_html_body = (
-            'Hi applicant,<br><br>'
-            'Your voiceover application for "Lesson to voiceover" lesson in '
-            'language English got rejected and the reviewer has left a message.'
-            '<br><br>Review message: A rejection message!<br><br>'
-            'You can create a new voiceover application through the'
-            '<a href="https://oppia.org/contributor-dashboard">'
-            'contributor dashboard</a> page.<br><br>'
-            '- The Oppia Team<br>'
-            '<br>'
-            'You can change your email preferences via the '
-            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
-
-        with self.can_send_emails_ctx:
-            email_manager.send_rejected_voiceover_application_email(
-                self.applicant_id, 'Lesson to voiceover', 'en',
-                'A rejection message!')
-
-            # Make sure correct email is sent.
-            messages = self._get_sent_email_messages(
-                self.APPLICANT_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-
-            # Make sure correct email model is stored.
-            all_models: Sequence[
-                email_models.SentEmailModel
-            ] = email_models.SentEmailModel.get_all().fetch()
-            sent_email_model = all_models[0]
-            self.assertEqual(
-                sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.applicant_id)
-            self.assertEqual(
-                sent_email_model.recipient_email, self.APPLICANT_EMAIL)
-            self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
-            self.assertEqual(
-                sent_email_model.sender_email,
-                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(
-                sent_email_model.intent,
-                feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
-
-    def test_can_send_emails_is_false_logs_error(self) -> None:
-        """When feconf.CAN_SEND_EMAILS is false,
-        send_rejected_voiceover_application_email(*args) should log an error.
-        """
-        observed_log_messages = []
-
-        def _mock_logging_function(msg: str, *args: str) -> None:
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        with self.swap(logging, 'error', _mock_logging_function):
-            email_manager.send_rejected_voiceover_application_email(
-                self.applicant_id, 'Lesson to voiceover', 'en',
-                'A rejection message!')
-
-            expected_log_message = 'This app cannot send emails to users.'
-            self.assertEqual(
-                observed_log_messages, [expected_log_message])
-
-
 class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     """Unit test related to account deletion application emails."""
 
@@ -6635,3 +6550,80 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
                 'Thanks!',
                 messages[0].html
             )
+
+
+class MailchimpSecretTest(test_utils.GenericTestBase):
+    """Tests for the verify_mailchimp_secret."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.swap_webhook_feconf_return_secret = self.swap(
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', 'secret')
+        self.swap_webhook_feconf_return_none = self.swap(
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', None)
+        self.swap_webhook_secrets_return_none = self.swap_to_always_return(
+            secrets_services, 'get_secret', None)
+        self.swap_webhook_secrets_return_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: 'secret',
+            expected_args=[
+                ('MAILCHIMP_WEBHOOK_SECRET',),
+                ('MAILCHIMP_WEBHOOK_SECRET',),
+            ]
+        )
+
+    def test_cloud_secrets_return_none_feconf_return_secret_passes(
+        self
+    ) -> None:
+        with self.swap_webhook_feconf_return_secret:
+            with self.swap_webhook_secrets_return_none:
+                self.assertTrue(email_manager.verify_mailchimp_secret('secret'))
+                self.assertFalse(
+                    email_manager.verify_mailchimp_secret('not-secret'))
+
+    def test_cloud_secrets_return_none_feconf_return_secret_logs_exception(
+        self
+    ) -> None:
+        with self.swap_webhook_feconf_return_secret:
+            with self.swap_webhook_secrets_return_none:
+                with self.capture_logging(min_level=logging.WARNING) as logs:
+                    self.assertTrue(
+                        email_manager.verify_mailchimp_secret('secret'))
+                    self.assertEqual(
+                        [
+                            'Cloud Secret Manager is not able to get '
+                            'MAILCHIMP_WEBHOOK_SECRET.',
+                        ],
+                        logs
+                    )
+
+    def test_cloud_secrets_return_secret_passes(self) -> None:
+        with self.swap_webhook_secrets_return_secret:
+            self.assertTrue(
+                email_manager.verify_mailchimp_secret('secret'))
+            self.assertFalse(
+                email_manager.verify_mailchimp_secret('not-secret'))
+
+    def test_cloud_secrets_return_none_feconf_return_none_passes(self) -> None:
+        with self.swap_webhook_feconf_return_none:
+            with self.swap_webhook_secrets_return_none:
+                self.assertFalse(
+                    email_manager.verify_mailchimp_secret('secret'))
+
+    def test_cloud_secrets_return_none_feconf_return_none_logs_exception(
+        self
+    ) -> None:
+        with self.swap_webhook_feconf_return_none:
+            with self.swap_webhook_secrets_return_none:
+                with self.capture_logging(min_level=logging.WARNING) as logs:
+                    self.assertFalse(
+                        email_manager.verify_mailchimp_secret('secret'))
+                    self.assertEqual(
+                        [
+                            'Cloud Secret Manager is not able to get '
+                            'MAILCHIMP_WEBHOOK_SECRET.',
+                            'Mailchimp webhook secret is not available.'
+                        ],
+                        logs
+                    )

@@ -159,7 +159,7 @@ export class SignupPageComponent {
   submitPrerequisitesForm(
       agreedToTerms: boolean,
       username: string,
-      canReceiveEmailUpdates: string | null): void {
+      canReceiveEmailUpdates: string | null = null): void {
     if (!agreedToTerms) {
       this.alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
       return;
@@ -211,7 +211,7 @@ export class SignupPageComponent {
           this.submissionInProcess = false;
           return;
         }
-        this.siteAnalyticsService.registerNewSignupEvent();
+        this.siteAnalyticsService.registerNewSignupEvent('#signup-submit');
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = (
             this.utilsService.getSafeReturnUrl(returnUrl));

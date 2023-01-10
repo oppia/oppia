@@ -18,7 +18,6 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { AlertsService } from 'services/alerts.service';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupUserInfo } from
@@ -29,7 +28,8 @@ import './invite-learners.component.css';
 
 @Component({
   selector: 'oppia-invite-learners',
-  templateUrl: './invite-learners.component.html'
+  templateUrl: './invite-learners.component.html',
+  styleUrls: ['./invite-learners.component.css']
 })
 export class InviteLearnersComponent {
   @Input() learnerGroupID: string = '';
@@ -42,10 +42,9 @@ export class InviteLearnersComponent {
     EventEmitter<LearnerGroupUserInfo[]> = new EventEmitter();
 
   searchedUsername: string = '';
-  alertTimeout = 6000;
+  errorMessage!: string;
 
   constructor(
-    private alertsService: AlertsService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
 
@@ -62,7 +61,7 @@ export class InviteLearnersComponent {
         (name) => name.toLowerCase() === username.toLowerCase()
       );
       if (isUserAlreadyInvited) {
-        this.alertsService.addInfoMessage(
+        this.errorMessage = (
           'User with username ' + username + ' has been already invited.'
         );
         return;
@@ -71,11 +70,12 @@ export class InviteLearnersComponent {
         this.learnerGroupID, username
       ).then(userInfo => {
         if (!userInfo.error) {
+          this.errorMessage = '';
           this.invitedUsersInfo.push(userInfo);
           this.invitedUsernames.push(userInfo.username);
           this.updateInvitedLearners();
         } else {
-          this.alertsService.addInfoMessage(userInfo.error, this.alertTimeout);
+          this.errorMessage = userInfo.error;
         }
       });
     }

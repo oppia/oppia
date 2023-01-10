@@ -195,6 +195,49 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/volunteer-page/volunteer-page.module')
       .then(m => m.VolunteerPageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_VIEWER.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/learner-group-pages/view-group/view-learner-group-page.module')
+      .then(m => m.ViewLearnerGroupPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-home-page/blog-home-page.module')
+      .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-home-page/blog-home-page.module')
+      .then(m => m.BlogHomePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-author-profile-page/blog-author-profile-page.module')
+      .then(m => m.BlogAuthorProfilePageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE
+    ),
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/blog-post-page/blog-post-page.module')
+      .then(m => m.BlogPostPageModule)
   }
 ];
 

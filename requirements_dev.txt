@@ -56,11 +56,13 @@ pylint==2.11.1
     # via
     #   -r requirements_dev.in
     #   pylint-quotes
-pylint-quotes @ git+https://github.com/oppia/pylint-quotes.git@0.2.4
+pylint-quotes==0.2.3
     # via -r requirements_dev.in
 pynacl==1.5.0
     # via pygithub
 pyyaml==6.0
+    # via -r requirements_dev.in
+rcssmin==1.1.1
     # via -r requirements_dev.in
 requests==2.27.1
     # via pygithub

@@ -41,9 +41,11 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockContentTranslationLanguageService {
-  currentLanguageCode: string;
+  currentLanguageCode!: string;
 
   getCurrentContentLanguageCode() {
     return this.currentLanguageCode;
@@ -68,14 +70,25 @@ class MockI18nLanguageCodeService {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: 'http://localhost:8181/explore/wZiXFx1iV5bz',
+      pathname: '/explore/wZiXFx1iV5bz'
+    }
+  };
+}
+
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
+  let windowRef: MockWindowRef;
   let playerTranscriptService: PlayerTranscriptService;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
+  let interactionObjectFactory: InteractionObjectFactory;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -90,6 +103,9 @@ describe('Content language selector component', () => {
         SwitchContentLanguageRefreshRequiredModalComponent
       ],
       providers: [{
+        provide: WindowRef,
+        useClass: MockWindowRef
+      }, {
         provide: ContentTranslationLanguageService,
         useClass: MockContentTranslationLanguageService
       }, {
@@ -103,6 +119,7 @@ describe('Content language selector component', () => {
     }).compileComponents();
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
@@ -110,18 +127,33 @@ describe('Content language selector component', () => {
     audioTranslationLanguageService = TestBed.get(
       AudioTranslationLanguageService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
+    windowRef = TestBed.inject(WindowRef);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
 
-  it('should correctly initialize selectedLanguageCode and ' +
-     'languagesInExploration', () => {
+  it('should correctly initialize selectedLanguageCode, ' +
+    'and languagesInExploration', () => {
     expect(component.selectedLanguageCode).toBe('fr');
     expect(component.languageOptions).toEqual([
-      {value: 'fr', displayed: 'français (French)'},
-      {value: 'zh', displayed: '中文 (Chinese)'},
-      {value: 'en', displayed: 'English'}
+      { value: 'fr', displayed: 'français (French)' },
+      { value: 'zh', displayed: '中文 (Chinese)' },
+      { value: 'en', displayed: 'English' }
     ]);
+  });
+
+  it('should correcly initialize newLanguageCode', () => {
+    component.ngOnInit();
+    expect(component.newLanguageCode).toBe('fr');
+
+    windowRef.nativeWindow.location.href = (
+      'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
+    windowRef.nativeWindow.location.pathname = (
+      '/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
+
+    component.ngOnInit();
+
+    expect(component.newLanguageCode).toBe('en');
   });
 
   it('should correctly select an option when refresh is not needed', () => {
@@ -131,7 +163,58 @@ describe('Content language selector component', () => {
 
     const card = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
-      null,
+      interactionObjectFactory.createFromBackendDict({
+        id: 'GraphInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
+              },
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: true,
+              param_changes: [],
+            },
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: '',
+          },
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        }
+      }),
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
@@ -153,7 +236,58 @@ describe('Content language selector component', () => {
 
     const card = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
-      null,
+      interactionObjectFactory.createFromBackendDict({
+        id: 'GraphInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
+              },
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: true,
+              param_changes: [],
+            },
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: '',
+          },
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        }
+      }),
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);

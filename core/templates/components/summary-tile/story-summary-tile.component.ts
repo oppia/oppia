@@ -34,7 +34,8 @@ import './story-summary-tile.component.css';
 
 @Component({
   selector: 'oppia-story-summary-tile',
-  templateUrl: 'story-summary-tile.component.html'
+  templateUrl: './story-summary-tile.component.html',
+  styleUrls: ['./story-summary-tile.component.css']
 })
 export class StorySummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -69,7 +70,7 @@ export class StorySummaryTileComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private assetsBackendApiService: AssetsBackendApiService
+    private assetsBackendApiService: AssetsBackendApiService,
   ) {}
 
   checkTabletView(): boolean {

@@ -38,7 +38,8 @@ import './learner-view-info.component.css';
 
 @Component({
   selector: 'oppia-learner-view-info',
-  templateUrl: './learner-view-info.component.html'
+  templateUrl: './learner-view-info.component.html',
+  styleUrls: ['./learner-view-info.component.css']
 })
 export class LearnerViewInfoComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -120,6 +121,9 @@ export class LearnerViewInfoComponent {
           );
         }
       );
+    } else {
+      this.siteAnalyticsService.registerCommunityLessonStarted(
+        this.explorationId);
     }
   }
 

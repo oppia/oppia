@@ -201,3 +201,93 @@
 .added-syllabus-items-successfully-modal .modal-body {
   padding: 15px 40px;
 }
+
+@media screen and (max-width: 940px) {
+  .oppia-learner-group-syllabus {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-group-syllabus {
+    background: #fff;
+    margin-top: 0;
+    padding: 20px;
+    width: 100%;
+  }
+
+  .oppia-learner-group-syllabus .assigned-syllabus-tab-title {
+    color: #00645c;
+    font-size: 20px;
+    font-style: normal;
+    line-height: 28px;
+  }
+
+  .oppia-learner-group-syllabus .assigned-syllabus-card-title {
+    font-size: 20px;
+  }
+
+  .oppia-learner-group-syllabus .same-row-container {
+    gap: 15px;
+  }
+
+  .oppia-learner-group-syllabus .add-syllabus-items-container,
+  .oppia-learner-group-syllabus .learner-group-assigned-syllabus {
+    box-shadow: unset;
+    padding: unset;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .oppia-add-learner-group-syllabus .syllabus-item-card {
+    display: grid;
+    max-height: unset;
+    padding-right: 0;
+  }
+
+  .oppia-add-learner-group-syllabus .syllabus-item-image-title-container {
+    align-items: unset;
+    display: grid;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .oppia-add-learner-group-syllabus .syllabus-item-cta-buttons-container {
+    justify-content: unset;
+    padding: 10px;
+    width: 100%;
+  }
+
+  .oppia-add-learner-group-syllabus .syllabus-item-image {
+    height: 130px;
+    width: 100%;
+  }
+
+  .oppia-add-learner-group-syllabus .syllabus-item-title-container {
+    justify-content: unset;
+    padding: 10px;
+  }
+}
+
+@media screen and (max-width: 540px) {
+  .oppia-learner-group-syllabus .assigned-syllabus-tab-title {
+    display: none;
+  }
+
+  .oppia-learner-group-syllabus .oppia-add-syllabus-items-button-container,
+  .oppia-learner-group-syllabus .oppia-add-syllabus-items-button {
+    width: 100%;
+  }
+
+  .oppia-learner-group-syllabus .assigned-sylabus-card {
+    display: grid;
+  }
+
+  .oppia-learner-group-syllabus .assigned-syllabus-card-title {
+    font-size: 18px;
+  }
+
+  .oppia-learner-group-syllabus .assigned-syllabus-item-image {
+    width: 100%;
+  }
+}

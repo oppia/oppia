@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the create new subtopic modal component.
  */
 
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 import { ComponentFixture, waitForAsync, TestBed, fakeAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -47,6 +47,11 @@ class MockActiveModal {
 }
 class MockTopicEditorStateService {
   getTopic() {
+    return new Topic(
+      '', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
+    );
   }
 
   getClassroomUrlFragment() {
@@ -73,8 +78,7 @@ describe('create new subtopic modal', function() {
   let topicUpdateService: TopicUpdateService;
   let topicEditorStateService: MockTopicEditorStateService;
   let subtopicValidationService: SubtopicValidationService;
-  let topicObjectFactory: TopicObjectFactory;
-  let topic = null;
+  let topic: Topic;
   let DefaultSubtopicPageSchema = {
     type: 'html',
     ui_config: {
@@ -117,12 +121,15 @@ describe('create new subtopic modal', function() {
       (TestBed.inject(TopicEditorStateService) as unknown) as
       jasmine.SpyObj<MockTopicEditorStateService>;
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
 
-    topic = topicObjectFactory.createInterstitialTopic();
+    topic = new Topic(
+      '', 'Topic name loading', 'Abbrev. name loading',
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
+    );
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     topic.getSubtopics = function() {
-      return subtopic1;
+      return [subtopic1];
     };
     topic.getId = function() {
       return '1';
@@ -136,8 +143,6 @@ describe('create new subtopic modal', function() {
   });
 
   it('should assign default values to modal when initialized', () => {
-    spyOn(topicUpdateService, 'addSubtopic').and.stub();
-
     component.ngOnInit();
     expect(component.SUBTOPIC_PAGE_SCHEMA).toEqual(DefaultSubtopicPageSchema);
     expect(component.subtopicId).toBe(1);
@@ -150,7 +155,6 @@ describe('create new subtopic modal', function() {
       .toBe(constants.MAX_CHARS_IN_SUBTOPIC_TITLE);
     expect(component.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
       .toBe(constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
-    expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(topic, '', '');
 
     component.localValueChange('working fine');
     expect(component.htmlData).toBe('working fine');
@@ -168,22 +172,17 @@ describe('create new subtopic modal', function() {
   it('should update editableThumbnailFilename when ' +
   'filename updated in \"Thubmnail Image\" modal', () => {
     let newFileName = 'shivamOppiaFile';
-    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename').and.stub();
     component.updateSubtopicThumbnailFilename(newFileName);
 
     expect(component.editableThumbnailFilename).toBe(newFileName);
-    expect(topicUpdateService.setSubtopicThumbnailFilename)
-      .toHaveBeenCalled();
   });
 
   it('should update ThumbnailBgColor when ' +
     'user select new color in \"Thubmnail Image\" modal', () => {
     let newThumbnailBgColor = 'red';
-    spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor').and.stub();
     component.updateSubtopicThumbnailBgColor(newThumbnailBgColor);
 
     expect(component.editableThumbnailBgColor).toBe(newThumbnailBgColor);
-    expect(topicUpdateService.setSubtopicThumbnailBgColor).toHaveBeenCalled();
   });
 
   it('should reset errorMsg when user' +
@@ -210,12 +209,10 @@ describe('create new subtopic modal', function() {
   it('should not create subtopic when \"Cancel\" button clicked',
     fakeAsync(() => {
       spyOn(topicEditorStateService, 'deleteSubtopicPage');
-      spyOn(topicUpdateService, 'deleteSubtopic');
 
       component.cancel();
 
       expect(topicEditorStateService.deleteSubtopicPage).toHaveBeenCalled();
-      expect(topicUpdateService.deleteSubtopic).toHaveBeenCalled();
     }));
 
   it('should check whether subtopicUrlFragmentExists when user enter data' +
@@ -233,12 +230,17 @@ describe('create new subtopic modal', function() {
     spyOn(subtopicValidationService, 'checkValidSubtopicName')
       .and.returnValue(true);
     spyOn(topicUpdateService, 'setSubtopicTitle');
+    spyOn(topicUpdateService, 'addSubtopic');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename').and.stub();
+    spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor').and.stub();
     spyOn(topicUpdateService, 'setSubtopicUrlFragment');
     spyOn(SubtopicPage, 'createDefault').and.callThrough();
     spyOn(topicEditorStateService, 'setSubtopicPage').and.callThrough();
     spyOn(ngbActiveModal, 'close');
+
     component.save();
 
+    expect(topicUpdateService.addSubtopic).toHaveBeenCalled();
     expect(topicUpdateService.setSubtopicTitle).toHaveBeenCalled();
     expect(topicUpdateService.setSubtopicUrlFragment).toHaveBeenCalled();
     expect(SubtopicPage.createDefault).toHaveBeenCalled();

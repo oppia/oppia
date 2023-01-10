@@ -333,6 +333,25 @@ class UserSettings:
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
+    def record_user_edited_an_exploration(self) -> None:
+        """Updates last_edited_an_exploration to the current datetime for the
+        user.
+        """
+        self.last_edited_an_exploration = datetime.datetime.utcnow()
+
+    def update_first_contribution_msec(
+        self, first_contribution_msec: float
+    ) -> None:
+        """Updates first_contribution_msec of user with given user_id
+        if it is set to None.
+
+        Args:
+            first_contribution_msec: float. New time to set in milliseconds
+                representing user's first contribution to Oppia.
+        """
+        if self.first_contribution_msec is None:
+            self.first_contribution_msec = first_contribution_msec
+
     def populate_from_modifiable_user_data(
         self, modifiable_user_data: ModifiableUserData
     ) -> None:
@@ -347,7 +366,6 @@ class UserSettings:
             ValidationError. None or empty value is provided for display alias
                 attribute.
         """
-
         if (not modifiable_user_data.display_alias or
                 not isinstance(modifiable_user_data.display_alias, str)):
             raise utils.ValidationError(
@@ -519,14 +537,15 @@ class UserSettings:
 class UserActionsInfo:
     """A class representing information of user actions.
     Attributes:
-        user_id: str. The unique ID of the user.
+        user_id: str|None. The unique ID of the user, or None if the user
+            is not logged in.
         roles: list(str). The roles of the user.
         actions: list(str). A list of actions accessible to the role.
     """
 
     def __init__(
         self,
-        user_id: str,
+        user_id: Optional[str],
         roles: List[str],
         actions: List[str]
     ) -> None:
@@ -535,7 +554,7 @@ class UserActionsInfo:
         self._actions = actions
 
     @property
-    def user_id(self) -> str:
+    def user_id(self) -> Optional[str]:
         """Returns the unique ID of the user.
 
         Returns:
@@ -634,6 +653,29 @@ class UserContributions:
                     'Expected exploration_id in edited_exploration_ids '
                     'to be a string, received %s' % (
                         exploration_id))
+
+    def add_created_exploration_id(self, exploration_id: str) -> None:
+        """Adds an exploration_id to list of created explorations.
+
+        Args:
+            exploration_id: str. The exploration id.
+        """
+        if exploration_id not in self.created_exploration_ids:
+            self.created_exploration_ids.append(exploration_id)
+            self.created_exploration_ids.sort()
+
+    def add_edited_exploration_id(
+        self,
+        exploration_id: str
+    ) -> None:
+        """Adds an exploration_id to list of edited explorations.
+
+        Args:
+            exploration_id: str. The exploration id.
+        """
+        if exploration_id not in self.edited_exploration_ids:
+            self.edited_exploration_ids.append(exploration_id)
+            self.edited_exploration_ids.sort()
 
 
 class UserGlobalPrefs:
