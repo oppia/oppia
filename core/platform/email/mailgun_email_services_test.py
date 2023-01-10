@@ -88,10 +88,9 @@ class EmailTests(test_utils.GenericTestBase):
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             urllib.request, 'Request', self.swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
-            with swap_request_context, swap_api, swap_domain:
+            with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
                     'a@a.com',
                     ['b@b.com'],
@@ -119,10 +118,9 @@ class EmailTests(test_utils.GenericTestBase):
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             urllib.request, 'Request', self.swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
-            with swap_request_context, swap_api, swap_domain:
+            with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
                     'a@a.com',
                     ['b@b.com'],
@@ -154,10 +152,9 @@ class EmailTests(test_utils.GenericTestBase):
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             urllib.request, 'Request', self.swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
-            with swap_request_context, swap_api, swap_domain:
+            with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
                     'a@a.com',
                     ['b@b.com'],
@@ -189,10 +186,9 @@ class EmailTests(test_utils.GenericTestBase):
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             urllib.request, 'Request', swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
-            with swap_request_context, swap_api, swap_domain:
+            with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
                     'a@a.com',
                     ['b@b.com', 'c@c.com', 'd@d.com'],
@@ -223,10 +219,9 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_mailgun_domain_name_not_set_raises_exception(self) -> None:
         # Testing no mailgun domain name.
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         mailgun_exception = self.assertRaisesRegex(
             Exception, 'Mailgun domain name is not set.')
-        with self.swap_api_key_secrets_return_none, swap_api, mailgun_exception:
+        with self.swap_api_key_secrets_return_secret, mailgun_exception:
             with self.capture_logging() as logs:
                 mailgun_email_services.send_email_to_recipients(
                     'a@a.com',
@@ -255,10 +250,9 @@ class EmailTests(test_utils.GenericTestBase):
             utils, 'url_open', swapped_urlopen)
         swap_request_context = self.swap(
             urllib.request, 'Request', swapped_request)
-        swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with self.swap_api_key_secrets_return_secret, swap_urlopen_context:
-            with swap_request_context, swap_api, swap_domain:
+            with swap_request_context, swap_domain:
                 resp = mailgun_email_services.send_email_to_recipients(
                     'a@a.com',
                     ['b@b.com'],
