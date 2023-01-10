@@ -211,7 +211,7 @@
 /core/templates/components/checkpoint-celebration-modal/ @oppia/lace-frontend-reviewers
 /core/templates/components/state-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/graph-services/ @oppia/lace-frontend-reviewers
-/core/templates/components/on-screen-keyboard/ @oppia/interaction-and-rte-reviewers
+/core/templates/components/on-screen-keyboard/ @oppia/lace-backend-reviewers
 /core/templates/components/recommendations/ @oppia/lace-frontend-reviewers
 /core/templates/components/save-pending-changes/ @oppia/lace-frontend-reviewers
 /core/templates/components/stale-tab-info/ @oppia/lace-frontend-reviewers
@@ -324,26 +324,26 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @oppia/interaction-and-rte-reviewers
-/core/domain/expression_parser*.py @oppia/interaction-and-rte-reviewers
-/core/domain/interaction_registry*.py @oppia/interaction-and-rte-reviewers
-/core/domain/object_registry*.py @oppia/interaction-and-rte-reviewers
+/core/domain/customization_args_util*.py @oppia/lace-frontend-reviewers
+/core/domain/expression_parser*.py @oppia/lace-frontend-reviewers
+/core/domain/interaction_registry*.py @oppia/lace-frontend-reviewers
+/core/domain/object_registry*.py @oppia/lace-frontend-reviewers
 /core/domain/rules_registry*.py @oppia/lace-backend-reviewers
-/core/domain/translatable_object_registry*.py @oppia/interaction-and-rte-reviewers
-/core/templates/components/keyboard-shortcut-help/ @oppia/interaction-and-rte-reviewers
-/core/templates/domain/objects/ @oppia/interaction-and-rte-reviewers
-/core/templates/expressions/ @oppia/interaction-and-rte-reviewers
-/core/templates/services/code-normalizer.service*.ts @oppia/interaction-and-rte-reviewers
-/core/templates/services/guppy-configuration.service.ts @oppia/interaction-and-rte-reviewers
-/core/templates/services/guppy-initialization.service.ts @oppia/interaction-and-rte-reviewers
-/core/templates/services/math-interactions.service.ts @oppia/interaction-and-rte-reviewers
-/extensions/domain*.py @oppia/interaction-and-rte-reviewers
-/extensions/interactions/ @oppia/interaction-and-rte-reviewers
-/extensions/objects/ @oppia/interaction-and-rte-reviewers
-/extensions/objects/templates/filepath-editor.component*.ts @oppia/interaction-and-rte-reviewers
-/extensions/objects/templates/filepath-editor.component.html @oppia/interaction-and-rte-reviewers
-/extensions/value_generators/ @oppia/interaction-and-rte-reviewers
-/extensions/__init__.py @oppia/interaction-and-rte-reviewers
+/core/domain/translatable_object_registry*.py @oppia/lace-frontend-reviewers
+/core/templates/components/keyboard-shortcut-help/ @oppia/lace-backend-reviewers
+/core/templates/domain/objects/ @oppia/lace-backend-reviewers
+/core/templates/expressions/ @oppia/lace-backend-reviewers
+/core/templates/services/code-normalizer.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/guppy-configuration.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/guppy-initialization.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/math-interactions.service.ts @oppia/lace-frontend-reviewers
+/extensions/domain*.py @oppia/lace-frontend-reviewers
+/extensions/interactions/ @oppia/lace-backend-reviewers
+/extensions/objects/ @oppia/lace-backend-reviewers
+/extensions/objects/templates/filepath-editor.component*.ts @oppia/lace-frontend-reviewers
+/extensions/objects/templates/filepath-editor.component.html @oppia/lace-frontend-reviewers
+/extensions/value_generators/ @oppia/lace-backend-reviewers
+/extensions/__init__.py @oppia/lace-frontend-reviewers
 
 
 # Lesson Analytics team.
@@ -512,8 +512,8 @@
 /core/templates/services/app.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/contextual/document-attribute-customization.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/contextual/meta-tag-customization.service*.ts @oppia/frontend-infrastructure-reviewers
-/core/templates/services/interaction-rules-registry.service*.ts @oppia/interaction-and-rte-reviewers
-/core/templates/services/interaction-specs.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/interaction-specs.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @oppia/angular-migration-reviewers
 /redis.conf @oppia/data-and-stability-reviewers
 /.firebase.json @oppia/data-and-stability-reviewers
@@ -566,30 +566,30 @@
 
 
 # Rich text editor team.
-/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @oppia/interaction-and-rte-reviewers
-/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @oppia/interaction-and-rte-reviewers
-/core/templates/components/ck-editor-helpers/ckeditor4.module.ts @oppia/interaction-and-rte-reviewers
-/core/templates/directives/mathjax-bind.directive.ts @oppia/interaction-and-rte-reviewers
-/core/templates/directives/mathjax.directive.ts @oppia/interaction-and-rte-reviewers
-/core/templates/mathjaxConfig.ts @oppia/interaction-and-rte-reviewers
-/core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @oppia/interaction-and-rte-reviewers
-/core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @oppia/interaction-and-rte-reviewers
-/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @oppia/interaction-and-rte-reviewers
-/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @oppia/interaction-and-rte-reviewers
-/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module.ts @oppia/interaction-and-rte-reviewers
-/core/templates/services/autoplayed-videos.service*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @oppia/lace-frontend-reviewers
+/core/templates/components/ck-editor-helpers/ckeditor4.module.ts @oppia/lace-frontend-reviewers
+/core/templates/directives/mathjax-bind.directive.ts @oppia/lace-frontend-reviewers
+/core/templates/directives/mathjax.directive.ts @oppia/lace-frontend-reviewers
+/core/templates/mathjaxConfig.ts @oppia/lace-frontend-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @oppia/lace-frontend-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module.ts @oppia/lace-frontend-reviewers
+/core/templates/services/autoplayed-videos.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/external-save.service*.ts @oppia/angular-migration-reviewers
 /core/templates/services/external-rte-save.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/oppia-rte-parser.service*.ts @oppia/interaction-and-rte-reviewers
-/core/templates/services/image-local-storage*.ts @oppia/interaction-and-rte-reviewers
-/core/templates/services/rte-helper.service*.ts @oppia/interaction-and-rte-reviewers
-/core/templates/services/rte-helper-modal.controller*.ts @oppia/interaction-and-rte-reviewers
+/core/templates/services/oppia-rte-parser.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/image-local-storage*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.controller*.ts @oppia/lace-frontend-reviewers
 /core/domain/image_validation_services*.py @oppia/lace-backend-reviewers
-/core/domain/rte_component_registry*.py @oppia/interaction-and-rte-reviewers
-/extensions/ckeditor_plugins/ @oppia/interaction-and-rte-reviewers
-/extensions/rich_text_components/rte-output-display.component* @oppia/interaction-and-rte-reviewers
-/extensions/rich_text_components/ @oppia/interaction-and-rte-reviewers
-/assets/rich_text_components_definitions.ts @oppia/interaction-and-rte-reviewers
+/core/domain/rte_component_registry*.py @oppia/lace-frontend-reviewers
+/extensions/ckeditor_plugins/ @oppia/lace-backend-reviewers
+/extensions/rich_text_components/rte-output-display.component* @oppia/lace-frontend-reviewers
+/extensions/rich_text_components/ @oppia/lace-backend-reviewers
+/assets/rich_text_components_definitions.ts @oppia/lace-frontend-reviewers
 
 
 # Suggestion and feedback team.
