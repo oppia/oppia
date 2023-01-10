@@ -87,6 +87,7 @@
     "I18N_ANDROID_PAGE_FEATURE_TEXT_4": "Switch between learners",
     "I18N_ANDROID_PAGE_FEEDBACK_TEXT": "Let us know at <strong class=\"oppia-android-bold-text\">android@oppia.org</strong><br>if you have any feedback or would like to sign up for updates",
     "I18N_ANDROID_PAGE_NAME_FIELD_LABEL": "Name (optional)",
+    "I18N_ANDROID_PAGE_SUPPORT_TEXT": "We support all Android versions going back to Lollipop (Android 5).",
     "I18N_ANDROID_PAGE_TITLE": "Android | Oppia",
     "I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT": "Subscribe to receive updates on Oppia’s Android app",
     "I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "Subscribe",

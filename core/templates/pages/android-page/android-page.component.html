@@ -14,18 +14,18 @@
                  [innerHTML]="'I18N_ANDROID_PAGE_BETA_DESCRIPTION' | translate">
               </p>
               <p class="oppia-mobile-only oppia-android-support-text">
-                We support all Android versions going back to Lollipop (Android 5).
+                {{ 'I18N_ANDROID_PAGE_SUPPORT_TEXT' | translate }}
               </p>
               <a [href]="ANDROID_APP_URL" target="_blank" rel="noopener">
                 <img class="oppia-android-google-play-logo"
                      src="/assets/images/android/android-landing-google-play.svg"
-                     alt="">
+                     alt="Link to Android app page">
               </a>
             </div>
           </div>
         </div>
         <div class="col-sm-6 col-4">
-          <img class="oppia-android-hero-image" src="/assets/images/android/android-landing-0.svg" alt="">
+          <img class="oppia-android-hero-image" src="/assets/images/android/android-landing-0.svg" alt="Image showing the application in use">
         </div>
       </div>
     </div>
@@ -37,10 +37,10 @@
       <div class="container">
         <div class="row">
           <div class="oppia-android-key-feature-image-container">
-            <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
-            <img *ngIf="featuresShown === 1" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
-            <img *ngIf="featuresShown === 2" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="">
-            <img *ngIf="featuresShown === 3" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="">
+            <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="Image showing the story page">
+            <img *ngIf="featuresShown === 1" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="Image showing a lesson being played">
+            <img *ngIf="featuresShown === 2" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="Image showing the lesson in different languages">
+            <img *ngIf="featuresShown === 3" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="Image showing that maintaining different profiles are possible">
           </div>
         </div>
         <div class="oppia-android-key-feature-container row">
@@ -106,10 +106,10 @@
               <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right"></i>
             </div>
             <div class="oppia-android-key-feature-image-container col-md-8">
-              <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="">
-              <img *ngIf="featuresShown === 1" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="">
-              <img *ngIf="featuresShown === 2" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="">
-              <img *ngIf="featuresShown === 3" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="">
+              <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="Image showing the story page">
+              <img *ngIf="featuresShown === 1" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="Image showing a lesson being played">
+              <img *ngIf="featuresShown === 2" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="Image showing the lesson in different languages">
+              <img *ngIf="featuresShown === 3" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="Image showing that maintaining different profiles are possible">
             </div>
             <div class="col-md-2 align-self-center" (click)="changeFeaturesShown((5 + featuresShown) % 4)">
               <i class="fas fa-chevron-right oppia-android-carousel-chevron"></i>
@@ -185,7 +185,7 @@
         </div>
       </div>
       <div class="container">
-        <img class="oppia-android-avatar-img mx-auto d-block" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+        <img class="oppia-android-avatar-img mx-auto d-block" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Image of Oppia mascot">
       </div>
     </div>
     <div class="oppia-android-app-updates-background oppia-android-otter-help-container">
