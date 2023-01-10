@@ -2269,14 +2269,7 @@ def verify_mailchimp_secret(secret: str) -> bool:
     mailchimp_webhook_secret = secrets_services.get_secret(
         'MAILCHIMP_WEBHOOK_SECRET')
     if mailchimp_webhook_secret is None:
-        logging.error(
-            'Cloud Secret Manager is not able to get MAILCHIMP_WEBHOOK_SECRET.')
-        # TODO(#16197): Remove MAILCHIMP_WEBHOOK_SECRET from feconf after we
-        # verify that secrets work.
-        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
-            logging.error('Mailchimp webhook secret is not available.')
-            return False
-
-        return secret == feconf.MAILCHIMP_WEBHOOK_SECRET
+        logging.error('Mailchimp Webhook secret is not available.')
+        return False
 
     return secret == mailchimp_webhook_secret
