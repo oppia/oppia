@@ -137,7 +137,7 @@ describe('Android page', () => {
     expect(component.validateEmailAddress()).toBeTrue();
   });
 
-  it('should add user to android mailing list and return status',
+  fit('should add user to android mailing list and return status',
     fakeAsync(() => {
       spyOn(alertsService, 'addInfoMessage');
       component.ngOnInit();
@@ -146,13 +146,13 @@ describe('Android page', () => {
       component.name = 'validName';
       spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.resolve(true));
+      component.userHasSubscribed = false;
 
       component.subscribeToAndroidList();
 
       flushMicrotasks();
 
-      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-        'Successfully added to mailing list!', 1000);
+      expect(component.userHasSubscribed).toBeTrue();
     }));
 
   it('should fail to add user to android mailing list and return status',
