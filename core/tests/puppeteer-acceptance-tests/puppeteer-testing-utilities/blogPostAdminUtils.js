@@ -17,6 +17,8 @@
  */
 
 const puppeteerUtilities = require('./puppeteer_utils.js');
+const testConstants = require(
+  '../puppeteer-testing-utilities/testConstants.js');
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
@@ -27,6 +29,7 @@ const roleUpdateUsernameInput = 'input#label-target-update-form-name';
 const blogEditorUsernameInput = 'input#label-target-form-reviewer-username';
 const maximumTagLimitInput = 'input#mat-input-0';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
+const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async addUserBioInBlogDashboard() {
@@ -263,6 +266,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   async expectBlogDashboardAccessToBeUnauthorized() {
+    await this.goto(blogDashboardUrl);
     try {
       await this.page.waitForSelector(unauthErrorContainer);
       console.log('User unauthorized to access blog dashboard!');
@@ -278,7 +282,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
      * guest user after giving the blog admin role to it. There is a
      * modal dialog box asking for the user name and bio for the users
      * given blog admin role as they first time opens the blog-dashboard. */
-    await this.reloadPage();
+    await this.goto(blogDashboardUrl);
     try {
       await this.waitForPageToLoad(blogDashboardAuthorDetailsModal);
       console.log('User authorized to access blog dashboard!');

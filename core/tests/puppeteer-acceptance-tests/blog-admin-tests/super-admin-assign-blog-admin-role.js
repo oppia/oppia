@@ -20,10 +20,7 @@ const e2eSuperAdmin = require(
   '../puppeteer-testing-utilities/blogPostAdminUtils.js');
 const e2eBlogAdmin = require(
   '../puppeteer-testing-utilities/blogPostAdminUtils.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/testConstants.js');
 
-const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const ROLE_BLOG_ADMIN = 'blog admin';
 
 let superAdminAssignBlogAdminRole = async function() {
@@ -33,14 +30,13 @@ let superAdminAssignBlogAdminRole = async function() {
   await blogAdmin.openBrowser();
   await blogAdmin.signUpNewUserWithUsernameAndEmail(
     'blogAdm', 'blog_admin@example.com');
-  await blogAdmin.goto(blogDashboardUrl);
   await blogAdmin.expectBlogDashboardAccessToBeUnauthorized();
 
   await superAdmin.openBrowser();
   await superAdmin.signUpNewUserWithUsernameAndEmail(
     'superAdm', 'testadmin@example.com');
   await superAdmin.assignRoleToUser('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.expectUserToHaveBlogAdminRole();
+  await superAdmin.expectUserToHaveRole('blogAdm', 'Blog Admin');
   await superAdmin.closeBrowser();
 
   await blogAdmin.expectBlogDashboardAccessToBeAuthorized();

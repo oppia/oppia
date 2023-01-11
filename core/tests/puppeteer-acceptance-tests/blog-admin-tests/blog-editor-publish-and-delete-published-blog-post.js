@@ -25,7 +25,7 @@ const testConstants = require(
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const ROLE_BLOG_ADMIN = 'blog admin';
 
-let publishBlogAndDeletePublishedBlogAsBlogPostAdmin = async function() {
+let blogEditorPublishBlogPostAndDeletePublishedBlogPost = async function() {
   const blogPostEditor = await new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
 
@@ -45,4 +45,4 @@ let publishBlogAndDeletePublishedBlogAsBlogPostAdmin = async function() {
   await blogPostEditor.closeBrowser();
 };
 
-await publishBlogAndDeletePublishedBlogAsBlogPostAdmin();
+await blogEditorPublishBlogPostAndDeletePublishedBlogPost();
