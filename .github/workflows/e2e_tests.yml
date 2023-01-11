@@ -42,20 +42,13 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - uses: ./.github/actions/install-oppia-dependencies
-      - id: check-risk
-        name: Check if PR is low-risk
-        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: Install chrome
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
       - name: Build Webpack
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.build --prod_env
       - name: Zip build files
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         # We avoid using ../ or absolute paths because unzip treats these as
         # security issues and will refuse to follow them.
         run: |
@@ -163,17 +156,11 @@ jobs:
         working-directory: /home/runner/work/oppia
         shell: bash
       - uses: ./.github/actions/install-oppia-dependencies
-      - id: check-risk
-        name: Check if PR is low-risk
-        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: Install chrome
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
       - name: Run E2E Test ${{ matrix.suite }}
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
