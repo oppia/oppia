@@ -125,22 +125,23 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
     # Here we use type Any because this method can accept any kind of
     # PCollection object to return the filtered migration results.
     def expand(
-        self, objects: Sequence[base_models.BaseModel]
-    ) -> Tuple[Sequence[base_models.BaseModel],
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
+        beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult]]:
         """Migrate exploration objects and flush the input
             in case of errors.
 
         Args:
-            objects: PCollection. Sequence of models.
+            pipeline: Pipeline. Input beam pipeline.
 
         Returns:
-            (Sequence(BaseModel), PCollection). Tuple containing
-            sequence of models which should be put into the datastore and
+            (PCollection, PCollection). Tuple containing
+            PCollection of models which should be put into the datastore and
             a PCollection of results from the exploration migration.
         """
         unmigrated_exploration_models = (
-            objects
+            pipeline
             | 'Get all non-deleted exploration models' >> (
                 ndb_io.GetModels(
                     exp_models.ExplorationModel.get_all(
@@ -157,7 +158,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         )
 
         exp_publication_status = (
-            objects
+            pipeline
             | 'Get all non-deleted exploration rights models' >> (
                 ndb_io.GetModels(exp_models.ExplorationRightsModel.get_all()))
             | 'Extract publication status' >> beam.Map(
@@ -261,8 +262,7 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         )
 
 
-# TODO(#15927): This job needs to be kept in sync with
-# AuditExplorationMigrationJob and later we will unify these jobs together.
+
 class MigrateExplorationJob(base_jobs.JobBase):
     """Job that migrates Exploration models."""
 
