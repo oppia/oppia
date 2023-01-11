@@ -219,6 +219,19 @@ class TestingTaskSpec:
                 print('[Debug invalid start byte flake] Command:', exc_list)
                 print('[Debug invalid start byte flake] Environment:', env)
                 raise e
+            elif 'invalid continuation byte' in str(e):  # pragma: no cover
+                # We sometimes get a UnicodeDecodeError with an "invalid
+                # continuation byte" message, and this can sometimes happen when
+                # trying to read a non-unicode file. To help debug this issue,
+                # print some more information before failing. See #16600 for
+                # details.
+                print(
+                    '[Debug invalid continuation byte flake] Command:',
+                    exc_list)
+                print(
+                    '[Debug invalid continuation byte flake] Environment:',
+                    env)
+                raise e
             else:
                 raise e
 
