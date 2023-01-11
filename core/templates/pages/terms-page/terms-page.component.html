@@ -251,7 +251,7 @@
   </mat-card>
 </div>
 
-<div class="nav oppia-terms-right-menu d-none d-md-block">
+<div class="oppia-terms-list oppia-terms-right-menu d-none d-md-block">
   <strong>Terms of Use</strong>
   <p><a (click)="scrollTo(ourServices)">Our Services</a></p>
   <p><a (click)="scrollTo(privacyPolicy)">Privacy Policy</a></p>
@@ -265,6 +265,15 @@
 </div>
 
 <style>
+  .oppia-terms-list {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+  }
   .oppia-page-cards-container .oppia-page-card {
     padding: 30px 55px 30px 45px;
   }

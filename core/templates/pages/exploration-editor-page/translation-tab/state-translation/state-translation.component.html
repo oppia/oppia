@@ -148,12 +148,12 @@
       <oppia-rte-output-display class="oppia-translation-state-content-html-data" [rteString]="interactionPreviewHtml">
       </oppia-rte-output-display>
       <h3>Content</h3>
-      <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+      <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
         <li class="oppia-rule-block mt-0"
             *ngFor="let caContent of interactionCustomizationArgTranslatableContent; index as index"
             [ngClass]="{'active': activeCustomizationArgContentIndex === index}">
           <a (click)="changeActiveCustomizationArgContentIndex(index)"
-             class="oppia-rule-tab"
+             class="oppia-rule-tab oppia-translation-preview-list"
              [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
              [ngStyle]="contentIdStatusColorStyle(caContent.content.contentId)">
             <oppia-response-header [index]="index"
@@ -191,11 +191,11 @@
     </div>
     <div *ngIf="isActive(TAB_ID_RULE_INPUTS)" class="translation-state-content">
       <div>
-        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+        <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
           <li class="oppia-rule-block e2e-test-translation-feedback mt-0"
               *ngFor="let ruleContent of interactionRuleTranslatableContents; index as index"
               [ngClass]="{'active': activeRuleContentIndex === index}">
-            <a class="oppia-rule-tab e2e-test-feedback-{{ index }}"
+            <a class="oppia-rule-tab e2e-test-feedback-{{ index }} oppia-translation-preview-list"
                (click)="changeActiveRuleContentIndex(index)"
                [ngClass]="{'oppia-rule-tab-active': activeRuleContentIndex === index}"
                [ngStyle]="contentIdStatusColorStyle(ruleContent.contentId)">
@@ -216,11 +216,11 @@
     </div>
     <div *ngIf="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
-        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+        <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
           <li class="oppia-rule-block e2e-test-translation-feedback mt-0"
               *ngFor="let answerGroup of stateAnswerGroups; index as index"
               [ngClass]="{'active': activeAnswerGroupIndex === index}">
-            <a class="oppia-rule-tab e2e-test-feedback-{{ index }}"
+            <a class="oppia-rule-tab e2e-test-feedback-{{ index }} oppia-translation-preview-list"
                (click)="changeActiveAnswerGroupIndex(index)"
                [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}"
                [ngStyle]="contentIdStatusColorStyle(answerGroup.outcome.feedback.contentId)">
@@ -259,10 +259,10 @@
 
 
       <div>
-        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+        <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
           <li [ngClass]="{'active': activeAnswerGroupIndex === stateAnswerGroups.length}"
               class="oppia-rule-block e2e-test-translation-feedback">
-            <a class="oppia-rule-tab oppia-default-rule-tab e2e-test-feedback-{{ stateAnswerGroups.length }}"
+            <a class="oppia-rule-tab oppia-default-rule-tab e2e-test-feedback-{{ stateAnswerGroups.length }} oppia-translation-preview-list"
                (click)="changeActiveAnswerGroupIndex(stateAnswerGroups.length)"
                [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == stateAnswerGroups.length}"
                [ngStyle]="contentIdStatusColorStyle(stateDefaultOutcome.feedback.contentId)">
@@ -294,12 +294,12 @@
       </div>
     </div>
     <div *ngIf="isActive(TAB_ID_HINTS)" class="translation-state-content">
-      <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+      <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
         <li class="oppia-rule-block e2e-test-translation-hint mt-0"
             *ngFor="let hint of stateHints; index as index"
             [ngClass]="{'active': activeHintIndex === index}">
           <a (click)="changeActiveHintIndex(index)"
-             class="oppia-rule-tab e2e-test-hint-{{ index }}"
+             class="oppia-rule-tab e2e-test-hint-{{ index }} oppia-translation-preview-list"
              [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
              [ngStyle]="contentIdStatusColorStyle(hint.hintContent.contentId)">
             <oppia-response-header [index]="index"
@@ -354,6 +354,19 @@
 
 
 <style>
+  .oppia-translation-preview-list {
+    display: block;
+  }
+
+  .oppia-translation-preview {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+  }
   .oppia-tab-needs-update {
     color: #f00;
   }
