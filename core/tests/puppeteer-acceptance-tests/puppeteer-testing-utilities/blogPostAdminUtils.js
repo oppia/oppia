@@ -316,7 +316,8 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
   async addNewBlogTag(tagName) {
     await this.clickOn('button', ' Add element ');
-    await this.page.keyboard.type(tagName);
+    await this.page.waitForTimeout(100);
+    await this.keyboard.type(tagName);
     await this.clickOn('button', 'Save');
     console.log('Tag ' + tagName + ' added in tag list successfully!');
   }

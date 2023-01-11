@@ -16,31 +16,24 @@
  * @fileoverview Accpetance Test for a Super Admin assign Blog Admin role.
  */
 
-const e2eSuperAdmin = require(
-  '../puppeteer-testing-utilities/blogPostAdminUtils.js');
-const e2eBlogAdmin = require(
-  '../puppeteer-testing-utilities/blogPostAdminUtils.js');
+const createNewUser = require('../puppeteer-testing-utilities/initializeUsers.js');
 
 const ROLE_BLOG_ADMIN = 'blog admin';
 
 let superAdminAssignBlogAdminRole = async function() {
-  const blogAdmin = await new e2eBlogAdmin();
-  const superAdmin = await new e2eSuperAdmin();
-
-  await blogAdmin.openBrowser();
-  await blogAdmin.signUpNewUserWithUsernameAndEmail(
+  const superAdmin = await createNewUser.superAdmin(
+    'superAdm', 'testadmin@example.com');
+  const blogAdmin = await createNewUser.blogAdmin(
     'blogAdm', 'blog_admin@example.com');
+
   await blogAdmin.expectBlogDashboardAccessToBeUnauthorized();
 
-  await superAdmin.openBrowser();
-  await superAdmin.signUpNewUserWithUsernameAndEmail(
-    'superAdm', 'testadmin@example.com');
   await superAdmin.assignRoleToUser('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.expectUserToHaveRole('blogAdm', 'Blog Admin');
+  await superAdmin.expectUserToHaveRole('blogAdm', ROLE_BLOG_ADMIN);
   await superAdmin.closeBrowser();
 
   await blogAdmin.expectBlogDashboardAccessToBeAuthorized();
   await blogAdmin.closeBrowser();
 };
 
-await superAdminAssignBlogAdminRole();
+superAdminAssignBlogAdminRole();

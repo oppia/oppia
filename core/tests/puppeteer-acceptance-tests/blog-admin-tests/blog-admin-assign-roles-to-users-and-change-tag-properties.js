@@ -17,50 +17,32 @@
  * tag properties from the blog-admin page.
  */
 
-const e2eSuperAdmin = require(
-  '../puppeteer-testing-utilities/blogPostAdminUtils.js');
-const e2eBlogAdmin = require(
-  '../puppeteer-testing-utilities/blogPostAdminUtils.js');
-const e2eBlogPostEditor = require(
-  '../puppeteer-testing-utilities/blogPostAdminUtils.js');
+const createNewUser = require('../puppeteer-testing-utilities/initializeUsers.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/testConstants.js');
 
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const ROLE_BLOG_ADMIN = 'BLOG_ADMIN';
-const ROLE_BLOG_POST_EDITOR = 'BLOG_POST_EDITOR';
+const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 
 let blogAdminAssignRolesToUsersAndChangeTagProperties = async function() {
-  const superAdmin = await new e2eSuperAdmin();
-  const blogAdmin = await new e2eBlogAdmin();
-  const blogPostEditor = await new e2eBlogPostEditor();
-
-  await blogAdmin.openBrowser();
-  await blogAdmin.signUpNewUserWithUsernameAndEmail(
+  const superAdmin = await createNewUser.superAdmin(
+    'superAdm', 'testadmin@example.com', 'blog admin');
+  await createNewUser.blogAdmin(
     'blogAdm', 'blog_admin@example.com');
-  await blogAdmin.closeBrowser();
-
-  await blogPostEditor.openBrowser();
-  await blogPostEditor.signUpNewUserWithUsernameAndEmail(
-    'blogPostEditor', 'blog_post_editor@example.com');
-  await blogPostEditor.closeBrowser();
-
-  await superAdmin.openBrowser();
-  await superAdmin.signUpNewUserWithUsernameAndEmail(
-    'superAdm', 'testadmin@example.com');
-  await superAdmin.assignRoleToUser('superAdm', 'blog admin');
-  await superAdmin.expectUserToHaveRole('superAdm', 'Blog Admin');
+  await createNewUser.blogPostEditor(
+    'blogEditor', 'blog_post_editor@example.com');
 
   await superAdmin.goto(blogAdminUrl);
   await superAdmin.assignUserAsRoleFromRoleDropdown('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.expectUserToHaveRole('blogAdm', 'Blog Admin');
+  await superAdmin.expectUserToHaveRole('blogAdm', 'blog admin');
   await superAdmin.assignUserAsRoleFromRoleDropdown(
-    'blogPostEditor', ROLE_BLOG_POST_EDITOR);
-  await superAdmin.expectUserToHaveRole('blogPostEditor', 'Blog Post Editor');
+    'blogEditor', 'BLOG_POST_EDITOR');
+  await superAdmin.expectUserToHaveRole('blogEditor', ROLE_BLOG_POST_EDITOR);
 
-  await superAdmin.removeBlogEditorRoleFromUsername('blogPostEditor');
+  await superAdmin.removeBlogEditorRoleFromUsername('blogEditor');
   await superAdmin.expectUserNotToHaveRole(
-    'blogPostEditor', 'Blog Post Editor');
+    'blogEditor', ROLE_BLOG_POST_EDITOR);
 
   await superAdmin.expectTagToNotExistInBlogTags('Test_Tag');
   await superAdmin.addNewBlogTag('Test_Tag');
@@ -72,4 +54,4 @@ let blogAdminAssignRolesToUsersAndChangeTagProperties = async function() {
   await superAdmin.closeBrowser();
 };
 
-await blogAdminAssignRolesToUsersAndChangeTagProperties();
+blogAdminAssignRolesToUsersAndChangeTagProperties();

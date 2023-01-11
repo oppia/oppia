@@ -23,7 +23,6 @@ const rolesEditorTab = testConstants.URLs.RolesEditorTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'e2e-test-role-edit-button';
 const rolesSelectDropdown = 'mat-select-trigger';
-const userRoleDesc = 'oppia-user-role-description';
 
 module.exports = class puppeteerUtilities {
   page;
@@ -140,7 +139,7 @@ module.exports = class puppeteerUtilities {
       console.log(allRoles.length);
       for (let i = 0; i < allRoles.length; i++) {
         console.log(allRoles[i].innerText);
-        if (allRoles[i].innerText === role) {
+        if (allRoles[i].innerText.toLowerCase() === role) {
           allRoles[i].click({waitUntil: 'networkidle0'});
           return;
         }
@@ -160,10 +159,10 @@ module.exports = class puppeteerUtilities {
     await this.clickOn('button', roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
     await this.page.evaluate((role) => {
-      const userRoles = document.getElementsByClassName(userRoleDesc);
+      const userRoles = document.getElementsByClassName(
+        'oppia-user-role-description');
       for (let i = 0; i < userRoles.length; i++) {
-        console.log(userRoles[i].innerText);
-        if (userRoles[i].innerText === role) {
+        if (userRoles[i].innerText.toLowerCase() === role) {
           return;
         }
       }
@@ -185,10 +184,10 @@ module.exports = class puppeteerUtilities {
     await this.clickOn('button', roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
     await this.page.evaluate((role) => {
-      const userRoles = document.getElementsByClassName(userRoleDesc);
+      const userRoles = document.getElementsByClassName(
+        'oppia-user-role-description');
       for (let i = 0; i < userRoles.length; i++) {
-        console.log(userRoles[i].innerText);
-        if (userRoles[i].innerText === role) {
+        if (userRoles[i].innerText.toLowerCase() === role) {
           throw new Error('User have the ' + role + ' role!');
         }
       }

@@ -17,26 +17,31 @@
  * and delete blog posts.
  */
 
-const e2eBlogPostEditor = require(
-  '../puppeteer-testing-utilities/blogPostAdminUtils.js');
+const createNewUser = require('../puppeteer-testing-utilities/initializeUsers.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/testConstants.js');
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const ROLE_BLOG_ADMIN = 'blog admin';
+const blogAdminUrl = testConstants.URLs.BlogAdmin;
+const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 
 let blogEditorPublishBlogPostAndDeletePublishedBlogPost = async function() {
-  const blogPostEditor = await new e2eBlogPostEditor();
-  await blogPostEditor.openBrowser();
+  const superAdmin = await createNewUser.superAdmin(
+    'superAdm', 'testadmin@example.com', ROLE_BLOG_ADMIN);
+  const blogPostEditor = await createNewUser.blogPostEditor(
+    'blogPostEditor', 'blog_post_editor@example.com');
 
-  await blogPostEditor.signUpNewUserWithUsernameAndEmail(
-    'blogEditor', 'testadmin@example.com');
-  await blogPostEditor.assignRoleToUser('blogEditor', ROLE_BLOG_ADMIN);
-  await blogPostEditor.expectUserToHaveRole('blogEditor', 'Blog Admin');
+  await superAdmin.goto(blogAdminUrl);
+  await superAdmin.assignUserAsRoleFromRoleDropdown(
+    'blogPostEditor', 'BLOG_POST_EDITOR');
+  await superAdmin.expectUserToHaveRole('blogPostEditor', ROLE_BLOG_POST_EDITOR);
+  await superAdmin.closeBrowser();
 
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
   await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
+
   await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectPublishedBlogPostWithTitleToExist('Test-Blog');
   await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
@@ -45,4 +50,4 @@ let blogEditorPublishBlogPostAndDeletePublishedBlogPost = async function() {
   await blogPostEditor.closeBrowser();
 };
 
-await blogEditorPublishBlogPostAndDeletePublishedBlogPost();
+blogEditorPublishBlogPostAndDeletePublishedBlogPost();
