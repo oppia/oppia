@@ -101,6 +101,10 @@ export class StoryEditorNavbarComponent implements OnInit {
     return this.isStorySaveable() || this.getTotalWarningsCount() === 0;
   }
 
+  getAllStoryWarnings(): String {
+    return this.validationIssues.concat(this.explorationValidationIssues).concat(this.prepublishValidationIssues).join('\n')
+  }
+
   discardChanges(): void {
     this.undoRedoService.clearChanges();
     this.storyEditorStateService.loadStory(this.story.getId());

@@ -1,9 +1,11 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
   <li class="oppia-dropdown-menu-container">
     <div ngbDropdown>
-      <span [matTooltip]="validationIssues.concat(explorationValidationIssues).concat(prepublishValidationIssues).join('\n')"
-            matTooltipClass="oppia-mat-tooltip-list" [matTooltipDisabled]="isWarningTooltipDisabled()"
-            aria-label="List that shows issues preventing to save story as draft" class="w-100">
+      <span [matTooltip]="getAllStoryWarnings()"
+            matTooltipClass="oppia-mat-tooltip-list"
+            [matTooltipDisabled]="isWarningTooltipDisabled()"
+            aria-label="List that shows issues preventing to save story as draft"
+            class="w-100">
         <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
                 [ngClass]="{'btn-success': isStorySaveable()}"
                 (click)="saveChanges()"
@@ -13,16 +15,19 @@
                class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
                alt="Save Story">
             </i>
-            <mat-icon *ngIf="!isWarningTooltipDisabled()" class="story-save-draft-warning">
+            <mat-icon *ngIf="!isWarningTooltipDisabled()" 
+                      class="story-save-draft-warning">
               warning
             </mat-icon>
             <span class="oppia-save-publish-button-label oppia-save-draft-text float-left">
               Save Draft
             </span>
-            <span class="d-none d-md-block float-left oppia-changes-count" *ngIf="getChangeListLength() > 0">
+            <span class="d-none d-md-block float-left oppia-changes-count"
+                  *ngIf="getChangeListLength() > 0">
               ({{ getChangeListLength() }})
             </span>
           </span>
+          
           <span *ngIf="isSaveInProgress()">
             <span class="oppia-save-publish-button-label">
               Saving
@@ -41,7 +46,8 @@
           class="oppia-dropdown-menu dropdown-menu"
           [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
         <li title="Discard all pending changes">
-          <a (click)="discardChanges()" [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
+          <a (click)="discardChanges()" 
+             [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
              class="dropdown-item e2e-test-discard-story-changes">
              Discard Draft
           </a>
@@ -90,7 +96,8 @@
         </div>
       </div>
       <div>
-        <div *ngIf="warningsAreShown" class="warning-box">
+        <div *ngIf="warningsAreShown" 
+             class="warning-box">
           <span>Warnings</span>
           <div *ngFor="let issue of validationIssues;trackBy:$index">
             <hr class="oppia-editor-warnings-separator">
@@ -103,8 +110,10 @@
         </div>
       </div>
       <div class="story-nav-dropdown-content">
-        <div class="story-nav-dropdown-text" (click)="toggleWarningText()">
-          <i *ngIf="!getTotalWarningsCount()" class="fas fa-pen navbar-tab-icon">
+        <div class="story-nav-dropdown-text" 
+             (click)="toggleWarningText()">
+          <i *ngIf="!getTotalWarningsCount()" 
+             class="fas fa-pen navbar-tab-icon">
           </i>
           <span>{{ activeTab }}</span>
           <span *ngIf="getTotalWarningsCount()">
@@ -205,6 +214,7 @@
   .story-editor-save-draft-icon {
     padding-left: 4px;
   }
+  
   @media screen and (max-width: 768px) {
     .navbar-desktop li {
       display: none;
@@ -223,7 +233,7 @@
       flex-wrap: wrap;
       width: 50%;
     }
-   .save-changes-btn {
+    .save-changes-btn {
       background-color: #008098;
       color: #fff;
       font-weight: bold;
