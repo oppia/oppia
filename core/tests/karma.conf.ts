@@ -18,7 +18,7 @@ console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 module.exports = function(config) {
   config.set({
     basePath: '../../',
-    frameworks: ['jasmine'],
+    frameworks: ['waitwebpack', 'jasmine'],
     files: [
       // Constants must be loaded before everything else.
       // Since jquery, angular-mocks and math-expressions
@@ -139,6 +139,7 @@ module.exports = function(config) {
       'karma-ng-html2js-preprocessor',
       'karma-json-fixtures-preprocessor',
       'karma-coverage',
+      require('./karma.waitwebpack'),
       'karma-webpack'
     ],
     ngHtml2JsPreprocessor: {
