@@ -122,8 +122,6 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
             })
             yield (exp_id, exp_change)
 
-    # Here we use type Any because this method can accept any kind of
-    # PCollection object to return the filtered migration results.
     def expand(
         self, pipeline: beam.Pipeline
     ) -> Tuple[
@@ -260,7 +258,6 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
             )
             | beam.Flatten()
         )
-
 
 
 class MigrateExplorationJob(base_jobs.JobBase):
