@@ -1,5 +1,29 @@
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utility File for the Acceptance Tests.
+ */
+
 const puppeteer = require('puppeteer');
 const testConstants = require('./testConstants.js');
+
+const rolesEditorTab = testConstants.URLs.RolesEditorTab;
+const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
+const roleEditorButtonSelector = 'e2e-test-role-edit-button';
+const rolesSelectDropdown = 'mat-select-trigger';
+const userRoleDesc = 'oppia-user-role-description';
 
 module.exports = class puppeteerUtilities {
   page;
@@ -8,7 +32,8 @@ module.exports = class puppeteerUtilities {
 
   /**
    * This is a function that opens a new browser instance for the user.
-   * @returns {Promise<puppeteer.Page>} - Returns a promise that resolves to a Page object controlled by Puppeteer.
+   * @returns {Promise<puppeteer.Page>} - Returns a promise that resolves
+   * to a Page object controlled by Puppeteer.
    */
   async openBrowser() {
     /* Currently, headless is set to false and the page viewport
@@ -21,7 +46,7 @@ module.exports = class puppeteerUtilities {
         headless: false,
         args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
       })
-      .then(async (browser) => {
+      .then(async(browser) => {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await (this.page).setViewport({ width: 0, height: 0 });
@@ -59,7 +84,8 @@ module.exports = class puppeteerUtilities {
     await this.signInWithEmail(signInEmail);
     await this.type('input.e2e-test-username-input', userName);
     await this.clickOn('input', 'e2e-test-agree-to-terms-checkbox');
-    await this.page.waitForSelector('button.e2e-test-register-user:not([disabled])');
+    await this.page.waitForSelector(
+      'button.e2e-test-register-user:not([disabled])');
     await this.clickOn('button', 'Submit and start contributing');
     await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
   }
@@ -76,18 +102,21 @@ module.exports = class puppeteerUtilities {
    * This function reloads the current page.
    */
   async reloadPage() {
-    await (this.page).reload({ waitUntil: ['networkidle0', 'domcontentloaded'] });
+    await (this.page).reload({waitUntil: ['networkidle0', 'domcontentloaded']});
   }
 
   /**
-   * This function clicks on any element using its CSS selector or the text written on that element.
+   * This function clicks on any element using its CSS selector
+   * or the text written on that element.
    * @param {string} tag - The HTML tag of the element.
-   * @param {string} selector - The CSS selector or the text written on the element.
+   * @param {string} selector - The CSS selector or the text
+   * written on the element.
    */
   async clickOn(tag, selector) {
     try {
       await (this.page).waitForXPath('//' + tag);
-      const [button] = await (this.page).$x('//' + tag + '[contains(text(), "' + selector + '")]');
+      const [button] = await (this.page).$x(
+        '//' + tag + '[contains(text(), "' + selector + '")]');
       await button.click();
     } catch {
       await (this.page).waitForSelector(tag + '.' + selector);
@@ -96,7 +125,80 @@ module.exports = class puppeteerUtilities {
   }
 
   /**
-   * This function types the given text in the input field using its CSS selector.
+   *
+   * @param {string} username - The username to which role would be assigned.
+   * @param {string role - The role that would be assigned to the user.
+   */
+  async assignRoleToUser(username, role) {
+    await this.goto(rolesEditorTab);
+    await this.type(roleEditorInputField, username);
+    await this.clickOn('button', roleEditorButtonSelector);
+    await this.clickOn('h4', 'Add role');
+    await this.clickOn('div', rolesSelectDropdown);
+    await this.page.evaluate(async(role) => {
+      const allRoles = document.getElementsByClassName('mat-option-text');
+      console.log(allRoles.length);
+      for (let i = 0; i < allRoles.length; i++) {
+        console.log(allRoles[i].innerText);
+        if (allRoles[i].innerText === role) {
+          allRoles[i].click({waitUntil: 'networkidle0'});
+          return;
+        }
+      }
+    }, role);
+  }
+
+  /**
+   *
+   * @param {string} username - The username to which role must be assigned.
+   * @param {string} role - The role which must be assigned to the user.
+   */
+  async expectUserToHaveRole(username, role) {
+    const currPageUrl = this.page.url();
+    await this.goto(rolesEditorTab);
+    await this.type(roleEditorInputField, username);
+    await this.clickOn('button', roleEditorButtonSelector);
+    await this.page.waitForSelector('div.justify-content-between');
+    await this.page.evaluate((role) => {
+      const userRoles = document.getElementsByClassName(userRoleDesc);
+      for (let i = 0; i < userRoles.length; i++) {
+        console.log(userRoles[i].innerText);
+        if (userRoles[i].innerText === role) {
+          return;
+        }
+      }
+      throw new Error('User does not have ' + role + ' role!');
+    }, role);
+    console.log('User ' + username + ' has the ' + role + ' role!');
+    await this.goto(currPageUrl);
+  }
+
+  /**
+   *
+   * @param {string} username - The user to which the role must not be assigned.
+   * @param {string} role - The role which must not be assigned to the user.
+   */
+  async expectUserNotToHaveRole(username, role) {
+    const currPageUrl = this.page.url();
+    await this.goto(rolesEditorTab);
+    await this.type(roleEditorInputField, username);
+    await this.clickOn('button', roleEditorButtonSelector);
+    await this.page.waitForSelector('div.justify-content-between');
+    await this.page.evaluate((role) => {
+      const userRoles = document.getElementsByClassName(userRoleDesc);
+      for (let i = 0; i < userRoles.length; i++) {
+        console.log(userRoles[i].innerText);
+        if (userRoles[i].innerText === role) {
+          throw new Error('User have the ' + role + ' role!');
+        }
+      }
+    }, role);
+    console.log('User ' + username + ' doesnot have the ' + role + ' role!');
+    await this.goto(currPageUrl);
+  }
+
+  /**
+   * This function types the text in the input field using its CSS selector.
    * @param {string} selector - The CSS selector of the input field.
    * @param {string} text - The text to be typed in the input field.
    */

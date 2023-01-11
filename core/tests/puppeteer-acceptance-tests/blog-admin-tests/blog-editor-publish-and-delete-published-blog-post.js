@@ -1,14 +1,36 @@
-const e2eBlogPostEditor = require('../puppeteer-testing-utilities/blogPostAdminUtils.js');
-const testConstants = require('../puppeteer-testing-utilities/testConstants.js');
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Accpetance Test for a Blog Post Editor to publish
+ * and delete blog posts.
+ */
+
+const e2eBlogPostEditor = require(
+  '../puppeteer-testing-utilities/blogPostAdminUtils.js');
+const testConstants = require(
+  '../puppeteer-testing-utilities/testConstants.js');
 
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const ROLE_BLOG_ADMIN = 'blog admin';
 
-async function publishBlogAndDeletePublishedBlogAsBlogPostAdmin() {
+let publishBlogAndDeletePublishedBlogAsBlogPostAdmin = async function() {
   const blogPostEditor = await new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
 
-  await blogPostEditor.signUpNewUserWithUsernameAndEmail('blogEditor', 'testadmin@example.com');
+  await blogPostEditor.signUpNewUserWithUsernameAndEmail(
+    'blogEditor', 'testadmin@example.com');
   await blogPostEditor.assignRoleToUser('blogEditor', ROLE_BLOG_ADMIN);
   await blogPostEditor.expectUserToHaveRole('blogEditor', 'Blog Admin');
 
@@ -19,8 +41,8 @@ async function publishBlogAndDeletePublishedBlogAsBlogPostAdmin() {
   await blogPostEditor.expectPublishedBlogPostWithTitleToExist('Test-Blog');
   await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
   await blogPostEditor.expectPublishedBlogPostWithTitleToNotExist('Test-Blog');
-  
-  await blogPostEditor.closeBrowser();
-}
 
-publishBlogAndDeletePublishedBlogAsBlogPostAdmin();
+  await blogPostEditor.closeBrowser();
+};
+
+await publishBlogAndDeletePublishedBlogAsBlogPostAdmin();
