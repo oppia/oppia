@@ -33,6 +33,7 @@ export class FocusManagerService {
   // This property can be undefined but not null because we need to emit it.
   private nextLabelToFocusOn: string | undefined;
   private focusEventEmitter: EventEmitter<string> = new EventEmitter();
+  private _schemaBasedListEditorIsActive: boolean = false;
 
   constructor(
       private deviceInfoService: DeviceInfoService,
@@ -64,11 +65,19 @@ export class FocusManagerService {
     return this.idGenerationService.generateNewId();
   }
 
+  set schemaBasedListEditorIsActive(listEditorIsActive: boolean) {
+    this._schemaBasedListEditorIsActive = listEditorIsActive;
+  }
+
   setFocusWithoutScroll(name: string): void {
     this.setFocus(name);
-    setTimeout(() => {
-      this.windowRef.nativeWindow.scrollTo(0, 0);
-    }, 5);
+    // We do not want to scroll back to top of the page when schema based list
+    // editor is being used due to autofocus in subsequent input fields.
+    if (!this._schemaBasedListEditorIsActive) {
+      setTimeout(() => {
+        this.windowRef.nativeWindow.scrollTo(0, 0);
+      }, 5);
+    }
   }
 
   get onFocus(): EventEmitter<string> {
