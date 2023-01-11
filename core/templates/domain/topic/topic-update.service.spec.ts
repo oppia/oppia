@@ -24,7 +24,7 @@ import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 // ^^^ This block is to be removed.
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { TopicObjectFactory, TopicBackendDict} from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TestBed } from '@angular/core/testing';
 import { SubtopicPage } from './subtopic-page.model';
@@ -32,7 +32,6 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 
 describe('Topic update service', function() {
   let topicUpdateService: TopicUpdateService;
-  let topicObjectFactory: TopicObjectFactory = null;
   let undoRedoService: UndoRedoService = null;
   let _sampleTopic = null;
   let _firstSkillSummary = null;
@@ -101,7 +100,6 @@ describe('Topic update service', function() {
 
   beforeEach(() => {
     topicUpdateService = TestBed.get(TopicUpdateService);
-    topicObjectFactory = TestBed.get(TopicObjectFactory);
     undoRedoService = TestBed.get(UndoRedoService);
 
     _firstSkillSummary = ShortSkillSummary.create(
@@ -113,7 +111,7 @@ describe('Topic update service', function() {
 
     _sampleSubtopicPage = SubtopicPage.createFromBackendDict(
       sampleSubtopicPageObject);
-    _sampleTopic = topicObjectFactory.create(
+    _sampleTopic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict);
   });
@@ -644,7 +642,7 @@ describe('Topic update service', function() {
   it('should rearrange a skill in a subtopic', () => {
     sampleTopicBackendObject.topicDict.subtopics[0].skill_ids = [
       'skill_id_1', 'skill_id_2', 'skill_id_3'];
-    _sampleTopic = topicObjectFactory.create(
+    _sampleTopic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict);
     let skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
@@ -684,7 +682,7 @@ describe('Topic update service', function() {
       {id: 3, title: 'Title3', skill_ids: []}];
     sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
 
-    _sampleTopic = topicObjectFactory.create(
+    _sampleTopic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict);
     var subtopics = _sampleTopic.getSubtopics();
