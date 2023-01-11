@@ -17,13 +17,19 @@
                             (pageChange)="onPageChange()"
                             class="ml-auto e2e-test-pagination">
               <ng-template ngbPaginationPrevious >
-                <i class="fa fa-angle-left text-center w-100 e2e-test-pagination-prev-button" aria-hidden="true" (click)="onPageChange()"></i>
+                <i class="fa fa-angle-left text-center w-100 e2e-test-pagination-prev-button align-middle"
+                   aria-hidden="true"
+                   (click)="onPageChange()">
+                </i>
               </ng-template>
               <ng-template ngbPaginationNumber let-p>
                 <button disabled class="pagination-button">{{ p }}</button>
               </ng-template>
               <ng-template ngbPaginationNext>
-                <i class="fa fa-angle-right text-center w-100 e2e-test-pagination-next-button" aria-hidden="true" (click)="onPageChange()"></i>
+                <i class="fa fa-angle-right text-center w-100 e2e-test-pagination-next-button align-middle"
+                   aria-hidden="true"
+                   (click)="onPageChange()">
+                </i>
               </ng-template>
             </ngb-pagination>
           </div>
@@ -48,10 +54,18 @@
                             (pageChange)="onPageChange()"
                             class="ml-auto text-center">
               <ng-template ngbPaginationPrevious>
-                <i class="fa fa-angle-left" aria-hidden="true" (click)="onPageChange()" (disabled)="false"></i>
+                <i class="fa fa-angle-left  align-middle"
+                   aria-hidden="true"
+                   (click)="onPageChange()"
+                   (disabled)="false">
+                </i>
               </ng-template>
               <ng-template ngbPaginationNext>
-                <i class="fa fa-angle-right" aria-hidden="true" (click)="onPageChange()" (disabled)="false"></i>
+                <i class="fa fa-angle-right  align-middle"
+                   aria-hidden="true"
+                   (click)="onPageChange()"
+                   (disabled)="false">
+                </i>
               </ng-template>
             </ngb-pagination>
           </div>
@@ -68,7 +82,8 @@
         </div>
       </div>
       <div *ngIf="noResultsFound && !showBlogPostCardsLoadingScreen"
-           class="col-8 posts-display-heading text-center e2e-test-no-results-found">
+           class="posts-display-heading text-center e2e-test-no-results-found"
+           [ngClass]="{'col-8': !isSmallScreenViewActive()}">
         <picture>
           <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
           <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
@@ -159,10 +174,10 @@
                       (pageChange)="onPageChange()"
                       class="ml-auto mr-auto text-center">
         <ng-template ngbPaginationPrevious>
-          <i class="fa fa-angle-left" aria-hidden="true"></i>
+          <i class="fa fa-angle-left align-middle" aria-hidden="true"></i>
         </ng-template>
         <ng-template ngbPaginationNext>
-          <i class="fa fa-angle-right" aria-hidden="true"></i>
+          <i class="fa fa-angle-right align-middle" aria-hidden="true"></i>
         </ng-template>
       </ngb-pagination>
     </div>
