@@ -160,6 +160,9 @@ implements ControlValueAccessor, Validator {
       this.schemaDefaultValueService.getDefaultValue(this.itemSchema));
     this.focusManagerService.setFocus(
       this.getFocusLabel(this.localValue.length - 1));
+    // This is to prevent the autofocus behaviour of the input field to scroll
+    // to top of the page when the user is adding a new element.
+    this.focusManagerService.schemaBasedListEditorIsActive = true;
   }
 
   private _deleteLastElementIfUndefined(): void {
