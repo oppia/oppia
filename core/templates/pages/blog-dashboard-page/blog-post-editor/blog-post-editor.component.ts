@@ -29,7 +29,6 @@ import { BlogPostUpdateService } from 'domain/blog/blog-post-update.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { BlogPostData } from 'domain/blog/blog-post.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
 import { AppConstants } from 'app.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -41,6 +40,7 @@ import dayjs from 'dayjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { UserService } from 'services/user.service';
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html'
@@ -60,7 +60,6 @@ export class BlogPostEditorComponent implements OnInit {
   thumbnailDataUrl!: string;
   MAX_CHARS_IN_BLOG_POST_TITLE!: number;
   MIN_CHARS_IN_BLOG_POST_TITLE!: number;
-  DEFAULT_PROFILE_PICTURE_URL: string = '';
   dateTimeLastSaved: string = '';
   authorName: string = '';
   windowIsNarrow: boolean = false;
@@ -88,15 +87,13 @@ export class BlogPostEditorComponent implements OnInit {
     private imageLocalStorageService: ImageLocalStorageService,
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
-    private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-      .getStaticImageUrl('/general/no_profile_picture.png');
     this.blogPostId = this.blogDashboardPageService.blogPostId;
     this.initEditor();
     this.MAX_CHARS_IN_BLOG_POST_TITLE = (
@@ -117,13 +114,14 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   initEditor(): void {
+    let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
+    profileImagePromise.then(data => {
+      this.authorProfilePictureUrl = decodeURIComponent(data as string);
+    });
     this.blogPostEditorBackendService.fetchBlogPostEditorData(this.blogPostId)
       .then(
         (editorData: BlogPostEditorData) => {
           this.blogPostData = editorData.blogPostDict;
-          this.authorProfilePictureUrl = decodeURIComponent((
-            // eslint-disable-next-line max-len
-            editorData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
           this.authorName = editorData.displayedAuthorName;
           this.defaultTagsList = editorData.listOfDefaulTags;
           this.maxAllowedTags = editorData.maxNumOfTags;

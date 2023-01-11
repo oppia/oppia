@@ -87,13 +87,11 @@ describe('LearnerGroupOverviewComponent', () => {
 
   const userInfo = LearnerGroupUserInfo.createFromBackendDict({
     username: 'username2',
-    profile_picture_data_url: 'picture',
     error: ''
   });
   const sampleLearnerGroupUserProgDict = {
     username: 'username2',
     progress_sharing_is_turned_on: true,
-    profile_picture_data_url: 'picture',
     stories_progress: [sampleStorySummaryBackendDict],
     subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
   };

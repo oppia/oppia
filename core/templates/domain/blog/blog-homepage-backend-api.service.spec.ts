@@ -111,8 +111,7 @@ describe('Blog home page backend api service', () => {
     blogPostPageBackendResponse = {
       author_username: 'test_username',
       blog_post_dict: blogPost,
-      summary_dicts: [] as BlogPostSummaryBackendDict[],
-      profile_picture_data_url: 'imageUrl'
+      summary_dicts: [] as BlogPostSummaryBackendDict[]
     };
     blogPostPageDataObject = {
       authorUsername: 'test_username',
@@ -123,8 +122,7 @@ describe('Blog home page backend api service', () => {
     blogAuthorProfileBackendResponse = {
       author_details: blogAuthorBackendDetails,
       no_of_blog_post_summaries: 0,
-      summary_dicts: [] as BlogPostSummaryBackendDict[],
-      profile_picture_data_url: 'imageUrl',
+      summary_dicts: [] as BlogPostSummaryBackendDict[]
     };
     blogAuthorProfileDataObject = {
       numOfBlogPostSummaries: 0,

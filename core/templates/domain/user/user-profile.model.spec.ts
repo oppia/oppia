@@ -80,7 +80,6 @@ describe('User profile model', () => {
         subject_interests: [],
         username_of_viewed_profile: 'user2',
         user_bio: 'hi',
-        profile_picture_data_url: 'image',
         user_email: 'test@email.com'
       };
 

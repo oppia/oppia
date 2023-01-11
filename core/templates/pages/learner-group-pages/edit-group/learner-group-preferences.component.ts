@@ -24,6 +24,7 @@ import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-in
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
+import { UserService } from 'services/user.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { DeleteLearnerGroupModalComponent } from '../templates/delete-learner-group-modal.component';
 import { InviteLearnersModalComponent } from '../templates/invite-learners-modal.component';
@@ -44,6 +45,7 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   activeTab!: string;
   newLearnerGroupTitle!: string;
   newLearnerGroupDescription!: string;
+  profilePictureUrl!: string;
   readOnlyMode = true;
   invitedLearnersInfo!: LearnerGroupUserInfo[];
   currentLearnersInfo!: LearnerGroupUserInfo[];
@@ -56,7 +58,8 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     private windowRef: WindowRef,
     private loaderService: LoaderService,
     private learnerGroupBackendApiService:
-      LearnerGroupBackendApiService
+      LearnerGroupBackendApiService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -212,8 +215,13 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     this.invitedLearners = invitedLearners;
   }
 
-  getProfileImageDataUrl(dataUrl: string): string {
-    return decodeURIComponent(dataUrl);
+  getProfileImageDataUrl(username: string): string {
+    let profileImagePromise = this.userService.getProfileImageDataUrlAsync(
+      username);
+    profileImagePromise.then(data => {
+      this.profilePictureUrl = decodeURIComponent(data as string);
+    });
+    return this.profilePictureUrl;
   }
 
   deleteLearnerGroup(): void {

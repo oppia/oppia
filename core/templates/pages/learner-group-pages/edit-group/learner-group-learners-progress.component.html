@@ -12,7 +12,7 @@
     <div *ngIf="learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">
       <div class="learner-progress-summary-header">
         <div class="learner-info">
-          <img [src]="getProfileImageDataUrl(learnerProgress.profilePictureDataUrl)">
+          <img [src]="getProfileImageDataUrl(learnerProgress.username)">
           <div>{{learnerProgress.username}}</div>
         </div>
         <div class="view-details-button btn btn-primary" (click)="activateLearnerSpecificView(learnerProgress)">
@@ -34,7 +34,7 @@
     <div *ngIf="!learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">
       <div class="learner-progress-summary-header">
         <div class="learner-info">
-          <img [src]="getProfileImageDataUrl(learnerProgress.profilePictureDataUrl)">
+          <img [src]="getProfileImageDataUrl(learnerProgress.username)">
           <div>{{learnerProgress.username}}</div>
         </div>
         <div class="permissions-message gray-message">
@@ -92,7 +92,7 @@
                     class="btn dropdown-toggle learners-dropdown-toggle"
                     title="progress">
               <div class="learner-info">
-                <img [src]="getProfileImageDataUrl(specificLearnerProgress.profilePictureDataUrl)">
+                <img [src]="getProfileImageDataUrl(specificLearnerProgress.username)">
                 <div>{{specificLearnerProgress.username}}</div>
               </div>
             </button>
@@ -102,7 +102,7 @@
               <ng-container *ngFor="let learnerProgress of learnersProgress">
                 <li ngbDropdownItem>
                   <div class="learner-info" (click)="updateLearnerSpecificProgress(learnerProgress)">
-                    <img [src]="getProfileImageDataUrl(learnerProgress.profilePictureDataUrl)">
+                    <img [src]="getProfileImageDataUrl(learnerProgress.username)">
                     <div>{{learnerProgress.username}}</div>
                   </div>
                 </li>

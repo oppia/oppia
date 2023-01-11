@@ -19,14 +19,11 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClient } from '@angular/common/http';
 
 import { AppConstants } from 'app.constants';
 import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
@@ -44,10 +41,6 @@ import './preferences-page.component.css';
 interface AudioLangaugeChoice {
   id: string;
   text: string;
-}
-
-interface ImageUploadBackendResponse {
-  filename: string;
 }
 
 @Component({
@@ -90,12 +83,9 @@ export class PreferencesPageComponent {
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
-    private http: HttpClient,
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
-    private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imageUploadHelperService: ImageUploadHelperService,
@@ -208,7 +198,7 @@ export class PreferencesPageComponent {
     reader.onload = () => {
       const imageData = reader.result as string;
       this.imageLocalStorageService.saveImage(
-        'profile_picture.png', imageData);
+        this.username + '_profile_picture.png', imageData);
     };
     reader.readAsDataURL(newImageFile);
   }

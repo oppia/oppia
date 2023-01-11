@@ -20,11 +20,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
-import { ImageFile } from 'domain/utilities/image-file.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
 export interface SubscriptionSummary {
   'creator_picture_data_url': string;
@@ -43,7 +39,6 @@ interface NonEmailPreferencesBackendDict {
   'preferred_language_codes': string[];
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
-  'profile_picture_data_url': string;
   'default_dashboard': string;
   'user_bio': string;
   'subject_interests': string;
@@ -83,8 +78,6 @@ export interface UserContributionRightsDataBackendDict {
 })
 export class UserBackendApiService {
   constructor(
-    private assetsBackendApiService: AssetsBackendApiService,
-    private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) {}
 
@@ -151,41 +144,6 @@ export class UserBackendApiService {
       update_type: updateType,
       data: data
     }).toPromise();
-  }
-
-  async loadProfileImage(username: string): Promise<ImageFile> {
-    // Fetch profile image for the current user if not specified.
-    let loginUserUsername = await this.getUserInfoAsync().then(
-      userInfo => userInfo.getUsername());
-    username = username || loginUserUsername;
-
-    if (this.profileImageCache !== undefined && username === loginUserUsername) {
-      return new ImageFile('profile_picture.png', this.profileImageCache);
-    }
-    return this._fetchProfileImage(username);
-  }
-
-  private async _fetchProfileImage(username: string): Promise<ImageFile> {
-    let onResolve!: (_: Blob) => void;
-    let onReject!: () => void;
-    const blobPromise = new Promise<Blob>((resolve, reject) => {
-      onResolve = resolve;
-      onReject = reject;
-    });
-
-    const subscription = this.http.get(
-      this.urlInterpolationService.interpolateUrl(
-        this.assetsBackendApiService.profileImageUrlTemplate,
-        {username: username}), {responseType: 'blob'}
-    ).subscribe(onResolve, onReject);
-
-    try {
-      const blob = await blobPromise;
-      this.profileImageCache = blob;
-      return new ImageFile('profile_picture.png', blob);
-    } catch {
-      return Promise.reject('profile_picture.png');
-    }
   }
 }
 angular.module('oppia').factory(

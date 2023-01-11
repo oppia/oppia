@@ -22,7 +22,6 @@ describe('Learner Group User Info', () => {
   it('should correctly convert backend dict to object', () => {
     const sampleLearnerGroupUserInfoDict = {
       username: 'user1',
-      profile_picture_data_url: 'profile_picture',
       error: 'some error message'
     };
 
@@ -32,8 +31,6 @@ describe('Learner Group User Info', () => {
     );
 
     expect(sampleLearnerGroupUserInfo.username).toEqual('user1');
-    expect(sampleLearnerGroupUserInfo.userProfilePictureUrl).toEqual(
-      'profile_picture');
     expect(sampleLearnerGroupUserInfo.error).toEqual('some error message');
   });
 });
