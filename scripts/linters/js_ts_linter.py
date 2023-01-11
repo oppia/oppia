@@ -464,7 +464,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                 if not (line.strip().startswith('//') or multiple_line_comment):
                     # Allow the use of 'as unknown' type conversion in spec
                     # files.
-                    if 'spec' in file_path:
+                    if '.spec.ts' in file_path:
                         unknown_types = [': unknown', '<unknown']
                         for unknown_type in unknown_types:
                             unknown_type_object = re.finditer(
@@ -479,18 +479,18 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                             unknown_type_indexes.extend([
                                 index.start() for index in unknown_type_object])
 
-                # Checking previous line contain comment, if yes then skip throw
-                # errors.
+                # Check whether previous line contains a proper comment. If it
+                # does, then skip throwing an error.
                 if not comment_before_unknown_type:
                     # Throw error if unknown type is present.
                     if unknown_type_indexes:
                         failed = True
                         for unknown_type_index in unknown_type_indexes:
                             error_message = (
-                                '%s:%s:%s: unknown type used. Add proper '
-                                'comment explaining why unknown type is '
+                                '%s:%s:%s: `unknown` type used. Add proper '
+                                'comment explaining why `unknown` type is '
                                 'used before the line if the type is needed '
-                                'otherwise remove the unknown type and use '
+                                'otherwise remove the `unknown` type and use '
                                 'the appropriate type.' % (
                                 file_path, line_num + 1, unknown_type_index))
                             error_messages.append(error_message)

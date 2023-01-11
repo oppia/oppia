@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,78 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service for generating random and unique content_id for
- * SubtitledHtml domain objects.
+ * @fileoverview Invalid syntax spec.ts file, used by scripts/linters/
+ * js_ts_linter_test.py.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import { AppConstants } from 'app.constants';
-import { StateNextContentIdIndexService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
+import { Injectable, Input, TemplateRef } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-  constructor(
-      private stateNextContentIdIndexService: StateNextContentIdIndexService
-  ) {}
+  @Input() tolerance: TemplateRef<unknown>;
+  constructor() {}
 
-  generateIdForComponent(
-      existingComponentIds: string[],
-      componentName: string): string {
-    let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
-    let searchKey = componentName + '_';
-    let count = 0;
-    for (let contentId in contentIdList) {
-      if (contentIdList[contentId].indexOf(searchKey) === 0) {
-        let splitContentId = contentIdList[contentId].split('_');
-        let tempCount =
-            parseInt(splitContentId[splitContentId.length - 1]);
-        if (tempCount > count) {
-          count = tempCount;
-        }
-      }
-    }
-    return (searchKey + String(count + 1));
-  }
-
-  _getNextId(
-      existingComponentIds: string[],
-      componentName: unknown): string {
-    // Worked example questions and explanations do not live in the State domain
-    // so they do not use next content id index.
-    if (componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.QUESTION ||
-        componentName ===
-        AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION) {
-      return this.generateIdForComponent(existingComponentIds, componentName);
-    } else {
-      throw new Error('Unknown component name provided.');
-    }
-  }
-
-  // Comment.
-  _getNextStateId(prefix: unknown): string {
-    // This function is used to generate content_ids for content that live in
-    // the State domain. This includes hints, feedback, and customization args.
-    const contentIdIndex = this.stateNextContentIdIndexService.displayed;
-    this.stateNextContentIdIndexService.displayed += 1;
-    return `${prefix}_${contentIdIndex}`;
-  }
-
-  getNextId(
-      existingComponentIds: string[],
-      componentName: string): string {
-    return this._getNextId(existingComponentIds, componentName);
-  }
-
-  getNextStateId(prefix: string): string {
-    return this._getNextStateId(prefix);
+  _getNextStateId(prefix: unknown): unknown {
+    const contentIdIndex = prefix as unknown;
+    return contentIdIndex;
   }
 }
-
-angular.module('oppia').factory(
-  'GenerateContentIdService', downgradeInjectable(GenerateContentIdService));

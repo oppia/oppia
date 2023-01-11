@@ -205,10 +205,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = [
-            '%s:%s:%s: unknown type used. Add proper comment explaining why '
-            'unknown type is used before the line if the type is needed '
-            'otherwise remove the unknown type and use the appropriate type.'
-            % (INVALID_UNKNOWN_IN_TS_FILEPATH, 57, 19)]
+            '%s:%s:%s: `unknown` type used. Add proper comment explaining why '
+            '`unknown` type is used before the line if the type is needed '
+            'otherwise remove the `unknown` type and use the appropriate type.'
+            % (INVALID_UNKNOWN_IN_TS_FILEPATH, 30, 19)]
         self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_duplicate_constant_declaration_in_separate_files(
