@@ -5,7 +5,9 @@
             matTooltipClass="oppia-mat-tooltip-list" [matTooltipDisabled]="isWarningTooltipDisabled()"
             aria-label="List that shows issues preventing to save story as draft" class="w-100">
         <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
-          [ngClass]="{'btn-success': isStorySaveable()}" (click)="saveChanges()" [disabled]="!isStorySaveable()">
+                [ngClass]="{'btn-success': isStorySaveable()}"
+                (click)="saveChanges()"
+                [disabled]="!isStorySaveable()">
           <span *ngIf="!isSaveInProgress()">
             <i *ngIf="isWarningTooltipDisabled()"
                class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
@@ -30,8 +32,11 @@
           </span>
         </button>
       </span>
-      <button type="button" class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
-              [disabled]="!getChangeListLength()" aria-label="Dropdown toggle" ngbDropdownToggle>
+      <button type="button"
+              class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
+              [disabled]="!getChangeListLength()"
+              aria-label="Dropdown toggle"
+              ngbDropdownToggle>
       </button>
       <ul ngbDropdownMenu class="oppia-dropdown-menu dropdown-menu"
         [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
@@ -55,8 +60,11 @@
         Publish Story
       </span>
     </button>
-    <button type="button" (click)="unpublishStory()" *ngIf="isStoryPublished()"
-            class="btn btn-secondary e2e-test-unpublish-story-button" [disabled]="isStorySaveable()">
+    <button type="button"
+            (click)="unpublishStory()"
+            *ngIf="isStoryPublished()"
+            class="btn btn-secondary e2e-test-unpublish-story-button"
+            [disabled]="isStorySaveable()">
       Unpublish Story
     </button>
   </li>
@@ -97,31 +105,39 @@
             ({{ getTotalWarningsCount()}} <i class="fa fa-exclamation-triangle error-icon"></i>)
           </span>
         </div>
-        <div class="story-nav-dropdown-icon" (click)="toggleNavigationOptions()">
+        <div class="story-nav-dropdown-icon"
+             (click)="toggleNavigationOptions()">
           <i class="fa fa-caret-down"></i>
         </div>
       </div>
     </div>
     <div class="story-nav-dropdown-container save-options-dropdown">
-      <div class="story-nav-story-nav-dropdown-options" *ngIf="showStoryEditOptions">
-        <div class="story-nav-dropdown-option" (click)="discardChanges()">
+      <div class="story-nav-story-nav-dropdown-options"
+           *ngIf="showStoryEditOptions">
+        <div class="story-nav-dropdown-option"
+             (click)="discardChanges()">
           <i class="fas fa-pen navbar-tab-icon"></i>
           <span>Discard Changes</span>
         </div>
         <div class="story-nav-dropdown-option e2e-test-mobile-publish-button">
-          <div *ngIf="!isStoryPublished()" (click)="publishStory()"
+          <div *ngIf="!isStoryPublished()"
+               (click)="publishStory()"
                [attr.disabled]="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="fas fa-pen navbar-tab-icon"></i>
             <span>Publish Story</span>
           </div>
-          <div (click)="unpublishStory()" *ngIf="isStoryPublished()" [attr.disabled]="isStorySaveable()">
+          <div (click)="unpublishStory()"
+               *ngIf="isStoryPublished()"
+               [attr.disabled]="isStorySaveable()">
             <i class="fas fa-pen navbar-tab-icon"></i>
             <span>Unpublish Story</span>
           </div>
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
-        <button class="story-nav-dropdown-text e2e-test-mobile-save-changes" [disabled]="!isStorySaveable()" (click)="saveChanges()">
+        <button class="story-nav-dropdown-text e2e-test-mobile-save-changes"
+                [disabled]="!isStorySaveable()"
+                (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
           </span>
@@ -132,7 +148,8 @@
             ({{ getChangeListLength() }})
           </span>
         </button>
-        <div class="story-nav-dropdown-icon" (click)="toggleStoryEditOptions()">
+        <div class="story-nav-dropdown-icon"
+             (click)="toggleStoryEditOptions()">
           <i class="fa fa-caret-down e2e-test-mobile-changes-dropdown"></i>
         </div>
       </div>
