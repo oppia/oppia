@@ -162,6 +162,14 @@ ngb-pagination .page-item.active .page-link {
   color: #333;
 }
 
+ngb-pagination ul li:last-child.page-item {
+  margin-left: 4px;
+}
+
+ngb-pagination ul li:first-child.page-item {
+  margin-right: 4px;
+}
+
 ngb-pagination .page-item .pagination-button {
   background: none;
   border: none;

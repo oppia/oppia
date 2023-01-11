@@ -27,7 +27,7 @@ import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
 import { SkillIdToDescriptionMap } from 'domain/topic/subtopic.model';
 import { SubtopicPageBackendDict } from 'domain/topic/subtopic-page.model';
-import { TopicBackendDict } from 'domain/topic/TopicObjectFactory';
+import { TopicBackendDict } from 'domain/topic/topic-object.model';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
