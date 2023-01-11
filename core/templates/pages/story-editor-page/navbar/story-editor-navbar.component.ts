@@ -104,7 +104,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   getAllStoryWarnings(): string {
     return this.validationIssues.concat(
       this.explorationValidationIssues).concat(
-        this.prepublishValidationIssues).join('\n')
+      this.prepublishValidationIssues).join('\n');
   }
 
   discardChanges(): void {
