@@ -19,31 +19,23 @@
 
 export interface LearnerGroupUserInfoBackendDict {
   username: string;
-  profile_picture_data_url: string;
   error: string;
 }
 
 export class LearnerGroupUserInfo {
   _username: string;
-  _userProfilePictureUrl: string;
   _error: string;
 
   constructor(
       username: string,
-      userProfilePictureUrl: string,
       error: string
   ) {
     this._username = username;
-    this._userProfilePictureUrl = userProfilePictureUrl;
     this._error = error;
   }
 
   get username(): string {
     return this._username;
-  }
-
-  get userProfilePictureUrl(): string {
-    return this._userProfilePictureUrl;
   }
 
   get error(): string {
@@ -55,7 +47,6 @@ export class LearnerGroupUserInfo {
   ): LearnerGroupUserInfo {
     return new LearnerGroupUserInfo(
       infoBackendDict.username,
-      infoBackendDict.profile_picture_data_url,
       infoBackendDict.error
     );
   }

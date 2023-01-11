@@ -34,7 +34,7 @@
           <div mat-card-avatar class="author-profile d-flex">
             <img mat-card-avatar
                  class="profile-image"
-                 [src]="authorProfilePictureUrl || DEFAULT_PROFILE_PICTURE_URL"
+                 [src]="authorProfilePictureUrl"
                  alt="Profile image of the author of the blog post.">
             <span class="author-username text-center general-text-format ml-4 my-auto">
               {{ authorName }}
@@ -164,7 +164,7 @@
       <div mat-card-avatar class="author-profile mx-auto">
         <img mat-card-avatar
              class="profile-image e2e-test-profile-current-user-photo"
-             [src]="authorProfilePictureUrl || DEFAULT_PROFILE_PICTURE_URL"
+             [src]="authorProfilePictureUrl"
              alt="Profile image of the author of the blog post.">
         <span class="author-username text-center general-text-format e2e-test-username-visible">
           {{ authorName }}

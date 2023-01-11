@@ -141,33 +141,27 @@ describe('LearnerGroupPreferencesComponent', () => {
   it('should initialize', fakeAsync(() => {
     const learnerInfo1 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username1',
-      profile_picture_data_url: 'picture',
       error: ''
     });
     const learnerInfo2 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username2',
-      profile_picture_data_url: 'picture2',
       error: ''
     });
     const learnerInfo3 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'user3',
-      profile_picture_data_url: 'picture3',
       error: ''
     });
     const allLearnersInfo = LearnerGroupAllLearnersInfo.createFromBackendDict({
       learners_info: [{
         username: 'user3',
-        profile_picture_data_url: 'picture3',
         error: ''
       }],
       invited_learners_info: [{
         username: 'username1',
-        profile_picture_data_url: 'picture',
         error: ''
       },
       {
         username: 'username2',
-        profile_picture_data_url: 'picture2',
         error: ''
       }]
     });
@@ -238,7 +232,6 @@ describe('LearnerGroupPreferencesComponent', () => {
       demoLearnerGroupBackendDict);
     const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username1',
-      profile_picture_data_url: 'picture',
       error: ''
     });
 
@@ -289,7 +282,6 @@ describe('LearnerGroupPreferencesComponent', () => {
         demoLearnerGroupBackendDict);
       const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
-        profile_picture_data_url: 'picture',
         error: ''
       });
 
@@ -331,7 +323,6 @@ describe('LearnerGroupPreferencesComponent', () => {
         demoLearnerGroupBackendDict);
       const newLearnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'username1',
-        profile_picture_data_url: 'picture',
         error: ''
       });
 
@@ -383,7 +374,6 @@ describe('LearnerGroupPreferencesComponent', () => {
         demoLearnerGroupBackendDict);
       const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
-        profile_picture_data_url: 'picture',
         error: ''
       });
 
@@ -426,7 +416,6 @@ describe('LearnerGroupPreferencesComponent', () => {
         demoLearnerGroupBackendDict);
       const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
         username: 'user3',
-        profile_picture_data_url: 'picture',
         error: ''
       });
 

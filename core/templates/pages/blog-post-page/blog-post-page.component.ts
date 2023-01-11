@@ -26,6 +26,7 @@ import { BlogPostPageConstants } from './blog-post-page.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogPostPageService } from './services/blog-post-page.service';
+import { UserService } from 'services/user.service';
 import dayjs from 'dayjs';
 
 import './blog-post-page.component.css';
@@ -46,7 +47,6 @@ export class BlogPostPageComponent implements OnInit {
   publishedDateString: string = '';
   authorProfilePicUrl!: string;
   authorUsername!: string;
-  DEFAULT_PROFILE_PICTURE_URL!: string;
   postsToRecommend: BlogPostSummary[] = [];
   blogPostLinkCopied: boolean = false;
 
@@ -56,6 +56,7 @@ export class BlogPostPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private blogPostPageService: BlogPostPageService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -66,9 +67,7 @@ export class BlogPostPageComponent implements OnInit {
     this.blogPost = this.blogPostPageData.blogPostDict;
     this.blogPostPageService.blogPostId = this.blogPostPageData.blogPostDict.id;
     this.postsToRecommend = this.blogPostPageData.summaryDicts;
-    this.decodeAuthorProfilePicUrl(
-      this.blogPostPageData.profilePictureDataUrl
-    );
+    this.getAuthorProfilePicUrl();
     if (this.blogPost.publishedOn) {
       this.publishedDateString = this.getDateStringInWords(
         this.blogPost.publishedOn);
@@ -93,11 +92,11 @@ export class BlogPostPageComponent implements OnInit {
     selection?.removeAllRanges();
   }
 
-  decodeAuthorProfilePicUrl(url: string): void {
-    this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-      .getStaticImageUrl('/general/no_profile_picture.png');
-    this.authorProfilePicUrl = decodeURIComponent((
-      url || this.DEFAULT_PROFILE_PICTURE_URL));
+  getAuthorProfilePicUrl(): void {
+    let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
+    profileImagePromise.then(data => {
+      this.authorProfilePicUrl = decodeURIComponent(data as string);
+    });
   }
 
   getDateStringInWords(naiveDate: string): string {

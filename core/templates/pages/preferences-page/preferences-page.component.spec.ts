@@ -50,7 +50,6 @@ describe('Preferences Page Component', () => {
     preferred_language_codes: ['en'],
     preferred_site_language_code: 'en',
     preferred_audio_language_code: 'en',
-    profile_picture_data_url: '',
     default_dashboard: 'creator',
     user_bio: 'test user bio',
     subject_interests: '',

@@ -76,7 +76,6 @@ describe('Ineffective feedback loop task model', function() {
           'times.'),
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       }));
 
@@ -105,7 +104,6 @@ describe('Ineffective feedback loop task model', function() {
           'times.'),
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
@@ -131,7 +129,6 @@ describe('Ineffective feedback loop task model', function() {
           'times.'),
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
@@ -154,7 +151,6 @@ describe('Ineffective feedback loop task model', function() {
           'times.'),
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError('backend dict has target_type "???" but expected "state"');

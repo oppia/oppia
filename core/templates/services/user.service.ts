@@ -16,24 +16,30 @@
  * @fileoverview Service for user data.
  */
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UpdatePreferencesResponse, UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private imageLocalStorageService: ImageLocalStorageService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService
+    private userBackendApiService: UserBackendApiService,
+    private http: HttpClient
   ) {}
 
   // This property will be null when the user does not have
@@ -56,21 +62,37 @@ export class UserService {
     return this.userInfo;
   }
 
-  async getProfileImageDataUrlAsync(): Promise<string> {
-    let defaultUrl = (
-      this.urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-    return this.getUserInfoAsync().then(
-      async(userInfo) => {
-        if (userInfo.isLoggedIn()) {
-          return this.userBackendApiService.getProfileImageDataUrlAsync(
-            defaultUrl);
-        } else {
-          return new Promise((resolve, reject) => {
-            resolve(defaultUrl);
+  private async _getProfileImagePromise(imageDataBlob: Blob): Promise<string> {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+      reader.readAsDataURL(imageDataBlob);
+    });
+  }
+
+  async getProfileImageDataUrlAsync(username: string = ''): Promise<string> {
+    let defaultUrl = this.urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
+     return this.getUserInfoAsync().then(userInfo => {
+      if (username === '') {
+        username = userInfo.getUsername();
+      }
+      let localStoredImage = this.imageLocalStorageService.getRawImageData(
+        username + '_profile_picture.png');
+      if (localStoredImage !== null) {
+        return new Promise(resolve => {return resolve(localStoredImage)});
+      }
+      return this.http.get(this.urlInterpolationService.interpolateUrl(
+        this.assetsBackendApiService.profileImageUrlTemplate,
+        {username: username}), {responseType: 'blob'}).toPromise().then(
+          (response) => {
+            return this._getProfileImagePromise(response);
+          }, () => {
+            return new Promise(resolve => {return resolve(defaultUrl)});
           });
-        }
-      });
+    });
   }
 
   async setProfileImageDataUrlAsync(

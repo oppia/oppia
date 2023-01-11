@@ -19,16 +19,20 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import { AppConstants } from 'app.constants';
 import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { EmailPreferencesBackendDict, SubscriptionSummary, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 require('cropperjs/dist/cropper.min.css');
 
@@ -83,6 +87,8 @@ export class PreferencesPageComponent {
     private windowRef: WindowRef,
     private alertsService: AlertsService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private imageUploadHelperService: ImageUploadHelperService,
     private languageUtilService: LanguageUtilService,
     private loaderService: LoaderService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
@@ -176,18 +182,43 @@ export class PreferencesPageComponent {
     }
   }
 
+  private saveProfileImage(newProfilePictureDataUrl: string): void {
+    if (AppConstants.EMULATOR_MODE) {
+      this._saveProfileImageToLocalStorage(newProfilePictureDataUrl);
+    } else {
+      this._postProfileImageToServer(newProfilePictureDataUrl);
+    }
+  }
+
+  private _saveProfileImageToLocalStorage(image: string): void {
+    this.profilePictureDataUrl = image;
+    const newImageFile = (
+      this.imageUploadHelperService.convertImageDataToImageFile(image));
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageData = reader.result as string;
+      this.imageLocalStorageService.saveImage(
+        this.username + '_profile_picture.png', imageData);
+    };
+    reader.readAsDataURL(newImageFile);
+  }
+
+  private _postProfileImageToServer(image: string): void {
+    this.profilePictureDataUrl = image;
+    this.userService.setProfileImageDataUrlAsync(image)
+      .then(() => {});
+  }
+
   showEditProfilePictureModal(): void {
     let modalRef = this.ngbModal.open(EditProfilePictureModalComponent, {
       backdrop: 'static'
     });
 
     modalRef.result.then((newProfilePictureDataUrl) => {
-      this.userService.setProfileImageDataUrlAsync(newProfilePictureDataUrl)
-        .then(() => {
-          // The reload is needed in order to update the profile picture
-          // in the top-right corner.
-          this.windowRef.nativeWindow.location.reload();
-        });
+      this.saveProfileImage(newProfilePictureDataUrl);
+      // The reload is needed in order to update the profile picture
+      // in the top-right corner.
+      this.windowRef.nativeWindow.location.reload();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -215,13 +246,10 @@ export class PreferencesPageComponent {
     this.hasPageLoaded = false;
 
     let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
-
     preferencesPromise.then((data) => {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
       this.preferredLanguageCodes = data.preferred_language_codes;
-      this.profilePictureDataUrl = decodeURIComponent(
-        data.profile_picture_data_url);
       this.defaultDashboard = data.default_dashboard;
       this.canReceiveEmailUpdates = data.can_receive_email_updates;
       this.canReceiveEditorRoleEmail =
@@ -242,7 +270,14 @@ export class PreferencesPageComponent {
       this.hasPageLoaded = true;
     });
 
-    Promise.all([userInfoPromise, preferencesPromise]).then(() => {
+    let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
+    profileImagePromise.then(data => {
+      this.profilePictureDataUrl = decodeURIComponent(data as string);
+    });
+
+    Promise.all([
+      userInfoPromise, preferencesPromise, profileImagePromise
+    ]).then(() => {
       this.loaderService.hideLoadingScreen();
     });
 

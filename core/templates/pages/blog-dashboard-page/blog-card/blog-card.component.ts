@@ -25,6 +25,7 @@ import { BlogPostPageConstants } from 'pages/blog-post-page/blog-post-page.const
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
+import { UserService } from 'services/user.service';
 
 @Component({
   selector: 'oppia-blog-card',
@@ -35,10 +36,8 @@ export class BlogCardComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
-  @Input() authorProfilePicDataUrl!: string;
   @Input() shownOnblogPostPage!: boolean;
   authorProfilePictureUrl!: string;
-  DEFAULT_PROFILE_PICTURE_URL: string = '';
   thumbnailUrl: string = '';
   publishedDateString: string = '';
   blogCardPreviewModeIsActive: boolean = false;
@@ -48,6 +47,7 @@ export class BlogCardComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private contextService: ContextService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -57,10 +57,11 @@ export class BlogCardComponent implements OnInit {
           AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.id,
           this.blogPostSummary.thumbnailFilename);
     }
-    this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-      .getStaticImageUrl('/general/no_profile_picture.png');
-    this.authorProfilePictureUrl = decodeURIComponent((
-      this.authorProfilePicDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
+    let profileImagePromise = this.userService.getProfileImageDataUrlAsync(
+      this.blogPostSummary.authorUsername);
+    profileImagePromise.then(data => {
+      this.authorProfilePictureUrl = decodeURIComponent(data as string);
+    });
     const publishedOn = this.blogPostSummary.publishedOn;
     if (publishedOn === undefined) {
       throw new Error('Blog Post Summary published date is not defined');

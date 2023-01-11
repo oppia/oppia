@@ -37,7 +37,6 @@ export interface TaskEntryBackendDict<TaskType = string> {
   'issue_description': string | null;
   'status': string;
   'resolver_username': string | null;
-  'resolver_profile_picture_data_url': string | null;
   'resolved_on_msecs': number | null;
 }
 
@@ -88,8 +87,6 @@ export class TaskEntry<TaskType = string> {
     this.targetType = backendDict.target_type;
     this.targetId = backendDict.target_id;
     this.resolverUsername = backendDict.resolver_username;
-    this.resolverProfilePictureDataUrl = (
-      backendDict.resolver_profile_picture_data_url);
     this.resolvedOnMsecs = backendDict.resolved_on_msecs;
     this.issueDescription = backendDict.issue_description;
     this.taskStatus = backendDict.status;
@@ -110,7 +107,6 @@ export class TaskEntry<TaskType = string> {
       issue_description: this.issueDescription,
       status: this.taskStatus,
       resolver_username: this.resolverUsername,
-      resolver_profile_picture_data_url: this.resolverProfilePictureDataUrl,
       resolved_on_msecs: this.resolvedOnMsecs,
     };
   }

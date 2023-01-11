@@ -77,7 +77,6 @@ describe('Invite Learners Modal Component', function() {
   it('should update newly invited learners and their info', () => {
     const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
       username: 'user1',
-      profile_picture_data_url: 'picture',
       error: ''
     });
 
