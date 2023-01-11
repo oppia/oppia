@@ -9,3 +9,4 @@ paths-ignore:
   # for SHA-1. We can migrate to a stronger cryptographic algorithm, replacing
   # all SHA-1, but that would require changes to the existing data we have.
   - core/utils.py
+  - scripts/release_scripts/update_configs.py
