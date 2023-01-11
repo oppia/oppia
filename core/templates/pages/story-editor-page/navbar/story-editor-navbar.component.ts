@@ -101,7 +101,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     return this.isStorySaveable() || this.getTotalWarningsCount() === 0;
   }
 
-  getAllStoryWarnings(): String {
+  getAllStoryWarnings(): string {
     return this.validationIssues.concat(this.explorationValidationIssues).concat(this.prepublishValidationIssues).join('\n')
   }
 

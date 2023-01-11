@@ -15,7 +15,7 @@
                class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
                alt="Save Story">
             </i>
-            <mat-icon *ngIf="!isWarningTooltipDisabled()" 
+            <mat-icon *ngIf="!isWarningTooltipDisabled()"
                       class="story-save-draft-warning">
               warning
             </mat-icon>
@@ -27,7 +27,7 @@
               ({{ getChangeListLength() }})
             </span>
           </span>
-          
+
           <span *ngIf="isSaveInProgress()">
             <span class="oppia-save-publish-button-label">
               Saving
@@ -46,7 +46,7 @@
           class="oppia-dropdown-menu dropdown-menu"
           [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
         <li title="Discard all pending changes">
-          <a (click)="discardChanges()" 
+          <a (click)="discardChanges()"
              [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
              class="dropdown-item e2e-test-discard-story-changes">
              Discard Draft
@@ -96,7 +96,7 @@
         </div>
       </div>
       <div>
-        <div *ngIf="warningsAreShown" 
+        <div *ngIf="warningsAreShown"
              class="warning-box">
           <span>Warnings</span>
           <div *ngFor="let issue of validationIssues;trackBy:$index">
@@ -110,9 +110,9 @@
         </div>
       </div>
       <div class="story-nav-dropdown-content">
-        <div class="story-nav-dropdown-text" 
+        <div class="story-nav-dropdown-text"
              (click)="toggleWarningText()">
-          <i *ngIf="!getTotalWarningsCount()" 
+          <i *ngIf="!getTotalWarningsCount()"
              class="fas fa-pen navbar-tab-icon">
           </i>
           <span>{{ activeTab }}</span>
