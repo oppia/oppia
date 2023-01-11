@@ -24,6 +24,7 @@ import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
 import { RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { APP_BASE_HREF } from '@angular/common';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -51,6 +52,7 @@ declare var angular: ng.IAngularStatic;
     RouterModule.forRoot([]),
     MatCardModule,
     ReactiveFormsModule,
+    BrowserAnimationsModule,
     SharedComponentsModule,
     AdminBlogAdminCommonModule,
     ToastrModule.forRoot(toastrConfig)
