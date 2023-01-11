@@ -202,7 +202,7 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
             self.assertItemsEqual(
                 mailchimp.lists.parent_emails, self.second_batch_emails)
 
-    def test_job_runs_correctly_with_mailchimp_api_key_missing(self) -> None:
+    def test_job_fails_with_mailchimp_api_key_missing(self) -> None:
         config_model = self.create_model(
             config_models.ConfigPropertyModel,
             id='batch_index_for_mailchimp',
@@ -218,13 +218,11 @@ class MailchimpPopulateJobTests(job_test_utils.JobTestBase):
             lambda _: None,
             expected_args=[('MAILCHIMP_API_KEY',)]
         )
-        swap_api_key_feconf = self.swap(
-            feconf, 'MAILCHIMP_API_KEY', 'abcdefabcdefabcdefabcdefabcdef12')
         swap_mailchimp_class = self.swap_to_always_return(
             mailchimp3, 'MailChimp', mailchimp)
 
         with swap_api_key_secrets_return_none, self.swap_audience_id:
-            with swap_api_key_feconf, swap_mailchimp_class:
+            with swap_mailchimp_class:
                 self.assert_job_output_is([
                     job_run_result.JobRunResult(stdout='Request successful')
                 ])
