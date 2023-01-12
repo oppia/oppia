@@ -375,6 +375,21 @@ describe('State translation component', () => {
         .toHaveBeenCalledWith('content_1', 'html');
     });
 
+    it('should return original HTML when written translation is not' +
+      ' available', () => {
+      let subtitledObject = SubtitledHtml.createFromBackendDict({
+        content_id: 'content_1',
+        html: 'This is the html'
+      });
+      spyOn(component, 'isTranslatedTextRequired').and.returnValue(true);
+      spyOn(explorationStatesService, 'getWrittenTranslationsMemento')
+        .and.returnValue({
+          hasWrittenTranslation: () => false
+        });
+      let html = component.getRequiredHtml(subtitledObject);
+      expect(html).toEqual(subtitledObject.html);
+    });
+
     it('should navigate to a given state', () => {
       spyOn(routerService, 'navigateToMainTab');
       component.navigateToState('Introduction');
