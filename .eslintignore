@@ -1,6 +1,6 @@
 core/templates/expressions/parser.js
 core/templates/google-analytics.initializer.ts
-core/tests/puppeteer-acceptance-tests/puppeteer-testing-utilities/showMessage.js
+core/tests/puppeteer-acceptance-tests/puppeteer-testing-utilities/showMessageUtils.js
 backend_prod_files/*
 integrations/*
 integrations_dev/*
