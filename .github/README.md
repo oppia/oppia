@@ -9,7 +9,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
   * [Oppia.org community site](https://www.oppia.org)
   * [User Documentation](https://oppia.github.io/)
   * [Contributors' wiki](https://github.com/oppia/oppia/wiki)
-  * [Developer mailing list](http://groups.google.com/group/oppia-dev)
+  * [GitHub Discussions](https://github.com/oppia/oppia/discussions)
   * [File an issue](https://github.com/oppia/oppia/issues/new/choose)
 
 <p align="center">
@@ -46,8 +46,7 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
 ## Keeping in touch
 
   * [Discussion forum](https://github.com/oppia/oppia/discussions)
-  * [GitHub Discussions](https://github.com/oppia/oppia/discussions)
-
+  * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
 
 ## Social Media
 [<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter] [<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn] [<img height="30" src = "https://img.shields.io/badge/facebook-1877F2.svg?&style=for-the-badge&logo=facebook&logoColor=white">][Facebook] [<img height="30" src = "https://img.shields.io/badge/medium-12100E.svg?&style=for-the-badge&logo=medium&logoColor=white">][medium] [<img height="30" src = "https://img.shields.io/badge/oppia.org%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][oppia-org-youtube] [<img height="30" src = "https://img.shields.io/badge/oppia%20dev%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][dev-youtube]
