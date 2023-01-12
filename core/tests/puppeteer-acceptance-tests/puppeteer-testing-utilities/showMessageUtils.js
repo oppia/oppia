@@ -18,7 +18,7 @@
 
 let showMessage = async function(message) {
   await console.log(message);
-}
+};
 
 module.exports = { showMessage };
 
