@@ -32,7 +32,7 @@ let superAdmin = async function(username, email, role = null) {
   }
 
   return superAdmin;
-}
+};
 
 let blogAdmin = async function(username, email) {
   const blogAdmin = await new e2eBlogAdmin();
@@ -41,7 +41,7 @@ let blogAdmin = async function(username, email) {
     username, email);
 
   return blogAdmin;
-}
+};
 
 let blogPostEditor = async function(username, email) {
   const blogPostEditor = await new e2eBlogPostEditor();
@@ -50,6 +50,6 @@ let blogPostEditor = async function(username, email) {
     username, email);
 
   return blogPostEditor;
-}
+};
 
 module.exports = { superAdmin, blogAdmin, blogPostEditor };
