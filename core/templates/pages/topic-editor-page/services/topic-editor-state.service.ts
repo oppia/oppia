@@ -30,7 +30,7 @@ import { SubtopicPage, SubtopicPageBackendDict } from 'domain/topic/subtopic-pag
 import { SkillIdToDescriptionMap } from 'domain/topic/subtopic.model';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicRights, TopicRightsBackendDict } from 'domain/topic/topic-rights.model';
-import { Topic, TopicBackendDict, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
 import cloneDeep from 'lodash/cloneDeep';
 import { AlertsService } from 'services/alerts.service';
 import { TopicDeleteCanonicalStoryChange, TopicDeleteAdditionalStoryChange }
@@ -90,7 +90,6 @@ export class TopicEditorStateService {
     private alertsService: AlertsService,
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private editableTopicBackendApiService: EditableTopicBackendApiService,
-    private topicObjectFactory: TopicObjectFactory,
     private topicRightsBackendApiService: TopicRightsBackendApiService,
     private loaderService: LoaderService,
     private undoRedoService: UndoRedoService
@@ -171,7 +170,7 @@ export class TopicEditorStateService {
       newBackendTopicDict: TopicBackendDict,
       skillIdToDescriptionDict: SkillIdToDescriptionMap): void {
     this._setTopic(
-      this.topicObjectFactory.create(
+      Topic.create(
         newBackendTopicDict, skillIdToDescriptionDict));
   }
 
