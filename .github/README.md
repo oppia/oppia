@@ -45,8 +45,8 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
 
 ## Keeping in touch
 
-  * [Discussion forum](http://groups.google.com/group/oppia)
-  * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
+  * [Discussion forum](https://github.com/oppia/oppia/discussions)
+  * [GitHub Discussions](https://github.com/oppia/oppia/discussions)
 
 
 ## Social Media
