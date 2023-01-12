@@ -17,14 +17,11 @@
  * delete draft blog posts.
  */
 
-const createNewUser = require('../puppeteer-testing-utilities/initializeUsers.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/testConstants.js');
+const createNewUser = require(
+  '../puppeteer-testing-utilities/initializeUsers.js');
 
-const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
-const blogAdminUrl = testConstants.URLs.BlogAdmin;
 
 let blogEditorCreateDraftAndDeleteDraftBlogPost = async function() {
   const superAdmin = await createNewUser.superAdmin(
@@ -32,17 +29,14 @@ let blogEditorCreateDraftAndDeleteDraftBlogPost = async function() {
   const blogPostEditor = await createNewUser.blogPostEditor(
     'blogPostEditor', 'blog_post_editor@example.com');
 
-  await superAdmin.goto(blogAdminUrl);
   await superAdmin.assignUserAsRoleFromRoleDropdown(
     'blogPostEditor', 'BLOG_POST_EDITOR');
-  await superAdmin.expectUserToHaveRole('blogPostEditor', ROLE_BLOG_POST_EDITOR);
+  await superAdmin.expectUserToHaveRole(
+    'blogPostEditor', ROLE_BLOG_POST_EDITOR);
   await superAdmin.closeBrowser();
 
-  await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
   await blogPostEditor.createDraftBlogPostWithTitle('Test-Blog');
-
-  await blogPostEditor.goto(blogDashboardUrl);
   await blogPostEditor.expectDraftBlogPostWithTitleToBePresent('Test-Blog');
 
   await blogPostEditor.deleteDraftBlogPostWithTitle('Test-Blog');

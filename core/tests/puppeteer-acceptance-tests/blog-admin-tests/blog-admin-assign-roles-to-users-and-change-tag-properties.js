@@ -17,25 +17,22 @@
  * tag properties from the blog-admin page.
  */
 
-const createNewUser = require('../puppeteer-testing-utilities/initializeUsers.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/testConstants.js');
+const createNewUser = require(
+  '../puppeteer-testing-utilities/initializeUsers.js');
 
-const blogAdminUrl = testConstants.URLs.BlogAdmin;
-const ROLE_BLOG_ADMIN = 'BLOG_ADMIN';
+const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 
 let blogAdminAssignRolesToUsersAndChangeTagProperties = async function() {
   const superAdmin = await createNewUser.superAdmin(
-    'superAdm', 'testadmin@example.com', 'blog admin');
+    'superAdm', 'testadmin@example.com', ROLE_BLOG_ADMIN);
   await createNewUser.blogAdmin(
     'blogAdm', 'blog_admin@example.com');
   await createNewUser.blogPostEditor(
     'blogEditor', 'blog_post_editor@example.com');
 
-  await superAdmin.goto(blogAdminUrl);
-  await superAdmin.assignUserAsRoleFromRoleDropdown('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.expectUserToHaveRole('blogAdm', 'blog admin');
+  await superAdmin.assignUserAsRoleFromRoleDropdown('blogAdm', 'BLOG_ADMIN');
+  await superAdmin.expectUserToHaveRole('blogAdm', ROLE_BLOG_ADMIN);
   await superAdmin.assignUserAsRoleFromRoleDropdown(
     'blogEditor', 'BLOG_POST_EDITOR');
   await superAdmin.expectUserToHaveRole('blogEditor', ROLE_BLOG_POST_EDITOR);

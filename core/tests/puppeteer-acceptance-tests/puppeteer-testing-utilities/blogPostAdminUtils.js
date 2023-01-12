@@ -30,6 +30,7 @@ const blogEditorUsernameInput = 'input#label-target-form-reviewer-username';
 const maximumTagLimitInput = 'input#mat-input-0';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
+const blogAdminUrl = testConstants.URLs.BlogAdmin;
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async addUserBioInBlogDashboard() {
@@ -151,6 +152,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   async expectNumberOfDraftOrPublishedBlogPostsToBe(number) {
+    await this.goto(blogDashboardUrl);
     await this.page.evaluate(async(number) => {
       const allDraftBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
@@ -165,6 +167,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle) {
+    await this.goto(blogDashboardUrl);
     await this.page.evaluate(async(checkDraftBlogPostByTitle) => {
       const allDraftBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
@@ -215,6 +218,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   async expectPublishedBlogPostWithTitleToExist(checkPublishBlogPostByTitle) {
+    await this.goto(blogDashboardUrl);
     await this.clickOn('div', 'PUBLISHED');
     await this.page.evaluate(async(checkPublishBlogPostByTitle) => {
       const allPublishedBlogPosts = document.getElementsByClassName(
@@ -292,12 +296,14 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   async assignUserAsRoleFromRoleDropdown(username, role) {
+    await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
     await this.clickOn('button', 'Update Role');
   }
 
   async removeBlogEditorRoleFromUsername(username) {
+    await this.goto(blogAdminUrl);
     await this.type(blogEditorUsernameInput, username);
     await this.clickOn('button', 'Remove Blog Editor ');
   }
