@@ -23,7 +23,7 @@ module.exports = {
   },
 };
 
-/** We need to ignore the eslint checks for the console statements in our 
+/** We need to ignore the eslint checks for the console statements in our
  * Acceptance Tests because we use console statements to log the progress or
  * feedback of the tests.
  */
