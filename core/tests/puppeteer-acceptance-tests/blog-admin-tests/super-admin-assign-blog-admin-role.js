@@ -16,7 +16,8 @@
  * @fileoverview Accpetance Test for a Super Admin assign Blog Admin role.
  */
 
-const createNewUser = require('../puppeteer-testing-utilities/initializeUsers.js');
+const createNewUser = require(
+  '../puppeteer-testing-utilities/initializeUsers.js');
 
 const ROLE_BLOG_ADMIN = 'blog admin';
 

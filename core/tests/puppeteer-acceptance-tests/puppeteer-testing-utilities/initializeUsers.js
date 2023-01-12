@@ -20,7 +20,7 @@ const e2eSuperAdmin = require('./blogPostAdminUtils.js');
 const e2eBlogAdmin = require('./blogPostAdminUtils.js');
 const e2eBlogPostEditor = require('./blogPostAdminUtils.js');
 
-async function superAdmin(username, email, role = null) {
+let superAdmin = async function(username, email, role = null) {
   const superAdmin = await new e2eSuperAdmin();
   await superAdmin.openBrowser();
   await superAdmin.signUpNewUserWithUsernameAndEmail(
@@ -34,21 +34,21 @@ async function superAdmin(username, email, role = null) {
   return superAdmin;
 }
 
-async function blogAdmin(username, email) {
+let blogAdmin = async function(username, email) {
   const blogAdmin = await new e2eBlogAdmin();
   await blogAdmin.openBrowser();
   await blogAdmin.signUpNewUserWithUsernameAndEmail(
     username, email);
-  
+
   return blogAdmin;
 }
 
-async function blogPostEditor(username, email) {
+let blogPostEditor = async function(username, email) {
   const blogPostEditor = await new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
   await blogPostEditor.signUpNewUserWithUsernameAndEmail(
     username, email);
-  
+
   return blogPostEditor;
 }
 
