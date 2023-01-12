@@ -983,6 +983,7 @@ def get_reviewable_translation_suggestions_by_offset(
     opportunity_summary_exp_ids: Optional[List[str]],
     limit: Optional[int],
     offset: int,
+    sort_key: Optional[str],
     language: Optional[str] = None
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
@@ -999,6 +1000,7 @@ def get_reviewable_translation_suggestions_by_offset(
             IDs are fetched.
         limit: int|None. The maximum number of results to return. If None,
             all available results are returned.
+        sort_key: str|None. The key to sort the suggestions by.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
         language: str. ISO 639-1 language code for which to filter. If it is
@@ -1032,14 +1034,20 @@ def get_reviewable_translation_suggestions_by_offset(
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_translation_suggestions_by_offset(
-                limit, offset,
-                user_id, language_codes))
+                limit,
+                offset,
+                user_id,
+                sort_key,
+                language_codes))
     elif len(opportunity_summary_exp_ids) > 0:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                limit, offset,
-                user_id, language_codes,
+                limit,
+                offset,
+                user_id,
+                sort_key,
+                language_codes,
                 opportunity_summary_exp_ids))
 
     translation_suggestions = []
@@ -1058,7 +1066,8 @@ def get_reviewable_translation_suggestions_by_offset(
 def get_reviewable_question_suggestions_by_offset(
     user_id: str,
     limit: int,
-    offset: int
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
     """Returns a list of question suggestions which the user
        can review.
@@ -1068,6 +1077,7 @@ def get_reviewable_question_suggestions_by_offset(
         limit: int. The maximum number of results to return.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
+        sort_key: str|None. The key to sort the suggestions by.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1078,7 +1088,8 @@ def get_reviewable_question_suggestions_by_offset(
     """
     suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel
-        .get_in_review_question_suggestions_by_offset(limit, offset, user_id))
+        .get_in_review_question_suggestions_by_offset(
+            limit, offset, user_id, sort_key))
 
     question_suggestions = []
     for suggestion_model in suggestions:
@@ -1511,7 +1522,8 @@ def get_submitted_suggestions_by_offset(
     user_id: str,
     suggestion_type: Literal['add_question'],
     limit: int,
-    offset: int
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[
     Sequence[suggestion_registry.SuggestionAddQuestion], int
 ]: ...
@@ -1522,7 +1534,8 @@ def get_submitted_suggestions_by_offset(
     user_id: str,
     suggestion_type: Literal['translate_content'],
     limit: int,
-    offset: int
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[
     Sequence[suggestion_registry.SuggestionTranslateContent], int
 ]: ...
@@ -1530,12 +1543,20 @@ def get_submitted_suggestions_by_offset(
 
 @overload
 def get_submitted_suggestions_by_offset(
-    user_id: str, suggestion_type: str, limit: int, offset: int
+    user_id: str,
+    suggestion_type: str,
+    limit: int,
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
 
 
 def get_submitted_suggestions_by_offset(
-    user_id: str, suggestion_type: str, limit: int, offset: int
+    user_id: str,
+    suggestion_type: str,
+    limit: int,
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
@@ -1546,6 +1567,7 @@ def get_submitted_suggestions_by_offset(
         limit: int. The maximum number of results to return.
         offset: int. The number of results to skip from the beginning
             of all results matching the query.
+        sort_key: str|None. The key to sort the suggestions by.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1560,7 +1582,8 @@ def get_submitted_suggestions_by_offset(
                 limit,
                 offset,
                 suggestion_type,
-                user_id))
+                user_id,
+                sort_key))
     suggestions = ([
         get_suggestion_from_model(s) for s in submitted_suggestion_models
     ])
