@@ -40,7 +40,7 @@ let blogEditorCreateDraftAndDeleteDraftBlogPost = async function() {
   await blogPostEditor.expectDraftBlogPostWithTitleToBePresent('Test-Blog');
 
   await blogPostEditor.deleteDraftBlogPostWithTitle('Test-Blog');
-  await blogPostEditor.expectDraftBlogPostWithTitleToBeAbsent('Test-Blog');
+  await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
 
   await blogPostEditor.closeBrowser();
 };

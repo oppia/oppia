@@ -18,6 +18,7 @@
 
 const puppeteer = require('puppeteer');
 const testConstants = require('./testConstants.js');
+const { showMessage } = require('./showMessageUtils.js');
 
 const rolesEditorTab = testConstants.URLs.RolesEditorTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
@@ -136,9 +137,7 @@ module.exports = class puppeteerUtilities {
     await this.clickOn('div', rolesSelectDropdown);
     await this.page.evaluate(async(role) => {
       const allRoles = document.getElementsByClassName('mat-option-text');
-      console.log(allRoles.length);
       for (let i = 0; i < allRoles.length; i++) {
-        console.log(allRoles[i].innerText);
         if (allRoles[i].innerText.toLowerCase() === role) {
           allRoles[i].click({waitUntil: 'networkidle0'});
           return;
@@ -168,7 +167,7 @@ module.exports = class puppeteerUtilities {
       }
       throw new Error('User does not have ' + role + ' role!');
     }, role);
-    console.log('User ' + username + ' has the ' + role + ' role!');
+    showMessage('User ' + username + ' has the ' + role + ' role!');
     await this.goto(currPageUrl);
   }
 
@@ -192,7 +191,7 @@ module.exports = class puppeteerUtilities {
         }
       }
     }, role);
-    console.log('User ' + username + ' doesnot have the ' + role + ' role!');
+    showMessage('User ' + username + ' doesnot have the ' + role + ' role!');
     await this.goto(currPageUrl);
   }
 

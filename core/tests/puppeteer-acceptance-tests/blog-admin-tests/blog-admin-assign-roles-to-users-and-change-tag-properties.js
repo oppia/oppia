@@ -43,7 +43,7 @@ let blogAdminAssignRolesToUsersAndChangeTagProperties = async function() {
 
   await superAdmin.expectTagToNotExistInBlogTags('Test_Tag');
   await superAdmin.addNewBlogTag('Test_Tag');
-  await superAdmin.expectTagWithNameToExistInTagList('Test_Tag');
+  await superAdmin.expectTagToExistInBlogTags('Test_Tag');
 
   await superAdmin.setMaximumTagLimitTo('5');
   await superAdmin.expectMaximumTagLimitToBe('5');

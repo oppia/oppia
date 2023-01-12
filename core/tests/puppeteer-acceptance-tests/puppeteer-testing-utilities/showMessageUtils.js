@@ -13,17 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview File configuring eslint checks to ignore console statements
- * in the puppeteer-acceptance-tests directory.
+ * @fileoverview Utility function for logging the progress of the tests.
  */
 
-module.exports = {
-  rules: {
-    'no-console': 'off',
-  },
-};
+let showMessage = async function(message) {
+  await console.log(message);
+}
+
+module.exports = { showMessage };
 
 /** We need to ignore the eslint checks for the console statements in our
  * Acceptance Tests because we use console statements to log the progress or
- * feedback of the tests.
+ * feedback of the tests. So adding this file in the .eslintignore file.
  */

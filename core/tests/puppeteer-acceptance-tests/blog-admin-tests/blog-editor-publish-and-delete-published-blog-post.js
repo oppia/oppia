@@ -40,7 +40,7 @@ let blogEditorPublishBlogPostAndDeletePublishedBlogPost = async function() {
 
   await blogPostEditor.expectPublishedBlogPostWithTitleToExist('Test-Blog');
   await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
-  await blogPostEditor.expectPublishedBlogPostWithTitleToNotExist('Test-Blog');
+  await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
 
   await blogPostEditor.closeBrowser();
 };

@@ -9,3 +9,4 @@ build/*
 *.min.js
 dump.rdb
 .direnv/*
+core/tests/puppeteer-acceptance-tests/puppeteer-testing-utilities/showMessage.js
