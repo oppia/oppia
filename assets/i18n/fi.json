@@ -49,6 +49,7 @@
 	"I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_0": "Olet menossa oikeaan suuntaan, mutta sinun on tarkistettava oikeinkirjoituksesi.",
 	"I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_1": "Olet lähellä oikeaa vastausta. Voisitko korjata kirjoitusasuasi?",
 	"I18N_ANSWER_MISSPELLED_RESPONSE_TEXT_2": "Tarkista oikeinkirjoituksesi uudestaan.",
+	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_EXPLAIN_TEXT": "Lisää lyhyt kuvaus itsestäsi. Huomaa, että kaikki tänne kirjoittamasi näytetään yleisölle.",
 	"I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON": "Uusi julkaisu",
 	"I18N_BLOG_DASHBOARD_TAB_DRAFTS": "Luonnokset",
 	"I18N_BLOG_DASHBOARD_TAB_PUBLISHED": "Julkaistu",
