@@ -270,7 +270,7 @@ describe('Contribution Opportunities backend API service', function() {
     })
   );
 
-  it('should fetch reviewable translation opportunities by laguage',
+  it('should fetch reviewable translation opportunities by language',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
