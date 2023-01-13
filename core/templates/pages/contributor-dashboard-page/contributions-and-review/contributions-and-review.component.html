@@ -86,8 +86,8 @@
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
       <div *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
         <review-translation-language-selector class="oppia-language-selector"
-        [activeLanguageCode]="languageCode"
-        (setActiveLanguageCode)="onChangeLanguage($event)">
+                                              [activeLanguageCode]="languageCode"
+                                              (setActiveLanguageCode)="onChangeLanguage($event)">
         </review-translation-language-selector>
       </div>
       <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container">
