@@ -116,7 +116,6 @@ export class OpportunitiesListComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
-
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
