@@ -53,7 +53,7 @@ topic-viewer-page .oppia-topic-viewer-container /deep/ .oppia-background-banner 
 }
 
 topic-viewer-page .oppia-topic-viewer-container .headroom--unpinned {
-  transform: translateY(-150%);
+  transform: translateY(0%);
 }
 
 topic-viewer-page .oppia-topic-viewer-container .headroom {
