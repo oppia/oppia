@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
