@@ -561,3 +561,56 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             expected_status_int=401)
 
         self.logout()
+
+
+class BlogPostTitleHandlerTest(test_utils.GenericTestBase):
+    """Tests for BlogPostTitleHandler."""
+
+    def setUp(self) -> None:
+        """Complete the setup process for testing."""
+        super().setUp()
+        self.signup(
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME,
+            feconf.ROLE_ID_BLOG_ADMIN)
+        blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
+        self.change_dict: blog_services.BlogPostChangeDict = {
+            'title': 'Sample Title',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': '<p>Hello Bloggers<p>',
+            'tags': ['Newsletter', 'Learners']
+        }
+        self.blog_post_id = blog_post.id
+        blog_services.update_blog_post(blog_post.id, self.change_dict)
+        blog_services.publish_blog_post(blog_post.id)
+
+    def test_blog_post_title_handler_when_unique(self) -> None:
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        params = {
+            'title': 'Sample'
+        }
+
+        # Blog post with same title does not exist yet.
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_TITLE_HANDLER, self.blog_post_id),
+            params=params,
+            )
+        self.assertEqual(json_response['blog_post_exists'], False)
+
+    def test_topic_name_handler_when_duplicate(self) -> None:
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        params = {
+            'title': 'Sample Title'
+        }
+
+        # Blog post with same title exist.
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_TITLE_HANDLER, self.blog_post_id),
+            params=params,
+            )
+        self.assertEqual(json_response['blog_post_exists'], True)

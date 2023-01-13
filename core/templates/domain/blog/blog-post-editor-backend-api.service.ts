@@ -46,6 +46,10 @@ interface BlogPostEditorBackendResponse {
   'list_of_default_tags': string[];
 }
 
+interface DoesBlogPostWithTitleExistBackendResponse {
+  'blog_post_id': string;
+}
+
 export interface BlogPostEditorData {
   blogPostDict: BlogPostData;
   displayedAuthorName: string;
@@ -150,6 +154,31 @@ export class BlogPostEditorBackendApiService {
       this.http.post(blogPostDataUrl, body).toPromise().then(
         () => {
           resolve();
+        }, (errorResponse) => {
+          reject(errorResponse.error.error);
+        }
+      );
+    });
+  }
+
+  async does_blog_post_with_given_title_already_exist(
+      blogPostId: string, title: string
+  ): Promise<boolean> {
+    const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
+      BlogDashboardPageConstants.BLOG_POST_TITLE_HANDLER_URL_TEMPLATE, {
+        blog_post_id: blogPostId,
+        title: title,
+      });
+    return new Promise((resolve, reject) => {
+      this.http.get<DoesBlogPostWithTitleExistBackendResponse>(
+        blogPostDataUrl, {
+          params: {
+            title: title
+          },
+        }
+      ).toPromise().then(
+        (response) => {
+
         }, (errorResponse) => {
           reject(errorResponse.error.error);
         }

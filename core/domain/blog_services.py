@@ -737,23 +737,36 @@ def update_blog_post(
     """
     updated_blog_post = apply_change_dict(blog_post_id, change_dict)
     if 'title' in change_dict:
-        blog_post_models: Sequence[blog_models.BlogPostModel] = (
-            blog_models.BlogPostModel.query().filter(
-                blog_models.BlogPostModel.title == updated_blog_post.title
-            ).filter(
-                blog_models.BlogPostModel.deleted == False  # pylint: disable=singleton-comparison
-            ).fetch()
-        )
-        if len(blog_post_models) > 0:
-            if (len(blog_post_models) > 1 or (
-                    blog_post_models[0].id != blog_post_id)):
-                raise utils.ValidationError(
-                    'Blog Post with given title already exists: %s'
-                    % updated_blog_post.title)
-
+        if does_blog_post_with_title_exist(change_dict.title):
+            raise utils.ValidationError(
+                'Blog Post with given title already exists: %s'
+                % updated_blog_post.title)
     _save_blog_post(updated_blog_post)
     updated_blog_post_summary = compute_summary_of_blog_post(updated_blog_post)
     _save_blog_post_summary(updated_blog_post_summary)
+
+
+def does_blog_post_with_title_exist(title: str, blog_post_id: str) -> bool:
+    """Checks whether a blog post with given title already exists.
+
+    Args:
+        title: str. The title of the blog post.
+
+    Returns:
+        bool. Whether a blog post with given title already exists.
+    """
+    blog_post_models: Sequence[blog_models.BlogPostModel] = (
+        blog_models.BlogPostModel.query().filter(
+            blog_models.BlogPostModel.title == title
+        ).filter(
+            blog_models.BlogPostModel.deleted == False  # pylint: disable=singleton-comparison
+        ).fetch()
+    )
+    if len(blog_post_models) > 0:
+        if (len(blog_post_models) > 1 or (
+                blog_post_models[0].id != blog_post_id)):
+            return True
+    return False
 
 
 def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:

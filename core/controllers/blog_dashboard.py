@@ -353,3 +353,48 @@ class BlogPostHandler(
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_services.delete_blog_post(blog_post_id)
         self.render_json(self.values)
+
+
+class BlogPostTitleHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """A data handler for checking if a blog post with given title exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'blog_post_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'title': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_BLOG_POST_TITLE
+                    }]
+                }
+            }
+        },
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_edit_blog_post
+    def get(self, blog_post_id: str) -> None:
+        """Handler that receives a blog post title and checks whether
+        a blog post with the same title exists.
+        """
+        assert self.normalized_request is not None
+        title =  self.normalized_request['title']
+        self.values.update({
+            'blog_post_exists': (
+                blog_services.does_blog_post_with_title_exist(
+                    title, blog_post_id
+                )
+            )
+        })
+        self.render_json(self.values)
