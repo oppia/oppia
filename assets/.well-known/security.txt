@@ -1,0 +1,5 @@
+Contact: security@oppia.org
+Preferred-Languages: en
+Canonical: https://www.oppia.org/.well-known/security.txt
+Acknowledgements: https://www.oppia.org/about#credits
+Policy: https://github.com/oppia/oppia/blob/develop/.github/SECURITY.md
