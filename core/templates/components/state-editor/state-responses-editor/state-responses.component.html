@@ -18,7 +18,7 @@
         <div *ngIf="answerGroups && answerGroups.length > 0">
           <div cdkDropList
                (cdkDropListDropped)="drop($event)"
-               class="nav oppia-option-list nav-stacked nav-pills"
+               class="oppia-option-list nav-stacked nav-pills"
                role="tablist">
             <div [cdkDragDisabled]="activeAnswerGroupIndex === index ? true : false"
                  cdkDrag
@@ -82,7 +82,7 @@
           <!-- CkDrop End -->
         </div>
         <div *ngIf="!suppressDefaultAnswerGroup()">
-          <div class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+          <div class="oppia-option-list nav-stacked nav-pills" role="tablist">
             <div class="option-list-default" [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}">
               <div class="oppia-rule-header-warning-placement"
                    *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome))"

@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core.constants import constants
 from core.platform import models
 
 from typing import (
@@ -484,6 +485,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         limit: Optional[int],
         offset: int,
         user_id: str,
+        sort_key: Optional[str],
         language_codes: List[str]
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches translation suggestions that are in-review where the
@@ -498,6 +500,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query. As a
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
+            sort_key: str|None. The key to sort the suggestions by.
             language_codes: list(str). List of language codes that the
                 suggestions should match.
 
@@ -509,6 +512,45 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
+        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+            # The first sort property must be the same as the property to which
+            # an inequality filter is applied. Thus, the inequality filter on
+            # author_id can not be used here.
+            suggestion_query = cls.get_all().filter(datastore_services.all_of(
+                cls.status == STATUS_IN_REVIEW,
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                cls.language_code.IN(language_codes)
+            )).order(-cls.created_on)
+
+            sorted_results: List[GeneralSuggestionModel] = []
+
+            if limit is None:
+                suggestion_models: Sequence[GeneralSuggestionModel] = (
+                    suggestion_query.fetch(offset=offset))
+                for suggestion_model in suggestion_models:
+                    offset += 1
+                    if suggestion_model.author_id != user_id:
+                        sorted_results.append(suggestion_model)
+            else:
+                num_suggestions_per_fetch = 1000
+
+                while len(sorted_results) < limit:
+                    suggestion_models = suggestion_query.fetch(
+                        num_suggestions_per_fetch, offset=offset)
+                    if not suggestion_models:
+                        break
+                    for suggestion_model in suggestion_models:
+                        offset += 1
+                        if suggestion_model.author_id != user_id:
+                            sorted_results.append(suggestion_model)
+                            if len(sorted_results) == limit:
+                                break
+
+            return (
+                sorted_results,
+                offset
+            )
+
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -534,6 +576,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         limit: Optional[int],
         offset: int,
         user_id: str,
+        sort_key: Optional[str],
         language_codes: List[str],
         exp_ids: List[str]
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
@@ -549,6 +592,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.
+            sort_key: str|None. The key to sort the suggestions by.
             language_codes: list(str). The list of language codes.
             exp_ids: list(str). Exploration IDs matching the target ID of the
                 translation suggestions.
@@ -562,6 +606,46 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
+        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+            # The first sort property must be the same as the property to which
+            # an inequality filter is applied. Thus, the inequality filter on
+            # author_id can not be used here.
+            suggestion_query = cls.get_all().filter(datastore_services.all_of(
+                cls.status == STATUS_IN_REVIEW,
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                cls.language_code.IN(language_codes),
+                cls.target_id.IN(exp_ids)
+            )).order(-cls.created_on)
+
+            sorted_results: List[GeneralSuggestionModel] = []
+
+            if limit is None:
+                suggestion_models: Sequence[GeneralSuggestionModel] = (
+                    suggestion_query.fetch(offset=offset))
+                for suggestion_model in suggestion_models:
+                    offset += 1
+                    if suggestion_model.author_id != user_id:
+                        sorted_results.append(suggestion_model)
+            else:
+                num_suggestions_per_fetch = 1000
+
+                while len(sorted_results) < limit:
+                    suggestion_models = suggestion_query.fetch(
+                        num_suggestions_per_fetch, offset=offset)
+                    if not suggestion_models:
+                        break
+                    for suggestion_model in suggestion_models:
+                        offset += 1
+                        if suggestion_model.author_id != user_id:
+                            sorted_results.append(suggestion_model)
+                            if len(sorted_results) == limit:
+                                break
+
+            return (
+                sorted_results,
+                offset
+            )
+
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -608,7 +692,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_question_suggestions_by_offset(
-        cls, limit: int, offset: int, user_id: str
+        cls,
+        limit: int,
+        offset: int,
+        user_id: str,
+        sort_key: Optional[str]
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -620,6 +708,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query. As a
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
+            sort_key: str|None. The key to sort the suggestions by.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -629,6 +718,38 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
+
+        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+            # The first sort property must be the same as the property to which
+            # an inequality filter is applied. Thus, the inequality filter on
+            # author_id can not be used here.
+            suggestion_query = cls.get_all().filter(
+                datastore_services.all_of(
+                    cls.status == STATUS_IN_REVIEW,
+                    cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            )).order(-cls.created_on)
+
+            sorted_results: List[GeneralSuggestionModel] = []
+            num_suggestions_per_fetch = 1000
+
+            while len(sorted_results) < limit:
+                suggestion_models: Sequence[GeneralSuggestionModel] = (
+                    suggestion_query.fetch(
+                        num_suggestions_per_fetch, offset=offset))
+                if not suggestion_models:
+                    break
+                for suggestion_model in suggestion_models:
+                    offset += 1
+                    if suggestion_model.author_id != user_id:
+                        sorted_results.append(suggestion_model)
+                        if len(sorted_results) == limit:
+                            break
+
+            return (
+                sorted_results,
+                offset
+            )
+
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
@@ -711,7 +832,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_user_created_suggestions_by_offset(
-        cls, limit: int, offset: int, suggestion_type: str, user_id: str
+        cls,
+        limit: int,
+        offset: int,
+        suggestion_type: str,
+        user_id: str,
+        sort_key: Optional[str]
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches suggestions of suggestion_type which the supplied user has
         created.
@@ -722,6 +848,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 results matching the query.
             suggestion_type: str. The type of suggestion to query for.
             user_id: str. The id of the user trying to make this query.
+            sort_key: str|None. The key to sort the suggestions by.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -733,7 +860,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.suggestion_type == suggestion_type,
             cls.author_id == user_id
-        )).order(-cls.created_on)
+        ))
+
+        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+            suggestion_query = suggestion_query.order(-cls.created_on)
 
         results: Sequence[GeneralSuggestionModel] = (
             suggestion_query.fetch(limit, offset=offset)

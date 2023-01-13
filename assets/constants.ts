@@ -5857,6 +5857,8 @@ export default {
     "translation", "voiceover", "question", "submit_question"
   ],
 
+  "SUGGESTIONS_SORT_KEY_DATE": "Date",
+
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
   "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
   "USER_FILTER_CRITERION_USERNAME": "username",
