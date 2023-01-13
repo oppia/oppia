@@ -33,11 +33,11 @@ describe('Review Translation language selector', () => {
   let component: ReviewTranslationLanguageSelectorComponent;
   let fixture: ComponentFixture<ReviewTranslationLanguageSelectorComponent>;
   let translationLanguageService: TranslationLanguageService;
-  let activeLanguageChangedEmitter = new EventEmitter();
+  const activeLanguageChangedEmitter = new EventEmitter();
 
   let preferredLanguageCode = 'en';
 
-  let contributionOpportunitiesBackendApiServiceStub:
+  const contributionOpportunitiesBackendApiServiceStub:
     Partial<ContributionOpportunitiesBackendApiService> = {
       getPreferredTranslationLanguageAsync: async() => {
         if (preferredLanguageCode) {
