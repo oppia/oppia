@@ -23,7 +23,7 @@ const createNewUser = require(
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 
-let blogAdminAssignRolesToUsersAndChangeTagProperties = async function() {
+let assignRolesToUsersAndChangeTagProperties = async function() {
   const superAdmin = await createNewUser.superAdmin(
     'superAdm', 'testadmin@example.com', ROLE_BLOG_ADMIN);
   await createNewUser.blogAdmin(
@@ -51,4 +51,4 @@ let blogAdminAssignRolesToUsersAndChangeTagProperties = async function() {
   await superAdmin.closeBrowser();
 };
 
-blogAdminAssignRolesToUsersAndChangeTagProperties();
+assignRolesToUsersAndChangeTagProperties();

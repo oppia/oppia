@@ -23,7 +23,7 @@ const createNewUser = require(
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 
-let blogEditorPublishBlogPostAndDeletePublishedBlogPost = async function() {
+let publishBlogPostAndDeletePublishedBlogPost = async function() {
   const superAdmin = await createNewUser.superAdmin(
     'superAdm', 'testadmin@example.com', ROLE_BLOG_ADMIN);
   const blogPostEditor = await createNewUser.blogPostEditor(
@@ -45,4 +45,4 @@ let blogEditorPublishBlogPostAndDeletePublishedBlogPost = async function() {
   await blogPostEditor.closeBrowser();
 };
 
-blogEditorPublishBlogPostAndDeletePublishedBlogPost();
+publishBlogPostAndDeletePublishedBlogPost();

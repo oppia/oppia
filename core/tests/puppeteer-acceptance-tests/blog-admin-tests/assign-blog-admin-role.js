@@ -21,7 +21,7 @@ const createNewUser = require(
 
 const ROLE_BLOG_ADMIN = 'blog admin';
 
-let superAdminAssignBlogAdminRole = async function() {
+let assignBlogAdminRole = async function() {
   const superAdmin = await createNewUser.superAdmin(
     'superAdm', 'testadmin@example.com');
   const blogAdmin = await createNewUser.blogAdmin(
@@ -37,4 +37,4 @@ let superAdminAssignBlogAdminRole = async function() {
   await blogAdmin.closeBrowser();
 };
 
-superAdminAssignBlogAdminRole();
+assignBlogAdminRole();
