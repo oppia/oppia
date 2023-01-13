@@ -17,12 +17,12 @@
  */
 
 let showMessage = async function(message) {
-  await console.log(message);
+  await console.log(message); // eslint-disable-line no-console
 };
 
 module.exports = { showMessage };
 
 /** We need to ignore the eslint checks for the console statements in our
  * Acceptance Tests because we use console statements to log the progress or
- * feedback of the tests. So adding this file in the .eslintignore file.
+ * feedback of the tests. So ignoring the console statement from eslint checks.
  */
