@@ -279,6 +279,7 @@ describe('Contribution Opportunities backend API service', function() {
         .fetchReviewableTranslationOpportunitiesAsync('All', 'hi').then(
           successHandler, failHandler
         );
+
       const req = httpTestingController.expectOne(
         urlInterpolationService.interpolateUrl(
           '/getreviewableopportunitieshandler?language_code=<language_code>',
