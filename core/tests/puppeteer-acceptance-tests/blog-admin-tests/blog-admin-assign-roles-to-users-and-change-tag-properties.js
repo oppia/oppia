@@ -31,9 +31,9 @@ let blogAdminAssignRolesToUsersAndChangeTagProperties = async function() {
   await createNewUser.blogPostEditor(
     'blogEditor', 'blog_post_editor@example.com');
 
-  await superAdmin.assignUserAsRoleFromRoleDropdown('blogAdm', 'BLOG_ADMIN');
+  await superAdmin.assignUserAsRoleFromBlogAdminPage('blogAdm', 'BLOG_ADMIN');
   await superAdmin.expectUserToHaveRole('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.assignUserAsRoleFromRoleDropdown(
+  await superAdmin.assignUserAsRoleFromBlogAdminPage(
     'blogEditor', 'BLOG_POST_EDITOR');
   await superAdmin.expectUserToHaveRole('blogEditor', ROLE_BLOG_POST_EDITOR);
 

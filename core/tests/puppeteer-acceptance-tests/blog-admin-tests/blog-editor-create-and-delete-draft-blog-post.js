@@ -29,7 +29,7 @@ let blogEditorCreateDraftAndDeleteDraftBlogPost = async function() {
   const blogPostEditor = await createNewUser.blogPostEditor(
     'blogPostEditor', 'blog_post_editor@example.com');
 
-  await superAdmin.assignUserAsRoleFromRoleDropdown(
+  await superAdmin.assignUserAsRoleFromBlogAdminPage(
     'blogPostEditor', 'BLOG_POST_EDITOR');
   await superAdmin.expectUserToHaveRole(
     'blogPostEditor', ROLE_BLOG_POST_EDITOR);

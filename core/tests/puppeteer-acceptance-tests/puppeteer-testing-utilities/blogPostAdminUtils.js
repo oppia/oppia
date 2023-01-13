@@ -250,7 +250,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }
   }
 
-  async assignUserAsRoleFromRoleDropdown(username, role) {
+  async assignUserAsRoleFromBlogAdminPage(username, role) {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
@@ -278,7 +278,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async addNewBlogTag(tagName) {
     await this.clickOn('button', ' Add element ');
     await this.page.waitForTimeout(100);
-    await this.keyboard.type(tagName);
+    await this.page.evaluate((tagName) => {
+      const tagList = document.getElementsByClassName('form-control');
+      tagList[tagList.length - 1].value = tagName;
+    }, tagName);
     await this.clickOn('button', 'Save');
     showMessage('Tag ' + tagName + ' added in tag list successfully!');
   }
@@ -311,7 +314,6 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async expectMaximumTagLimitToBe(limit) {
     await this.page.evaluate(async(limit) => {
       const tagLimit = document.getElementById('mat-input-0').value;
-      showMessage(tagLimit);
       if (tagLimit.value !== limit) {
         throw new Error('Maximum tag limit is not ' + limit + '!');
       }
