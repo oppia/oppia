@@ -3,7 +3,7 @@
 </ng-template>
 <ul class="nav navbar-nav oppia-navbar-nav float-right mr-0">
   <li class="nav-item">
-    <span class="nav-link" ngbTooltip="Share"
+    <span tabindex="0" class="nav-link" ngbTooltip="Share"
           placement="bottom" (click)="toggleAttributionModal()">
       <i class="fas fa-share-alt exploration-player-navbar-icons"></i>
       <span class="oppia-icon-accessibility-label">Share</span>
@@ -12,7 +12,7 @@
   <li *ngIf="feedbackOptionIsShown" placement="bottom-right"
       [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
       class="nav-item" #feedbackPopOver="ngbPopover" [autoClose]="false">
-    <div class="nav-link e2e-test-exploration-feedback-popup-link"
+    <div tabindex="0" class="nav-link e2e-test-exploration-feedback-popup-link"
        ngbTooltip="{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}" placement="bottom">
       <i class="fas fa-comment-alt exploration-player-navbar-icons"></i>
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</span>
