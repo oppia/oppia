@@ -119,7 +119,6 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
-
     this.fetchAndLoadOpportunities();
   }
 
