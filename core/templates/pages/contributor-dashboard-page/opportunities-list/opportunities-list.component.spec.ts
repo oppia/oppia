@@ -740,5 +740,15 @@ describe('Opportunities List Component', () => {
 
       expect(component.activePageNumber).toBe(1);
     }));
+
+    it('should not crash when loadOpportunities is not set', fakeAsync(() => {
+      component.loadOpportunities = undefined;
+      expect(component.activePageNumber).toBe(1);
+
+      component.init();
+      tick();
+
+      expect(component.activePageNumber).toBe(1);
+    }));
   });
 });
