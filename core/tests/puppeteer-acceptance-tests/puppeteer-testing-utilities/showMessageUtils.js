@@ -17,7 +17,7 @@
  */
 
 let showMessage = async function(message) {
-  await console.log(message); // eslint-disable-line
+  await console.log(message);
 };
 
 module.exports = { showMessage };
