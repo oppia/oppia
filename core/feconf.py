@@ -533,20 +533,13 @@ EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
 EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
-# with the Mailgun API key.
-MAILGUN_API_KEY = None
-# If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
 # Audience ID of the mailing list for Oppia in Mailchimp.
 MAILCHIMP_AUDIENCE_ID = None
-# Mailchimp API Key.
-MAILCHIMP_API_KEY = None
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
-# Mailchimp secret, used to authenticate webhook requests.
-MAILCHIMP_WEBHOOK_SECRET = None
 # Valid Mailchimp merge keys.
 VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
@@ -1638,6 +1631,9 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
+
+# The sort keys of submitted questions shown on the Contributor Dashboard.
+SUGGESTIONS_SORT_KEYS = [constants.SUGGESTIONS_SORT_KEY_DATE]
 
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
