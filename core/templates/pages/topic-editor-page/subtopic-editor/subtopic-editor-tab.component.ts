@@ -25,7 +25,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';

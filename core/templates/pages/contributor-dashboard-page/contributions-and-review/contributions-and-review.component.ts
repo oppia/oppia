@@ -115,6 +115,7 @@ export class ContributionsAndReview
   TAB_TYPE_CONTRIBUTIONS: string;
   TAB_TYPE_REVIEWS: string;
   TAB_TYPE_ACCOMPLISHMENTS: string;
+  REVIEWABLE_QUESTIONS_SORT_KEYS: string[];
   activeExplorationId: string;
   contributions: Record<string, SuggestionDetails> | object;
   userDetailsLoading: boolean;
@@ -127,6 +128,10 @@ export class ContributionsAndReview
   accomplishmentsTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
   languageCode: string;
+  userCreatedQuestionsSortKey: string;
+  reviewableQuestionsSortKey: string;
+  userCreatedTranslationsSortKey: string;
+  reviewableTranslationsSortKey: string;
   tabNameToOpportunityFetchFunction: {
     [key: string]: {
       [key: string]: Function;
@@ -342,6 +347,12 @@ export class ContributionsAndReview
       this.activeTabSubtype === this.SUGGESTION_TYPE_TRANSLATE);
   }
 
+  isReviewQuestionsTab(): boolean {
+    return (
+      this.activeTabType === this.TAB_TYPE_REVIEWS &&
+      this.activeTabSubtype === this.SUGGESTION_TYPE_QUESTION);
+  }
+
   openQuestionSuggestionModal(
       suggestionId: string,
       suggestion: Suggestion,
@@ -513,6 +524,12 @@ export class ContributionsAndReview
     return this.activeTabType === this.TAB_TYPE_ACCOMPLISHMENTS;
   }
 
+  setReviewableQuestionsSortKey(sortKey: string): void {
+    this.reviewableQuestionsSortKey = sortKey;
+    this.contributionOpportunitiesService
+      .reloadOpportunitiesEventEmitter.emit();
+  }
+
   ngOnInit(): void {
     this.SUGGESTION_TYPE_QUESTION = 'add_question';
     this.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
@@ -521,6 +538,13 @@ export class ContributionsAndReview
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.TAB_TYPE_ACCOMPLISHMENTS = 'accomplishments';
+    this.REVIEWABLE_QUESTIONS_SORT_KEYS = [
+      AppConstants.SUGGESTIONS_SORT_KEY_DATE];
+    this.userCreatedQuestionsSortKey = AppConstants.SUGGESTIONS_SORT_KEY_DATE;
+    this.reviewableQuestionsSortKey = AppConstants.SUGGESTIONS_SORT_KEY_DATE;
+    this.userCreatedTranslationsSortKey = (
+      AppConstants.SUGGESTIONS_SORT_KEY_DATE);
+    this.reviewableTranslationsSortKey = AppConstants.SUGGESTIONS_SORT_KEY_DATE;
     this.activeExplorationId = null;
     this.contributions = {};
     this.userDetailsLoading = true;
@@ -630,24 +654,25 @@ export class ContributionsAndReview
         [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getUserCreatedQuestionSuggestionsAsync(
-              shouldResetOffset);
+              shouldResetOffset, this.userCreatedQuestionsSortKey);
         },
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getReviewableQuestionSuggestionsAsync(
-              shouldResetOffset);
+              shouldResetOffset, this.reviewableQuestionsSortKey);
         }
       },
       [this.SUGGESTION_TYPE_TRANSLATE]: {
         [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getUserCreatedTranslationSuggestionsAsync(
-              shouldResetOffset);
+              shouldResetOffset, this.userCreatedTranslationsSortKey);
         },
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getReviewableTranslationSuggestionsAsync(
               shouldResetOffset,
+              this.reviewableTranslationsSortKey,
               this.activeExplorationId);
         }
       }
