@@ -18,7 +18,7 @@
     <button mat-button class="float-right oppia-exploration-feedback-submit-btn e2e-test-exploration-feedback-submit-btn"
             [ngClass]="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}"
             (click)="saveFeedback()"
-            [disabled]="!feedbackText || feedbackText.length > MAX_REVIEW_MESSAGE_LENGTH">
+            [disabled]="!feedbackText || feedbackText.length > MAX_REVIEW_MESSAGE_LENGTH" type="button" class="btn btn-primary">
       {{ 'I18N_PLAYER_SUBMIT_BUTTON' | translate }}
     </button>
     <div class="checkbox oppia-checkbox" *ngIf="isLoggedIn">
