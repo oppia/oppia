@@ -10,6 +10,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
   * [User Documentation](https://oppia.github.io/)
   * [Contributors' wiki](https://github.com/oppia/oppia/wiki)
   * [GitHub Discussions](https://github.com/oppia/oppia/discussions)
+  * [Developer announcements](http://groups.google.com/group/oppia-dev)
   * [File an issue](https://github.com/oppia/oppia/issues/new/choose)
 
 <p align="center">
