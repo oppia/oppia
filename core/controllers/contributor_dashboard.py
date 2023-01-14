@@ -390,7 +390,7 @@ class ReviewableOpportunitiesHandler(
         in_review_suggestions, _ = (
             suggestion_services
             .get_reviewable_translation_suggestions_by_offset(
-                user_id, topic_exp_ids, None, 0, language))
+                user_id, topic_exp_ids, None, 0, None, language))
         # Filter out suggestions that should not be shown to the user.
         # This is defined as a set as we only care about the unique IDs.
         in_review_suggestion_target_ids = {

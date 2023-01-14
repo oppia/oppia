@@ -726,8 +726,6 @@ class WorkedExample:
                 worked_example_dict['explanation']['content_id'],
                 worked_example_dict['explanation']['html'])
         )
-        worked_example.question.validate()
-        worked_example.explanation.validate()
 
         return worked_example
 
@@ -850,7 +848,6 @@ class SkillContents:
             translation_domain.WrittenTranslations.from_dict(
                 skill_contents_dict['written_translations'])
         )
-        skill_contents.explanation.validate()
 
         return skill_contents
 

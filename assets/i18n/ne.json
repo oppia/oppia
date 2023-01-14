@@ -7,6 +7,8 @@
 	"I18N_ACTION_CREATE_LESSON": "तपाईँको आफ्नै पाठ निर्माण गर्नुहोस्",
 	"I18N_ADD_NEW_SYLLABUS_CANCEL_BUTTON_TEXT": "रद्द गर्नुहोस्",
 	"I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT": "भयो",
+	"I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT": "मलाइ खबर गर्नु",
+	"I18N_BLOG_POST_EDITOR_DELETE_BUTTON": "मेट्ने",
 	"I18N_CLASSROOM_CALLOUT_BUTTON": "अन्वेषण",
 	"I18N_CONGRATULATORY_CHECKPOINT_TITLE_1": "हुर्रे!",
 	"I18N_CONGRATULATORY_CHECKPOINT_TITLE_2": "अति उत्तम!",
@@ -169,7 +171,7 @@
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "धन्यवाद ।",
 	"I18N_SPLASH_TITLE": "पुस्तक भन्दा बाहिर सोच्नुहोस्।",
 	"I18N_START_HERE": "शुरू गर्न यहाँ क्लिक गर्नुहोस्!",
-	"I18N_SUBSCRIBE_BUTTON_TEXT": "सवस्क्रिप्ट",
+	"I18N_SUBSCRIBE_BUTTON_TEXT": "सदस्यता लिनुहोस्",
 	"I18N_SYLLABUS_SKILL_TITLE": "सीप",
 	"I18N_SYLLABUS_STORY_TITLE": "कथा",
 	"I18N_TOPNAV_ABOUT": "बारेमा",
@@ -188,6 +190,6 @@
 	"I18N_TOPNAV_PREFERENCES": "अभिरुचीहरू",
 	"I18N_TOPNAV_SIGN_IN": "प्रवेश",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Oppia को साथमा पढाउनुहोस्",
-	"I18N_TOTAL_SUBSCRIBERS_TEXT": "तपाईँका कूल <[totalSubscribers]> सदस्यहरू छन्।",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "तपाईंको कूल <[totalSubscribers]> सदस्यहरू छन्।",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "सदस्यता खारेज गर्नुहोस्"
 }

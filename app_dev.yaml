@@ -37,9 +37,9 @@ handlers:
   static_dir: third_party/static
   secure: always
   expiration: "90d"
-- url: /security.txt
-  static_files: assets/security.txt
-  upload: assets/security.txt
+- url: /.well-known/security.txt
+  static_files: assets/.well-known/security.txt
+  upload: assets/.well-known/security.txt
   secure: always
 
 # DEVELOPMENT STATIC

@@ -2637,7 +2637,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
 
@@ -2646,7 +2647,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
 
         self.assertEqual(len(response['suggestions']), 0)
@@ -2657,7 +2659,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
@@ -2666,7 +2669,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/topic/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(response, {})
 
@@ -2676,7 +2680,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/skill/add_question', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
@@ -2685,7 +2690,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/topic/add_question', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(response, {})
 
@@ -2698,7 +2704,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/skill/add_question', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
@@ -2715,7 +2722,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
@@ -2758,7 +2766,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content', {
                 'limit': 1,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
 
         # The new translation suggestion is returned first, but because it is
@@ -2776,14 +2785,16 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
 
         self.get_json(
             '/getsubmittedsuggestions/exploration/invalid_suggestion_type', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             },
             expected_status_int=400)
 
@@ -2793,14 +2804,16 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getsubmittedsuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
 
         self.get_json(
             '/getsubmittedsuggestions/invalid_target_type/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             }, expected_status_int=400)
 
 
@@ -2957,7 +2970,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 0)
         self.assertEqual(response['next_offset'], 0)
@@ -2969,7 +2983,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/exploration/translate_content', params={
                 'exploration_id': self.EXP_ID,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(response['next_offset'], 1)
@@ -3056,7 +3071,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/exploration/translate_content', params={
                 'exploration_id': exp_100.id,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(response['next_offset'], 1)
@@ -3089,7 +3105,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getreviewablesuggestions/exploration/translate_content', params={
                 'exploration_id': exp_100.id,
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 0)
         self.assertEqual(response['next_offset'], 1)
@@ -3098,7 +3115,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/topic/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(response, {})
 
@@ -3106,7 +3124,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/skill/add_question', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(len(response['suggestions']), 1)
         suggestion = response['suggestions'][0]
@@ -3147,7 +3166,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/getreviewablesuggestions/topic/add_question', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
         self.assertEqual(response, {})
 
@@ -3155,7 +3175,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '/getreviewablesuggestions/exploration/invalid_suggestion_type', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             },
             expected_status_int=404
         )
@@ -3164,7 +3185,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '/getreviewablesuggestions/invalid_target_type/translate_content', {
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                'offset': 0
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             },
             expected_status_int=400
         )
