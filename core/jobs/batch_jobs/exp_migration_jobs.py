@@ -126,7 +126,8 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         self, pipeline: beam.Pipeline
     ) -> Tuple[
         beam.PCollection[base_models.BaseModel],
-        beam.PCollection[job_run_result.JobRunResult]]:
+        beam.PCollection[job_run_result.JobRunResult]
+    ]:
         """Migrate exploration objects and flush the input
             in case of errors.
 
@@ -249,14 +250,15 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
                     'EXP PREVIOUSLY MIGRATED'))
         )
 
+        job_run_results = (
+            migrated_exp_job_run_results,
+            exp_objects_list_job_run_results,
+            already_migrated_job_run_results
+        ) | 'Flatten job run results' >> beam.Flatten()
+
         return (
             transformed_exp_objects_list,
-            (
-                migrated_exp_job_run_results,
-                exp_objects_list_job_run_results,
-                already_migrated_job_run_results
-            )
-            | beam.Flatten()
+            job_run_results
         )
 
 
@@ -333,9 +335,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
         with datastore_services.get_ndb_context():
             unused_put_results = (
-                (
-                    exp_related_models_to_put
-                )
+                exp_related_models_to_put
                 | 'Filter None models' >> beam.Filter(
                     lambda x: x is not None)
                 | 'Put models into datastore' >> ndb_io.PutModels()
