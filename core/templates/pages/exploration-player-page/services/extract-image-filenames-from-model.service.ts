@@ -21,12 +21,11 @@ import { Injectable } from '@angular/core';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
-import { ContentTranslationManagerService } from
-  'pages/exploration-player-page/services/content-translation-manager.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { ImageClickInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { EntityTranslationsService } from 'services/entity-translations.services';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +33,7 @@ import { ImageClickInputCustomizationArgs } from 'interactions/customization-arg
 export class ExtractImageFilenamesFromModelService {
   constructor(
     private htmlEscaperService: HtmlEscaperService,
-    private contentTranslationManagerService: ContentTranslationManagerService,
+    private entityTranslationsService: EntityTranslationsService,
     private contentTranslationLanguageService: ContentTranslationLanguageService
   ) {}
 
@@ -177,7 +176,7 @@ export class ExtractImageFilenamesFromModelService {
     }
     let allHtmlOfState: string[] = state.getAllHTMLStrings();
     allHtmlOfState.concat(
-      this.contentTranslationManagerService.getHtmlTranslations(
+      this.entityTranslationsService.getHtmlTranslations(
         this.contentTranslationLanguageService.getCurrentContentLanguageCode(),
         state.getAllContentIds()
       )

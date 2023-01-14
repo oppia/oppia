@@ -31,6 +31,8 @@ import { TranslationStatusService } from '../services/translation-status.service
 import { TranslationTabActiveModeService } from '../services/translation-tab-active-mode.service';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { ContextService } from 'services/context.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
+import { LoaderService } from 'services/loader.service';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -55,11 +57,13 @@ export class TranslatorOverviewComponent implements OnInit {
 
   constructor(
     private contextService: ContextService,
+    private entityTranslationsService: EntityTranslationsService,
     private explorationLanguageCodeService:
       ExplorationLanguageCodeService,
     private focusManagerService: FocusManagerService,
     private graphDataService: GraphDataService,
     private languageUtilService: LanguageUtilService,
+    private loaderService: LoaderService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
     private translationLanguageService: TranslationLanguageService,
@@ -108,10 +112,9 @@ export class TranslatorOverviewComponent implements OnInit {
     }
 
     this.refreshDirectiveScope();
-    this.translationStatusService.refresh().then(() => {
-      setTimeout(() => {
-        this.graphDataService.recompute();
-      });
+    this.translationStatusService.refresh();
+    setTimeout(() => {
+      this.graphDataService.recompute();
     });
   }
 
@@ -143,14 +146,20 @@ export class TranslatorOverviewComponent implements OnInit {
       this.stateEditorService.onShowTranslationTabBusyModal.emit();
       return;
     }
-    this.translationLanguageService.setActiveLanguageCode(
-      this.languageCode);
-    this.translationStatusService.refresh();
 
-    this.windowRef.nativeWindow.localStorage.setItem(
-      this.LAST_SELECTED_TRANSLATION_LANGUAGE, this.languageCode);
+    this.loaderService.showLoadingScreen('Loading');
+    this.entityTranslationsService.getEntityTranslationsAsync(
+      this.languageCode
+    ).then(() => {
+      this.translationLanguageService.setActiveLanguageCode(
+        this.languageCode);
+      this.translationStatusService.refresh();
+      this.loaderService.hideLoadingScreen();
+      this.windowRef.nativeWindow.localStorage.setItem(
+        this.LAST_SELECTED_TRANSLATION_LANGUAGE, this.languageCode);
 
-    this.routerService.onCenterGraph.emit();
+      this.routerService.onCenterGraph.emit();
+    });
   }
 
   getTranslationProgressAriaLabel(): string {
@@ -192,14 +201,19 @@ export class TranslatorOverviewComponent implements OnInit {
         prevLanguageCode : (
           ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
 
-    this.translationLanguageService.setActiveLanguageCode(
-      this.languageCode);
-    // We need to refresh the status service once the active language is
-    // set.
-    this.translationStatusService.refresh();
-    this.inTranslationMode = false;
-    this.inVoiceoverMode = false;
-    this.refreshDirectiveScope();
+    this.entityTranslationsService.getEntityTranslationsAsync(
+      this.languageCode
+    ).then(() => {
+      this.translationLanguageService.setActiveLanguageCode(this.languageCode);
+      // We need to refresh the status service once the active language is
+      // set.
+      this.translationStatusService.refresh();
+      this.routerService.onCenterGraph.emit();
+
+      this.inTranslationMode = false;
+      this.inVoiceoverMode = false;
+      this.refreshDirectiveScope();
+    });
   }
 }
 

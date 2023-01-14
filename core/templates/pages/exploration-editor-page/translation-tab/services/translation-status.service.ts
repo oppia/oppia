@@ -327,25 +327,14 @@ export class TranslationStatusService implements OnInit {
     }
   }
 
-  refresh(): Promise<void> {
-    return new Promise((resolve) => {
-      if (this.translationTabActiveModeService.isTranslationModeActive()) {
-        this.langCode = this.translationLanguageService.getActiveLanguageCode();
-        this.loaderService.showLoadingScreen('Loading');
-        this.entityTranslationsService.refreshEntityTranslationsAsync(
-          this.langCode
-        ).then((entityTranslationObject) => {
-          this.entityTranslation = entityTranslationObject;
-          this._computeAllStatesStatus();
-          resolve();
-          this.loaderService.hideLoadingScreen();
-          this.stateEditorService.onRefreshStateTranslation.emit();
-        });
-      } else {
-        this._computeAllStatesStatus();
-        resolve();
-      }
-    });
+  refresh(): void {
+    this.langCode = this.translationLanguageService.getActiveLanguageCode();
+    this.entityTranslation = (
+      this.entityTranslationsService.languageCodeToEntityTranslations[
+        this.langCode]
+    );
+    this._computeAllStatesStatus();
+    this.stateEditorService.onRefreshStateTranslation.emit();
   }
 
   getAllStatesNeedUpdatewarning(): Record<string, string[]> {

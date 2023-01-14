@@ -31,6 +31,7 @@ import { ExpressionInterpolationService } from 'expressions/expression-interpola
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -78,8 +79,9 @@ export class ExplorationEngineService {
     private audioTranslationLanguageService: AudioTranslationLanguageService,
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
-    private contentTranslationManagerService: ContentTranslationManagerService,
     private contextService: ContextService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
+    private entityTranslationsService: EntityTranslationsService,
     private explorationFeaturesBackendApiService:
       ExplorationFeaturesBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
@@ -369,8 +371,10 @@ export class ExplorationEngineService {
       this._loadInitialState(successCallback);
     }
 
-    this.contentTranslationManagerService.init(
-      'exploration', this._explorationId, this.version);
+    this.entityTranslationsService.init(
+      this._explorationId, 'exploration', this.version);
+    this.contentTranslationManagerService.setOriginalTranscript(
+      this.exploration.getLanguageCode());
 
     this.contentTranslationLanguageService.init(
       displayableLanguageCodes,

@@ -25,12 +25,10 @@ import { PlayerTranscriptService } from 'pages/exploration-player-page/services/
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
-export interface LanguageCodeToEntityTranslations {
-  [languageCode: string]: EntityTranslation;
-}
+import { EntityTranslationsService } from 'services/entity-translations.services';
+import { ContextService } from 'services/context.service';
+import { ImagePreloaderService } from './image-preloader.service';
 
 @Injectable({
   providedIn: 'root'
@@ -46,60 +44,15 @@ export class ContentTranslationManagerService {
   // The 'originalTranscript' is a copy of the transcript in the exploration
   // language in it's initial state.
   private originalTranscript: StateCard[] = [];
-  private languageCodeToEntityTranslations: LanguageCodeToEntityTranslations = (
-    {});
-
-  private entityType!: string;
-  private entityId!: string;
-  private version!: number;
 
   constructor(
     private alertsService: AlertsService,
     private playerTranscriptService: PlayerTranscriptService,
     private extensionTagAssemblerService: ExtensionTagAssemblerService,
-    private entityTranslationBackendApiService: (
-      EntityTranslationBackendApiService)
+    private entityTranslationsService: EntityTranslationsService,
+    private contextService: ContextService,
+    private imagePreloaderService: ImagePreloaderService
   ) {}
-
-  fetchAndDisplayTranslations(languageCode: string): void {
-    this.alertsService.addInfoMessage('Fetching translations.');
-    this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
-      this.entityId,
-      this.entityType,
-      this.version,
-      languageCode
-    ).then((entityTranslation) => {
-      this.languageCodeToEntityTranslations[languageCode] = entityTranslation;
-      this.alertsService.clearMessages();
-      this.alertsService.addSuccessMessage('Translations fetched.');
-      this.displayTranslations(languageCode);
-    }, () => { });
-  }
-
-  getHtmlTranslations(
-      languageCode: string,
-      contentIds: string[]
-  ): string[] {
-    if (!this.languageCodeToEntityTranslations.hasOwnProperty(languageCode)) {
-      return [];
-    }
-
-    let entityTranslation = this.languageCodeToEntityTranslations[
-      languageCode] as EntityTranslation;
-    let htmlStrings: string[] = [];
-    contentIds.forEach((contentId) => {
-      if (!entityTranslation.hasWrittenTranslation(contentId)) {
-        return;
-      }
-
-      let writtenTranslation = entityTranslation.getWrittenTranslation(
-        contentId) as TranslatedContent;
-      if (writtenTranslation.dataFormat === 'html') {
-        htmlStrings.push(writtenTranslation.translation as string);
-      }
-    });
-    return htmlStrings;
-  }
 
   setOriginalTranscript(explorationLanguageCode: string): void {
     this.explorationLanguageCode = explorationLanguageCode;
@@ -126,22 +79,31 @@ export class ContentTranslationManagerService {
     if (languageCode === this.explorationLanguageCode) {
       this.playerTranscriptService.restoreImmutably(
         cloneDeep(this.originalTranscript));
-    } else if (
-      !this.languageCodeToEntityTranslations.hasOwnProperty(languageCode)) {
-      this.fetchAndDisplayTranslations(languageCode);
-      return;
+      this.onStateCardContentUpdateEmitter.emit();
     } else {
-      const cards = this.playerTranscriptService.transcript;
-      cards.forEach(
-        card => this._displayTranslationsForCard(card, languageCode));
-    }
+      this.alertsService.addInfoMessage('Fetching translation.');
+      this.entityTranslationsService.getEntityTranslationsAsync(
+        languageCode
+      ).then((entityTranslations) => {
+        // Image preloading is disabled in the exploration editor preview mode.
+        if (!this.contextService.isInExplorationEditorPage()) {
+          this.imagePreloaderService.restartImagePreloader(
+            this.playerTranscriptService.getCard(0).getStateName());
+        }
 
-    this.onStateCardContentUpdateEmitter.emit();
+        const cards = this.playerTranscriptService.transcript;
+        cards.forEach(
+          card => this._displayTranslationsForCard(card, entityTranslations));
+        this.alertsService.clearMessages();
+        this.alertsService.addSuccessMessage('Translations fetched.');
+        this.onStateCardContentUpdateEmitter.emit();
+      });
+    }
   }
 
-  _displayTranslationsForCard(card: StateCard, languageCode: string): void {
-    const entityTranslations = this.languageCodeToEntityTranslations[
-      languageCode];
+  _displayTranslationsForCard(
+      card: StateCard, entityTranslations: EntityTranslation
+  ): void {
     card.swapContentsWithTranslation(entityTranslations);
     if (card.getInteractionId()) {
       // DOMParser().parseFromString() creates a HTML document from

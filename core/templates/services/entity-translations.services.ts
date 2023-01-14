@@ -19,9 +19,13 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 
+export interface LanguageCodeToEntityTranslations {
+  [languageCode: string]: EntityTranslation;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +34,10 @@ export class EntityTranslationsService {
   private entityId!: string;
   private entityType!: string;
   private entityVersion!: number;
-  public entityTranslation!: EntityTranslation;
+  public languageCodeToEntityTranslations: LanguageCodeToEntityTranslations = (
+    {}
+  );
+
   constructor(
     private entityTranslationBackendApiService: (
       EntityTranslationBackendApiService)
@@ -46,19 +53,46 @@ export class EntityTranslationsService {
     this.entityId = entityId;
   }
 
-  async refreshEntityTranslationsAsync(languageCode: string):
-      Promise<EntityTranslation> {
+  async getEntityTranslationsAsync(languageCode: string):
+    Promise<EntityTranslation> {
     return new Promise((resolve, reject) => {
+      if (languageCode in this.languageCodeToEntityTranslations) {
+        resolve(this.languageCodeToEntityTranslations[languageCode]);
+        return;
+      }
       this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
-        this.entityType,
         this.entityId,
+        this.entityType,
         this.entityVersion,
         languageCode
       ).then((entityTranslation) => {
-        this.entityTranslation = entityTranslation;
+        this.languageCodeToEntityTranslations[languageCode] = entityTranslation;
         resolve(entityTranslation);
       });
     });
+  }
+
+  getHtmlTranslations(languageCode: string, contentIds: string[]): string[] {
+    if (
+      !this.languageCodeToEntityTranslations.hasOwnProperty(languageCode)) {
+      return [];
+    }
+
+    let entityTranslation = this.languageCodeToEntityTranslations[
+      languageCode] as EntityTranslation;
+    let htmlStrings: string[] = [];
+    contentIds.forEach((contentId) => {
+      if (!entityTranslation.hasWrittenTranslation(contentId)) {
+        return;
+      }
+
+      let writtenTranslation = entityTranslation.getWrittenTranslation(
+        contentId) as TranslatedContent;
+      if (writtenTranslation.dataFormat === 'html') {
+        htmlStrings.push(writtenTranslation.translation as string);
+      }
+    });
+    return htmlStrings;
   }
 }
 

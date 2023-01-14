@@ -23,7 +23,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
-import { ContextService } from 'services/context.service';
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { PlayerPositionService } from
@@ -33,10 +32,9 @@ import { PlayerTranscriptService } from
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
-import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 import { Subscription } from 'rxjs';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -49,11 +47,9 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
-    private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private ngbModal: NgbModal,
-    private imagePreloaderService: ImagePreloaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
   ) {}
 
@@ -89,18 +85,14 @@ export class ContentLanguageSelectorComponent implements OnInit {
       const modalRef = this.ngbModal.open(
         SwitchContentLanguageRefreshRequiredModalComponent);
       modalRef.componentInstance.languageCode = newLanguageCode;
-    } else {
+    } else if (this.selectedLanguageCode !== newLanguageCode) {
       this.contentTranslationLanguageService.setCurrentContentLanguageCode(
         newLanguageCode);
+      this.contentTranslationManagerService.displayTranslations(
+        newLanguageCode);
       this.selectedLanguageCode = newLanguageCode;
+      this.changeDetectorRef.detectChanges();
     }
-
-    // Image preloading is disabled in the exploration editor preview mode.
-    if (!this.contextService.isInExplorationEditorPage()) {
-      this.imagePreloaderService.restartImagePreloader(
-        this.playerTranscriptService.getCard(0).getStateName());
-    }
-    this.changeDetectorRef.detectChanges();
   }
 
   shouldDisplaySelector(): boolean {

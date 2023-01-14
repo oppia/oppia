@@ -89,7 +89,7 @@ describe('Entity translations service', () => {
 
       entityTranslationsService.init('entity1', 'exploration', 5);
 
-      entityTranslationsService.refreshEntityTranslationsAsync('hi')
+      entityTranslationsService.getEntityTranslationsAsync('hi')
         .then(successHandler, failHandler);
       tick();
       flushMicrotasks();

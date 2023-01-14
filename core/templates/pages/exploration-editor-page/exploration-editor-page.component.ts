@@ -233,7 +233,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         explorationData.states,
         (explorationData as ExplorationData).exploration_is_linked_to_story);
       this.entityTranslationsService.init(
-        'exploration', this.explorationId, explorationData.version);
+        this.explorationId, 'exploration', explorationData.version);
 
       this.explorationTitleService.init(explorationData.title);
       this.explorationCategoryService.init(

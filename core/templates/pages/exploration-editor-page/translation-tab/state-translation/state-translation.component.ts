@@ -47,6 +47,7 @@ import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { EntityTranslationsService } from 'services/entity-translations.services';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import { TranslationLanguageService } from '../services/translation-language.service';
 
 @Component({
   selector: 'oppia-state-translation',
@@ -101,6 +102,7 @@ export class StateTranslationComponent
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
     private entityTranslationsService: EntityTranslationsService,
+    private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
     private translationTabActiveContentIdService:
       TranslationTabActiveContentIdService,
@@ -117,8 +119,29 @@ export class StateTranslationComponent
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
-    let html = subtitledHtml.html;
-    return html;
+    if (this.translationTabActiveModeService.isTranslationModeActive()) {
+      return subtitledHtml.html;
+    }
+
+    let langCode = this.translationLanguageService.getActiveLanguageCode();
+    if (
+      !this.entityTranslationsService
+        .languageCodeToEntityTranslations.hasOwnProperty(langCode)
+    ) {
+      return subtitledHtml.html;
+    }
+
+    let translationContent = (
+      this.entityTranslationsService
+        .languageCodeToEntityTranslations[langCode].getWrittenTranslation(
+          subtitledHtml.contentId
+        )
+    );
+    if (!translationContent) {
+      return subtitledHtml.html;
+    }
+
+    return translationContent.translation as string;
   }
 
   getEmptyContentMessage(): string {
@@ -214,9 +237,13 @@ export class StateTranslationComponent
 
   updateTranslatedContent(): void {
     if (!this.translationTabActiveModeService.isVoiceoverModeActive()) {
-      this.activeTranslatedContent = (
-        this.entityTranslationsService.entityTranslation.getWrittenTranslation(
-          this.translationTabActiveContentIdService.getActiveContentId()));
+      let langCode = this.translationLanguageService.getActiveLanguageCode();
+      const entityTranslations = (
+        this.entityTranslationsService.languageCodeToEntityTranslations[
+          langCode]
+      );
+      this.activeTranslatedContent = entityTranslations.getWrittenTranslation(
+        this.translationTabActiveContentIdService.getActiveContentId());
     }
   }
 

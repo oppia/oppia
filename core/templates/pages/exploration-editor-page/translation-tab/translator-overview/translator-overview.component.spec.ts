@@ -126,10 +126,7 @@ describe('Translator Overview component', () => {
     fakeAsync(() => {
       spyOn(translationTabActiveModeService, 'activateVoiceoverMode');
       spyOn(graphDataService, 'recompute');
-      spyOn(translationStatusService, 'refresh').and.returnValue(
-        new Promise((callback) => {
-          callback();
-        }));
+      spyOn(translationStatusService, 'refresh');
 
       component.changeActiveMode('Voiceover');
 
@@ -146,10 +143,7 @@ describe('Translator Overview component', () => {
     fakeAsync(() => {
       spyOn(translationTabActiveModeService, 'activateTranslationMode');
       spyOn(graphDataService, 'recompute');
-      spyOn(translationStatusService, 'refresh').and.returnValue(
-        new Promise((callback) => {
-          callback();
-        }));
+      spyOn(translationStatusService, 'refresh');
 
       component.changeActiveMode('Translate');
 
