@@ -164,7 +164,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
-                (['pip', 'uninstall', '-r', 'requirements_dev.txt'],),
+                (['pip', 'uninstall', '-r', 'requirements_dev.txt', '-y'],),
             ],
             expected_kwargs=[
                 {'check': True, 'encoding': 'utf-8'},

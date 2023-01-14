@@ -96,7 +96,7 @@ def install_dev_dependencies() -> None:
 def uninstall_dev_dependencies() -> None:
     """Uninstall dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
-        ['pip', 'uninstall', '-r', COMPILED_REQUIREMENTS_DEV_FILE_PATH],
+        ['pip', 'uninstall', '-r', COMPILED_REQUIREMENTS_DEV_FILE_PATH, '-y'],
         check=True,
         encoding='utf-8',
     )
