@@ -18,37 +18,37 @@
  */
 
 const createNewUser = require(
-  '../puppeteer-testing-utilities/initializeUsers.js');
+  '../puppeteer-testing-utilities/initializeUsersUtils.js');
+const { closeAllBrowsers } = require(
+  '../puppeteer-testing-utilities/initializeUsersUtils.js');
 
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 
 let assignRolesToUsersAndChangeTagProperties = async function() {
-  const superAdmin = await createNewUser.superAdmin(
-    'superAdm', 'testadmin@example.com', ROLE_BLOG_ADMIN);
-  await createNewUser.blogAdmin(
-    'blogAdm', 'blog_admin@example.com');
-  await createNewUser.blogPostEditor(
-    'blogEditor', 'blog_post_editor@example.com');
+  const blogAdmin = await createNewUser.blogAdmin('blogAdm');
+  const superAdmin = await createNewUser.superAdmin('superAdm');
+  await createNewUser.guestUser('guestUsr1', 'guest_user1@example.com');
+  await createNewUser.guestUser('guestUsr2', 'guest_user2@example.com');
 
-  await superAdmin.assignUserAsRoleFromBlogAdminPage('blogAdm', 'BLOG_ADMIN');
+  await blogAdmin.assignUserAsRoleFromBlogAdminPage('guestUsr1', 'BLOG_ADMIN');
   await superAdmin.expectUserToHaveRole('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.assignUserAsRoleFromBlogAdminPage(
-    'blogEditor', 'BLOG_POST_EDITOR');
-  await superAdmin.expectUserToHaveRole('blogEditor', ROLE_BLOG_POST_EDITOR);
+  await blogAdmin.assignUserAsRoleFromBlogAdminPage(
+    'guestUsr2', 'BLOG_POST_EDITOR');
+  await superAdmin.expectUserToHaveRole('guestUsr2', ROLE_BLOG_POST_EDITOR);
 
-  await superAdmin.removeBlogEditorRoleFromUsername('blogEditor');
+  await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
   await superAdmin.expectUserNotToHaveRole(
-    'blogEditor', ROLE_BLOG_POST_EDITOR);
+    'guestUsr2', ROLE_BLOG_POST_EDITOR);
 
-  await superAdmin.expectTagToNotExistInBlogTags('Test_Tag');
-  await superAdmin.addNewBlogTag('Test_Tag');
-  await superAdmin.expectTagToExistInBlogTags('Test_Tag');
+  await blogAdmin.expectTagToNotExistInBlogTags('Test_Tag');
+  await blogAdmin.addNewBlogTag('Test_Tag');
+  await blogAdmin.expectTagToExistInBlogTags('Test_Tag');
 
-  await superAdmin.setMaximumTagLimitTo('5');
-  await superAdmin.expectMaximumTagLimitToBe('5');
+  await blogAdmin.setMaximumTagLimitTo('5');
+  await blogAdmin.expectMaximumTagLimitToBe('5');
 
-  await superAdmin.closeBrowser();
+  await closeAllBrowsers();
 };
 
 assignRolesToUsersAndChangeTagProperties();

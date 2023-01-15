@@ -18,31 +18,21 @@
  */
 
 const createNewUser = require(
-  '../puppeteer-testing-utilities/initializeUsers.js');
-
-const ROLE_BLOG_ADMIN = 'blog admin';
-const ROLE_BLOG_POST_EDITOR = 'blog post editor';
+  '../puppeteer-testing-utilities/initializeUsersUtils.js');
+const { closeAllBrowsers } = require(
+  '../puppeteer-testing-utilities/initializeUsersUtils.js');
 
 let publishBlogPostAndDeletePublishedBlogPost = async function() {
-  const superAdmin = await createNewUser.superAdmin(
-    'superAdm', 'testadmin@example.com', ROLE_BLOG_ADMIN);
-  const blogPostEditor = await createNewUser.blogPostEditor(
-    'blogPostEditor', 'blog_post_editor@example.com');
+  const blogPostEditor = await createNewUser.blogPostEditor('blogPostEditor');
 
-  await superAdmin.assignUserAsRoleFromBlogAdminPage(
-    'blogPostEditor', 'BLOG_POST_EDITOR');
-  await superAdmin.expectUserToHaveRole(
-    'blogPostEditor', ROLE_BLOG_POST_EDITOR);
-  await superAdmin.closeBrowser();
-
-  await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
+  await blogPostEditor.expectNumberOfDraftAndPublishedBlogPostsToBe(0);
   await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
 
   await blogPostEditor.expectPublishedBlogPostWithTitleToExist('Test-Blog');
   await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
-  await blogPostEditor.expectNumberOfDraftOrPublishedBlogPostsToBe(0);
+  await blogPostEditor.expectNumberOfDraftAndPublishedBlogPostsToBe(0);
 
-  await blogPostEditor.closeBrowser();
+  await closeAllBrowsers();
 };
 
 publishBlogPostAndDeletePublishedBlogPost();

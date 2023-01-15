@@ -152,7 +152,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }, toDeletePublishedBlogPostTitle);
   }
 
-  async expectNumberOfDraftOrPublishedBlogPostsToBe(number) {
+  async expectNumberOfDraftAndPublishedBlogPostsToBe(number) {
     await this.goto(blogDashboardUrl);
     await this.page.evaluate(async(number) => {
       const allDraftBlogPosts = document.getElementsByClassName(

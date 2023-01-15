@@ -17,24 +17,21 @@
  */
 
 const createNewUser = require(
-  '../puppeteer-testing-utilities/initializeUsers.js');
+  '../puppeteer-testing-utilities/initializeUsersUtils.js');
+const { closeAllBrowsers } = require(
+  '../puppeteer-testing-utilities/initializeUsersUtils.js');
 
-const ROLE_BLOG_ADMIN = 'blog admin';
+let blogDashboardAccessibleByBlogAdmins = async function() {
+  const guestUser = await createNewUser.guestUser('superAdm');
+  const blogAdmin = await createNewUser.blogAdmin('blogAdm');
 
-let assignBlogAdminRole = async function() {
-  const superAdmin = await createNewUser.superAdmin(
-    'superAdm', 'testadmin@example.com');
-  const blogAdmin = await createNewUser.blogAdmin(
-    'blogAdm', 'blog_admin@example.com');
-
-  await blogAdmin.expectBlogDashboardAccessToBeUnauthorized();
-
-  await superAdmin.assignRoleToUser('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.expectUserToHaveRole('blogAdm', ROLE_BLOG_ADMIN);
-  await superAdmin.closeBrowser();
+  /** The blog-dashboard is not accessible to any guest user
+   *  as the user donot have the blog admin role. */
+  await guestUser.expectBlogDashboardAccessToBeUnauthorized();
 
   await blogAdmin.expectBlogDashboardAccessToBeAuthorized();
-  await blogAdmin.closeBrowser();
+
+  await closeAllBrowsers();
 };
 
-assignBlogAdminRole();
+blogDashboardAccessibleByBlogAdmins();
