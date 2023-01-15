@@ -22,7 +22,7 @@ const e2eBlogPostEditor = require('./blogPostAdminUtils.js');
 const e2eGuestUser = require('./puppeteer_utils.js');
 
 let superAdminInstance = null, blogAdminInstance = null,
-blogPostEditorInstance = null;
+  blogPostEditorInstance = null;
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 let browserInstances = [];
@@ -91,13 +91,13 @@ let guestUser = async function(username, email) {
 
   await browserInstances.push(guestUser);
   return guestUser;
-}
+};
 
 let closeAllBrowsers = async function() {
   for (let i = 0; i < browserInstances.length; i++) {
     await browserInstances[i].closeBrowser();
   }
-}
+};
 
 module.exports = { superAdmin, blogAdmin, blogPostEditor,
   guestUser, closeAllBrowsers };
