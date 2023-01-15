@@ -21,12 +21,13 @@ const e2eBlogAdmin = require('./blogPostAdminUtils.js');
 const e2eBlogPostEditor = require('./blogPostAdminUtils.js');
 const e2eGuestUser = require('./puppeteer_utils.js');
 
-let superAdminInstance = null, blogAdminInstance = null, blogPostEditorInstance = null;
+let superAdminInstance = null, blogAdminInstance = null,
+blogPostEditorInstance = null;
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 let browserInstances = [];
 
-async function superAdmin(username) {
+let superAdmin = async function(username) {
   if (superAdminInstance !== null) {
     return superAdminInstance;
   }
@@ -40,7 +41,7 @@ async function superAdmin(username) {
   return superAdminInstance = superAdmin;
 };
 
-async function blogAdmin(username) {
+let blogAdmin = async function(username) {
   if (blogAdminInstance !== null) {
     return blogAdminInstance;
   }
@@ -60,7 +61,7 @@ async function blogAdmin(username) {
   return blogAdminInstance = blogAdmin;
 };
 
-async function blogPostEditor(username) {
+let blogPostEditor = async function(username) {
   if (blogPostEditorInstance !== null) {
     return blogPostEditorInstance;
   }
@@ -82,7 +83,7 @@ async function blogPostEditor(username) {
   return blogPostEditorInstance = blogPostEditor;
 };
 
-async function guestUser(username, email) {
+let guestUser = async function(username, email) {
   const guestUser = await new e2eGuestUser();
   await guestUser.openBrowser();
   await guestUser.signUpNewUserWithUsernameAndEmail(
@@ -92,10 +93,11 @@ async function guestUser(username, email) {
   return guestUser;
 }
 
-async function closeAllBrowsers() {
+let closeAllBrowsers = async function() {
   for (let i = 0; i < browserInstances.length; i++) {
     await browserInstances[i].closeBrowser();
   }
 }
 
-module.exports = { superAdmin, blogAdmin, blogPostEditor, guestUser, closeAllBrowsers };
+module.exports = { superAdmin, blogAdmin, blogPostEditor,
+  guestUser, closeAllBrowsers };

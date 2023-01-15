@@ -22,7 +22,8 @@ const { closeAllBrowsers } = require(
   '../puppeteer-testing-utilities/initializeUsersUtils.js');
 
 let blogDashboardAccessibleByBlogAdmins = async function() {
-  const guestUser = await createNewUser.guestUser('superAdm');
+  const guestUser = await createNewUser.guestUser(
+    'guestUser', 'guest_user@example.com');
   const blogAdmin = await createNewUser.blogAdmin('blogAdm');
 
   /** The blog-dashboard is not accessible to any guest user
