@@ -94,6 +94,10 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateNumericExpression(
+      '5*5')).toBeTrue();
+    expect(mathInteractionsService.getWarningText()).toBe('');
+
+    expect(mathInteractionsService.validateNumericExpression(
       '(1+2+3)^(-3.5)')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
@@ -115,6 +119,11 @@ describe('MathInteractionsService', () => {
       '+', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "+".');
+
+      expect(mathInteractionsService.validateAlgebraicExpression(
+        '*', [])).toBeFalse();
+      expect(mathInteractionsService.getWarningText()).toBe(
+        'Your answer seems to be missing a variable/number before the "*".');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(+)', [])).toBeFalse();
