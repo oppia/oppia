@@ -21,7 +21,7 @@
         <span *ngIf="isEditable && rules.length > 1"
               class="oppia-delete-rule-button oppia-transition-200 e2e-test-delete-answer"
               (click)="deleteRule(index)">
-          <i class="material-icons md-18">&#xE5CD;</i>
+          <i class="fa-solid fa-x fa-lg"></i>
         </span>
 
         <div *ngIf="activeRuleIndex === index">
@@ -42,7 +42,7 @@
     <div *ngIf="isEditable && isMLEnabled() && !isInQuestionMode()">
       <div *ngIf="isCurrentInteractionTrainable()">
         <button type="button" class="btn btn-secondary btn-lg oppia-modify-training-data-button" (click)="openTrainingDataEditor()">
-          <i class="material-icons md-24">playlist_add</i> Modify Training Data
+          <i class="fa-xl">playlist_add</i> Modify Training Data
         </button>
       </div>
     </div>
