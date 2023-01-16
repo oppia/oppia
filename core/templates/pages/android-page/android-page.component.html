@@ -31,8 +31,11 @@
     </div>
 
     <div class="oppia-android-features oppia-android-features-tablet">
-      <p class="oppia-android-features-main-text"
-         [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate">
+      <p class="oppia-android-features-main-text mb-2"
+         [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER_1' | translate">
+      </p>
+      <p class="oppia-android-features-main-text mt-0"
+         [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER_2' | translate">
       </p>
       <div class="container">
         <div class="row">
@@ -55,13 +58,16 @@
             </div>
             <div *ngIf="featuresShown === 2" class="oppia-android-key-feature text-center">
               <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_3' | translate }}</div>
-              <div class="oppia-android-key-feature-subtext"
+              <div class="oppia-android-key-feature-subtext mb-4"
                    [innerHTML]="'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_3' | translate">
+              </div>
+              <div class="oppia-android-key-feature-subtext"
+                   [innerHTML]="'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_4' | translate">
               </div>
             </div>
             <div *ngIf="featuresShown === 3" class="oppia-android-key-feature text-center">
-              <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_4' | translate }}</div>
-              <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_4' | translate }}</div>
+              <div class="oppia-android-key-feature-text oppia-android-text-color mb-5">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_4' | translate }}</div>
+              <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_5' | translate }}</div>
             </div>
           </div>
         </div>
@@ -76,7 +82,10 @@
 
     <div class="oppia-android-features-web oppia-android-empty-div"></div>
     <div class="oppia-android-features oppia-android-features-web oppia-web-only container mb-5">
-      <span [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate"
+      <span [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER_1' | translate"
+            class="oppia-android-features-main-text row">
+      </span>
+      <span [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER_2' | translate"
             class="oppia-android-features-main-text row">
       </span>
       <div class="oppia-android-key-feature-container row">
@@ -91,13 +100,16 @@
           </div>
           <div class="oppia-android-key-feature">
             <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_3' | translate }}</div>
-            <div class="oppia-android-key-feature-subtext"
+            <div class="oppia-android-key-feature-subtext mb-4"
                  [innerHTML]="'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_3' | translate">
+            </div>
+            <div class="oppia-android-key-feature-subtext"
+                 [innerHTML]="'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_4' | translate">
             </div>
           </div>
           <div class="oppia-android-key-feature">
             <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_4' | translate }}</div>
-            <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_4' | translate }}</div>
+            <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_5' | translate }}</div>
           </div>
         </div>
         <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7">
