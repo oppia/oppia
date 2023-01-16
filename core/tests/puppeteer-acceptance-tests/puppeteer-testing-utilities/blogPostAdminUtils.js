@@ -55,6 +55,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('span', 'SAVE AS DRAFT');
 
     showMessage('Successfully created a draft blog post!');
+    await this.goto(blogDashboardUrl);
   }
 
   async deleteDraftBlogPostWithTitle(draftBlogPostTitle) {
@@ -108,7 +109,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('button', 'mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn('div', thumbnailPhotoBox);
-    await this.uploadFile('collection.svg');
+    await this.uploadFile('blog-post-thumbnail.svg');
     await this.clickOn('button', ' Add Thumbnail Image ');
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
@@ -152,21 +153,26 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }, toDeletePublishedBlogPostTitle);
   }
 
-  async expectNumberOfDraftAndPublishedBlogPostsToBe(number) {
-    await this.goto(blogDashboardUrl);
+  async expectNumberOfBlogPostsToBe(number) {
     await this.page.evaluate(async(number) => {
-      const allDraftBlogPosts = document.getElementsByClassName(
+      const allBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
-      if (allDraftBlogPosts.length !== number) {
+      if (allBlogPosts.length !== number) {
         throw new Error(
-          'Number of draft/published blog posts is not equal to ' +
+          'Number of blog posts is not equal to ' +
           number);
       }
     }, number);
 
-    showMessage('Number of draft/published blog posts is equal to ' + number);
+    showMessage('Number of blog posts is equal to ' + number);
   }
 
+  async navigateToPublishTab() {
+    await this.goto(blogDashboardUrl);
+    await this.clickOn('div', 'PUBLISHED');
+    showMessage('Navigated to publish tab.');
+  }
+  
   async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle) {
     await this.goto(blogDashboardUrl);
     await this.page.evaluate(async(checkDraftBlogPostByTitle) => {
@@ -195,7 +201,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       ' exists!');
   }
 
-  async expectPublishedBlogPostWithTitleToExist(checkPublishBlogPostByTitle) {
+  async expectPublishedBlogPostWithTitleToBePresent(checkPublishBlogPostByTitle) {
     await this.goto(blogDashboardUrl);
     await this.clickOn('div', 'PUBLISHED');
     await this.page.evaluate(async(checkPublishBlogPostByTitle) => {

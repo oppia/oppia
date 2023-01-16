@@ -25,12 +25,14 @@ const { closeAllBrowsers } = require(
 let publishBlogPostAndDeletePublishedBlogPost = async function() {
   const blogPostEditor = await userFactor.createNewBlogPostEditor('blogPostEditor');
 
-  await blogPostEditor.expectNumberOfDraftAndPublishedBlogPostsToBe(0);
+  await blogPostEditor.expectNumberOfBlogPostsToBe(0);
   await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
+  await blogPostEditor.navigateToPublishTab();
+  await blogPostEditor.expectNumberOfBlogPostsToBe(1);
+  await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent('Test-Blog');
 
-  await blogPostEditor.expectPublishedBlogPostWithTitleToExist('Test-Blog');
   await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
-  await blogPostEditor.expectNumberOfDraftAndPublishedBlogPostsToBe(0);
+  await blogPostEditor.expectNumberOfBlogPostsToBe(0);
 
   await closeAllBrowsers();
 };
