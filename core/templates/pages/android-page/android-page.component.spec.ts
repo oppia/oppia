@@ -122,7 +122,7 @@ describe('Android page', () => {
 
   it('should change feature selection', () => {
     component.ngOnInit();
-    expect(component.featuresShown).toBe(1);
+    expect(component.featuresShown).toBe(0);
 
     component.changeFeaturesShown(3);
 
