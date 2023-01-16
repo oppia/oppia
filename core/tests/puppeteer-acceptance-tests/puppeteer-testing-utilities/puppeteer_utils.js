@@ -80,7 +80,7 @@ module.exports = class puppeteerUtilities {
    * @param {string} userName - The username of the user.
    * @param {string} signInEmail - The email of the user.
    */
-  async signUpNewUserWithUsernameAndEmail(userName, signInEmail) {
+  async signUpNewUser(userName, signInEmail) {
     await this.signInWithEmail(signInEmail);
     await this.type('input.e2e-test-username-input', userName);
     await this.clickOn('input', 'e2e-test-agree-to-terms-checkbox');

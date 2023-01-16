@@ -34,7 +34,7 @@ let superAdmin = async function(username) {
 
   const superAdmin = await new e2eSuperAdmin();
   await superAdmin.openBrowser();
-  await superAdmin.signUpNewUserWithUsernameAndEmail(
+  await superAdmin.signUpNewUser(
     username, 'testadmin@example.com');
 
   await browserInstances.push(superAdmin);
@@ -51,7 +51,7 @@ let blogAdmin = async function(username) {
   }
   const blogAdmin = await new e2eBlogAdmin();
   await blogAdmin.openBrowser();
-  await blogAdmin.signUpNewUserWithUsernameAndEmail(
+  await blogAdmin.signUpNewUser(
     username, 'blog_admin@example.com');
 
   await superAdminInstance.assignRoleToUser(username, ROLE_BLOG_ADMIN);
@@ -71,7 +71,7 @@ let blogPostEditor = async function(username) {
   }
   const blogPostEditor = await new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
-  await blogPostEditor.signUpNewUserWithUsernameAndEmail(
+  await blogPostEditor.signUpNewUser(
     username, 'blog_post_editor@example.com');
 
   await blogAdminInstance.assignUserAsRoleFromBlogAdminPage(
@@ -86,7 +86,7 @@ let blogPostEditor = async function(username) {
 let guestUser = async function(username, email) {
   const guestUser = await new e2eGuestUser();
   await guestUser.openBrowser();
-  await guestUser.signUpNewUserWithUsernameAndEmail(
+  await guestUser.signUpNewUser(
     username, email);
 
   await browserInstances.push(guestUser);
