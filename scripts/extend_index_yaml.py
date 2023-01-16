@@ -24,9 +24,18 @@ from __future__ import annotations
 
 import os
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 import xmltodict
 import yaml
+
+XmlIndexesDict = Dict[
+    str, Dict[
+        str, List[Dict[str, Union[str, Dict[str, str], List[Dict[str, str]]]]]
+    ]
+]
+YamlIndexesDict = Dict[
+    str, List[Dict[str, Union[str, Dict[str, str], List[Dict[str, str]]]]]
+]
 
 INDEX_YAML_PATH = os.path.join(os.getcwd(), 'index.yaml')
 WEB_INF_INDEX_XML_PATH = os.path.join(
@@ -40,10 +49,8 @@ WEB_INF_INDEX_XML_PATH = os.path.join(
 
 
 def reformat_xml_dict_into_yaml_dict(
-    xml_dict: Dict[str, Dict[str, List[Dict[str, str | Dict[str, str]]]]]
-) -> Optional[
-    Dict[str, List[Dict[str, str | Dict[str, str] | List[Dict[str, str]]]]]
-]:
+    xml_dict: XmlIndexesDict
+) -> Optional[YamlIndexesDict]:
     """Reformats the xml index dict into yaml index dict.
 
     Args:

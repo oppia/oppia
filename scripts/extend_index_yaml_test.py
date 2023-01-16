@@ -25,7 +25,150 @@ from core.tests import test_utils
 from . import extend_index_yaml
 
 
-class ExtendIndexYamlTest(test_utils.GenericTestBase):
+class ReformatXmlToYamlTests(test_utils.GenericTestBase):
+    """Class for testing the reformat_xml_dict_into_yaml_dict function."""
+
+    def test_dict_with_one_index_one_attribute_ascending(self) -> None:
+        xml_dict: extend_index_yaml.XmlIndexesDict = {
+            'datastore-indexes': {
+                'datastore-index': [{
+                    '@kind': 'TopicModel',
+                    '@ancestor': 'false',
+                    '@source-service': 'auto',
+                    'property': [
+                        {
+                            '@name': 'property',
+                            '@direction': 'asc'
+                        }
+                    ]
+                }]
+            }
+        }
+        expected_yaml_dict: extend_index_yaml.YamlIndexesDict = {
+            'indexes': [{
+                'kind': 'TopicModel',
+                'properties': [{'name': 'property'}]
+            }]
+        }
+        self.assertEqual(
+            extend_index_yaml.reformat_xml_dict_into_yaml_dict(xml_dict),
+            expected_yaml_dict
+        )
+
+    def test_dict_with_one_index_multiple_attributes_ascending(
+        self
+    ) -> None:
+        xml_dict: extend_index_yaml.XmlIndexesDict = {
+            'datastore-indexes': {
+                'datastore-index': [{
+                    '@kind': 'TopicModel',
+                    '@ancestor': 'false',
+                    '@source-service': 'auto',
+                    'property': [
+                        {
+                            '@name': 'property1',
+                            '@direction': 'asc'
+                        },
+                        {
+                            '@name': 'property2',
+                            '@direction': 'asc'
+                        }
+                    ]
+                }]
+            }
+        }
+        expected_yaml_dict: extend_index_yaml.YamlIndexesDict = {
+            'indexes': [
+                {
+                    'kind': 'TopicModel',
+                    'properties': [
+                        {
+                            'name': 'property1'
+                        },
+                        {
+                            'name': 'property2'
+                        }
+                    ]
+                }
+            ]
+        }
+        self.assertEqual(
+            extend_index_yaml.reformat_xml_dict_into_yaml_dict(xml_dict),
+            expected_yaml_dict
+        )
+
+    def test_dict_with_multiple_indexes_properties_descending(self) -> None:
+        xml_dict: extend_index_yaml.XmlIndexesDict = {
+            'datastore-indexes': {
+                'datastore-index': [
+                    {
+                        '@kind': 'TopicModel',
+                        '@ancestor': 'false',
+                        '@source-service': 'auto',
+                        'property': [
+                            {
+                                '@name': 'property1',
+                                '@direction': 'asc'
+                            },
+                            {
+                                '@name': 'property2',
+                                '@direction': 'desc'
+                            }
+                        ]
+                    },
+                    {
+                        '@kind': 'CollectionModel',
+                        '@ancestor': 'false',
+                        '@source-service': 'auto',
+                        'property': [
+                            {
+                                '@name': 'property3',
+                                '@direction': 'asc'
+                            },
+                            {
+                                '@name': 'property4',
+                                '@direction': 'desc'
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        expected_yaml_dict: extend_index_yaml.YamlIndexesDict = {
+            'indexes': [
+                {
+                    'kind': 'TopicModel',
+                    'properties': [
+                        {
+                            'name': 'property1'
+                        },
+                        {
+                            'name': 'property2',
+                            'direction': 'desc'
+                        }
+                    ]
+                },
+                {
+                    'kind': 'CollectionModel',
+                    'properties': [
+                        {
+                            'name': 'property3'
+                        },
+                        {
+                            'name': 'property4',
+                            'direction': 'desc'
+                        }
+                    ]
+                }
+            ]
+        }
+        self.assertEqual(
+            extend_index_yaml.reformat_xml_dict_into_yaml_dict(xml_dict),
+            expected_yaml_dict
+        )
+
+
+class ExtendIndexYamlTests(test_utils.GenericTestBase):
     """Class for testing the extend_index_yaml script."""
 
     def setUp(self) -> None:
