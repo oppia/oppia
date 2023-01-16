@@ -22,6 +22,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ContributorCertificateResponse } from '../services/contribution-and-review-backend-api.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 
+interface CertificateContentData {
+  text: string;
+  linePosition: number;
+}
+
 @Component({
   selector: 'certificate-download-modal',
   templateUrl: './certificate-download-modal.component.html'
@@ -163,7 +168,6 @@ export class CertificateDownloadModalComponent {
 
       ctx.font = '30px Capriola';
       ctx.fillStyle = '#8F9899';
-      // Increase y coordinate by 150.
       linePosition += 150;
       ctx.fillText(
         'WE GRATEFULLY ACKNOWLEDGE',
@@ -173,26 +177,76 @@ export class CertificateDownloadModalComponent {
 
       ctx.font = '40px Capriola';
       ctx.fillStyle = '#00645C';
-      // Increase y coordinate by 100.
       linePosition += 100;
       ctx.fillText(this.username, this.CERTIFICATE_MID_POINT, linePosition);
 
       ctx.font = '28px Capriola';
       ctx.fillStyle = '#8F9899';
-      // Increase y coordinate by 100.
       linePosition += 100;
 
       if (this.suggestionType === 'translate_content') {
-        linePosition = this.fillTranslationSubmitterCertificateContent(
-          linePosition, ctx, response);
+        let certificateContentData: [CertificateContentData];
+        certificateContentData.push(
+          {
+            text: 'for their dedication and time in translating Oppia\'s ' +
+            'basic maths lessons to ' + response.language,
+            linePosition: linePosition
+          },
+          {
+            text: 'which will help our ' + response.language + '-speaking ' +
+            'learners better understand the lessons.',
+            linePosition: linePosition += 40
+          },
+          {
+            text: 'This certificate confirms that ' + this.username +
+            ' has contributed ' + response.contribution_hours + ' hours ' +
+            'worth of',
+            linePosition: linePosition += 80
+          },
+          {
+            text: 'translations from ' + response.from_date + ' to ' +
+            response.to_date + '.',
+            linePosition: linePosition += 40
+          }
+        );
+        this.fillCertificateContent(
+          ctx, certificateContentData
+        );
+        linePosition += 100;
       } else {
-        linePosition = this.fillQuestionSubmitterCertificateContent(
-          linePosition, ctx, response);
+        let certificateContentData: [CertificateContentData];
+        certificateContentData.push(
+          {
+            text: 'for their dedication and time in contributing practice ' +
+            'questions to Oppia\'s',
+            linePosition: linePosition
+          },
+          {
+            text: 'Math Classroom, which supports our mission of improving',
+            linePosition: linePosition += 40
+          },
+          {
+            text: 'access to quality education.',
+            linePosition: linePosition += 40
+          },
+          {
+            text: 'This certificate confirms that ' + this.username +
+            ' has contributed ' + response.contribution_hours + ' hours',
+            linePosition: linePosition += 80
+          },
+          {
+            text: `to Oppia from ${response.from_date} to ${response.to_date}.`,
+            linePosition: linePosition += 40
+          },
+        );
+        this.fillCertificateContent(
+          ctx, certificateContentData
+        );
+        linePosition += 40;
       }
 
       ctx.font = '36px Brush Script MT';
       ctx.fillStyle = '#000000';
-      // Increase y coordinate by 100.
       linePosition += 100;
       ctx.fillText(
         response.team_lead,
@@ -207,7 +261,6 @@ export class CertificateDownloadModalComponent {
         linePosition
       );
 
-      // Increase y coordinate by 20.
       linePosition += 20;
       ctx.moveTo(this.SIGNATURE_LINE_STARTING_POSITION, linePosition);
       ctx.lineTo(this.SIGNATURE_LINE_ENDING_POSITION, linePosition);
@@ -215,7 +268,6 @@ export class CertificateDownloadModalComponent {
       ctx.lineTo(this.DATE_LINE_ENDING_POSITION, linePosition);
       ctx.stroke();
 
-      // Increase y coordinate by 40.
       linePosition += 40;
       ctx.font = '24px Roboto';
       ctx.fillStyle = '#8F9899';
@@ -230,97 +282,17 @@ export class CertificateDownloadModalComponent {
     };
   }
 
-  fillTranslationSubmitterCertificateContent(
-      linePosition: number,
+  fillCertificateContent(
       ctx: CanvasRenderingContext2D,
-      response: ContributorCertificateResponse
-  ): number {
-    ctx.fillText(
-      'for their dedication and time in translating Oppia\'s basic maths ' +
-      'lessons to ' + response.language,
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 40.
-    linePosition += 40;
-
-    ctx.fillText(
-      'which will help our ' + response.language + '-speaking learners ' +
-      'better understand the lessons.',
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 80.
-    linePosition += 80;
-
-    ctx.fillText(
-      `This certificate confirms that ${this.username} has contributed ` +
-      response.contribution_hours + ' hours worth of',
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 40.
-    linePosition += 40;
-
-    ctx.fillText(
-      `translations from ${response.from_date} to ${response.to_date}.`,
-      this.CERTIFICATE_MID_POINT,
-      860
-    );
-    // Increase y coordinate by 40.
-    linePosition += 100;
-
-    return linePosition;
-  }
-
-  fillQuestionSubmitterCertificateContent(
-      linePosition: number,
-      ctx: CanvasRenderingContext2D,
-      response: ContributorCertificateResponse
-  ): number {
-    ctx.fillText(
-      'for their dedication and time in contributing practice questions ' +
-      'to Oppia\'s',
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 40.
-    linePosition += 40;
-
-    ctx.fillText(
-      'Math Classroom, which supports our mission of improving',
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 40.
-    linePosition += 40;
-
-    ctx.fillText(
-      'access to quality education.',
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 80.
-    linePosition += 80;
-
-    ctx.fillText(
-      `This certificate confirms that ${this.username} has contributed ` +
-      response.contribution_hours + ' hours',
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 40.
-    linePosition += 40;
-
-    ctx.fillText(
-      `to Oppia from ${response.from_date} to ${response.to_date}.`,
-      this.CERTIFICATE_MID_POINT,
-      linePosition
-    );
-    // Increase y coordinate by 40.
-    linePosition += 40;
-
-    return linePosition;
+      data: [CertificateContentData]
+  ): void {
+    data.forEach((data: CertificateContentData) => {
+      ctx.fillText(
+        data.text,
+        this.CERTIFICATE_MID_POINT,
+        data.linePosition
+      );
+    });
   }
 }
 

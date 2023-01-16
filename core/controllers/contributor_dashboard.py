@@ -993,9 +993,7 @@ class ContributorCertificateHandler(
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(
-        self,
-        username: str,
-        suggestion_type: str
+        self, username: str, suggestion_type: str
     ) -> None:
         """Handles GET requests."""
         language = None

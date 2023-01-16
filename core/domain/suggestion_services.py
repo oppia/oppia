@@ -3025,6 +3025,9 @@ def generate_contributor_certificate_data(
         raise Exception('There is no user for the given username.')
 
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        # For the suggestion_type translate_content, there should be a
+        # corresponding language_code.
+        assert isinstance(language_code, str)
         data = _generate_translation_contributor_certificate_data(
             language_code, from_date, to_date, user_id)
 
@@ -3039,7 +3042,7 @@ def generate_contributor_certificate_data(
 
 
 def _generate_translation_contributor_certificate_data(
-    language_code: Optional[str],
+    language_code: str,
     from_date: datetime.datetime,
     to_date: datetime.datetime,
     user_id: str
@@ -3047,7 +3050,7 @@ def _generate_translation_contributor_certificate_data(
     """Returns data to generate translation submitter certificate.
 
     Args:
-        language_code: str|None. The language for which the contributions should
+        language_code: str. The language for which the contributions should
             be considered.
         from_date: datetime.datetime. The start of the date range for which
             the contributions were created.
@@ -3073,11 +3076,8 @@ def _generate_translation_contributor_certificate_data(
         constants.SUPPORTED_AUDIO_LANGUAGES), None)
     if language is None:
         raise Exception('The provided language is invalid.')
-    # Since we have found a corresponding language for the given language code
-    # we can make sure that language code is not None.
-    assert isinstance(language_code, str)
     language_description = language['description']
-    if language_description.find(' (') != -1:
+    if ' (' in language_description:
         language_description = language_description[
             language_description.find('(') + 1:language_description.find(')')]
 
@@ -3110,7 +3110,7 @@ def _generate_translation_contributor_certificate_data(
         words_without_empty_strings = [
             word for word in words if word != '']
         words_count += len(words_without_empty_strings)
-    # Source: https://github.com/oppia/oppia/pull/16513/files#r1027109026
+    # Source: https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
     hours_contributed = round((words_count / 300), 2)
 
     if words_count == 0:
@@ -3173,7 +3173,7 @@ def _generate_question_contributor_certificate_data(
             minutes_contributed += 20
         else:
             minutes_contributed += 12
-    # Source: https://github.com/oppia/oppia/pull/16513/files#r1027109026
+    # Source: https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
     hours_contributed = round((minutes_contributed / 60), 2)
 
     if minutes_contributed == 0:

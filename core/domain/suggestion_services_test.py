@@ -958,8 +958,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_change['question_dict']
         )
 
-        question_state_data = test_question_dict[
-            'question_state_data']
+        question_state_data = test_question_dict['question_state_data']
         question_state_data['content'][
             'html'] = '<p>Updated question</p>'
         question_state_data['interaction'][
@@ -6061,6 +6060,9 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.username = user_services.get_username(self.author_id)
+        self.from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        self.to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
     def test_create_translation_contributor_certificate(self) -> None:
         score_category: str = (
@@ -6080,16 +6082,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.author_id,
             'reviewer_1', change_cmd, score_category,
             'exploration.exp1.thread_6', 'hi')
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         response = suggestion_services.generate_contributor_certificate_data(
-            username,
+            self.username,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             'hi',
-            from_date,
-            to_date
+            self.from_date,
+            self.to_date,
         )
 
         self.assertIsNotNone(response)
@@ -6114,16 +6113,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.author_id,
             'reviewer_1', change_cmd, score_category,
             'exploration.exp1.thread_6', 'en')
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         response = suggestion_services.generate_contributor_certificate_data(
-            username,
+            self.username,
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             'en',
-            from_date,
-            to_date
+            self.from_date,
+            self.to_date,
         )
 
         self.assertIsNotNone(response)
@@ -6155,10 +6151,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             suggestion_change['question_dict']
         )
 
-        question_state_data = test_question_dict[
-            'question_state_data']
-        question_state_data['content'][
-            'html'] = '<p>No image content</p>'
+        question_state_data = test_question_dict['question_state_data']
+        question_state_data['content']['html'] = '<p>No image content</p>'
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
@@ -6166,16 +6160,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED, self.author_id,
             'reviewer_2', suggestion_change, 'category1',
             'thread_1', 'en')
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         response = suggestion_services.generate_contributor_certificate_data(
-            username,
+            self.username,
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             None,
-            from_date,
-            to_date
+            self.from_date,
+            self.to_date,
         )
 
         self.assertIsNotNone(response)
@@ -6209,11 +6200,9 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             suggestion_change['question_dict']
         )
 
-        question_state_data = test_question_dict[
-            'question_state_data']
-        question_state_data['content'][
-            'html'
-        ] = '<oppia-noninteractive-image></oppia-noninteractive-image>'
+        question_state_data = test_question_dict['question_state_data']
+        question_state_data['content']['html'] = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
@@ -6221,16 +6210,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED, self.author_id,
             'reviewer_2', suggestion_change, 'category1',
             'thread_1', 'en')
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         response = suggestion_services.generate_contributor_certificate_data(
-            username,
+            self.username,
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             None,
-            from_date,
-            to_date
+            self.from_date,
+            self.to_date,
         )
 
         self.assertIsNotNone(response)
@@ -6238,94 +6224,73 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
     def test_create_contributor_certificate_raises_exception_for_no_suggestions(
         self
     ) -> None:
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
-
         with self.assertRaisesRegex(
             Exception,
             'There are no contributions for the given time range.'
         ):
             suggestion_services.generate_contributor_certificate_data(
-                username,
+                self.username,
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'hi',
-                from_date,
-                to_date
+                self.from_date,
+                self.to_date,
             )
 
     def test_create_certificate_raises_exception_for_no_question_suggestions(
         self
     ) -> None:
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
-
         with self.assertRaisesRegex(
             Exception,
             'There are no contributions for the given time range.'
         ):
             suggestion_services.generate_contributor_certificate_data(
-                username,
+                self.username,
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 None,
-                from_date,
-                to_date
+                self.from_date,
+                self.to_date,
             )
 
     def test_create_contributor_certificate_raises_exception_for_wrong_language(
         self
     ) -> None:
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
-
         with self.assertRaisesRegex(
-            Exception,
-            'The provided language is invalid.'
+            Exception, 'The provided language is invalid.'
         ):
             suggestion_services.generate_contributor_certificate_data(
-                username,
+                self.username,
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'test',
-                from_date,
-                to_date
+                self.from_date,
+                self.to_date,
             )
 
     def test_create_contributor_certificate_raises_exception_for_wrong_username(
         self
     ) -> None:
         username = 'wrong_user'
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
         with self.assertRaisesRegex(
-            Exception,
-            'There is no user for the given username.'
+            Exception, 'There is no user for the given username.'
         ):
             suggestion_services.generate_contributor_certificate_data(
                 username,
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 'hi',
-                from_date,
-                to_date
+                self.from_date,
+                self.to_date,
             )
 
     def test_create_contributor_certificate_raises_exception_for_wrong_type(
         self
     ) -> None:
-        username = user_services.get_username(self.author_id)
-        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
-
         with self.assertRaisesRegex(
-            Exception,
-            'The suggestion type is invalid.'
+            Exception, 'The suggestion type is invalid.'
         ):
             suggestion_services.generate_contributor_certificate_data(
-                username,
+                self.username,
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 'test',
-                from_date,
-                to_date
+                self.from_date,
+                self.to_date,
             )
