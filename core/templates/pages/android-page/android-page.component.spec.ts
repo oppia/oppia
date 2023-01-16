@@ -86,6 +86,14 @@ describe('Android page', () => {
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   });
 
+  it('should set page title on init', () => {
+    spyOn(component, 'setPageTitle');
+
+    component.ngAfterViewInit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
+  });
+
   it('should obtain translated page title whenever the selected' +
   'language changes', () => {
     component.ngOnInit();
