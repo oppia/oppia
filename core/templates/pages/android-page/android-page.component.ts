@@ -105,7 +105,7 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    this.featuresShown = 1;
+    this.featuresShown = 0;
   }
 
   ngAfterViewInit(): void {

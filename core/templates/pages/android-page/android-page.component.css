@@ -174,6 +174,7 @@
 .oppia-android-features-main-text {
   font-size: 48px;
   line-height: 60px;
+  max-width: 335px;
 }
 
 .oppia-android-page-container {
@@ -479,5 +480,6 @@
 
   .oppia-android-features-main-text {
     margin-left: 0;
+    max-width: 145px;
   }
 }
