@@ -31,8 +31,11 @@ let assignRolesToUsersAndChangeTagProperties = async function() {
   await userFactor.createNewGuestUser('guestUsr1', 'guest_user1@example.com');
   await userFactor.createNewGuestUser('guestUsr2', 'guest_user2@example.com');
 
+  await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLE_BLOG_ADMIN);
   await blogAdmin.assignUserToRoleFromBlogAdminPage('guestUsr1', 'BLOG_ADMIN');
   await superAdmin.expectUserToHaveRole('guestUsr1', ROLE_BLOG_ADMIN);
+
+  await superAdmin.expectUserNotToHaveRole('guestUsr2', ROLE_BLOG_POST_EDITOR);
   await blogAdmin.assignUserToRoleFromBlogAdminPage(
     'guestUsr2', 'BLOG_POST_EDITOR');
   await superAdmin.expectUserToHaveRole('guestUsr2', ROLE_BLOG_POST_EDITOR);
