@@ -27,7 +27,7 @@ const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 let browserInstances = [];
 
-let superAdmin = async function(username) {
+let createNewSuperAdmin = async function(username) {
   if (superAdminInstance !== null) {
     return superAdminInstance;
   }
@@ -41,7 +41,7 @@ let superAdmin = async function(username) {
   return superAdminInstance = superAdmin;
 };
 
-let blogAdmin = async function(username) {
+let createNewBlogAdmin = async function(username) {
   if (blogAdminInstance !== null) {
     return blogAdminInstance;
   }
@@ -61,7 +61,7 @@ let blogAdmin = async function(username) {
   return blogAdminInstance = blogAdmin;
 };
 
-let blogPostEditor = async function(username) {
+let createNewBlogPostEditor = async function(username) {
   if (blogPostEditorInstance !== null) {
     return blogPostEditorInstance;
   }
@@ -74,7 +74,7 @@ let blogPostEditor = async function(username) {
   await blogPostEditor.signUpNewUser(
     username, 'blog_post_editor@example.com');
 
-  await blogAdminInstance.assignUserAsRoleFromBlogAdminPage(
+  await blogAdminInstance.assignUserToRoleFromBlogAdminPage(
     'blogPostEditor', 'BLOG_POST_EDITOR');
   await superAdminInstance.expectUserToHaveRole(
     'blogPostEditor', ROLE_BLOG_POST_EDITOR);
@@ -83,7 +83,7 @@ let blogPostEditor = async function(username) {
   return blogPostEditorInstance = blogPostEditor;
 };
 
-let guestUser = async function(username, email) {
+let createNewGuestUser = async function(username, email) {
   const guestUser = await new e2eGuestUser();
   await guestUser.openBrowser();
   await guestUser.signUpNewUser(
@@ -99,5 +99,5 @@ let closeAllBrowsers = async function() {
   }
 };
 
-module.exports = { superAdmin, blogAdmin, blogPostEditor,
-  guestUser, closeAllBrowsers };
+module.exports = { createNewSuperAdmin, createNewBlogAdmin,
+  createNewBlogPostEditor, createNewGuestUser, closeAllBrowsers };

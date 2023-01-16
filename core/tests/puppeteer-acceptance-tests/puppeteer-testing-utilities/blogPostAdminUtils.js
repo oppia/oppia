@@ -250,7 +250,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }
   }
 
-  async assignUserAsRoleFromBlogAdminPage(username, role) {
+  async assignUserToRoleFromBlogAdminPage(username, role) {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);

@@ -17,13 +17,13 @@
  * and delete blog posts.
  */
 
-const createNewUser = require(
-  '../puppeteer-testing-utilities/initializeUsersUtils.js');
+const userFactor = require(
+  '../puppeteer-testing-utilities/userFactory.js');
 const { closeAllBrowsers } = require(
-  '../puppeteer-testing-utilities/initializeUsersUtils.js');
+  '../puppeteer-testing-utilities/userFactory.js');
 
 let publishBlogPostAndDeletePublishedBlogPost = async function() {
-  const blogPostEditor = await createNewUser.blogPostEditor('blogPostEditor');
+  const blogPostEditor = await userFactor.createNewBlogPostEditor('blogPostEditor');
 
   await blogPostEditor.expectNumberOfDraftAndPublishedBlogPostsToBe(0);
   await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
