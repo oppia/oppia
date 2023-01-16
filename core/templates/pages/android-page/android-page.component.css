@@ -252,6 +252,8 @@
   border-radius: 50%;
   color: #fff;
   padding: 15px 20px;
+  position: relative;
+  z-index: 100;
 }
 
 .oppia-android-carousel-item-container {
@@ -369,7 +371,6 @@
   }
 
   .oppia-android-features {
-    height: 100vh;
     margin-bottom: 100px;
     margin-left: 0;
     margin-top: 100px;
