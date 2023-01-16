@@ -1,30 +1,40 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
   <li class="oppia-dropdown-menu-container">
     <div ngbDropdown>
-      <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
-              [ngClass]="{'btn-success': isStorySaveable()}"
-              (click)="saveChanges()"
-              [disabled]="!isStorySaveable()">
-        <span *ngIf="!isSaveInProgress()">
-          <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
-             alt="Save Story">
-          </i>
-          <span class="oppia-save-publish-button-label oppia-save-draft-text float-left">
-            Save Draft
+      <span [matTooltip]="getAllStoryWarnings()"
+            matTooltipClass="oppia-mat-tooltip-list"
+            [matTooltipDisabled]="isWarningTooltipDisabled()"
+            aria-label="List that shows issues preventing to save story as draft"
+            class="w-100">
+        <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+                [ngClass]="{'btn-success': isStorySaveable()}"
+                (click)="saveChanges()"
+                [disabled]="!isStorySaveable()">
+          <span *ngIf="!isSaveInProgress()">
+            <i *ngIf="isWarningTooltipDisabled()"
+               class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
+               alt="Save Story">
+            </i>
+            <i class="fas fa-exclamation-triangle story-save-draft-warning"
+               *ngIf="!isWarningTooltipDisabled()">
+            </i>
+            <span class="oppia-save-publish-button-label oppia-save-draft-text float-left">
+              Save Draft
+            </span>
+            <span class="d-none d-md-block float-left oppia-changes-count"
+                  *ngIf="getChangeListLength() > 0">
+              ({{ getChangeListLength() }})
+            </span>
           </span>
-          <span class="d-none d-md-block float-left oppia-changes-count"
-                *ngIf="getChangeListLength() > 0">
-            ({{ getChangeListLength() }})
-          </span>
-        </span>
 
-        <span *ngIf="isSaveInProgress()">
-          <span class="oppia-save-publish-button-label">
-            Saving
+          <span *ngIf="isSaveInProgress()">
+            <span class="oppia-save-publish-button-label">
+              Saving
+            </span>
+            <loading-dots></loading-dots>
           </span>
-          <loading-dots></loading-dots>
-        </span>
-      </button>
+        </button>
+      </span>
       <button type="button"
               class="btn btn-light dropdown-toggle oppia-dropdown-toggle e2e-test-show-discard-option"
               [disabled]="!getChangeListLength()"
@@ -85,7 +95,8 @@
         </div>
       </div>
       <div>
-        <div *ngIf="warningsAreShown" class="warning-box">
+        <div *ngIf="warningsAreShown"
+             class="warning-box">
           <span>Warnings</span>
           <div *ngFor="let issue of validationIssues;trackBy:$index">
             <hr class="oppia-editor-warnings-separator">
@@ -98,8 +109,10 @@
         </div>
       </div>
       <div class="story-nav-dropdown-content">
-        <div class="story-nav-dropdown-text" (click)="toggleWarningText()">
-          <i *ngIf="!getTotalWarningsCount()" class="fas fa-pen navbar-tab-icon">
+        <div class="story-nav-dropdown-text"
+             (click)="toggleWarningText()">
+          <i *ngIf="!getTotalWarningsCount()"
+             class="fas fa-pen navbar-tab-icon">
           </i>
           <span>{{ activeTab }}</span>
           <span *ngIf="getTotalWarningsCount()">
@@ -173,7 +186,7 @@
     display: none;
   }
   .story-nav-mobile .navbar-tab-icon {
-      padding: 5px;
+    padding: 5px;
   }
   .oppia-dropdown-menu-container {
     margin-right: 5px;
@@ -278,16 +291,13 @@
       flex-wrap: wrap;
       justify-content: space-between;
     }
-
     .right-container {
       background-color: #419889;
       color: #fff;
     }
-
     .story-nav-dropdown-option {
       padding: 5px 0;
     }
-
     .story-nav-dropdown-icon {
       align-items: center;
       background-color: #e6e6e6;
