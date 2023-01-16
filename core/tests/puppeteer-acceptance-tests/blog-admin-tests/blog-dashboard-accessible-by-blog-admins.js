@@ -27,7 +27,7 @@ let blogDashboardAccessibleByBlogAdmins = async function() {
   const blogAdmin = await userFactor.createNewBlogAdmin('blogAdm');
 
   /** The blog-dashboard is not accessible to any guest user
-   *  as the user donot have the blog admin role. */
+   *  as the user does not have the blog admin role. */
   await guestUser.expectBlogDashboardAccessToBeUnauthorized();
 
   await blogAdmin.expectBlogDashboardAccessToBeAuthorized();

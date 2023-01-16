@@ -311,6 +311,16 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Successfully updated the tag limit to ' + limit + '!');
   }
 
+  async expectMaximumTagLimitNotToBe(limit) {
+    await this.page.evaluate(async(limit) => {
+      const tagLimit = document.getElementById('mat-input-0').value;
+      if (tagLimit.value === limit) {
+        throw new Error('Maximum tag limit is already ' + limit + '!');
+      }
+    }, limit);
+    showMessage('Maximum tag limit is not ' + limit + '!');
+  }
+
   async expectMaximumTagLimitToBe(limit) {
     await this.page.evaluate(async(limit) => {
       const tagLimit = document.getElementById('mat-input-0').value;
