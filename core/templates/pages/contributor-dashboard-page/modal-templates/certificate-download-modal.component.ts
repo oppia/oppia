@@ -185,8 +185,7 @@ export class CertificateDownloadModalComponent {
       linePosition += 100;
 
       if (this.suggestionType === 'translate_content') {
-        let certificateContentData: [CertificateContentData];
-        certificateContentData.push(
+        const certificateContentData: CertificateContentData[] = [
           {
             text: 'for their dedication and time in translating Oppia\'s ' +
             'basic maths lessons to ' + response.language,
@@ -208,14 +207,13 @@ export class CertificateDownloadModalComponent {
             response.to_date + '.',
             linePosition: linePosition += 40
           }
-        );
+        ];
         this.fillCertificateContent(
           ctx, certificateContentData
         );
         linePosition += 100;
       } else {
-        let certificateContentData: [CertificateContentData];
-        certificateContentData.push(
+        const certificateContentData: CertificateContentData[] = [
           {
             text: 'for their dedication and time in contributing practice ' +
             'questions to Oppia\'s',
@@ -237,8 +235,8 @@ export class CertificateDownloadModalComponent {
           {
             text: `to Oppia from ${response.from_date} to ${response.to_date}.`,
             linePosition: linePosition += 40
-          },
-        );
+          }
+        ];
         this.fillCertificateContent(
           ctx, certificateContentData
         );
@@ -284,7 +282,7 @@ export class CertificateDownloadModalComponent {
 
   fillCertificateContent(
       ctx: CanvasRenderingContext2D,
-      data: [CertificateContentData]
+      data: CertificateContentData[]
   ): void {
     data.forEach((data: CertificateContentData) => {
       ctx.fillText(
