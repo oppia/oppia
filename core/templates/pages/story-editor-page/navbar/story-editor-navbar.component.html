@@ -15,10 +15,8 @@
                class="fas fa-save md-18 md-dark oppia-save-publish-button-icon story-editor-save-draft-icon"
                alt="Save Story">
             </i>
-            <mat-icon *ngIf="!isWarningTooltipDisabled()"
-                      class="story-save-draft-warning">
-              warning
-            </mat-icon>
+            <i class="fas fa-exclamation-triangle story-save-draft-warning"
+               *ngIf="!isWarningTooltipDisabled()"></i>
             <span class="oppia-save-publish-button-label oppia-save-draft-text float-left">
               Save Draft
             </span>
