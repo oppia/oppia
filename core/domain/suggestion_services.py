@@ -3110,7 +3110,8 @@ def _generate_translation_contributor_certificate_data(
         words_without_empty_strings = [
             word for word in words if word != '']
         words_count += len(words_without_empty_strings)
-    # Source: https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
+    # Goto the below link for more information.
+    # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
     hours_contributed = round((words_count / 300), 2)
 
     if words_count == 0:
@@ -3173,7 +3174,8 @@ def _generate_question_contributor_certificate_data(
             minutes_contributed += 20
         else:
             minutes_contributed += 12
-    # Source: https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
+    # Goto the below link for more information.
+    # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
     hours_contributed = round((minutes_contributed / 60), 2)
 
     if minutes_contributed == 0:
