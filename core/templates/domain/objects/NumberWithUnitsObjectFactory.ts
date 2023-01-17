@@ -79,9 +79,7 @@ export class NumberWithUnits {
     // for complete sanitization of tags. See https://codeql.github.com/codeql-
     // query-help/javascript/js-incomplete-multi-character-sanitization/.
     if (unitsString.includes('$')) {
-      while (unitsString.includes('$')) {
-        unitsString = unitsString.replace('$', '');
-      }
+      unitsString = unitsString.replaceAll(/\$/g, '');
       numberWithUnitsString += '$' + ' ';
     }
     if (unitsString.includes('Rs')) {
