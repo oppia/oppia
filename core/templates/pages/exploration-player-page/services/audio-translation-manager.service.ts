@@ -133,9 +133,7 @@ export class AudioTranslationManagerService {
     // A while loop is used here to ensure multiple passes through the string
     // for complete sanitization of tags. See https://codeql.github.com/codeql-
     // query-help/javascript/js-incomplete-multi-character-sanitization/.
-    while (cleanChoiceLabel.includes('<')) {
-      cleanChoiceLabel = cleanChoiceLabel.replace(/<[^>]+>/g, '');
-    }
+    cleanChoiceLabel = cleanChoiceLabel.replaceAll(/<[^>]+>/g, '');
     // Add a stop for the voiceover with a dot. Useful for multiple choices.
     return cleanChoiceLabel + '. ';
   }

@@ -130,9 +130,7 @@ export class CkEditorCopyContentService {
     // A while loop is used here to ensure multiple passes through the string
     // for complete sanitization of tags. See https://codeql.github.com/codeql-
     // query-help/javascript/js-incomplete-multi-character-sanitization/.
-    while (html.includes('<!--')) {
-      html = html.replace(/<!--[^>]*-*-*>*/gm, '');
-    }
+    html = html.replaceAll(/<!--[^>]*-->/g, '').trim();
     if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
