@@ -38,7 +38,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class ContributorDashboardPageComponent
   implements OnInit {
-  OPPIA_AVATAR_LINK_URL: string | null = AppConstants.OPPIA_AVATAR_LINK_URL;
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
