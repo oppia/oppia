@@ -76,7 +76,7 @@ export class NumberWithUnits {
     let unitsString = (new UnitsObjectFactory()).fromList(
       this.units).toString();
     if (unitsString.includes('$')) {
-      unitsString = unitsString.replace('$', '');
+      unitsString = unitsString.replaceAll('$', '');
       numberWithUnitsString += '$' + ' ';
     }
     if (unitsString.includes('Rs')) {
