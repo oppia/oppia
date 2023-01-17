@@ -176,7 +176,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('div', 'PUBLISHED');
     showMessage('Navigated to publish tab.');
   }
-  
+
   async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle) {
     await this.goto(blogDashboardUrl);
     await this.page.evaluate(async(checkDraftBlogPostByTitle) => {
@@ -205,33 +205,33 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       ' exists!');
   }
 
-  async expectPublishedBlogPostWithTitleToBePresent(checkPublishBlogPostByTitle) {
+  async expectPublishedBlogPostWithTitleToBePresent(blogPostTitle) {
     await this.goto(blogDashboardUrl);
     await this.clickOn('div', 'PUBLISHED');
-    await this.page.evaluate(async(checkPublishBlogPostByTitle) => {
+    await this.page.evaluate(async(blogPostTitle) => {
       const allPublishedBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
       let count = 0;
       for (let i = 0; i < allPublishedBlogPosts.length; i++) {
         let publishedBlogPostTitle = allPublishedBlogPosts[i].
           getElementsByClassName('e2e-test-blog-post-title')[0].innerText;
-        if (publishedBlogPostTitle === checkPublishBlogPostByTitle) {
+        if (publishedBlogPostTitle === blogPostTitle) {
           count++;
         }
       }
       if (count === 0) {
         throw new Error(
           'Blog post with title ' +
-          checkPublishBlogPostByTitle + ' does not exist!');
+          blogPostTitle + ' does not exist!');
       } else if (count > 1) {
         throw new Error(
           'Blog post with title ' +
-          checkPublishBlogPostByTitle + ' exists more than once!');
+          blogPostTitle + ' exists more than once!');
       }
-    }, checkPublishBlogPostByTitle);
+    }, blogPostTitle);
     showMessage(
       'Published blog post with title ' +
-      checkPublishBlogPostByTitle + ' exists!');
+      blogPostTitle + ' exists!');
   }
 
   async expectBlogDashboardAccessToBeUnauthorized() {
