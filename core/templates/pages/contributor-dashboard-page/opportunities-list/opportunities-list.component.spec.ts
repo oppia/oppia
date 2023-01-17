@@ -747,6 +747,8 @@ describe('Opportunities List Component', () => {
 
       component.init();
       tick();
+      component.ngOnInit();
+      tick();
 
       expect(component.activePageNumber).toBe(1);
     }));
