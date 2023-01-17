@@ -17,7 +17,7 @@
  * tag properties from the blog-admin page.
  */
 
-const userFactor = require(
+const userFactory = require(
   '../puppeteer-testing-utilities/userFactory.js');
 const { closeAllBrowsers } = require(
   '../puppeteer-testing-utilities/userFactory.js');
@@ -26,10 +26,10 @@ const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 
 let assignRolesToUsersAndChangeTagProperties = async function() {
-  const blogAdmin = await userFactor.createNewBlogAdmin('blogAdm');
-  const superAdmin = await userFactor.createNewSuperAdmin('superAdm');
-  await userFactor.createNewGuestUser('guestUsr1', 'guest_user1@example.com');
-  await userFactor.createNewGuestUser('guestUsr2', 'guest_user2@example.com');
+  const blogAdmin = await userFactory.createNewBlogAdmin('blogAdm');
+  const superAdmin = await userFactory.createNewSuperAdmin('superAdm');
+  await userFactory.createNewGuestUser('guestUsr1', 'guest_user1@example.com');
+  await userFactory.createNewGuestUser('guestUsr2', 'guest_user2@example.com');
 
   await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLE_BLOG_ADMIN);
   await blogAdmin.assignUserToRoleFromBlogAdminPage('guestUsr1', 'BLOG_ADMIN');

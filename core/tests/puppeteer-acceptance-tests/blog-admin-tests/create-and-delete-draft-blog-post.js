@@ -17,13 +17,13 @@
  * delete draft blog posts.
  */
 
-const userFactor = require(
+const userFactory = require(
   '../puppeteer-testing-utilities/userFactory.js');
 const { closeAllBrowsers } = require(
   '../puppeteer-testing-utilities/userFactory.js');
 
 let createDraftAndDeleteDraftBlogPost = async function() {
-  const blogPostEditor = await userFactor.createNewBlogPostEditor('blogPostEditor');
+  const blogPostEditor = await userFactory.createNewBlogPostEditor('blogPostEditor');
 
   await blogPostEditor.expectNumberOfBlogPostsToBe(0);
   await blogPostEditor.createDraftBlogPostWithTitle('Test-Blog');

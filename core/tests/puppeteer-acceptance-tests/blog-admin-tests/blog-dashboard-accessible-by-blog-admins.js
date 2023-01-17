@@ -16,15 +16,15 @@
  * @fileoverview Accpetance Test for a Super Admin assign Blog Admin role.
  */
 
-const userFactor = require(
+const userFactory = require(
   '../puppeteer-testing-utilities/userFactory.js');
 const { closeAllBrowsers } = require(
   '../puppeteer-testing-utilities/userFactory.js');
 
 let blogDashboardAccessibleByBlogAdmins = async function() {
-  const guestUser = await userFactor.createNewGuestUser(
+  const guestUser = await userFactory.createNewGuestUser(
     'guestUser', 'guest_user@example.com');
-  const blogAdmin = await userFactor.createNewBlogAdmin('blogAdm');
+  const blogAdmin = await userFactory.createNewBlogAdmin('blogAdm');
 
   /** The blog-dashboard is not accessible to any guest user
    *  as the user does not have the blog admin role. */
