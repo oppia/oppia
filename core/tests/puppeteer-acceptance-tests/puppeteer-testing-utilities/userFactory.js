@@ -19,7 +19,7 @@
 const e2eSuperAdmin = require('./blogPostAdminUtils.js');
 const e2eBlogAdmin = require('./blogPostAdminUtils.js');
 const e2eBlogPostEditor = require('./blogPostAdminUtils.js');
-const e2eGuestUser = require('./puppeteer_utils.js');
+const e2eGuestUser = require('./blogPostAdminUtils.js');
 
 let superAdminInstance = null, blogAdminInstance = null,
   blogPostEditorInstance = null;
