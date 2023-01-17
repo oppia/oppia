@@ -32,7 +32,7 @@ import { TranslateTextService } from '../services/translate-text.service';
 
 @Component({
   selector: 'oppia-translation-opportunities',
-  templateUrl: './translation-opportunities.component.html',
+  templateUrl: './translation-opportunities.component.html', 
 })
 export class TranslationOpportunitiesComponent {
   // These properties are initialized using Angular lifecycle hooks
