@@ -3,7 +3,7 @@
 // See: https://github.com/Microsoft/dtslint#typestsconfigjson
 {
   "compilerOptions": {
-    "lib": ["es2017", "dom", "webworker"],
+    "lib": ["esnext", "dom", "webworker"],
     "target": "es6",
     "noImplicitAny": true,
     "noImplicitThis": true,
