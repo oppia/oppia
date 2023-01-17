@@ -153,7 +153,7 @@ def run_shell_cmd(
     try:
         last_stdout_str = last_stdout_bytes.decode('utf-8')
         last_stderr_str = last_stderr_bytes.decode('utf-8')
-    except UnicodeDecodeError as e:
+    except UnicodeDecodeError as e:  # pragma: no cover
         # We sometimes get a UnicodeDecodeError with an "invalid continuation
         # byte" or "invalid start byte" message, and this can sometimes happen
         # when trying to read a non-unicode file. To help debug this issue,
