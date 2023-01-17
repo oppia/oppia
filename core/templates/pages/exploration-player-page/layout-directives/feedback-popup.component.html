@@ -15,7 +15,7 @@
     </div>
 
     <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
-    <button mat-button class="float-right oppia-exploration-feedback-submit-btn e2e-test-exploration-feedback-submit-btn"
+    <button mat-button class=" btn btn-success float-right oppia-exploration-feedback-submit-btn e2e-test-exploration-feedback-submit-btn"
             [ngClass]="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}"
             (click)="saveFeedback()"
             [disabled]="!feedbackText || feedbackText.length > MAX_REVIEW_MESSAGE_LENGTH">
