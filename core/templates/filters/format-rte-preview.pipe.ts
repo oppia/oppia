@@ -35,10 +35,7 @@ export class FormatRtePreviewPipe {
     html = html.replace(/&nbsp;/ig, ' ');
     html = html.replace(/&quot;/ig, '');
     // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
-    // A while loop is used here to ensure multiple passes through the string
-    // for complete sanitization of tags. See https://codeql.github.com/codeql-
-    // query-help/javascript/js-incomplete-multi-character-sanitization/.
-    html = html.replaceAll(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
     let formattedOutput = html.replace(/(<([^>]+)>)/g, rteTag => {
       let replaceString = (
         this.capitalizePipe.transform(rteTag.split('-')[2].split(' ')[0]));

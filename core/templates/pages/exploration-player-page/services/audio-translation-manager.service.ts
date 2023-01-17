@@ -130,10 +130,7 @@ export class AudioTranslationManagerService {
     // If the labels are in html format, remove the tags and leave the
     // content only.
     let cleanChoiceLabel = html;
-    // A while loop is used here to ensure multiple passes through the string
-    // for complete sanitization of tags. See https://codeql.github.com/codeql-
-    // query-help/javascript/js-incomplete-multi-character-sanitization/.
-    cleanChoiceLabel = cleanChoiceLabel.replaceAll(/<[^>]+>/g, '');
+    cleanChoiceLabel = cleanChoiceLabel.replace(/<[^>]+>/g, '');
     // Add a stop for the voiceover with a dot. Useful for multiple choices.
     return cleanChoiceLabel + '. ';
   }
