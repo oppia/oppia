@@ -41,6 +41,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('button', ' Save ');
   }
 
+  async navigateToBlogDashboardPage() {
+    await this.goto(blogDashboardUrl);
+  }
+
   async createDraftBlogPostWithTitle(draftBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
     // See Note-1 below.

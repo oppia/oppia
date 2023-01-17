@@ -25,8 +25,10 @@ const { closeAllBrowsers } = require(
 let createDraftAndDeleteDraftBlogPost = async function() {
   const blogPostEditor = await userFactory.createNewBlogPostEditor('blogPostEditor');
 
+  await blogPostEditor.navigateToBlogDashboardPage();
   await blogPostEditor.expectNumberOfBlogPostsToBe(0);
   await blogPostEditor.createDraftBlogPostWithTitle('Test-Blog');
+
   await blogPostEditor.expectNumberOfBlogPostsToBe(1);
   await blogPostEditor.expectDraftBlogPostWithTitleToBePresent('Test-Blog');
 
