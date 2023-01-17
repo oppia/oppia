@@ -106,7 +106,7 @@ export class StateCard {
   }
 
   getInteractionId(): string | null {
-    if (this.getInteraction()) {
+    if (this.getInteraction() && this.getInteraction().id !== '') {
       return this.getInteraction().id;
     }
     return null;

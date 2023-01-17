@@ -92,14 +92,14 @@ export class Interaction {
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome | null;
   hints: Hint[];
-  id: string | null;
+  id: string;
   solution: Solution | null;
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome | null,
-      hints: Hint[], id: string | null, solution: Solution | null) {
+      hints: Hint[], id: string, solution: Solution | null) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -391,10 +391,10 @@ export class InteractionObjectFactory {
   }
 
   convertFromCustomizationArgsBackendDict(
-      interactionId: string | null,
+      interactionId: string,
       caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
-    if (interactionId === null) {
+    if (interactionId === '') {
       return {};
     }
     switch (interactionId) {
@@ -464,21 +464,21 @@ export class InteractionObjectFactory {
     return new Interaction(
       this.createAnswerGroupsFromBackendDict(
         interactionDict.answer_groups,
-        interactionDict.id),
+        interactionDict.id ?? ''),
       interactionDict.confirmed_unclassified_answers,
       this.convertFromCustomizationArgsBackendDict(
-        interactionDict.id, interactionDict.customization_args),
+        interactionDict.id ?? '', interactionDict.customization_args),
       interactionDict.default_outcome ? this.createOutcomeFromBackendDict(
         interactionDict.default_outcome) : null,
       this.createHintsFromBackendDict(interactionDict.hints),
-      interactionDict.id,
+      interactionDict.id ?? '',
       interactionDict.solution ? this.createSolutionFromBackendDict(
         interactionDict.solution) : null);
   }
 
   createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
-      interactionId: string | null
+      interactionId: string,
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {

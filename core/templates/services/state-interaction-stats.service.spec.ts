@@ -197,7 +197,7 @@ describe('State Interaction Stats Service', () => {
 
   it('should throw error if interaction id does not exist',
     fakeAsync(async() => {
-      mockState.interaction.id = null;
+      mockState.interaction.id = '';
 
       expect(() => {
         stateInteractionStatsService.computeStatsAsync(expId, mockState);

@@ -261,7 +261,7 @@ describe('Solution object factory', () => {
         choices: {
           value: [new SubtitledHtml('This is a choice', '')]
         }
-      }, null, [], null, null);
+      }, null, [], '', null);
 
       expect(() => {
         solution.getOppiaShortAnswerResponseHtml(interaction);
