@@ -24,23 +24,81 @@ from __future__ import annotations
 
 import os
 
+from typing import Dict, List, Optional, Union
+import xmltodict
 import yaml
 
+XmlIndexesDict = Dict[
+    str, Dict[
+        str, List[Dict[str, Union[str, Dict[str, str], List[Dict[str, str]]]]]
+    ]
+]
+YamlIndexesDict = Dict[
+    str, List[Dict[str, Union[str, Dict[str, str], List[Dict[str, str]]]]]
+]
+
 INDEX_YAML_PATH = os.path.join(os.getcwd(), 'index.yaml')
-WEB_INF_INDEX_YAML_PATH = os.path.join(
-    os.getcwd(), '..', 'cloud_datastore_emulator_cache', 'WEB-INF', 'index.yaml'
+WEB_INF_INDEX_XML_PATH = os.path.join(
+    os.getcwd(),
+    os.pardir,
+    'cloud_datastore_emulator_cache',
+    'WEB-INF',
+    'appengine-generated',
+    'datastore-indexes-auto.xml'
 )
+
+
+def reformat_xml_dict_into_yaml_dict(
+    xml_dict: XmlIndexesDict
+) -> Optional[YamlIndexesDict]:
+    """Reformats the xml index dict into yaml index dict.
+
+    Args:
+        xml_dict: dict. The dict parsed from xml index file.
+
+    Returns:
+        dict. The dict in yaml format.
+    """
+    yaml_index_entries = []
+    if (
+        'datastore-indexes' not in xml_dict or
+        'datastore-index' not in xml_dict['datastore-indexes']
+    ):
+        return None
+
+    for xml_index in xml_dict['datastore-indexes']['datastore-index']:
+        yaml_index_properties: List[Dict[str, str]] = []
+        for xml_index_property in xml_index['property']:
+            assert isinstance(xml_index_property, dict)
+            yaml_index_property = {
+                'name': xml_index_property['@name'],
+            }
+            if xml_index_property['@direction'] == 'desc':
+                yaml_index_property['direction'] = 'desc'
+            yaml_index_properties.append(yaml_index_property)
+
+        yaml_index_entries.append({
+            'kind': xml_index['@kind'], 'properties': yaml_index_properties
+        })
+
+    return {'indexes': yaml_index_entries}
 
 
 def main() -> None:
     """Extends index.yaml file."""
     with open(INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
         index_yaml_dict = yaml.safe_load(f)
-    with open(WEB_INF_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
-        web_inf_index_yaml_dict = yaml.safe_load(f)
 
-    if web_inf_index_yaml_dict['indexes'] is None:
-        return
+    with open(WEB_INF_INDEX_XML_PATH, 'r', encoding='utf-8') as f:
+        web_inf_index_xml_dict = xmltodict.parse(
+            f.read(), force_list={'datastore-index', 'property'}
+        )
+
+    web_inf_index_yaml_dict = reformat_xml_dict_into_yaml_dict(
+        web_inf_index_xml_dict)
+
+    if web_inf_index_yaml_dict is None:
+        return None
 
     new_kinds = [
         kind for kind in web_inf_index_yaml_dict['indexes']
