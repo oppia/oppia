@@ -18,7 +18,7 @@
 
 import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
+// Import { AppConstants } from 'app.constants';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
@@ -58,7 +58,6 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
   lastAnswer: string | null = null;
   maxHelpCardHeightSeen: number = 0;
   helpCardHasContinueButton: boolean = false;
-  OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
   CONTINUE_BUTTON_FOCUS_LABEL: string = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
 

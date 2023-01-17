@@ -28,7 +28,7 @@ import { UserService } from 'services/user.service';
 import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 import { TranslateTextService } from '../services/translate-text.service';
-import { AppConstants } from 'app.constants';
+// Import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-translation-opportunities',
@@ -39,8 +39,6 @@ export class TranslationOpportunitiesComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   OPPIA_AVATAR_IMAGE_URL!: string;
-  // This constant is defined as null at AppConstants.
-  OPPIA_AVATAR_LINK_URL!: string | null;
 
   allOpportunities: {[id: string]: TranslationOpportunity} = {};
   userIsLoggedIn = false;
