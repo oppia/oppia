@@ -27,7 +27,7 @@ import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { StoryReference } from 'domain/topic/story-reference-object.model';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 
 describe('Topic editor page', function() {
   var ctrl = null;

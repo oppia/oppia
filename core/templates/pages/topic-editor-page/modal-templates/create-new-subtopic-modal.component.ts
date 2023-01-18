@@ -22,7 +22,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { WindowRef } from 'services/contextual/window-ref.service';
 import AppConstants from 'assets/constants';
 import cloneDeep from 'lodash/cloneDeep';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
