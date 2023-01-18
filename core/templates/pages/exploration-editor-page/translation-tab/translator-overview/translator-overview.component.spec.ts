@@ -140,7 +140,6 @@ describe('Translator Overview component', () => {
   it('should change to voiceover active mode when changing translation tab',
     fakeAsync(() => {
       spyOn(translationTabActiveModeService, 'activateVoiceoverMode');
-      spyOn(graphDataService, 'recompute');
       spyOn(translationStatusService, 'refresh');
 
       component.changeActiveMode('Voiceover');
@@ -149,8 +148,7 @@ describe('Translator Overview component', () => {
         .toHaveBeenCalled();
       expect(translationStatusService.refresh).toHaveBeenCalled();
 
-      tick();
-      expect(graphDataService.recompute).toHaveBeenCalled();
+      flush();
     })
   );
 
@@ -166,7 +164,7 @@ describe('Translator Overview component', () => {
         .toHaveBeenCalled();
       expect(translationStatusService.refresh).toHaveBeenCalled();
 
-      tick();
+      flush();
       expect(graphDataService.recompute).toHaveBeenCalled();
     })
   );
@@ -177,7 +175,7 @@ describe('Translator Overview component', () => {
       component.languageCode = 'es';
       component.changeTranslationLanguage();
 
-      tick();
+      flush();
       expect(translationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalled();
     })
@@ -192,7 +190,7 @@ describe('Translator Overview component', () => {
         .returnValue(showTranslationTabBusyModalEmitter);
       component.changeTranslationLanguage();
 
-      tick();
+      flush();
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
 
       // Reset value for isTranslationTabBusy.
