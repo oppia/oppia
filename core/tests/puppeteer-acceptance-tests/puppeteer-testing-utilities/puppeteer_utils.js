@@ -24,6 +24,7 @@ const rolesEditorTab = testConstants.URLs.RolesEditorTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'e2e-test-role-edit-button';
 const rolesSelectDropdown = 'mat-select-trigger';
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing'
 
 module.exports = class puppeteerUtilities {
   page;
@@ -66,12 +67,12 @@ module.exports = class puppeteerUtilities {
   async signInWithEmail(email) {
     await this.goto(testConstants.URLs.home);
     if (!this.userHasAcceptedCookies) {
-      await this.clickOn('button', 'OK');
+      await this.clickOn('OK');
       this.userHasAcceptedCookies = true;
     }
-    await this.clickOn('span', 'Sign in');
+    await this.clickOn('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
-    await this.clickOn('span', 'Sign In');
+    await this.clickOn('Sign In');
     await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
   }
 
@@ -86,7 +87,7 @@ module.exports = class puppeteerUtilities {
     await this.clickOn('input', 'e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])');
-    await this.clickOn('button', 'Submit and start contributing');
+    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
     await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
   }
 
@@ -95,33 +96,34 @@ module.exports = class puppeteerUtilities {
    * @param {string} selector - The CSS selector of the component.
    */
   async waitForPageToLoad(selector) {
-    await (this.page).waitForSelector(selector);
+    await this.page.waitForSelector(selector);
   }
 
   /**
    * This function reloads the current page.
    */
   async reloadPage() {
-    await (this.page).reload({waitUntil: ['networkidle0', 'domcontentloaded']});
+    await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
+  }
+
+  /**
+   * The function clicks the element using the text on the button.
+   * @param {string} text - The text on the button to be clicked.
+   */
+  async clickOn(text) {
+    const [button] = await (this.page).$x(
+      '//' + '*[contains(text(), "' + text + '")]');
+    await button.click();
   }
 
   /**
    * This function clicks on any element using its CSS selector
-   * or the text written on that element.
    * @param {string} tag - The HTML tag of the element.
-   * @param {string} selector - The CSS selector or the text
-   * written on the element.
+   * @param {string} selector - The CSS selector of the element
    */
   async clickOn(tag, selector) {
-    try {
-      await (this.page).waitForXPath('//' + tag);
-      const [button] = await (this.page).$x(
-        '//' + tag + '[contains(text(), "' + selector + '")]');
-      await button.click();
-    } catch {
-      await (this.page).waitForSelector(tag + '.' + selector);
-      await (this.page).click(tag + '.' + selector);
-    }
+    await (this.page).waitForSelector(tag + '.' + selector);
+    await (this.page).click(tag + '.' + selector);
   }
 
   /**
@@ -133,7 +135,7 @@ module.exports = class puppeteerUtilities {
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn('button', roleEditorButtonSelector);
-    await this.clickOn('h4', 'Add role');
+    await this.clickOn('Add role');
     await this.clickOn('div', rolesSelectDropdown);
     await this.page.evaluate(async(role) => {
       const allRoles = document.getElementsByClassName('mat-option-text');

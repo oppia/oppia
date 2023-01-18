@@ -32,13 +32,21 @@ const maximumTagLimitInput = 'input#mat-input-0';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
+const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = ' CREATE NEW BLOG POST ';
+const LABEL_FOR_SAVE_BUTTON = ' SAVE ';
+const LABEL_FOR_DONE_BUTTON = ' DONE ';
+const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
+const LABEL_FOR_DELETE_BUTTON = 'Delete';
+const LABEL_FOR_CONFIRM_BUTTON = ' Confirm ';
+const LABEL_FOR_ADD_THUMBNAIL_BUTTON = ' Add Thumbnail Image ';
+const LABEL_FOR_ADD_ELEMENT_BUTTON = ' Add element ';
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async addUserBioInBlogDashboard() {
     await this.type(blogAuthorBioField, 'Dummy-User-Bio');
     await this.page.waitForSelector(
       'button.e2e-test-save-author-details-button:not([disabled])');
-    await this.clickOn('button', ' Save ');
+    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
   }
 
   async navigateToBlogDashboardPage() {
@@ -49,14 +57,14 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.addUserBioInBlogDashboard();
     // See Note-1 below.
     await this.page.waitForTimeout(500);
-    await this.clickOn('span', ' CREATE NEW BLOG POST ');
+    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.type(blogTitleInput, draftBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
-    await this.clickOn('span', ' DONE ');
+    await this.clickOn(LABEL_FOR_DONE_BUTTON);
     await this.page.waitForSelector(
       'button.e2e-test-save-as-draft-button:not([disabled])');
-    await this.clickOn('span', 'SAVE AS DRAFT');
+    await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
 
     showMessage('Successfully created a draft blog post!');
     await this.goto(blogDashboardUrl);
@@ -66,9 +74,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.page.exposeFunction('deleteDraftBlogPost', async() => {
       // See Note-2 below.
       await this.page.waitForTimeout(100);
-      await this.clickOn('span', 'Delete');
+      await this.clickOn(LABEL_FOR_DELETE_BUTTON);
       await this.page.waitForSelector('div.modal-dialog');
-      await this.clickOn('button', ' Confirm ');
+      await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
       showMessage('Draft blog post with given title deleted successfully!');
     });
     await this.page.evaluate(async({draftBlogPostTitle}) => {
@@ -107,38 +115,38 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.addUserBioInBlogDashboard();
     // See Note-1 below.
     await this.page.waitForTimeout(500);
-    await this.clickOn('span', ' CREATE NEW BLOG POST ');
+    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
 
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn('button', 'mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn('div', thumbnailPhotoBox);
     await this.uploadFile('blog-post-thumbnail.svg');
-    await this.clickOn('button', ' Add Thumbnail Image ');
+    await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
 
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
-    await this.clickOn('span', ' DONE ');
+    await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
     await this.page.waitForSelector(
       'button.e2e-test-publish-blog-post-button:not([disabled])');
-    await this.clickOn('span', 'PUBLISH');
+    await this.clickOn('PUBLISH');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
-    await this.clickOn('button', ' Confirm ');
+    await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
     showMessage('Successfully published a blog post!');
   }
 
   async deletePublishedBlogPostWithTitle(toDeletePublishedBlogPostTitle) {
-    await this.clickOn('div', 'PUBLISHED');
+    await this.clickOn('PUBLISHED');
     await this.page.exposeFunction('deletePublishedBlogPost', async() => {
       // See Note-2 below.
       await this.page.waitForTimeout(100);
-      await this.clickOn('span', 'Delete');
+      await this.clickOn(LABEL_FOR_DELETE_BUTTON);
       await this.page.waitForSelector('button.e2e-test-confirm-button');
-      await this.clickOn('button', ' Confirm ');
+      await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
       showMessage('Published blog post with given title deleted successfully!');
     });
     await this.page.evaluate(async(toDeletePublishedBlogPostTitle) => {
@@ -173,7 +181,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
   async navigateToPublishTab() {
     await this.goto(blogDashboardUrl);
-    await this.clickOn('div', 'PUBLISHED');
+    await this.clickOn('PUBLISHED');
     showMessage('Navigated to publish tab.');
   }
 
@@ -207,7 +215,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
   async expectPublishedBlogPostWithTitleToBePresent(blogPostTitle) {
     await this.goto(blogDashboardUrl);
-    await this.clickOn('div', 'PUBLISHED');
+    await this.clickOn('PUBLISHED');
     await this.page.evaluate(async(blogPostTitle) => {
       const allPublishedBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
@@ -264,13 +272,13 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
-    await this.clickOn('button', 'Update Role');
+    await this.clickOn('Update Role');
   }
 
   async removeBlogEditorRoleFromUsername(username) {
     await this.goto(blogAdminUrl);
     await this.type(blogEditorUsernameInput, username);
-    await this.clickOn('button', 'Remove Blog Editor ');
+    await this.clickOn('Remove Blog Editor ');
   }
 
   async expectTagToNotExistInBlogTags(tagName) {
@@ -286,13 +294,13 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   async addNewBlogTag(tagName) {
-    await this.clickOn('button', ' Add element ');
+    await this.clickOn(LABEL_FOR_ADD_ELEMENT_BUTTON);
     await this.page.waitForTimeout(100);
     await this.page.evaluate((tagName) => {
       const tagList = document.getElementsByClassName('form-control');
       tagList[tagList.length - 1].value = tagName;
     }, tagName);
-    await this.clickOn('button', 'Save');
+    await this.clickOn('Save');
     showMessage('Tag ' + tagName + ' added in tag list successfully!');
   }
 
@@ -316,7 +324,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.page.keyboard.press('Backspace');
 
     await this.type(maximumTagLimitInput, limit);
-    await this.clickOn('button', 'Save');
+    await this.clickOn('Save');
 
     showMessage('Successfully updated the tag limit to ' + limit + '!');
   }
@@ -356,7 +364,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
  */
 
 /* NOTE 2 */
-/** Giving explicit waitForTimeout when clicking 'Unpublish' or 'Delete' button
+/** Giving explicit waitForTimeout when clicking 'Unpublish' or 'DELETE' button
  * in the blog dashboard page (for deleting or unpublishing any blog post) as we
  * need to wait for the small transition to complete.
  * We cannot wait for the particular element using its selector because on
