@@ -38,8 +38,13 @@ describe('Debouncer service', () => {
       jasmine.clock().install();
       const fnToBeCalled = () => ls.log('function was called');
       ds.debounce(fnToBeCalled, 5)();
+<<<<<<< HEAD
       // Ticks for 10 seconds so all the setTimeout calls will be executed.
       jasmine.clock().tick(200000);
+=======
+      // Ticks for 15 seconds so all the setTimeout calls will be executed.
+      jasmine.clock().tick(15000);
+>>>>>>> upstream/develop
       jasmine.clock().uninstall();
       expect(loggerServiceSpy).toHaveBeenCalled();
     });
