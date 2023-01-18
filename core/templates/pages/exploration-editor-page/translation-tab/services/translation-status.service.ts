@@ -49,7 +49,7 @@ export class TranslationStatusService implements OnInit {
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   langCode!: string;
-  stateNeedsUpdateWarnings!: Record<string, string[]>;
+  stateNeedsUpdateWarnings!: Record<string, string[]> = {};
   stateWiseStatusColor!: Record<string, string>;
   explorationTranslationContentRequiredCount!: number;
   explorationVoiceoverContentRequiredCount!: number;
