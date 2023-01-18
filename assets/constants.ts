@@ -6046,7 +6046,7 @@ export default {
   // the users' browsers as garbage (although it'd expire eventually).
   "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
 
-  "ALLOW_YAML_FILE_UPLOAD": true,
+  "ALLOW_YAML_FILE_UPLOAD": false,
 
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
