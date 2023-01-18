@@ -47,7 +47,7 @@ interface BlogPostEditorBackendResponse {
 }
 
 interface DoesBlogPostWithTitleExistBackendResponse {
-  'blog_post_id': string;
+  'blog_post_exists': boolean;
 }
 
 export interface BlogPostEditorData {
@@ -161,13 +161,12 @@ export class BlogPostEditorBackendApiService {
     });
   }
 
-  async does_blog_post_with_given_title_already_exist(
+  async doesPostWithGivenTitleAlreadyExistAsync(
       blogPostId: string, title: string
   ): Promise<boolean> {
     const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
       BlogDashboardPageConstants.BLOG_POST_TITLE_HANDLER_URL_TEMPLATE, {
-        blog_post_id: blogPostId,
-        title: title,
+        blog_post_id: blogPostId
       });
     return new Promise((resolve, reject) => {
       this.http.get<DoesBlogPostWithTitleExistBackendResponse>(
@@ -178,7 +177,7 @@ export class BlogPostEditorBackendApiService {
         }
       ).toPromise().then(
         (response) => {
-
+          resolve(response.blog_post_exists);
         }, (errorResponse) => {
           reject(errorResponse.error.error);
         }

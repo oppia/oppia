@@ -254,16 +254,83 @@ describe('Blog Post Editor Component', () => {
       expect(blogDashboardPageService.navigateToMainTab).toHaveBeenCalled();
     }));
 
-  it('should update local title value', () => {
-    spyOn(blogPostUpdateService, 'setBlogPostTitle');
+  it('should update local title value when title is unique and valid',
+    fakeAsync(() => {
+      spyOn(
+        blogPostEditorBackendApiService,
+        'doesPostWithGivenTitleAlreadyExistAsync'
+      ).and.returnValue(Promise.resolve(false));
+      spyOn(blogPostUpdateService, 'setBlogPostTitle');
+      component.title = 'Sample title changed';
+
+      component.blogPostData = sampleBlogPostData;
+      component.updateLocalTitleValue();
+
+      expect(blogPostUpdateService.setBlogPostTitle).toHaveBeenCalledWith(
+        sampleBlogPostData, 'Sample title changed');
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(component.titleIsDuplicate).toBeFalse();
+    })
+  );
+
+  it('should not update title and should raise error when the title is' +
+  ' duplicate', fakeAsync(() => {
+    spyOn(
+      blogPostEditorBackendApiService,
+      'doesPostWithGivenTitleAlreadyExistAsync'
+    ).and.returnValue(Promise.resolve(true));
+    spyOn(alertsService, 'addWarning');
     component.title = 'Sample title changed';
 
     component.blogPostData = sampleBlogPostData;
     component.updateLocalTitleValue();
+    tick();
 
-    expect(blogPostUpdateService.setBlogPostTitle).toHaveBeenCalledWith(
-      sampleBlogPostData, 'Sample title changed');
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Blog Post with the given title exists already. Please use a' +
+      ' different title.'
+    );
     expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+    expect(component.titleIsDuplicate).toBeTrue();
+  }));
+
+  it('should not update title and should raise error when the checking for' +
+  'uniqueness of the title fails', fakeAsync(() => {
+    spyOn(
+      blogPostEditorBackendApiService,
+      'doesPostWithGivenTitleAlreadyExistAsync'
+    ).and.returnValue(Promise.reject('Internal Server Error'));
+    spyOn(alertsService, 'addWarning');
+    component.title = 'Sample title changed';
+
+    component.blogPostData = sampleBlogPostData;
+    component.updateLocalTitleValue();
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to check if title is unique. ' +
+      'Internal Error: Internal Server Error'
+    );
+    expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+    expect(component.titleIsDuplicate).toBeFalse();
+  }));
+
+  it('should validate title pattern', () => {
+    //  A valid title contains words (containing a-zA-Z0-9) separated by spaces,
+    // hyphens(-), ampersand(&) and colon(:).
+    // Should return true if the title is valid.
+    component.title = 'valid & correct: title';
+
+    expect(component.isTitlePatternValid()).toBeTrue();
+
+    // Title contains invalid special characters.
+    component.title = 'invalid# character';
+
+    expect(component.isTitlePatternValid()).toBeFalse();
+
+    component.title = 'invalid % character';
+
+    expect(component.isTitlePatternValid()).toBeFalse();
   });
 
   it('should update local edited content', () => {
@@ -580,6 +647,11 @@ describe('Blog Post Editor Component', () => {
     component.newChangesAreMade = true;
     component.lastChangesWerePublished = true;
 
+    component.titleIsDuplicate = true;
+
+    expect(component.isPublishButtonDisabled()).toBeTrue();
+
+    component.titleIsDuplicate = false;
     expect(component.isPublishButtonDisabled()).toBe(false);
 
     component.newChangesAreMade = false;

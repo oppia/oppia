@@ -737,7 +737,7 @@ def update_blog_post(
     """
     updated_blog_post = apply_change_dict(blog_post_id, change_dict)
     if 'title' in change_dict:
-        if does_blog_post_with_title_exist(change_dict.title):
+        if does_blog_post_with_title_exist(change_dict['title'], blog_post_id):
             raise utils.ValidationError(
                 'Blog Post with given title already exists: %s'
                 % updated_blog_post.title)

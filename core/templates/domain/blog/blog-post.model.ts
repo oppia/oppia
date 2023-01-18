@@ -17,6 +17,7 @@
  * blog post domain objects.
  */
 
+import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
 export interface BlogPostBackendDict {
   'id': string ;
@@ -123,13 +124,25 @@ export class BlogPostData {
 
   validate(): string[] {
     let issues = [];
+    let validTitleRegex: RegExp = new RegExp(
+      constants.VALID_BLOG_POST_TITLE_REGEX
+    );
     if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
+    } else if (!validTitleRegex.test(this._title)) {
+      issues.push(
+        'Blog Post title contains invalid characters.'
+      );
     } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not be less than ' +
         `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
+      );
+    } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
+      issues.push(
+        'Blog Post title should not be more than ' +
+        `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (this._content === '') {
@@ -141,9 +154,16 @@ export class BlogPostData {
 
   prepublishValidate(maxTags: number): string[] {
     let issues = [];
+    let validTitleRegex: RegExp = new RegExp(
+      constants.VALID_BLOG_POST_TITLE_REGEX
+    );
     if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
+    } else if (!validTitleRegex.test(this._title)) {
+      issues.push(
+        'Blog Post title contains invalid characters.'
+      );
     } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not exceed ' +

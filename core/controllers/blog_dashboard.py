@@ -232,7 +232,8 @@ class BlogPostHandler(
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        validation_method.validate_change_dict_for_blog_post),
+                        validation_method.validate_change_dict_for_blog_post
+                    ),
                 }
             },
         },
@@ -306,7 +307,6 @@ class BlogPostHandler(
             blog_services.get_blog_post_rights(blog_post_id, strict=True))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
         change_dict = self.normalized_payload['change_dict']
-
         blog_services.update_blog_post(blog_post_id, change_dict)
         new_publish_status = self.normalized_payload['new_publish_status']
         if new_publish_status:
@@ -355,8 +355,16 @@ class BlogPostHandler(
         self.render_json(self.values)
 
 
+class BlogPostTitleHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of BlogPostTitleHandler's normalized_request
+    dictionary.
+    """
+
+    title: str
+
+
 class BlogPostTitleHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[Dict[str, str], BlogPostTitleHandlerNormalizedRequestDict]
 ):
     """A data handler for checking if a blog post with given title exists."""
 
@@ -381,7 +389,6 @@ class BlogPostTitleHandler(
             }
         },
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_blog_post
     def get(self, blog_post_id: str) -> None:

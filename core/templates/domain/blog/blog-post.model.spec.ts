@@ -54,6 +54,20 @@ describe('Blog Post Object Factory', () => {
       'Blog Post title should not be less than 5 characters.',
       'Blog Post content should not be empty.'
     ]);
+
+    sampleBlogPostData.title = 'aa'.repeat(65);
+    expect(sampleBlogPostData.validate()).toEqual([
+      'Blog Post title should not be more than 65 characters.',
+      'Blog Post content should not be empty.'
+    ]);
+
+    // Title contains invalid special characters. Only hyphens(-), ampersand(&)
+    // and colon(:) are allowed.
+    sampleBlogPostData.title = 'invalid chars#';
+    expect(sampleBlogPostData.validate()).toEqual([
+      'Blog Post title contains invalid characters.',
+      'Blog Post content should not be empty.'
+    ]);
   });
 
   it('should not find issues with a valid publishable blog post', () => {
@@ -84,6 +98,17 @@ describe('Blog Post Object Factory', () => {
       'Blog Post should have atleast one tag linked to it.',
       'Blog Post content should not be empty.',
     ]);
+
+    // Title contains invalid special characters. Only hyphens(-), ampersand(&)
+    // and colon(:) are allowed.
+    sampleBlogPostData.title = 'invalid chars#';
+
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
+      'Blog Post title contains invalid characters.',
+      'Blog Post should have a thumbnail.',
+      'Blog Post should have atleast one tag linked to it.',
+      'Blog Post content should not be empty.',
+    ]);
   });
 
   it('should correctly set tags in the blog post when tags are changed', () => {
@@ -95,8 +120,8 @@ describe('Blog Post Object Factory', () => {
   it('should raise correct validation issues for' +
     ' exceeding property limits', () => {
     sampleBlogPostData.addTag('Learner');
-    sampleBlogPostData.title = 'Title exceeding character limit of 40' +
-      ' characters should raise error.';
+    sampleBlogPostData.title = 'Title exceeding character limit of 65' +
+      ' characters should raise error';
     let maxTags = 1;
 
     expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([

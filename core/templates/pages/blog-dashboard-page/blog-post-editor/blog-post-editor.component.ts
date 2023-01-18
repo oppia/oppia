@@ -21,6 +21,7 @@ interface EditorSchema {
   'ui_config': object;
 }
 
+import constants from 'assets/constants';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
@@ -70,6 +71,7 @@ export class BlogPostEditorComponent implements OnInit {
   lastChangesWerePublished: boolean = false;
   saveInProgress: boolean = false;
   publishingInProgress: boolean = false;
+  titleIsDuplicate!: boolean;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
@@ -77,6 +79,8 @@ export class BlogPostEditorComponent implements OnInit {
       startupFocusEnabled: false
     }
   };
+
+  BLOG_POST_TITLE_PATTERN: string = constants.VALID_BLOG_POST_TITLE_REGEX;
 
   constructor(
     private alertsService: AlertsService,
@@ -95,6 +99,7 @@ export class BlogPostEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
+    this.titleIsDuplicate = false;
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.blogPostId = this.blogDashboardPageService.blogPostId;
@@ -174,11 +179,37 @@ export class BlogPostEditorComponent implements OnInit {
 
   updateLocalTitleValue(): void {
     this.blogPostUpdateService.setBlogPostTitle(
-      this.blogPostData, this.title);
-    this.newChangesAreMade = true;
-    this.blogDashboardPageService.setNavTitle(
-      this.lastChangesWerePublished, this.title);
-    this.preventPageUnloadEventService.addListener();
+      this.blogPostData, this.title
+    );
+    if (this.isTitlePatternValid()) {
+      this.blogPostEditorBackendService.doesPostWithGivenTitleAlreadyExistAsync(
+        this.blogPostId, this.title
+      ).then((response: boolean) => {
+        if (!response) {
+          this.titleIsDuplicate = false;
+          this.newChangesAreMade = true;
+          this.blogDashboardPageService.setNavTitle(
+            this.lastChangesWerePublished, this.title
+          );
+        } else {
+          this.titleIsDuplicate = true;
+          this.alertsService.addWarning(
+            'Blog Post with the given title exists already. Please use a' +
+            ' different title.'
+          );
+        }
+      }, error => {
+        this.alertsService.addWarning(
+          `Failed to check if title is unique. Internal Error: ${error}`
+        );
+      });
+      this.preventPageUnloadEventService.addListener();
+    }
+  }
+
+  isTitlePatternValid(): boolean {
+    let titleRegex: RegExp = new RegExp(this.BLOG_POST_TITLE_PATTERN);
+    return titleRegex.test(this.title);
   }
 
   cancelEdit(): void {
@@ -346,7 +377,10 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   isPublishButtonDisabled(): boolean {
-    if (this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0) {
+    if (this.titleIsDuplicate) {
+      return true;
+    } else if (
+      this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0) {
       return true;
     } else if (this.newChangesAreMade) {
       return false;
