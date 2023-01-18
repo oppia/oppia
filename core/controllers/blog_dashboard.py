@@ -396,7 +396,7 @@ class BlogPostTitleHandler(
         a blog post with the same title exists.
         """
         assert self.normalized_request is not None
-        title =  self.normalized_request['title']
+        title = self.normalized_request['title']
         self.values.update({
             'blog_post_exists': (
                 blog_services.does_blog_post_with_title_exist(

@@ -751,6 +751,7 @@ def does_blog_post_with_title_exist(title: str, blog_post_id: str) -> bool:
 
     Args:
         title: str. The title of the blog post.
+        blog_post_id: str. The id of the blog post.
 
     Returns:
         bool. Whether a blog post with given title already exists.
