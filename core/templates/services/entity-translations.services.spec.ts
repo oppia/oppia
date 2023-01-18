@@ -25,6 +25,7 @@ import { EntityTranslationsService } from './entity-translations.services';
 describe('Entity translations service', () => {
   let entityTranslationsService: EntityTranslationsService;
   let etbs: EntityTranslationBackendApiService;
+  let entityTranslation: EntityTranslation;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -34,7 +35,7 @@ describe('Entity translations service', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     etbs = TestBed.inject(EntityTranslationBackendApiService);
 
-    let entityTranslation = EntityTranslation.createFromBackendDict({
+    entityTranslation = EntityTranslation.createFromBackendDict({
       entity_id: 'exp',
       entity_type: 'exploration',
       entity_version: 5,
@@ -82,7 +83,7 @@ describe('Entity translations service', () => {
     );
   });
 
-  it('should successfully fetch data from abckend api service',
+  it('should successfully fetch data from backend api service',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -98,4 +99,46 @@ describe('Entity translations service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should store fetched data and return without calling api service',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      entityTranslationsService.init('entity1', 'exploration', 5);
+      entityTranslationsService.languageCodeToEntityTranslations.hi = (
+        entityTranslation
+      );
+
+      entityTranslationsService.getEntityTranslationsAsync('hi')
+        .then(successHandler, failHandler);
+      tick();
+      flushMicrotasks();
+
+      expect(etbs.fetchEntityTranslationAsync).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should return correct html for given contentIds', () => {
+    entityTranslationsService.languageCodeToEntityTranslations.hi = (
+      entityTranslation
+    );
+
+    const htmlData = entityTranslationsService.getHtmlTranslations(
+      'hi', ['content', 'invalid_content', 'rule_input_3']);
+
+    expect(htmlData).toEqual(['<p>fr content</p>']);
+  });
+
+  it('should return empty list for translation not available in language',
+    () => {
+      entityTranslationsService.languageCodeToEntityTranslations.hi = (
+        entityTranslation
+      );
+
+      const htmlData = entityTranslationsService.getHtmlTranslations(
+        'ar', ['content', 'invalid_content', 'rule_input_3']);
+
+      expect(htmlData).toEqual([]);
+    });
 });

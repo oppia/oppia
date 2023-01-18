@@ -56,6 +56,8 @@ import { TranslationLanguageService } from '../services/translation-language.ser
 import { TranslationTabActiveContentIdService } from '../services/translation-tab-active-content-id.service';
 import { TranslationTabActiveModeService } from '../services/translation-tab-active-mode.service';
 import { StateTranslationComponent } from './state-translation.component';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
@@ -1048,6 +1050,7 @@ describe('State translation component', () => {
   let translationTabActiveContentIdService:
     TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let routerService: RouterService;
 
   let explorationState1 = {
     Introduction: {
@@ -1312,6 +1315,7 @@ describe('State translation component', () => {
       TranslationTabActiveContentIdService);
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService);
+    routerService = TestBed.inject(RouterService);
     explorationStatesService.init(explorationState1, false);
     stateRecordedVoiceoversService.init(
       'Introduction', RecordedVoiceovers.createFromBackendDict(
@@ -1389,6 +1393,59 @@ describe('State translation component', () => {
         null,
         'InvalidType');
     }).toThrowError('The InvalidType type is not implemented.');
+  });
+
+  it('should correctly navigate to the given state', () => {
+    spyOn(routerService, 'navigateToMainTab').and.callFake(() => { });
+
+    component.navigateToState('new_state');
+
+    expect(routerService.navigateToMainTab).toHaveBeenCalledWith('new_state');
+  });
+
+  it('should return original html when translation tab is active', () => {
+    spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
+      .returnValue(true);
+
+    const htmlData = component.getRequiredHtml(
+      new SubtitledHtml('<p>HTML data</p>', 'content_0'));
+
+    expect(htmlData).toBe('<p>HTML data</p>');
+  });
+
+  it('should return original html when translation not available', () => {
+    const htmlData = component.getRequiredHtml(
+      new SubtitledHtml('<p>HTML data</p>', 'content_0'));
+
+    expect(htmlData).toBe('<p>HTML data</p>');
+  });
+
+  it('should return translation html when translation available', () => {
+    entityTranslationsService.languageCodeToEntityTranslations.en = (
+      new EntityTranslation(
+        'entityId', 'entityType', 'entityVersion', 'hi', {
+          content_0: new TranslatedContent('Translated HTML', 'html', true)
+        })
+    );
+
+    const htmlData = component.getRequiredHtml(
+      new SubtitledHtml('<p>HTML data</p>', 'content_0'));
+
+    expect(htmlData).toBe('Translated HTML');
+  });
+
+  it('should return translation html when translation no available', () => {
+    entityTranslationsService.languageCodeToEntityTranslations.en = (
+      new EntityTranslation(
+        'entityId', 'entityType', 'entityVersion', 'hi', {
+          content_1: new TranslatedContent('Translated HTML', 'html', true)
+        })
+    );
+
+    const htmlData = component.getRequiredHtml(
+      new SubtitledHtml('<p>HTML data</p>', 'content_0'));
+
+    expect(htmlData).toBe('<p>HTML data</p>');
   });
 
   describe('when rules input tab is accessed but with no rules', () => {

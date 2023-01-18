@@ -351,6 +351,14 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       nodeErrorMessage);
   });
 
+  it('should get node error message as null for null warning', () => {
+    component.showTranslationWarnings = false;
+    spyOn(explorationWarningsService, 'getAllStateRelatedWarnings').and
+      .returnValue('');
+    expect(
+      component.getNodeErrorMessage('This is a label for node 1')).toBeNull();
+  });
+
   it('should center the graph', fakeAsync(() => {
     component.ngOnInit();
     tick();
