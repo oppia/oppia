@@ -16,7 +16,7 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-const puppeteerUtilities = require('./puppeteer_utils.js');
+const puppeteerUtilities = require('./puppeteerUtils.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/testConstants.js');
 const { showMessage } = require('./showMessageUtils.js');
