@@ -18,7 +18,7 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -108,7 +108,8 @@ describe('Translator Overview component', () => {
     component.ngOnInit();
     fixture.detectChanges();
 
-    tick();
+    flush();
+    discardPeriodicTasks();
     expect(
       entityTranslationsService.getEntityTranslationsAsync
     ).toHaveBeenCalled();
@@ -149,6 +150,7 @@ describe('Translator Overview component', () => {
       expect(translationStatusService.refresh).toHaveBeenCalled();
 
       flush();
+      discardPeriodicTasks();
     })
   );
 
@@ -165,6 +167,7 @@ describe('Translator Overview component', () => {
       expect(translationStatusService.refresh).toHaveBeenCalled();
 
       flush();
+      discardPeriodicTasks();
       expect(graphDataService.recompute).toHaveBeenCalled();
     })
   );
@@ -176,6 +179,7 @@ describe('Translator Overview component', () => {
       component.changeTranslationLanguage();
 
       flush();
+      discardPeriodicTasks();
       expect(translationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalled();
     })
@@ -191,6 +195,7 @@ describe('Translator Overview component', () => {
       component.changeTranslationLanguage();
 
       flush();
+      discardPeriodicTasks();
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
 
       // Reset value for isTranslationTabBusy.
@@ -220,13 +225,16 @@ describe('Translator Overview component', () => {
   });
 
   it('should apply autofocus to history tab element when tab is switched',
-    () => {
+    fakeAsync(() => {
       spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
       spyOn(focusManagerService, 'setFocus');
 
       component.ngOnInit();
 
+      flush();
+      discardPeriodicTasks();
+
       expect(focusManagerService.setFocus).toHaveBeenCalledWith(
         'audioTranslationLanguageCodeField');
-    });
+    }));
 });
