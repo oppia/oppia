@@ -150,8 +150,21 @@ def run_shell_cmd(
     last_stdout_bytes, last_stderr_bytes = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
     # compatible with rest of the code.
-    last_stdout_str = last_stdout_bytes.decode('utf-8')
-    last_stderr_str = last_stderr_bytes.decode('utf-8')
+    try:
+        last_stdout_str = last_stdout_bytes.decode('utf-8')
+        last_stderr_str = last_stderr_bytes.decode('utf-8')
+    except UnicodeDecodeError as e:  # pragma: no cover
+        # We sometimes get a UnicodeDecodeError with an "invalid continuation
+        # byte" or "invalid start byte" message, and this can sometimes happen
+        # when trying to read a non-unicode file. To help debug this issue,
+        # print some more information before failing. See #16600 for details.
+        print(
+            '[Debug invalid start/continuation byte flake] STDOUT:',
+            last_stdout_bytes)
+        print(
+            '[Debug invalid start/continuation byte flake] STDERR:',
+            last_stderr_bytes)
+        raise e
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
