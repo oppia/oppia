@@ -121,9 +121,9 @@ describe('MathInteractionsService', () => {
       'Your answer seems to be missing a variable/number after the "+".');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '*', [])).toBeFalse();
+      '×', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer seems to be missing a value before operator "*".');
+      'Your answer seems to be missing a number before the × operator.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(+)', [])).toBeFalse();

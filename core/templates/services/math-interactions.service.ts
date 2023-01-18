@@ -67,7 +67,7 @@ export class MathInteractionsService {
     }
     if (errorMessage === 'Not a prefix operator.') {
       errorMessage = (
-        'Your answer seems to be missing a value before operator "*".');
+        'Your answer seems to be missing a number before the × operator.');
     }
     if (errorMessage === 'A prefix operator was expected.') {
       let symbol1, symbol2;
