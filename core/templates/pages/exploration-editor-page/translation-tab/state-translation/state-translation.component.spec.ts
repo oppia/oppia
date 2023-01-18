@@ -1373,6 +1373,28 @@ describe('State translation component', () => {
     });
   });
 
+  it('should update correct translation with updateTranslatedContent', () => {
+    component.activeTranslatedContent = new TranslatedContent();
+    entityTranslationsService.languageCodeToEntityTranslations.en = (
+      new EntityTranslation(
+        'entityId', 'entityType', 'entityVersion', 'hi', {
+          content_0: new TranslatedContent('Translated HTML', 'html', true)
+        })
+    );
+
+    translationTabActiveModeService.isVoiceoverModeActive = (
+      jasmine.createSpy().and.returnValue(false)
+    );
+    spyOn(
+      translationTabActiveContentIdService, 'getActiveContentId'
+    ).and.returnValue('content_0');
+
+    component.updateTranslatedContent();
+
+    expect(
+      component.activeTranslatedContent.translation).toBe('Translated HTML');
+  });
+
   it('should format TranslatableSetOfNormalizedString values', () => {
     expect(component.getHumanReadableRuleInputValues(
       { normalizedStrSet: ['input1', 'input2'], unicodeStrSet: null },
