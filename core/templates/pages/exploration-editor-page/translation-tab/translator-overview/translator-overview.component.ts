@@ -154,11 +154,10 @@ export class TranslatorOverviewComponent implements OnInit {
       this.translationLanguageService.setActiveLanguageCode(
         this.languageCode);
       this.translationStatusService.refresh();
-      this.loaderService.hideLoadingScreen();
       this.windowRef.nativeWindow.localStorage.setItem(
         this.LAST_SELECTED_TRANSLATION_LANGUAGE, this.languageCode);
-
       this.routerService.onCenterGraph.emit();
+      this.loaderService.hideLoadingScreen();
     });
   }
 

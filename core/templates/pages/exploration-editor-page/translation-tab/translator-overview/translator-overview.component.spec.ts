@@ -18,7 +18,7 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -32,6 +32,7 @@ import { TranslatorOverviewComponent } from './translator-overview.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
 
 class MockNgbModal {
   open() {
@@ -55,6 +56,7 @@ describe('Translator Overview component', () => {
   let explorationLanguageCode: string = 'hi';
   let focusManagerService: FocusManagerService;
   let routerService: RouterService;
+  let entityTranslationsService: EntityTranslationsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -74,7 +76,7 @@ describe('Translator Overview component', () => {
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     fixture = TestBed.createComponent(TranslatorOverviewComponent);
     component = fixture.componentInstance;
 
@@ -91,18 +93,31 @@ describe('Translator Overview component', () => {
       TranslationTabActiveModeService);
     focusManagerService = TestBed.inject(FocusManagerService);
     routerService = TestBed.inject(RouterService);
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
 
     spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
       .returnValue(true);
     spyOn(translationTabActiveModeService, 'isVoiceoverModeActive').and
       .returnValue(true);
+    spyOn(entityTranslationsService, 'getEntityTranslationsAsync')
+      .and.resolveTo();
 
     explorationLanguageCodeService.init(explorationLanguageCode);
     component.isTranslationTabBusy = false;
 
     component.ngOnInit();
     fixture.detectChanges();
-  });
+
+    tick();
+    expect(
+      entityTranslationsService.getEntityTranslationsAsync
+    ).toHaveBeenCalled();
+  }));
+
+  afterEach(fakeAsync(() => {
+    flush();
+    discardPeriodicTasks();
+  }));
 
   it('should initialize component properties after controller is initialized',
     () => {
@@ -157,16 +172,19 @@ describe('Translator Overview component', () => {
   );
 
   it('should change translation language when translation tab is not busy',
-    () => {
+    fakeAsync(() => {
       spyOn(translationLanguageService, 'setActiveLanguageCode');
       component.languageCode = 'es';
       component.changeTranslationLanguage();
+
+      tick();
       expect(translationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalled();
-    });
+    })
+  );
 
   it('should not change translation language when translation tab is busy',
-    () => {
+    fakeAsync(() => {
       component.isTranslationTabBusy = true;
       let showTranslationTabBusyModalEmitter = new EventEmitter();
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
@@ -174,11 +192,12 @@ describe('Translator Overview component', () => {
         .returnValue(showTranslationTabBusyModalEmitter);
       component.changeTranslationLanguage();
 
+      tick();
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
 
       // Reset value for isTranslationTabBusy.
       component.isTranslationTabBusy = false;
-    });
+    }));
 
   it('should get translation bar progress data when there are more' +
     ' than 1 item to be translated', () => {

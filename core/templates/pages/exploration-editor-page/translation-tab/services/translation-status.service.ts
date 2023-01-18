@@ -27,7 +27,6 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { LoaderService } from 'services/loader.service';
 import { EntityTranslationsService } from 'services/entity-translations.services';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
@@ -64,7 +63,6 @@ export class TranslationStatusService implements OnInit {
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
-    private loaderService: LoaderService,
     private entityTranslationsService: EntityTranslationsService,
     private stateEditorService: StateEditorService
   ) { }

@@ -21,13 +21,10 @@ import { TestBed } from '@angular/core/testing';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
-import { ContentTranslationManagerService } from
-  'pages/exploration-player-page/services/content-translation-manager.service';
 import { UrlService } from 'services/contextual/url.service';
 
 describe('Content translation language service', () => {
   let ctls: ContentTranslationLanguageService;
-  let ctms: ContentTranslationManagerService;
   let us: UrlService;
   let availableLanguageCodes: string[];
 
@@ -37,7 +34,6 @@ describe('Content translation language service', () => {
     });
 
     ctls = TestBed.inject(ContentTranslationLanguageService);
-    ctms = TestBed.inject(ContentTranslationManagerService);
     us = TestBed.inject(UrlService);
     availableLanguageCodes = ['fr', 'zh'];
   });
@@ -91,12 +87,9 @@ describe('Content translation language service', () => {
     ]);
   });
 
-  it('should correctly set the current language code and call the content ' +
-     'translation manager service', () => {
-    const displayTranslationsSpy = spyOn(ctms, 'displayTranslations');
+  it('should correctly set the current language code', () => {
     ctls.init(availableLanguageCodes, [], 'en');
     ctls.setCurrentContentLanguageCode('fr');
     expect(ctls.getCurrentContentLanguageCode()).toBe('fr');
-    expect(displayTranslationsSpy).toHaveBeenCalledWith('fr');
   });
 });

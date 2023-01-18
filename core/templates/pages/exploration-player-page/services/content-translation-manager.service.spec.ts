@@ -31,6 +31,7 @@ import { AudioTranslationLanguageService} from 'pages/exploration-player-page/se
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
@@ -41,6 +42,7 @@ describe('Content translation manager service', () => {
   let atls: AudioTranslationLanguageService;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
+  let imagePreloaderService: ImagePreloaderService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -53,6 +55,7 @@ describe('Content translation manager service', () => {
     suof = TestBed.inject(SubtitledUnicodeObjectFactory);
     atls = TestBed.inject(AudioTranslationLanguageService);
     etbs = TestBed.inject(EntityTranslationBackendApiService);
+    imagePreloaderService = TestBed.inject(ImagePreloaderService);
 
     entityTranslation = EntityTranslation.createFromBackendDict({
       entity_id: 'exp',
@@ -100,6 +103,8 @@ describe('Content translation manager service', () => {
     spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
       Promise.resolve(entityTranslation)
     );
+    spyOn(imagePreloaderService, 'restartImagePreloader').and.returnValue(
+      undefined);
 
     let defaultOutcomeDict = {
       dest: 'dest_default',
@@ -319,48 +324,6 @@ describe('Content translation manager service', () => {
     tick();
 
     expect(onStateCardContentUpdate).toHaveBeenCalled();
-    discardPeriodicTasks();
-  }));
-
-  it('should return translation HTML if it exist', fakeAsync(
-    () => {
-      ctms.displayTranslations('fr');
-      tick();
-
-      let translatedHtml = ctms.getHtmlTranslations(
-        'fr', ['hint_0', 'solution']);
-      expect(translatedHtml).toEqual(['<p>fr hint</p>', '<p>fr solution</p>']);
-      discardPeriodicTasks();
-    }));
-
-  it('should return empty list if content_id in translation does not exist',
-    fakeAsync(() => {
-      ctms.displayTranslations('fr');
-      tick();
-
-      let translatedHtml = ctms.getHtmlTranslations('fr', ['hint_1']);
-      expect(translatedHtml).toEqual([]);
-      discardPeriodicTasks();
-    }));
-
-  it('should return empty list if translation does not exist', fakeAsync(
-    () => {
-      ctms.displayTranslations('fr');
-      tick();
-
-      let translatedHtml = ctms.getHtmlTranslations(
-        'hi', ['hint_0', 'solution']);
-      expect(translatedHtml).toEqual([]);
-      discardPeriodicTasks();
-    }));
-
-  it('should not return non html translations', fakeAsync(() => {
-    ctms.displayTranslations('fr');
-    tick();
-
-    let translatedHtml = ctms.getHtmlTranslations(
-      'fr', ['hint_0', 'ca_placeholder_0']);
-    expect(translatedHtml).toEqual(['<p>fr hint</p>']);
     discardPeriodicTasks();
   }));
 

@@ -119,12 +119,6 @@ export class ContentTranslationManagerService {
       card.setInteractionHtml(element.outerHTML);
     }
   }
-
-  init(entityType: string, entityId: string, version: number): void {
-    this.entityType = entityType;
-    this.entityId = entityId;
-    this.version = version;
-  }
 }
 
 angular.module('oppia').factory(

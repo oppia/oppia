@@ -16,7 +16,7 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-import { discardPeriodicTasks, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -92,7 +92,7 @@ describe('Translation status service', () => {
     generateContentIdService.init(() => currentIndex++, () => { });
   });
 
-  beforeEach(fakeAsync(() => {
+  beforeEach(() => {
     statesWithAudioDict = {
       First: {
         content: {
@@ -112,7 +112,6 @@ describe('Translation status service', () => {
               }
             },
             feedback_2: {},
-            rule_input_4: {}
           }
         },
         interaction: {
@@ -287,8 +286,8 @@ describe('Translation status service', () => {
     ess.init(statesWithAudioDict, false);
     ttams.activateVoiceoverMode();
     tls.setActiveLanguageCode('en');
-    spyOn(entityTranslationsService, 'getEntityTranslationsAsync')
-      .and.returnValue(Promise.resolve(EntityTranslation.createFromBackendDict({
+    entityTranslationsService.languageCodeToEntityTranslations.hi = (
+      EntityTranslation.createFromBackendDict({
         entity_id: 'exp_id',
         entity_type: 'exploration',
         entity_version: 5,
@@ -300,11 +299,10 @@ describe('Translation status service', () => {
             needs_update: false
           }
         }
-      }
-      )));
+      })
+    );
     tss.refresh();
-    tick();
-  }));
+  });
 
   it('should initialize service properly', () => {
     tss.ngOnInit();
@@ -336,44 +334,41 @@ describe('Translation status service', () => {
   });
 
   it('should return a correct list of state names for which translation ' +
-      'needs update', fakeAsync(() => {
+      'needs update', () => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
     var statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
     expect(Object.keys(statesNeedingTranslationUpdate).length).toBe(0);
 
-    entityTranslationsService.getEntityTranslationsAsync = (
-      jasmine.createSpy().and.returnValue(Promise.resolve(
-        EntityTranslation.createFromBackendDict({
-          entity_id: 'exp_id',
-          entity_type: 'exploration',
-          entity_version: 5,
-          language_code: 'hi',
-          translations: {
-            feedback_3: {
-              content_format: 'html',
-              content_value: '<p>This is feedback 1.</p>',
-              needs_update: true
-            },
-            feedback_2: {
-              content_format: 'html',
-              content_value: '<p>This is first card.</p>',
-              needs_update: true
-            }
+    entityTranslationsService.languageCodeToEntityTranslations.hi = (
+      EntityTranslation.createFromBackendDict({
+        entity_id: 'exp_id',
+        entity_type: 'exploration',
+        entity_version: 5,
+        language_code: 'hi',
+        translations: {
+          feedback_3: {
+            content_format: 'html',
+            content_value: '<p>This is feedback 1.</p>',
+            needs_update: true
+          },
+          feedback_2: {
+            content_format: 'html',
+            content_value: '<p>This is first card.</p>',
+            needs_update: true
           }
-        })
-      ))
+        }
+      })
     );
 
     tss.refresh();
-    tick();
     statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
     expect(Object.keys(statesNeedingTranslationUpdate).length).toBe(1);
     expect(Object.keys(statesNeedingTranslationUpdate)[0]).toBe('First');
-  }));
+  });
 
   it('should return a correct count of audio and translations required in ' +
-      'an exploration', fakeAsync(() => {
+      'an exploration', () => {
     ttams.activateVoiceoverMode();
     var explorationAudioRequiredCount = (
       tss.getExplorationContentRequiredCount());
@@ -383,30 +378,27 @@ describe('Translation status service', () => {
     tls.setActiveLanguageCode('hi');
     var explorationTranslationsRequiredCount = (
       tss.getExplorationContentRequiredCount());
-    expect(explorationTranslationsRequiredCount).toBe(9);
+    expect(explorationTranslationsRequiredCount).toBe(8);
 
     // To test changes after adding a new state.
     ess.addState('Fourth', () => {});
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
     ess.saveInteractionId('Fourth', 'EndExploration');
 
+    tss.refresh();
     ttams.activateVoiceoverMode();
     tls.setActiveLanguageCode('en');
     var explorationAudioRequiredCount = (
       tss.getExplorationContentRequiredCount());
-    expect(explorationAudioRequiredCount).toBe(8);
+    expect(explorationAudioRequiredCount).toBe(9);
 
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
-    tss.refresh();
-    tick();
-    flush();
 
     var explorationTranslationsRequiredCount = (
       tss.getExplorationContentRequiredCount());
-    expect(explorationTranslationsRequiredCount).toBe(10);
-    discardPeriodicTasks();
-  }));
+    expect(explorationTranslationsRequiredCount).toBe(9);
+  });
 
   it('should return a correct count of audio not available in an exploration',
     () => {
@@ -426,7 +418,7 @@ describe('Translation status service', () => {
     });
 
   it('should return a correct count of translations not available in an ' +
-      'exploration', fakeAsync(() => {
+      'exploration', () => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
     var explorationTranslationNotAvailableCount = (
@@ -439,14 +431,10 @@ describe('Translation status service', () => {
 
     ttams.activateTranslationMode();
     tss.refresh();
-    tick();
-    flush();
-
     explorationTranslationNotAvailableCount = (
       tss.getExplorationContentNotAvailableCount());
-    expect(explorationTranslationNotAvailableCount).toBe(9);
-    discardPeriodicTasks();
-  }));
+    expect(explorationTranslationNotAvailableCount).toBe(8);
+  });
 
   it('should return correct status color for audio availability in the ' +
       'active state components', () => {
@@ -481,12 +469,11 @@ describe('Translation status service', () => {
   });
 
   it('should return correct status color for translations availability in ' +
-      'the active state components', fakeAsync(() => {
+      'the active state components', () => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
     srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
     tss.refresh();
-    tick();
 
     var activeStateComponentStatus = (
       tss.getActiveStateComponentStatusColor('content'));
@@ -520,7 +507,7 @@ describe('Translation status service', () => {
     activeStateComponentStatus = (
       tss.getActiveStateComponentStatusColor('feedback'));
     expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
-  }));
+  });
 
   it('should correctly return whether active state component audio needs ' +
       'update', () => {
@@ -544,7 +531,7 @@ describe('Translation status service', () => {
   });
 
   it('should correctly return whether active state component translation ' +
-      'needs update', fakeAsync((() => {
+      'needs update', (() => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
     srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
@@ -554,13 +541,11 @@ describe('Translation status service', () => {
     expect(activeStateComponentNeedsUpdateStatus).toBe(false);
 
     tss.refresh();
-    tick();
-
     tss.entityTranslation.markTranslationAsNeedingUpdate('feedback_3');
     activeStateComponentNeedsUpdateStatus = (
       tss.getActiveStateComponentNeedsUpdateStatus('feedback'));
     expect(activeStateComponentNeedsUpdateStatus).toBe(true);
-  })));
+  }));
 
   it('should return correct audio availability status color of a contentId ' +
       'of active state', () => {
@@ -598,11 +583,10 @@ describe('Translation status service', () => {
   });
 
   it('should return correct translation availability status color of a ' +
-      'contentId of active state', fakeAsync(() => {
+      'contentId of active state', () => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
     tss.refresh();
-    tick();
 
     var activeStateContentIdStatusColor = (
       tss.getActiveStateContentIdStatusColor('content_0'));
@@ -615,7 +599,7 @@ describe('Translation status service', () => {
       tss.getActiveStateContentIdStatusColor('feedback_3'));
     expect(activeStateContentIdStatusColor).toBe(
       ALL_ASSETS_AVAILABLE_COLOR);
-  }));
+  });
 
   it('should return correct needs update status of voice-over of active ' +
       'state contentId', () => {
@@ -638,7 +622,7 @@ describe('Translation status service', () => {
   });
 
   it('should return correct needs update status of translation of active ' +
-      'state contentId', fakeAsync(() => {
+      'state contentId', () => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
     var activeStateContentIdNeedsUpdateStatus = (
@@ -646,11 +630,10 @@ describe('Translation status service', () => {
     expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
 
     tss.refresh();
-    tick();
 
     tss.entityTranslation.markTranslationAsNeedingUpdate('feedback_3');
     activeStateContentIdNeedsUpdateStatus = (
       tss.getActiveStateContentIdNeedsUpdateStatus('feedback_3'));
     expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
-  }));
+  });
 });

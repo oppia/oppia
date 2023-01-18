@@ -22,10 +22,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { ImagePreloaderService } from
   'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
 import { ContextService } from 'services/context.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
@@ -45,7 +45,7 @@ describe('Image preloader service', () => {
   let imagePreloaderService: ImagePreloaderService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
-  let ctms: ContentTranslationManagerService;
+  let entityTranslationsService: EntityTranslationsService;
   let svgSanitizerService: SvgSanitizerService;
 
 
@@ -394,13 +394,13 @@ describe('Image preloader service', () => {
     explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
     contextService = TestBed.get(ContextService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-    ctms = TestBed.get(ContentTranslationManagerService);
+    entityTranslationsService = TestBed.get(EntityTranslationsService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
-    spyOn(ctms, 'getHtmlTranslations').and.callFake(
+    spyOn(entityTranslationsService, 'getHtmlTranslations').and.callFake(
       (unusedLanguageCode, unusedContentIds) => {
         return [];
       });

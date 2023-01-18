@@ -242,8 +242,10 @@ export class StateTranslationComponent
         this.entityTranslationsService.languageCodeToEntityTranslations[
           langCode]
       );
-      this.activeTranslatedContent = entityTranslations.getWrittenTranslation(
-        this.translationTabActiveContentIdService.getActiveContentId());
+      if (entityTranslations) {
+        this.activeTranslatedContent = entityTranslations.getWrittenTranslation(
+          this.translationTabActiveContentIdService.getActiveContentId());
+      }
     }
   }
 

@@ -46,7 +46,6 @@ import { ContinueValidationService } from 'interactions/Continue/directives/cont
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ContextService } from 'services/context.service';
 import { EntityTranslationsService } from 'services/entity-translations.services';
@@ -105,7 +104,6 @@ describe('State translation component', () => {
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
-  let routerService: RouterService;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let translationLanguageService: TranslationLanguageService;
@@ -280,7 +278,6 @@ describe('State translation component', () => {
         StateSolutionService,
         StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
-        RouterService,
         StateEditorService,
         TranslationLanguageService,
         TranslationTabActiveContentIdService,
@@ -313,7 +310,6 @@ describe('State translation component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
-    routerService = TestBed.inject(RouterService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService);
@@ -372,29 +368,6 @@ describe('State translation component', () => {
       expect(component.isDisabled('content')).toBe(false);
       expect(translationTabActiveContentIdService.setActiveContent)
         .toHaveBeenCalledWith('content_1', 'html');
-    });
-
-    it('should return original HTML when written translation is not' +
-      ' available', () => {
-      let subtitledObject = SubtitledHtml.createFromBackendDict({
-        content_id: 'content_1',
-        html: 'This is the html'
-      });
-      spyOn(component, 'isTranslatedTextRequired').and.returnValue(true);
-      spyOn(explorationStatesService, 'getWrittenTranslationsMemento')
-        .and.returnValue({
-          hasWrittenTranslation: () => false
-        });
-      let html = component.getRequiredHtml(subtitledObject);
-      expect(html).toEqual(subtitledObject.html);
-    });
-
-    it('should navigate to a given state', () => {
-      spyOn(routerService, 'navigateToMainTab');
-      component.navigateToState('Introduction');
-
-      expect(routerService.navigateToMainTab).toHaveBeenCalledWith(
-        'Introduction');
     });
 
     it('should get customization argument translatable customization' +
@@ -855,7 +828,6 @@ describe('State translation component', () => {
         StateSolutionService,
         StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
-        RouterService,
         StateEditorService,
         TranslationLanguageService,
         TranslationTabActiveContentIdService,
@@ -1305,7 +1277,6 @@ describe('State translation component', () => {
         StateSolutionService,
         StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
-        RouterService,
         StateEditorService,
         TranslationLanguageService,
         TranslationTabActiveContentIdService,
@@ -1671,7 +1642,6 @@ describe('State translation component', () => {
         StateSolutionService,
         StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
-        RouterService,
         StateEditorService,
         TranslationLanguageService,
         TranslationTabActiveContentIdService,
