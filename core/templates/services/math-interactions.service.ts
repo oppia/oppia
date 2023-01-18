@@ -62,8 +62,7 @@ export class MathInteractionsService {
     }
     if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
       errorMessage = (
-        'Your answer seems to be missing a variable/number after the "' +
-        errorMessage[0] + '".');
+        'Your answer seems to be missing a number after the × operator.');
     }
     if (errorMessage === 'Not a prefix operator.') {
       errorMessage = (
@@ -177,7 +176,7 @@ export class MathInteractionsService {
     }
     if (expressionString.match(/(\+$)|(\+\))/g)) {
       this.warningText = (
-        'Your answer seems to be missing a variable/number after the "+".');
+        'Your answer seems to be missing a number after the + operator.');
       return false;
     }
     let invalidIntegers = expressionString.match(
