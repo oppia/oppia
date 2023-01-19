@@ -94,6 +94,8 @@
   height: 0;
   position: relative;
 }
+
+.view-text h2,
 .community-lessons-section .view-text {
   bottom: 22px;
   float: right;
@@ -101,6 +103,7 @@
   font-weight: 500;
   position: relative;
 }
+
 .community-lessons-section .dropdown-content {
   background-color: #fff;
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
@@ -147,6 +150,14 @@
 .subscriptions-section .empty-section {
   padding: 0 113px 0 40px;
 }
+
+.community-lessons-section .empty-section,
+.playlist-section .empty-section,
+.subscriptions-section .empty-section{
+  font-size: 16px;
+  font-weight:inherit;
+}
+
 .community-lessons-section .remove-icon,
 .playlist-section .remove-icon {
   color: white;
