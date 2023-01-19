@@ -25,15 +25,18 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import List, Optional, TypedDict
+from typing import Final, List, Optional, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-# This is same as base_models.ID_Length.
-BLOG_POST_ID_LENGTH = 12
+MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT: Final = (
+    constants.MAX_CHARS_IN_BLOG_POST_TITLE
+    + len('-')
+    + constants.BLOG_POST_ID_LENGTH
+)
 
 
 class BlogPostDict(TypedDict):
@@ -249,7 +252,8 @@ class BlogPost:
             if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
                 raise utils.ValidationError(
                     'Title field contains invalid characters. Only words'
-                    '(a-zA-Z0-9) separated by spaces, hyphens(-) and colon(:) '
+                    r'\(a-zA-Z0-9(\'\!\)\) separated by spaces, hyphens\(-\),'
+                    r' comma(,), ampersand(&) and colon\(:\) are allowed.'
                     'are allowed. Received %s' % title)
 
     @classmethod
@@ -272,10 +276,10 @@ class BlogPost:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
 
-        if len(url_fragment) > constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
+        if len(url_fragment) > MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not exceed %d characters.'
-                % (constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
+                % (MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
 
         if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
             raise utils.ValidationError(
@@ -388,7 +392,7 @@ class BlogPost:
         Args:
             blog_id: str. The blog post id to validate.
         """
-        if len(blog_id) != BLOG_POST_ID_LENGTH:
+        if len(blog_id) != constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
 
 
@@ -520,10 +524,10 @@ class BlogPostSummary:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
 
-        if len(url_fragment) > constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
+        if len(url_fragment) > MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not exceed %d characters.'
-                % (constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
+                % (MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
 
         if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
             raise utils.ValidationError(

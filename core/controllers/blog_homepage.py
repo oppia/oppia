@@ -20,6 +20,7 @@ import logging
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_domain
@@ -33,6 +34,13 @@ BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST: Final = (
     feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST
+)
+
+
+MAX_CHARS_IN_BLOG_POST_URL: Final = (
+    constants.MAX_CHARS_IN_BLOG_POST_TITLE
+    + len('-')
+    + constants.BLOG_POST_ID_LENGTH
 )
 
 
@@ -235,7 +243,11 @@ class BlogPostDataHandler(
         'blog_post_url': {
             'schema': {
                 'type': 'basestring'
-            }
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': MAX_CHARS_IN_BLOG_POST_URL
+            }]
         }
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}

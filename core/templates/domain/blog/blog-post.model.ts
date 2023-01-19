@@ -40,6 +40,7 @@ export class BlogPostData {
   _urlFragment: string;
   _lastUpdated?: string;
   _publishedOn?: string;
+  _titleIsDuplicate: boolean;
   constructor(
       id: string,
       displayedAuthorName: string,
@@ -59,6 +60,7 @@ export class BlogPostData {
     this._urlFragment = urlFragment;
     this._lastUpdated = lastUpdated;
     this._publishedOn = publishedOn;
+    this._titleIsDuplicate = false;
   }
 
   get id(): string {
@@ -91,6 +93,14 @@ export class BlogPostData {
 
   set tags(tags: string[]) {
     this._tags = tags;
+  }
+
+  set titleIsDuplicate(titleIsDuplicate: boolean) {
+    this._titleIsDuplicate = titleIsDuplicate;
+  }
+
+  get titleIsDuplicate(): boolean {
+    return this._titleIsDuplicate;
   }
 
   addTag(tag: string): void {
@@ -127,7 +137,10 @@ export class BlogPostData {
     let validTitleRegex: RegExp = new RegExp(
       constants.VALID_BLOG_POST_TITLE_REGEX
     );
-    if (this._title === '') {
+    if (this._titleIsDuplicate) {
+      issues.push(
+        'Blog Post with the given title already exists.');
+    } else if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
     } else if (!validTitleRegex.test(this._title)) {
@@ -157,7 +170,10 @@ export class BlogPostData {
     let validTitleRegex: RegExp = new RegExp(
       constants.VALID_BLOG_POST_TITLE_REGEX
     );
-    if (this._title === '') {
+    if (this._titleIsDuplicate) {
+      issues.push(
+        'Blog Post with the given title already exists.');
+    } else if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
     } else if (!validTitleRegex.test(this._title)) {

@@ -587,6 +587,11 @@ class BlogPostTitleHandlerTest(test_utils.GenericTestBase):
         blog_services.update_blog_post(blog_post.id, self.change_dict)
         blog_services.publish_blog_post(blog_post.id)
 
+        # Creating another blog post.
+        self.new_blog_post_id = (
+            blog_services.create_new_blog_post(self.blog_admin_id).id
+        )
+
     def test_blog_post_title_handler_when_unique(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
 
@@ -596,21 +601,21 @@ class BlogPostTitleHandlerTest(test_utils.GenericTestBase):
 
         # Blog post with same title does not exist yet.
         json_response = self.get_json(
-            '%s/%s' % (feconf.BLOG_TITLE_HANDLER, self.blog_post_id),
+            '%s/%s' % (feconf.BLOG_TITLE_HANDLER, self.new_blog_post_id),
             params=params,
             )
         self.assertEqual(json_response['blog_post_exists'], False)
 
-    def test_topic_name_handler_when_duplicate(self) -> None:
+    def test_blog_post_title_handler_when_duplicate(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
 
         params = {
             'title': 'Sample Title'
         }
 
-        # Blog post with same title exist.
+        # Blog post with same title already exist.
         json_response = self.get_json(
-            '%s/%s' % (feconf.BLOG_TITLE_HANDLER, self.blog_post_id),
+            '%s/%s' % (feconf.BLOG_TITLE_HANDLER, self.new_blog_post_id),
             params=params,
             )
         self.assertEqual(json_response['blog_post_exists'], True)

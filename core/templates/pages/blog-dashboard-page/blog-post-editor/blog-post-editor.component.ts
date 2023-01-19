@@ -71,7 +71,6 @@ export class BlogPostEditorComponent implements OnInit {
   lastChangesWerePublished: boolean = false;
   saveInProgress: boolean = false;
   publishingInProgress: boolean = false;
-  titleIsDuplicate!: boolean;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
@@ -99,7 +98,6 @@ export class BlogPostEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.titleIsDuplicate = false;
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.blogPostId = this.blogDashboardPageService.blogPostId;
@@ -181,18 +179,22 @@ export class BlogPostEditorComponent implements OnInit {
     this.blogPostUpdateService.setBlogPostTitle(
       this.blogPostData, this.title
     );
-    if (this.isTitlePatternValid()) {
+    if (
+      this.isTitlePatternValid() &&
+      this.title.length <= this.MAX_CHARS_IN_BLOG_POST_TITLE &&
+      this.title.length >= this.MIN_CHARS_IN_BLOG_POST_TITLE
+    ) {
       this.blogPostEditorBackendService.doesPostWithGivenTitleAlreadyExistAsync(
         this.blogPostId, this.title
       ).then((response: boolean) => {
         if (!response) {
-          this.titleIsDuplicate = false;
+          this.blogPostData.titleIsDuplicate = false;
           this.newChangesAreMade = true;
           this.blogDashboardPageService.setNavTitle(
             this.lastChangesWerePublished, this.title
           );
         } else {
-          this.titleIsDuplicate = true;
+          this.blogPostData.titleIsDuplicate = true;
           this.alertsService.addWarning(
             'Blog Post with the given title exists already. Please use a' +
             ' different title.'
@@ -377,7 +379,7 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   isPublishButtonDisabled(): boolean {
-    if (this.titleIsDuplicate) {
+    if (this.blogPostData.titleIsDuplicate) {
       return true;
     } else if (
       this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0) {

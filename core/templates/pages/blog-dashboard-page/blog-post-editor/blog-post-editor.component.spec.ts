@@ -269,7 +269,7 @@ describe('Blog Post Editor Component', () => {
       expect(blogPostUpdateService.setBlogPostTitle).toHaveBeenCalledWith(
         sampleBlogPostData, 'Sample title changed');
       expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-      expect(component.titleIsDuplicate).toBeFalse();
+      expect(component.blogPostData.titleIsDuplicate).toBeFalse();
     })
   );
 
@@ -291,7 +291,7 @@ describe('Blog Post Editor Component', () => {
       ' different title.'
     );
     expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-    expect(component.titleIsDuplicate).toBeTrue();
+    expect(component.blogPostData.titleIsDuplicate).toBeTrue();
   }));
 
   it('should not update title and should raise error when the checking for' +
@@ -312,7 +312,7 @@ describe('Blog Post Editor Component', () => {
       'Internal Error: Internal Server Error'
     );
     expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
-    expect(component.titleIsDuplicate).toBeFalse();
+    expect(component.blogPostData.titleIsDuplicate).toBeFalse();
   }));
 
   it('should validate title pattern', () => {
@@ -647,11 +647,11 @@ describe('Blog Post Editor Component', () => {
     component.newChangesAreMade = true;
     component.lastChangesWerePublished = true;
 
-    component.titleIsDuplicate = true;
+    component.blogPostData.titleIsDuplicate = true;
 
     expect(component.isPublishButtonDisabled()).toBeTrue();
 
-    component.titleIsDuplicate = false;
+    component.blogPostData.titleIsDuplicate = false;
     expect(component.isPublishButtonDisabled()).toBe(false);
 
     component.newChangesAreMade = false;
