@@ -18,13 +18,13 @@
             class="oppia-pagination-button"
             (click)="gotoPage(activePageNumber - 1)"
             [disabled]="activePageNumber == 1">
-      <span class="material-icons">navigate_before</span>Previous
+            <i class="fa-solid fa-angle-left"></i>
     </button>
     <button type="button"
             class="oppia-pagination-button"
             (click)="gotoPage(activePageNumber + 1)"
             [disabled]="loadingOpportunityData || userIsOnLastPage">
-      Next<span class="material-icons">navigate_next</span>
+      Next<i class="fa-solid fa-angle-right"></i>
     </button>
   </div>
   <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
@@ -92,3 +92,4 @@
     }
   }
 </style>
+<script src="https://kit.fontawesome.com/f1e162f77d.js" crossorigin="anonymous"></script>

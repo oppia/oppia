@@ -20,9 +20,8 @@
            [(ngModel)]="optionsFilter"
            (input)="filterOptions()"
            autofocus>
-    <div class="material-icons oppia-translation-language-selector-inner-container-arrow" (click)="toggleDropdown()">
-      arrow_drop_down
-    </div>
+           <i class="fa-solid fa-caret-down oppia-translation-language-selector-inner-container-arrow" (click)="toggleDropdown()"></i>
+     
 
     <div class="oppia-translation-language-selector-dropdown-options-container">
       <div *ngIf="featuredLanguages.length > 0" class="e2e-test-featured-language-container">
@@ -32,12 +31,12 @@
                *ngIf="languageIdToDescription[featuredOption.languageCode]"
                (click)="selectOption(featuredOption.languageCode)"
                [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : featuredOption.languageCode === activeLanguageCode}">
-            <span class="material-icons oppia-translation-language-selector-info-icon e2e-test-featured-language-tooltip"
+               <i class="fa-solid fa-circle-info oppia-translation-language-selector-info-icon e2e-test-featured-language-tooltip">
                   *ngIf="featuredOption.explanation"
                   (mouseenter)="showExplanationPopup(i)"
                   (mouseleave)="hideExplanationPopup()">
-              info
-            </span>
+              
+            </i>
             {{languageIdToDescription[featuredOption.languageCode]}}
           </div>
         </div>
@@ -172,3 +171,4 @@
     width: calc(100% - 32px);
   }
 </style>
+<script src="https://kit.fontawesome.com/f1e162f77d.js" crossorigin="anonymous"></script>
