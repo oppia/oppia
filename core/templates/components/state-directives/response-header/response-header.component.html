@@ -13,33 +13,33 @@
         Correct
       </div>
     </div>
-    <span class="oppia-response-summary" [attr.title]="summary">
+  <span class="oppia-response-summary" [attr.title]="summary">
       <span class="oppia-response-short-summary">{{shortSummary}}</span>
+      <span *ngIf="outcome"> →</span>
+    <span *ngIf="isCorrect() && isInQuestionMode()">
+    Correct
+    </span>
+    <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
+        (click)="returnToState()" class="oppia-nested-link">
+    {{outcome.dest}}
+    </span>
+    <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
+    <em *ngIf="outcome.newStateName">{{outcome.newStateName}}</em>
+    <em *ngIf="!outcome.newStateName">Nowhere yet...</em>
+    </span>
+    <span *ngIf="outcome && !isInQuestionMode() && isOutcomeLooping()">
+    <em>(try again)</em>
+    </span>
+    <span *ngIf="outcome && isInQuestionMode() && !isCorrect()">
+    <em>Wrong<br> (try again)</em>
+    </span>
       <span *ngIf="numRules > 1" class="badge badge-primary position-relative oppia-num-rules">
         +{{numRules - 1}}
       </span>
-    </span>
+  </span>
   </div>
 
   <br class="break-in-mobile">
-  <span *ngIf="outcome"> →</span>
-  <span *ngIf="isCorrect() && isInQuestionMode()">
-    Correct
-  </span>
-  <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
-        (click)="returnToState()" class="oppia-nested-link">
-    {{outcome.dest}}
-  </span>
-  <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
-    <em *ngIf="outcome.newStateName">{{outcome.newStateName}}</em>
-    <em *ngIf="!outcome.newStateName">Nowhere yet...</em>
-  </span>
-  <span *ngIf="outcome && !isInQuestionMode() && isOutcomeLooping()">
-    <em>(try again)</em>
-  </span>
-  <span *ngIf="outcome && isInQuestionMode() && !isCorrect()">
-    <em>Wrong<br> (try again)</em>
-  </span>
 </div>
 
 <style>
@@ -50,7 +50,7 @@
   .oppia-nested-link {
     color: #0844aa;
     cursor: pointer;
-    display: contents;
+    display: inline-block;
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -62,7 +62,6 @@
     text-decoration: underline;
   }
   .oppia-response-header {
-    display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -121,51 +120,6 @@
     }
     .oppia-response-container-desktop {
       display: none;
-    }
-  }
-  @media screen and (max-width: 1457px) {
-    .oppia-response-header {
-      width: 65%;
-    }
-  }
-  @media screen and (max-width: 953px) {
-    .oppia-response-header {
-      width: 58%;
-    }
-  }
-  @media screen and (max-width: 845px) {
-    .oppia-response-header {
-      width: 48%;
-    }
-  }
-  @media screen and (max-width: 768px) {
-    .oppia-response-header {
-      width: 60%;
-    }
-  }
-  @media screen and (max-width: 549px) {
-    .oppia-response-header {
-      width: 55%;
-    }
-  }
-  @media screen and (max-width: 461px) {
-    .oppia-response-header {
-      width: 50%;
-    }
-  }
-  @media screen and (max-width: 450px) {
-    .oppia-response-header {
-      width: 48%;
-    }
-  }
-  @media screen and (max-width: 411px) {
-    .oppia-response-header {
-      width: 39%;
-    }
-  }
-  @media screen and (max-width: 390px) {
-    .oppia-response-header {
-      width: 35%;
     }
   }
 </style>
