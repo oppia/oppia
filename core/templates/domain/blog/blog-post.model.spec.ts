@@ -34,6 +34,7 @@ describe('Blog Post Object Factory', () => {
     };
     sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
+    sampleBlogPostData.titleIsDuplicate = false;
   });
 
   it('should not find issues with a valid blog post', () => {
@@ -66,6 +67,12 @@ describe('Blog Post Object Factory', () => {
     sampleBlogPostData.title = 'invalid chars#';
     expect(sampleBlogPostData.validate()).toEqual([
       'Blog Post title contains invalid characters.',
+      'Blog Post content should not be empty.'
+    ]);
+
+    sampleBlogPostData.titleIsDuplicate = true;
+    expect(sampleBlogPostData.validate()).toEqual([
+      'Blog Post with the given title already exists.',
       'Blog Post content should not be empty.'
     ]);
   });
@@ -105,6 +112,14 @@ describe('Blog Post Object Factory', () => {
 
     expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
       'Blog Post title contains invalid characters.',
+      'Blog Post should have a thumbnail.',
+      'Blog Post should have atleast one tag linked to it.',
+      'Blog Post content should not be empty.',
+    ]);
+
+    sampleBlogPostData.titleIsDuplicate = true;
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
+      'Blog Post with the given title already exists.',
       'Blog Post should have a thumbnail.',
       'Blog Post should have atleast one tag linked to it.',
       'Blog Post content should not be empty.',
