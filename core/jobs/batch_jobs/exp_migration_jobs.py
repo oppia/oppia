@@ -333,8 +333,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
-        with datastore_services.get_ndb_context():
-            unused_put_results = (
+        unused_put_results = (
                 exp_related_models_to_put
                 | 'Filter None models' >> beam.Filter(
                     lambda x: x is not None)
