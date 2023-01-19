@@ -12,7 +12,11 @@
     <div *ngIf="learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">
       <div class="learner-progress-summary-header">
         <div class="learner-info">
-          <img [src]="getProfileImageDataUrl(learnerProgress.username)">
+          <picture>
+            <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
+            <source type="image/png" [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
+            <img [src]="getProfileImagePngDataUrl(learnerProgress.username)">
+          </picture>
           <div>{{learnerProgress.username}}</div>
         </div>
         <div class="view-details-button btn btn-primary" (click)="activateLearnerSpecificView(learnerProgress)">
@@ -34,7 +38,11 @@
     <div *ngIf="!learnerProgress.isProgressSharingTurnedOn" class="learner-progress-summary">
       <div class="learner-progress-summary-header">
         <div class="learner-info">
-          <img [src]="getProfileImageDataUrl(learnerProgress.username)">
+          <picture>
+            <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
+            <source type="image/png" [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
+            <img [src]="getProfileImagePngDataUrl(learnerProgress.username)">
+          </picture>
           <div>{{learnerProgress.username}}</div>
         </div>
         <div class="permissions-message gray-message">
@@ -92,7 +100,11 @@
                     class="btn dropdown-toggle learners-dropdown-toggle"
                     title="progress">
               <div class="learner-info">
-                <img [src]="getProfileImageDataUrl(specificLearnerProgress.username)">
+                <picture>
+                  <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(specificLearnerProgress.username)">
+                  <source type="image/png" [srcset]="getProfileImagePngDataUrl(specificLearnerProgress.username)">
+                  <img [src]="getProfileImagePngDataUrl(specificLearnerProgress.username)">
+                </picture>
                 <div>{{specificLearnerProgress.username}}</div>
               </div>
             </button>
@@ -102,7 +114,11 @@
               <ng-container *ngFor="let learnerProgress of learnersProgress">
                 <li ngbDropdownItem>
                   <div class="learner-info" (click)="updateLearnerSpecificProgress(learnerProgress)">
-                    <img [src]="getProfileImageDataUrl(learnerProgress.username)">
+                    <picture>
+                      <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
+                      <source type="image/png" [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
+                      <img [src]="getProfileImagePngDataUrl(learnerProgress.username)">
+                    </picture>
                     <div>{{learnerProgress.username}}</div>
                   </div>
                 </li>

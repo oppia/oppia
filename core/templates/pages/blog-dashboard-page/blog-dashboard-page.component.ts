@@ -40,8 +40,10 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   activeTab!: string;
   authorName!: string;
   authorBio!: string;
-  authorProfilePictureUrl!: string;
+  authorProfilePicPngUrl!: string;
+  authorProfilePicWebpUrl!: string;
   blogDashboardData!: BlogDashboardData;
+  username!: string;
   windowIsNarrow: boolean = false;
   activeView: string = 'gridView';
   directiveSubscriptions = new Subscription();
@@ -82,12 +84,18 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  async getUserInfoAsync(): Promise<void> {
+    const userInfo = await this.userService.getUserInfoAsync();
+    this.username = userInfo.getUsername();
+    this.authorProfilePicPngUrl = this.userService.getProfileImageDataUrlAsync(
+      this.username);
+    this.authorProfilePicWebpUrl = this.userService.getProfileImageDataUrlAsync(
+      this.username, true);
+  }
+
   initMainTab(): void {
     this.loaderService.showLoadingScreen('Loading');
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
-    profileImagePromise.then(data => {
-      this.authorProfilePictureUrl = decodeURIComponent(data as string);
-    });
+    this.getUserInfoAsync();
     this.blogDashboardBackendService.fetchBlogDashboardDataAsync().then(
       (dashboardData) => {
         this.blogDashboardData = dashboardData;

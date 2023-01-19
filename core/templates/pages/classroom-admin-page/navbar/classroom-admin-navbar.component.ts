@@ -33,7 +33,8 @@ export class ClassroomAdminNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  profilePictureDataUrl!: string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   profileUrl!: string;
   username!: string | null;
   logoWebpImageSrc!: string;
@@ -56,9 +57,11 @@ export class ClassroomAdminNavbarComponent implements OnInit {
     return this.profileDropdownIsActive = false;
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
-    let dataUrl = await this.userService.getProfileImageDataUrlAsync();
-    this.profilePictureDataUrl = decodeURIComponent(dataUrl);
+  getProfileImageDataAsync(username: string): void {
+    this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
+      username);
+    this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
+      username, true);
   }
 
   async getUserInfoAsync(): Promise<void> {
@@ -73,10 +76,10 @@ export class ClassroomAdminNavbarComponent implements OnInit {
         '/profile/<username>', {
           username: this.username
         }));
+    this.getProfileImageDataAsync(this.username);
   }
 
   ngOnInit(): void {
-    this.getProfileImageDataAsync();
     this.getUserInfoAsync();
 
     this.logoPngImageSrc = this.urlInterpolationService.getStaticImageUrl(

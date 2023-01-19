@@ -37,7 +37,8 @@ export class BlogCardComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() blogPostSummary!: BlogPostSummary;
   @Input() shownOnblogPostPage!: boolean;
-  authorProfilePictureUrl!: string;
+  authorProfilePicPngUrl!: string;
+  authorProfilePicWebpUrl!: string;
   thumbnailUrl: string = '';
   publishedDateString: string = '';
   blogCardPreviewModeIsActive: boolean = false;
@@ -57,11 +58,10 @@ export class BlogCardComponent implements OnInit {
           AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.id,
           this.blogPostSummary.thumbnailFilename);
     }
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync(
+    this.authorProfilePicPngUrl = this.userService.getProfileImageDataUrlAsync(
       this.blogPostSummary.authorUsername);
-    profileImagePromise.then(data => {
-      this.authorProfilePictureUrl = decodeURIComponent(data as string);
-    });
+    this.authorProfilePicWebpUrl = this.userService.getProfileImageDataUrlAsync(
+      this.blogPostSummary.authorUsername, true);
     const publishedOn = this.blogPostSummary.publishedOn;
     if (publishedOn === undefined) {
       throw new Error('Blog Post Summary published date is not defined');

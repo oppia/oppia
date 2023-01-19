@@ -38,11 +38,14 @@
                  aria-label="Edit profile picture button">
             </div>
             <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"></i>
-            <img *ngIf="profilePictureDataUrl"
-                 [src]="profilePictureDataUrl"
-                 class="img-thumbnail e2e-test-custom-photo"
-                 alt="Profile photo picture">
-            <picture *ngIf="!profilePictureDataUrl">
+            <picture *ngIf="profilePicturePngDataUrl">
+              <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+              <source type="image/png" [srcset]="profilePicturePngDataUrl">
+              <img [src]="profilePicturePngDataUrl"
+                   class="img-thumbnail e2e-test-custom-photo"
+                   alt="Profile photo picture">
+            </picture>
+            <picture *ngIf="!profilePicturePngDataUrl">
               <source type="image/webp" [srcset]="getStaticImageUrl('/general/no_profile_picture.webp')">
               <source type="image/png" [srcset]="getStaticImageUrl('/general/no_profile_picture.png')">
               <img [src]="getStaticImageUrl('/general/no_profile_picture.png')"

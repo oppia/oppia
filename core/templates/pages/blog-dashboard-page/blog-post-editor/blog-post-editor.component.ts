@@ -51,11 +51,13 @@ export class BlogPostEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   blogPostData!: BlogPostData;
   blogPostId!: string;
-  authorProfilePictureUrl!: string;
+  authorProfilePicPngUrl!: string;
+  authorProfilePicWebpUrl!: string;
   uploadedImageDataUrl!: string;
   title!: string;
   defaultTagsList!: string[];
   maxAllowedTags!: number;
+  username!: string;
   localEditedContent!: string;
   thumbnailDataUrl!: string;
   MAX_CHARS_IN_BLOG_POST_TITLE!: number;
@@ -113,11 +115,17 @@ export class BlogPostEditorComponent implements OnInit {
     return this.HTML_SCHEMA;
   }
 
+  async getUserInfoAsync(): Promise<void> {
+    const userInfo = await this.userService.getUserInfoAsync();
+    this.username = userInfo.getUsername();
+    this.authorProfilePicPngUrl = this.userService.getProfileImageDataUrlAsync(
+      this.username);
+    this.authorProfilePicWebpUrl = this.userService.getProfileImageDataUrlAsync(
+      this.username, true);
+  }
+
   initEditor(): void {
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
-    profileImagePromise.then(data => {
-      this.authorProfilePictureUrl = decodeURIComponent(data as string);
-    });
+    this.getUserInfoAsync();
     this.blogPostEditorBackendService.fetchBlogPostEditorData(this.blogPostId)
       .then(
         (editorData: BlogPostEditorData) => {
@@ -336,8 +344,6 @@ export class BlogPostEditorComponent implements OnInit {
 
   showPreview(): void {
     this.blogDashboardPageService.blogPostData = this.blogPostData;
-    this.blogDashboardPageService.authorPictureUrl = (
-      this.authorProfilePictureUrl);
     this.ngbModal.open(BlogCardPreviewModalComponent, {
       backdrop: 'static'
     });

@@ -130,7 +130,8 @@ export class TutorCardComponent {
   getCanAskLearnerForAnswerInfo!: () => boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
   OPPIA_AVATAR_LINK_URL!: string | null;
-  profilePicture!: string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   directiveSubscriptions = new Subscription();
   arePreviousResponsesShown: boolean = false;
   nextMilestoneChapterCount: number | null = null;
@@ -139,6 +140,7 @@ export class TutorCardComponent {
   checkMarkSkipped: boolean = false;
   confettiAnimationTimeout!: NodeJS.Timeout;
   skipClickListener: Function | null = null;
+  username!: string;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -163,7 +165,26 @@ export class TutorCardComponent {
     private translateService: TranslateService
   ) {}
 
+  async getUserInfoAsync(): Promise<void> {
+    const userInfo = await this.userService.getUserInfoAsync();
+    this.username = userInfo.getUsername();
+    if (!this._editorPreviewMode) {
+      this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
+        this.username);
+      this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
+        this.username, true);
+    } else {
+      this.profilePictureWebpDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.profilePicturePngDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+    }
+  }
+
   ngOnInit(): void {
+    this.getUserInfoAsync();
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
     this.isIframed = this.urlService.isIframed();
     this.getCanAskLearnerForAnswerInfo = (
@@ -172,19 +193,6 @@ export class TutorCardComponent {
       this.urlInterpolationService
         .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
     this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
-
-    this.profilePicture = this.urlInterpolationService
-      .getStaticImageUrl('/avatar/user_blue_72px.png');
-
-    if (!this._editorPreviewMode) {
-      this.userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-        this.profilePicture = dataUrl;
-      });
-    } else {
-      this.profilePicture = (
-        this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-    }
 
     this.directiveSubscriptions.add(
       this.explorationPlayerStateService.onOppiaFeedbackAvailable.subscribe(

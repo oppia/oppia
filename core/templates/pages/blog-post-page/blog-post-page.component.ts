@@ -45,7 +45,8 @@ export class BlogPostPageComponent implements OnInit {
   blogPostUrlFragment!: string;
   blogPost!: BlogPostData;
   publishedDateString: string = '';
-  authorProfilePicUrl!: string;
+  authorProfilePicPngUrl!: string;
+  authorProfilePicWebpUrl!: string;
   authorUsername!: string;
   postsToRecommend: BlogPostSummary[] = [];
   blogPostLinkCopied: boolean = false;
@@ -67,7 +68,7 @@ export class BlogPostPageComponent implements OnInit {
     this.blogPost = this.blogPostPageData.blogPostDict;
     this.blogPostPageService.blogPostId = this.blogPostPageData.blogPostDict.id;
     this.postsToRecommend = this.blogPostPageData.summaryDicts;
-    this.getAuthorProfilePicUrl();
+    this.getAuthorProfilePicUrl(this.authorUsername);
     if (this.blogPost.publishedOn) {
       this.publishedDateString = this.getDateStringInWords(
         this.blogPost.publishedOn);
@@ -92,11 +93,11 @@ export class BlogPostPageComponent implements OnInit {
     selection?.removeAllRanges();
   }
 
-  getAuthorProfilePicUrl(): void {
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
-    profileImagePromise.then(data => {
-      this.authorProfilePicUrl = decodeURIComponent(data as string);
-    });
+  getAuthorProfilePicUrl(username: string): void {
+    this.authorProfilePicPngUrl = this.userService.getProfileImageDataUrlAsync(
+      username);
+    this.authorProfilePicWebpUrl = this.userService.getProfileImageDataUrlAsync(
+      username, true);
   }
 
   getDateStringInWords(naiveDate: string): string {

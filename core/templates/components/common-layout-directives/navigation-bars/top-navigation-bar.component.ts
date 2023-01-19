@@ -113,7 +113,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // these properties remain undefined.
   username: string | undefined;
   profilePageUrl: string | undefined;
-  profilePictureDataUrl: string | undefined;
+  profilePicturePngDataUrl: string | undefined;
+  profilePictureWebpDataUrl: string | undefined;
 
   // The 'activeMenuName' property is not initialized in the constructor
   // or in a lifecycle hook, and is set based on certain
@@ -173,7 +174,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.getProfileImageDataAsync();
     this.currentUrl =
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
     this.url = new URL(this.windowRef.nativeWindow.location.toString());
@@ -266,6 +266,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           '/profile/<username>', {
             username: this.username
           });
+        this.getProfileImageDataAsync(this.username);
       }
     });
 
@@ -361,9 +362,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return 0;
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
-    let dataUrl = await this.userService.getProfileImageDataUrlAsync();
-    this.profilePictureDataUrl = decodeURIComponent(dataUrl);
+  getProfileImageDataAsync(username: string): void {
+    this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
+      username);
+    this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
+      username, true);
   }
 
   getStaticImageUrl(imagePath: string): string {

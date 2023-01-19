@@ -17,11 +17,11 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { SafeUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import AppConstants from 'assets/constants';
+import { AppConstants as appConstants } from 'app.constants';
 import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
@@ -43,7 +43,8 @@ export class ContributorDashboardPageComponent
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   defaultHeaderVisible!: boolean;
-  profilePictureDataUrl!: SafeUrl | string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   userInfoIsLoading!: boolean;
   userIsLoggedIn!: boolean;
   userIsReviewer!: boolean;
@@ -192,16 +193,21 @@ export class ContributorDashboardPageComponent
       if (userInfo.isLoggedIn()) {
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
+        this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
+          this.username);
+        this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
+          this.username, true);
       } else {
         this.userIsLoggedIn = false;
         this.username = '';
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            appConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            appConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       }
     });
-
-    this.userService.getProfileImageDataUrlAsync().then(
-      (dataUrl) => {
-        this.profilePictureDataUrl = decodeURIComponent(dataUrl);
-      });
 
     this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((topicNames) => {

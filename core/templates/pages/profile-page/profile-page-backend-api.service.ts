@@ -25,8 +25,6 @@ import { ProfilePageDomainConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { UserBackendApiService } from 
-  'services/user-backend-api.service';
 import { UserProfile, UserProfileBackendDict } from
   'domain/user/user-profile.model';
 import { UserService } from 'services/user.service';
@@ -74,15 +72,6 @@ export class ProfilePageBackendApiService {
       });
   }
 
-  async _fetchProfileImageDataUrlAsync(): Promise<string> {
-    return this.userService.getProfileImageDataUrlAsync(
-      this.urlService.getUsernameFromProfileUrl()).then(image => {
-        return new Promise(resolve => {
-          resolve(image as string);
-        });
-    });
-  }
-
   /**
    * Subscribes to a profile for the given username.
    * @param {String} creatorUsername - username of profile to be subscribed.
@@ -104,12 +93,5 @@ export class ProfilePageBackendApiService {
    */
   async fetchProfileDataAsync(): Promise<UserProfile> {
     return this._fetchProfileDataAsync();
-  }
-
-  /**
-   * Fetches the profile photo URI for username in URL.
-   */
-  async fetchProfileImageDataUrlAsync(): Promise<string> {
-    return this._fetchProfileImageDataUrlAsync();
   }
 }

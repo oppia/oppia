@@ -22,6 +22,7 @@ import { AppConstants } from 'app.constants';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { UserProfile } from 'domain/user/user-profile.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -81,7 +82,8 @@ export class ProfilePageComponent {
   profileIsOfCurrentUser: boolean = false;
   explorationsOnPage: LearnerExplorationSummary[] = [];
   subjectInterests: string[] = [];
-  profilePictureDataUrl: string = '';
+  profilePicturePngDataUrl: string = '';
+  profilePictureWebpDataUrl: string = '';
   preferencesUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
@@ -93,6 +95,7 @@ export class ProfilePageComponent {
     private ratingComputationService: RatingComputationService,
     private userService: UserService,
     private windowRef: WindowRef,
+    private urlInterpolationService: UrlInterpolationService
   ) { }
 
   ngOnInit(): void {
@@ -169,15 +172,24 @@ export class ProfilePageComponent {
       this.numUserPortfolioExplorations = data.editedExpSummaries.length;
       this.subjectInterests = data.subjectInterests;
       this.firstContributionMsec = data.firstContributionMsec;
+
+      if (data.username) {
+        this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
+          data.username);
+        this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
+          data.username, true);
+      }
+      else {
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      }
     });
 
-    let profileImagePromise = (
-      this.profilePageBackendApiService.fetchProfileImageDataUrlAsync());
-    profileImagePromise.then((data) => {
-      this.profilePictureDataUrl = decodeURIComponent(data);
-    });
-
-    Promise.all([profileDataPromise, profileImagePromise]).then(() => {
+    Promise.all([profileDataPromise]).then(() => {
       this.loaderService.hideLoadingScreen();
     });
   }

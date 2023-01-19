@@ -315,9 +315,13 @@
                   <div class="col-sm-1 feedback-message-author-picture oppia-feedback-message-spacing p-0">
                     <span class="feedback-message-header">
                       <span class="d-inline-block">
-                        <img [src]="profilePictureDataUrl"
-                             class="oppia-navbar-profile-picture rounded-circle feedback-thread-learner-profile-pic"
-                             alt="User Avatar">
+                        <picture>
+                          <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                          <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                          <img [src]="profilePicturePngDataUrl"
+                              class="oppia-navbar-profile-picture rounded-circle feedback-thread-learner-profile-pic"
+                              alt="User Avatar">
+                        </picture>
                       </span>
                     </span>
                   </div>

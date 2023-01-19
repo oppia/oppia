@@ -91,14 +91,12 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
     return strugglingSubtopicsCount;
   }
 
-  getProfileImageDataUrl(username: string): string {
-    let profilePictureUrl: string;
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync(
-      username);
-    profileImagePromise.then(data => {
-      profilePictureUrl = decodeURIComponent(data as string);
-    });
-    return profilePictureUrl
+  getProfileImagePngDataUrl(username: string): string {
+    return this.userService.getProfileImageDataUrlAsync(username);
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    return this.userService.getProfileImageDataUrlAsync(username, true);
   }
 
   activateLearnerSpecificView(

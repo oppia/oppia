@@ -33,7 +33,8 @@ export class ProfileLinkImageComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
-  profilePicture!: string;
+  profilePicturePng!: string;
+  profilePictureWebp!: string;
   profileUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
       ':username_fragment', this.username
@@ -53,21 +54,17 @@ export class ProfileLinkImageComponent implements OnInit {
     var DEFAULT_PROFILE_IMAGE_PATH = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.webp'));
-    this.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
+    this.profilePictureWebp = DEFAULT_PROFILE_IMAGE_PATH;
     this.profileUrl = (
       '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
         ':username_fragment', this.username
       )
     );
 
-    // Returns a promise for the user profile picture, or the default
-    // image if user is not logged in or has not uploaded a profile
-    // picture, or the player is in preview mode.
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync(
+    this.profilePicturePng = this.userService.getProfileImageDataUrlAsync(
       this.username);
-    profileImagePromise.then((profilePicture: string) => {
-      this.profilePicture = profilePicture;
-    });
+    this.profilePictureWebp = this.userService.getProfileImageDataUrlAsync(
+      this.username, true);
   }
 }
 

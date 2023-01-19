@@ -49,13 +49,15 @@ export class InputResponsePairComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() data!: InputResponsePair;
   @Input() oppiaAvatarImageUrl!: string;
-  @Input() profilePicture!: string;
+  @Input() profilePicturePngDataUrl!: string;
+  @Input() profilePictureWebpDataUrl!: string;
   @Input() inputResponsePairId!: string;
   @Input() bottomSection!: boolean;
   @Input() isLastPair!: boolean;
   @Input() feedbackIsEnabled!: boolean;
   @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
-  decodedProfilePicture: string | undefined;
+  decodedProfilePicturePng: string;
+  decodedProfilePictureWebp: string;
   @ViewChild('popover') popover!: NgbPopover;
 
   constructor(
@@ -70,7 +72,8 @@ export class InputResponsePairComponent {
   ) {}
 
   ngOnInit(): void {
-    this.decodedProfilePicture = decodeURIComponent(this.profilePicture);
+    this.decodedProfilePicturePng = this.profilePicturePngDataUrl;
+    this.decodedProfilePictureWebp = this.profilePictureWebpDataUrl;
   }
 
   isVideoRteElementPresentInResponse(): boolean {

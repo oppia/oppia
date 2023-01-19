@@ -16,7 +16,6 @@
  * @fileoverview Service for user data.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -39,7 +38,6 @@ export class UserService {
     private urlService: UrlService,
     private windowRef: WindowRef,
     private userBackendApiService: UserBackendApiService,
-    private http: HttpClient
   ) {}
 
   // This property will be null when the user does not have
@@ -62,37 +60,33 @@ export class UserService {
     return this.userInfo;
   }
 
-  private async _getProfileImagePromise(imageDataBlob: Blob): Promise<string> {
-    return new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result as string);
-      };
-      reader.readAsDataURL(imageDataBlob);
-    });
-  }
-
-  async getProfileImageDataUrlAsync(username: string = ''): Promise<string> {
-    let defaultUrl = this.urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
-     return this.getUserInfoAsync().then(userInfo => {
-      if (username === '') {
-        username = userInfo.getUsername();
+  getProfileImageDataUrlAsync(
+    username: string, isWebp: boolean = false): string {
+    let defaultUrlWebp = this.urlInterpolationService.getStaticImageUrl(
+      AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
+    let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(
+      AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
+    let localStoredImage = this.imageLocalStorageService.getRawImageData(
+      username + '_profile_picture.png');
+    if (localStoredImage !== null) {
+      return localStoredImage;
+    }
+    if (AppConstants.EMULATOR_MODE) {
+      if (isWebp) {
+        return defaultUrlWebp;
       }
-      let localStoredImage = this.imageLocalStorageService.getRawImageData(
-        username + '_profile_picture.png');
-      if (localStoredImage !== null) {
-        return new Promise(resolve => {return resolve(localStoredImage)});
+      return defaultUrlPng;
+    }
+    else {
+      if (isWebp) {
+        return this.urlInterpolationService.interpolateUrl(
+          this.assetsBackendApiService.profileImageWebpUrlTemplate,
+          {username: username})
       }
-      return this.http.get(this.urlInterpolationService.interpolateUrl(
-        this.assetsBackendApiService.profileImageUrlTemplate,
-        {username: username}), {responseType: 'blob'}).toPromise().then(
-          (response) => {
-            return this._getProfileImagePromise(response);
-          }, () => {
-            return new Promise(resolve => {return resolve(defaultUrl)});
-          });
-    });
+      return this.urlInterpolationService.interpolateUrl(
+        this.assetsBackendApiService.profileImagePngUrlTemplate,
+        {username: username})
+    }
   }
 
   async setProfileImageDataUrlAsync(

@@ -56,7 +56,8 @@ export class PreferencesPageComponent {
   preferredLanguageCodes!: string[];
   preferredSiteLanguageCode!: string;
   preferredAudioLanguageCode!: string;
-  profilePictureDataUrl!: string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
   userBio!: string;
   defaultDashboard!: string;
@@ -191,7 +192,6 @@ export class PreferencesPageComponent {
   }
 
   private _saveProfileImageToLocalStorage(image: string): void {
-    this.profilePictureDataUrl = image;
     const newImageFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(image));
     const reader = new FileReader();
@@ -204,7 +204,6 @@ export class PreferencesPageComponent {
   }
 
   private _postProfileImageToServer(image: string): void {
-    this.profilePictureDataUrl = image;
     this.userService.setProfileImageDataUrlAsync(image)
       .then(() => {});
   }
@@ -232,6 +231,10 @@ export class PreferencesPageComponent {
     userInfoPromise.then((userInfo) => {
       this.username = userInfo.getUsername();
       this.email = userInfo.getEmail();
+      this.profilePicturePngDataUrl = (
+        this.userService.getProfileImageDataUrlAsync(this.username));
+      this.profilePictureWebpDataUrl = (
+        this.userService.getProfileImageDataUrlAsync(this.username, true));
     });
 
     this.AUDIO_LANGUAGE_CHOICES = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
@@ -270,14 +273,7 @@ export class PreferencesPageComponent {
       this.hasPageLoaded = true;
     });
 
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync();
-    profileImagePromise.then(data => {
-      this.profilePictureDataUrl = decodeURIComponent(data as string);
-    });
-
-    Promise.all([
-      userInfoPromise, preferencesPromise, profileImagePromise
-    ]).then(() => {
+    Promise.all([userInfoPromise, preferencesPromise]).then(() => {
       this.loaderService.hideLoadingScreen();
     });
 

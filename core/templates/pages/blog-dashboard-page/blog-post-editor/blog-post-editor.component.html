@@ -32,10 +32,14 @@
       <div *ngIf="windowIsNarrow">
         <mat-card-header [ngClass]="{'flex-column': windowIsNarrow}">
           <div mat-card-avatar class="author-profile d-flex">
-            <img mat-card-avatar
-                 class="profile-image"
-                 [src]="authorProfilePictureUrl"
-                 alt="Profile image of the author of the blog post.">
+            <picture>
+              <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
+              <source type="image/png" [srcset]="authorProfilePicPngUrl">
+              <img mat-card-avatar
+                [src]="authorProfilePicPngUrl"
+                class="profile-image"
+                alt="Profile image of the author of the blog post">
+            </picture>
             <span class="author-username text-center general-text-format ml-4 my-auto">
               {{ authorName }}
             </span>

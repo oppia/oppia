@@ -52,7 +52,8 @@
       <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
         <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
           <oppia-input-response-pair [data]="responsePair"
-                                     [profilePicture]="profilePicture"
+                                     [profilePicturePngDataUrl]="profilePicturePngDataUrl"
+                                     [profilePictureWebpDataUrl]="profilePictureWebpDataUrl"
                                      [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                      [inputResponsePairId]="getInputResponsePairId($index)"
                                      [isLastPair]="false"

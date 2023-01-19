@@ -42,7 +42,8 @@ export class BlogAuthorProfilePageComponent implements OnInit {
   authorName!: string;
   authorUsername!: string;
   authorBio!: string;
-  authorProfilePicUrl!: string;
+  authorProfilePicPngUrl!: string;
+  authorProfilePicWebpUrl!: string;
   lastPostOnPageNum!: number;
   noResultsFound!: boolean;
   blogPostSummaries: BlogPostSummary[] = [];
@@ -141,11 +142,10 @@ export class BlogAuthorProfilePageComponent implements OnInit {
   }
 
   getAuthorProfilePicUrl(): void {
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync(
+    this.authorProfilePicPngUrl = this.userService.getProfileImageDataUrlAsync(
       this.authorUsername);
-    profileImagePromise.then(data => {
-      this.authorProfilePicUrl = decodeURIComponent(data as string);
-    });
+    this.authorProfilePicWebpUrl = this.userService.getProfileImageDataUrlAsync(
+      this.authorUsername, true);
   }
 
   isSmallScreenViewActive(): boolean {

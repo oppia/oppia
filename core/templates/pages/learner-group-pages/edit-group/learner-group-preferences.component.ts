@@ -215,13 +215,12 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     this.invitedLearners = invitedLearners;
   }
 
-  getProfileImageDataUrl(username: string): string {
-    let profileImagePromise = this.userService.getProfileImageDataUrlAsync(
-      username);
-    profileImagePromise.then(data => {
-      this.profilePictureUrl = decodeURIComponent(data as string);
-    });
-    return this.profilePictureUrl;
+  getProfileImagePngDataUrl(username: string): string {
+    return this.userService.getProfileImageDataUrlAsync(username);
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    return this.userService.getProfileImageDataUrlAsync(username, true);
   }
 
   deleteLearnerGroup(): void {
