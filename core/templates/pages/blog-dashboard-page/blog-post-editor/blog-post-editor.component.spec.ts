@@ -62,7 +62,7 @@ describe('Blog Post Editor Component', () => {
   let sampleBlogPostBackendDict = {
     id: 'sampleBlogId',
     displayed_author_name: 'test_user',
-    title: 'sample_title',
+    title: 'sample title',
     content: '<p>hello</p>',
     thumbnail_filename: 'image.png',
     tags: ['learners', 'news'],
@@ -230,7 +230,7 @@ describe('Blog Post Editor Component', () => {
     expect(blogDashboardPageService.imageUploaderIsNarrow).toBe(true);
     expect(component.dateTimeLastSaved).toEqual(
       'November 21, 2014 at 04:52 AM');
-    expect(component.title).toEqual('sample_title');
+    expect(component.title).toEqual('sample title');
     expect(component.contentEditorIsActive).toBe(false);
     expect(component.lastChangesWerePublished).toBe(true);
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
