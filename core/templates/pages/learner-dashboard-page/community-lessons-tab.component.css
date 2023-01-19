@@ -94,7 +94,6 @@
   height: 0;
   position: relative;
 }
-
 .community-lessons-section .view-text {
   bottom: 22px;
   float: right;
@@ -102,7 +101,6 @@
   font-weight: 500;
   position: relative;
 }
-
 .community-lessons-section .dropdown-content {
   background-color: #fff;
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
