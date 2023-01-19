@@ -715,6 +715,8 @@ describe('Contributions and review component', () => {
           return;
         });
 
+      expect(component.languageCode).toBeUndefined();
+
       component.onChangeLanguage('es');
 
       expect(component.languageCode).toBe('es');
