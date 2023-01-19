@@ -7,9 +7,8 @@
         <div *ngIf="isEditable"
              class="oppia-click-to-start-editing"
              (click)="openEditorModal()">
-          <i class="material-icons oppia-editor-edit-icon float-right"
-             title="Edit Solution">&#xE254;
-          </i>
+          <i class="fas fa-edit oppia-editor-edit-icon float-right"
+             title="Edit Solution"></i>
         </div>
         <strong>
           {{stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One'}} solution is...
