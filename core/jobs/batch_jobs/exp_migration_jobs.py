@@ -325,8 +325,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_related_models_to_put = (
             transformed_exp_objects_list
             | 'Generate exploration models to put' >> beam.FlatMap(
-                lambda exp_objects: self.
-                _update_exploration(
+                lambda exp_objects: self._update_exploration(
                     exp_objects['exp_model'],
                     exp_objects['exploration'],
                     exp_objects['exp_changes'],
@@ -335,8 +334,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
         unused_put_results = (
                 exp_related_models_to_put
-                | 'Filter None models' >> beam.Filter(
-                    lambda x: x is not None)
+                | 'Filter None models' >> beam.Filter(lambda x: x is not None)
                 | 'Put models into datastore' >> ndb_io.PutModels()
             )
 
