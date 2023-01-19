@@ -36,9 +36,11 @@
       </label>
       <p *ngIf="flagMessageTextareaIsShown">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate }}
+        // make the textarea non-expandable
         <textarea rows="3" cols="50"
                   [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}"
-                  class="form-control e2e-test-report-exploration-text-area" oppiaFocusOn="flagMessageTextarea">
+                  class="form-control e2e-test-report-exploration-text-area" oppiaFocusOn="flagMessageTextarea"
+                  style="height: 210px; resize: none;" >
         </textarea>
       </p>
     </div>
