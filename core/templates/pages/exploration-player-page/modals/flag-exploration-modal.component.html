@@ -38,7 +38,7 @@
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate }}
         <textarea rows="3" cols="50"
                   [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}"
-                  class="form-control e2e-test-report-exploration-text-area textarea-custom" oppiaFocusOn="flagMessageTextarea">
+                  class="form-control e2e-test-report-exploration-text-area report-exploration-dialog-box-textarea" oppiaFocusOn="flagMessageTextarea">
         </textarea>
       </p>
     </div>
@@ -67,7 +67,7 @@
     font-weight: lighter;
     height: 15px;
   }
-  .textarea-custom {
+  .report-exploration-dialog-box-textarea {
     height: 210px;
     resize: none;
   }
