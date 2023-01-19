@@ -3,7 +3,7 @@
   </h1>
   <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
     <span class="view-text" [ngStyle]="displayInCommunityLessons.length !== 0 && {'right': '100px'}">
-      <h2>{{ 'I18N_LEARNER_DASHBOARD_VIEW' | translate }}</h2>
+      <span>{{ 'I18N_LEARNER_DASHBOARD_VIEW' | translate }}</span>
     </span>
     <button (click)="toggleDropdown()" class="dropbtn">
       {{selectedSection}}
