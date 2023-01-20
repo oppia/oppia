@@ -327,6 +327,7 @@ describe('Opportunities List Component', () => {
     // is hard to test or spy on the constructor. So, we have created a
     // function to manually trigger and tests different edge cases.
     component.init();
+    component.onChangeLanguage('en');
     tick();
 
     // Added two opportunities with id's as 'id1' and 'id2'.
@@ -492,6 +493,7 @@ describe('Opportunities List Component', () => {
   it('should navigate to updated last page when current last page is removed',
     fakeAsync(() => {
       component.init();
+      component.onChangeLanguage('en');
       tick();
       component.ngOnInit();
       tick();
@@ -527,6 +529,7 @@ describe('Opportunities List Component', () => {
       expect(component.activePageNumber).toBe(1);
 
       component.init();
+      component.onChangeLanguage('en');
       tick();
       mockReloadOpportunitiesEventEmitter.emit();
       tick();
@@ -737,5 +740,18 @@ describe('Opportunities List Component', () => {
 
       expect(component.activePageNumber).toBe(1);
     }));
+
+    it('should show the first page when loadOpportunities is not set',
+      fakeAsync(() => {
+        component.loadOpportunities = undefined;
+        expect(component.activePageNumber).toBe(1);
+
+        component.init();
+        tick();
+        component.ngOnInit();
+        tick();
+
+        expect(component.activePageNumber).toBe(1);
+      }));
   });
 });
