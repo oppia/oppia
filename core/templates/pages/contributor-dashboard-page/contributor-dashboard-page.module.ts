@@ -31,6 +31,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
+import { ReviewTranslationLanguageSelectorComponent } from './translation-language-selector/review-translation-language-selector.component';
 import { TranslationTopicSelectorComponent } from
   './translation-topic-selector/translation-topic-selector.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
@@ -73,6 +74,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
+    ReviewTranslationLanguageSelectorComponent,
     ContributorStatsComponent,
     BadgeComponent,
     TranslationLanguageSelectorComponent,
@@ -91,6 +93,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
+    ReviewTranslationLanguageSelectorComponent,
     ContributorStatsComponent,
     BadgeComponent,
     TranslationLanguageSelectorComponent,

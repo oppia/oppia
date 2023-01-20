@@ -99,7 +99,8 @@ export class ContributionOpportunitiesBackendApiService {
       opportunityDict.id, opportunityDict.topic_name,
       opportunityDict.story_title, opportunityDict.chapter_title,
       opportunityDict.content_count, opportunityDict.translation_counts,
-      opportunityDict.translation_in_review_counts);
+      opportunityDict.translation_in_review_counts,
+      opportunityDict.language_code);
   }
 
   private _getSkillOpportunityFromDict(
@@ -166,17 +167,22 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   async fetchReviewableTranslationOpportunitiesAsync(
-      topicName: string
+      topicName: string,
+      languageCode?: string
   ): Promise<FetchedReviewableTranslationOpportunitiesResponse> {
     const params: {
       topic_name?: string;
+      language_code?: string;
     } = {};
-    if (topicName !== constants.TOPIC_SENTINEL_NAME_ALL) {
+    if (topicName !== '' && topicName !== constants.TOPIC_SENTINEL_NAME_ALL) {
       params.topic_name = topicName;
+    }
+    if (languageCode && languageCode !== '') {
+      params.language_code = languageCode;
     }
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
       '/getreviewableopportunitieshandler', {
-        params
+        params: params
       }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
         dict => this._getExplorationOpportunityFromDict(dict));

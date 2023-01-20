@@ -36,6 +36,7 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 
 
 class MockNgbModalRef {
@@ -108,7 +109,8 @@ describe('Contributions and review component', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService
         },
-        UserService
+        UserService,
+        OpportunitiesListComponent
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -704,6 +706,24 @@ describe('Contributions and review component', () => {
 
         expect(component.activeExplorationId).toBeNull();
       }));
+
+    it('should be able to change language', fakeAsync(() => {
+      component.opportunitiesListRef = TestBed.inject(
+        OpportunitiesListComponent);
+      spyOn(component.opportunitiesListRef, 'onChangeLanguage')
+        .and.callFake(() => {
+          return;
+        });
+
+      expect(component.languageCode).toBeUndefined();
+
+      component.onChangeLanguage('es');
+
+      expect(component.languageCode).toBe('es');
+      expect(
+        component.opportunitiesListRef.onChangeLanguage
+      ).toHaveBeenCalledWith('es');
+    }));
 
     it('should return true on Review Translations tab', fakeAsync(() => {
       component.contributionTabs = [
