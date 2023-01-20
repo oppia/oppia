@@ -18,7 +18,7 @@
       <span *ngIf="outcome"> →</span>
       <span *ngIf="isCorrect() && isInQuestionMode()">
     Correct
-    </span>
+      </span>
       <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
         (click)="returnToState()" class="oppia-nested-link">
     {{outcome.dest}}
@@ -26,17 +26,17 @@
       <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
         <em *ngIf="outcome.newStateName">{{outcome.newStateName}}</em>
         <em *ngIf="!outcome.newStateName">Nowhere yet...</em>
-    </span>
+      </span>
       <span *ngIf="outcome && !isInQuestionMode() && isOutcomeLooping()">
         <em>(try again)</em>
-    </span>
+      </span>
       <span *ngIf="outcome && isInQuestionMode() && !isCorrect()">
         <em>Wrong<br> (try again)</em>
-    </span>
+      </span>
       <span *ngIf="numRules > 1" class="badge badge-primary position-relative oppia-num-rules">
         +{{numRules - 1}}
       </span>
-  </span>
+    </span>
   </div>
 
   <br class="break-in-mobile">
