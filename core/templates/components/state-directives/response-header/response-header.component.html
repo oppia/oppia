@@ -13,25 +13,25 @@
         Correct
       </div>
     </div>
-  <span class="oppia-response-summary" [attr.title]="summary">
+    <span class="oppia-response-summary" [attr.title]="summary">
       <span class="oppia-response-short-summary">{{shortSummary}}</span>
       <span *ngIf="outcome"> →</span>
-    <span *ngIf="isCorrect() && isInQuestionMode()">
+      <span *ngIf="isCorrect() && isInQuestionMode()">
     Correct
     </span>
-    <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
+      <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
         (click)="returnToState()" class="oppia-nested-link">
     {{outcome.dest}}
+      </span>
+      <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
+        <em *ngIf="outcome.newStateName">{{outcome.newStateName}}</em>
+        <em *ngIf="!outcome.newStateName">Nowhere yet...</em>
     </span>
-    <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
-    <em *ngIf="outcome.newStateName">{{outcome.newStateName}}</em>
-    <em *ngIf="!outcome.newStateName">Nowhere yet...</em>
+      <span *ngIf="outcome && !isInQuestionMode() && isOutcomeLooping()">
+        <em>(try again)</em>
     </span>
-    <span *ngIf="outcome && !isInQuestionMode() && isOutcomeLooping()">
-    <em>(try again)</em>
-    </span>
-    <span *ngIf="outcome && isInQuestionMode() && !isCorrect()">
-    <em>Wrong<br> (try again)</em>
+      <span *ngIf="outcome && isInQuestionMode() && !isCorrect()">
+        <em>Wrong<br> (try again)</em>
     </span>
       <span *ngIf="numRules > 1" class="badge badge-primary position-relative oppia-num-rules">
         +{{numRules - 1}}
