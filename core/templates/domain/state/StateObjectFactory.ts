@@ -40,7 +40,6 @@ import {
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
@@ -166,7 +165,7 @@ export class StateObjectFactory {
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
-    return constants.NEW_STATE_TEMPLATE as StateBackendDict;
+    return AppConstants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
   // TODO(#14313): Remove the createDefaultState so that full state can be

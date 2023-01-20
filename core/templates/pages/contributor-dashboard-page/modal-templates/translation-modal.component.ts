@@ -31,7 +31,6 @@ import { Status, TranslatableItem, TranslateTextService } from 'pages/contributo
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
-import constants from 'assets/constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import {
@@ -132,7 +131,7 @@ export class TranslationModalComponent {
     }
   };
 
-  TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
+  TRANSLATION_TIPS = AppConstants.TRANSLATION_TIPS;
   isActiveLanguageReviewer: boolean = false;
   hadCopyParagraphError: boolean = false;
   hasImgTextError: boolean = false;

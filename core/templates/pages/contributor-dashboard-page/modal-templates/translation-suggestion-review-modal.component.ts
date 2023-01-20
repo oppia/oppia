@@ -30,7 +30,6 @@ import { UserService } from 'services/user.service';
 import { ValidatorsService } from 'services/validators.service';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { AppConstants } from 'app.constants';
-import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 // This throws "TS2307". We need to
@@ -151,7 +150,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     translationContainer!: ElementRef;
 
   HTML_SCHEMA: HTMLSchema = { type: 'html' };
-  MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
+  MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
     items: {

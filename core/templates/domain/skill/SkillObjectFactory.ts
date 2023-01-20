@@ -40,7 +40,7 @@ import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
 import { Rubric, RubricBackendDict } from
   'domain/skill/rubric.model';
 import { ValidatorsService } from 'services/validators.service';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export class Skill {
   _id: string;
@@ -54,7 +54,7 @@ export class Skill {
   _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
-  SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
+  SKILL_DIFFICULTIES: readonly string[] = AppConstants.SKILL_DIFFICULTIES;
 
   constructor(
       id: string,

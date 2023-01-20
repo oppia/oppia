@@ -23,7 +23,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { Subscription } from 'rxjs';
 
 type ExplorationOpportunitiesFetcherFunction = () => Promise<{
@@ -60,7 +60,7 @@ export class OpportunitiesListComponent {
   visibleOpportunities: ExplorationOpportunity[] = [];
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
-  OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
+  OPPORTUNITIES_PAGE_SIZE = AppConstants.OPPORTUNITIES_PAGE_SIZE;
   more: boolean = false;
   userIsOnLastPage: boolean = true;
   languageCode: string = '';

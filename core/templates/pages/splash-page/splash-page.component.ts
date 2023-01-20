@@ -17,7 +17,7 @@
  */
 import { Component, OnInit } from '@angular/core';
 
-import splashConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -27,6 +27,8 @@ import { UserService } from 'services/user.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import './splash-page.component.css';
+
+const splashConstants = AppConstants.commonConstants;
 
 export interface Testimonial {
   quote: string;

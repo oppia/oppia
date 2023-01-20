@@ -19,7 +19,7 @@
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface InvalidTagsAndAttributes {
@@ -90,7 +90,7 @@ export class EditThumbnailModalComponent {
 
   isValidFilename(file: File): boolean {
     const VALID_THUMBNAIL_FILENAME_REGEX = new RegExp(
-      constants.VALID_THUMBNAIL_FILENAME_REGEX);
+      AppConstants.VALID_THUMBNAIL_FILENAME_REGEX);
     return VALID_THUMBNAIL_FILENAME_REGEX.test(file.name);
   }
 

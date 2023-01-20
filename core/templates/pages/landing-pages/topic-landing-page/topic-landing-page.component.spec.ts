@@ -29,7 +29,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 class MockWindowRef {
   _window = {
@@ -139,7 +139,7 @@ describe('Topic Landing Page', () => {
     fixture.detectChanges();
 
     expect(windowRef.nativeWindow.location.href).toBe(
-      `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
+      `/learn/${AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
   }));
 
   it('should return correct lesson quality image src', function() {

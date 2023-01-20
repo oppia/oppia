@@ -28,7 +28,7 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 describe('App', function() {
@@ -60,9 +60,10 @@ describe('App', function() {
 
     it('should transform all key value pairs to angular constants',
       function() {
-        for (var constantName in constants) {
+        for (var constantName in AppConstants.commonConstants) {
           expect($injector.has(constantName)).toBe(true);
-          expect($injector.get(constantName)).toEqual(constants[constantName]);
+          expect($injector.get(constantName)).toEqual(
+            AppConstants.commonConstants[constantName]);
         }
       });
   });

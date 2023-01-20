@@ -25,7 +25,9 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('domain/exploration/curated-exploration-validation.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 
-import newChapterConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
+
+const newChapterConstants = AppConstants.commonConstants;
 
 angular.module('oppia').controller('CreateNewChapterModalController', [
   '$controller', '$scope', '$uibModalInstance',

@@ -23,8 +23,10 @@ import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-import topicConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
+
+const topicConstants = AppConstants.commonConstants;
 
 require(
   'components/common-layout-directives/common-elements/' +

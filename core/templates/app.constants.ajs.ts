@@ -20,10 +20,9 @@
 // equivalents of the Angular constants are no longer needed.
 import { AppConstants } from 'app.constants';
 
-import constants from 'assets/constants';
-
-for (var constantName in constants) {
-  angular.module('oppia').constant(constantName, constants[constantName]);
+for (var constantName in AppConstants.commonConstants) {
+  angular.module('oppia').constant(
+    constantName, AppConstants.commonConstants[constantName]);
 }
 
 // Translations of strings that are loaded in the front page. They are listed

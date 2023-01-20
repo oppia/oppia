@@ -32,7 +32,7 @@ import { ParamChangeBackendDict } from './ParamChangeObjectFactory';
 import { ParamSpecBackendDict } from './ParamSpecObjectFactory';
 import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
 import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFactory';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 interface LostChangeValues {
   'outcome'?: Outcome;
@@ -205,7 +205,7 @@ export class LostChange {
 
   getLanguage(): string {
     let language = '';
-    let supportedLanguages = constants.SUPPORTED_CONTENT_LANGUAGES;
+    let supportedLanguages = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
     if (this.cmd === 'add_written_translation') {
       for (let i = 0; i < supportedLanguages.length; i++) {
         if (this.languageCode === supportedLanguages[i].code) {

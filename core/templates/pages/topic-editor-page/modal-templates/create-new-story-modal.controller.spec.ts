@@ -22,8 +22,7 @@ import { TestBed } from '@angular/core/testing';
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
-import CONSTANTS from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 describe('Create New Story Modal Controller', function() {
   var $scope = null;
@@ -72,7 +71,7 @@ describe('Create New Story Modal Controller', function() {
     expect($scope.story.title).toBe('');
     expect($scope.story.description).toBe('');
     expect($scope.MAX_CHARS_IN_STORY_TITLE).toBe(
-      CONSTANTS.MAX_CHARS_IN_STORY_TITLE);
+      AppConstants.MAX_CHARS_IN_STORY_TITLE);
   });
 
   it('should check if url fragment already exists', function() {

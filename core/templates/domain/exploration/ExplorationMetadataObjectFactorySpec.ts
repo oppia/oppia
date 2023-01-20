@@ -17,7 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { ExplorationMetadata, ExplorationMetadataBackendDict, ExplorationMetadataObjectFactory } from './ExplorationMetadataObjectFactory';
 
 describe('Exploration metadata object factory', () => {
@@ -78,10 +78,10 @@ describe('Exploration metadata object factory', () => {
       .createFromBackendDict(explorationMetadataBackendDict);
     const backendDict = explorationMetadata.toBackendDict();
 
-    for (let property of constants.METADATA_PROPERTIES) {
+    for (let property of AppConstants.METADATA_PROPERTIES) {
       expect(backendDict.hasOwnProperty(property)).toBeTrue();
     }
-    for (let property of constants.NON_METADATA_PROPERTIES) {
+    for (let property of AppConstants.NON_METADATA_PROPERTIES) {
       expect(backendDict.hasOwnProperty(property)).toBeFalse();
     }
   });

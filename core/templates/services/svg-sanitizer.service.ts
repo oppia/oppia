@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 type nodeAttr = (
   'style' |
@@ -38,7 +38,7 @@ type nodeAttr = (
   'typeof'
 );
 
-type keyOfSvgAttrsAllowlist = keyof typeof constants.SVG_ATTRS_ALLOWLIST;
+type keyOfSvgAttrsAllowlist = keyof typeof AppConstants.SVG_ATTRS_ALLOWLIST;
 
 @Injectable({
   providedIn: 'root'
@@ -133,14 +133,14 @@ export class SvgSanitizerService {
     let invalidTags: string[] = [];
     let invalidAttrs: string[] = [];
 
-    let allowedTags = Object.keys(constants.SVG_ATTRS_ALLOWLIST);
+    let allowedTags = Object.keys(AppConstants.SVG_ATTRS_ALLOWLIST);
     let nodeTagName: keyOfSvgAttrsAllowlist;
     svg.querySelectorAll('*').forEach((node) => {
       nodeTagName = node.tagName.toLowerCase() as keyOfSvgAttrsAllowlist;
       if (allowedTags.indexOf(nodeTagName) !== -1) {
         for (let i = 0; i < node.attributes.length; i++) {
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
-          if (constants.SVG_ATTRS_ALLOWLIST[nodeTagName].indexOf(
+          if (AppConstants.SVG_ATTRS_ALLOWLIST[nodeTagName].indexOf(
             nodeAttrName as nodeAttr) === -1
           ) {
             invalidAttrs.push(

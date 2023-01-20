@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { State, StateBackendDict, StateObjectFactory }
   from 'domain/state/StateObjectFactory';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
@@ -220,7 +220,7 @@ export class QuestionObjectFactory {
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
       null, this.stateObject.createDefaultState(null),
-      constants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
+      AppConstants.DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
   }
 
   createFromBackendDict(questionBackendDict: QuestionBackendDict): Question {

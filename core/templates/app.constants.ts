@@ -20,6 +20,7 @@ import commonConstants from 'assets/constants';
 
 export const AppConstants = {
   ...commonConstants,
+  commonConstants,
   DEFAULT_TRANSLATIONS: {
     I18N_LIBRARY_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Library',
     I18N_LIBRARY_LOADING: 'Loading',

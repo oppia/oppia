@@ -15,7 +15,7 @@
 /**
  * @fileoverview Frontend Model for newly created story.
  */
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export class NewlyCreatedStory {
   title: string;
@@ -41,7 +41,7 @@ export class NewlyCreatedStory {
    */
   isValid(): boolean {
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
-      constants.VALID_URL_FRAGMENT_REGEX);
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
     return Boolean(
       this.title &&
       this.description &&
