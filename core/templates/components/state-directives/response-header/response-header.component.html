@@ -19,8 +19,7 @@
       <span *ngIf="isCorrect() && isInQuestionMode()">
     Correct
       </span>
-      <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
-      (click)="returnToState()" class="oppia-nested-link">
+      <span *ngIf="outcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()" (click)="returnToState()" class="oppia-nested-link">
     {{outcome.dest}}
       </span>
       <span class="oppia-nested-link" *ngIf="outcome && !isOutcomeLooping() && isCreatingNewState()">
