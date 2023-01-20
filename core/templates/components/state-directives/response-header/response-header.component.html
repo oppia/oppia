@@ -52,7 +52,7 @@
     cursor: pointer;
     display: inline-block;
     max-width: 100px;
-    overflow: hidden;
+    overflow: inherit;
     text-overflow: ellipsis;
     vertical-align: top;
     word-wrap: break-word;
@@ -65,7 +65,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 78%;
+    width: 92%;
   }
   .oppia-response-tick-cross {
     margin-bottom: 7px;
@@ -120,6 +120,16 @@
     }
     .oppia-response-container-desktop {
       display: none;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .oppia-response-header {
+      width: 75%;
+    }
+  }
+  @media screen and (max-width: 472px) {
+    .oppia-response-header {
+      width: 66%;
     }
   }
 </style>
