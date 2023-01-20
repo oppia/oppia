@@ -28,8 +28,6 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import './splash-page.component.css';
 
-const splashConstants = AppConstants.commonConstants;
-
 export interface Testimonial {
   quote: string;
   studentDetails: string;
@@ -164,7 +162,7 @@ export class SplashPageComponent implements OnInit {
     this.testimonials = this.getTestimonials();
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {

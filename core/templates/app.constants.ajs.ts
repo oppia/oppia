@@ -18,11 +18,13 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
+import constants from 'assets/constants';
+// // Import from assets/constants because we loop over all constants.
 import { AppConstants } from 'app.constants';
 
-for (var constantName in AppConstants.commonConstants) {
+for (var constantName in constants) {
   angular.module('oppia').constant(
-    constantName, AppConstants.commonConstants[constantName]);
+    constantName, constants[constantName]);
 }
 
 // Translations of strings that are loaded in the front page. They are listed

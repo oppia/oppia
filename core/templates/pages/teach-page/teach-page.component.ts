@@ -29,8 +29,6 @@ import { UserService } from 'services/user.service';
 import { Subscription } from 'rxjs';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 
-const splashConstants = AppConstants.commonConstants;
-
 export interface Testimonial {
   quote: string;
   studentDetails: string;
@@ -80,7 +78,7 @@ export class TeachPageComponent implements OnInit {
     this.testimonials = this.getTestimonials();
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.libraryUrl = '/community-library';
     this.loaderService.showLoadingScreen('Loading');

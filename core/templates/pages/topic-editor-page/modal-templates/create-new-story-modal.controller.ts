@@ -27,7 +27,6 @@ require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 import { AppConstants } from 'app.constants';
-const newStoryConstants = AppConstants.commonConstants;
 
 angular.module('oppia').controller('CreateNewStoryModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',
@@ -44,13 +43,13 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
       $uibModalInstance: $uibModalInstance
     });
     $scope.validUrlFragmentRegex = new RegExp(
-      newStoryConstants.VALID_URL_FRAGMENT_REGEX);
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
     $scope.story = NewlyCreatedStory.createDefault();
     $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
     $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = MAX_CHARS_IN_STORY_URL_FRAGMENT;
     $scope.MAX_CHARS_IN_STORY_DESCRIPTION = MAX_CHARS_IN_STORY_DESCRIPTION;
     $scope.allowedBgColors = (
-      newStoryConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
+      AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
     $scope.storyUrlFragmentExists = false;
     $scope.hostname = WindowRef.nativeWindow.location.hostname;
     $scope.classroomUrlFragment = (

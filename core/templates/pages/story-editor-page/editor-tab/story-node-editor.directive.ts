@@ -47,8 +47,6 @@ import { Subscription } from 'rxjs';
 // is migrated to Angular.
 import { AppConstants } from 'app.constants';
 
-const storyNodeConstants = AppConstants.commonConstants;
-
 angular.module('oppia').directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -126,7 +124,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.skillInfoHasLoaded = false;
             _recalculateAvailableNodes();
             $scope.allowedBgColors = (
-              storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
+              AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
               .then(function(response) {
