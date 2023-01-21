@@ -18,8 +18,6 @@
 
 const userFactory = require(
   '../puppeteer-testing-utilities/userFactory.js');
-const { closeAllBrowsers } = require(
-  '../puppeteer-testing-utilities/userFactory.js');
 
 let blogDashboardAccessibleByBlogAdmins = async function() {
   const guestUser = await userFactory.createNewGuestUser(
@@ -32,7 +30,7 @@ let blogDashboardAccessibleByBlogAdmins = async function() {
 
   await blogAdmin.expectBlogDashboardAccessToBeAuthorized();
 
-  await closeAllBrowsers();
+  await userFactory.closeAllBrowsers();
 };
 
 blogDashboardAccessibleByBlogAdmins();

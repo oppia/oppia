@@ -19,8 +19,6 @@
 
 const userFactory = require(
   '../puppeteer-testing-utilities/userFactory.js');
-const { closeAllBrowsers } = require(
-  '../puppeteer-testing-utilities/userFactory.js');
 
 let publishBlogPostAndDeletePublishedBlogPost = async function() {
   const blogPostEditor = await userFactory.createNewBlogPostEditor(
@@ -37,7 +35,7 @@ let publishBlogPostAndDeletePublishedBlogPost = async function() {
   await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
   await blogPostEditor.expectNumberOfBlogPostsToBe(0);
 
-  await closeAllBrowsers();
+  await userFactory.closeAllBrowsers();
 };
 
 publishBlogPostAndDeletePublishedBlogPost();

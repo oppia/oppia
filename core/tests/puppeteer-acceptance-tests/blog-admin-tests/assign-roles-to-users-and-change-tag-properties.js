@@ -19,8 +19,6 @@
 
 const userFactory = require(
   '../puppeteer-testing-utilities/userFactory.js');
-const { closeAllBrowsers } = require(
-  '../puppeteer-testing-utilities/userFactory.js');
 
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
@@ -52,7 +50,7 @@ let assignRolesToUsersAndChangeTagProperties = async function() {
   await blogAdmin.setMaximumTagLimitTo('5');
   await blogAdmin.expectMaximumTagLimitToBe('5');
 
-  await closeAllBrowsers();
+  await userFactory.closeAllBrowsers();
 };
 
 assignRolesToUsersAndChangeTagProperties();
