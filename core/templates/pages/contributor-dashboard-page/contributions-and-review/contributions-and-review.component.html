@@ -84,6 +84,12 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
+      <div *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
+        <review-translation-language-selector class="oppia-language-selector"
+                                              [activeLanguageCode]="languageCode"
+                                              (setActiveLanguageCode)="onChangeLanguage($event)">
+        </review-translation-language-selector>
+      </div>
       <div class="oppia-contributions-tab-panel oppia-contributions-tab-panel-container">
         <span class="sort-questions-select float-right"
               *ngIf="isReviewQuestionsTab()">
@@ -102,7 +108,8 @@
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab"
-                                [showOpportunityButton]="true">
+                                [showOpportunityButton]="true"
+                                #opportunitiesList>
       </oppia-opportunities-list>
       <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab() && !isAccomplishmentsTabActive()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
@@ -394,6 +401,17 @@
       background-color: transparent;
       width: 95%;
     }
+  }
+
+  .oppia-language-selector-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 15px;
+    margin-top: 20px;
+  }
+
+  .oppia-language-selector-container .oppia-language-selector {
+    min-width: 240px;
   }
 
   @media only screen and (min-width: 601px) and (max-width: 1500px) {
