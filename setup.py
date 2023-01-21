@@ -20,10 +20,10 @@ The package is built by running 'python setup.py sdist' in the build.py.
 
 from __future__ import annotations
 
+from core import feconf
+
 import pkg_resources
 import setuptools
-
-from core import feconf
 
 
 def main() -> None:
