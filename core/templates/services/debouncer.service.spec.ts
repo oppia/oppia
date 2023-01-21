@@ -24,7 +24,7 @@ describe('Debouncer service', () => {
   let ls: LoggerService;
   let loggerServiceSpy: jasmine.Spy<(msg: string) => void>;
 
-  eforeEach(() => {
+  beforeEach(() => {
     ds = TestBed.get(DebouncerService);
     ls = TestBed.get(LoggerService);
 
