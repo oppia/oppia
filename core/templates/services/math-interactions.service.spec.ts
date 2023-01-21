@@ -27,7 +27,7 @@ describe('MathInteractionsService', () => {
     mathInteractionsService = TestBed.get(MathInteractionsService);
   });
 
-  fit('should validate expressions correctly', function() {
+  it('should validate expressions correctly', function() {
     // Success cases.
     // Algebraic Expressions.
     expect(mathInteractionsService.validateAlgebraicExpression(
