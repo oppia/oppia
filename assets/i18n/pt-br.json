@@ -658,6 +658,7 @@
 	"I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION": "Ver sugestão",
 	"I18N_LEARNT_TOPIC": "<[topicName]> aprendido",
 	"I18N_LEARN_TOPIC": "Aprenda <[topicName]>",
+	"I18N_LESSON_INFO_HEADER": "Informações da Lição",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "Você completou este",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "Já adicionado à playlist",
 	"I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST": "Adicionar à Playlist 'Tocar Mais Tarde'",

@@ -405,6 +405,7 @@
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "Návrh",
 	"I18N_LEARNER_DASHBOARD_TOOLTIP": "Kolekcie sú viaceré navzájom súvisiace prieskumné výpravy určené pre dokončenie v rade.",
 	"I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION": "Pozrieť návrh",
+	"I18N_LESSON_INFO_HEADER": "Informácie o lekcii",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "Dokončené",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "Už pridané do herného zoznamu",
 	"I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST": "Pridať do zoznamu \"Hrať neskôr\"",

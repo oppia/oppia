@@ -387,6 +387,7 @@
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "Suggestie",
 	"I18N_LEARNER_DASHBOARD_TOOLTIP": "Verzamelingen zijn meerdere gerelateerde verkenningen die bedoeld zijn om in een bepaalde volgorde te worden voltooid.",
 	"I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION": "Suggestie bekijken",
+	"I18N_LESSON_INFO_HEADER": "Lesinformatie",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "Dit heb je afgerond",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "Is al toegevoegd aan je afspeellijst",
 	"I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST": "Toevoegen aan de lijst 'Later afspelen'",
