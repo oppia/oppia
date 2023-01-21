@@ -409,10 +409,10 @@ def convert_png_binary_to_webp_binary(png_binary: bytes) -> bytes:
     Returns:
         bytes. The binary content of webp.
     """
-    output = io.BytesIO()
-    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
-    image.save(output, 'webp')
-    return output.getvalue()
+    with io.BytesIO() as output:
+        image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+        image.save(output, 'webp')
+        return output.getvalue()
 
 
 def convert_data_url_to_binary(

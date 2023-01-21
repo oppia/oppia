@@ -201,11 +201,18 @@ export class PreferencesPageComponent {
         this.username + '_profile_picture.png', imageData);
     };
     reader.readAsDataURL(newImageFile);
+    // The reload is needed in order to update the profile picture
+    // in the top-right corner.
+    this.windowRef.nativeWindow.location.reload();
   }
 
   private _postProfileImageToServer(image: string): void {
     this.userService.setProfileImageDataUrlAsync(image)
-      .then(() => {});
+      .then(() => {
+        // The reload is needed in order to update the profile picture
+        // in the top-right corner.
+        this.windowRef.nativeWindow.location.reload();
+      });
   }
 
   showEditProfilePictureModal(): void {
@@ -215,9 +222,6 @@ export class PreferencesPageComponent {
 
     modalRef.result.then((newProfilePictureDataUrl) => {
       this.saveProfileImage(newProfilePictureDataUrl);
-      // The reload is needed in order to update the profile picture
-      // in the top-right corner.
-      this.windowRef.nativeWindow.location.reload();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

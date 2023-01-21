@@ -61,7 +61,8 @@ export class UserService {
   }
 
   getProfileImageDataUrlAsync(
-    username: string, isWebp: boolean = false): string {
+    username: string, isWebp: boolean = false
+  ): string {
     let defaultUrlWebp = this.urlInterpolationService.getStaticImageUrl(
       AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
     let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(

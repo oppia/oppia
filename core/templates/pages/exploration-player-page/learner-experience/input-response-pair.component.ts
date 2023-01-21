@@ -56,8 +56,6 @@ export class InputResponsePairComponent {
   @Input() isLastPair!: boolean;
   @Input() feedbackIsEnabled!: boolean;
   @Output() dataChange: EventEmitter<InputResponsePair> = new EventEmitter();
-  decodedProfilePicturePng: string;
-  decodedProfilePictureWebp: string;
   @ViewChild('popover') popover!: NgbPopover;
 
   constructor(
@@ -70,11 +68,6 @@ export class InputResponsePairComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private numberConversionService: NumberConversionService,
   ) {}
-
-  ngOnInit(): void {
-    this.decodedProfilePicturePng = this.profilePicturePngDataUrl;
-    this.decodedProfilePictureWebp = this.profilePictureWebpDataUrl;
-  }
 
   isVideoRteElementPresentInResponse(): boolean {
     if (this.data.oppiaResponse) {

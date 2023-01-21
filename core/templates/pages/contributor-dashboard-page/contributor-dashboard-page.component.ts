@@ -20,8 +20,7 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import AppConstants from 'assets/constants';
-import { AppConstants as appConstants } from 'app.constants';
+import { AppConstants } from 'app.constants';
 import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
@@ -202,10 +201,10 @@ export class ContributorDashboardPageComponent
         this.username = '';
         this.profilePictureWebpDataUrl = (
           this.urlInterpolationService.getStaticImageUrl(
-            appConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
         this.profilePicturePngDataUrl = (
           this.urlInterpolationService.getStaticImageUrl(
-            appConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       }
     });
 
