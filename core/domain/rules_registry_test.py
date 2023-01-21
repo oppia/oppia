@@ -43,7 +43,6 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             html_field_types_to_rule_specs,
             specs_from_json)
-        
 
     def test_get_html_field_types_to_rule_specs_for_previous_state_schema_version(  # pylint: disable=line-too-long
         self
@@ -74,7 +73,7 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
                 rules_registry.Registry
                 .get_html_field_types_to_rule_specs(state_schema_version=10)
             )
-   
+
     def test_get_html_field_types_to_rule_specs_for_previous_andcurrent_state_schema_version(  # pylint: disable=line-too-long
         self
     ) -> None:
