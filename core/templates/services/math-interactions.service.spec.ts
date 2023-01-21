@@ -27,7 +27,7 @@ describe('MathInteractionsService', () => {
     mathInteractionsService = TestBed.get(MathInteractionsService);
   });
 
-  it('should validate expressions correctly', function() {
+  fit('should validate expressions correctly', function() {
     // Success cases.
     // Algebraic Expressions.
     expect(mathInteractionsService.validateAlgebraicExpression(
@@ -114,6 +114,15 @@ describe('MathInteractionsService', () => {
       '', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Please enter an answer before submitting.');
+
+    expect(mathInteractionsService.cleanErrorMessage(
+      '×', [])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your answer seems to be missing a number before the × operator.');
+    expect(mathInteractionsService.cleanErrorMessage(
+      '×', ['a'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your answer seems to be missing a number before the × operator.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '+', [])).toBeFalse();

@@ -60,14 +60,15 @@ export class MathInteractionsService {
       errorMessage = 'Your answer includes a division by zero, which is ' +
         'not valid.';
     }
+
     if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
       errorMessage = (
         'Your answer seems to be missing a number after the * operator.');
     }
-    // if (errorMessage === 'Not a prefix operator.') {
-    //   errorMessage = (
-    //     'Your answer seems to be missing a number before the × operator.');
-    // }
+    if (errorMessage === 'Not a prefix operator.') {
+      errorMessage = (
+        'Your answer seems to be missing a number before the × operator.');
+    }
     if (errorMessage === 'A prefix operator was expected.') {
       let symbol1, symbol2;
       for (let s1 of '/*^') {
