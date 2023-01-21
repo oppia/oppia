@@ -74,7 +74,7 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
                 .get_html_field_types_to_rule_specs(state_schema_version=10)
             )
 
-    def test_get_html_field_types_to_rule_specs_for_previous_andcurrent_state_schema_version(  # pylint: disable=line-too-long
+    def test_get_html_field_types_to_rule_specs_for_previous_and_current_state_schema_version(  # pylint: disable=line-too-long
         self
     ) -> None:
         html_field_types_to_rule_specs_v41 = (
