@@ -199,7 +199,7 @@ export class TutorCardComponent {
           }
         }
       )
-    );
+    );  
   }
 
   ngOnDestroy(): void {

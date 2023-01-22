@@ -19,7 +19,7 @@
 import { Component, Output, EventEmitter, Input, OnInit, OnDestroy, ElementRef, ViewChild, ChangeDetectorRef, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { StateCard } from 'domain/state_card/state-card.model';
+import { StateCard } from 'domain/state_card/state-card.model';  
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { AudioPlayerService } from 'services/audio-player.service';

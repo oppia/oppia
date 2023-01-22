@@ -28,7 +28,7 @@ import { UserService } from 'services/user.service';
 import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 import { TranslateTextService } from '../services/translate-text.service';
-// Import { AppConstants } from 'app.constants';
+// Import { AppConstants } from 'app.constants';  
 
 @Component({
   selector: 'oppia-translation-opportunities',
@@ -131,7 +131,6 @@ export class TranslationOpportunitiesComponent {
     if (this.translationLanguageService.getActiveLanguageCode()) {
       this.languageSelected = true;
     } else {
-      this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
       this.OPPIA_AVATAR_IMAGE_URL = (
         this.urlInterpolationService.getStaticImageUrl(
           '/avatar/oppia_avatar_100px.svg'));
