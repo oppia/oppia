@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the translation opportunities.
+ * @fileoverview Component for the translation opportunities. 
  */
 
 import { Component, Injector } from '@angular/core';
