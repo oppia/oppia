@@ -4,10 +4,9 @@
       <picture>
         <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
         <source type="image/png" [srcset]="authorProfilePicPngUrl">
-        <img mat-card-avatar
-          [src]="authorProfilePicPngUrl"
-          class="e2e-test-profile-current-user-photo"
-          alt="Profile image of the author of the blog post">
+        <img mat-card-avatar [src]="authorProfilePicPngUrl"
+             class="e2e-test-profile-current-user-photo"
+             alt="Profile image of the author of the blog post">
       </picture>
       <mat-card-title class="w-100 d-flex justify-content-between">
         <span class="blog-dashboard-card-title e2e-test-username-visible">

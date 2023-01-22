@@ -19,7 +19,6 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SafeResourceUrl } from '@angular/platform-browser';
 import { trigger, state, style, transition,
   animate, group } from '@angular/animations';
 import { TranslateService } from '@ngx-translate/core';
@@ -192,8 +191,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
           this.username);
         this.profilePicturePngDataUrl = profileImageUrls[0];
         this.profilePictureWebpDataUrl = profileImageUrls[1];
-      }
-      else {
+      } else {
         this.profilePictureWebpDataUrl = (
           this.urlInterpolationService.getStaticImageUrl(
             AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));

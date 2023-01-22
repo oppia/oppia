@@ -21,7 +21,6 @@ import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { BlogAuthorProfilePageData, BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
 import { BlogAuthorProfilePageConstants } from './blog-author-profile-page.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
 import { UrlService } from 'services/contextual/url.service';
 import { AlertsService } from 'services/alerts.service';

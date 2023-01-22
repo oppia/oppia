@@ -86,8 +86,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
         this.username);
       this.profilePicturePngDataUrl = profileImageUrls[0];
       this.profilePictureWebpDataUrl = profileImageUrls[1];
-    }
-    else {
+    } else {
       this.profilePictureWebpDataUrl = (
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));

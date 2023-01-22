@@ -12,8 +12,8 @@
     <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
     <source type="image/png" [srcset]="profilePicturePngDataUrl">
     <img [src]="profilePicturePngDataUrl"
-          class="conversation-skin-user-avatar rounded-circle"
-          alt="">
+         class="conversation-skin-user-avatar rounded-circle"
+         alt="">
   </picture>
   <div *ngIf="!data.isHint">
     <div dir="auto" *ngIf="getShortAnswerHtml()"

@@ -5,10 +5,9 @@
       <picture>
         <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
         <source type="image/png" [srcset]="authorProfilePicPngUrl">
-        <img mat-card-avatar
-          [src]="authorProfilePicPngUrl"
-          class="authorProfilePic e2e-test-author-profile-photo"
-          alt="Profile image of the author">
+        <img mat-card-avatar [src]="authorProfilePicPngUrl"
+             class="authorProfilePic e2e-test-author-profile-photo"
+             alt="Profile image of the author">
       </picture>
       <mat-card-title class="w-100 d-flex flex-column"
                       [ngClass]="{'align-items-center mt-2': isSmallScreenViewActive()}">

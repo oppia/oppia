@@ -35,10 +35,9 @@
             <picture>
               <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
               <source type="image/png" [srcset]="authorProfilePicPngUrl">
-              <img mat-card-avatar
-                [src]="authorProfilePicPngUrl"
-                class="profile-image"
-                alt="Profile image of the author of the blog post">
+              <img mat-card-avatar [src]="authorProfilePicPngUrl"
+                   class="profile-image"
+                   alt="Profile image of the author of the blog post">
             </picture>
             <span class="author-username text-center general-text-format ml-4 my-auto">
               {{ authorName }}

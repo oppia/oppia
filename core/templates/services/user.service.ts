@@ -72,14 +72,13 @@ export class UserService {
     }
     if (AppConstants.EMULATOR_MODE) {
       return [defaultUrlPng, defaultUrlWebp];
-    }
-    else {
+    } else {
       let pngImageUrl = this.urlInterpolationService.interpolateUrl(
         this.assetsBackendApiService.profileImagePngUrlTemplate,
-        {username: username})
+        {username: username});
       let WebpImageUrl = this.urlInterpolationService.interpolateUrl(
         this.assetsBackendApiService.profileImageWebpUrlTemplate,
-        {username: username})
+        {username: username});
       return [pngImageUrl, WebpImageUrl];
     }
   }

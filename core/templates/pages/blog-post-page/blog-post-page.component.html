@@ -8,11 +8,10 @@
         <picture>
           <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
           <source type="image/png" [srcset]="authorProfilePicPngUrl">
-          <img mat-card-avatar
-             class="mr-2 e2e-test-author-profile-photo"
-             [src]="authorProfilePicPngUrl"
-             alt="Profile image of the author of the blog post"
-             (click)="navigateToAuthorProfilePage()">
+          <img mat-card-avatar class="mr-2 e2e-test-author-profile-photo"
+               [src]="authorProfilePicPngUrl"
+               alt="Profile image of the author of the blog post"
+               (click)="navigateToAuthorProfilePage()">
         </picture>
         <mat-card-subtitle class="blog-author-name e2e-test-author-name" (click)="navigateToAuthorProfilePage()">
           {{ blogPost.displayedAuthorName }}

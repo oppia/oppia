@@ -59,7 +59,7 @@ export class FeedbackMessageSummary {
 
   static createNewMessage(
       newMessageId: number, newMessageText: string, authorUsername: string
-      ): FeedbackMessageSummary {
+  ): FeedbackMessageSummary {
     // Date.now() returns number of milliseconds since 1970-01-01 UTC.
     let createdOnMsecs: number = new Date().getTime();
     return new FeedbackMessageSummary(

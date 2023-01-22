@@ -176,8 +176,7 @@ export class ProfilePageComponent {
             data.username);
           this.profilePicturePngDataUrl = profileImageUrls[0];
           this.profilePictureWebpDataUrl = profileImageUrls[1];
-        }
-        else {
+        } else {
           this.profilePictureWebpDataUrl = (
             this.urlInterpolationService.getStaticImageUrl(
               AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
@@ -186,7 +185,7 @@ export class ProfilePageComponent {
               AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
         }
         this.loaderService.hideLoadingScreen();
-    });
+      });
   }
 
   changeSubscriptionStatus(): void {

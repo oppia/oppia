@@ -19,15 +19,15 @@
             <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
             <source type="image/png" [srcset]="profilePicturePngDataUrl">
             <img [src]="profilePicturePngDataUrl"
-                  class="oppia-profile-picture-fullsize e2e-test-profile-current-user-photo"
-                  alt="">
+                 class="oppia-profile-picture-fullsize e2e-test-profile-current-user-photo"
+                 alt="">
           </picture>
           <picture *ngIf="!profileIsOfCurrentUser">
             <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
             <source type="image/png" [srcset]="profilePicturePngDataUrl">
             <img [src]="profilePicturePngDataUrl"
-                  class="oppia-profile-picture-fullsize e2e-test-profile-other-user-photo"
-                  alt="">
+                 class="oppia-profile-picture-fullsize e2e-test-profile-other-user-photo"
+                 alt="">
           </picture>
         </div>
       </div>
