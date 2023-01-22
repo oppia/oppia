@@ -115,6 +115,11 @@ classroom-page .oppia-classroom-page-subheading-text {
   font-size: 1em;
 }
 
+.oppia-classroom-search-bar-container {
+  display: flex;
+  justify-content: center;
+}
+
 @media(max-width: 1150px) {
   .oppia-topic-summary-tiles {
     margin-bottom: 55px;
@@ -150,11 +155,6 @@ classroom-page .oppia-classroom-page-subheading-text {
   .oppia-classroom-search-section {
     text-align: center;
     width: 95vw;
-  }
-
-  .oppia-classroom-search-bar-container {
-    display: flex;
-    justify-content: center;
   }
 
   .oppia-classroom-search-container {
