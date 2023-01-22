@@ -43,6 +43,7 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
+  text-align: center;
   width: 75vw;
 }
 
@@ -153,7 +154,6 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 
   .oppia-classroom-search-section {
-    text-align: center;
     width: 95vw;
   }
 
