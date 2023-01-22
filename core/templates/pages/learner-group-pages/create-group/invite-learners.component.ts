@@ -45,6 +45,7 @@ export class InviteLearnersComponent {
   searchedUsername: string = '';
   errorMessage!: string;
   profilePictureUrl!: string;
+  profileImageUrls!: [string, string];
 
   constructor(
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
@@ -93,11 +94,15 @@ export class InviteLearnersComponent {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    return this.userService.getProfileImageDataUrlAsync(username);
+    this.profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+      username);
+    return this.profileImageUrls[0];
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    return this.userService.getProfileImageDataUrlAsync(username, true);
+    this.profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+      username);
+    return this.profileImageUrls[1];
   }
 }
 

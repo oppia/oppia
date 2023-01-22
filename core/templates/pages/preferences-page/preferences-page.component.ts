@@ -235,10 +235,10 @@ export class PreferencesPageComponent {
     userInfoPromise.then((userInfo) => {
       this.username = userInfo.getUsername();
       this.email = userInfo.getEmail();
-      this.profilePicturePngDataUrl = (
-        this.userService.getProfileImageDataUrlAsync(this.username));
-      this.profilePictureWebpDataUrl = (
-        this.userService.getProfileImageDataUrlAsync(this.username, true));
+      let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+        this.username);
+      this.profilePicturePngDataUrl = profileImageUrls[0];
+      this.profilePictureWebpDataUrl = profileImageUrls[1];
     });
 
     this.AUDIO_LANGUAGE_CHOICES = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(

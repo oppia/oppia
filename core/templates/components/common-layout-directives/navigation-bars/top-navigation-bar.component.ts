@@ -363,10 +363,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   getProfileImageDataAsync(username: string): void {
-    this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
-      username);
-    this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
-      username, true);
+    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+      this.username);
+    this.profilePicturePngDataUrl = profileImageUrls[0];
+    this.profilePictureWebpDataUrl = profileImageUrls[1];
   }
 
   getStaticImageUrl(imagePath: string): string {

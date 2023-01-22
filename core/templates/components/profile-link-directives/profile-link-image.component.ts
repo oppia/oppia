@@ -33,8 +33,8 @@ export class ProfileLinkImageComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
-  profilePicturePng!: string;
-  profilePictureWebp!: string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   profileUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
       ':username_fragment', this.username
@@ -54,17 +54,17 @@ export class ProfileLinkImageComponent implements OnInit {
     var DEFAULT_PROFILE_IMAGE_PATH = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.webp'));
-    this.profilePictureWebp = DEFAULT_PROFILE_IMAGE_PATH;
+    this.profilePictureWebpDataUrl = DEFAULT_PROFILE_IMAGE_PATH;
     this.profileUrl = (
       '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
         ':username_fragment', this.username
       )
     );
 
-    this.profilePicturePng = this.userService.getProfileImageDataUrlAsync(
+    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
       this.username);
-    this.profilePictureWebp = this.userService.getProfileImageDataUrlAsync(
-      this.username, true);
+    this.profilePicturePngDataUrl = profileImageUrls[0];
+    this.profilePictureWebpDataUrl = profileImageUrls[1];
   }
 }
 

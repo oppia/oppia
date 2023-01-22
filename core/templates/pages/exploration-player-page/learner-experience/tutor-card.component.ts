@@ -169,10 +169,10 @@ export class TutorCardComponent {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
     if (!this._editorPreviewMode) {
-      this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
+      let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
         this.username);
-      this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
-        this.username, true);
+      this.profilePicturePngDataUrl = profileImageUrls[0];
+      this.profilePictureWebpDataUrl = profileImageUrls[1];
     } else {
       this.profilePictureWebpDataUrl = (
         this.urlInterpolationService.getStaticImageUrl(

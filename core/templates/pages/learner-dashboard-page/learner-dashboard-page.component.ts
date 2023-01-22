@@ -188,10 +188,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       const username = userInfo.getUsername();
       if (username) {
         this.username = username;
-        this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
+        let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
           this.username);
-        this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
-          this.username, true);
+        this.profilePicturePngDataUrl = profileImageUrls[0];
+        this.profilePictureWebpDataUrl = profileImageUrls[1];
       }
       else {
         this.profilePictureWebpDataUrl = (

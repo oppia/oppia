@@ -172,12 +172,10 @@ export class ProfilePageComponent {
         this.firstContributionMsec = data.firstContributionMsec;
 
         if (data.username) {
-          this.profilePicturePngDataUrl = (
-            this.userService.getProfileImageDataUrlAsync(
-              data.username));
-          this.profilePictureWebpDataUrl = (
-            this.userService.getProfileImageDataUrlAsync(
-              data.username, true));
+          let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+            data.username);
+          this.profilePicturePngDataUrl = profileImageUrls[0];
+          this.profilePictureWebpDataUrl = profileImageUrls[1];
         }
         else {
           this.profilePictureWebpDataUrl = (

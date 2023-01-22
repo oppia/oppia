@@ -60,9 +60,7 @@ export class UserService {
     return this.userInfo;
   }
 
-  getProfileImageDataUrlAsync(
-    username: string, isWebp: boolean = false
-  ): string {
+  getProfileImageDataUrlAsync(username: string): [string, string] {
     let defaultUrlWebp = this.urlInterpolationService.getStaticImageUrl(
       AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
     let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(
@@ -70,23 +68,19 @@ export class UserService {
     let localStoredImage = this.imageLocalStorageService.getRawImageData(
       username + '_profile_picture.png');
     if (localStoredImage !== null) {
-      return localStoredImage;
+      return [localStoredImage, localStoredImage];
     }
     if (AppConstants.EMULATOR_MODE) {
-      if (isWebp) {
-        return defaultUrlWebp;
-      }
-      return defaultUrlPng;
+      return [defaultUrlPng, defaultUrlWebp];
     }
     else {
-      if (isWebp) {
-        return this.urlInterpolationService.interpolateUrl(
-          this.assetsBackendApiService.profileImageWebpUrlTemplate,
-          {username: username})
-      }
-      return this.urlInterpolationService.interpolateUrl(
+      let pngImageUrl = this.urlInterpolationService.interpolateUrl(
         this.assetsBackendApiService.profileImagePngUrlTemplate,
         {username: username})
+      let WebpImageUrl = this.urlInterpolationService.interpolateUrl(
+        this.assetsBackendApiService.profileImageWebpUrlTemplate,
+        {username: username})
+      return [pngImageUrl, WebpImageUrl];
     }
   }
 

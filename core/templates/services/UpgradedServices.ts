@@ -1123,8 +1123,7 @@ export class UpgradedServices {
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
       upgradedServices['WindowRef'],
-      upgradedServices['UserBackendApiService'],
-      upgradedServices['HttpClient']
+      upgradedServices['UserBackendApiService']
     );
 
     // Topological level: 4.

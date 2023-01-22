@@ -87,10 +87,10 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
-    this.authorProfilePicPngUrl = this.userService.getProfileImageDataUrlAsync(
+    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
       this.username);
-    this.authorProfilePicWebpUrl = this.userService.getProfileImageDataUrlAsync(
-      this.username, true);
+    this.authorProfilePicPngUrl = profileImageUrls[0];
+    this.authorProfilePicWebpUrl = profileImageUrls[1];
   }
 
   initMainTab(): void {

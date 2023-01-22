@@ -142,10 +142,10 @@ export class BlogAuthorProfilePageComponent implements OnInit {
   }
 
   getAuthorProfilePicUrl(): void {
-    this.authorProfilePicPngUrl = this.userService.getProfileImageDataUrlAsync(
+    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
       this.authorUsername);
-    this.authorProfilePicWebpUrl = this.userService.getProfileImageDataUrlAsync(
-      this.authorUsername, true);
+    this.authorProfilePicPngUrl = profileImageUrls[0];
+    this.authorProfilePicWebpUrl = profileImageUrls[1];
   }
 
   isSmallScreenViewActive(): boolean {

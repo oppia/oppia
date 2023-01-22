@@ -94,10 +94,10 @@ export class BlogPostPageComponent implements OnInit {
   }
 
   getAuthorProfilePicUrl(username: string): void {
-    this.authorProfilePicPngUrl = this.userService.getProfileImageDataUrlAsync(
+    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
       username);
-    this.authorProfilePicWebpUrl = this.userService.getProfileImageDataUrlAsync(
-      username, true);
+    this.authorProfilePicPngUrl = profileImageUrls[0];
+    this.authorProfilePicWebpUrl = profileImageUrls[1];
   }
 
   getDateStringInWords(naiveDate: string): string {

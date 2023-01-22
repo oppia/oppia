@@ -42,6 +42,7 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
   searchUsernameQuery: string = '';
   matchingUsersProgress: LearnerGroupUserProgress[] = [];
   storiesChaptersProgress: ChapterProgressSummary[] = [];
+  profileImageUrls!: [string, string];
 
   constructor(
     private learnerGroupSyllabusBackendApiService:
@@ -92,11 +93,15 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    return this.userService.getProfileImageDataUrlAsync(username);
+    this.profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+      username);
+    return this.profileImageUrls[0];
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    return this.userService.getProfileImageDataUrlAsync(username, true);
+    this.profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+      username);
+    return this.profileImageUrls[1];
   }
 
   activateLearnerSpecificView(

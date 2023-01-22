@@ -58,10 +58,10 @@ export class ClassroomAdminNavbarComponent implements OnInit {
   }
 
   getProfileImageDataAsync(username: string): void {
-    this.profilePicturePngDataUrl = this.userService.getProfileImageDataUrlAsync(
+    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
       username);
-    this.profilePictureWebpDataUrl = this.userService.getProfileImageDataUrlAsync(
-      username, true);
+    this.profilePicturePngDataUrl = profileImageUrls[0];
+    this.profilePictureWebpDataUrl = profileImageUrls[1];
   }
 
   async getUserInfoAsync(): Promise<void> {

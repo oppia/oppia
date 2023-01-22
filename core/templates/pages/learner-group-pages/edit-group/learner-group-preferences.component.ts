@@ -50,6 +50,7 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   invitedLearnersInfo!: LearnerGroupUserInfo[];
   currentLearnersInfo!: LearnerGroupUserInfo[];
   invitedLearners: string[] = [];
+  profileImageUrls!: [string, string];
   EDIT_PREFERENCES_SECTIONS_I18N_IDS = (
     LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS);
 
@@ -216,11 +217,15 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    return this.userService.getProfileImageDataUrlAsync(username);
+    this.profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+      username);
+    return this.profileImageUrls[0];
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    return this.userService.getProfileImageDataUrlAsync(username, true);
+    this.profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+      username);
+    return this.profileImageUrls[1];
   }
 
   deleteLearnerGroup(): void {
