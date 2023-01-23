@@ -239,12 +239,10 @@ describe('Skill Preview Tab Component', () => {
     component.displayedCard = displayedCard;
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeFalse();
 
-    let supplementalDisplayCard = new StateCard(
+    component.displayedCard = new StateCard(
       null, null, null, new Interaction(
-        [], [], null, null, [], 'DragAndDropSortInput', null),
+        [], [], null, null, [], 'ImageClickInput', null),
       [], null, null, '', null);
-
-    component.displayedCard = supplementalDisplayCard;
 
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
   });
@@ -260,12 +258,11 @@ describe('Skill Preview Tab Component', () => {
     component.displayedCard = displayedCard;
     expect(component.displayedCard.isInteractionInline()).toBeTrue();
 
-    let supplementalDisplayCard = new StateCard(
+    component.displayedCard = new StateCard(
       null, null, null, new Interaction(
-        [], [], null, null, [], 'DragAndDropSortInput', null),
+        [], [], null, null, [], 'ImageClickInput', null),
       [], null, null, '', null);
 
-    component.displayedCard = supplementalDisplayCard;
     expect(component.displayedCard.isInteractionInline()).toBeFalse();
   });
 
