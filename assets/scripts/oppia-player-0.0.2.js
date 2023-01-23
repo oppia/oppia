@@ -58,7 +58,7 @@
    */
 
   /**
-   * generate a 0-1 random number using a crytographically secure method
+   * Generate a 0-1 random number using a crytographically secure method
    * without using division, which results in biased random numbers. Reference:
    * https://thecompetentdev.com/weeklyjstips/tips/73_generate_secure_randoms/
    * @returns The random number between 0 and 1.
