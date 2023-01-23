@@ -149,11 +149,11 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 
   .oppia-classroom-viewer-container {
-    text-align: center;
     width: 80vw;
   }
 
   .oppia-classroom-search-section {
+    text-align: center;
     width: 95vw;
   }
 
