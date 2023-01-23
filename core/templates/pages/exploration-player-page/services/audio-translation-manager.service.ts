@@ -129,8 +129,7 @@ export class AudioTranslationManagerService {
   cleanUpHTMLforVoiceover(html: string): string {
     // If the labels are in html format, remove the tags and leave the
     // content only.
-    let cleanChoiceLabel = html;
-    cleanChoiceLabel = cleanChoiceLabel.replaceAll(/<[^>]*>*/g, '');
+    const cleanChoiceLabel = html.replace(/<[^>]+>/g, '');
     // Add a stop for the voiceover with a dot. Useful for multiple choices.
     return cleanChoiceLabel + '. ';
   }

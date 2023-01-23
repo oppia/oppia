@@ -35,7 +35,7 @@ export class FormatRtePreviewPipe {
     html = html.replace(/&nbsp;/ig, ' ');
     html = html.replace(/&quot;/ig, '');
     // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
-    html = html.replaceAll(/<(?!oppia-noninteractive\s*?)[^>]*>*/g, '');
+    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
     let formattedOutput = html.replace(/(<([^>]+)>)/g, rteTag => {
       let replaceString = (
         this.capitalizePipe.transform(rteTag.split('-')[2].split(' ')[0]));

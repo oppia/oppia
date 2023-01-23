@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "lib": [
-      "esnext",
+      "es2017",
       "dom",
       "webworker"
     ],
