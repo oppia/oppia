@@ -148,18 +148,13 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       });
   }
 
-  isSupplementalCardNonempty(card: StateCard): boolean {
-    return !card.isInteractionInline();
-  }
-
   canWindowShowTwoCards(): boolean {
     return this.windowDimensionsService.getWidth() >
     ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
   }
 
   isCurrentSupplementalCardNonEmpty(): boolean {
-    return this.displayedCard && this.isSupplementalCardNonempty(
-      this.displayedCard);
+    return this.displayedCard && !this.displayedCard.isInteractionInline();
   }
 
   selectQuestionToPreview(index: number): void {

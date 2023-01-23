@@ -237,11 +237,16 @@ describe('Skill Preview Tab Component', () => {
 
   it('should tell if current supplemental card is non empty', () => {
     component.displayedCard = displayedCard;
-    spyOn(component, 'isSupplementalCardNonempty').and.returnValues(
-      true, false);
+    expect(component.isCurrentSupplementalCardNonEmpty()).toBeFalse();
+
+    let supplementalDisplayCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'DragAndDropSortInput', null),
+      [], null, null, '', null);
+
+    component.displayedCard = supplementalDisplayCard;
 
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
-    expect(component.isCurrentSupplementalCardNonEmpty()).toBeFalse();
   });
 
   it('should tell if window can show two cards', () => {
@@ -252,8 +257,16 @@ describe('Skill Preview Tab Component', () => {
   });
 
   it('should tell if supplemental card is non empty', () => {
-    expect(component.isSupplementalCardNonempty(displayedCard))
-      .toBeFalse();
+    component.displayedCard = displayedCard;
+    expect(component.displayedCard.isInteractionInline()).toBeTrue();
+
+    let supplementalDisplayCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'DragAndDropSortInput', null),
+      [], null, null, '', null);
+
+    component.displayedCard = supplementalDisplayCard;
+    expect(component.displayedCard.isInteractionInline()).toBeFalse();
   });
 
   it('should filter the questions', () => {
