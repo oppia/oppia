@@ -43,10 +43,11 @@ export class FeedbackMessageSummary {
   createdOnMsecs: number;
 
   constructor(
-      messageId: number, text: string, updatedStatus: string | null,
-      suggestionHtml: string | null, currentContentHtml: string | null,
-      description: string | null, authorUsername: string,
-      createdOnMsecs: number) {
+    messageId: number, text: string, updatedStatus: string | null,
+    suggestionHtml: string | null, currentContentHtml: string | null,
+    description: string | null, authorUsername: string,
+    createdOnMsecs: number
+  ) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;

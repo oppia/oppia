@@ -57,13 +57,6 @@ export class ClassroomAdminNavbarComponent implements OnInit {
     return this.profileDropdownIsActive = false;
   }
 
-  getProfileImageDataAsync(username: string): void {
-    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-      username);
-    this.profilePicturePngDataUrl = profileImageUrls[0];
-    this.profilePictureWebpDataUrl = profileImageUrls[1];
-  }
-
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
@@ -76,7 +69,8 @@ export class ClassroomAdminNavbarComponent implements OnInit {
         '/profile/<username>', {
           username: this.username
         }));
-    this.getProfileImageDataAsync(this.username);
+    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+      this.userService.getProfileImageDataUrlAsync(this.username));
   }
 
   ngOnInit(): void {

@@ -58,10 +58,9 @@ export class BlogCardComponent implements OnInit {
           AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.id,
           this.blogPostSummary.thumbnailFilename);
     }
-    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-      this.blogPostSummary.authorUsername);
-    this.authorProfilePicPngUrl = profileImageUrls[0];
-    this.authorProfilePicWebpUrl = profileImageUrls[1];
+    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+      this.userService.getProfileImageDataUrlAsync(
+        this.blogPostSummary.authorUsername));
     const publishedOn = this.blogPostSummary.publishedOn;
     if (publishedOn === undefined) {
       throw new Error('Blog Post Summary published date is not defined');

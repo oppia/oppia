@@ -192,10 +192,8 @@ export class ContributorDashboardPageComponent
       if (userInfo.isLoggedIn()) {
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
-        let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-          this.username);
-        this.profilePicturePngDataUrl = profileImageUrls[0];
-        this.profilePictureWebpDataUrl = profileImageUrls[1];
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrlAsync(this.username));
       } else {
         this.userIsLoggedIn = false;
         this.username = '';

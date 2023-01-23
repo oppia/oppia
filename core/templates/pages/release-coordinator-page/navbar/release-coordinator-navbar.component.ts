@@ -82,10 +82,8 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
           '/profile/<username>', {
             username: this.username
           }));
-      let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-        this.username);
-      this.profilePicturePngDataUrl = profileImageUrls[0];
-      this.profilePictureWebpDataUrl = profileImageUrls[1];
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+            this.userService.getProfileImageDataUrlAsync(this.username));
     } else {
       this.profilePictureWebpDataUrl = (
         this.urlInterpolationService.getStaticImageUrl(

@@ -40,7 +40,6 @@ export class LearnerGroupOverviewComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
   learnersProgress!: LearnerGroupUserProgress[];
   activeTab!: string;
-  profileImageUrls!: [string, string];
   EDIT_OVERVIEW_SECTIONS_I18N_IDS = (
     LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
   );
@@ -114,15 +113,15 @@ export class LearnerGroupOverviewComponent implements OnInit {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    this.profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+    let [pngImageUrl, ] = this.userService.getProfileImageDataUrlAsync(
       username);
-    return this.profileImageUrls[0];
+    return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    this.profileImageUrls = this.userService.getProfileImageDataUrlAsync(
+    let [, webpImageUrl] = this.userService.getProfileImageDataUrlAsync(
       username);
-    return this.profileImageUrls[1];
+    return webpImageUrl;
   }
 }
 

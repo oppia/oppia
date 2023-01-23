@@ -67,7 +67,8 @@
     <div class="conversation-skin-tutor-card-bottom-section" *ngIf="isInteractionInline() && displayedCard.getInputResponsePairs().length > 0">
       <oppia-input-response-pair [data]="displayedCard.getInputResponsePairs()[displayedCard.getInputResponsePairs().length - 1]"
                                  [bottomSection]="true"
-                                 [profilePicture]="profilePicture"
+                                 [profilePicturePngDataUrl]="profilePicturePngDataUrl"
+                                 [profilePictureWebpDataUrl]="profilePictureWebpDataUrl"
                                  [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                  [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
                                  [isLastPair]="true"

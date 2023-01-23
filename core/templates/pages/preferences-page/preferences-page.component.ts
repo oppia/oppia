@@ -207,12 +207,11 @@ export class PreferencesPageComponent {
   }
 
   private _postProfileImageToServer(image: string): void {
-    this.userService.setProfileImageDataUrlAsync(image)
-      .then(() => {
-        // The reload is needed in order to update the profile picture
-        // in the top-right corner.
-        this.windowRef.nativeWindow.location.reload();
-      });
+    this.userService.setProfileImageDataUrlAsync(image).then(() => {
+      // The reload is needed in order to update the profile picture
+      // in the top-right corner.
+      this.windowRef.nativeWindow.location.reload();
+    });
   }
 
   showEditProfilePictureModal(): void {
@@ -235,10 +234,8 @@ export class PreferencesPageComponent {
     userInfoPromise.then((userInfo) => {
       this.username = userInfo.getUsername();
       this.email = userInfo.getEmail();
-      let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-        this.username);
-      this.profilePicturePngDataUrl = profileImageUrls[0];
-      this.profilePictureWebpDataUrl = profileImageUrls[1];
+      [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+        this.userService.getProfileImageDataUrlAsync(this.username));
     });
 
     this.AUDIO_LANGUAGE_CHOICES = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(

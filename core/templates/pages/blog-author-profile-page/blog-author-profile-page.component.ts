@@ -81,8 +81,9 @@ export class BlogAuthorProfilePageComponent implements OnInit {
         this.noResultsFound = false;
         this.blogPostSummaries = data.blogPostSummaries;
         this.blogPostSummariesToShow = this.blogPostSummaries;
-        this.getAuthorProfilePicUrl();
         this.calculateLastPostOnPageNum();
+        [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+          this.userService.getProfileImageDataUrlAsync(this.authorUsername));
       } else {
         this.noResultsFound = true;
       }
@@ -138,13 +139,6 @@ export class BlogAuthorProfilePageComponent implements OnInit {
     this.calculateFirstPostOnPageNum();
     this.calculateLastPostOnPageNum();
     this.loadPage();
-  }
-
-  getAuthorProfilePicUrl(): void {
-    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-      this.authorUsername);
-    this.authorProfilePicPngUrl = profileImageUrls[0];
-    this.authorProfilePicWebpUrl = profileImageUrls[1];
   }
 
   isSmallScreenViewActive(): boolean {

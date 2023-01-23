@@ -59,13 +59,6 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
     this.profileDropdownIsActive = false;
   }
 
-  getProfileImageDataAsync(username: string): void {
-    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-      username);
-    this.profilePicturePngDataUrl = profileImageUrls[0];
-    this.profilePictureWebpDataUrl = profileImageUrls[1];
-  }
-
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
 
@@ -78,7 +71,8 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
           username: this.username
         })
       );
-      this.getProfileImageDataAsync(this.username);
+      [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+        this.userService.getProfileImageDataUrlAsync(this.username));
     }
   }
 

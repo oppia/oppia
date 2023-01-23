@@ -266,7 +266,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           '/profile/<username>', {
             username: this.username
           });
-        this.getProfileImageDataAsync(this.username);
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrlAsync(this.username));
+      } else {
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
       }
     });
 
@@ -360,13 +368,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       return (space < width) ? (Math.round(space - width)) : 0;
     }
     return 0;
-  }
-
-  getProfileImageDataAsync(username: string): void {
-    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-      this.username);
-    this.profilePicturePngDataUrl = profileImageUrls[0];
-    this.profilePictureWebpDataUrl = profileImageUrls[1];
   }
 
   getStaticImageUrl(imagePath: string): string {

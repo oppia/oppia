@@ -26,12 +26,11 @@ var ProfilePage = function() {
   };
   var bio = $('.e2e-test-profile-bio');
   var createdExplorationStat = $('.e2e-test-profile-created-stat');
-  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
+  var userProfilePhoto = $('.e2e-test-profile-user-photo');
   var interestPlaceholder = $('.e2e-test-profile-no-interest');
   var interestsSelector = function() {
     return $$('.e2e-test-profile-interest');
   };
-  var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
 
   this.get = async function(userName) {
     await browser.url('/profile/' + userName);
@@ -40,14 +39,8 @@ var ProfilePage = function() {
 
   this.expectCurrUserToHaveProfilePhoto = async function() {
     await waitFor.visibilityOf(
-      currUserProfilePhoto,
-      'Current user profile photo taking too long to display');
-  };
-
-  this.expectOtherUserToHaveProfilePhoto = async function() {
-    await waitFor.presenceOf(
-      otherUserProfilePhoto,
-      'Other user profile photo taking too long to display');
+      userProfilePhoto,
+      'User profile photo taking too long to display');
   };
 
   this.expectUserToHaveBio = async function(expectedText) {

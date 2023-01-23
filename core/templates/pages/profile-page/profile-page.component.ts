@@ -82,8 +82,8 @@ export class ProfilePageComponent {
   profileIsOfCurrentUser: boolean = false;
   explorationsOnPage: LearnerExplorationSummary[] = [];
   subjectInterests: string[] = [];
-  profilePicturePngDataUrl: string = '';
-  profilePictureWebpDataUrl: string = '';
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   preferencesUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
@@ -172,10 +172,8 @@ export class ProfilePageComponent {
         this.firstContributionMsec = data.firstContributionMsec;
 
         if (data.username) {
-          let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-            data.username);
-          this.profilePicturePngDataUrl = profileImageUrls[0];
-          this.profilePictureWebpDataUrl = profileImageUrls[1];
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+            this.userService.getProfileImageDataUrlAsync(data.username));
         } else {
           this.profilePictureWebpDataUrl = (
             this.urlInterpolationService.getStaticImageUrl(

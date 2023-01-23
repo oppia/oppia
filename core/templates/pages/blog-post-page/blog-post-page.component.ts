@@ -68,7 +68,8 @@ export class BlogPostPageComponent implements OnInit {
     this.blogPost = this.blogPostPageData.blogPostDict;
     this.blogPostPageService.blogPostId = this.blogPostPageData.blogPostDict.id;
     this.postsToRecommend = this.blogPostPageData.summaryDicts;
-    this.getAuthorProfilePicUrl(this.authorUsername);
+    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+      this.userService.getProfileImageDataUrlAsync(this.authorUsername));
     if (this.blogPost.publishedOn) {
       this.publishedDateString = this.getDateStringInWords(
         this.blogPost.publishedOn);
@@ -91,13 +92,6 @@ export class BlogPostPageComponent implements OnInit {
     selection?.addRange(range);
     document.execCommand('copy');
     selection?.removeAllRanges();
-  }
-
-  getAuthorProfilePicUrl(username: string): void {
-    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-      username);
-    this.authorProfilePicPngUrl = profileImageUrls[0];
-    this.authorProfilePicWebpUrl = profileImageUrls[1];
   }
 
   getDateStringInWords(naiveDate: string): string {

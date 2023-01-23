@@ -118,10 +118,8 @@ export class BlogPostEditorComponent implements OnInit {
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
-    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-      this.username);
-    this.authorProfilePicPngUrl = profileImageUrls[0];
-    this.authorProfilePicWebpUrl = profileImageUrls[1];
+    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+      this.userService.getProfileImageDataUrlAsync(this.username));
   }
 
   initEditor(): void {

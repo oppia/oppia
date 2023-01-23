@@ -51,20 +51,16 @@ export class ProfileLinkImageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    var DEFAULT_PROFILE_IMAGE_PATH = (
+    this.profilePictureWebpDataUrl = (
       this.urlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.webp'));
-    this.profilePictureWebpDataUrl = DEFAULT_PROFILE_IMAGE_PATH;
+        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
     this.profileUrl = (
       '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
         ':username_fragment', this.username
       )
     );
-
-    let profileImageUrls = this.userService.getProfileImageDataUrlAsync(
-      this.username);
-    this.profilePicturePngDataUrl = profileImageUrls[0];
-    this.profilePictureWebpDataUrl = profileImageUrls[1];
+    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+      this.userService.getProfileImageDataUrlAsync(this.username));
   }
 }
 

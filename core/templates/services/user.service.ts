@@ -65,6 +65,11 @@ export class UserService {
       AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
     let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(
       AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
+    // We store profile images to the browser-local-storage when in the
+    // emulator mode. In general we return the tuple of png image URL
+    // and web image url but as we are only storing the image in the
+    // local storage we return tuple of localStoredImage, one for png
+    // and other for webp.
     let localStoredImage = this.imageLocalStorageService.getRawImageData(
       username + '_profile_picture.png');
     if (localStoredImage !== null) {

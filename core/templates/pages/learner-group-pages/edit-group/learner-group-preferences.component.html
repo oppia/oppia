@@ -76,7 +76,9 @@
             <picture>
               <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
               <source type="image/png" [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
-              <img class="group-learners-card-avatar" [src]="getProfileImagePngDataUrl(learnerInfo.username)">
+              <img class="group-learners-card-avatar"
+                   [src]="getProfileImagePngDataUrl(learnerInfo.username)"
+                   alt="User profile picture">
             </picture>
             <span>{{learnerInfo.username}}</span>
           </div>

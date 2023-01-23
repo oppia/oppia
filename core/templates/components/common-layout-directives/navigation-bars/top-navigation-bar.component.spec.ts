@@ -436,17 +436,6 @@ describe('TopNavigationBarComponent', () => {
     });
   }));
 
-  it('should get profile image data asynchronously', fakeAsync(() => {
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo('%2Fimages%2Furl%2F1');
-    expect(component.profilePictureDataUrl).toBe(undefined);
-
-    component.getProfileImageDataAsync();
-    tick();
-
-    expect(component.profilePictureDataUrl).toBe('/images/url/1');
-  }));
-
   it('should change the language when user clicks on new language' +
     ' from dropdown', () => {
     let langCode = 'hi';

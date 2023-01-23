@@ -117,7 +117,7 @@
                     <picture>
                       <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
                       <source type="image/png" [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
-                      <img [src]="getProfileImagePngDataUrl(learnerProgress.username)">
+                      <img [src]="getProfileImagePngDataUrl(learnerProgress.username)" alt="User profile picture">
                     </picture>
                     <div>{{learnerProgress.username}}</div>
                   </div>
