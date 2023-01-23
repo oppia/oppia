@@ -13,11 +13,8 @@ paths-ignore:
   # TODO(#17117): These files cause an "Incomplete multi-character sanitization"
   # error to be thrown by CodeQL (cases enumerated in the issue). If we define a
   # central method for this stripping, we can remove these files.
-  - core/templates/pages/exploration-player-page/services/audio-translation-
-  manager.service.ts
-  - core/templates/pages/exploration-editor-page/changes-in-human-readable-form/
-  changes-in-human-readable-form.component.spec.ts
-  - core/templates/components/ck-editor-helpers/
-  ck-editor-copy-content.service.ts
+  - core/templates/pages/exploration-player-page/services/audio-translation-manager.service.ts
+  - core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts
+  - core/templates/components/ck-editor-helpers/ck-editor-copy-content.service.ts
   - core/templates/filters/format-rte-preview.pipe.ts
   - core/templates/domain/objects/NumberWithUnitsObjectFactory.ts
