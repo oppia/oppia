@@ -384,7 +384,8 @@ def create_managed_web_browser(
     url = 'http://localhost:%s/' % port
     human_readable_name = 'Web Browser'
     if common.is_linux_os():
-        if any(re.match('.*VBOX.*', d) for d in os.listdir('/dev/disk/by-id/')):
+        disk_dir_path = '/dev/disk/by-id/'
+        if os.path.exists(disk_dir_path) and any(re.match('.*VBOX.*', d) for d in os.listdir(disk_dir_path)):
             return None
         else:
             return managed_process(
