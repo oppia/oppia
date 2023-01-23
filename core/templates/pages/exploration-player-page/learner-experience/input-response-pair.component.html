@@ -31,7 +31,7 @@
   </div>
 </div>
 
-<div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== '' && feedbackIsEnabled">  
+<div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== '' && feedbackIsEnabled">
   <img class="conversation-skin-oppia-avatar rounded-circle"
        [src]="oppiaAvatarImageUrl" alt="">
   <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
