@@ -12,9 +12,6 @@
        [ngClass]="{'learner-view-card-transition-class': isOnTerminalCard(), 'card-content-hidden': !checkMarkHidden}">
     <div class="oppia-learner-view-card-top-section">
       <oppia-content-language-selector></oppia-content-language-selector>
-      <a [ngClass]=""    
-         target="_blank"
-         rel="noopener">
         <img class="conversation-skin-oppia-avatar"
              [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
              *ngIf="avatarImageIsShown">

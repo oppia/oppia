@@ -22,9 +22,6 @@
   width: 100px;
 }
 
-oppia-input-response-pair .oppia-popover {
-  cursor: pointer;
-}
 .oppia-answer-popup-container .oppia-answer-popup {
   max-height: 300px;
   overflow-y: scroll;

@@ -28,7 +28,6 @@ import { UserService } from 'services/user.service';
 import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 import { TranslateTextService } from '../services/translate-text.service';
-// Import { AppConstants } from 'app.constants';  
 
 @Component({
   selector: 'oppia-translation-opportunities',
