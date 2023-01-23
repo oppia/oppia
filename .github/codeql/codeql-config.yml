@@ -19,3 +19,4 @@ paths-ignore:
   - core/templates/filters/format-rte-preview.pipe.ts
   - core/templates/domain/objects/NumberWithUnitsObjectFactory.ts
   - extensions/rich_text_components/rte-output-display.component.spec.ts
+  - core/tests/webdriverio_utils/forms.js
