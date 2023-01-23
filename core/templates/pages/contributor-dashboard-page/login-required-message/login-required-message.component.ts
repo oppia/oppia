@@ -22,7 +22,6 @@ import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-// Import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'login-required-message',

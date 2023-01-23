@@ -33,6 +33,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './supplemental-card.component.css';
 
+
 @Component({
   selector: 'oppia-supplemental-card',
   templateUrl: './supplemental-card.component.html',
