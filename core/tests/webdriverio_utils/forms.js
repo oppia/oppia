@@ -552,13 +552,11 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       await arrayOfElems[arrayPointer].getTagName()
     ).toBe(tagName);
     // Remove comments introduced by angular for bindings using replace.
-    let res = await arrayOfElems[arrayPointer].getHTML(false);
     expect(
       (
         await arrayOfElems[arrayPointer].getHTML(false)
       ).replace(/<!--[^>]*-->/g, '').trim()
     ).toBe(text);
-    expect(res).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
