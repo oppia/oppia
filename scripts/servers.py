@@ -385,7 +385,7 @@ def create_managed_web_browser(
     human_readable_name = 'Web Browser'
     if common.is_linux_os():
         disk_dir_path = '/dev/disk/by-id/'
-        if (os.path.exists(disk_dir_path) and 
+        if (os.path.exists(disk_dir_path) and
             any(re.match('.*VBOX.*', d) for d in os.listdir(disk_dir_path))):
             return None
         else:
