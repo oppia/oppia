@@ -12,11 +12,9 @@
        [ngClass]="{'learner-view-card-transition-class': isOnTerminalCard(), 'card-content-hidden': !checkMarkHidden}">
     <div class="oppia-learner-view-card-top-section">
       <oppia-content-language-selector></oppia-content-language-selector>
-      <a [ngClass]="">
-        <img class="conversation-skin-oppia-avatar"
-             [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
+      <img class="conversation-skin-oppia-avatar"
+           [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
              *ngIf="avatarImageIsShown">
-      </a>
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            [ngClass]="getContentAudioHighlightClass()">
         <div tabindex="1">
@@ -165,10 +163,8 @@
 
     <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
       <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
-        <a [ngClass]="">
-          <img class="conversation-skin-oppia-avatar rounded-circle"
-               [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
-        </a>
+        <img class="conversation-skin-oppia-avatar rounded-circle"
+             [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
         <div class="conversation-skin-oppia-feedback-content">
           {{ 'I18N_EXPLORATION_STATE_PREVIOUSLY_COMPLETED' | translate }}
         </div>
