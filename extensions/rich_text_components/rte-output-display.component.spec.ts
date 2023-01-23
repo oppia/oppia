@@ -54,13 +54,8 @@ describe('RTE display component', () => {
     let rteComponentDe: DebugElement = fixture.debugElement;
 
     // eslint-disable-next-line oppia/no-inner-html
-    let html = fixture.nativeElement.innerHTML;
-    // A while loop is used here to ensure multiple passes through the string
-    // for complete sanitization of tags. See https://codeql.github.com/codeql-
-    // query-help/javascript/js-incomplete-multi-character-sanitization/.
-    while (html.includes('<!--')) {
-      html = html.replace(/(?=<!--)([\s\S]*?)-->/g, '');
-    }
+    let html = fixture.nativeElement.innerHTML.replace(/<!--[^>]*-->/g, '');
+
     expect(html).toBe('');
 
     fixture.detectChanges();
@@ -99,13 +94,7 @@ describe('RTE display component', () => {
 
     expect(() => {
       // eslint-disable-next-line oppia/no-inner-html
-      let html = fixture.nativeElement.innerHTML;
-      // A while loop is used here to ensure multiple passes through the string
-      // for complete sanitization of tags. See https://codeql.github.com/codeql-
-      // query-help/javascript/js-incomplete-multi-character-sanitization/.
-      while (html.includes('<!--')) {
-        html = html.replace(/<!--[^>]*-*-*>*/gm, '');
-      }
+      let html = fixture.nativeElement.innerHTML.replace(/<!--[^>]*-->/g, '');
       expect(html).toBe('');
 
       fixture.detectChanges();
