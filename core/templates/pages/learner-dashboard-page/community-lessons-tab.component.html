@@ -1,6 +1,6 @@
 <div class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
-  <p class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
-  </p>
+  <h1 class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
+  </h1>
   <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
     <span class="view-text" [ngStyle]="displayInCommunityLessons.length !== 0 && {'right': '100px'}">
       <span>{{ 'I18N_LEARNER_DASHBOARD_VIEW' | translate }}</span>
@@ -25,7 +25,7 @@
     </div>
   </div>
   <div *ngIf="noCommunityLessonActivity">
-    <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate" class="empty-section"></p>
+    <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate" class="empty-section"></h2>
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
@@ -35,8 +35,8 @@
   </div>
   <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalIncompleteLessonsList.length !== 0">
-      <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
-      </p>
+      <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
+      </h2>
       <div class="summary-container">
         <div *ngFor="let summaryTile of displayIncompleteLessonsList"
              class="oppia-summary-tile-container"
@@ -99,8 +99,8 @@
   </div>
   <div class="completed-section e2e-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalCompletedLessonsList.length !== 0">
-      <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
-      </p>
+      <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
+      </h2>
       <div class="summary-container">
         <span class="oppia-learner-dashboard-nonexistent-exploration" *ngIf="completedToIncompleteCollections.length !== 0">
           <span
@@ -251,10 +251,10 @@
   </div>
 </div>
 <div class="playlist-section e2e-test-play-later-section">
-  <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
-  </p>
+  <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
+  </h1>
   <div *ngIf="noPlaylistActivity">
-    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate" class="empty-section"></p>
+    <h2 [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate" class="empty-section"></h2>
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
@@ -353,7 +353,7 @@
   </div>
 </div>
 <div class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
-  <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
+  <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></h1>
   <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
     <mat-card class="oppia-subscription-card oppia-subscription-container-list"
       *ngFor="let subscription of subscriptionsList">
