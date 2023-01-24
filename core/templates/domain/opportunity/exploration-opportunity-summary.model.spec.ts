@@ -38,7 +38,8 @@ describe('Exploration opportunity summary model', () => {
         },
         translation_in_review_counts: {
           hi: 20
-        }
+        },
+        language_code: 'hi'
       };
       explorationOpportunitySummary = (
         ExplorationOpportunitySummary.createFromBackendDict(
@@ -99,7 +100,8 @@ describe('Exploration opportunity summary model', () => {
         chapter_title: 'Introduction',
         content_count: 0,
         translation_counts: {},
-        translation_in_review_counts: {}
+        translation_in_review_counts: {},
+        language_code: 'en'
       };
       const explorationOpportunitySummaryForNoContents = (
         ExplorationOpportunitySummary.createFromBackendDict(

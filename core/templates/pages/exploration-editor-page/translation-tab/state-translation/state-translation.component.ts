@@ -138,6 +138,8 @@ export class StateTranslationComponent
           writtenTranslations.getWrittenTranslation(
             contentId, activeLanguageCode));
         html = writtenTranslation.getTranslation();
+      } else {
+        html = subtitledHtml.html;
       }
     } else {
       html = subtitledHtml.html;
