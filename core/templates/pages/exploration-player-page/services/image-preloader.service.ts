@@ -161,7 +161,7 @@ export class ImagePreloaderService {
   */
   getDimensionsOfImage(filename: string): ImageDimensions {
     const dimensionsRegex = RegExp(
-      '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif|svg)$', 'g');
+      '[^/]+_height_([0-9]+)_width_([0-9]+)\\.(png|jpeg|jpg|gif|svg)$', 'g');
     var imageDimensions = dimensionsRegex.exec(filename);
     if (imageDimensions) {
       var dimensions = {
@@ -182,7 +182,7 @@ export class ImagePreloaderService {
   */
   getDimensionsOfMathSvg(filename: string): ImageDimensions {
     var dimensionsRegex = RegExp(
-      '[^/]+_height_([0-9d]+)_width_([0-9d]+)_vertical_([0-9d]+)\.svg', 'g');
+      '[^/]+_height_([0-9d]+)_width_([0-9d]+)_vertical_([0-9d]+)\\.svg', 'g');
     var imageDimensions = dimensionsRegex.exec(filename);
     if (imageDimensions) {
       var dimensions = {
