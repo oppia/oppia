@@ -325,7 +325,7 @@
   border-radius: 10px;
   height: auto;
   left: 50%;
-  max-width: 495px;
+  max-width: 500px;
   position: fixed;
   top: 8vh;
   transform: translateX(-50%);
@@ -397,7 +397,7 @@
 }
 
 .save-progress-menu .uid-box .oppia-tooltip-container {
-  margin-left: -25px;
+  margin-left: 7px;
 }
 
 .save-progress-menu .uid-box .guide-text {
