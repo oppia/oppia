@@ -40,16 +40,16 @@
     "REPO_SPECIFIC_CHANGE_MODULE_TARGET": "scripts.release_scripts.repo_specific_changes_fetcher",
     "SERVER_ERROR_PLAYBOOK_URL": "https://docs.google.com/document/d/1nCEDVGpU_jfdb8oP5HuOGigJqwlxrd6FyqWaffaWUXo/edit#heading=h.dugm7khzkjay",
     "SCHEMA_VERSIONS_TO_JOBS_MAPPING": {
-        "CURRENT_COLLECTION_SCHEMA_VERSION": ["CollectionMigrationOneOffJob"],
+        "CURRENT_COLLECTION_SCHEMA_VERSION": ["MigrateCollectionJob"],
         "CURRENT_STATE_SCHEMA_VERSION": [
-            "ExplorationMigrationJobManager", "QuestionMigrationOneOffJob",
+            "MigrateExplorationJob", "MigrateQuestionJob",
             "QuestionSuggestionMigrationJobManager"],
-        "CURRENT_SKILL_CONTENTS_SCHEMA_VERSION": ["SkillMigrationOneOffJob"],
-        "CURRENT_MISCONCEPTIONS_SCHEMA_VERSION": ["SkillMigrationOneOffJob"],
-        "CURRENT_RUBRIC_SCHEMA_VERSION": ["SkillMigrationOneOffJob"],
-        "CURRENT_STORY_CONTENTS_SCHEMA_VERSION": ["StoryMigrationOneOffJob"],
-        "CURRENT_SUBTOPIC_SCHEMA_VERSION": ["TopicMigrationOneOffJob"],
-        "CURRENT_STORY_REFERENCE_SCHEMA_VERSION": ["TopicMigrationOneOffJob"]
+        "CURRENT_SKILL_CONTENTS_SCHEMA_VERSION": ["MigrateSkillJob"],
+        "CURRENT_MISCONCEPTIONS_SCHEMA_VERSION": ["MigrateSkillJob"],
+        "CURRENT_RUBRIC_SCHEMA_VERSION": ["MigrateSkillJob"],
+        "CURRENT_STORY_CONTENTS_SCHEMA_VERSION": ["MigrateStoryJob"],
+        "CURRENT_SUBTOPIC_SCHEMA_VERSION": ["MigrateTopicJob"],
+        "CURRENT_STORY_REFERENCE_SCHEMA_VERSION": ["MigrateTopicJob"]
     },
     "THIRD_PARTY_DIR": "third_party",
     "UPDATE_CONFIGS_MODULE_TARGET": "scripts.release_scripts.update_configs",
