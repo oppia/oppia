@@ -404,7 +404,7 @@ export class MathInteractionsService {
     // be treated as 5*sqrt(x).
     for (let functionName of this.mathFunctionNames) {
       expressionString = expressionString.replace(new RegExp(
-        '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
+        '([a-zA-Z0-9\\)])' + functionName, 'g'), '$1*' + functionName);
     }
 
     // Inserting multiplication signs between digit and variable.
