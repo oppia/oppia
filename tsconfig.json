@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "skipLibCheck": true,
-    "downlevelIteration": true,
+    "ignoreDeprecations": "5.0",
     "lib": ["es2017", "dom", "webworker"],
     "module": "es2020",
     "noImplicitUseStrict": true,
