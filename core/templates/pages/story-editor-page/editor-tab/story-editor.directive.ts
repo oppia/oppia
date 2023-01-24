@@ -18,382 +18,387 @@
 
 import { Subscription } from 'rxjs';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import storyConstants from 'assets/constants';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { StoryEditorStateService } from '../services/story-editor-state.service';
+import { StoryUpdateService } from 'domain/story/story-update.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { AlertsService } from 'services/alerts.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { StoryNode } from 'domain/story/story-node.model';
+import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { NewChapterTitleModalComponent } from '../modal-templates/new-chapter-title-modal.component';
+import { DeleteChapterModalComponent } from '../modal-templates/delete-chapter-modal.component';
+import { Story } from 'domain/story/StoryObjectFactory';
+import { StoryContents } from 'domain/story/story-contents-object.model';
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.component.ts');
-require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
-require(
-  'pages/story-editor-page/modal-templates/' +
-  'new-chapter-title-modal.controller.ts');
+@Component({
+  selector: 'oppia-story-editor',
+  templateUrl: './story-editor.directive.html'
+})
+export class StoryEditorComponent implements OnInit, OnDestroy {
+  story: Story;
+  storyContents: StoryContents;
+  disconnectedNodes: string[];
+  linearNodesList: StoryNode[];
+  nodes: StoryNode[];
+  allowedBgColors = (
+    AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/story/story-update.service.ts');
-require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/alerts.service.ts');
-require('services/contextual/window-dimensions.service.ts');
+  initialNodeId: string;
+  notesEditorIsShown: boolean;
+  storyTitleEditorIsShown: boolean;
+  editableTitle: string;
+  editableUrlFragment: string;
+  editableMetaTagContent: string;
+  initialStoryUrlFragment: string;
+  editableNotes: string;
+  editableDescription: string;
+  editableDescriptionIsEmpty: boolean;
+  storyDescriptionChanged: boolean;
+  storyUrlFragmentExists: boolean;
+  idOfNodeToEdit: string;
+  dragStartIndex: number;
+  nodeBeingDragged: StoryNode;
+  mainStoryCardIsShown: boolean;
+  storyPreviewCardIsShown: boolean;
+  chaptersListIsShown: boolean;
+  selectedChapterIndex: number;
+  NOTES_SCHEMA = {
+    type: 'html',
+    ui_config: {
+      startupFocusEnabled: false
+    }
+  };
 
-require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
-require(
-  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
-require('services/stateful/focus-manager.service.ts');
-require('services/ngb-modal.service.ts');
+  constructor(
+    private alertsService: AlertsService,
+    private windowRef: WindowRef,
+    private focusManagerService: FocusManagerService,
+    private storyEditorStateService: StoryEditorStateService,
+    private ngbModal: NgbModal,
+    private storyUpdateService: StoryUpdateService,
+    private windowDimensionsService: WindowDimensionsService,
+    private storyEditorNavigationService: StoryEditorNavigationService,
+    private undoRedoService: UndoRedoService,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
-angular.module('oppia').directive('storyEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
-      controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'FocusManagerService', 'NgbModal',
-        'StoryEditorNavigationService', 'StoryEditorStateService',
-        'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
-        'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
-        'MAX_CHARS_IN_STORY_DESCRIPTION',
-        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
-        function(
-            $rootScope, $scope, $uibModal, AlertsService,
-            FocusManagerService, NgbModal,
-            StoryEditorNavigationService, StoryEditorStateService,
-            StoryUpdateService, UndoRedoService, WindowDimensionsService,
-            WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
-            MAX_CHARS_IN_STORY_DESCRIPTION,
-            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
-          $scope.MAX_CHARS_IN_STORY_DESCRIPTION = (
-            MAX_CHARS_IN_STORY_DESCRIPTION);
-          $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
-          $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = (
-            MAX_CHARS_IN_STORY_URL_FRAGMENT);
-          $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
-          $scope.hostname = WindowRef.nativeWindow.location.hostname;
-          var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
-          var _init = function() {
-            $scope.story = StoryEditorStateService.getStory();
-            if ($scope.story) {
-              $scope.storyContents = $scope.story.getStoryContents();
-            }
-            if ($scope.storyContents) {
-              $scope.setNodeToEdit($scope.storyContents.getInitialNodeId());
-            }
-            _initEditor();
-          };
+  directiveSubscriptions = new Subscription();
+  MAX_CHARS_IN_STORY_DESCRIPTION = (
+    AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION);
 
-          var _initEditor = function() {
-            $scope.story = StoryEditorStateService.getStory();
-            if ($scope.story) {
-              $scope.storyContents = $scope.story.getStoryContents();
-              $scope.disconnectedNodes = [];
-              $scope.linearNodesList = [];
-              $scope.nodes = [];
-              $scope.allowedBgColors = (
-                storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
-              if ($scope.storyContents &&
-                  $scope.storyContents.getNodes().length > 0) {
-                $scope.nodes = $scope.storyContents.getNodes();
-                $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
-                $scope.linearNodesList =
-                  $scope.storyContents.getLinearNodesList();
-              }
-              $scope.notesEditorIsShown = false;
-              $scope.storyTitleEditorIsShown = false;
-              $scope.editableTitle = $scope.story.getTitle();
-              $scope.editableUrlFragment = $scope.story.getUrlFragment();
-              $scope.editableMetaTagContent = $scope.story.getMetaTagContent();
-              $scope.initialStoryUrlFragment = $scope.story.getUrlFragment();
-              $scope.editableNotes = $scope.story.getNotes();
-              $scope.editableDescription = $scope.story.getDescription();
-              $scope.editableDescriptionIsEmpty = (
-                $scope.editableDescription === '');
-              $scope.storyDescriptionChanged = false;
-              $scope.storyUrlFragmentExists = false;
-              $scope.$applyAsync();
-            }
-          };
+  MAX_CHARS_IN_STORY_TITLE = AppConstants.MAX_CHARS_IN_STORY_TITLE;
 
-          $scope.setNodeToEdit = function(nodeId) {
-            $scope.idOfNodeToEdit = nodeId;
-          };
+  MAX_CHARS_IN_STORY_URL_FRAGMENT = (
+    AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT);
 
-          $scope.openNotesEditor = function() {
-            $scope.notesEditorIsShown = true;
-          };
+  MAX_CHARS_IN_META_TAG_CONTENT = AppConstants.MAX_CHARS_IN_META_TAG_CONTENT;
 
-          $scope.closeNotesEditor = function() {
-            $scope.notesEditorIsShown = false;
-          };
+  hostname = this.windowRef.nativeWindow.location.hostname;
+  TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
 
-          $scope.isInitialNode = function(nodeId) {
-            return (
-              $scope.story.getStoryContents().getInitialNodeId() === nodeId);
-          };
+  _init(): void {
+    this.story = this.storyEditorStateService.getStory();
+    if (this.story) {
+      this.storyContents = this.story.getStoryContents();
+    }
+    if (this.storyContents) {
+      this.setNodeToEdit(this.storyContents.getInitialNodeId());
+    }
+    this._initEditor();
+  }
 
-          $scope.onMoveChapterStart = function(index, node) {
-            $scope.dragStartIndex = index;
-            $scope.nodeBeingDragged = node;
-          };
+  _initEditor(): void {
+    this.story = this.storyEditorStateService.getStory();
+    if (this.story) {
+      this.storyContents = this.story.getStoryContents();
+      this.disconnectedNodes = [];
+      this.linearNodesList = [];
+      this.nodes = [];
+      if (this.storyContents &&
+          this.storyContents.getNodes().length > 0) {
+        this.nodes = this.storyContents.getNodes();
+        this.initialNodeId = this.storyContents.getInitialNodeId();
+        this.linearNodesList =
+          this.storyContents.getLinearNodesList();
+      }
+      this.notesEditorIsShown = false;
+      this.storyTitleEditorIsShown = false;
+      this.editableTitle = this.story.getTitle();
+      this.editableUrlFragment = this.story.getUrlFragment();
+      this.editableMetaTagContent = this.story.getMetaTagContent();
+      this.initialStoryUrlFragment = this.story.getUrlFragment();
+      this.editableNotes = this.story.getNotes();
+      this.editableDescription = this.story.getDescription();
+      this.editableDescriptionIsEmpty = (
+        this.editableDescription === '');
+      this.storyDescriptionChanged = false;
+      this.storyUrlFragmentExists = false;
+    }
+  }
 
-          $scope.rearrangeNodeInStory = function(toIndex) {
-            if ($scope.dragStartIndex === toIndex) {
-              return;
-            }
-            if ($scope.dragStartIndex === 0) {
-              StoryUpdateService.setInitialNodeId(
-                $scope.story, $scope.story.getStoryContents().getNodes()[
-                  toIndex].getId());
-            }
-            if (toIndex === 0) {
-              StoryUpdateService.setInitialNodeId(
-                $scope.story, $scope.story.getStoryContents().getNodes()[
-                  $scope.dragStartIndex].getId());
-            }
-            StoryUpdateService.rearrangeNodeInStory(
-              $scope.story, $scope.dragStartIndex, toIndex);
-            _initEditor();
-          };
+  setNodeToEdit(nodeId: string): void {
+    this.idOfNodeToEdit = nodeId;
+  }
 
-          $scope.deleteNode = function(nodeId) {
-            if ($scope.isInitialNode(nodeId)) {
-              AlertsService.addInfoMessage(
-                'Cannot delete the first chapter of a story.', 3000);
-              return;
-            }
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/modal-templates/' +
-                'delete-chapter-modal.template.html'),
-              backdrop: true,
-              controller: 'ConfirmOrCancelModalController'
-            }).result.then(function() {
-              StoryUpdateService.deleteStoryNode($scope.story, nodeId);
-              _initEditor();
-              StoryEditorStateService.onRecalculateAvailableNodes.emit();
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
+  openNotesEditor(): void {
+    this.notesEditorIsShown = true;
+  }
 
-          $scope.createNode = function() {
-            var nodeTitles = $scope.linearNodesList.map(function(node) {
-              return node.getTitle();
-            });
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/modal-templates/' +
-                'new-chapter-title-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                nodeTitles: () => nodeTitles
-              },
-              windowClass: 'create-new-chapter',
-              controller: 'CreateNewChapterModalController'
-            }).result.then(function() {
-              _initEditor();
-              // If the first node is added, open it just after creation.
-              if ($scope.story.getStoryContents().getNodes().length === 1) {
-                $scope.setNodeToEdit(
-                  $scope.story.getStoryContents().getInitialNodeId());
-              } else {
-                var nodesArray = $scope.story.getStoryContents().getNodes();
-                var nodesLength = nodesArray.length;
-                var secondLastNodeId = nodesArray[nodesLength - 2].getId();
-                var lastNodeId = nodesArray[nodesLength - 1].getId();
-                StoryUpdateService.addDestinationNodeIdToNode(
-                  $scope.story, secondLastNodeId, lastNodeId);
-              }
-              StoryEditorStateService.onRecalculateAvailableNodes.emit();
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
+  closeNotesEditor(): void {
+    this.notesEditorIsShown = false;
+  }
 
-          $scope.updateNotes = function(newNotes) {
-            if (newNotes !== $scope.story.getNotes()) {
-              StoryUpdateService.setStoryNotes($scope.story, newNotes);
-              _initEditor();
-            }
-          };
+  isInitialNode(nodeId: string): boolean {
+    return (
+      this.story.getStoryContents().getInitialNodeId() === nodeId);
+  }
 
-          $scope.navigateToChapterWithId = function(id, index) {
-            StoryEditorNavigationService.navigateToChapterEditorWithId(
-              id, index);
-          };
+  onMoveChapterStart(index: number, node: StoryNode): void {
+    this.dragStartIndex = index;
+    this.nodeBeingDragged = node;
+  }
 
-          $scope.updateStoryDescriptionStatus = function(description) {
-            $scope.editableDescriptionIsEmpty = (description === '');
-            $scope.storyDescriptionChanged = true;
-          };
+  rearrangeNodeInStory(toIndex: number): void {
+    if (this.dragStartIndex === toIndex) {
+      return;
+    }
+    if (this.dragStartIndex === 0) {
+      this.storyUpdateService.setInitialNodeId(
+        this.story, this.story.getStoryContents().getNodes()[
+          toIndex].getId());
+    }
+    if (toIndex === 0) {
+      this.storyUpdateService.setInitialNodeId(
+        this.story, this.story.getStoryContents().getNodes()[
+          this.dragStartIndex].getId());
+    }
+    this.storyUpdateService.rearrangeNodeInStory(
+      this.story, this.dragStartIndex, toIndex);
+    this._initEditor();
+  }
 
-          $scope.updateStoryMetaTagContent = function(newMetaTagContent) {
-            if (newMetaTagContent !== $scope.story.getMetaTagContent()) {
-              StoryUpdateService.setStoryMetaTagContent(
-                $scope.story, newMetaTagContent);
-            }
-          };
+  deleteNode(nodeId: string): void {
+    if (this.isInitialNode(nodeId)) {
+      this.alertsService.addInfoMessage(
+        'Cannot delete the first chapter of a story.', 3000);
+      return;
+    }
+    this.ngbModal.open(DeleteChapterModalComponent, {
+      backdrop: true,
+    }).result.then(() => {
+      this.storyUpdateService.deleteStoryNode(this.story, nodeId);
+      this._initEditor();
+      this.storyEditorStateService.onRecalculateAvailableNodes.emit();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
 
-          $scope.returnToTopicEditorPage = function() {
-            if (UndoRedoService.getChangeCount() > 0) {
-              const modalRef = NgbModal.open(
-                SavePendingChangesModalComponent, {
-                  backdrop: true
-                });
+  createNode(): void {
+    let nodeTitles = this.linearNodesList.map((node) => {
+      return node.getTitle();
+    });
+    const modalRef = this.ngbModal.open(NewChapterTitleModalComponent, {
+      backdrop: 'static',
+      windowClass: 'create-new-chapter',
+    });
+    modalRef.componentInstance.nodeTitles = nodeTitles;
+    modalRef.componentInstance.result.then(() => {
+      this._initEditor();
+      // If the first node is added, open it just after creation.
+      if (this.story.getStoryContents().getNodes().length === 1) {
+        this.setNodeToEdit(
+          this.story.getStoryContents().getInitialNodeId());
+      } else {
+        let nodesArray = this.story.getStoryContents().getNodes();
+        let nodesLength = nodesArray.length;
+        let secondLastNodeId = nodesArray[nodesLength - 2].getId();
+        let lastNodeId = nodesArray[nodesLength - 1].getId();
+        this.storyUpdateService.addDestinationNodeIdToNode(
+          this.story, secondLastNodeId, lastNodeId);
+      }
+      this.storyEditorStateService.onRecalculateAvailableNodes.emit();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
 
-              modalRef.componentInstance.body = (
-                'Please save all pending changes ' +
-                'before returning to the topic.');
+  updateNotes(newNotes: string): void {
+    if (newNotes !== this.story.getNotes()) {
+      this.storyUpdateService.setStoryNotes(this.story, newNotes);
+      this._initEditor();
+    }
+  }
 
-              modalRef.result.then(function() {}, function() {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              });
-            } else {
-              const topicId = (
-                StoryEditorStateService.getStory().getCorrespondingTopicId());
-              WindowRef.nativeWindow.open(
-                UrlInterpolationService.interpolateUrl(
-                  TOPIC_EDITOR_URL_TEMPLATE, {
-                    topic_id: topicId
-                  }
-                ), '_self');
-            }
-          };
+  navigateToChapterWithId(id: string, index: number): void {
+    this.storyEditorNavigationService.navigateToChapterEditorWithId(
+      id, index);
+  }
 
-          $scope.getClassroomUrlFragment = function() {
-            return StoryEditorStateService.getClassroomUrlFragment();
-          };
+  updateStoryDescriptionStatus(description: string): void {
+    this.editableDescriptionIsEmpty = (description === '');
+    this.storyDescriptionChanged = true;
+  }
 
-          $scope.getTopicUrlFragment = function() {
-            return StoryEditorStateService.getTopicUrlFragment();
-          };
+  updateStoryMetaTagContent(newMetaTagContent: string): void {
+    if (newMetaTagContent !== this.story.getMetaTagContent()) {
+      this.storyUpdateService.setStoryMetaTagContent(
+        this.story, newMetaTagContent);
+    }
+  }
 
-          $scope.getTopicName = function() {
-            return StoryEditorStateService.getTopicName();
-          };
+  returnToTopicEditorPage(): void {
+    if (this.undoRedoService.getChangeCount() > 0) {
+      const modalRef = this.ngbModal.open(
+        SavePendingChangesModalComponent, {
+          backdrop: true
+        });
 
-          $scope.updateStoryTitle = function(newTitle) {
-            if (newTitle !== $scope.story.getTitle()) {
-              StoryUpdateService.setStoryTitle($scope.story, newTitle);
-            }
-          };
+      modalRef.componentInstance.body = (
+        'Please save all pending changes ' +
+        'before returning to the topic.');
 
-          $scope.updateStoryUrlFragment = function(newUrlFragment) {
-            if (newUrlFragment === $scope.initialStoryUrlFragment) {
-              $scope.storyUrlFragmentExists = false;
-              return;
-            }
-            if (newUrlFragment) {
-              StoryEditorStateService.updateExistenceOfStoryUrlFragment(
-                newUrlFragment, function() {
-                  $scope.storyUrlFragmentExists = (
-                    StoryEditorStateService.getStoryWithUrlFragmentExists());
-                  StoryUpdateService.setStoryUrlFragment(
-                    $scope.story, newUrlFragment);
-                  $rootScope.$apply();
-                });
-            } else {
-              StoryUpdateService.setStoryUrlFragment(
-                $scope.story, newUrlFragment);
-            }
-          };
+      modalRef.result.then(() => {}, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    } else {
+      const topicId = (
+        this.storyEditorStateService.getStory().getCorrespondingTopicId());
+      this.windowRef.nativeWindow.open(
+        this.urlInterpolationService.interpolateUrl(
+          this.TOPIC_EDITOR_URL_TEMPLATE, {
+            topic_id: topicId
+          }
+        ), '_self');
+    }
+  }
 
-          $scope.updateStoryThumbnailFilename = function(
-              newThumbnailFilename) {
-            if (newThumbnailFilename !== $scope.story.getThumbnailFilename()) {
-              StoryUpdateService.setThumbnailFilename(
-                $scope.story, newThumbnailFilename);
-            }
-            $scope.$applyAsync();
-          };
+  getClassroomUrlFragment(): string {
+    return this.storyEditorStateService.getClassroomUrlFragment();
+  }
 
-          $scope.updateStoryThumbnailBgColor = function(
-              newThumbnailBgColor) {
-            if (newThumbnailBgColor !== $scope.story.getThumbnailBgColor()) {
-              StoryUpdateService.setThumbnailBgColor(
-                $scope.story, newThumbnailBgColor);
-            }
-          };
+  getTopicUrlFragment(): string {
+    return this.storyEditorStateService.getTopicUrlFragment();
+  }
 
-          $scope.updateStoryDescription = function(newDescription) {
-            if (newDescription !== $scope.story.getDescription()) {
-              StoryUpdateService.setStoryDescription(
-                $scope.story, newDescription);
-            }
-          };
+  getTopicName(): string {
+    return this.storyEditorStateService.getTopicName();
+  }
 
-          $scope.togglePreview = function() {
-            $scope.storyPreviewCardIsShown = !($scope.storyPreviewCardIsShown);
-          };
+  updateStoryTitle(newTitle: string): void {
+    if (newTitle !== this.story.getTitle()) {
+      this.storyUpdateService.setStoryTitle(this.story, newTitle);
+    }
+  }
 
-          $scope.toggleChapterEditOptions = function(chapterIndex) {
-            $scope.selectedChapterIndex = (
-              $scope.selectedChapterIndex === chapterIndex) ? -1 : chapterIndex;
-          };
+  updateStoryUrlFragment(newUrlFragment: string): void {
+    if (newUrlFragment === this.initialStoryUrlFragment) {
+      this.storyUrlFragmentExists = false;
+      return;
+    }
+    if (newUrlFragment) {
+      this.storyEditorStateService.updateExistenceOfStoryUrlFragment(
+        newUrlFragment, () => {
+          this.storyUrlFragmentExists = (
+            this.storyEditorStateService.getStoryWithUrlFragmentExists());
+          this.storyUpdateService.setStoryUrlFragment(
+            this.story, newUrlFragment);
+        });
+    } else {
+      this.storyUpdateService.setStoryUrlFragment(
+        this.story, newUrlFragment);
+    }
+  }
 
-          $scope.toggleChapterLists = function() {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
-            }
-          };
+  updateStoryThumbnailFilename(
+      newThumbnailFilename: string): void {
+    if (newThumbnailFilename !== this.story.getThumbnailFilename()) {
+      this.storyUpdateService.setThumbnailFilename(
+        this.story, newThumbnailFilename);
+    }
+  }
 
-          $scope.toggleStoryEditorCard = function() {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
-            }
-          };
+  updateStoryThumbnailBgColor(
+      newThumbnailBgColor: string): void {
+    if (newThumbnailBgColor !== this.story.getThumbnailBgColor()) {
+      this.storyUpdateService.setThumbnailBgColor(
+        this.story, newThumbnailBgColor);
+    }
+  }
 
-          ctrl.$onInit = function() {
-            $scope.storyPreviewCardIsShown = false;
-            $scope.mainStoryCardIsShown = true;
-            $scope.chaptersListIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.NOTES_SCHEMA = {
-              type: 'html',
-              ui_config: {
-                startupFocusEnabled: false
-              }
-            };
-            ctrl.directiveSubscriptions.add(
-              StoryEditorStateService.onViewStoryNodeEditor.subscribe(
-                (nodeId) => $scope.setNodeToEdit(nodeId)
-              )
-            );
+  updateStoryDescription(newDescription: string): void {
+    if (newDescription !== this.story.getDescription()) {
+      this.storyUpdateService.setStoryDescription(
+        this.story, newDescription);
+    }
+  }
 
-            ctrl.directiveSubscriptions.add(
-              StoryEditorStateService.onStoryInitialized.subscribe(
-                () =>{
-                  _init();
-                  FocusManagerService.setFocus('metaTagInputField');
-                }
-              ));
-            ctrl.directiveSubscriptions.add(
-              StoryEditorStateService.onStoryReinitialized.subscribe(
-                () => _initEditor()
-              ));
+  togglePreview(): void {
+    this.storyPreviewCardIsShown = !(this.storyPreviewCardIsShown);
+  }
 
-            _init();
-            _initEditor();
-          };
+  toggleChapterEditOptions(chapterIndex: number): void {
+    this.selectedChapterIndex = (
+      this.selectedChapterIndex === chapterIndex) ? -1 : chapterIndex;
+  }
 
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
-          };
+  toggleChapterLists(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.chaptersListIsShown = !this.chaptersListIsShown;
+    }
+  }
+
+  toggleStoryEditorCard(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.mainStoryCardIsShown = !this.mainStoryCardIsShown;
+    }
+  }
+
+  ngOnInit(): void {
+    this.storyPreviewCardIsShown = false;
+    this.mainStoryCardIsShown = true;
+    this.chaptersListIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onViewStoryNodeEditor.subscribe(
+        (nodeId: string) => this.setNodeToEdit(nodeId)
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onStoryInitialized.subscribe(
+        () =>{
+          this._init();
+          this.focusManagerService.setFocus('metaTagInputField');
         }
-      ]
-    };
-  }]);
+      ));
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onStoryReinitialized.subscribe(
+        () => this._initEditor()
+      ));
+
+    this._init();
+    this._initEditor();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaStoryEditor', downgradeComponent({
+  component: StoryEditorComponent
+}));
