@@ -181,8 +181,8 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     padding-top: 8px;
   }
   oppia-search-bar .oppia-input-group input {
-    border-bottom-left-radius: 10px;
-    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px !important;
+    border-top-left-radius: 10px !important;
     margin-left: -4.5vw;
   }
   .oppia-search-bar-input::-webkit-input-placeholder {
