@@ -4,7 +4,8 @@
        [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
        #helpCard>
     <img class="conversation-skin-oppia-avatar"
-         [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
+         [src]="OPPIA_AVATAR_IMAGE_URL"
+         alt="">
     <button type="button" class="conversation-skin-close-help-card-button e2e-test-close-help-card-button"
             (click)="clearHelpCard()" *ngIf="!helpCardHasContinueButton">
       <i class="fas fa-times"></i>
