@@ -22,9 +22,9 @@ const { showMessage } = require('./showMessageUtils.js');
 
 const rolesEditorTab = testConstants.URLs.RolesEditorTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
-const roleEditorButtonSelector = 'e2e-test-role-edit-button';
-const rolesSelectDropdown = 'mat-select-trigger';
-const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing'
+const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
+const rolesSelectDropdown = 'div.mat-select-trigger';
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 module.exports = class puppeteerUtilities {
   page;
@@ -84,7 +84,7 @@ module.exports = class puppeteerUtilities {
   async signUpNewUser(userName, signInEmail) {
     await this.signInWithEmail(signInEmail);
     await this.type('input.e2e-test-username-input', userName);
-    await this.clickOn('input', 'e2e-test-agree-to-terms-checkbox');
+    await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])');
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
@@ -108,22 +108,18 @@ module.exports = class puppeteerUtilities {
 
   /**
    * The function clicks the element using the text on the button.
-   * @param {string} text - The text on the button to be clicked.
+   * @param {string} selector - The text on the button or the CSS selector of
+   * the element to be clicked
    */
-  async clickOn(text) {
-    const [button] = await (this.page).$x(
-      '//' + '*[contains(text(), "' + text + '")]');
-    await button.click();
-  }
-
-  /**
-   * This function clicks on any element using its CSS selector
-   * @param {string} tag - The HTML tag of the element.
-   * @param {string} selector - The CSS selector of the element
-   */
-  async clickOn(tag, selector) {
-    await (this.page).waitForSelector(tag + '.' + selector);
-    await (this.page).click(tag + '.' + selector);
+  async clickOn(selector) {
+    try {
+      const [button] = await (this.page).$x(
+        '//' + '*[contains(text(), "' + selector + '")]');
+      await button.click();
+    } catch {
+      await (this.page).waitForSelector(selector);
+      await (this.page).click(selector);
+    }
   }
 
   /**
@@ -134,9 +130,9 @@ module.exports = class puppeteerUtilities {
   async assignRoleToUser(username, role) {
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, username);
-    await this.clickOn('button', roleEditorButtonSelector);
+    await this.clickOn(roleEditorButtonSelector);
     await this.clickOn('Add role');
-    await this.clickOn('div', rolesSelectDropdown);
+    await this.clickOn(rolesSelectDropdown);
     await this.page.evaluate(async(role) => {
       const allRoles = document.getElementsByClassName('mat-option-text');
       for (let i = 0; i < allRoles.length; i++) {
@@ -157,7 +153,7 @@ module.exports = class puppeteerUtilities {
     const currPageUrl = this.page.url();
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, username);
-    await this.clickOn('button', roleEditorButtonSelector);
+    await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
     await this.page.evaluate((role) => {
       const userRoles = document.getElementsByClassName(
@@ -182,7 +178,7 @@ module.exports = class puppeteerUtilities {
     const currPageUrl = this.page.url();
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, username);
-    await this.clickOn('button', roleEditorButtonSelector);
+    await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
     await this.page.evaluate((role) => {
       const userRoles = document.getElementsByClassName(

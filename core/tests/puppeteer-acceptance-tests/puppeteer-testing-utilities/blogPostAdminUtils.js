@@ -23,7 +23,7 @@ const { showMessage } = require('./showMessageUtils.js');
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
-const thumbnailPhotoBox = 'e2e-test-photo-clickable';
+const thumbnailPhotoBox = 'div.e2e-test-photo-clickable';
 const unauthErrorContainer = 'div.e2e-test-error-container';
 const blogDashboardAuthorDetailsModal = 'div.modal-dialog';
 const roleUpdateUsernameInput = 'input#label-target-update-form-name';
@@ -118,9 +118,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
 
     await this.expectPublishButtonToBeDisabled();
-    await this.clickOn('button', 'mat-button-toggle-button');
+    await this.clickOn('button.mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
-    await this.clickOn('div', thumbnailPhotoBox);
+    await this.clickOn(thumbnailPhotoBox);
     await this.uploadFile('blog-post-thumbnail.svg');
     await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
