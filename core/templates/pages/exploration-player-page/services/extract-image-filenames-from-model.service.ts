@@ -175,7 +175,7 @@ export class ExtractImageFilenamesFromModelService {
       filenamesInState.push(filename);
     }
     let allHtmlOfState: string[] = state.getAllHTMLStrings();
-    allHtmlOfState.concat(
+    let htmlTranslations: string[] = (
       this.entityTranslationsService.getHtmlTranslations(
         this.contentTranslationLanguageService.getCurrentContentLanguageCode(),
         state.getAllContentIds()
@@ -183,7 +183,8 @@ export class ExtractImageFilenamesFromModelService {
     );
     return [
       ...filenamesInState,
-      ...this._extractFilenamesFromHtmlList(allHtmlOfState)
+      ...this._extractFilenamesFromHtmlList(allHtmlOfState),
+      ...this._extractFilenamesFromHtmlList(htmlTranslations),
     ];
   }
 
