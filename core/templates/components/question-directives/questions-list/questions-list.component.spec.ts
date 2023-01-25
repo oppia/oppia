@@ -898,13 +898,11 @@ describe('Questions List Component', () => {
     component.associatedSkillSummaries = [
       ShortSkillSummary.createFromBackendDict({
         skill_id: '1',
-        skill_description: 'Skill Description',
-        difficulty: 0
+        skill_description: 'Skill Description'
       }),
       ShortSkillSummary.createFromBackendDict({
         skill_id: '2',
-        skill_description: 'Skill Description',
-        difficulty: 0
+        skill_description: 'Skill Description'
       })
     ];
     component.skillLinkageModificationsArray = [];
@@ -919,7 +917,8 @@ describe('Questions List Component', () => {
     expect(component.skillLinkageModificationsArray).toEqual([
       {
         id: '1',
-        task: 'remove'
+        task: 'remove',
+        difficulty: 0.0
       } as SkillLinkageModificationsArray
     ]);
   });
