@@ -44,6 +44,7 @@ oppia-supplemental-card .conversation-skin-close-help-card-button {
   background: none;
   border: 0;
   color: #000;
+  cursor: pointer;
   height: 24px;
   opacity: 0.5;
   position: absolute;

@@ -150,6 +150,7 @@ oppia-tutor-card .card-content-hidden {
 
 .conversation-skin-responses-dropdown-container {
   border-bottom: 1px solid #ccc;
+  cursor: pointer;
   line-height: 0.1em;
   margin: 8px 20px 20px 20px;
   text-align: center;
