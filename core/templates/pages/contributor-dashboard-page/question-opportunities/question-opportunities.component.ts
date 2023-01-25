@@ -82,7 +82,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
       let maxQuestionsPerSkill = AppConstants.MAX_QUESTIONS_PER_SKILL;
       const progressPercentage = (
         (opportunity.getQuestionCount() / maxQuestionsPerSkill) * 100
-        ).toFixed(2);
+      ).toFixed(2);
       const opportunityDict: Opportunity = {
         id: opportunity.id,
         heading: heading,

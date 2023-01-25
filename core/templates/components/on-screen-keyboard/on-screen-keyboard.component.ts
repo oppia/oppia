@@ -49,6 +49,7 @@ export class OnScreenKeyboardComponent {
   mainTab: string = AppConstants.OSK_MAIN_TAB;
   greekSymbols: string[] = Object.values(
     AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
   greekLetters: string[] = Object.keys(
     AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
 

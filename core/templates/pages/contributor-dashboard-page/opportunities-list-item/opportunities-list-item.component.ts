@@ -102,7 +102,7 @@ export class OpportunitiesListItemComponent {
       if (this.opportunity.progressPercentage) {
         this.progressPercentage =
           `${Math.floor(this.opportunity.progressPercentage)}%`;
-        if (this.opportunityType === 
+        if (this.opportunityType ===
           AppConstants.OPPORTUNITY_TYPE_TRANSLATION
         ) {
           this.translationProgressBar = true;

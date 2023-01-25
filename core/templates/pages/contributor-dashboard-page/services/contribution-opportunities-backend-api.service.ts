@@ -174,7 +174,7 @@ export class ContributionOpportunitiesBackendApiService {
       topic_name?: string;
       language_code?: string;
     } = {};
-    if (topicName !== '' && 
+    if (topicName !== '' &&
       topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL
     ) {
       params.topic_name = topicName;
