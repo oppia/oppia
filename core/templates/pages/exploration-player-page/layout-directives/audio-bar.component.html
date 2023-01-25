@@ -1,5 +1,5 @@
 <div class="audio-header" *ngIf="isAudioBarAvailable()"
-     [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
+  [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
   <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded" headroom>
     <div class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
       <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
@@ -11,10 +11,10 @@
             </span>
           </a>
           <a (click)="onPlayButtonClicked()"
-             [ngbTooltip]="!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : ''"
-             placement="right">
+            [ngbTooltip]="!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : ''"
+            placement="right">
             <i class="fas oppia-audio-controls-button-icon" tabindex="0"
-               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+              [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
             </i>
           </a>
           <a (click)="onForwardButtonClicked()">
@@ -30,43 +30,36 @@
           </div>
           <div *ngIf="!audioLoadingIndicatorIsShown">
             <oppia-audio-slider [value]="audioPlayerService.getCurrentTime()"
-                                [max]="audioPlayerService.getAudioDuration()"
-                                (valueChange)="setProgress($event)"
-                                aria-label="audio-slider">
+              [max]="audioPlayerService.getAudioDuration()" (valueChange)="setProgress($event)"
+              aria-label="audio-slider">
             </oppia-audio-slider>
           </div>
           <span *ngIf="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()"
-                class="audio-controls-message">
+            class="audio-controls-message">
             {{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
           </span>
           <span *ngIf="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()"
-                class="audio-controls-message">
+            class="audio-controls-message">
             {{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
           </span>
           <!--Filler space for message-->
           <span class="audio-controls-message">&zwnj;</span>
         </div>
         <div class="oppia-audio-header-select">
-          <select class="audio-language-select e2e-test-audio-lang-select"
-                  [(ngModel)]="selectedLanguage.value"
-                  (change)="onNewLanguageSelected()">
+          <select class="audio-language-select e2e-test-audio-lang-select" [(ngModel)]="selectedLanguage.value"
+            (change)="onNewLanguageSelected()">
             <option *ngFor="let opt of languagesInExploration" [value]="opt.value">{{ opt.displayed }}</option>
           </select>
         </div>
       </div>
     </div>
-    <div class="audio-collapse-button audio-toggle-button"
-         *ngIf="audioBarIsExpanded"
-         (click)="collapseAudioBar()"
-         aria-label="Audio menu collapse"
-         [ngClass]="{'audio-controls-margin': progressBarIsShown}">
+    <div class="audio-collapse-button audio-toggle-button" *ngIf="audioBarIsExpanded" (click)="collapseAudioBar()"
+      aria-label="Audio menu collapse" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
       <i class="fas fa-sort-up"></i>
     </div>
   </div>
-  <div class="audio-expand-button audio-toggle-button"
-       *ngIf="!audioBarIsExpanded"
-       (click)="expandAudioBar()"
-       aria-label="Audio menu expand">
+  <div class="audio-expand-button audio-toggle-button" *ngIf="!audioBarIsExpanded" (click)="expandAudioBar()"
+    aria-label="Audio menu expand">
     <div class="container e2e-test-audio-bar">
       <div class="row">
         <div class="col-lg-6 px-0 mt-1 ml-2">
@@ -107,7 +100,8 @@
     border-color: #009688;
   }
 
-  .audio-header .fa-sort-up, .audio-header .fa-sort-down {
+  .audio-header .fa-sort-up,
+  .audio-header .fa-sort-down {
     transform: translateY(-2px);
   }
 
@@ -121,6 +115,7 @@
       height: 32px;
       width: 90px;
     }
+
     .audio-expand-button-text {
       display: none;
     }
@@ -157,12 +152,14 @@
     text-align: right;
     vertical-align: middle;
   }
+
   .oppia-audio-header-control-buttons {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     width: 700px;
   }
+
   .oppia-replay-white-circle {
     display: inline-block;
     font-size: 1.4em;
@@ -172,6 +169,7 @@
     vertical-align: middle;
     width: 36px;
   }
+
   .audio-undo-icon {
     color: #fff;
     left: 50%;
@@ -180,12 +178,15 @@
     top: 7px;
     transform: translateX(-43%);
   }
+
   .audio-undo-icon-forward {
     transform: scaleX(-1) translateX(43%);
   }
+
   .oppia-audio-header-select {
     transform: translateY(5px);
   }
+
   .oppia-five-icon {
     bottom: 7px;
     color: #fff;
@@ -194,9 +195,11 @@
     left: 3px;
     position: relative;
   }
+
   .oppia-five-icon-forward {
     left: 0;
   }
+
   .audio-controls-button-image {
     height: 21px;
     width: 21px;
@@ -274,6 +277,7 @@
       top: 0;
     }
   }
+
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;
@@ -299,30 +303,52 @@
     .oppia-audio-header-control-buttons {
       justify-content: space-evenly;
     }
+
     .oppia-replay-white-circle {
       padding: 5px;
       width: 26px;
     }
+
     .oppia-audio-header-select select {
       width: 100%;
     }
+
     .audio-header-control-icons {
       order: 2;
     }
+
     .slider-section {
       order: 1;
       width: 90%;
     }
+
+    
+    .slider-section ng-star-inserted {
+      align-items: center;
+      margin-top: -20px;
+      display: flex;
+    }
+
     .oppia-audio-header-select {
       order: 3;
       width: 50%;
     }
+
     .audio-collapse-button {
       top: 80px;
     }
+
     .audio-controls {
       height: 80px;
     }
+
+    .audio-controls audio-control-margin {
+      height: 100px;
+    }
+
+    
+
+
   }
 
   @media screen and (max-width: 550px) {
@@ -332,17 +358,21 @@
       padding: 20px 0;
       padding-right: 20px;
     }
+
     .slider-section {
       transform: translateY(4px);
     }
+
     .audio-collapse-button {
       top: 98px;
     }
+
     .audio-header-control-icons {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
     }
+
     .oppia-audio-controls-button-icon {
       font-size: 1.1em;
       margin: 0 20px;
