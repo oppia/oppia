@@ -43,8 +43,6 @@ require('services/stateful/focus-manager.service.ts');
 require('domain/skill/skill-backend-api.service.ts');
 import { Subscription } from 'rxjs';
 
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
 import { AppConstants } from 'app.constants';
 
 angular.module('oppia').directive('storyNodeEditor', [

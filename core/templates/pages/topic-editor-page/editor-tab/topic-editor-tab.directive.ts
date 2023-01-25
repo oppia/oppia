@@ -20,9 +20,6 @@ import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/chang
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { Subscription } from 'rxjs';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
 import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 
