@@ -382,8 +382,8 @@ def create_managed_web_browser(
         None if the current operating system does not support web browsers.
 
     Raises:
-        Exception. Could not attempt to launch the web browser (When Operating
-            System cannot be identified).
+        Exception. Unable to launch the web browser (this happens when
+            Operating System cannot be identified).
     """
     url = 'http://localhost:%s/' % port
     human_readable_name = 'Web Browser'

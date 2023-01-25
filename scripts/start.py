@@ -196,38 +196,35 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             )
             initializer.populate_debug_data()
 
-        try:
-            managed_web_browser = (
-                None if parsed_args.no_browser else
-                servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
-
-            if managed_web_browser is None:
-                common.print_each_string_after_two_new_lines([
-                    'INFORMATION',
-                    'Local development server is ready! You can access it by '
-                    'navigating to http://localhost:%s/ in a web '
-                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
-                ])
-            else:
-                common.print_each_string_after_two_new_lines([
-                    'INFORMATION',
-                    'Local development server is ready! Opening a default web '
-                    'browser window pointing to it: '
-                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
-                ])
-                stack.enter_context(managed_web_browser)
-        except Exception as error:
+        if parsed_args.no_browser:
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Local development server is ready! You can access it by '
                 'navigating to http://localhost:%s/ in a web '
                 'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
             ])
-            common.print_each_string_after_two_new_lines([
-                'ERROR',
-                'Error occurred while launching the web '
-                'browser window: %s ' % error,
-            ])
+        else:
+            try:
+                stack.enter_context(servers.create_managed_web_browser(
+                    PORT_NUMBER_FOR_GAE_SERVER))
+                common.print_each_string_after_two_new_lines([
+                    'INFORMATION',
+                    'Local development server is ready! Opening a default web '
+                    'browser window pointing to it: '
+                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
+                ])
+            except Exception as error:
+                common.print_each_string_after_two_new_lines([
+                    'INFORMATION',
+                    'Local development server is ready! You can access it by '
+                    'navigating to http://localhost:%s/ in a web '
+                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
+                ])
+                common.print_each_string_after_two_new_lines([
+                    'ERROR',
+                    'Error occurred while  attempting to automatically launch '
+                    'the web browser: %s' % error,
+                ])
 
         dev_appserver.wait()
 
