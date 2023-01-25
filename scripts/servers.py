@@ -380,22 +380,31 @@ def create_managed_web_browser(
     Returns:
         context manager|None. The context manager to a web browser window, or
         None if the current operating system does not support web browsers.
+
+    Raises:
+        Exception. It can raise various exceptions such as FileNotFound
+            or the process failure exceptions.
     """
     url = 'http://localhost:%s/' % port
     human_readable_name = 'Web Browser'
-    if common.is_linux_os():
-        disk_dir_path = '/dev/disk/by-id/'
-        if (os.path.exists(disk_dir_path) and
-            any(re.match('.*VBOX.*', d) for d in os.listdir(disk_dir_path))):
-            return None
-        else:
+    try:
+        if common.is_linux_os():
+            if any(re.match('.*VBOX.*', d) for d in
+               os.listdir('/dev/disk/by-id/')):
+                return None
+            else:
+                return managed_process(
+                    ['xdg-open', url], human_readable_name=human_readable_name)
+        elif common.is_mac_os():
             return managed_process(
-                ['xdg-open', url], human_readable_name=human_readable_name)
-    elif common.is_mac_os():
-        return managed_process(
-            ['open', url], human_readable_name=human_readable_name)
-    else:
-        return None
+                ['open', url], human_readable_name=human_readable_name)
+        else:
+            return None
+    except Exception as error:
+        logging.exception(
+                'Error occurred when trying to launch the web '
+                'browser: %s' % error)
+        raise error
 
 
 @contextlib.contextmanager
