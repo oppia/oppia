@@ -28,7 +28,7 @@ import time
 
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     import datetime
 
 
