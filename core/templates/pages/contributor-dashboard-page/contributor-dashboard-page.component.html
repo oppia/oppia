@@ -123,9 +123,9 @@
               <div class="oppia-explanation-container">
                 <div class="oppia-opportunities-tabs-explanation">
                   <div class="oppia-opportunities-tabs-explanation-before">
-                    {{tabsDetails[activeTabName].tabName}}
+                    <h1>{{tabsDetails[activeTabName].tabName}}</h1>
                   </div>
-                  {{tabsDetails[activeTabName].description}}
+                  <h2>{{tabsDetails[activeTabName].description}}</h2>
                 </div>
               </div>
             </div>
@@ -256,6 +256,14 @@
   </div>
 </div>
 <style>
+
+  h1{
+    font-size: 26px;
+    color: #009688;
+  }
+  h2{
+    font-size: 16px;
+  }
   .oppia-tabs-container {
     text-align: center;
   }
