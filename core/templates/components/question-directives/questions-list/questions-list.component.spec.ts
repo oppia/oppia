@@ -898,11 +898,13 @@ describe('Questions List Component', () => {
     component.associatedSkillSummaries = [
       ShortSkillSummary.createFromBackendDict({
         skill_id: '1',
-        skill_description: 'Skill Description'
+        skill_description: 'Skill Description',
+        difficulty: 0
       }),
       ShortSkillSummary.createFromBackendDict({
         skill_id: '2',
-        skill_description: 'Skill Description'
+        skill_description: 'Skill Description',
+        difficulty: 0
       })
     ];
     component.skillLinkageModificationsArray = [];
