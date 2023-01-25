@@ -355,6 +355,15 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     CKEDITOR.plugins.addExternal(
       'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
 
+    // CKEDITOR.plugins.addExternal(
+    //   'wordCount',
+    //   // '/third_party/static/ckeditor-4.12.1/plugins/wordcount/',
+    //   // '/third_party/static/ckeditor-bootstrapck-1.0.0/plugins/wordcount/',
+    //   '/extensions/ckeditor_plugins/wordcount/',
+    //   'plugin.js'
+    // );
+
+
     const sharedSpaces = {
       top: (
         this.elementRef.nativeElement.children[0].children[0] as HTMLElement)
@@ -469,7 +478,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       if (ck.getData() === this.value) {
         return;
       }
-
+      // This console.log gives error, with wordCount not found
+      // console.log(CKEDITOR.instances.editor1.wordCount.wordCount);
       // TODO(#12882): Remove the use of jQuery.
       var elt = $('<div>' + ck.getData() + '</div>');
       var textElt = elt[0].childNodes;
