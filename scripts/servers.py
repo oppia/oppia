@@ -382,23 +382,21 @@ def create_managed_web_browser(
         None if the current operating system does not support web browsers.
 
     Raises:
-        Exception. An error occurred while launching the web browser window.
+        Exception. Could not attempt to launch the web browser (When Operating
+            System cannot be identified).
     """
     url = 'http://localhost:%s/' % port
     human_readable_name = 'Web Browser'
-    try:
-        if common.is_linux_os():
-            return managed_process(
-                ['xdg-open', url], human_readable_name=human_readable_name)
-        elif common.is_mac_os():
-            return managed_process(
-                ['open', url], human_readable_name=human_readable_name)
-        else:
-            return None
-    except Exception as error:
-        logging.exception(
-                'Error occurred while launching the web browser: %s' % error)
-        raise error
+    if common.is_linux_os():
+        return managed_process(
+            ['xdg-open', url], human_readable_name=human_readable_name)
+    elif common.is_mac_os():
+        return managed_process(
+            ['open', url], human_readable_name=human_readable_name)
+    else:
+        raise Exception(
+            'Unable to identify the Operating System and therefore, unable to '
+            'launch the web browser.')
 
 
 @contextlib.contextmanager
