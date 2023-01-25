@@ -26,7 +26,7 @@ from core.platform.taskqueue import cloud_tasks_emulator
 import requests
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     import datetime
 
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
