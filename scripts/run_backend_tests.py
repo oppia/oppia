@@ -149,22 +149,10 @@ def run_shell_cmd(
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env)
     last_stdout_bytes, last_stderr_bytes = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
-    # compatible with rest of the code.
-    try:
-        last_stdout_str = last_stdout_bytes.decode('utf-8')
-        last_stderr_str = last_stderr_bytes.decode('utf-8')
-    except UnicodeDecodeError as e:  # pragma: no cover
-        # We sometimes get a UnicodeDecodeError with an "invalid continuation
-        # byte" or "invalid start byte" message, and this can sometimes happen
-        # when trying to read a non-unicode file. To help debug this issue,
-        # print some more information before failing. See #16600 for details.
-        print(
-            '[Debug invalid start/continuation byte flake] STDOUT:',
-            last_stdout_bytes)
-        print(
-            '[Debug invalid start/continuation byte flake] STDERR:',
-            last_stderr_bytes)
-        raise e
+    # compatible with rest of the code. Sometimes we get invalid bytes, in which
+    # case we replace them with U+FFFD.
+    last_stdout_str = last_stdout_bytes.decode('utf-8', 'replace')
+    last_stderr_str = last_stderr_bytes.decode('utf-8', 'replace')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
@@ -222,29 +210,6 @@ class TestingTaskSpec:
             # see that.
             if 'ev_epollex_linux.cc' in str(e):
                 result = run_shell_cmd(exc_list, env=env)
-            # We exempt this block from coverage since it's just added for
-            # debugging a backend flake.
-            elif 'invalid start byte' in str(e):  # pragma: no cover
-                # We sometimes get a UnicodeDecodeError with an "invalid start
-                # byte" message, and this can sometimes happen when trying to
-                # read a non-unicode file. To help debug this issue, print some
-                # more information before failing. See #16600 for details.
-                print('[Debug invalid start byte flake] Command:', exc_list)
-                print('[Debug invalid start byte flake] Environment:', env)
-                raise e
-            elif 'invalid continuation byte' in str(e):  # pragma: no cover
-                # We sometimes get a UnicodeDecodeError with an "invalid
-                # continuation byte" message, and this can sometimes happen when
-                # trying to read a non-unicode file. To help debug this issue,
-                # print some more information before failing. See #16600 for
-                # details.
-                print(
-                    '[Debug invalid continuation byte flake] Command:',
-                    exc_list)
-                print(
-                    '[Debug invalid continuation byte flake] Environment:',
-                    env)
-                raise e
             else:
                 raise e
 
