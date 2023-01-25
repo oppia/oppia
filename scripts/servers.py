@@ -382,19 +382,14 @@ def create_managed_web_browser(
         None if the current operating system does not support web browsers.
 
     Raises:
-        Exception. It can raise various exceptions such as FileNotFound
-            or the process failure exceptions.
+        Exception. An error occurred while launching the web browser window.
     """
     url = 'http://localhost:%s/' % port
     human_readable_name = 'Web Browser'
     try:
         if common.is_linux_os():
-            if any(re.match('.*VBOX.*', d) for d in
-               os.listdir('/dev/disk/by-id/')):
-                return None
-            else:
-                return managed_process(
-                    ['xdg-open', url], human_readable_name=human_readable_name)
+            return managed_process(
+                ['xdg-open', url], human_readable_name=human_readable_name)
         elif common.is_mac_os():
             return managed_process(
                 ['open', url], human_readable_name=human_readable_name)
@@ -402,8 +397,7 @@ def create_managed_web_browser(
             return None
     except Exception as error:
         logging.exception(
-                'Error occurred when trying to launch the web '
-                'browser: %s' % error)
+                'Error occurred while launching the web browser: %s' % error)
         raise error
 
 
