@@ -29,7 +29,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import constants from 'assets/constants';
-// Import from assets/constants because we loop over all constants.
 import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 describe('App', function() {

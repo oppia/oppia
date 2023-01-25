@@ -103,7 +103,8 @@ export class LearnerLocalNavComponent implements OnInit {
       this.username = userInfo.getUsername();
       if (
         this.username === null &&
-        !AppConstants.ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS) {
+        !AppConstants.ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS
+      ) {
         this.feedbackOptionIsShown = false;
       }
       this.loaderService.hideLoadingScreen();

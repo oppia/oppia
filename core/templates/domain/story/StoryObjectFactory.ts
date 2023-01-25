@@ -173,7 +173,8 @@ export class Story {
       }
       if (
         this._urlFragment.length >
-        AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+        AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT
+      ) {
         issues.push(
           'Url Fragment should not be greater than ' +
           `${AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);

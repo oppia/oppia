@@ -79,10 +79,10 @@ export class QuestionOpportunitiesComponent implements OnInit {
       const opportunity = opportunitiesObject.opportunities[index];
       const heading = opportunity.getOpportunityHeading();
       const subheading = opportunity.getOpportunitySubheading();
+      let maxQuestionsPerSkill = AppConstants.MAX_QUESTIONS_PER_SKILL;
       const progressPercentage = (
-        (opportunity.getQuestionCount() / (
-          AppConstants.MAX_QUESTIONS_PER_SKILL)) *
-        100).toFixed(2);
+        (opportunity.getQuestionCount() / maxQuestionsPerSkill) * 100
+        ).toFixed(2);
       const opportunityDict: Opportunity = {
         id: opportunity.id,
         heading: heading,

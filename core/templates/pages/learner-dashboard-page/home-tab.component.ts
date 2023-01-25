@@ -111,11 +111,8 @@ export class HomeTabComponent {
       return false;
     } else if (this.currentGoalsLength === this.goalTopicsLength) {
       return true;
-    } else if (this.currentGoalsLength === (
-      AppConstants.MAX_CURRENT_GOALS_COUNT)) {
-      return true;
     }
-    return false;
+    return this.currentGoalsLength === AppConstants.MAX_CURRENT_GOALS_COUNT;
   }
 
   getWidth(length: number): number {

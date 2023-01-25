@@ -102,8 +102,9 @@ export class OpportunitiesListItemComponent {
       if (this.opportunity.progressPercentage) {
         this.progressPercentage =
           `${Math.floor(this.opportunity.progressPercentage)}%`;
-        if (this.opportunityType === (
-          AppConstants.OPPORTUNITY_TYPE_TRANSLATION)) {
+        if (this.opportunityType === 
+          AppConstants.OPPORTUNITY_TYPE_TRANSLATION
+        ) {
           this.translationProgressBar = true;
           const translatedPercentage = (
             this.opportunity.translationsCount / this.opportunity.totalCount
