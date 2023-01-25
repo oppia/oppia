@@ -216,7 +216,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                     'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
                 ])
                 stack.enter_context(managed_web_browser)
-        except Exception:
+        except Exception as error:
+            common.print_each_string_after_two_new_lines([
+                'ERROR',
+                'Error occurred while launching the web '
+                'browser window: %s ' % error,
+            ])
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Local development server is ready! You can access it by '
