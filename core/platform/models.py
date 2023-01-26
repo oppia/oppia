@@ -28,7 +28,7 @@ from typing import List, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models  # pylint: disable=unused-import
+    from mypy_imports import base_models
 
 # Constant for valid model names.
 Names = feconf.ValidModelNames
