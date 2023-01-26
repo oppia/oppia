@@ -174,9 +174,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Title should not be empty', '')
         self._assert_strict_valid_title_for_blog_post(
             'Title field contains invalid characters. Only words'
-            r'\(a-zA-Z0-9(\'\!\)\) separated by spaces, hyphens\(-\), comma(,),'
-            r'ampersand(&) and colon\(:\) are allowed.'
-            'Received %s' % 'ABC12^* heloo', 'ABC12^* heloo'
+            r'\(a-zA-Z0-9\(\'!\)\) separated by spaces\, hyphens\(-\)\, comma'
+            r'\(\,\)\, ampersand\(&\) and colon\(:\) are allowed.'
+            'Received %s' % r'ABC12\!\# heloo', r'ABC12\!\# heloo'
         )
 
     def _assert_strict_valid_tags_for_blog_post(
