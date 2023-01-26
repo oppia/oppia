@@ -918,7 +918,7 @@ describe('Questions List Component', () => {
       {
         id: '1',
         task: 'remove',
-        difficulty: 0.0
+        difficulty: 0.6
       } as SkillLinkageModificationsArray
     ]);
   });
