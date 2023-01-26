@@ -61,7 +61,7 @@ module.exports = class puppeteerUtilities {
   }
 
   /**
-   * This function signs in the user with the given email to the Oppia website.
+   * Function to sign in the user with the given email to the Oppia website.
    * @param {string} email - The email of the user.
    */
   async signInWithEmail(email) {
@@ -100,7 +100,7 @@ module.exports = class puppeteerUtilities {
   }
 
   /**
-   * This function reloads the current page.
+   * Function to reload the current page.
    */
   async reloadPage() {
     await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
@@ -145,7 +145,7 @@ module.exports = class puppeteerUtilities {
   }
 
   /**
-   *
+   * The function excepts the user to have the given role.
    * @param {string} username - The username to which role must be assigned.
    * @param {string} role - The role which must be assigned to the user.
    */
@@ -170,7 +170,7 @@ module.exports = class puppeteerUtilities {
   }
 
   /**
-   *
+   * The function excepts the user to not have the given role.
    * @param {string} username - The user to which the role must not be assigned.
    * @param {string} role - The role which must not be assigned to the user.
    */

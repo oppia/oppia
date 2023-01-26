@@ -42,6 +42,9 @@ const LABEL_FOR_ADD_THUMBNAIL_BUTTON = ' Add Thumbnail Image ';
 const LABEL_FOR_ADD_ELEMENT_BUTTON = ' Add element ';
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
+  /**
+   * Fucntion for adding blog post author bio in blog dashboard.
+   */
   async addUserBioInBlogDashboard() {
     await this.type(blogAuthorBioField, 'Dummy-User-Bio');
     await this.page.waitForSelector(

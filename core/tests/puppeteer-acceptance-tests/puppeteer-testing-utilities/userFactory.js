@@ -16,8 +16,8 @@
  * @fileoverview Utility File for declaring and initializing users.
  */
 
-let e2eSuperAdmin = e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser
-  = require('./blogPostAdminUtils.js');
+let e2eSuperAdmin = e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser =
+  require('./blogPostAdminUtils.js');
 
 let superAdminInstance = null, blogAdminInstance = null,
   blogPostEditorInstance = null;
