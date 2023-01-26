@@ -131,7 +131,8 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
   /**
    * Function to publish a blog post with given title.
-   * @param {string} newBlogPostTitle - The title of the blog post to be published.
+   * @param {string} newBlogPostTitle - The title of the blog post
+   * to be published.
    */
   async publishNewBlogPostWithTitle(newBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
@@ -221,7 +222,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
 
   /**
    * Function to check a draft blog post to be created with the given title.
-   * @param {string} checkDraftBlogPostByTitle - The title of the draft blog post.
+   * @param {string} checkDraftBlogPostByTitle - The title of draft blog post.
    */
   async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle) {
     await this.goto(blogDashboardUrl);

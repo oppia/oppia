@@ -29,9 +29,10 @@ const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 let browserInstances = [];
 
 /**
- * The function creates a new super admin user and returns the instance of that user.
+ * The function creates a new super admin user and returns the instance
+ * of that user.
  * @param {string} username - The username of the super admin.
- * @returns 
+ * @returns The super admin instance created.
  */
 let createNewSuperAdmin = async function(username) {
   if (superAdminInstance !== null) {
@@ -48,9 +49,10 @@ let createNewSuperAdmin = async function(username) {
 };
 
 /**
- * The function creates a new blog admin user and returns the instance of that user.
+ * The function creates a new blog admin user and returns the instance
+ * of that user.
  * @param {string} username - The username of the blog admin.
- * @returns 
+ * @returns The blog admin instance created.
  */
 let createNewBlogAdmin = async function(username) {
   if (blogAdminInstance !== null) {
@@ -76,7 +78,7 @@ let createNewBlogAdmin = async function(username) {
  * The function creates a new blog post editor user and returns the
  * instance of that user.
  * @param {string} username - The username of the blog post editor.
- * @returns 
+ * @returns The blog post editor instance created.
  */
 let createNewBlogPostEditor = async function(username) {
   if (blogPostEditorInstance !== null) {
@@ -105,7 +107,7 @@ let createNewBlogPostEditor = async function(username) {
  * The function creates a new guest user and returns the instance of that user.
  * @param {string} username - The username of the guest user.
  * @param {string} email - The email of the guest user.
- * @returns 
+ * @returns The guest user instance created.
  */
 let createNewGuestUser = async function(username, email) {
   const guestUser = await new e2eGuestUser();
