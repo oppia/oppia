@@ -16,10 +16,10 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-const puppeteerUtilities = require('./puppeteer-utils.js');
+const puppeteerUtilities = require('../puppeteer-testing-utilities/puppeteer-utils.js');
 const testConstants = require(
-  './test-constants.js');
-const { showMessage } = require('./show-message-utils.js');
+  '../puppeteer-testing-utilities/test-constants.js');
+const { showMessage } = require('../puppeteer-testing-utilities/show-message-utils.js');
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
@@ -144,7 +144,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('button.mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile('blog-post-thumbnail.svg');
+    await this.uploadFile('../images/blog-post-thumbnail.svg');
     await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();

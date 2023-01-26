@@ -17,7 +17,7 @@
  */
 
 let e2eSuperAdmin = e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser =
-  require('./blog-post-admin-utils.js');
+  require('../user-utilities/blog-post-admin-utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
