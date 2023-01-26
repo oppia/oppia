@@ -313,7 +313,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.skillLinkageModificationsArray.push({
       id: skillId,
       task: 'remove',
-      difficulty: 0.0
+      difficulty: AppConstants.DEFAULT_SKILL_DIFFICULTY
     } as SkillLinkageModificationsArray);
 
     this.associatedSkillSummaries =
