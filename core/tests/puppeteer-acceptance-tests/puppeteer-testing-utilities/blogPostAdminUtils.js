@@ -60,7 +60,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to create a blog post with given title.
+   * This function creates a blog post with given title.
    * @param {string} draftBlogPostTitle - The title of the draft blog post
    * to be created.
    */
@@ -82,7 +82,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function for deleting a draft blog post with given title.
+   * This function deletes a draft blog post with given title.
    * @param {string} draftBlogPostTitle - The title of the draft blog post.
    */
   async deleteDraftBlogPostWithTitle(draftBlogPostTitle) {
@@ -111,7 +111,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check if the Publish button is disabled.
+   * This function checks if the Publish button is disabled.
    */
   async expectPublishButtonToBeDisabled() {
     await this.page.waitForSelector('button.e2e-test-publish-blog-post-button');
@@ -130,7 +130,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to publish a blog post with given title.
+   * This function publishes a blog post with given title.
    * @param {string} newBlogPostTitle - The title of the blog post
    * to be published.
    */
@@ -163,7 +163,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to delete a published blog post with the given title.
+   * This function deletes a published blog post with the given title.
    * @param {string} blogPostTitle - The title of the published blog post
    * to be deleted.
    */
@@ -194,7 +194,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check the number of the blog posts in the blog dashboard.
+   * This function checks the number of the blog posts in the blog dashboard.
    * @param {number} number - The number of the blog posts.
    */
   async expectNumberOfBlogPostsToBe(number) {
@@ -212,7 +212,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to navigate in the Published tab in the blog-dashbaord.
+   * This function navigates to the Published tab in the blog-dashbaord.
    */
   async navigateToPublishTab() {
     await this.goto(blogDashboardUrl);
@@ -221,7 +221,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check a draft blog post to be created with the given title.
+   * This function checks a draft blog post to be created with the given title.
    * @param {string} checkDraftBlogPostByTitle - The title of draft blog post.
    */
   async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle) {
@@ -253,7 +253,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check if the blog post with given title is published.
+   * This function checks if the blog post with given title is published.
    * @param {string} blogPostTitle - The title of the blog post.
    */
   async expectPublishedBlogPostWithTitleToBePresent(blogPostTitle) {
@@ -286,7 +286,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check if the blog dashboard is not accessible by the user.
+   * This function checks if the blog dashboard is not accessible by the user.
    */
   async expectBlogDashboardAccessToBeUnauthorized() {
     await this.goto(blogDashboardUrl);
@@ -301,7 +301,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check if the blog dashboard is accessible by the user.
+   * This function checks if the blog dashboard is accessible by the user.
    */
   async expectBlogDashboardAccessToBeAuthorized() {
     /** Here we are trying to check if the blog dashboard is accessible to the
@@ -318,7 +318,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to assign a user with a role from the blog admin page.
+   * This function assigns a user with a role from the blog admin page.
    * @param {string} username - The username of the user.
    * @param {string} role - The role of the user.
    */
@@ -330,7 +330,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to remove blog editor role from the users.
+   * This function removes blog editor role from the users.
    * @param {string} username - The username of the user.
    */
   async removeBlogEditorRoleFromUsername(username) {
@@ -340,7 +340,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check if the tag name exists in the blog taglist.
+   * This function checks if the tag name exists in the blog taglist.
    * @param {string} tagName - The name of the tag.
    */
   async expectTagToNotExistInBlogTags(tagName) {
@@ -356,8 +356,8 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to add a new tag in the blog taglist.
-   * @param {*} tagName - The name of the tag.
+   * This function adds a new tag in the blog taglist.
+   * @param {string} tagName - The name of the tag.
    */
   async addNewBlogTag(tagName) {
     await this.clickOn(LABEL_FOR_ADD_ELEMENT_BUTTON);
@@ -371,7 +371,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check tag exists in the blog taglists.
+   * This function checks tag exists in the blog taglists.
    * @param {string} tagName - The name of the tag.
    */
   async expectTagToExistInBlogTags(tagName) {
@@ -388,7 +388,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to change the blog tags limit.
+   * This function changes the blog tags limit.
    * @param {number} limit - The limit of the blog tags.
    */
   async setMaximumTagLimitTo(limit) {
@@ -404,7 +404,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check if the tag limit is not equal to.
+   * This function checks if the tag limit is not equal to.
    * @param {number} limit - The limit of the blog tags.
    */
   async expectMaximumTagLimitNotToBe(limit) {
@@ -418,7 +418,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   }
 
   /**
-   * Function to check if the tag limit is equal to.
+   * This function checks if the tag limit is equal to.
    * @param {number} limit - The limit of the blog tags.
    */
   async expectMaximumTagLimitToBe(limit) {
