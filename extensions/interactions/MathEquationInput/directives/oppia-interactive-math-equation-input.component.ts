@@ -122,6 +122,10 @@ export class InteractiveMathEquationInput implements OnInit {
         this.isCurrentAnswerValid();
       }
     });
+    Guppy.event('done', () => {
+      this.submitAnswer();
+    });
+
     Guppy.event('focus', (focusObj: FocusObj) => {
       if (!focusObj.focused) {
         this.isCurrentAnswerValid();
