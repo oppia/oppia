@@ -116,7 +116,7 @@ describe('MathInteractionsService', () => {
       'Please enter an answer before submitting.');
 
     expect(MathInteractionsService.cleanErrorMessage(
-      '×a', ['a'])).toBeFalse();
+      '×', [])).toBeFalse();
     expect(MathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a number before the × operator.');
 
