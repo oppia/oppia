@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services  # pylint: disable=unused-import
+    from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 

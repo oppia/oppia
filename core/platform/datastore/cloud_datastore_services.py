@@ -30,7 +30,7 @@ from typing import (
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models  # pylint: disable=unused-import
+    from mypy_imports import base_models
     from mypy_imports import transaction_services
 
 transaction_services = models.Registry.import_transaction_services()
