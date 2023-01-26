@@ -18,14 +18,16 @@
 
 from __future__ import annotations
 
-import datetime  # pylint: disable=unused-import
 import os
 
 from core import feconf
 from core.platform.taskqueue import cloud_tasks_emulator
 
 import requests
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
+
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime
 
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
