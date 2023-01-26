@@ -19,12 +19,20 @@
 let e2eSuperAdmin = e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser =
   require('./blogPostAdminUtils.js');
 
+/**
+ * Global user instances that are created and can be reused again.
+ */
 let superAdminInstance = null, blogAdminInstance = null,
   blogPostEditorInstance = null;
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
 let browserInstances = [];
 
+/**
+ * The function creates a new super admin user and returns the instance of that user.
+ * @param {string} username - The username of the super admin.
+ * @returns 
+ */
 let createNewSuperAdmin = async function(username) {
   if (superAdminInstance !== null) {
     return superAdminInstance;
@@ -34,10 +42,16 @@ let createNewSuperAdmin = async function(username) {
   await superAdmin.openBrowser();
   await superAdmin.signUpNewUser(username, 'testadmin@example.com');
 
-  await browserInstances.push(superAdmin);
-  return superAdminInstance = superAdmin;
+  browserInstances.push(superAdmin);
+  superAdminInstance = superAdmin;
+  return superAdmin;
 };
 
+/**
+ * The function creates a new blog admin user and returns the instance of that user.
+ * @param {string} username - The username of the blog admin.
+ * @returns 
+ */
 let createNewBlogAdmin = async function(username) {
   if (blogAdminInstance !== null) {
     return blogAdminInstance;
@@ -53,10 +67,17 @@ let createNewBlogAdmin = async function(username) {
   await superAdminInstance.assignRoleToUser(username, ROLE_BLOG_ADMIN);
   await superAdminInstance.expectUserToHaveRole(username, ROLE_BLOG_ADMIN);
 
-  await browserInstances.push(blogAdmin);
-  return blogAdminInstance = blogAdmin;
+  browserInstances.push(blogAdmin);
+  blogAdminInstance = blogAdmin;
+  return blogAdmin;
 };
 
+/**
+ * The function creates a new blog post editor user and returns the
+ * instance of that user.
+ * @param {string} username - The username of the blog post editor.
+ * @returns 
+ */
 let createNewBlogPostEditor = async function(username) {
   if (blogPostEditorInstance !== null) {
     return blogPostEditorInstance;
@@ -75,19 +96,29 @@ let createNewBlogPostEditor = async function(username) {
   await superAdminInstance.expectUserToHaveRole(
     'blogPostEditor', ROLE_BLOG_POST_EDITOR);
 
-  await browserInstances.push(blogPostEditor);
-  return blogPostEditorInstance = blogPostEditor;
+  browserInstances.push(blogPostEditor);
+  blogPostEditorInstance = blogPostEditor;
+  return blogPostEditor;
 };
 
+/**
+ * The function creates a new guest user and returns the instance of that user.
+ * @param {string} username - The username of the guest user.
+ * @param {string} email - The email of the guest user.
+ * @returns 
+ */
 let createNewGuestUser = async function(username, email) {
   const guestUser = await new e2eGuestUser();
   await guestUser.openBrowser();
   await guestUser.signUpNewUser(username, email);
 
-  await browserInstances.push(guestUser);
+  browserInstances.push(guestUser);
   return guestUser;
 };
 
+/**
+ * The function closes all the browsers opened by different users.
+ */
 let closeAllBrowsers = async function() {
   for (let i = 0; i < browserInstances.length; i++) {
     await browserInstances[i].closeBrowser();

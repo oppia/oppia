@@ -123,7 +123,7 @@ module.exports = class puppeteerUtilities {
   }
 
   /**
-   *
+   * The function to assign a role to a user.
    * @param {string} username - The username to which role would be assigned.
    * @param {string role - The role that would be assigned to the user.
    */

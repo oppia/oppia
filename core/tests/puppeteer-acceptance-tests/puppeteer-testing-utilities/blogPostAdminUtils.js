@@ -52,10 +52,18 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn(LABEL_FOR_SAVE_BUTTON);
   }
 
+  /**
+   * Function for navigating to the blog dashboard page.
+   */
   async navigateToBlogDashboardPage() {
     await this.goto(blogDashboardUrl);
   }
 
+  /**
+   * Function to create a blog post with given title.
+   * @param {string} draftBlogPostTitle - The title of the draft blog post
+   * to be created.
+   */
   async createDraftBlogPostWithTitle(draftBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
     // See Note-1 below.
@@ -73,6 +81,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.goto(blogDashboardUrl);
   }
 
+  /**
+   * Function for deleting a draft blog post with given title.
+   * @param {string} draftBlogPostTitle - The title of the draft blog post.
+   */
   async deleteDraftBlogPostWithTitle(draftBlogPostTitle) {
     await this.page.exposeFunction('deleteDraftBlogPost', async() => {
       // See Note-2 below.
@@ -98,6 +110,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }, {draftBlogPostTitle});
   }
 
+  /**
+   * Function to check if the Publish button is disabled.
+   */
   async expectPublishButtonToBeDisabled() {
     await this.page.waitForSelector('button.e2e-test-publish-blog-post-button');
     await this.page.evaluate(() => {
@@ -114,6 +129,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       'is not completely filled.');
   }
 
+  /**
+   * Function to publish a blog post with given title.
+   * @param {string} newBlogPostTitle - The title of the blog post to be published.
+   */
   async publishNewBlogPostWithTitle(newBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
     // See Note-1 below.
@@ -142,7 +161,12 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Successfully published a blog post!');
   }
 
-  async deletePublishedBlogPostWithTitle(toDeletePublishedBlogPostTitle) {
+  /**
+   * Function to delete a published blog post with the given title.
+   * @param {string} blogPostTitle - The title of the published blog post
+   * to be deleted.
+   */
+  async deletePublishedBlogPostWithTitle(blogPostTitle) {
     await this.clickOn('PUBLISHED');
     await this.page.exposeFunction('deletePublishedBlogPost', async() => {
       // See Note-2 below.
@@ -152,22 +176,26 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
       showMessage('Published blog post with given title deleted successfully!');
     });
-    await this.page.evaluate(async(toDeletePublishedBlogPostTitle) => {
+    await this.page.evaluate(async(blogPostTitle) => {
       const allPublishedBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
       for (let i = 0; i < allPublishedBlogPosts.length; i++) {
         let publishedBlogPostTitle = allPublishedBlogPosts[i].
           getElementsByClassName('e2e-test-blog-post-title')[0].innerText;
-        if (publishedBlogPostTitle === toDeletePublishedBlogPostTitle) {
+        if (publishedBlogPostTitle === blogPostTitle) {
           allPublishedBlogPosts[i].getElementsByClassName(
             'e2e-test-blog-post-edit-box')[0].click();
           await window.deletePublishedBlogPost();
           return;
         }
       }
-    }, toDeletePublishedBlogPostTitle);
+    }, blogPostTitle);
   }
 
+  /**
+   * Function to check the number of the blog posts in the blog dashboard.
+   * @param {number} number - The number of the blog posts.
+   */
   async expectNumberOfBlogPostsToBe(number) {
     await this.page.evaluate(async(number) => {
       const allBlogPosts = document.getElementsByClassName(
@@ -182,12 +210,19 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Number of blog posts is equal to ' + number);
   }
 
+  /**
+   * Function to navigate in the Published tab in the blog-dashbaord.
+   */
   async navigateToPublishTab() {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
     showMessage('Navigated to publish tab.');
   }
 
+  /**
+   * Function to check a draft blog post to be created with the given title.
+   * @param {string} checkDraftBlogPostByTitle - The title of the draft blog post.
+   */
   async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle) {
     await this.goto(blogDashboardUrl);
     await this.page.evaluate(async(checkDraftBlogPostByTitle) => {
@@ -216,6 +251,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       ' exists!');
   }
 
+  /**
+   * Function to check if the blog post with given title is published.
+   * @param {string} blogPostTitle - The title of the blog post.
+   */
   async expectPublishedBlogPostWithTitleToBePresent(blogPostTitle) {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
@@ -245,6 +284,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       blogPostTitle + ' exists!');
   }
 
+  /**
+   * Function to check if the blog dashboard is not accessible by the user.
+   */
   async expectBlogDashboardAccessToBeUnauthorized() {
     await this.goto(blogDashboardUrl);
     try {
@@ -257,6 +299,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }
   }
 
+  /**
+   * Function to check if the blog dashboard is accessible by the user.
+   */
   async expectBlogDashboardAccessToBeAuthorized() {
     /** Here we are trying to check if the blog dashboard is accessible to the
      * guest user after giving the blog admin role to it. There is a
@@ -271,6 +316,11 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     }
   }
 
+  /**
+   * Function to assign a user with a role from the blog admin page.
+   * @param {string} username - The username of the user.
+   * @param {string} role - The role of the user.
+   */
   async assignUserToRoleFromBlogAdminPage(username, role) {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
@@ -278,12 +328,20 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.clickOn('Update Role');
   }
 
+  /**
+   * Function to remove blog editor role from the users.
+   * @param {string} username - The username of the user.
+   */
   async removeBlogEditorRoleFromUsername(username) {
     await this.goto(blogAdminUrl);
     await this.type(blogEditorUsernameInput, username);
     await this.clickOn('Remove Blog Editor ');
   }
 
+  /**
+   * Function to check if the tag name exists in the blog taglist.
+   * @param {string} tagName - The name of the tag.
+   */
   async expectTagToNotExistInBlogTags(tagName) {
     await (this.page).evaluate(async(tagName) => {
       const tagList = document.getElementsByClassName('form-control');
@@ -296,6 +354,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Tag with name ' + tagName + ' does not exist in tag list!');
   }
 
+  /**
+   * Function to add a new tag in the blog taglist.
+   * @param {*} tagName - The name of the tag.
+   */
   async addNewBlogTag(tagName) {
     await this.clickOn(LABEL_FOR_ADD_ELEMENT_BUTTON);
     await this.page.waitForTimeout(100);
@@ -307,6 +369,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Tag ' + tagName + ' added in tag list successfully!');
   }
 
+  /**
+   * Function to check tag exists in the blog taglists.
+   * @param {string} tagName - The name of the tag.
+   */
   async expectTagToExistInBlogTags(tagName) {
     await this.page.evaluate(async(tagName) => {
       const tagList = document.getElementsByClassName('form-control');
@@ -320,6 +386,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Tag with name ' + tagName + ' exists in tag list!');
   }
 
+  /**
+   * Function to change the blog tags limit.
+   * @param {number} limit - The limit of the blog tags.
+   */
   async setMaximumTagLimitTo(limit) {
     // These steps are for deleting the existing value in the input field.
     const tagInputField = await this.page.$(maximumTagLimitInput);
@@ -332,6 +402,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Successfully updated the tag limit to ' + limit + '!');
   }
 
+  /**
+   * Function to check if the tag limit is not equal to.
+   * @param {number} limit - The limit of the blog tags.
+   */
   async expectMaximumTagLimitNotToBe(limit) {
     await this.page.evaluate(async(limit) => {
       const tagLimit = document.getElementById('mat-input-0').value;
@@ -342,6 +416,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Maximum tag limit is not ' + limit + '!');
   }
 
+  /**
+   * Function to check if the tag limit is equal to.
+   * @param {number} limit - The limit of the blog tags.
+   */
   async expectMaximumTagLimitToBe(limit) {
     await this.page.evaluate(async(limit) => {
       const tagLimit = document.getElementById('mat-input-0').value;
