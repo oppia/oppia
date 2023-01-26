@@ -18,7 +18,7 @@
  */
 
 const userFactory = require(
-  '../puppeteer-testing-utilities/userFactory.js');
+  '../puppeteer-testing-utilities/user-factory.js');
 
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';

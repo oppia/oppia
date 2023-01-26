@@ -17,7 +17,7 @@
  */
 
 const userFactory = require(
-  '../puppeteer-testing-utilities/userFactory.js');
+  '../puppeteer-testing-utilities/user-factory.js');
 
 let blogDashboardAccessibleByBlogAdmins = async function() {
   const guestUser = await userFactory.createNewGuestUser(

@@ -18,7 +18,7 @@
  */
 
 const userFactory = require(
-  '../puppeteer-testing-utilities/userFactory.js');
+  '../puppeteer-testing-utilities/user-factory.js');
 
 let createDraftAndDeleteDraftBlogPost = async function() {
   const blogPostEditor = await userFactory.createNewBlogPostEditor(

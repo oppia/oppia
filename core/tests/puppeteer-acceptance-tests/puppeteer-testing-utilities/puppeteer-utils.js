@@ -17,8 +17,8 @@
  */
 
 const puppeteer = require('puppeteer');
-const testConstants = require('./testConstants.js');
-const { showMessage } = require('./showMessageUtils.js');
+const testConstants = require('./test-constants.js');
+const { showMessage } = require('./show-message-utils.js');
 
 const rolesEditorTab = testConstants.URLs.RolesEditorTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
