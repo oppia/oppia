@@ -361,9 +361,11 @@ export class ClassroomAdminPageComponent implements OnInit {
       [topicId]).then(topicIdToTopicName => {
       const topicName = topicIdToTopicName[topicId];
 
+      this.topicIdsToTopicName[topicId] = topicName;
       this.tempClassroomData.addNewTopicId(topicId);
       this.topicNameToPrerequisiteTopicNames[topicName] = [];
       this.topicNames.push(topicName);
+      this.topicDependencyIsLoaded = true;
 
       this.classroomDataIsChanged = true;
       this.newTopicCanBeAdded = false;
@@ -476,6 +478,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       this.tempClassroomData.removeTopic(topicId);
 
       delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
+      delete this.topicIdsToTopicName[topicId];
 
       this.topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
 
@@ -483,6 +486,10 @@ export class ClassroomAdminPageComponent implements OnInit {
         this.tempClassroomData, this.classroomData);
 
       this.classroomDataIsChanged = true;
+
+      if (this.tempClassroomData.getTopicsCount() === 0) {
+        this.topicDependencyIsLoaded = false;
+      }
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is
