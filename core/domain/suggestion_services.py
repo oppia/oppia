@@ -3110,7 +3110,8 @@ def _generate_translation_contributor_certificate_data(
         words_without_empty_strings = [
             word for word in words if word != '']
         words_count += len(words_without_empty_strings)
-    # Goto the below link for more information.
+    # Go to the below link for more information about how we count hours
+    # contributed.# Goto the below link for more information.
     # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
     hours_contributed = round((words_count / 300), 2)
 
@@ -3174,7 +3175,8 @@ def _generate_question_contributor_certificate_data(
             minutes_contributed += 20
         else:
             minutes_contributed += 12
-    # Goto the below link for more information.
+    # Go to the below link for more information about how we count hours
+    # contributed.
     # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
     hours_contributed = round((minutes_contributed / 60), 2)
 

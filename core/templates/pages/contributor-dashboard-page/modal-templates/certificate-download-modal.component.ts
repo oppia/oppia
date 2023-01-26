@@ -65,9 +65,6 @@ export class CertificateDownloadModalComponent {
     private contributionAndReviewService: ContributionAndReviewService) {
   }
 
-  ngOnInit(): void {
-  }
-
   close(): void {
     this.activeModal.close();
   }
@@ -76,9 +73,9 @@ export class CertificateDownloadModalComponent {
     this.errorsFound = false;
     this.errorMessage = '';
     if (
-      new Date(this.fromDate) >= new Date(this.toDate) ||
       !this.fromDate ||
-      !this.toDate
+      !this.toDate ||
+      new Date(this.fromDate) >= new Date(this.toDate)
     ) {
       this.errorsFound = true;
       this.errorMessage = 'Invalid date range.';

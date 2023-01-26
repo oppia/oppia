@@ -241,11 +241,17 @@ export class ContributionAndReviewBackendApiService {
         suggestion_type: suggestionType
       }
     );
-    const params = {
+    let params: {
+      from_date: string;
+      to_date: string;
+      language?: string;
+    } = {
       from_date: fromDate,
-      to_date: toDate,
-      ...(language && {language})
+      to_date: toDate
     };
+    if (language) {
+      params.language = language;
+    }
     return this.http.get<ContributorCertificateResponse>(
       url, { params }
     ).toPromise();
