@@ -343,7 +343,7 @@ describe('Exploration object factory', () => {
 
       const firstState = exploration.getState('first state');
 
-      firstState.interaction.id = '';
+      firstState.interaction.id = null;
       firstState.writtenTranslations.addWrittenTranslation(
         'content', 'fr', 'html', '<p>translation</p>');
       expect(

@@ -153,7 +153,7 @@ export class StateTopAnswersStatsService {
       stateName) as AnswerStatsEntry;
 
     let interactionId = updatedState.interaction.id;
-    if (interactionId === '') {
+    if (interactionId === null) {
       throw new Error('Interaction ID cannot be null.');
     }
     if (stateStats.interactionId !== interactionId) {

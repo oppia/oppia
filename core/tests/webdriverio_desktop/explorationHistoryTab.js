@@ -176,7 +176,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       21: {
-        text: '  id: \'\'',
+        text: '  id: null',
         highlighted: true
       },
       22: {

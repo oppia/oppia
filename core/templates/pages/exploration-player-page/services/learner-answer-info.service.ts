@@ -43,7 +43,7 @@ export class LearnerAnswerInfoService {
   // Name is null before saving a state.
   private stateName!: string | null;
   // Id is null until populated from the backend.
-  private interactionId!: string;
+  private interactionId!: string | null;
   private currentAnswer!: string;
   private currentInteractionRulesService!: InteractionRulesService;
   private submittedAnswerInfoCount: number = 0;
@@ -92,7 +92,7 @@ export class LearnerAnswerInfoService {
       return;
     }
 
-    if (this.interactionId === '') {
+    if (this.interactionId === null) {
       throw new Error('Interaction id cannot be null.');
     }
 
@@ -139,7 +139,7 @@ export class LearnerAnswerInfoService {
   }
 
   recordLearnerAnswerInfo(answerDetails: string): void {
-    if (this.interactionId === '') {
+    if (this.interactionId === null) {
       throw new Error('Interaction id cannot be null.');
     }
 

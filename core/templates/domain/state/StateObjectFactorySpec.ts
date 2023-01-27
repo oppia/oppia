@@ -215,7 +215,7 @@ describe('State Object Factory', () => {
 
   it('should correctly get required written translation content ids', () => {
     const state = sof.createFromBackendDict('State name', stateObject);
-    state.interaction.id = '';
+    state.interaction.id = null;
     expect(
       state.getRequiredWrittenTranslationContentIds()
     ).toEqual(new Set(['content', 'rule_input_2']));

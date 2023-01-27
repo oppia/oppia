@@ -438,7 +438,7 @@ describe('StateTopAnswersStatsService', () => {
       await stateTopAnswersStatsService.getInitPromiseAsync();
 
       const updatedState = states.getState('Hola');
-      updatedState.interaction.id = '';
+      updatedState.interaction.id = null;
 
       expect(() => {
         stateTopAnswersStatsService.onStateInteractionSaved(updatedState);

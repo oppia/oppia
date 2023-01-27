@@ -136,7 +136,7 @@ describe('Current Interaction Service', () => {
   });
 
   it('should throw error on submitting when submitAnswerFn is null', () => {
-    let interaction = new Interaction([], [], {}, null, [], '', null);
+    let interaction = new Interaction([], [], {}, null, [], null, null);
     let recordedVoiceovers = new RecordedVoiceovers({});
     let writtenTranslations = new WrittenTranslations(
       {}, new WrittenTranslationObjectFactory());
