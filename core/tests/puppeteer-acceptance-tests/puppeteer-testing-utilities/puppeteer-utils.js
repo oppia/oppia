@@ -109,8 +109,7 @@ module.exports = class puppeteerUtilities {
       const [button] = await this.page.$x(
         /** Disabling the line because we need to use backticks for
          * string interpolation. */
-        // eslint-disable-next-line quotes
-        `//` + `*[contains(text(), '${selector}')]`);
+        `//` + `*[contains(text(), '${selector}')]`); // eslint-disable-line
       await button.click();
     } catch {
       await this.page.waitForSelector(selector);
