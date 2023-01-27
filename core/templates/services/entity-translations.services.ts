@@ -22,6 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
+import { AlertsService } from './alerts.service';
 
 export interface LanguageCodeToEntityTranslations {
   [languageCode: string]: EntityTranslation;
@@ -39,6 +40,7 @@ export class EntityTranslationsService {
   );
 
   constructor(
+    private alertsService: AlertsService,
     private entityTranslationBackendApiService: (
       EntityTranslationBackendApiService)
   ) {}
@@ -60,6 +62,7 @@ export class EntityTranslationsService {
         resolve(this.languageCodeToEntityTranslations[languageCode]);
         return;
       }
+      this.alertsService.addInfoMessage('Fetching translation.');
       this.entityTranslationBackendApiService.fetchEntityTranslationAsync(
         this.entityId,
         this.entityType,
@@ -67,6 +70,8 @@ export class EntityTranslationsService {
         languageCode
       ).then((entityTranslation) => {
         this.languageCodeToEntityTranslations[languageCode] = entityTranslation;
+        this.alertsService.clearMessages();
+        this.alertsService.addSuccessMessage('Translations fetched.');
         resolve(entityTranslation);
       });
     });
@@ -93,6 +98,10 @@ export class EntityTranslationsService {
       }
     });
     return htmlStrings;
+  }
+
+  reset(): void {
+    this.languageCodeToEntityTranslations = {};
   }
 }
 

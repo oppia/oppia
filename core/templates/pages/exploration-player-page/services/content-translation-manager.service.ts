@@ -20,7 +20,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AlertsService } from 'services/alerts.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
@@ -46,7 +45,6 @@ export class ContentTranslationManagerService {
   private originalTranscript: StateCard[] = [];
 
   constructor(
-    private alertsService: AlertsService,
     private playerTranscriptService: PlayerTranscriptService,
     private extensionTagAssemblerService: ExtensionTagAssemblerService,
     private entityTranslationsService: EntityTranslationsService,
@@ -81,7 +79,6 @@ export class ContentTranslationManagerService {
         cloneDeep(this.originalTranscript));
       this.onStateCardContentUpdateEmitter.emit();
     } else {
-      this.alertsService.addInfoMessage('Fetching translation.');
       this.entityTranslationsService.getEntityTranslationsAsync(
         languageCode
       ).then((entityTranslations) => {
@@ -94,8 +91,6 @@ export class ContentTranslationManagerService {
         const cards = this.playerTranscriptService.transcript;
         cards.forEach(
           card => this._displayTranslationsForCard(card, entityTranslations));
-        this.alertsService.clearMessages();
-        this.alertsService.addSuccessMessage('Translations fetched.');
         this.onStateCardContentUpdateEmitter.emit();
       });
     }

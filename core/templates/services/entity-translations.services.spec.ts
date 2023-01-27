@@ -100,6 +100,32 @@ describe('Entity translations service', () => {
     })
   );
 
+  it('should remove fetched translations when reset', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    entityTranslationsService.init('entity1', 'exploration', 5);
+
+    entityTranslationsService.getEntityTranslationsAsync('hi')
+      .then(successHandler, failHandler);
+    tick();
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(
+      entityTranslationsService
+        .languageCodeToEntityTranslations.hasOwnProperty('hi')
+    ).toBeTrue();
+    entityTranslationsService.reset();
+
+    expect(
+      entityTranslationsService
+        .languageCodeToEntityTranslations.hasOwnProperty('hi')
+    ).not.toBeTrue();
+  }));
+
   it('should store fetched data and return without calling api service',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
