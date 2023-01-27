@@ -22,7 +22,3 @@ let showMessage = async function(message) {
 };
 
 module.exports = { showMessage };
-
-/** We need to ignore the eslint checks for the console statements in our
- * Acceptance Tests.
- */

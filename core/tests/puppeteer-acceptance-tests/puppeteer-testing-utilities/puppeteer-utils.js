@@ -109,7 +109,7 @@ module.exports = class puppeteerUtilities {
       const [button] = await this.page.$x(
         /** Disabling the line because we need to use backticks for
          * string interpolation. */
-        `//` + `*[contains(text(), '${selector}')]`); // eslint-disable-line
+        `//` + `*[contains(text(), '${selector}')]`); // eslint-disable-line quotes
       await button.click();
     } catch {
       await this.page.waitForSelector(selector);
@@ -136,7 +136,7 @@ module.exports = class puppeteerUtilities {
           return;
         }
       }
-      throw new Error('Role ' + role + ' donot exists.');
+      throw new Error('Role ' + role + ' does not exists.');
     }, role);
   }
 
