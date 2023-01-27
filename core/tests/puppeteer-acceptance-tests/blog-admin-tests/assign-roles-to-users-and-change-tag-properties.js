@@ -17,7 +17,7 @@
  * tag properties from the blog-admin page.
  */
 
-/** TODO(#16552): 1 user-story left when user cannot publish a blog post if the
+/** TODO(#16552): One user-story left when user cannot publish a blog post if
  * title duplicates with an existing published blog post. This test should be
  * written as the issue #16552 is fixed. */
 /** TODO(#17162): This test should be done without the need of super admin, as
