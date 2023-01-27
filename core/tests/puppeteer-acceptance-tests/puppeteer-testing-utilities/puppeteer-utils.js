@@ -50,7 +50,7 @@ module.exports = class puppeteerUtilities {
       .then(async(browser) => {
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await (this.page).setViewport({ width: 0, height: 0 });
+        await this.page.setViewport({ width: 0, height: 0 });
         // Accepting the alerts that appear in between the tests.
         await this.page.on('dialog', async dialog => {
           await dialog.accept();
@@ -73,7 +73,7 @@ module.exports = class puppeteerUtilities {
     await this.clickOn('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
     await this.clickOn('Sign In');
-    await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
   }
 
   /**
@@ -88,15 +88,7 @@ module.exports = class puppeteerUtilities {
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])');
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
-    await (this.page).waitForNavigation({waitUntil: 'networkidle0'});
-  }
-
-  /**
-   * This function waits for a component using its CSS selector to load.
-   * @param {string} selector - The CSS selector of the component.
-   */
-  async waitForPageToLoad(selector) {
-    await this.page.waitForSelector(selector);
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
   }
 
   /**
@@ -113,12 +105,12 @@ module.exports = class puppeteerUtilities {
    */
   async clickOn(selector) {
     try {
-      const [button] = await (this.page).$x(
+      const [button] = await this.page.$x(
         '//' + '*[contains(text(), "' + selector + '")]');
       await button.click();
     } catch {
-      await (this.page).waitForSelector(selector);
-      await (this.page).click(selector);
+      await this.page.waitForSelector(selector);
+      await this.page.click(selector);
     }
   }
 
@@ -150,7 +142,7 @@ module.exports = class puppeteerUtilities {
    * @param {string} role - The role which must be assigned to the user.
    */
   async expectUserToHaveRole(username, role) {
-    const currPageUrl = this.page.url();
+    const currentPageUrl = this.page.url();
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
@@ -163,10 +155,10 @@ module.exports = class puppeteerUtilities {
           return;
         }
       }
-      throw new Error('User does not have ' + role + ' role!');
+      throw new Error('User does not have the ' + role + ' role!');
     }, role);
     showMessage('User ' + username + ' has the ' + role + ' role!');
-    await this.goto(currPageUrl);
+    await this.goto(currentPageUrl);
   }
 
   /**
@@ -175,7 +167,7 @@ module.exports = class puppeteerUtilities {
    * @param {string} role - The role which must not be assigned to the user.
    */
   async expectUserNotToHaveRole(username, role) {
-    const currPageUrl = this.page.url();
+    const currentPageUrl = this.page.url();
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
@@ -185,12 +177,12 @@ module.exports = class puppeteerUtilities {
         'oppia-user-role-description');
       for (let i = 0; i < userRoles.length; i++) {
         if (userRoles[i].innerText.toLowerCase() === role) {
-          throw new Error('User have the ' + role + ' role!');
+          throw new Error('User has the ' + role + ' role!');
         }
       }
     }, role);
-    showMessage('User ' + username + ' doesnot have the ' + role + ' role!');
-    await this.goto(currPageUrl);
+    showMessage('User ' + username + ' does not have the ' + role + ' role!');
+    await this.goto(currentPageUrl);
   }
 
   /**
@@ -199,8 +191,8 @@ module.exports = class puppeteerUtilities {
    * @param {string} text - The text to be typed in the input field.
    */
   async type(selector, text) {
-    await (this.page).waitForSelector(selector);
-    await (this.page).type(selector, text);
+    await this.page.waitForSelector(selector);
+    await this.page.type(selector, text);
   }
 
   /**
@@ -208,7 +200,7 @@ module.exports = class puppeteerUtilities {
    * @param {string} url - The URL to which the page has to be navigated.
    */
   async goto(url) {
-    await (this.page).goto(url, {waitUntil: 'networkidle0'});
+    await this.page.goto(url, {waitUntil: 'networkidle0'});
   }
 
   /**
@@ -216,7 +208,7 @@ module.exports = class puppeteerUtilities {
    * @param {string} filePath - The path of the file to be uploaded.
    */
   async uploadFile(filePath) {
-    const inputUploadHandle = await (this.page).$('input[type=file]');
+    const inputUploadHandle = await this.page.$('input[type=file]');
     let fileToUpload = filePath;
     inputUploadHandle.uploadFile(fileToUpload);
   }
@@ -226,7 +218,7 @@ module.exports = class puppeteerUtilities {
    */
   async logout() {
     await this.goto(testConstants.URLs.logout);
-    await this.waitForPageToLoad(testConstants.Dashboard.MainDashboard);
+    await this.page.waitForSelector(testConstants.Dashboard.MainDashboard);
   }
 
   /**

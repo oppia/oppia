@@ -45,7 +45,7 @@ const LABEL_FOR_ADD_ELEMENT_BUTTON = ' Add element ';
 
 module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   /**
-   * Fucntion for adding blog post author bio in blog dashboard.
+   * Function for adding blog post author bio in blog dashboard.
    */
   async addUserBioInBlogDashboard() {
     await this.type(blogAuthorBioField, 'Dummy-User-Bio');
@@ -312,7 +312,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
      * given blog admin role as they first time opens the blog-dashboard. */
     await this.goto(blogDashboardUrl);
     try {
-      await this.waitForPageToLoad(blogDashboardAuthorDetailsModal);
+      await this.page.waitForSelector(blogDashboardAuthorDetailsModal);
       showMessage('User authorized to access blog dashboard!');
     } catch (err) {
       throw new Error('User unauthorized to access blog dashboard!');
@@ -346,7 +346,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
    * @param {string} tagName - The name of the tag.
    */
   async expectTagToNotExistInBlogTags(tagName) {
-    await (this.page).evaluate(async(tagName) => {
+    await this.page.evaluate(async(tagName) => {
       const tagList = document.getElementsByClassName('form-control');
       for (let i = 0; i < tagList.length; i++) {
         if (tagList[i].value === tagName) {
@@ -430,7 +430,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         throw new Error('Maximum tag limit is not ' + limit + '!');
       }
     });
-    showMessage('Maximum tag limit changed to ' + limit + '!');
+    showMessage('Maximum tag is currently ' + limit + '!');
   }
 };
 
@@ -458,6 +458,3 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
  * or delete button is not clickable until the transition is completed.
  * So we need to wait for that small transition to complete
  * (just 100millisecond is enough). */
-
-
-// TODO(#16552): user-story(B8 cell) left as blocked by this issue.

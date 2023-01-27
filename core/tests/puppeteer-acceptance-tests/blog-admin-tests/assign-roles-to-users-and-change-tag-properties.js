@@ -17,6 +17,10 @@
  * tag properties from the blog-admin page.
  */
 
+// TODO(#16552): user-story(B8 cell) left as blocked by this issue.
+// TODO(#17162): This test can be done without the need of a super admin, as
+// blog admin can revoke blog editor role of other users from /blog-admin page.
+
 const userFactory = require(
   '../puppeteer-testing-utilities/user-factory.js');
 

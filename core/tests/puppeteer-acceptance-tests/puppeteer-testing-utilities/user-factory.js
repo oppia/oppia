@@ -26,7 +26,7 @@ let superAdminInstance = null, blogAdminInstance = null,
   blogPostEditorInstance = null;
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
-let browserInstances = [];
+let activeUsers = [];
 
 /**
  * The function creates a new super admin user and returns the instance
@@ -43,7 +43,7 @@ let createNewSuperAdmin = async function(username) {
   await superAdmin.openBrowser();
   await superAdmin.signUpNewUser(username, 'testadmin@example.com');
 
-  browserInstances.push(superAdmin);
+  activeUsers.push(superAdmin);
   superAdminInstance = superAdmin;
   return superAdmin;
 };
@@ -69,7 +69,7 @@ let createNewBlogAdmin = async function(username) {
   await superAdminInstance.assignRoleToUser(username, ROLE_BLOG_ADMIN);
   await superAdminInstance.expectUserToHaveRole(username, ROLE_BLOG_ADMIN);
 
-  browserInstances.push(blogAdmin);
+  activeUsers.push(blogAdmin);
   blogAdminInstance = blogAdmin;
   return blogAdmin;
 };
@@ -98,7 +98,7 @@ let createNewBlogPostEditor = async function(username) {
   await superAdminInstance.expectUserToHaveRole(
     'blogPostEditor', ROLE_BLOG_POST_EDITOR);
 
-  browserInstances.push(blogPostEditor);
+  activeUsers.push(blogPostEditor);
   blogPostEditorInstance = blogPostEditor;
   return blogPostEditor;
 };
@@ -114,7 +114,7 @@ let createNewGuestUser = async function(username, email) {
   await guestUser.openBrowser();
   await guestUser.signUpNewUser(username, email);
 
-  browserInstances.push(guestUser);
+  activeUsers.push(guestUser);
   return guestUser;
 };
 
@@ -122,8 +122,8 @@ let createNewGuestUser = async function(username, email) {
  * The function closes all the browsers opened by different users.
  */
 let closeAllBrowsers = async function() {
-  for (let i = 0; i < browserInstances.length; i++) {
-    await browserInstances[i].closeBrowser();
+  for (let i = 0; i < activeUsers.length; i++) {
+    await activeUsers[i].closeBrowser();
   }
 };
 
