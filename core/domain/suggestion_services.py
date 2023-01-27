@@ -3113,7 +3113,7 @@ def _generate_translation_contributor_certificate_data(
     # Go to the below link for more information about how we count hours
     # contributed.# Goto the below link for more information.
     # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
-    hours_contributed = round((words_count / 300), 2)
+    hours_contributed = round(words_count / 300, 2)
 
     if words_count == 0:
         raise Exception(
@@ -3178,7 +3178,7 @@ def _generate_question_contributor_certificate_data(
     # Go to the below link for more information about how we count hours
     # contributed.
     # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
-    hours_contributed = round((minutes_contributed / 60), 2)
+    hours_contributed = round(minutes_contributed / 60, 2)
 
     if minutes_contributed == 0:
         raise Exception(

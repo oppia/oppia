@@ -999,6 +999,11 @@ class ContributorCertificateHandler(
         assert self.normalized_request is not None
         from_date = self.normalized_request['from_date']
         to_date = self.normalized_request['to_date']
+
+        # When generating the question contributors' certificates, we do not
+        # send language parameter. Hence, we will have to use
+        # self.normalized_request.get('language') in order to get the default
+        # value when language is not present in the request.
         language = self.normalized_request.get('language')
 
         from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')

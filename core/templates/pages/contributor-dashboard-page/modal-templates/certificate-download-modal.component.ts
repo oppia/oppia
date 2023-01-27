@@ -19,6 +19,7 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
 import { ContributorCertificateResponse } from '../services/contribution-and-review-backend-api.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 
@@ -112,6 +113,9 @@ export class CertificateDownloadModalComponent {
   createCertificate(response: ContributorCertificateResponse): void {
     const canvas = document.createElement('canvas');
     const currentDate = new Date();
+    // Intl.DateTimeFormatOptions is used to enable language sensitive date
+    // formatting.
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat
     const dateOptions: Intl.DateTimeFormatOptions = {
       year: 'numeric',
       month: 'long',
@@ -120,7 +124,7 @@ export class CertificateDownloadModalComponent {
     // Textual parts are starting when y coordinate is equals to 350.
     let linePosition = 350;
     const image = new Image(this.LOGO_WIDTH, this.LOGO_HEIGHT);
-    image.src = '/assets/images/contributor_dashboard/oppia-logo.jpg';
+    image.src = AppConstants.CONTRIBUTOR_CERTIFICATE_LOGO;
     canvas.width = this.CERTIFICATE_WIDTH;
     canvas.height = this.CERTIFICATE_HEIGHT;
     const ctx = canvas.getContext('2d');
