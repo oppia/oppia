@@ -370,7 +370,7 @@ def managed_redis_server() -> Iterator[psutil.Process]:
 def create_managed_web_browser(
     port: int
 ) -> ContextManager[psutil.Process]:
-    """Returns a context manager for a web browser targeting the given port on
+    """Returns a ContextManager for a web browser targeting the given port on
     localhost. If a web browser cannot be opened on the current system by Oppia,
     then raises an exception.
 
@@ -378,12 +378,12 @@ def create_managed_web_browser(
         port: int. The port number to open in the web browser.
 
     Returns:
-        context manager. The context manager to a web browser window if the
+        ContextManager. The ContextManager to a web browser window if the
         current operating system can be identified and a web browser can be
         launched automatically.
 
     Raises:
-        Exception. Unable to launch the web browser (this happens when
+        Exception. Unable to launch the web browser (this happens when the
             Operating System cannot be identified).
     """
     url = 'http://localhost:%s/' % port

@@ -222,7 +222,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 ])
                 common.print_each_string_after_two_new_lines([
                     'ERROR',
-                    'Error occurred while  attempting to automatically launch '
+                    'Error occurred while attempting to automatically launch '
                     'the web browser: %s' % error,
                 ])
 
