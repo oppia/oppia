@@ -240,7 +240,7 @@ export class CertificateDownloadModalComponent {
         linePosition += 40;
       }
 
-      ctx.font = '36px Brush Script MT';
+      ctx.font = '24px Brush Script MT';
       ctx.fillStyle = '#000000';
       linePosition += 100;
       ctx.fillText(
