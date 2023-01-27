@@ -16,10 +16,12 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-const puppeteerUtilities = require('../puppeteer-testing-utilities/puppeteer-utils.js');
+const puppeteerUtilities = require(
+  '../puppeteer-testing-utilities/puppeteer-utils.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
-const { showMessage } = require('../puppeteer-testing-utilities/show-message-utils.js');
+const { showMessage } = require(
+  '../puppeteer-testing-utilities/show-message-utils.js');
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
