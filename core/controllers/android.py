@@ -24,6 +24,7 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
@@ -31,9 +32,11 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -42,7 +45,7 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 
-from typing import Dict, List
+from typing import Dict, List, TypedDict, Union
 
 
 class InitializeAndroidTestDataHandler(
@@ -337,3 +340,107 @@ class InitializeAndroidTestDataHandler(
             skill_id, skill_description, rubrics)
         skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
+
+
+class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of AndroidActivityHandler's normalized_request
+    dictionary.
+    """
+
+    activity_type: str
+    activity_id: str
+    activity_version: int
+    api_key: str
+
+
+class AndroidActivityHandler(base.BaseHandler[
+    Dict[str, str], AndroidActivityHandlerHandlerNormalizedRequestDict
+]):
+    """Handler for providing activities to Android."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'secret': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'activity_type': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        constants.ACTIVITY_TYPE_EXPLORATION,
+                        constants.ACTIVITY_TYPE_STORY,
+                        constants.ACTIVITY_TYPE_SKILL,
+                        constants.ACTIVITY_TYPE_SUBTOPIC,
+                        constants.ACTIVITY_TYPE_LEARN_TOPIC
+                    ]
+                },
+            },
+            'activity_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'activity_version': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+    }
+
+    ACTIVITY_TYPE_TO_FETCHER = {
+        constants.ACTIVITY_TYPE_EXPLORATION: exp_fetchers.get_exploration_by_id,
+        constants.ACTIVITY_TYPE_STORY: story_fetchers.get_story_by_id,
+        constants.ACTIVITY_TYPE_SKILL: skill_fetchers.get_skill_by_id,
+        constants.ACTIVITY_TYPE_SUBTOPIC: (
+            subtopic_page_services.get_subtopic_page_by_id),
+        constants.ACTIVITY_TYPE_LEARN_TOPIC: topic_fetchers.get_topic_by_id
+    }
+
+    # Here, the 'secret' url_path_argument is not used in the function body
+    # because the actual usage of 'secret' lies within the
+    # 'is_from_oppia_android_build' decorator, and here we are getting 'secret'
+    # because the decorator always passes every url_path_args to HTTP methods.
+    @acl_decorators.is_from_oppia_android_build
+    def get(self, unused_secret: str) -> None:
+        """Handles GET requests."""
+        assert self.normalized_request is not None
+        activity_id = self.normalized_request['activity_id']
+        activity_type = self.normalized_request['activity_type']
+        activity_version = self.normalized_request['activity_version']
+        activity: Union[
+            exp_domain.Exploration,
+            story_domain.Story,
+            skill_domain.Skill,
+            subtopic_page_domain.SubtopicPage,
+            topic_domain.Topic
+        ]
+        try:
+            if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+                activity = exp_fetchers.get_exploration_by_id(
+                    activity_id, version=activity_version)
+            elif activity_type == constants.ACTIVITY_TYPE_STORY:
+                activity = story_fetchers.get_story_by_id(
+                    activity_id, version=activity_version)
+            elif activity_type == constants.ACTIVITY_TYPE_SKILL:
+                activity = skill_fetchers.get_skill_by_id(
+                    activity_id, version=activity_version)
+            elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
+                topic_id, subtopic_page_id = activity_id.split('-')
+                activity = subtopic_page_services.get_subtopic_page_by_id(
+                    topic_id,
+                    int(subtopic_page_id),
+                    version=activity_version
+                )
+            else:
+                activity = topic_fetchers.get_topic_by_id(
+                    activity_id, version=activity_version)
+        except Exception as e:
+            raise self.PageNotFoundException from e
+        self.render_json(activity.to_dict())

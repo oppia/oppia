@@ -27,6 +27,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import base
+from core.domain import android_services
 from core.domain import blog_services
 from core.domain import classifier_services
 from core.domain import classroom_services
@@ -4653,3 +4654,46 @@ def is_from_oppia_android(
         return handler(self, **kwargs)
 
     return test_is_from_oppia_android
+
+
+def is_from_oppia_android_build(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether the request was sent from Oppia Android build
+    process.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_is_from_oppia_android_build(
+        self: _SelfBaseHandlerType, secret: str, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks whether the request was sent from Oppia Android build process.
+
+        Args:
+            secret: str. The secret key sent by the Oppia Android build process.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            Exception. If the secret API key is not set.
+            UnauthorizedUserException. If incoming request is not from a valid
+                Oppia Android build request.
+        """
+        if not android_services.verify_android_build_secret(secret):
+            raise self.UnauthorizedUserException(
+                'The incoming request is not a valid '
+                'Oppia Android build request.'
+            )
+        return handler(self, **kwargs)
+
+    return test_is_from_oppia_android_build

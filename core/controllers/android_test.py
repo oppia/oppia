@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the android_e2e_config."""
+"""Tests for the android."""
 
 from __future__ import annotations
 
@@ -20,15 +20,24 @@ import os
 
 from core import feconf
 from core.constants import constants
+from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import skill_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import secrets_services
 
-class AndroidConfigTest(test_utils.GenericTestBase):
+secrets_services = models.Registry.import_secrets_services()
+
+
+class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""
 
     def test_initialize_in_production_raises_exception(self) -> None:
@@ -124,3 +133,129 @@ class AndroidConfigTest(test_utils.GenericTestBase):
             csrf_token=None, expected_status_int=400)
         self.assertEqual(
             response['error'], 'The topic exists but is not published.')
+
+
+class AndroidActivityHandlerTest(test_utils.GenericTestBase):
+    """Tests for the AndroidActivityHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.secrets_swap = self.swap_to_always_return(
+            secrets_services, 'get_secret', 'key')
+
+    def test_get_without_api_key_returns_error(self) -> None:
+        self.get_json('/android_data', expected_status_int=400)
+
+    def test_get_with_wrong_api_key_returns_error(self) -> None:
+        secrets_swap = self.swap_to_always_return(
+            secrets_services, 'get_secret', 'not_key')
+        with secrets_swap:
+            self.get_json(
+                '/android_data?activity_type=story&activity_id=id&'
+                'activity_version=1&api_key=key',
+                expected_status_int=401
+            )
+
+    def test_get_non_existent_activity_returns_error(self) -> None:
+        with self.secrets_swap:
+            self.get_json(
+                '/android_data?activity_type=story&activity_id=story_id&'
+                'activity_version=1&api_key=key',
+                expected_status_int=404
+            )
+
+    def test_get_exploration_returns_correct_json(self) -> None:
+        exploration = self.save_new_default_exploration('exp_id', 'owner_id')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exploration&'
+                    'activity_id=exp_id&activity_version=1&api_key=key',
+                    expected_status_int=200
+                ),
+                exploration.to_dict()
+            )
+
+    def test_get_different_versions_of_exploration_returns_correct_json(
+        self
+    ) -> None:
+        exploration = self.save_new_default_exploration('exp_id', 'owner_id')
+        exp_services.update_exploration(
+            'owner_id',
+            'exp_id',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'new objective'
+                })
+            ],
+            'change objective'
+        )
+        new_exploration = exp_fetchers.get_exploration_by_id('exp_id')
+
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exploration&'
+                    'activity_id=exp_id&activity_version=1&api_key=key',
+                    expected_status_int=200
+                ),
+                exploration.to_dict()
+            )
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exploration&'
+                    'activity_id=exp_id&activity_version=2&api_key=key',
+                    expected_status_int=200
+                ),
+                new_exploration.to_dict()
+            )
+
+    def test_get_story_returns_correct_json(self) -> None:
+        story = self.save_new_story('story_id', 'user_id', 'Title')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=story&activity_id=story_id&'
+                    'activity_version=1&api_key=key',
+                    expected_status_int=200
+                ),
+                story.to_dict()
+            )
+
+    def test_get_skill_returns_correct_json(self) -> None:
+        skill = self.save_new_skill('skill_id', 'user_id', 'Description')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=skill&activity_id=skill_id&'
+                    'activity_version=1&api_key=key',
+                    expected_status_int=200
+                ),
+                skill.to_dict()
+            )
+
+    def test_get_subtopic_returns_correct_json(self) -> None:
+        subtopic = self.save_new_subtopic(1, 'user_id', 'topic_id')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=subtopic&'
+                    'activity_id=topic_id-1&activity_version=1&api_key=key',
+                    expected_status_int=200
+                ),
+                subtopic.to_dict()
+            )
+
+    def test_get_topic_returns_correct_json(self) -> None:
+        topic = self.save_new_topic('topic_id', 'user_id')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=learntopic&'
+                    'activity_id=topic_id&activity_version=1&api_key=key',
+                    expected_status_int=200
+                ),
+                topic.to_dict()
+            )
