@@ -69,7 +69,11 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
    */
   async createDraftBlogPostWithTitle(draftBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
-    // See Note-1 below.
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
     await this.page.waitForTimeout(500);
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.type(blogTitleInput, draftBlogPostTitle);
@@ -90,7 +94,11 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
    */
   async deleteDraftBlogPostWithTitle(draftBlogPostTitle) {
     await this.page.exposeFunction('deleteDraftBlogPost', async() => {
-      // See Note-2 below.
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
       await this.page.waitForTimeout(100);
       await this.clickOn(LABEL_FOR_DELETE_BUTTON);
       await this.page.waitForSelector('div.modal-dialog');
@@ -139,7 +147,11 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
    */
   async publishNewBlogPostWithTitle(newBlogPostTitle) {
     await this.addUserBioInBlogDashboard();
-    // See Note-1 below.
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
     await this.page.waitForTimeout(500);
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
 
@@ -173,7 +185,11 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async deletePublishedBlogPostWithTitle(blogPostTitle) {
     await this.clickOn('PUBLISHED');
     await this.page.exposeFunction('deletePublishedBlogPost', async() => {
-      // See Note-2 below.
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
       await this.page.waitForTimeout(100);
       await this.clickOn(LABEL_FOR_DELETE_BUTTON);
       await this.page.waitForSelector('button.e2e-test-confirm-button');
@@ -434,28 +450,3 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     showMessage('Maximum tag is currently ' + limit + '!');
   }
 };
-
-
-/* NOTE 1 */
-/** Giving explicit waitForTimeout when clicking the 'CREATE NEW BLOG POST'
- * button in the blog dashboard page as we need to add Bio for the user for
- * the first time we access the /blog-dashboard page. It is a modal dialog
- * box and beside it the blog dashboard is already loaded (in DOM also), thats
- * why we cannot wait for 'CREATE NEW BLOG POST' button using its selector
- * as it is already there even when the modal dialog box is opened and the
- * button is not clickable. So we need to wait for the modal dialog box
- * to close after saving the author bio details, and after that we can click
- * the 'CREATE NEW BLOG POST' button.
- */
-
-/* NOTE 2 */
-/** Giving explicit waitForTimeout when clicking 'Unpublish' or 'DELETE' button
- * in the blog dashboard page (for deleting or unpublishing any blog post) as we
- * need to wait for the small transition to complete.
- * We cannot wait for the particular element using its selector because on
- * clicking the options button (represented by three dots) that button in
- * the overlay in instantly loaded in the DOM and also its DOM selector.
- * But the transition of the overlay is not completed and the unpublish
- * or delete button is not clickable until the transition is completed.
- * So we need to wait for that small transition to complete
- * (just 100millisecond is enough). */
