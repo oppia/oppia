@@ -133,6 +133,7 @@ module.exports = class puppeteerUtilities {
           return;
         }
       }
+      throw new Error('Role ' + role + ' donot exists.');
     }, role);
   }
 
