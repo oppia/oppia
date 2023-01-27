@@ -62,8 +62,7 @@ describe('App', function() {
       function() {
         for (var constantName in constants) {
           expect($injector.has(constantName)).toBe(true);
-          expect($injector.get(constantName)).toEqual(
-            constants[constantName]);
+          expect($injector.get(constantName)).toEqual(constants[constantName]);
         }
       });
   });
