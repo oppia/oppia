@@ -462,9 +462,10 @@ export class InteractionObjectFactory {
 
   createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
     return new Interaction(
+      interactionDict.id ?
       this.createAnswerGroupsFromBackendDict(
         interactionDict.answer_groups,
-        interactionDict.id),
+        interactionDict.id) : [],
       interactionDict.confirmed_unclassified_answers,
       this.convertFromCustomizationArgsBackendDict(
         interactionDict.id, interactionDict.customization_args),
@@ -478,7 +479,7 @@ export class InteractionObjectFactory {
 
   createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
-      interactionId: string | null,
+      interactionId: string,
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
