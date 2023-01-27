@@ -17,13 +17,13 @@
  * tag properties from the blog-admin page.
  */
 
-/** TODO: 1 user-story left when user cannot publish a blog post if the
+/** TODO(#16552): 1 user-story left when user cannot publish a blog post if the
  * title duplicates with an existing published blog post. This test should be
  * written as the issue #16552 is fixed. */
-/** TODO: This test should be done without the need of super admin, as blog
+/** TODO(#17162): This test should be done without the need of super admin, as blog
  * admin must be able to revoke blog editor role of other users from the
- * /blog-admin page. But this is not the case now. This test should be written
- * as the issue #17162 is fixed. */
+ * /blog-admin page. But this is not the case now, only super admin can do this.
+ * This test should be written as the issue #17162 is fixed. */
 
 const userFactory = require(
   '../puppeteer-testing-utilities/user-factory.js');
