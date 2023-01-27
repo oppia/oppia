@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { ContributionAndReviewBackendApiService }
+import { ContributionAndReviewBackendApiService, ContributorCertificateResponse }
   from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
@@ -297,6 +297,18 @@ export class ContributionAndReviewService {
       ).then(() => {
         onSuccess(suggestionId);
       }, () => onFailure && onFailure(suggestionId));
+  }
+
+  async downloadContributorCertificateAsync(
+      username: string,
+      suggestionType: string,
+      languageCode: string | null,
+      fromDate: string,
+      toDate: string
+  ): Promise<ContributorCertificateResponse> {
+    return this.contributionAndReviewBackendApiService
+      .downloadContributorCertificateAsync(
+        username, suggestionType, languageCode, fromDate, toDate);
   }
 }
 

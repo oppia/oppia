@@ -1943,3 +1943,75 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 self.OWNER_USERNAME))
 
         self.logout()
+
+    def test_get_contributor_certificate(self) -> None:
+        score_category: str = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        change_cmd = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
+            self.OWNER_USERNAME, change_cmd, score_category,
+            'exploration.exp1.thread_6', 'hi')
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date_str = from_date.strftime('%Y-%m-%d')
+        to_date = datetime.datetime.today()
+        to_date_str = to_date.strftime('%Y-%m-%d')
+
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorcertificate/%s/%s?language=%s&'
+            'from_date=%s&to_date=%s' % (
+                self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi', from_date_str, to_date_str
+            )
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'from_date': from_date.strftime('%d %b %Y'),
+                'to_date': to_date.strftime('%d %b %Y'),
+                'contribution_hours': '0.01',
+                'team_lead': feconf.TRANSLATION_TEAM_LEAD,
+                'language': 'Hindi'
+            }
+        )
+
+        self.logout()
+
+    def test_get_contributor_certificate_raises_invalid_date_exception(
+        self
+    ) -> None:
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date_str = from_date.strftime('%Y-%m-%d')
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+        to_date_str = to_date.strftime('%Y-%m-%d')
+
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorcertificate/%s/%s?language=%s&'
+            'from_date=%s&to_date=%s' % (
+                self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi', from_date_str, to_date_str
+            ),
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            response['error'],
+            'To date should not be a future date.'
+        )
+
+        self.logout()

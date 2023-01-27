@@ -16,13 +16,15 @@
  * @fileoverview Component for the contribution stats view.
  */
 
-import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Injector, Input, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { ContributionAndReviewStatsService, QuestionContributionBackendDict, QuestionReviewBackendDict, TranslationContributionBackendDict, TranslationReviewBackendDict } from '../services/contribution-and-review-stats.service';
 import { UserService } from 'services/user.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AppConstants } from 'app.constants';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CertificateDownloadModalComponent } from '../modal-templates/certificate-download-modal.component';
 
 interface Option {
   contributionType: string;
@@ -166,10 +168,12 @@ export class ContributorStatsComponent {
     };
 
   constructor(
-    private readonly languageUtilService: LanguageUtilService,
+    public readonly languageUtilService: LanguageUtilService,
     private readonly contributionAndReviewStatsService:
         ContributionAndReviewStatsService,
-    private readonly userService: UserService) {
+    private readonly userService: UserService,
+    private readonly modalService: NgbModal,
+    private readonly injector: Injector) {
   }
 
   async ngOnInit(): Promise<void> {
@@ -235,19 +239,17 @@ export class ContributorStatsComponent {
 
     if (response.translation_contribution_stats.length > 0) {
       response.translation_contribution_stats.map((stat) => {
-        const language = this.languageUtilService.getAudioLanguageDescription(
-          stat.language_code);
         const translationContributionStatsData = this
-          .statsData?.translationContribution.get(language);
+          .statsData.translationContribution.get(stat.language_code);
         if (translationContributionStatsData === undefined) {
           this.statsData?.translationContribution.set(
-            language,
+            stat.language_code,
             new PageableStats([this.createTranslationContributionStat(stat)]));
         } else {
           translationContributionStatsData.data?.push(
             this.createTranslationContributionStat(stat));
           this.statsData?.translationContribution.set(
-            language,
+            stat.language_code,
             translationContributionStatsData
           );
         }
@@ -256,19 +258,17 @@ export class ContributorStatsComponent {
 
     if (response.translation_review_stats.length > 0) {
       response.translation_review_stats.map((stat) => {
-        const language = this.languageUtilService.getAudioLanguageDescription(
-          stat.language_code);
         const translationReviewStatsData = this
-          .statsData?.translationReview.get(language);
+          .statsData.translationReview.get(stat.language_code);
         if (translationReviewStatsData === undefined) {
           this.statsData.translationReview.set(
-            language,
+            stat.language_code,
             new PageableStats([this.createTranslationReviewStat(stat)]));
         } else {
           translationReviewStatsData.data?.push(
             this.createTranslationReviewStat(stat));
           this.statsData?.translationReview.set(
-            language,
+            stat.language_code,
             translationReviewStatsData
           );
         }
@@ -293,7 +293,8 @@ export class ContributorStatsComponent {
   }
 
   createTranslationContributionStat(
-      stat: TranslationContributionBackendDict): TranslationContributionStats {
+      stat: TranslationContributionBackendDict
+  ): TranslationContributionStats {
     return {
       firstContributionDate: stat.first_contribution_date,
       lastContributionDate: stat.last_contribution_date,
@@ -304,7 +305,8 @@ export class ContributorStatsComponent {
   }
 
   createTranslationReviewStat(
-      stat: TranslationReviewBackendDict): TranslationReviewStats {
+      stat: TranslationReviewBackendDict
+  ): TranslationReviewStats {
     return {
       firstContributionDate: stat.first_contribution_date,
       lastContributionDate: stat.last_contribution_date,
@@ -317,7 +319,8 @@ export class ContributorStatsComponent {
   }
 
   createQuestionContributionStat(
-      stat: QuestionContributionBackendDict): QuestionContributionStats {
+      stat: QuestionContributionBackendDict
+  ): QuestionContributionStats {
     return {
       firstContributionDate: stat.first_contribution_date,
       lastContributionDate: stat.last_contribution_date,
@@ -329,7 +332,8 @@ export class ContributorStatsComponent {
   }
 
   createQuestionReviewStat(
-      stat: QuestionReviewBackendDict): QuestionReviewStats {
+      stat: QuestionReviewBackendDict
+  ): QuestionReviewStats {
     return {
       firstContributionDate: stat.first_contribution_date,
       lastContributionDate: stat.last_contribution_date,
@@ -349,8 +353,7 @@ export class ContributorStatsComponent {
   }
 
   goToPreviousPage(page: PageableStats): void {
-    if (
-      page.currentPageStartIndex === 0) {
+    if (page.currentPageStartIndex === 0) {
       throw new Error('There are no more pages before this one.');
     }
     page.currentPageStartIndex -= this.ITEMS_PER_PAGE;
@@ -366,6 +369,20 @@ export class ContributorStatsComponent {
   // order.
   provideOriginalOrder(): number {
     return 0;
+  }
+
+  openCertificateDownloadModal(
+      suggestionType: string, languageCode: string | null
+  ): void {
+    const modalRef = this.modalService.open(
+      CertificateDownloadModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        injector: this.injector
+      });
+    modalRef.componentInstance.suggestionType = suggestionType;
+    modalRef.componentInstance.username = this.username;
+    modalRef.componentInstance.languageCode = languageCode;
   }
 
   /**

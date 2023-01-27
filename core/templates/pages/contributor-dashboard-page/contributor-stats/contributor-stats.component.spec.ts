@@ -24,6 +24,8 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { ContributorStatsComponent } from './contributor-stats.component';
 import { ContributionAndReviewStatsService } from '../services/contribution-and-review-stats.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { CertificateDownloadModalComponent } from '../modal-templates/certificate-download-modal.component';
 
 describe('Contributor stats component', () => {
   let fetchAllContributionAndReviewStatsAsync: jasmine.Spy;
@@ -111,17 +113,22 @@ describe('Contributor stats component', () => {
   let contributionAndReviewStatsService: ContributionAndReviewStatsService;
   let languageUtilService: LanguageUtilService;
   let userService: UserService;
+  let modalService: NgbModal;
+  let certificateModal: NgbModalRef;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        ContributorStatsComponent
+        ContributorStatsComponent,
+        CertificateDownloadModalComponent
       ],
       providers: [
         ContributionAndReviewStatsService,
         LanguageUtilService,
-        UserService
+        UserService,
+        NgbModal,
+        NgbActiveModal
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -133,8 +140,12 @@ describe('Contributor stats component', () => {
 
     contributionAndReviewStatsService = TestBed.inject(
       ContributionAndReviewStatsService);
+    certificateModal = TestBed.createComponent(
+      CertificateDownloadModalComponent) as unknown as NgbModalRef;
     languageUtilService = TestBed.inject(LanguageUtilService);
     userService = TestBed.inject(UserService);
+    modalService = TestBed.inject(NgbModal);
+    spyOn(modalService, 'open').and.returnValue(certificateModal);
 
     fetchAllContributionAndReviewStatsAsync = spyOn(
       contributionAndReviewStatsService,
@@ -196,6 +207,14 @@ describe('Contributor stats component', () => {
       expect(component.dropdownShown).toBeFalse;
       expect(component.selectedContributionType).toEqual(
         'Question Reviews');
+    }));
+
+    it('should open date range selecting model to generate certificate for' +
+      ' contributors',
+    fakeAsync(() => {
+      component.openCertificateDownloadModal('add_question', '');
+      tick();
+      expect(modalService.open).toHaveBeenCalled();
     }));
 
     it('should be able to page stats', fakeAsync(() => {

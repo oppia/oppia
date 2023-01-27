@@ -70,6 +70,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
+    CertificateDownloadModalComponent,
+    ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
@@ -88,6 +90,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ContributorBadgesComponent
   ],
   entryComponents: [
+    CertificateDownloadModalComponent,
     ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -139,6 +142,7 @@ import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
 import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import { ContributorStatsComponent } from './contributor-stats/contributor-stats.component';
+import { CertificateDownloadModalComponent } from './modal-templates/certificate-download-modal.component';
 import { ContributorBadgesComponent } from './contributor-badges/contributor-badges.component';
 import { BadgeComponent } from './badge/badge.component';
 

@@ -958,8 +958,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_change['question_dict']
         )
 
-        question_state_data = test_question_dict[
-            'question_state_data']
+        question_state_data = test_question_dict['question_state_data']
         question_state_data['content'][
             'html'] = '<p>Updated question</p>'
         question_state_data['interaction'][
@@ -6048,4 +6047,250 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
                 user_id, feconf.CONTRIBUTION_TYPE_TRANSLATION,
                 'test', 'hi',
                 'Initial Contributor'
+            )
+
+
+class ContributorCertificateTests(test_utils.GenericTestBase):
+    """Tests for contributor certificate generation."""
+
+    AUTHOR_EMAIL: Final = 'author@example.com'
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.username = user_services.get_username(self.author_id)
+        self.from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        self.to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+
+    def test_create_translation_contributor_certificate(self) -> None:
+        score_category: str = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        change_cmd = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.author_id,
+            'reviewer_1', change_cmd, score_category,
+            'exploration.exp1.thread_6', 'hi')
+
+        response = suggestion_services.generate_contributor_certificate_data(
+            self.username,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            'hi',
+            self.from_date,
+            self.to_date,
+        )
+
+        self.assertIsNotNone(response)
+
+    def test_create_translation_contributor_certificate_for_english(
+        self
+    ) -> None:
+        score_category: str = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        change_cmd = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'en',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.author_id,
+            'reviewer_1', change_cmd, score_category,
+            'exploration.exp1.thread_6', 'en')
+
+        response = suggestion_services.generate_contributor_certificate_data(
+            self.username,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            'en',
+            self.from_date,
+            self.to_date,
+        )
+
+        self.assertIsNotNone(response)
+
+    def test_create_question_contributor_certificate(self) -> None:
+        suggestion_change: Dict[
+            str, Union[str, float, question_domain.QuestionDict]
+        ] = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': 1,
+            'skill_difficulty': 0.3
+        }
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(suggestion_change['question_dict'], dict)
+        test_question_dict: question_domain.QuestionDict = (
+            suggestion_change['question_dict']
+        )
+
+        question_state_data = test_question_dict['question_state_data']
+        question_state_data['content']['html'] = '<p>No image content</p>'
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            'reviewer_2', suggestion_change, 'category1',
+            'thread_1', 'en')
+
+        response = suggestion_services.generate_contributor_certificate_data(
+            self.username,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            None,
+            self.from_date,
+            self.to_date,
+        )
+
+        self.assertIsNotNone(response)
+
+    def test_create_question_contributor_certificate_with_image_content(
+        self
+    ) -> None:
+        suggestion_change: Dict[
+            str, Union[str, float, question_domain.QuestionDict]
+        ] = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'id': 'test_id',
+                'version': 12,
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': 1,
+            'skill_difficulty': 0.3
+        }
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(suggestion_change['question_dict'], dict)
+        test_question_dict: question_domain.QuestionDict = (
+            suggestion_change['question_dict']
+        )
+
+        question_state_data = test_question_dict['question_state_data']
+        question_state_data['content']['html'] = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            'reviewer_2', suggestion_change, 'category1',
+            'thread_1', 'en')
+
+        response = suggestion_services.generate_contributor_certificate_data(
+            self.username,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            None,
+            self.from_date,
+            self.to_date,
+        )
+
+        self.assertIsNotNone(response)
+
+    def test_create_contributor_certificate_raises_exception_for_no_suggestions(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'There are no contributions for the given time range.'
+        ):
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            )
+
+    def test_create_certificate_raises_exception_for_no_question_suggestions(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'There are no contributions for the given time range.'
+        ):
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                None,
+                self.from_date,
+                self.to_date,
+            )
+
+    def test_create_contributor_certificate_raises_exception_for_wrong_language(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'The provided language is invalid.'
+        ):
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'test',
+                self.from_date,
+                self.to_date,
+            )
+
+    def test_create_contributor_certificate_raises_exception_for_wrong_username(
+        self
+    ) -> None:
+        username = 'wrong_user'
+
+        with self.assertRaisesRegex(
+            Exception, 'There is no user for the given username.'
+        ):
+            suggestion_services.generate_contributor_certificate_data(
+                username,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi',
+                self.from_date,
+                self.to_date,
+            )
+
+    def test_create_contributor_certificate_raises_exception_for_wrong_type(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'The suggestion type is invalid.'
+        ):
+            suggestion_services.generate_contributor_certificate_data(
+                self.username,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                'test',
+                self.from_date,
+                self.to_date,
             )
