@@ -329,9 +329,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
-    const [updateRoleButton] = await this.page.$x(
-      `//` + `button[contains(text(), 'Update Role')]`);
-    await updateRoleButton.click();
+    await this.clickOn('button.oppia-blog-admin-update-role-button');
   }
 
   /**
@@ -341,9 +339,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async removeBlogEditorRoleFromUsername(username) {
     await this.goto(blogAdminUrl);
     await this.type(blogEditorUsernameInput, username);
-    const [removeBlogEditorButton] = await this.page.$x(
-      `//` + `button[contains(text(), 'Remove Blog Editor ')]`);
-    await removeBlogEditorButton.click();
+    await this.clickOn('button.oppia-blog-admin-remove-blog-editor-button');
   }
 
   /**
