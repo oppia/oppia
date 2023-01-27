@@ -36,7 +36,7 @@ const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = ' CREATE NEW BLOG POST ';
-const LABEL_FOR_SAVE_BUTTON = ' SAVE ';
+const LABEL_FOR_SAVE_BUTTON = ' Save ';
 const LABEL_FOR_DONE_BUTTON = ' DONE ';
 const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
@@ -329,7 +329,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
-    await this.clickOn('Update Role');
+    const [updateRoleButton] = await this.page.$x(
+      `//` + `button[contains(text(), 'Update Role')]`);
+    await updateRoleButton.click();
   }
 
   /**
@@ -339,7 +341,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
   async removeBlogEditorRoleFromUsername(username) {
     await this.goto(blogAdminUrl);
     await this.type(blogEditorUsernameInput, username);
-    await this.clickOn('Remove Blog Editor ');
+    const [removeBlogEditorButton] = await this.page.$x(
+      `//` + `button[contains(text(), 'Remove Blog Editor ')]`);
+    await removeBlogEditorButton.click();
   }
 
   /**
