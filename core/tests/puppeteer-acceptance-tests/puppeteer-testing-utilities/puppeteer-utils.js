@@ -107,7 +107,7 @@ module.exports = class puppeteerUtilities {
   async clickOn(selector) {
     try {
       const [button] = await this.page.$x(
-        `//` + `*[contains(text(), "${selector}")]`);
+        `//` + `*[contains(text(), '${selector}')]`);
       await button.click();
     } catch {
       await this.page.waitForSelector(selector);
