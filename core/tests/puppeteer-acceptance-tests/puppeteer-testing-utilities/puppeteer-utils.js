@@ -25,6 +25,7 @@ const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+const addRoleButton = 'button.oppia-add-role-button';
 
 module.exports = class puppeteerUtilities {
   page;
@@ -106,7 +107,7 @@ module.exports = class puppeteerUtilities {
   async clickOn(selector) {
     try {
       const [button] = await this.page.$x(
-        '//' + '*[contains(text(), "' + selector + '")]');
+        `//` + `*[contains(text(), "${selector}")]`);
       await button.click();
     } catch {
       await this.page.waitForSelector(selector);
@@ -123,7 +124,7 @@ module.exports = class puppeteerUtilities {
     await this.goto(rolesEditorTab);
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
-    await this.clickOn('Add role');
+    await this.clickOn(addRoleButton);
     await this.clickOn(rolesSelectDropdown);
     await this.page.evaluate(async(role) => {
       const allRoles = document.getElementsByClassName('mat-option-text');

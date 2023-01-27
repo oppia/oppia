@@ -127,5 +127,10 @@ let closeAllBrowsers = async function() {
   }
 };
 
-module.exports = { createNewSuperAdmin, createNewBlogAdmin,
-  createNewBlogPostEditor, createNewGuestUser, closeAllBrowsers };
+module.exports = {
+  createNewSuperAdmin,
+  createNewBlogAdmin,
+  createNewBlogPostEditor,
+  createNewGuestUser,
+  closeAllBrowsers
+};
