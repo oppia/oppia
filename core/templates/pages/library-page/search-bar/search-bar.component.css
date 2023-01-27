@@ -180,13 +180,11 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     height: 45px;
     padding-top: 8px;
   }
-
-
-
-.input-group > .form-control:not(:first-child){
+  
+  .input-group > .form-control:not(:first-child){
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
-}
+  }
 
   oppia-search-bar .oppia-input-group input {
     margin-left: -4.5vw;
