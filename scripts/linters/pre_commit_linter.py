@@ -697,6 +697,9 @@ def main(args: Optional[List[str]] = None) -> None:
             third_party_semaphore, name=name)
         tasks_third_party.append(task_third_party)
 
+    print('tasks_custom', tasks_custom)
+    print('task_third_party', task_third_party)
+
     # Execute tasks.
     # Here we set Concurrency limit for custom task to 25 because we need to
     # parallelize the tasks to work on full capacity of CPU.
