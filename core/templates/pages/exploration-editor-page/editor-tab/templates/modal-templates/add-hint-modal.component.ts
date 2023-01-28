@@ -73,7 +73,29 @@ export class AddHintModalComponent
   }
 
   isHintLengthExceeded(tmpHint: string): boolean {
-    return Boolean(tmpHint.length > 500);
+    // The variable chars stores the remaining characters by
+    // removing the html tags from tmpHint.
+    let charRgx = /(?<=>)([^(\n)]*?)(?=<)/g;
+    let chars: string = '';
+    if (tmpHint !== null) {
+      let charArray = tmpHint.match(charRgx);
+      if (charArray !== null) {
+        chars = charArray.join('');
+      }
+    }
+    let charCount: number = chars.length;
+    // Regex for html entities like &nbsp; &lt; etc.
+    const entityRegex = /\&(.*?);/g;
+    if (entityRegex.test(chars)) {
+      let htmlEntityArray = chars.match(entityRegex);
+      if (htmlEntityArray !== null) {
+        let htmlEntityCount: number = htmlEntityArray.length;
+        let nonEntityCount: number = chars.replace(entityRegex, '').length;
+        charCount = htmlEntityCount + nonEntityCount;
+      }
+    }
+    // Note: charCount does not include the characters from Rich Text ELements.
+    return Boolean(charCount > 500);
   }
 
   updateLocalHint($event: string): void {
