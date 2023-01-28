@@ -35,7 +35,7 @@ import { animate, keyframes, style, transition, trigger } from '@angular/animati
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 
 import './progress-nav.component.css';
-import { InteractionCustomizationArgs, ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 
 @Component({
@@ -205,28 +205,6 @@ export class ProgressNavComponent {
     }
   }
 
-  doesInteractionHaveSpecialCaseForMobile(): boolean {
-    // The submit button should be shown:
-    // 1. In mobile mode, if the current interaction is either
-    //    ItemSelectionInput or MultipleChoiceInput.
-    // 2. In desktop mode, if the current interaction is
-    //    ItemSelectionInput with maximum selectable choices > 1.
-    if (this.browserCheckerService.isMobileDevice()) {
-      return (
-        !this.interactionId ||
-        this.SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE.indexOf(
-          this.interactionId) >= 0);
-    } else {
-      let interactionCustomizationArgs = (
-        this.interactionCustomizationArgs as
-          ItemSelectionInputCustomizationArgs);
-      return (
-        this.interactionId === 'ItemSelectionInput' &&
-              interactionCustomizationArgs
-                .maxAllowableSelectionCount.value > 1);
-    }
-  }
-
   validateIndexAndChangeCard(index: number): void {
     if (index >= 0 && index < this.transcriptLength) {
       this.changeCard.emit(index);
@@ -243,10 +221,6 @@ export class ProgressNavComponent {
   }
 
   shouldGenericSubmitButtonBeShown(): boolean {
-    if (this.doesInteractionHaveSpecialCaseForMobile()) {
-      return true;
-    }
-
     return (this.doesInteractionHaveNavSubmitButton() && (
       this.interactionIsInline ||
       !this.canWindowShowTwoCards()

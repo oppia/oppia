@@ -164,48 +164,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     // frontend tests.
   });
 
-  it('should update selected answer when user selects an option', () => {
-    let dummyMouseEvent = new MouseEvent('Mouse');
-    spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
-    spyOn(document, 'querySelector')
-      .withArgs('button.multiple-choice-option.selected').and.returnValue({
-        // This throws "Type '{ add: () => void; remove: () => void; }'
-        // is missing the following properties from type 'DOMTokenList':
-        // length, value, contains, item, and 4 more". We need to suppress
-        // this error because typescript expects more
-        // properties than just one add and remove.
-        // We need only add and remove for testing purposes.
-        // @ts-expect-error
-        classList: {
-          add: () => {
-            return;
-          },
-          remove: () => {
-            return;
-          }
-        }
-      });
-    spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
-      {
-        classList: {
-          add: () => {
-            return;
-          },
-          remove: () => {
-            return;
-          }
-        }
-
-      }
-    );
-    spyOn(component, 'submitAnswer');
-
-    component.selectAnswer(dummyMouseEvent, '1');
-
-    expect(component.answer).toBe(1);
-    expect(component.submitAnswer).toHaveBeenCalled();
-  });
-
   it('should not update the answer if the user does not select any', () => {
     let dummyMouseEvent = new MouseEvent('Mouse');
     component.answer = 1;

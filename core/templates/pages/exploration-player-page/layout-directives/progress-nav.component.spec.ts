@@ -222,16 +222,6 @@ describe('Progress nav component', () => {
     expect(componentInstance.canWindowShowTwoCards()).toBeTrue();
   });
 
-  it('should tell if generic submit button should be shown', () => {
-    spyOn(componentInstance, 'doesInteractionHaveSpecialCaseForMobile')
-      .and.returnValues(true, false);
-    spyOn(componentInstance, 'doesInteractionHaveNavSubmitButton')
-      .and.returnValue(false);
-
-    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeTrue();
-    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeFalse();
-  });
-
   it('should tell if continue button should be shown', () => {
     componentInstance.conceptCardIsBeingShown = true;
 

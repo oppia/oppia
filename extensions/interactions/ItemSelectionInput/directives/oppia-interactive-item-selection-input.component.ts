@@ -168,9 +168,6 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.userSelections = {};
     this.userSelections[this.choices[index]] = true;
     this.notEnoughSelections = false;
-    if (!this.browserCheckerService.isMobileDevice()) {
-      this.submitAnswer();
-    }
   }
 
   submitAnswer(): void {

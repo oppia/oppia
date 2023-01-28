@@ -160,64 +160,6 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       }).toThrowError('Content id is null');
     });
 
-    it('should deselect previously selected option and select the option' +
-    ' checked by the user', () => {
-      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
-      let dummyMouseEvent = new MouseEvent('Mouse');
-      spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
-      spyOn(document, 'querySelector')
-        .withArgs('button.multiple-choice-option.selected').and.returnValue({
-          // This throws "Type '{ add: () => void; remove: () => void; }'
-          // is missing the following properties from type 'DOMTokenList':
-          // length, value, contains, item, and 4 more". We need to suppress
-          // this error because typescript expects more
-          // properties than just one add and remove.
-          // We need only add and remove for testing purposes.
-          // @ts-expect-error
-          classList: {
-            add: () => {
-              return;
-            },
-            remove: () => {
-              return;
-            },
-            contains: (text: string) => {
-              return true;
-            }
-          }
-        });
-      spyOnProperty(dummyMouseEvent, 'currentTarget').and.returnValue(
-        {
-          classList: {
-            add: () => {
-              return;
-            },
-            remove: () => {
-              return;
-            },
-            contains: (text: string) => {
-              return true;
-            }
-          }
-
-        }
-      );
-      spyOn(currentInteractionService, 'onSubmit').and.callThrough();
-      spyOn(component, 'submitAnswer').and.callThrough();
-      component.ngOnInit();
-      component.userSelections = {
-        'choice 2': true
-      };
-
-      component.submitMultipleChoiceAnswer(dummyMouseEvent, 0);
-
-      expect(component.userSelections).toEqual({
-        'choice 1': true,
-      });
-      expect(component.submitAnswer).toHaveBeenCalledTimes(2);
-      expect(currentInteractionService.onSubmit).toHaveBeenCalledTimes(2);
-    });
-
     it('should not submit answer when user click an option if user is using a' +
     ' mobile', () => {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
