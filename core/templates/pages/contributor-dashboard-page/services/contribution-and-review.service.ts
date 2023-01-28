@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { ContributionAndReviewBackendApiService }
+import { ContributionAndReviewBackendApiService, ContributorCertificateResponse }
   from './contribution-and-review-backend-api.service';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
@@ -38,12 +38,14 @@ class SuggestionFetcher {
   // The current offset, i.e. the number of items to skip (from the beginning of
   // all matching results) in the next fetch.
   offset: number;
+  sortKey: string;
   // Cache of suggestions.
   suggestionIdToDetails: SuggestionDetailsDict;
 
   constructor(type: string) {
     this.type = type;
     this.offset = 0;
+    this.sortKey = '';
     this.suggestionIdToDetails = {};
   }
 }
@@ -136,6 +138,7 @@ export class ContributionAndReviewService {
         // page is cached.
         (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
         fetcher.offset,
+        fetcher.sortKey,
         explorationId
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
@@ -168,24 +171,30 @@ export class ContributionAndReviewService {
   }
 
   async getUserCreatedQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true
+      shouldResetOffset: boolean = true,
+      sortKey: string
   ): Promise<FetchSuggestionsResponse> {
+    this.userCreatedQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedQuestionFetcher,
       shouldResetOffset);
   }
 
   async getReviewableQuestionSuggestionsAsync(
-      shouldResetOffset: boolean = true
+      shouldResetOffset: boolean = true,
+      sortKey: string
   ): Promise<FetchSuggestionsResponse> {
+    this.reviewableQuestionFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher,
       shouldResetOffset);
   }
 
   async getUserCreatedTranslationSuggestionsAsync(
-      shouldResetOffset: boolean = true
+      shouldResetOffset: boolean = true,
+      sortKey: string
   ): Promise<FetchSuggestionsResponse> {
+    this.userCreatedTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.userCreatedTranslationFetcher,
       shouldResetOffset);
@@ -193,8 +202,10 @@ export class ContributionAndReviewService {
 
   async getReviewableTranslationSuggestionsAsync(
       shouldResetOffset: boolean = true,
+      sortKey: string,
       explorationId?: string
   ): Promise<FetchSuggestionsResponse> {
+    this.reviewableTranslationFetcher.sortKey = sortKey;
     return this.fetchSuggestionsAsync(
       this.reviewableTranslationFetcher,
       shouldResetOffset,
@@ -286,6 +297,18 @@ export class ContributionAndReviewService {
       ).then(() => {
         onSuccess(suggestionId);
       }, () => onFailure && onFailure(suggestionId));
+  }
+
+  async downloadContributorCertificateAsync(
+      username: string,
+      suggestionType: string,
+      languageCode: string | null,
+      fromDate: string,
+      toDate: string
+  ): Promise<ContributorCertificateResponse> {
+    return this.contributionAndReviewBackendApiService
+      .downloadContributorCertificateAsync(
+        username, suggestionType, languageCode, fromDate, toDate);
   }
 }
 

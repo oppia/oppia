@@ -1,0 +1,271 @@
+<div class="oppia-translate-text-header-container">
+  <div class="oppia-translate-text-header">
+    <div class="oppia-opportunities-details">
+      <div class="oppia-opportunities-heading">
+        Select the time range
+      </div>
+      <button type="button"
+              class="close oppia-close-button-position"
+              (click)="close()"
+              attr.aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="modal-body">
+  <div *ngIf="!certificateDownloading">
+    <div class="datepicker-container">
+      <div class="date-label">From:</div>
+      <input class="datepicker" type="date" [(ngModel)]="fromDate">
+    </div>
+    <div class="datepicker-container">
+      <div class="date-label">To:</div>
+      <input class="datepicker" type="date"[(ngModel)]="toDate">
+    </div>
+    <div class="datepicker-container" *ngIf="errorsFound">
+      <span class="date-range-error">{{errorMessage}}</span>
+    </div>
+  </div>
+  <div *ngIf="certificateDownloading" class="loader"></div>
+  <div *ngIf="certificateDownloading" class="certficate-generation-await">
+    Generating certificate for time range {{fromDate}} to {{toDate}}. Please wait.
+  </div>
+</div>
+<div class="oppia-translate-modal-footer modal-footer">
+  <button class="btn btn-default" (click)="close()">
+    Cancel
+  </button>
+  <button [disabled]="certificateDownloading || disableDownloadButton()"
+          class="btn btn-success oppia-upload-translated-text-button"
+          (click)="downloadCertificate()">
+    <i [hidden]="!certificateDownloading" class="fa fa-spinner"></i>
+    <span>
+      Download
+    </span>
+  </button>
+</div>
+<style>
+  .certficate-generation-await {
+    font-size: 20px;
+    text-align: center;
+  }
+  .date-range-error {
+    color: red;
+  }
+  .datepicker-container {
+    margin: auto;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 60%
+  }
+  .date-label {
+    float: left;
+    width: 25%;
+  }
+  .datepicker {
+    width: 75%;
+  }
+  .oppia-collapse-content {
+    display: none;
+  }
+  .oppia-translate-modal-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .oppia-translate-text-header-container .oppia-opportunities-heading {
+    display: block;
+    font-size: 20px;
+  }
+  .oppia-translate-text-header-container .oppia-mobile-opportunities-heading {
+    display: none;
+  }
+  .oppia-translate-text-header-container .oppia-opportunities-subheading {
+    color: #009688;
+    display: block;
+    font-size: 14px;
+    height: 40%;
+    width: 100%;
+  }
+  .oppia-translate-text-header-container .oppia-mobile-opportunities-subheading {
+    color: #009688;
+    display: none;
+    font-size: 14px;
+    height: 40%;
+    width: 100%;
+  }
+  .oppia-translate-text-header-container .oppia-opportunities-details {
+    display: flex;
+    flex-direction: column;
+    margin: 1.8% 0;
+    width: 95%;
+  }
+  .oppia-translate-text-header-container {
+    border-bottom: 1px solid #e5e5e5;
+    padding-left: 15px;
+  }
+  .oppia-translate-text-header,
+  .oppia-translatable-text-section {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-translate-rule-list {
+    margin-bottom: 0;
+    margin-top: 10px;
+    padding-left: 20px;
+  }
+  .oppia-rules-translation-tip {
+    color: #757575;
+  }
+  .oppia-loading-text {
+    height: 40px;
+    width: 100%;
+  }
+  .oppia-loading-text1 {
+    height: 50%;
+    width: 60%;
+  }
+  .oppia-loading-text2 {
+    height: 50%;
+    width: 40%;
+  }
+  .oppia-translation-editor-section {
+    padding: 20px 0;
+    word-wrap: break-word;
+  }
+  .oppia-text-to-translate-container {
+    border: 1px solid #ccc;
+    margin: 15px 0;
+    margin-bottom: 0;
+    padding: 20px;
+  }
+  .oppia-rules-to-translate-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 15px 0 0;
+    padding: 20px;
+  }
+  .oppia-translation-tips-container {
+    background-color: #eee;
+    border: 1px solid #eee;
+    margin: 15px 0;
+    padding: 20px;
+  }
+  .oppia-skip-button {
+    color: #ababab;
+    margin-left: 5%;
+  }
+  .oppia-close-button-position {
+    font-size: 2.5rem;
+    position: absolute;
+    right: 20px;
+    top: 12px;
+  }
+  .oppia-rte-editor-focused:focus > p {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > ol {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > ul {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > pre {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > blockquote {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-tabs > div {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > uib-accordion > div {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-image > figure {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-video > center {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused *:hover {
+    background-color: rgba(233, 241, 242);
+  }
+  .oppia-translation-error-section {
+    color: red;
+  }
+  .loader {
+    animation: spinner 4s linear infinite;
+    border: 10px solid #e0e0e0;
+    border-radius: 50%;
+    border-top: 10px solid #00645c;
+    height: 100px;
+    margin: auto;
+    width: 100px;
+  }
+
+  @keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @media screen and (max-width: 700px) {
+    .oppia-container-expanded {
+      height: fit-content;
+      max-height: none;
+      overflow-y: hidden;
+    }
+    .oppia-container-contracted {
+      max-height: 30vh;
+      overflow-y: scroll;
+    }
+    .oppia-collapse-content {
+      background-color: #016a5d;
+      color: white;
+      cursor: pointer;
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin: auto;
+      padding: 5px 10px;
+      position: relative;
+      text-align: center;
+      text-transform: uppercase;
+      top: -13px;
+      width: 85px;
+    }
+    .oppia-translate-text-header-container {
+      display: none;
+    }
+    .oppia-translate-text-header-container .oppia-mobile-opportunities-heading {
+      display: block;
+      font-size: 18px;
+    }
+    .oppia-translatable-text-section {
+      font-size: 16px;
+    }
+    .oppia-text-to-translate-container {
+      font-size: 16px;
+    }
+  }
+
+  @media screen and (max-width: 370px) {
+    .oppia-translate-text-header-container .oppia-opportunities-subheading {
+      display: none;
+    }
+    .oppia-translate-text-header-container .oppia-mobile-opportunities-subheading {
+      display: block;
+    }
+  }
+
+  @media screen and (max-width: 330px) {
+    .oppia-translate-modal-footer {
+      align-items: flex-end;
+      flex-direction: column;
+    }
+    .oppia-translate-modal-footer button {
+      margin: 5px;
+    }
+  }
+</style>

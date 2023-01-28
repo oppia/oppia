@@ -36,6 +36,7 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 
 
 class MockNgbModalRef {
@@ -108,7 +109,8 @@ describe('Contributions and review component', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService
         },
-        UserService
+        UserService,
+        OpportunitiesListComponent
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -705,6 +707,24 @@ describe('Contributions and review component', () => {
         expect(component.activeExplorationId).toBeNull();
       }));
 
+    it('should be able to change language', fakeAsync(() => {
+      component.opportunitiesListRef = TestBed.inject(
+        OpportunitiesListComponent);
+      spyOn(component.opportunitiesListRef, 'onChangeLanguage')
+        .and.callFake(() => {
+          return;
+        });
+
+      expect(component.languageCode).toBeUndefined();
+
+      component.onChangeLanguage('es');
+
+      expect(component.languageCode).toBe('es');
+      expect(
+        component.opportunitiesListRef.onChangeLanguage
+      ).toHaveBeenCalledWith('es');
+    }));
+
     it('should return true on Review Translations tab', fakeAsync(() => {
       component.contributionTabs = [
         {
@@ -768,16 +788,18 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.isReviewTranslationsTab()).toBeTrue();
+      expect(component.isReviewQuestionsTab()).toBeFalse();
       expect(alertsService.addSuccessMessage)
         .toHaveBeenCalledWith('Submitted suggestion review.');
     }));
 
-    it('should return false on Review Questions tab', () => {
+    it('should return true on Review Questions tab', () => {
       spyOn(component, 'openQuestionSuggestionModal').and.callFake(() => {
         return;
       });
 
       component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
+      expect(component.isReviewQuestionsTab()).toBeTrue();
       expect(component.isReviewTranslationsTab()).toBeFalse();
 
       component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
@@ -798,6 +820,14 @@ describe('Contributions and review component', () => {
       };
 
       component.onClickViewSuggestion('SUGGESTION');
+    });
+
+    it('should change the sort key of reviewable questions', () => {
+      expect(component.reviewableQuestionsSortKey).toBe('Date');
+
+      component.setReviewableQuestionsSortKey('Name');
+
+      expect(component.reviewableQuestionsSortKey).toBe('Name');
     });
 
     it('should open question suggestion modal', fakeAsync(() => {

@@ -29,7 +29,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UrlService } from 'services/contextual/url.service';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
