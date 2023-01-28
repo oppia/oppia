@@ -22,11 +22,10 @@ let e2eSuperAdmin = e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser =
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance = null, blogAdminInstance = null,
-  blogPostEditorInstance = null;
+let superAdminInstance = null;
+let activeUsers = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
-let activeUsers = [];
 
 /**
  * The function creates a new super admin user and returns the instance
@@ -55,13 +54,10 @@ let createNewSuperAdmin = async function(username) {
  * @returns The blog admin instance created.
  */
 let createNewBlogAdmin = async function(username) {
-  if (blogAdminInstance !== null) {
-    return blogAdminInstance;
-  }
-
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
+
   const blogAdmin = await new e2eBlogAdmin();
   await blogAdmin.openBrowser();
   await blogAdmin.signUpNewUser(username, 'blog_admin@example.com');
@@ -70,7 +66,6 @@ let createNewBlogAdmin = async function(username) {
   await superAdminInstance.expectUserToHaveRole(username, ROLE_BLOG_ADMIN);
 
   activeUsers.push(blogAdmin);
-  blogAdminInstance = blogAdmin;
   return blogAdmin;
 };
 
@@ -81,25 +76,19 @@ let createNewBlogAdmin = async function(username) {
  * @returns The blog post editor instance created.
  */
 let createNewBlogPostEditor = async function(username) {
-  if (blogPostEditorInstance !== null) {
-    return blogPostEditorInstance;
-  }
+  const blogAdmin = await createNewBlogAdmin('blogAdm');
 
-  if (blogAdminInstance === null) {
-    blogAdminInstance = await createNewBlogAdmin('blogAdm');
-  }
   const blogPostEditor = await new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
   await blogPostEditor.signUpNewUser(
     username, 'blog_post_editor@example.com');
 
-  await blogAdminInstance.assignUserToRoleFromBlogAdminPage(
+  await blogAdmin.assignUserToRoleFromBlogAdminPage(
     'blogPostEditor', 'BLOG_POST_EDITOR');
   await superAdminInstance.expectUserToHaveRole(
     'blogPostEditor', ROLE_BLOG_POST_EDITOR);
 
   activeUsers.push(blogPostEditor);
-  blogPostEditorInstance = blogPostEditor;
   return blogPostEditor;
 };
 
