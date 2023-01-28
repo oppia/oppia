@@ -230,5 +230,7 @@ export const AppConstants = {
       DISPLAY_NAME: 'Question Reviews'
     }
   },
-  CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500]
+  CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500],
+  CONTRIBUTOR_CERTIFICATE_LOGO:
+    '/assets/images/contributor_dashboard/oppia-logo.jpg'
 } as const;
