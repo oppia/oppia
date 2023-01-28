@@ -28,9 +28,11 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const addRoleButton = 'button.oppia-add-role-button';
 
 module.exports = class puppeteerUtilities {
-  page;
-  browserObject;
-  userHasAcceptedCookies = false;
+  constructor() {
+    this.page;
+    this.browserObject;
+    this.userHasAcceptedCookies = false;
+  }
 
   /**
    * This is a function that opens a new browser instance for the user.
@@ -107,11 +109,9 @@ module.exports = class puppeteerUtilities {
   async clickOn(selector) {
     try {
       const [button] = await this.page.$x(
-        /** Disabling the line because we need to use backticks for
-         * string interpolation. */
-        `//` + `*[contains(text(), '${selector}')]`); // eslint-disable-line
+        '//' + `*[contains(text(), '${selector}')]`);
       await button.click();
-    } catch {
+    } catch (error) {
       await this.page.waitForSelector(selector);
       await this.page.click(selector);
     }
@@ -120,7 +120,7 @@ module.exports = class puppeteerUtilities {
   /**
    * The function to assign a role to a user.
    * @param {string} username - The username to which role would be assigned.
-   * @param {string role - The role that would be assigned to the user.
+   * @param {string} role - The role that would be assigned to the user.
    */
   async assignRoleToUser(username, role) {
     await this.goto(rolesEditorTab);

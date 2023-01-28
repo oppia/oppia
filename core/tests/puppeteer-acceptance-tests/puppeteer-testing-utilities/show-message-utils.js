@@ -16,9 +16,10 @@
  * @fileoverview Utility function for logging the progress of the tests.
  */
 
-let showMessage = async function(message) {
+let showMessage = function(message) {
   // We use console statements to log the progress or feedback of the tests.
-  await console.log(message); // eslint-disable-line no-console
+  // eslint-disable-next-line no-console
+  console.log(message);
 };
 
 module.exports = { showMessage };
