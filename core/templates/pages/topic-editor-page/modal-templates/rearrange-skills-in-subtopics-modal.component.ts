@@ -23,7 +23,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { Subscription } from 'rxjs';
 import { SubtopicValidationService } from '../services/subtopic-validation.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';

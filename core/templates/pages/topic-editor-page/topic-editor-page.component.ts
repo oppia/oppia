@@ -19,7 +19,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { Subscription } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { ContextService } from 'services/context.service';

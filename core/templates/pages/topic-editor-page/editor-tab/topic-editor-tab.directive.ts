@@ -42,7 +42,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { RearrangeSkillsInSubtopicsModalComponent } from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
 

@@ -24,7 +24,7 @@ import { SavePendingChangesModalComponent } from 'components/save-pending-change
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
