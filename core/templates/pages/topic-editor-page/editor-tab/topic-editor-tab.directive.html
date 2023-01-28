@@ -248,7 +248,7 @@
               <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
             </a>
             <div class="edit-options-container">
-              <i class="fa fa-ellipsis-v" (click)="toggleUncategorizedSkillOptions($index)"></i>
+              <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn" (click)="toggleUncategorizedSkillOptions($index)"></i>
             </div>
             <div class="uncategorized-skill-option-box"
                  *ngIf="uncategorizedEditOptionsIndex === $index"
@@ -258,7 +258,7 @@
                 <i class="fa fa-trash"></i>
                 <span>Remove from topic</span>
               </div>
-              <div class="uncategorized-skill-edit-option edit-option-assign" (click)="changeSubtopicAssignment(null, skillSummary)">
+              <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-subtopic" (click)="changeSubtopicAssignment(null, skillSummary)">
                 <i class="fa fa-plus"></i>
                 <span>Assign to Subtopic</span>
               </div>

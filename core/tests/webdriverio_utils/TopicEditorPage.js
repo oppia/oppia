@@ -311,6 +311,19 @@ var TopicEditorPage = function() {
     await dragAndDrop(toMove, target);
   };
 
+  this.replacement = async function(subtopicIndex = 0) {
+    await action.click(
+      'Save rearranged skills modal', $('.e2e-test-skill-item-edit-btn'));
+    await action.click('e2e-test-assign-subtopic', $(
+      '.e2e-test-assign-subtopic'));
+
+    await action.click('e2e-test-assign-subtopic', $$(
+      '.e2e-test-subtopic-name')[subtopicIndex]);
+
+    await action.click('e2e-test-assign-subtopic', $(
+      '.e2e-test-skill-assign-subtopic-confirm'));
+  };
+
   this.saveRearrangedSkills = async function() {
     await action.click(
       'Save rearranged skills modal', saveRearrangedSkillsButton);

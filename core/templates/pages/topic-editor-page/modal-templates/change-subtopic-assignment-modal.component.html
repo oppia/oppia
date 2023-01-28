@@ -4,14 +4,14 @@
 <div class="modal-body">
   <mat-radio-group class="oppia-radio-group">
     <mat-radio-button *ngFor="let subtopic of subtopics" [value]="subtopic.getTitle()" attr.aria-label="{{ subtopic.getTitle() }}" (click)="changeSelectedSubtopic(subtopic.getId())">
-      {{ subtopic.getTitle() }}
+      <span class="e2e-test-subtopic-name e2e-test-subtopic-name-{{subtopic.getTitle()}}">{{ subtopic.getTitle() }}</span>
     </mat-radio-button>
   </mat-radio-group>
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-primary" (click)="confirm(selectedSubtopicId)">
+  <button class="btn btn-primary e2e-test-skill-assign-subtopic-confirm" (click)="confirm(selectedSubtopicId)">
     <span>Assign</span>
   </button>
 </div>
