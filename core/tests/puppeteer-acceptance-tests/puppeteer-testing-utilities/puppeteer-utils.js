@@ -28,9 +28,9 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const addRoleButton = 'button.oppia-add-role-button';
 
 module.exports = class puppeteerUtilities {
-  page;
-  browserObject;
-  userHasAcceptedCookies = false;
+  page
+  browserObject
+  userHasAcceptedCookies = false
 
   /**
    * This is a function that opens a new browser instance for the user.
