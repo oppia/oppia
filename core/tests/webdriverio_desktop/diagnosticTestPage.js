@@ -110,7 +110,7 @@ describe('Diagnostic test page functionality', function() {
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.navigateToTopicEditorTab();
-    // await topicEditorPage.navigateToReassignModal();
+    // Await topicEditorPage.navigateToReassignModal();
 
     // await topicEditorPage.dragSkillToSubtopic('Diagnostic test skill', 0);
     // await topicEditorPage.saveRearrangedSkills();
