@@ -115,9 +115,9 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe(
       'Please enter an answer before submitting.');
 
-    expect(MathInteractionsService.validateAlgebraicExpression(
+    expect(mathInteractionsService.validateAlgebraicExpression(
       '*', [])).toBeFalse();
-    expect(MathInteractionsService.getWarningText()).toBe(
+    expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a number before the × operator.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
