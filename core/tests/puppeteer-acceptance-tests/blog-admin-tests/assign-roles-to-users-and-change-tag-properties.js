@@ -17,7 +17,7 @@
  * tag properties from the blog-admin page.
  */
 
-/** TODO(#16552): One user-story left when user cannot publish a blog post if
+/** TODO(#16552): Write a test when user is not able to publish a blog post if
  * title duplicates with an existing published blog post. */
 /** TODO(#17162): This test should be done without the need of super admin, as
  * blog admin must be able to revoke blog editor role of other users from the
