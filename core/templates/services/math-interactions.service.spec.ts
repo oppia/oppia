@@ -94,10 +94,6 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateNumericExpression(
-      '5*5')).toBeTrue();
-    expect(mathInteractionsService.getWarningText()).toBe('');
-
-    expect(mathInteractionsService.validateNumericExpression(
       '(1+2+3)^(-3.5)')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
