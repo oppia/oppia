@@ -74,7 +74,7 @@ var TopicEditorPage = function() {
     '.e2e-test-confirm-subtopic-creation-button');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var storyThumbnailButton = $(
-    '.e2e-test-thumbnail-editor .e2e-test-photo-button');
+    '.e2e-test-story-image .e2e-test-thumbnail-editor .e2e-test-photo-button');
   var addSubtopicButton = $('.e2e-test-add-subtopic-button');
   var newSubtopicTitlefield = $('.e2e-test-new-subtopic-title-field');
   var newSubtopicUrlFragmentField = $(
@@ -96,7 +96,7 @@ var TopicEditorPage = function() {
   };
   var storyListTable = $('.e2e-test-story-list-table');
   var storyThumbnailButton = $(
-    '.e2e-test-thumbnail-editor .e2e-test-photo-button');
+    '.e2e-test-story-image .e2e-test-thumbnail-editor .e2e-test-photo-button');
   var subtopicColumnsSelector = function() {
     return $$('.e2e-test-subtopic-column');
   };
