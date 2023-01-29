@@ -32,7 +32,12 @@ import { SkillPreviewTabComponent } from './skill-preview-tab.component';
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 const questionDict = {
   id: 'question_id',
   question_state_data: {
@@ -240,9 +245,11 @@ describe('Skill Preview Tab Component', () => {
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeFalse();
 
     component.displayedCard = new StateCard(
-      null, null, null, new Interaction(
-        [], [], null, null, [], 'ImageClickInput', null),
-      [], null, null, '', null);
+      '', '', '', new Interaction(
+        [], [], null as InteractionCustomizationArgs, null,
+        [], 'ImageClickInput', null),
+      [], null as RecordedVoiceovers, null as WrittenTranslations,
+      '', null as AudioTranslationLanguageService);
 
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
   });
@@ -259,9 +266,11 @@ describe('Skill Preview Tab Component', () => {
     expect(component.displayedCard.isInteractionInline()).toBeTrue();
 
     component.displayedCard = new StateCard(
-      null, null, null, new Interaction(
-        [], [], null, null, [], 'ImageClickInput', null),
-      [], null, null, '', null);
+      '', '', '', new Interaction(
+        [], [], null as InteractionCustomizationArgs, null,
+        [], 'ImageClickInput', null),
+      [], null as RecordedVoiceovers, null as WrittenTranslations,
+      '', null as AudioTranslationLanguageService);
 
     expect(component.displayedCard.isInteractionInline()).toBeFalse();
   });
