@@ -248,8 +248,9 @@ describe('Skill Preview Tab Component', () => {
       '', '', '', new Interaction(
         [], [], null as InteractionCustomizationArgs, null,
         [], 'ImageClickInput', null),
-      [], null as RecordedVoiceovers, null as WrittenTranslations,
-      '', null as AudioTranslationLanguageService);
+      [], null as unknown as RecordedVoiceovers,
+      null as unknown as WrittenTranslations,
+      '', null as unknown as AudioTranslationLanguageService);
 
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
   });
@@ -267,10 +268,11 @@ describe('Skill Preview Tab Component', () => {
 
     component.displayedCard = new StateCard(
       '', '', '', new Interaction(
-        [], [], null as InteractionCustomizationArgs, null,
+        [], [], null as unknown as InteractionCustomizationArgs, null,
         [], 'ImageClickInput', null),
-      [], null as RecordedVoiceovers, null as WrittenTranslations,
-      '', null as AudioTranslationLanguageService);
+      [], null as unknown as RecordedVoiceovers,
+      null as unknown as WrittenTranslations,
+      '', null as unknown as AudioTranslationLanguageService);
 
     expect(component.displayedCard.isInteractionInline()).toBeFalse();
   });
