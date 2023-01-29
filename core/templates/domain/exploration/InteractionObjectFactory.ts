@@ -68,6 +68,7 @@ import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { Answer } from 'interactions/CodeRepl/directives/oppia-response-code-repl.component';
 
 
 export interface InteractionBackendDict {
@@ -462,10 +463,9 @@ export class InteractionObjectFactory {
 
   createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
     return new Interaction(
-      interactionDict.id ?
       this.createAnswerGroupsFromBackendDict(
         interactionDict.answer_groups,
-        interactionDict.id) : [],
+        interactionDict.id),
       interactionDict.confirmed_unclassified_answers,
       this.convertFromCustomizationArgsBackendDict(
         interactionDict.id, interactionDict.customization_args),
@@ -479,7 +479,7 @@ export class InteractionObjectFactory {
 
   createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
-      interactionId: string,
+      interactionId: string | null,
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
