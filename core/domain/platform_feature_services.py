@@ -32,6 +32,7 @@ docstrings in this file.
 
 from __future__ import annotations
 
+from core import feconf
 from core import platform_feature_list
 from core.constants import constants
 from core.domain import platform_parameter_domain
@@ -149,21 +150,20 @@ def update_feature_flag_rules(
         feature_name, committer_id, commit_message, new_rules)
 
 
-# TODO(#10211): Currently Oppia runs in either of the two modes:
-# dev or prod. There should be another mode 'test' added for QA testing,
-# once it is added, this function needs to be updated to take that into
-# consideration.
 def _get_server_mode() -> platform_parameter_domain.ServerMode:
     """Returns the running mode of Oppia.
 
     Returns:
-        Enum(SERVER_MODES). The server mode of Oppia, dev if Oppia is running
-        in development mode, prod if in production mode.
+        Enum(SERVER_MODES). The server mode of Oppia. This is "dev" if Oppia is
+        running in development mode, "test" if Oppia is running on a test
+        server, and "prod" if Oppia is running in full production mode.
     """
     return (
         platform_parameter_domain.ServerMode.DEV
         if constants.DEV_MODE
         else platform_parameter_domain.ServerMode.PROD
+        if feconf.OPPIA_PROJECT_ID == 'oppiaserver'
+        else platform_parameter_domain.ServerMode.TEST
     )
 
 
