@@ -145,6 +145,8 @@
 .community-lessons-section .empty-section,
 .playlist-section .empty-section,
 .subscriptions-section .empty-section {
+  font-size: 16px;
+  font-weight: inherit;
   padding: 0 113px 0 40px;
 }
 .community-lessons-section .remove-icon,
