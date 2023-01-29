@@ -133,6 +133,36 @@ angular.module('oppia').controller('RteHelperModalController', [
       $uibModalInstance.dismiss(true);
     };
 
+    $scope.disableSaveButtonForRte = function() {
+      // This method disables the save button for RTE if they violate
+      // the validations defined in rich_text_components_definitions.ts file.
+      let result: boolean = false;
+      $scope.customizationArgSpecs.forEach((arg, index: number) => {
+        let tCA = $scope.tmpCustomizationArgs;
+        if (arg.schema.validators) {
+          let id: string = arg.schema.validators[0].id;
+          if (id.endsWith('least')) {
+            let minValue = arg.schema.validators[0].min_value;
+            if (id.includes('length')) {
+              result = result || tCA[index].value.length < minValue;
+            } else {
+              result = result || tCA[index].value < minValue;
+            }
+          } else if (id.endsWith('most')) {
+            let maxValue = arg.schema.validators[0].max_value;
+            if (id.includes('length')) {
+              result = result || tCA[index].value.length > maxValue;
+            } else {
+              result = result || tCA[index].value > maxValue;
+            }
+          } else if (id.endsWith('nonempty')) {
+            result = result || tCA[index].value.length <= 0;
+          }
+        }
+      });
+      return result;
+    };
+
     $scope.disableSaveButtonForMathRte = function() {
       // This method disables the save button when the Math SVG has not yet
       // been generated but being processed.

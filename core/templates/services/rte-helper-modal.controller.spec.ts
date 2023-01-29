@@ -489,6 +489,147 @@ describe('Rte Helper Modal Controller', function() {
       });
     });
 
+  describe('when editor has validator specs', function() {
+    var customizationArgSpecs = [{
+      schema: {
+        validators: [{
+          id: ''
+        }]
+      }
+    }];
+
+    beforeEach(angular.mock.module('oppia'));
+
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      mockExternalRteSaveEventEmitter = new EventEmitter();
+      $provide.value('ExternalRteSaveService', {
+        onExternalRteSave: mockExternalRteSaveEventEmitter
+      });
+    }));
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      $timeout = $injector.get('$timeout');
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $controller(
+        'RteHelperModalController', {
+          $scope: $scope,
+          $uibModalInstance: $uibModalInstance,
+          attrsCustomizationArgsDict: {
+          },
+          customizationArgSpecs: customizationArgSpecs,
+        });
+    }));
+
+    it('should check for minimum value validation', ()=>{
+      $scope.customizationArgSpecs = [{
+        schema: {
+          validators: [{
+            id: 'is_at_least',
+            min_value: 0
+          }]
+        }
+      }];
+
+      $scope.tmpCustomizationArgs = [{
+        value: -2
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeTrue();
+
+      $scope.tmpCustomizationArgs = [{
+        value: 2
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeFalse();
+    });
+
+    it('should check for maximum value validation', ()=>{
+      $scope.customizationArgSpecs = [{
+        schema: {
+          validators: [{
+            id: 'is_at_most',
+            max_value: 0
+          }]
+        }
+      }];
+
+      $scope.tmpCustomizationArgs = [{
+        value: 2
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeTrue();
+
+      $scope.tmpCustomizationArgs = [{
+        value: -2
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeFalse();
+    });
+
+    it('should check for minimum length validation', ()=>{
+      $scope.customizationArgSpecs = [{
+        schema: {
+          validators: [{
+            id: 'has_length_at_least',
+            min_value: 10
+          }]
+        }
+      }];
+
+      $scope.tmpCustomizationArgs = [{
+        value: 'testStr'
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeTrue();
+
+      $scope.tmpCustomizationArgs = [{
+        value: 'testString'
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeFalse();
+    });
+
+    it('should check for maximum length validation', ()=>{
+      $scope.customizationArgSpecs = [{
+        schema: {
+          validators: [{
+            id: 'has_length_at_most',
+            max_value: 5
+          }]
+        }
+      }];
+
+      $scope.tmpCustomizationArgs = [{
+        value: 'testString'
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeTrue();
+
+      $scope.tmpCustomizationArgs = [{
+        value: 'test'
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeFalse();
+    });
+
+    it('should check for nonempty value validation', ()=>{
+      $scope.customizationArgSpecs = [{
+        schema: {
+          validators: [{
+            id: 'is_nonempty',
+          }]
+        }
+      }];
+
+      $scope.tmpCustomizationArgs = [{
+        value: 'testString'
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeFalse();
+
+      $scope.tmpCustomizationArgs = [{
+        value: ''
+      }];
+      expect($scope.disableSaveButtonForRte()).toBeTrue();
+    });
+  });
+
   describe('when cancel is clicked with default customization args', () => {
     var customizationArgSpecs = [{
       name: 'filepath',
