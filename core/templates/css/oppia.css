@@ -131,6 +131,14 @@ why they need to be overriden.  */
   transform: none !important;
 }
 
+.embedded-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
 .md-button {
   font-size: 16px;
   line-height: 22px;
@@ -4094,4 +4102,13 @@ oppia-response-text-input {
   .conversation-skin-oppia-avatar {
     display: none;
   }
+}
+
+mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.story-save-draft-warning {
+  color: #fc0;
 }

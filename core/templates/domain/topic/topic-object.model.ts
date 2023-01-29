@@ -17,9 +17,6 @@
  * topic domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import cloneDeep from 'lodash/cloneDeep';
 
 import { ShortSkillSummary } from
@@ -620,15 +617,10 @@ export class Topic {
 
     this._subtopics = cloneDeep(otherTopic.getSubtopics());
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class TopicObjectFactory {
-  constructor() {}
 
-  create(
+
+  static create(
       topicBackendDict: TopicBackendDict,
       skillIdToDescriptionDict: SkillIdToDescriptionMap): Topic {
     let subtopics = topicBackendDict.subtopics.map((
@@ -666,7 +658,3 @@ export class TopicObjectFactory {
     );
   }
 }
-
-angular.module('oppia').factory(
-  'TopicObjectFactory',
-  downgradeInjectable(TopicObjectFactory));

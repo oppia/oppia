@@ -28,7 +28,7 @@ jobs:
           else
             JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.standard-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
             echo "::set-output name=job-strategy-matrix::$JOB_STRATEGY_MATRIX"
-          fi          
+          fi
   frontend-karma-tests:
     needs: generate-job-strategy-matrix
     runs-on:  ${{ matrix.os }}
@@ -49,7 +49,7 @@ jobs:
           echo $GITHUB_WORKSPACE
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.8.12'
+          python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: Cache node modules and third_party/static

@@ -59,10 +59,29 @@
    * location hash. This defends against fraudulent messages being sent to the
    * child iframe by other code within the parent page.
    */
+
+  /**
+   * Generate a 0-1 random number using a crytographically secure method
+   * without using division, which results in biased random numbers. Reference:
+   * https://thecompetentdev.com/weeklyjstips/tips/73_generate_secure_randoms/
+   * @returns The random number between 0 and 1.
+   */
+  const random = () => {
+    var buffer = new ArrayBuffer(8);
+    var ints = new Int8Array(buffer);
+    window.crypto.getRandomValues(ints);
+
+    ints[7] = 63;
+    ints[6] |= 0xf0;
+    
+    var float = new DataView(buffer).getFloat64(0, true) - 1;
+    return float;
+  }
+
   var SECRET_LENGTH = 64;
   var secret = '';
   for (var i = 0; i < SECRET_LENGTH; i++) {
-    secret += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    secret += String.fromCharCode(65 + Math.floor(random() * 26));
   }
 
   var OppiaEmbed = (function() {
@@ -187,9 +206,11 @@
       var VERSION_KEY = 'version=';
       var SECRET_KEY = 'secret=';
       var versionString = explorationVersion ? '&v=' + explorationVersion : '';
+      var langCode = this.oppiaNode.getAttribute('exp-language') || '';
+      var languageString = langCode ? '&lang=' + langCode : '';
       this.iframe.src = encodeURI(
-        this.targetDomain + '/explore/' + this.oppiaNode.getAttribute('oppia-id') +
-        '?iframed=true&locale=en' + versionString +
+        this.targetDomain + '/embed/exploration/' + this.oppiaNode.getAttribute('oppia-id') +
+        '?iframed=true&locale=en' + versionString + languageString +
         '#' + VERSION_KEY + OPPIA_EMBED_GLOBALS.version +
         '&' + SECRET_KEY + secret);
 

@@ -28,6 +28,7 @@ export interface ExplorationOpportunitySummaryBackendDict {
   'content_count': number;
   'translation_counts': TranslationCountsDict;
   'translation_in_review_counts': TranslationCountsDict;
+  'language_code': string;
 }
 
 export class ExplorationOpportunitySummary {
@@ -38,12 +39,14 @@ export class ExplorationOpportunitySummary {
   contentCount: number;
   translationCounts: TranslationCountsDict;
   translationInReviewCount: TranslationCountsDict;
+  languageCode: string;
 
   constructor(
       expId: string, topicName: string, storyTitle: string,
       chapterTitle: string, contentCount: number,
       translationCounts: TranslationCountsDict,
-      translationInReviewCount: TranslationCountsDict) {
+      translationInReviewCount: TranslationCountsDict,
+      languageCode: string) {
     this.id = expId;
     this.topicName = topicName;
     this.storyTitle = storyTitle;
@@ -51,6 +54,7 @@ export class ExplorationOpportunitySummary {
     this.contentCount = contentCount;
     this.translationCounts = translationCounts;
     this.translationInReviewCount = translationInReviewCount;
+    this.languageCode = languageCode;
   }
 
   static createFromBackendDict(
@@ -59,7 +63,8 @@ export class ExplorationOpportunitySummary {
     return new ExplorationOpportunitySummary(
       backendDict.id, backendDict.topic_name, backendDict.story_title,
       backendDict.chapter_title, backendDict.content_count,
-      backendDict.translation_counts, backendDict.translation_in_review_counts);
+      backendDict.translation_counts, backendDict.translation_in_review_counts,
+      backendDict.language_code);
   }
 
   getExplorationId(): string {

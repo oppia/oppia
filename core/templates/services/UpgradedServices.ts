@@ -25,6 +25,7 @@ import { HttpClient, HttpXhrBackend,
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
 
+
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -458,7 +459,6 @@ import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service';
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -499,7 +499,6 @@ import { MathInteractionsService } from './math-interactions.service';
 interface UpgradedServicesDict {
   [service: string]: unknown;
 }
-
 @Injectable({
   providedIn: 'root'
 })
@@ -834,7 +833,9 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['FocusManagerService'] = new FocusManagerService(
       upgradedServices['DeviceInfoService'],
-      upgradedServices['IdGenerationService']);
+      upgradedServices['IdGenerationService'],
+      upgradedServices['WindowRef'],
+    );
     upgradedServices['HttpClient'] = new HttpClient(
       upgradedServices['HttpXhrBackend']);
     upgradedServices['LanguageUtilService'] = new LanguageUtilService(
@@ -884,7 +885,6 @@ export class UpgradedServices {
       new StoryObjectFactory();
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
-    upgradedServices['TopicObjectFactory'] = new TopicObjectFactory();
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
@@ -1105,7 +1105,6 @@ export class UpgradedServices {
         upgradedServices['CountVectorizerService'],
         upgradedServices['SVMPredictionService'],
         upgradedServices['TextInputTokenizer']);
-    upgradedServices['TopicObjectFactory'] = new TopicObjectFactory();
     upgradedServices['TopicCreationBackendApiService'] =
       new TopicCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =

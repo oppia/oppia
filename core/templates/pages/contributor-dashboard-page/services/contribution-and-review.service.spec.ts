@@ -29,6 +29,7 @@ describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
   let carbas: ContributionAndReviewBackendApiService;
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
+  let downloadContributorCertificateAsyncSpy: jasmine.Spy;
 
   const suggestion1 = {
     suggestion_id: 'suggestion_id_1',
@@ -106,6 +107,8 @@ describe('Contribution and review service', () => {
     cars = TestBed.inject(ContributionAndReviewService);
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
     fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
+    downloadContributorCertificateAsyncSpy = spyOn(
+      carbas, 'downloadContributorCertificateAsync');
   });
 
   describe('getUserCreatedQuestionSuggestionsAsync', () => {
@@ -124,7 +127,7 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-        cars.getUserCreatedQuestionSuggestionsAsync()
+        cars.getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
@@ -148,7 +151,7 @@ describe('Contribution and review service', () => {
 
       // Only the first 2 results should be returned and the extra result
       // should be cached.
-      cars.getUserCreatedQuestionSuggestionsAsync()
+      cars.getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_1)
             .toEqual(expectedSuggestionDict);
@@ -191,7 +194,7 @@ describe('Contribution and review service', () => {
 
       // Return both the cached 3rd suggestion and the new 4th suggestion to the
       // caller.
-      cars.getUserCreatedQuestionSuggestionsAsync(false)
+      cars.getUserCreatedQuestionSuggestionsAsync(false, 'sort_key')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_3)
             .toEqual(expectedSuggestion3Dict);
@@ -218,7 +221,7 @@ describe('Contribution and review service', () => {
 
       // Only the first 2 results should be returned and the extra result
       // should be cached.
-      cars.getUserCreatedQuestionSuggestionsAsync()
+      cars.getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_1)
             .toEqual(expectedSuggestionDict);
@@ -236,7 +239,7 @@ describe('Contribution and review service', () => {
         Promise.resolve(multiplePageBackendFetchResponse));
 
       // Return the first 2 results from offset 0 again.
-      cars.getUserCreatedQuestionSuggestionsAsync()
+      cars.getUserCreatedQuestionSuggestionsAsync(true, 'sort_key')
         .then((response) => {
           expect(response.suggestionIdToDetails.suggestion_id_1)
             .toEqual(expectedSuggestionDict);
@@ -249,13 +252,39 @@ describe('Contribution and review service', () => {
     }));
   });
 
+  describe('downloadContributorCertificateAsync', () => {
+    it('should download the contributor certificate',
+      () => {
+        downloadContributorCertificateAsyncSpy.and.returnValue(
+          Promise.resolve({
+            from_date: '1 Nov 2022',
+            to_date: '1 Dec 2022',
+            contribution_hours: 1.0,
+            team_lead: 'Test User',
+            language: 'Hindi'
+          }));
+
+        cars.downloadContributorCertificateAsync(
+          'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02'
+        ).then((response) => {
+          expect(response.from_date).toEqual('1 Nov 2022');
+          expect(response.to_date).toEqual('1 Dec 2022');
+          expect(response.contribution_hours).toEqual(1.0);
+          expect(response.team_lead).toEqual('Test User');
+          expect(response.language).toEqual('Hindi');
+        });
+
+        expect(downloadContributorCertificateAsyncSpy).toHaveBeenCalled();
+      });
+  });
+
   describe('getReviewableQuestionSuggestionsAsync', () => {
     it('should return available question suggestions and opportunity details',
       () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-        cars.getReviewableQuestionSuggestionsAsync()
+        cars.getReviewableQuestionSuggestionsAsync(true, 'sort_key')
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
               .toEqual(expectedSuggestionDict);
@@ -271,7 +300,7 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse));
 
-        cars.getUserCreatedTranslationSuggestionsAsync()
+        cars.getUserCreatedTranslationSuggestionsAsync(true, 'sort_key')
           .then((response) => {
             expect(response.suggestionIdToDetails.suggestion_id_1)
               .toEqual(expectedSuggestionDict);

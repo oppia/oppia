@@ -112,6 +112,10 @@ OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 FRONTEND_TEMPLATES_DIR = (
     os.path.join('webpack_bundles') if constants.DEV_MODE else
     os.path.join('build', 'webpack_bundles'))
+# To know more about AOT visit https://angular.io/guide/glossary#aot
+FRONTEND_AOT_DIR = (
+    os.path.join('dist', 'oppia-angular') if constants.DEV_MODE else
+    os.path.join('dist', 'oppia-angular-prod'))
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
 
@@ -259,7 +263,6 @@ MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
 PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
-PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -530,24 +533,17 @@ EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
 EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
-# with the Mailgun API key.
-MAILGUN_API_KEY = None
-# If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
 # Audience ID of the mailing list for Oppia in Mailchimp.
 MAILCHIMP_AUDIENCE_ID = None
-# Mailchimp API Key.
-MAILCHIMP_API_KEY = None
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
-# Mailchimp secret, used to authenticate webhook requests.
-MAILCHIMP_WEBHOOK_SECRET = None
 # Valid Mailchimp merge keys.
 VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
-VALID_MAILCHIMP_TAGS = ['Android', 'Web']
+VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
@@ -579,7 +575,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.8'
+OPPIA_VERSION = '3.2.9'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -933,6 +929,7 @@ CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
 CONTRIBUTOR_STATS_SUMMARIES_URL = '/contributorstatssummaries'
 CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = '/contributorallstatssummaries'
+CONTRIBUTOR_CERTIFICATE_URL = '/contributorcertificate'
 CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
@@ -1611,6 +1608,9 @@ CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
+TRANSLATION_TEAM_LEAD = 'Anubhuti Varshney'
+QUESTION_TEAM_LEAD = 'Jatin Kumar Jadoun'
+
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
     'suggestion_type', 'target_type', 'target_id', 'status', 'author_id',
@@ -1637,6 +1637,9 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
+
+# The sort keys of submitted questions shown on the Contributor Dashboard.
+SUGGESTIONS_SORT_KEYS = [constants.SUGGESTIONS_SORT_KEY_DATE]
 
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is

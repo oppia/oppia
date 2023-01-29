@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.8.12'
+          python-version: '3.8.15'
           architecture: 'x64'
       - uses: ./.github/actions/merge
       - name: Cache node modules and third_party/static
@@ -36,11 +36,7 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - uses: ./.github/actions/install-oppia-dependencies
-      - id: check-risk
-        name: Check if PR is low-risk
-        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: Install chrome
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
       - name: Check that all e2e test files are captured in wdio.conf.js
         run: python -m scripts.check_e2e_tests_are_captured_in_ci
