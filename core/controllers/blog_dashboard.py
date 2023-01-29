@@ -216,12 +216,16 @@ class BlogPostHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.BLOG_POST_ID_LENGTH
+                },
+                {
+                "id": "has_length_at_least",
+                "min_value": 5
+                }]
             },
-            'validators': [{
-                'id': 'has_length_at_most',
-                'max_value': constants.BLOG_POST_ID_LENGTH
-            }]
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -259,7 +263,6 @@ class BlogPostHandler(
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id: str) -> None:
         """Populates the data on the blog dashboard editor page."""
-        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
@@ -306,7 +309,6 @@ class BlogPostHandler(
     def put(self, blog_post_id: str) -> None:
         """Updates properties of the given blog post."""
         assert self.normalized_payload is not None
-        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=True))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
@@ -331,7 +333,6 @@ class BlogPostHandler(
         """Stores thumbnail of the blog post in the datastore."""
         assert self.normalized_request is not None
         assert self.normalized_payload is not None
-        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         raw_image = self.normalized_request['image']
         thumbnail_filename = self.normalized_payload['thumbnail_filename']
         try:
@@ -354,7 +355,6 @@ class BlogPostHandler(
     @acl_decorators.can_delete_blog_post
     def delete(self, blog_post_id: str) -> None:
         """Handles Delete requests."""
-        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_services.delete_blog_post(blog_post_id)
         self.render_json(self.values)
 
@@ -376,7 +376,15 @@ class BlogPostTitleHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.BLOG_POST_ID_LENGTH
+                },
+                {
+                "id": "has_length_at_least",
+                "min_value": 5
+                }]
             }
         }
     }

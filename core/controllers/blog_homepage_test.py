@@ -18,10 +18,13 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.constants import constants
 from core.domain import blog_services
 from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
+
+from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -29,6 +32,11 @@ if MYPY:  # pragma: no cover
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
+MAX_CHARS_IN_BLOG_POST_URL: Final = (
+    constants.MAX_CHARS_IN_BLOG_POST_TITLE
+    + len('-')
+    + constants.BLOG_POST_ID_LENGTH
+)
 
 class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
     """Checks that the data for blog homepage is handled properly."""
@@ -340,6 +348,27 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, blog_post.url_fragment),
             expected_status_int=404
+        )
+
+    def test_raise_exception_if_blog_post_url_is_invalid(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        # Blog post URL fragment is exceeding max character limit.
+        self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_HOMEPAGE_DATA_URL,
+                'aa'*MAX_CHARS_IN_BLOG_POST_URL
+            ),
+            expected_status_int=400
+        )
+        # Blog post URL fragment fails minimum character validation.
+        self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_HOMEPAGE_DATA_URL,
+                'aa'
+            ),
+            expected_status_int=400
         )
 
 

@@ -20,6 +20,7 @@ import os
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import blog_services
 from core.platform import models
 from core.tests import test_utils
@@ -318,9 +319,18 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
 
     def test_get_blog_post_data_by_invalid_blog_post_id(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
+        # ID fails minimum length validation.
         self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, '123'),
-            expected_status_int=500)
+            expected_status_int=400)
+
+        # ID fails maximum length validation.
+        self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_EDITOR_DATA_URL_PREFIX,
+                '123'*constants.BLOG_POST_ID_LENGTH
+            ),
+            expected_status_int=400)
 
         blog_services.delete_blog_post(self.blog_post.id)
         self.get_json(
@@ -407,14 +417,16 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.put_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, 123),
             payload, csrf_token=csrf_token,
-            expected_status_int=404)
+            expected_status_int=400
+        )
 
         blog_services.delete_blog_post(self.blog_post.id)
         csrf_token = self.get_new_csrf_token()
         # This is raised by acl decorator.
         self.put_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
-            payload, csrf_token=csrf_token, expected_status_int=404)
+            payload, csrf_token=csrf_token, expected_status_int=404
+        )
 
     def test_update_blog_post_with_invalid_change_dict(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
@@ -570,12 +582,15 @@ class BlogPostTitleHandlerTest(test_utils.GenericTestBase):
         """Complete the setup process for testing."""
         super().setUp()
         self.signup(
-            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME
+        )
         self.blog_admin_id = (
-            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL)
+        )
         self.add_user_role(
             self.BLOG_ADMIN_USERNAME,
-            feconf.ROLE_ID_BLOG_ADMIN)
+            feconf.ROLE_ID_BLOG_ADMIN
+        )
         blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
         self.change_dict: blog_services.BlogPostChangeDict = {
             'title': 'Sample Title',

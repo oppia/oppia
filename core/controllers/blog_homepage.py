@@ -242,12 +242,16 @@ class BlogPostDataHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_url': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
+                },
+                {
+                    'id': 'has_length_at_least',
+                    'min_value': constants.BLOG_POST_ID_LENGTH
+                }]
             },
-            'validators': [{
-                'id': 'has_length_at_most',
-                'max_value': MAX_CHARS_IN_BLOG_POST_URL
-            }]
         }
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
