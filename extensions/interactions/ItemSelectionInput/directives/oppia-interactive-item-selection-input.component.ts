@@ -159,9 +159,11 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   submitMultipleChoiceAnswer(event: MouseEvent, index: number): void {
     event.preventDefault();
     // Deselect previously selected option.
-    if ((event.currentTarget as HTMLDivElement).classList.contains(
-      'selected')) {
-      (event.currentTarget as HTMLDivElement).classList.remove('selected');
+    var selectedElement = (
+      document.querySelector(
+        'button.multiple-choice-option.selected'));
+    if (selectedElement) {
+      selectedElement.classList.remove('selected');
     }
     // Selected current option.
     (event.currentTarget as HTMLDivElement).classList.add('selected');
