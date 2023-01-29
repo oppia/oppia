@@ -6184,6 +6184,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         self.assertIsNotNone(response)
 
     def test_create_question_contributor_certificate(self) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {
@@ -6194,12 +6195,14 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 'id': 'test_id',
                 'version': 12,
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 1,
             'skill_difficulty': 0.3
@@ -6233,6 +6236,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
     def test_create_question_contributor_certificate_with_image_content(
         self
     ) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         suggestion_change: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {
@@ -6243,12 +6247,14 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
                 'id': 'test_id',
                 'version': 12,
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': 1,
             'skill_difficulty': 0.3
