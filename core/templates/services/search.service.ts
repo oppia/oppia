@@ -118,7 +118,8 @@ export class SearchService {
     if (!itemCodes ||
         itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
         itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
-          itemCodes.length - EXPECTED_SUFFIX.length) {
+          itemCodes.length - EXPECTED_SUFFIX.length ||
+          itemCodes.lastIndexOf(EXPECTED_SUFFIX) === -1) {
       throw new Error(
         'Invalid search query url fragment for ' +
         itemsType + ': ' + urlComponent);
