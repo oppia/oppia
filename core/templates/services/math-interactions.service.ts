@@ -62,7 +62,8 @@ export class MathInteractionsService {
     }
     if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
       errorMessage = (
-        'Your answer seems to be missing a number after the × operator.');
+        'Your answer seems to be missing a variable/number after the "' +
+        errorMessage[0] + '".');
     }
     if (errorMessage === 'Not a prefix operator.') {
       errorMessage = (
