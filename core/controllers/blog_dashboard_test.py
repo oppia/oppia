@@ -528,11 +528,12 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
 
     def test_cannot_delete_invalid_blog_post(self) -> None:
         # Check that an invalid blog post can not be deleted.
-        # Error is raised by acl decorator.
+        # The error is raised as blog post id fails minimum character limit
+        # validation check.
         self.login(self.BLOG_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, 123456),
-            expected_status_int=404)
+            expected_status_int=400)
         self.logout()
 
         self.login(self.BLOG_ADMIN_EMAIL)
@@ -547,8 +548,10 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.login(self.BLOG_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
-                feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
-            expected_status_int=200)
+                feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id
+            ),
+            expected_status_int=200
+        )
         self.logout()
 
     def test_blog_post_handler_delete_by_blog_editor(self) -> None:
