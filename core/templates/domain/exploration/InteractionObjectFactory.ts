@@ -68,7 +68,6 @@ import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { Answer } from 'interactions/CodeRepl/directives/oppia-response-code-repl.component';
 
 
 export interface InteractionBackendDict {
