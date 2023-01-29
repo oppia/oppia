@@ -136,9 +136,12 @@ describe('Skill Preview Tab Component', () => {
 
 
   let displayedCard = new StateCard(
-    null, null, null, new Interaction(
-      [], [], null, null, [], '', null),
-    [], null, null, '', null);
+    '', '', '', new Interaction(
+      [], [], null as unknown as InteractionCustomizationArgs, null,
+      [], null, null),
+    [], null as unknown as RecordedVoiceovers,
+    null as unknown as WrittenTranslations,
+    '', null as unknown as AudioTranslationLanguageService);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -246,7 +249,7 @@ describe('Skill Preview Tab Component', () => {
 
     component.displayedCard = new StateCard(
       '', '', '', new Interaction(
-        [], [], null as InteractionCustomizationArgs, null,
+        [], [], null as unknown as InteractionCustomizationArgs, null,
         [], 'ImageClickInput', null),
       [], null as unknown as RecordedVoiceovers,
       null as unknown as WrittenTranslations,
