@@ -38,6 +38,7 @@ MAX_CHARS_IN_BLOG_POST_URL: Final = (
     + constants.BLOG_POST_ID_LENGTH
 )
 
+
 class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
     """Checks that the data for blog homepage is handled properly."""
 
@@ -358,7 +359,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '%s/%s' % (
                 feconf.BLOG_HOMEPAGE_DATA_URL,
-                'aa'*MAX_CHARS_IN_BLOG_POST_URL
+                'aa' * MAX_CHARS_IN_BLOG_POST_URL
             ),
             expected_status_int=400
         )

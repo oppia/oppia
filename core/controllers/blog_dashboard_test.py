@@ -328,7 +328,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.get_json(
             '%s/%s' % (
                 feconf.BLOG_EDITOR_DATA_URL_PREFIX,
-                '123'*constants.BLOG_POST_ID_LENGTH
+                '123' * constants.BLOG_POST_ID_LENGTH
             ),
             expected_status_int=400)
 

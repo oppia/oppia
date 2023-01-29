@@ -222,8 +222,8 @@ class BlogPostHandler(
                     'max_value': constants.BLOG_POST_ID_LENGTH
                 },
                 {
-                "id": "has_length_at_least",
-                "min_value": 5
+                'id': 'has_length_at_least',
+                'min_value': constants.BLOG_POST_ID_LENGTH
                 }]
             },
         }
@@ -382,8 +382,8 @@ class BlogPostTitleHandler(
                     'max_value': constants.BLOG_POST_ID_LENGTH
                 },
                 {
-                "id": "has_length_at_least",
-                "min_value": 5
+                'id': 'has_length_at_least',
+                'min_value': constants.BLOG_POST_ID_LENGTH,
                 }]
             }
         }
