@@ -40,16 +40,8 @@ module.exports = class puppeteerUtilities {
    * to a Page object controlled by Puppeteer.
    */
   async openBrowser() {
-    /* Currently, headless is set to false and the page viewport
-       is maximized so that it would be easy for the developers
-       to debug easily while testing.
-       We can remove these settings before merging as we have
-       to run the tests in headless mode. */
     await puppeteer
-      .launch({
-        headless: false,
-        args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
-      })
+      .launch()
       .then(async(browser) => {
         this.browserObject = browser;
         this.page = await browser.newPage();
