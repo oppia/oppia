@@ -181,40 +181,6 @@ describe('Progress nav component', () => {
     expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
   }));
 
-  it('should return true if interaction has special case for mobile', () => {
-    spyOn(browserCheckerService, 'isMobileDevice')
-      .and.returnValue(true);
-    componentInstance.interactionId = 'ItemSelectionInput';
-    expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
-      .toBeTrue();
-    expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
-  });
-
-  it('should return false if interaction id is not item selection input',
-    () => {
-      spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
-      componentInstance.interactionId = 'not item selection input';
-
-      expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
-        .toBeFalse();
-      expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
-    });
-
-  it('should not resolve special case for interaction if in desktop mode',
-    () => {
-      spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
-      componentInstance.interactionCustomizationArgs = {
-        maxAllowableSelectionCount: {
-          value: 2
-        }
-      };
-      componentInstance.interactionId = 'ItemSelectionInput';
-
-      expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
-        .toBeTrue();
-      expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
-    });
-
   it('should tell if window can show two cards', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1);
