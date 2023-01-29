@@ -41,7 +41,9 @@ module.exports = class puppeteerUtilities {
    */
   async openBrowser() {
     await puppeteer
-      .launch()
+      .launch({
+        args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
+      })
       .then(async(browser) => {
         this.browserObject = browser;
         this.page = await browser.newPage();
