@@ -131,13 +131,13 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         'e2e-test-publish-blog-post-button')[0].disabled;
       if (!publishedButtonIsDisabled) {
         throw new Error(
-          'Published button is not disabled when the ' +
-          'blog post data is not completely filled');
+          'Published button is not disabled when the blog post data is not' +
+          ' completely filled');
       }
     });
     showMessage(
-      'Published button is disabled when blog post data ' +
-      'is not completely filled.');
+      'Published button is disabled when blog post data is not completely' +
+      ' filled');
   }
 
   /**
@@ -222,12 +222,11 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
         'blog-dashboard-tile-content');
       if (allBlogPosts.length !== number) {
         throw new Error(
-          'Number of blog posts is not equal to ' +
-          number);
+          `Number of blog posts is not equal to ${number}`);
       }
     }, number);
 
-    showMessage('Number of blog posts is equal to ' + number);
+    showMessage(`Number of blog posts is equal to ${number}`);
   }
 
   /**
@@ -258,17 +257,16 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       }
       if (count === 0) {
         throw new Error(
-          'Draft blog post with title ' +
-          checkDraftBlogPostByTitle + ' does not exist!');
+          `Draft blog post with title ${checkDraftBlogPostByTitle} does not` +
+          ' exist!');
       } else if (count > 1) {
         throw new Error(
-          'Draft blog post with title ' +
-          checkDraftBlogPostByTitle + ' exists more than once!');
+          `Draft blog post with title ${checkDraftBlogPostByTitle} exists` +
+          ' more than once!');
       }
     }, checkDraftBlogPostByTitle);
     showMessage(
-      'Draft blog post with title ' + checkDraftBlogPostByTitle +
-      ' exists!');
+      `Draft blog post with title ${checkDraftBlogPostByTitle} exists!`);
   }
 
   /**
@@ -291,17 +289,14 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       }
       if (count === 0) {
         throw new Error(
-          'Blog post with title ' +
-          blogPostTitle + ' does not exist!');
+          `Blog post with title ${blogPostTitle} does not exist!`);
       } else if (count > 1) {
         throw new Error(
-          'Blog post with title ' +
-          blogPostTitle + ' exists more than once!');
+          `Blog post with title ${blogPostTitle} exists more than once!`);
       }
     }, blogPostTitle);
     showMessage(
-      'Published blog post with title ' +
-      blogPostTitle + ' exists!');
+      `Published blog post with title ${blogPostTitle} exists!`);
   }
 
   /**
@@ -314,8 +309,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       showMessage('User unauthorized to access blog dashboard!');
     } catch (err) {
       throw new Error(
-        'No unauthorization error on accessing the ' +
-        'blog dashboard page!');
+        'No unauthorization error on accessing the blog dashboard page!');
     }
   }
 
@@ -367,11 +361,11 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       const tagList = document.getElementsByClassName('form-control');
       for (let i = 0; i < tagList.length; i++) {
         if (tagList[i].value === tagName) {
-          throw new Error('Tag ' + tagName + ' already exists in tag list!');
+          throw new Error(`Tag ${tagName} already exists in tag list!`);
         }
       }
     }, tagName);
-    showMessage('Tag with name ' + tagName + ' does not exist in tag list!');
+    showMessage(`Tag with name ${tagName} does not exist in tag list!`);
   }
 
   /**
@@ -386,7 +380,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
       tagList[tagList.length - 1].value = tagName;
     }, tagName);
     await this.clickOn('Save');
-    showMessage('Tag ' + tagName + ' added in tag list successfully!');
+    showMessage(`Tag ${tagName} added in tag list successfully!`);
   }
 
   /**
@@ -401,9 +395,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
           return;
         }
       }
-      throw new Error('Tag ' + tagName + ' does not exist in tag list!');
+      throw new Error(`Tag ${tagName} does not exist in tag list!`);
     }, tagName);
-    showMessage('Tag with name ' + tagName + ' exists in tag list!');
+    showMessage(`Tag with name ${tagName} exists in tag list!`);
   }
 
   /**
@@ -419,7 +413,7 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.type(maximumTagLimitInput, limit);
     await this.clickOn('Save');
 
-    showMessage('Successfully updated the tag limit to ' + limit + '!');
+    showMessage(`Successfully updated the tag limit to ${limit}!`);
   }
 
   /**
@@ -430,10 +424,10 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.page.evaluate(async(limit) => {
       const tagLimit = document.getElementById('mat-input-0').value;
       if (tagLimit.value === limit) {
-        throw new Error('Maximum tag limit is already ' + limit + '!');
+        throw new Error(`Maximum tag limit is already ${limit}!`);
       }
     }, limit);
-    showMessage('Maximum tag limit is not ' + limit + '!');
+    showMessage(`Maximum tag limit is not ${limit}!`);
   }
 
   /**
@@ -444,9 +438,9 @@ module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
     await this.page.evaluate(async(limit) => {
       const tagLimit = document.getElementById('mat-input-0').value;
       if (tagLimit.value !== limit) {
-        throw new Error('Maximum tag limit is not ' + limit + '!');
+        throw new Error(`Maximum tag limit is not ${limit}!`);
       }
     });
-    showMessage('Maximum tag is currently ' + limit + '!');
+    showMessage(`Maximum tag is currently ${limit}!`);
   }
 };

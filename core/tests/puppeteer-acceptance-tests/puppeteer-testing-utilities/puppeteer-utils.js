@@ -103,7 +103,7 @@ module.exports = class puppeteerUtilities {
   async clickOn(selector) {
     try {
       const [button] = await this.page.$x(
-        '//' + `*[contains(text(), '${selector}')]`);
+        `\/\/*[contains(text(), '${selector}')]`);
       await button.click();
     } catch (error) {
       await this.page.waitForSelector(selector);
@@ -130,7 +130,7 @@ module.exports = class puppeteerUtilities {
           return;
         }
       }
-      throw new Error('Role ' + role + ' does not exists.');
+      throw new Error(`Role ${role} does not exists.`);
     }, role);
   }
 
@@ -153,9 +153,9 @@ module.exports = class puppeteerUtilities {
           return;
         }
       }
-      throw new Error('User does not have the ' + role + ' role!');
+      throw new Error(`User does not have the ${role} role!`);
     }, role);
-    showMessage('User ' + username + ' has the ' + role + ' role!');
+    showMessage(`User ${username} has the ${role} role!`);
     await this.goto(currentPageUrl);
   }
 
@@ -175,11 +175,11 @@ module.exports = class puppeteerUtilities {
         'oppia-user-role-description');
       for (let i = 0; i < userRoles.length; i++) {
         if (userRoles[i].innerText.toLowerCase() === role) {
-          throw new Error('User has the ' + role + ' role!');
+          throw new Error(`User has the ${role} role!`);
         }
       }
     }, role);
-    showMessage('User ' + username + ' does not have the ' + role + ' role!');
+    showMessage(`User ${username} does not have the ${role} role!`);
     await this.goto(currentPageUrl);
   }
 
