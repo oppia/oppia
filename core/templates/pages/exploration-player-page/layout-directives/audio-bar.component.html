@@ -212,7 +212,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    height: 44px;
+    height: 70px;
     justify-content: center;
     padding: 0 4px;
     transition: margin-top 200ms linear;
@@ -249,6 +249,7 @@
     color: white;
     font-size: 10px;
     font-style: italic;
+    vertical-align: 29px;
   }
 
   .audio-header {
@@ -277,14 +278,15 @@
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     margin-left: 5px;
-    padding-left: 3px;
+    padding-left: 2px;
+    padding-top: 2px;
   }
 
   .slider-section {
+    line-height: 0px;
     transform: translateY(10px);
-    width: 38%;
   }
 
   .audio-bar-nav-up {
@@ -295,7 +297,7 @@
     margin-top: -270px;
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 370px) {
     .oppia-audio-header-control-buttons {
       justify-content: space-evenly;
     }
