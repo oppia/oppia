@@ -419,7 +419,7 @@ export class DiagnosticTestPlayerEngineService {
 
     return StateCard.createNewCard(
       stateData.name as string, questionHtml, interactionHtml as string,
-      interaction, stateData.recordedVoiceovers, stateData.writtenTranslations,
+      interaction, stateData.recordedVoiceovers,
       stateData.content.contentId as string,
       this.audioTranslationLanguageService
     );
