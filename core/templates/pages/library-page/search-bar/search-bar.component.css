@@ -165,6 +165,7 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     border-radius: 0;
     height: 45px;
   }
+
   .oppia-search-button {
     border-bottom-right-radius: 10px;
     border-top-right-radius: 10px;
@@ -173,17 +174,14 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
   oppia-search-bar .oppia-input-group.classroom-page-input-group {
     width: 17em;
   }
-  .oppia-search-bar-text-input {
+  .oppia-search-bar-form .input-group .oppia-search-bar-text-input {
     border: 3px solid #257d76;
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
-    height: 45px;
-    padding-top: 8px;
-  }
-  
-  .input-group > .form-control:not(:first-child){
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
+    height: 45px;
+    padding-top: 8px;
   }
 
   oppia-search-bar .oppia-input-group input {
