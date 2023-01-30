@@ -452,13 +452,13 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         suggestions = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['created_suggestions_list'][0]
         change_dict['old_value'] = {
-            'content_id': 'content_0',
+            'content_id': 'content',
             'html': ''
         }
         self.assertEqual(suggestions['change'], change_dict)
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
-            suggestions['change']['old_value']['content_id'], 'content_0')
+            suggestions['change']['old_value']['content_id'], 'content')
         self.logout()
 
     def test_get_suggestions_to_review_list(self) -> None:
@@ -494,7 +494,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_1', None)
 
         change_dict['old_value'] = {
-            'content_id': 'content_0',
+            'content_id': 'content',
             'html': ''
         }
         suggestions = self.get_json(
@@ -504,7 +504,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(suggestions[0]['change'], change_dict)
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
-            suggestions[0]['change']['old_value']['content_id'], 'content_0')
+            suggestions[0]['change']['old_value']['content_id'], 'content')
 
         self.logout()
 

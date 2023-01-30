@@ -36,6 +36,8 @@ interface ExplanationFormSchema {
 })
 export class SolutionEditor implements OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+    EventEmitter<string[]> = new EventEmitter();
 
   @Output() openSolutionEditorModal: EventEmitter<void> = new EventEmitter();
 
@@ -65,6 +67,10 @@ export class SolutionEditor implements OnInit {
 
   updateNewSolution(value: Solution): void {
     this.saveSolution.emit(value);
+  }
+
+  openMarkAllAudioAsNeedingUpdateModalIfRequired(value: string[]): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
   }
 
   openEditorModal(): void {

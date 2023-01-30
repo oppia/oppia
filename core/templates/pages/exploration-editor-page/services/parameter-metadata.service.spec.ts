@@ -80,6 +80,7 @@ describe('Parameter Metadata Service', () => {
             solicit_answer_details: false,
             card_is_checkpoint: false,
             linked_skill_id: null,
+            next_content_id_index: 0,
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}'
@@ -127,12 +128,19 @@ describe('Parameter Metadata Service', () => {
               },
               hints: [],
             },
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {},
+              },
+            },
           },
           State: {
             classifier_model_id: null,
             solicit_answer_details: false,
             card_is_checkpoint: false,
             linked_skill_id: null,
+            next_content_id_index: 0,
             content: {
               content_id: 'content',
               html: 'content'
@@ -180,12 +188,19 @@ describe('Parameter Metadata Service', () => {
               },
               hints: []
             },
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {},
+              }
+            }
           },
           State2: {
             classifier_model_id: null,
             solicit_answer_details: false,
             card_is_checkpoint: false,
             linked_skill_id: null,
+            next_content_id_index: 0,
             content: {
               content_id: 'content',
               html: 'content'
@@ -233,12 +248,19 @@ describe('Parameter Metadata Service', () => {
               },
               hints: []
             },
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {},
+              }
+            }
           },
           State3: {
             classifier_model_id: null,
             solicit_answer_details: false,
             card_is_checkpoint: false,
             linked_skill_id: null,
+            next_content_id_index: 0,
             content: {
               content_id: 'content',
               html: 'content'
@@ -285,6 +307,12 @@ describe('Parameter Metadata Service', () => {
                 },
               },
               hints: []
+            },
+            written_translations: {
+              translations_mapping: {
+                content: {},
+                default_outcome: {},
+              }
             }
           }
         });

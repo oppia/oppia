@@ -24,21 +24,15 @@ import {
   SubtitledHtml,
   SubtitledHtmlBackendDict
 } from 'domain/exploration/subtitled-html.model';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface HintBackendDict {
   'hint_content': SubtitledHtmlBackendDict;
 }
 
-export class Hint extends BaseTranslatableObject {
+export class Hint {
   hintContent: SubtitledHtml;
   constructor(hintContent: SubtitledHtml) {
-    super();
     this.hintContent = hintContent;
-  }
-
-  getTranslatableFields(): SubtitledHtml[] {
-    return [this.hintContent];
   }
 
   toBackendDict(): HintBackendDict {
