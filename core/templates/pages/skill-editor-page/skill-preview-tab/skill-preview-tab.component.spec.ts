@@ -140,7 +140,6 @@ describe('Skill Preview Tab Component', () => {
       [], [], null as unknown as InteractionCustomizationArgs, null,
       [], null, null),
     [], null as unknown as RecordedVoiceovers,
-    null as unknown as WrittenTranslations,
     '', null as unknown as AudioTranslationLanguageService);
 
   beforeEach(waitForAsync(() => {
@@ -252,7 +251,6 @@ describe('Skill Preview Tab Component', () => {
         [], [], null as unknown as InteractionCustomizationArgs, null,
         [], 'ImageClickInput', null),
       [], null as unknown as RecordedVoiceovers,
-      null as unknown as WrittenTranslations,
       '', null as unknown as AudioTranslationLanguageService);
 
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
@@ -274,11 +272,11 @@ describe('Skill Preview Tab Component', () => {
         [], [], null as unknown as InteractionCustomizationArgs, null,
         [], 'ImageClickInput', null),
       [], null as unknown as RecordedVoiceovers,
-      null as unknown as WrittenTranslations,
       '', null as unknown as AudioTranslationLanguageService);
 
     expect(component.displayedCard.isInteractionInline()).toBeFalse();
-  });
+  }); null as unknown as WrittenTranslations,
+
 
   it('should filter the questions', () => {
     component.questionDicts = [questionDict1, questionDict2,
