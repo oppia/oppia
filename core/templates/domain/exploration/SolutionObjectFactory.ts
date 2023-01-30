@@ -40,6 +40,7 @@ import {
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 import { InteractionCustomizationArgs, DragAndDropSortInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 export interface ExplanationBackendDict {
@@ -61,7 +62,7 @@ export interface ShortAnswerResponse {
   answer: string;
 }
 
-export class Solution {
+export class Solution extends BaseTranslatableObject {
   ehfs: ExplorationHtmlFormatterService;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
@@ -70,10 +71,16 @@ export class Solution {
       ehfs: ExplorationHtmlFormatterService,
       answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
       explanation: SubtitledHtml) {
+    super();
+
     this.ehfs = ehfs;
     this.answerIsExclusive = answerIsExclusive;
     this.correctAnswer = correctAnswer;
     this.explanation = explanation;
+  }
+
+  getTranslatableFields(): SubtitledHtml[] {
+    return [this.explanation];
   }
 
   toBackendDict(): SolutionBackendDict {
