@@ -399,12 +399,13 @@ export class InteractionObjectFactory {
   }
 
   convertFromCustomizationArgsBackendDict(
-      interactionId: string | null,
+      interactionId: string,
       caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
-    if (interactionId === null) {
-      return {};
-    }
+    //This code is commented because interactionId can never be null 
+    // if (interactionId === null) {
+    //   return {};
+    // }
     switch (interactionId) {
       case 'AlgebraicExpressionInput':
         return (
@@ -486,7 +487,7 @@ export class InteractionObjectFactory {
 
   createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
-      interactionId: string | null
+      interactionId: string
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
