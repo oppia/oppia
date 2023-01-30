@@ -173,7 +173,12 @@ export class QuestionSuggestionReviewModalComponent
       modalRef.componentInstance.skill = skillDict.skill;
       modalRef.componentInstance.skillDifficulty = this.skillDifficulty;
 
-      modalRef.result.then(() => {
+      modalRef.result.then((change) => {
+        this.allContributions[this.suggestionId].suggestion.change
+          .question_dict = change.questionDict;
+        this.allContributions[this.suggestionId].suggestion.change
+          .skill_difficulty = change.skillDifficulty;
+        this.refreshContributionState();
         this.editSuggestionEmitter.emit(
           {
             suggestionId: this.suggestionId,
