@@ -2973,7 +2973,7 @@ oppia-noninteractive-link {
 .oppia-activity-summary-tile .activity-title,
 .oppia-activity-summary-tile-mobile .activity-title {
   bottom: 0;
-  color: white;
+  color: #1a1a1a;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 1.1em;
   font-weight: normal;
