@@ -296,29 +296,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Before each individual test, create a question."""
         super().setUp()
-        content_id_generator = translation_domain.ContentIdGenerator()
-        question_state_data = self._create_valid_question_data(
-            'ABC', content_id_generator)
+        question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
-            ['skillId12345-123'],
-            content_id_generator.next_content_id_index)
-
-        self.content_id_generator = translation_domain.ContentIdGenerator()
-        self.question_state_dict = (
-            question_domain.Question.create_default_question_state(
-                self.content_id_generator
-            ).to_dict())
+            ['skillId12345-123'])
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.',
-                translation_domain.TranslatableContentFormat.HTML,
-                True
-            )
+                'My name is Nikhil.', True)
         }
         self.dummy_entity_translations = translation_domain.EntityTranslation(
-            'question_id', feconf.TranslatableEntityType.QUESTION, 1, 'hi',
+            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
             translation_dict)
         self.state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
@@ -344,17 +332,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify to_dict and from_dict methods
         of Question domain object.
         """
+        default_question_state_data = (
+            question_domain.Question.create_default_question_state())
         question_dict: question_domain.QuestionDict = {
             'id': 'col1.random',
-            'question_state_data': self.question_state_dict,
+            'question_state_data': default_question_state_data.to_dict(),
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'language_code': 'en',
             'version': 1,
             'linked_skill_ids': ['skill1'],
-            'inapplicable_skill_misconception_ids': ['skill1-123'],
-            'next_content_id_index': (
-                self.content_id_generator.next_content_id_index)
+            'inapplicable_skill_misconception_ids': ['skill1-123']
         }
 
         observed_object = question_domain.Question.from_dict(question_dict)
@@ -647,11 +635,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         skill_ids = ['test_skill1', 'test_skill2']
         question = question_domain.Question.create_default_question(
             question_id, skill_ids)
-        content_id_generator = translation_domain.ContentIdGenerator()
         default_question_data = (
-            question_domain.Question.create_default_question_state(
-                content_id_generator
-            ).to_dict())
+            question_domain.Question.create_default_question_state().to_dict())
 
         self.assertEqual(question.id, question_id)
         self.assertEqual(
@@ -693,13 +678,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify update_question_state_data method of the Question
         domain object.
         """
-        content_id_generator = translation_domain.ContentIdGenerator()
-        question_state_data = self._create_valid_question_data(
-            'Test', content_id_generator)
+        question_state_data = self._create_valid_question_data('Test')
 
         self.question.update_question_state_data(question_state_data)
-        self.question.update_next_content_id_index(
-            content_id_generator.next_content_id_index)
 
         self.assertEqual(
             question_state_data.to_dict(),
@@ -707,23 +688,26 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v27_to_v28(self) -> None:
-        test_data = self.question_state_dict['recorded_voiceovers']
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        test_data = question_data['recorded_voiceovers']
         # Here we use MyPy ignore because we are defining an older version
         # dictionary of state which contains `content_ids_to_audio_translations`
         # key, but question_data is of type StateDict (latest version dictionary
         # for state) and StateDict do not contain this older key. So, because of
         # this MyPy throws an `TypedDict "StateDict" has no key` error. Thus to
         # avoid the error, we used ignore here.
-        self.question_state_dict['content_ids_to_audio_translations'] = (  # type: ignore[misc]
+        question_data['content_ids_to_audio_translations'] = (  # type: ignore[misc]
             test_data['voiceovers_mapping'])
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
         # Removing 'recorded_voiceovers' from question_data.
-        del self.question_state_dict['recorded_voiceovers']  # type: ignore[misc]
+        del question_data['recorded_voiceovers']  # type: ignore[misc]
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 27
         }
 
@@ -738,14 +722,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['recorded_voiceovers'], test_data)
 
     def test_question_state_dict_conversion_from_v28_to_v29(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
         # Removing 'solicit_answer_details' from question_data.
-        del self.question_state_dict['solicit_answer_details']  # type: ignore[misc]
+        del question_data['solicit_answer_details']  # type: ignore[misc]
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 28
         }
 
@@ -760,6 +746,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['solicit_answer_details'], False)
 
     def test_question_state_dict_conversion_from_v29_to_v30(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
         # Here we use MyPy ignore because the expected type for `answer_groups`
         # key is AnswerGroupDict but for testing purposes we are providing
         # a dictionary which contains `tagged_misconception_id` key and this
@@ -767,14 +756,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # So, due to this MyPy throws an `Extra key 'tagged_misconception_id'
         # for TypedDict "AnswerGroupDict"` error. Thus to avoid the error,
         # we used ignore here.
-        self.question_state_dict['interaction']['answer_groups'] = [
+        question_data['interaction']['answer_groups'] = [
             {  # type: ignore[typeddict-item]
                 'tagged_misconception_id': 1
             }
         ]
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 29
         }
 
@@ -799,20 +788,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'answer_groups'][0]['tagged_skill_misconception_id'])
 
     def test_question_state_dict_conversion_from_v30_to_v31(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
         # Here we use MyPy ignore because here we are defining an empty
         # VoiceoverDict, for checking when this dict passes throw conversion
         # functions, keys are populated automatically or not. So, due to the
         # absence of keys MyPy throws an `Missing key` error. Thus to avoid
         # the error, we used ignore here.
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {
+        question_data['recorded_voiceovers']['voiceovers_mapping'] = {
             'content': {
                 'audio_metadata': {}  # type: ignore[typeddict-item]
             }
         }
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 30
         }
 
@@ -838,23 +829,25 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v31_to_v32(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['interaction']['id'] = 'SetInput'
+        question_data['interaction']['id'] = 'SetInput'
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 31
         }
 
         self.assertEqual(
-            self.question_state_dict['interaction']['customization_args'], {})
+            question_data['interaction']['customization_args'], {})
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 32)
         self.assertEqual(
-            self.question_state_dict['interaction']['customization_args'],
+            question_data['interaction']['customization_args'],
             {
                 'buttonText': {
                     'value': 'Add item'
@@ -863,23 +856,25 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v32_to_v33(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['interaction']['id'] = 'MultipleChoiceInput'
+        question_data['interaction']['id'] = 'MultipleChoiceInput'
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 32
         }
 
         self.assertEqual(
-            self.question_state_dict['interaction']['customization_args'], {})
+            question_data['interaction']['customization_args'], {})
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 33)
         self.assertEqual(
-            self.question_state_dict['interaction']['customization_args'],
+            question_data['interaction']['customization_args'],
             {
                 'showChoicesInShuffledOrder': {
                     'value': True
@@ -888,16 +883,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v33_to_v34(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
         # Ruling out the possibility of None for mypy type checking.
-        assert self.question_state_dict['interaction'][
-            'default_outcome'] is not None
-        self.question_state_dict['content']['html'] = '<br/>'
-        self.question_state_dict['interaction']['default_outcome'][
+        assert question_data['interaction']['default_outcome'] is not None
+        question_data['content']['html'] = '<br/>'
+        question_data['interaction']['default_outcome'][
             'feedback']['html'] = '<br/>'
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 33
         }
 
@@ -924,9 +920,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v34_to_v35(self) -> None:
+        question_data: state_domain.StateDict = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['interaction']['id'] = 'MathExpressionInput'
-        self.question_state_dict['interaction']['solution'] = {
+        question_data['interaction']['id'] = 'MathExpressionInput'
+        question_data['interaction']['solution'] = {
             'answer_is_exclusive': False,
             'correct_answer': {
                 'ascii': '1'
@@ -936,7 +934,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
-        self.question_state_dict['interaction']['answer_groups'] = [
+        question_data['interaction']['answer_groups'] = [
             # Here we use MyPy ignore because here we are defining
             # AnswerGroupDict and while defining AnswerGroupDict MyPy
             # expects that all keys are defined, but for testing purposes
@@ -1012,20 +1010,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }
         ]
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {
+        question_data['recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = { # type: ignore[misc]
-            'translations_mapping': {
-                'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
-            }
+        question_data['written_translations']['translations_mapping'] = {
+            'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 34
         }
 
@@ -1040,6 +1033,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(
             test_value['state']['recorded_voiceovers'][
                 'voiceovers_mapping'],
+            {'temp_id_3': {}}
+        )
+        self.assertEqual(
+           test_value['state']['written_translations'][
+               'translations_mapping'],
             {'temp_id_3': {}}
         )
         self.assertEqual(
@@ -1104,6 +1102,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}
         }
+        test_value['state']['written_translations']['translations_mapping'] = {
+            'temp_id': {}
+        }
         test_value['state_schema_version'] = 34
 
         question_domain.Question.update_state_from_model(
@@ -1160,6 +1161,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}
         }
+        test_value['state']['written_translations']['translations_mapping'] = {
+            'temp_id': {}
+        }
         test_value['state_schema_version'] = 34
 
         question_domain.Question.update_state_from_model(
@@ -1181,6 +1185,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v35_to_v36(self) -> None:
+        question_data: state_domain.StateDict = (
+            question_domain.Question.create_default_question_state().to_dict())
+
         # Here we use MyPy ignore because we are defining WrittenTranslationDict
         # and WrittenTranslationDict do not accept 'html' key, because the
         # latest version of WrittenTranslation does not have any `html`
@@ -1188,40 +1195,35 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        self.question_state_dict['written_translations'] = { # type: ignore[misc]
-            'translations_mapping': {
-                'temp_id_1': {
-                    'en': {
-                        'html': 'html_body_1'
-                    }
-                },
-                'temp_id_2': {
-                    'en': {
-                        'html': 'html_body_2'
-                    }
+        question_data['written_translations']['translations_mapping'] = {
+            'temp_id_1': {
+                'en': {  # type: ignore[typeddict-item]
+                    'html': 'html_body_1'
+                }
+            },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
+            'temp_id_2': {
+                'en': {  # type: ignore[typeddict-item]
+                    'html': 'html_body_2'
                 }
             }
         }
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 35
         }
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains next_content_id_index property.
-        test_value['state']['next_content_id_index'] = 0 # type: ignore[misc]
+
+        self.assertEqual(test_value['state']['next_content_id_index'], 0)
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 36)
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains next_content_id_index property.
-        self.assertEqual(test_value['state']['next_content_id_index'], 3) # type: ignore[misc]
+        self.assertEqual(test_value['state']['next_content_id_index'], 3)
 
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
-        t_map = test_value['state']['written_translations'][ # type: ignore[misc]
+        t_map = test_value['state']['written_translations'][
             'translations_mapping']
         self.assertEqual(t_map['temp_id_1']['en']['data_format'], 'html')
         self.assertEqual(t_map['temp_id_2']['en']['data_format'], 'html')
@@ -1245,14 +1247,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
+        test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
@@ -1267,10 +1271,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['interaction']['customization_args'],
             {'initialCode': {}}
         )
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
+            test_value['state']['written_translations']['translations_mapping'],
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1296,14 +1298,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
+        test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
@@ -1333,14 +1337,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
+        test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
@@ -1380,10 +1386,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'ca_choices_9': {}
             }
         )
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
+            test_value['state']['written_translations']['translations_mapping'],
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1408,14 +1412,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # version of WrittenTranslation for which we have to provide `html`
         # key. So, due to this MyPy throws an `Extra key 'html' for TypedDict`
         # error. Thus to avoid the error, we used ignore here.
-        test_value['state']['written_translations']['translations_mapping'] = { # type: ignore[misc]
+        test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
+            # Here we use MyPy ignore because we are defining an older version
+            # WrittenTranslationDict which contain 'html' key.
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
@@ -1448,10 +1454,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
             {'ca_choices_3': {}}
         )
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
+            test_value['state']['written_translations']['translations_mapping'],
             {
                 'temp_id_1': {
                     'en': {'data_format': 'html', 'translation': 'html_body_1'}
@@ -1464,9 +1468,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v36_to_v37(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['interaction']['id'] = 'TextInput'
-        self.question_state_dict['interaction']['answer_groups'] = [{
+        question_data['interaction']['id'] = 'TextInput'
+        question_data['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'rule_type': 'CaseSensitiveEquals',
                 'inputs': {'x': ''}
@@ -1488,7 +1494,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 36
         }
 
@@ -1503,9 +1509,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v37_to_v38(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['interaction']['id'] = 'MathEquationInput'
-        self.question_state_dict['interaction']['answer_groups'] = [{
+        question_data['interaction']['id'] = 'MathEquationInput'
+        question_data['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'inputs': {
                     'x': 'variable=pi'
@@ -1527,10 +1535,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        self.question_state_dict['interaction']['customization_args'] = {}
+        question_data['interaction']['customization_args'] = {}
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 37
         }
 
@@ -1539,7 +1547,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 38)
         self.assertEqual(
-            self.question_state_dict['interaction']['customization_args'],
+            question_data['interaction']['customization_args'],
             {
                 'customOskLetters': {
                     'value': ['a', 'b', 'e', 'i', 'l', 'r', 'v', 'π']
@@ -1548,19 +1556,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v38_to_v39(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
-        self.question_state_dict['interaction']['customization_args'] = {}
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {}
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = { # type: ignore[misc]
-            'translations_mapping': {}
-        }
+        question_data['interaction']['id'] = 'NumericExpressionInput'
+        question_data['interaction']['customization_args'] = {}
+        question_data['recorded_voiceovers']['voiceovers_mapping'] = {}
+        question_data['written_translations']['translations_mapping'] = {}
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 38
         }
 
@@ -1584,17 +1589,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
             {'ca_placeholder_0': {}}
         )
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
         self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'], # type: ignore[misc]
+            test_value['state']['written_translations']['translations_mapping'],
             {'ca_placeholder_0': {}}
         )
 
     def test_question_state_dict_conversion_from_v39_to_v40(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['interaction']['id'] = 'TextInput'
-        self.question_state_dict['interaction']['answer_groups'] = [{
+        question_data['interaction']['id'] = 'TextInput'
+        question_data['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'inputs': {
                     'x': 'variable=pi'
@@ -1618,7 +1623,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 39
         }
 
@@ -1636,13 +1641,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v40_to_v41(self) -> None:
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
-        self.question_state_dict['written_translations'] = { # type: ignore[misc]
-            'translations_mapping': {}
-        }
-        self.question_state_dict['interaction']['id'] = 'TextInput'
-        self.question_state_dict['interaction']['answer_groups'] = [{
+        question_data: state_domain.StateDict = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'TextInput'
+        question_data['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'rule_type': 'standard',
                 'inputs': {
@@ -1664,14 +1667,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains next_content_id_index property.
-        self.question_state_dict['next_content_id_index'] = 0 # type: ignore[misc]
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {}
+        question_data['next_content_id_index'] = 0
+        question_data['recorded_voiceovers']['voiceovers_mapping'] = {}
+        question_data['written_translations']['translations_mapping'] = {}
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 40
         }
 
@@ -1679,9 +1680,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 41)
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains next_content_id_index property.
-        self.assertEqual(test_value['state']['next_content_id_index'], 1) # type: ignore[misc]
+        self.assertEqual(test_value['state']['next_content_id_index'], 1)
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0][
                 'rule_specs'][0]['inputs']['x'],
@@ -1692,6 +1691,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
+            {'rule_input_0': {}}
+        )
+        self.assertEqual(
+            test_value['state']['written_translations']['translations_mapping'],
             {'rule_input_0': {}}
         )
 
@@ -1719,19 +1722,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains next_content_id_index property.
-        test_value['state']['next_content_id_index'] = 0 # type: ignore[misc]
+        test_value['state']['next_content_id_index'] = 0
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
+        test_value['state']['written_translations']['translations_mapping'] = {}
         test_value['state_schema_version'] = 40
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 41)
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains next_content_id_index property.
-        self.assertEqual(test_value['state']['next_content_id_index'], 1) # type: ignore[misc]
+        self.assertEqual(test_value['state']['next_content_id_index'], 1)
         self.assertEqual(
             test_value['state']['interaction']['answer_groups'][0][
                 'rule_specs'][0]['inputs']['x'],
@@ -1744,8 +1744,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
             {'rule_input_0': {}}
         )
+        self.assertEqual(
+            test_value['state']['written_translations']['translations_mapping'],
+            {'rule_input_0': {}}
+        )
 
     def test_question_state_dict_conversion_from_v41_to_v42(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
         test_solution_dict: state_domain.SolutionDict = {
             'correct_answer': ['correct_value'],
             'explanation': {
@@ -1761,14 +1767,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'html': 'value_3', 'content_id': 'content_id_3'}
         ]
 
-        self.question_state_dict['interaction']['id'] = 'ItemSelectionInput'
-        self.question_state_dict['interaction']['solution'] = test_solution_dict
-        self.question_state_dict['interaction']['customization_args'] = {
+        question_data['interaction']['id'] = 'ItemSelectionInput'
+        question_data['interaction']['solution'] = test_solution_dict
+        question_data['interaction']['customization_args'] = {
             'choices': {
                 'value': ca_choices_dicts
             }
         }
-        self.question_state_dict['interaction']['answer_groups'] = [{
+        question_data['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'inputs': {
                     'x': ['correct_value'],
@@ -1792,7 +1798,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 41
         }
 
@@ -1967,11 +1973,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v42_to_v43(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
+        question_data['interaction']['id'] = 'NumericExpressionInput'
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 42
         }
 
@@ -1994,13 +2002,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v43_to_v44(self) -> None:
-        test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
-            'state_schema_version': 43
-        }
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
-        del test_value['state']['card_is_checkpoint']  # type: ignore[misc]
+        del question_data['card_is_checkpoint']  # type: ignore[misc]
+
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_data,
+            'state_schema_version': 43
+        }
+
+        self.assertNotIn('card_is_checkpoint', test_value['state'])
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
@@ -2009,12 +2023,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state']['card_is_checkpoint'], False)
 
     def test_question_state_dict_conversion_from_v44_to_v45(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
-        del self.question_state_dict['linked_skill_id']  # type: ignore[misc]
+        del question_data['linked_skill_id']  # type: ignore[misc]
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 44
         }
 
@@ -2027,8 +2044,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertIsNone(test_value['state']['linked_skill_id'])
 
     def test_question_state_dict_conversion_from_v45_to_v46(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 45
         }
 
@@ -2041,15 +2061,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state'], initial_json)
 
     def test_question_state_dict_conversion_from_v46_to_v47(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['content']['html'] = (
+        question_data['content']['html'] = (
             '<oppia-noninteractive-svgdiagram '
             'svg_filename-with-value="filename.svg">'
             '</oppia-noninteractive-svgdiagram>'
         )
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 46
         }
 
@@ -2066,11 +2088,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v47_to_v48(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
-        self.question_state_dict['content']['html'] = '&nbsp;'
+        question_data['content']['html'] = '&nbsp;'
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 47
         }
 
@@ -2081,10 +2105,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state']['content']['html'], ' ')
 
     def test_question_state_dict_conversion_from_v48_to_v49(self) -> None:
-        self.question_state_dict['interaction']['id'] = 'NumericInput'
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'NumericInput'
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 48
         }
 
@@ -2107,15 +2134,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v49_to_v50(self) -> None:
-        self.question_state_dict['interaction']['id'] = (
-            'AlgebraicExpressionInput')
-        self.question_state_dict['interaction']['customization_args'] = {
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'AlgebraicExpressionInput'
+        question_data['interaction']['customization_args'] = {
             'customOskLetters': {
                 'value': ['a', 'b', 'c']
             }
         }
         inputs_variable_test_dict: List[str] = []
-        self.question_state_dict['interaction']['answer_groups'] = [{
+        question_data['interaction']['answer_groups'] = [{
             'outcome': {
                 'dest': 'abc',
                 'dest_if_really_stuck': None,
@@ -2145,7 +2174,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
 
         test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
+            'state': question_data,
             'state_schema_version': 49
         }
         question_domain.Question.update_state_from_model(
@@ -2169,7 +2198,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             translatable_content.content_value
             for translatable_content in
             self.question.get_all_contents_which_need_translations(
-                self.dummy_entity_translations).values()
+                self.dummy_entity_translations)
         ]
 
         self.assertItemsEqual(
@@ -2181,11 +2210,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             ])
 
     def test_question_state_dict_conversion_from_v50_to_v51(self) -> None:
-        content_id_generator = translation_domain.ContentIdGenerator()
         question_data = (
-            question_domain.Question.create_default_question_state(
-                content_id_generator
-            ).to_dict())
+            question_domain.Question.create_default_question_state().to_dict())
 
         # Here we use MyPy ignore because we are defining AnswerGroupDict
         # and while defining AnswerGroupDict MyPy expects that all keys
@@ -2224,11 +2250,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
 
     def test_question_state_dict_conversion_from_v51_to_v52(self) -> None:
-        content_id_generator = translation_domain.ContentIdGenerator()
         question_data = (
-            question_domain.Question.create_default_question_state(
-                content_id_generator
-            ).to_dict())
+            question_domain.Question.create_default_question_state().to_dict())
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
@@ -2241,10 +2264,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 52)
 
     def test_question_state_dict_conversion_from_v52_to_v53(self) -> None:
-        content_id_generator = translation_domain.ContentIdGenerator()
-        question_data = question_domain.Question.create_default_question_state(
-            content_id_generator
-        ).to_dict()
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
