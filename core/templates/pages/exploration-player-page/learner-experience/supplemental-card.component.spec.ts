@@ -32,6 +32,7 @@ import { HelpCardEventResponse, PlayerPositionService } from '../services/player
 import { SupplementalCardComponent } from './supplemental-card.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
@@ -49,7 +50,7 @@ describe('Supplemental card component', () => {
   let recordedVoiceovers = new RecordedVoiceovers({});
   let mockStateCard = new StateCard(
     'state_name', 'html', 'html', {} as Interaction, [], recordedVoiceovers,
-    '', {} as AudioTranslationLanguageService);
+    {} as WrittenTranslations, '', {} as AudioTranslationLanguageService);
 
   class MockChangeDetectorRef {
     detectChanges(): void {}
@@ -218,7 +219,7 @@ describe('Supplemental card component', () => {
   it('should update the displayedCard when changes are detected', () => {
     let updatedStateCard = new StateCard(
       'state_name', 'new content', 'html', {} as Interaction, [],
-      recordedVoiceovers, '',
+      recordedVoiceovers, {} as WrittenTranslations, '',
       {} as AudioTranslationLanguageService);
     const changes: SimpleChanges = {
       displayedCard: {

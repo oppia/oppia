@@ -26,7 +26,6 @@ from core.domain import question_services
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
-from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -81,14 +80,11 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
             self.skill_id, self.admin_id, description='Skill Description')
 
         self.question_id = question_services.get_new_question_id()
-        self.content_id_generator = translation_domain.ContentIdGenerator()
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id,
             self.editor_id,
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'),
+            [self.skill_id])
 
 
 class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
@@ -459,13 +455,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.question_id_2 = question_services.get_new_question_id()
-        self.content_id_generator_2 = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data(
-                'ABC', self.content_id_generator_2),
-            [self.skill_id],
-            self.content_id_generator_2.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.skill_id])
 
     def test_put_with_non_admin_or_topic_manager_disallows_access(self) -> None:
         self.login(self.NEW_USER_EMAIL)
@@ -730,18 +722,12 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_long_commit_message_fails(self) -> None:
-        new_question_data = self._create_valid_question_data(
-            'DEF', self.content_id_generator)
+        new_question_data = self._create_valid_question_data('DEF')
         change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
-        }, {
-            'cmd': 'update_question_property',
-            'property_name': 'next_content_id_index',
-            'new_value': self.content_id_generator.next_content_id_index,
-            'old_value': 0
         }]
         payload = {
             'change_list': change_list,
@@ -764,18 +750,12 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         )
 
     def test_put_with_admin_email_allows_question_editing(self) -> None:
-        new_question_data = self._create_valid_question_data(
-            'DEF', self.content_id_generator)
+        new_question_data = self._create_valid_question_data('DEF')
         change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
-        }, {
-            'cmd': 'update_question_property',
-            'property_name': 'next_content_id_index',
-            'new_value': self.content_id_generator.next_content_id_index,
-            'old_value': 2
         }]
         payload = {
             'change_list': change_list,
@@ -816,8 +796,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_topic_manager_email_allows_question_editing(self) -> None:
-        new_question_data = self._create_valid_question_data(
-            'DEF', self.content_id_generator)
+        new_question_data = self._create_valid_question_data('DEF')
         change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
@@ -831,20 +810,14 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
         self.login(self.TOPIC_MANAGER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        new_question_data = self._create_valid_question_data(
-            'GHI', self.content_id_generator)
-        new_change_list = [{
+        new_question_data = self._create_valid_question_data('GHI')
+        change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
             'new_value': new_question_data.to_dict(),
             'old_value': self.question.question_state_data.to_dict()
-        }, {
-            'cmd': 'update_question_property',
-            'property_name': 'next_content_id_index',
-            'new_value': self.content_id_generator.next_content_id_index,
-            'old_value': 2
         }]
-        payload['change_list'] = new_change_list
+        payload['change_list'] = change_list
         payload['commit_message'] = 'update question data'
         response_json = self.put_json(
             '%s/%s' % (
@@ -863,7 +836,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     def test_put_with_creating_new_fully_specified_question_returns_400(
         self
     ) -> None:
-        self._create_valid_question_data('XXX', self.content_id_generator)
+        self._create_valid_question_data('XXX')
         change_list = [{
             'cmd': 'create_new_fully_specified_question',
             'question_dict': {},

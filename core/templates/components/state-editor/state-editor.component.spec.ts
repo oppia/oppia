@@ -84,6 +84,8 @@ describe('State Editor Component', () => {
     spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
     spyOn(component.onSaveInteractionCustomizationArgs, 'emit').and.stub();
     spyOn(component.onSaveInteractionId, 'emit').and.stub();
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
+      .and.stub();
     spyOn(component.onSaveStateContent, 'emit').and.stub();
 
     component.sendRecomputeGraph();
@@ -112,6 +114,7 @@ describe('State Editor Component', () => {
     component.sendOnSaveNextContentIdIndex(0);
     component.sendOnSaveInteractionCustomizationArgs('');
     component.sendOnSaveInteractionId('');
+    component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired([]);
     component.sendOnSaveStateContent(
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'));
 
@@ -130,6 +133,8 @@ describe('State Editor Component', () => {
     expect(component.onSaveInteractionCustomizationArgs.emit)
       .toHaveBeenCalled();
     expect(component.onSaveInteractionId.emit).toHaveBeenCalled();
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalled();
     expect(component.onSaveStateContent.emit).toHaveBeenCalled();
   });
 
@@ -211,7 +216,13 @@ describe('State Editor Component', () => {
         hints: []
       },
       param_changes: [],
-      solicit_answer_details: false
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
     };
     spyOnProperty(stateEditorService, 'onStateEditorInitialized')
       .and.returnValue(onStateEditorInitializedEmitter);

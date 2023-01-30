@@ -31,7 +31,6 @@ import { ContextService } from 'services/context.service';
 import { AppConstants } from 'app.constants';
 import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 class MockStateCustomizationArgsService {
   displayed = {
@@ -109,7 +108,6 @@ describe('Customize Interaction Modal Component', () => {
   let contextService: ContextService;
   let changeDetectorRef: ChangeDetectorRef;
   let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
-  let generateContentIdService: GenerateContentIdService;
   let interactionDetailsCacheService: InteractionDetailsCacheService;
   let interactionObjectFactory: InteractionObjectFactory;
   let ngbActiveModal: NgbActiveModal;
@@ -180,8 +178,6 @@ describe('Customize Interaction Modal Component', () => {
       SubtitledUnicodeObjectFactory);
     ratioExpressionInputValidationService = TestBed.inject(
       RatioExpressionInputValidationService);
-    generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => {});
 
     stateInteractionIdService.displayed = 'RatioExpressionInput';
     fixture.detectChanges();

@@ -67,7 +67,6 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.platform.search import elastic_search_services
@@ -92,6 +91,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import email_services
+    from mypy_imports import exp_models
     from mypy_imports import feedback_models
     from mypy_imports import memory_cache_services
     from mypy_imports import platform_auth_services
@@ -2184,7 +2184,6 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
-next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
@@ -2194,7 +2193,7 @@ states:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content_0
+      content_id: content
       html: ''
     interaction:
       answer_groups: []
@@ -2204,7 +2203,7 @@ states:
         dest: %s
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_1
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -2214,17 +2213,22 @@ states:
       id: null
       solution: null
     linked_skill_id: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
+        content: {}
+        default_outcome: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
   New state:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content_2
+      content_id: content
       html: ''
     interaction:
       answer_groups: []
@@ -2234,7 +2238,7 @@ states:
         dest: New state
         dest_if_really_stuck: null
         feedback:
-          content_id: default_outcome_3
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -2244,12 +2248,17 @@ states:
       id: null
       solution: null
     linked_skill_id: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content_2: {}
-        default_outcome_3: {}
+        content: {}
+        default_outcome: {}
     solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
 states_schema_version: %d
 tags: []
 title: Title
@@ -3092,8 +3101,7 @@ title: Title
         return exploration
 
     def set_interaction_for_state(
-            self, state: state_domain.State, interaction_id: str,
-            content_id_generator: translation_domain.ContentIdGenerator
+        self, state: state_domain.State, interaction_id: str
     ) -> None:
         """Sets the interaction_id, sets the fully populated default interaction
         customization arguments, and increments next_content_id_index as needed.
@@ -3102,15 +3110,18 @@ title: Title
             state: State. The state domain object to set the interaction for.
             interaction_id: str. The interaction id to set. Also sets the
                 default customization args for the given interaction id.
-            content_id_generator: ContentIdGenerator. A ContentIdGenerator
-                object to be used for generating new content Ids.
         """
+
+        # We wrap next_content_id_index in a dict so that modifying it in the
+        # inner function modifies the value.
+        next_content_id_index_dict = {'value': state.next_content_id_index}
+
         # Here we use type Any because, argument 'value' can accept values of
         # customization args and customization args can have int, str, bool and
         # other types too. Also, Any is used for schema because values in schema
         # dictionary can be of type str, List, Dict and other types too.
         def traverse_schema_and_assign_content_ids(
-            value: Any, schema: Dict[str, Any], ca_name: str
+            value: Any, schema: Dict[str, Any], contentId: str
         ) -> None:
             """Generates content_id from recursively traversing the schema, and
             assigning to the current value.
@@ -3119,8 +3130,7 @@ title: Title
                 value: *. The current traversed value in customization
                     arguments.
                 schema: dict. The current traversed schema.
-                ca_name: str. The arg name which will be used for generating
-                    content_id.
+                contentId: str. The content_id generated so far.
             """
             is_subtitled_html_spec = (
                 schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
@@ -3132,19 +3142,19 @@ title: Title
                 schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
-                value['content_id'] = content_id_generator.generate(
-                    translation_domain.ContentType.CUSTOMIZATION_ARG,
-                    extra_prefix=ca_name)
+                value['content_id'] = '%s_%i' % (
+                    contentId, next_content_id_index_dict['value'])
+                next_content_id_index_dict['value'] += 1
             elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
                     traverse_schema_and_assign_content_ids(
-                        x, schema['items'], ca_name)
+                        x, schema['items'], contentId)
             elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
                     traverse_schema_and_assign_content_ids(
                         schema['properties'][schema_property.name],
                         schema_property['schema'],
-                        '%s_%s' % (ca_name, schema_property.name))
+                        '%s_%s' % (contentId, schema_property.name))
 
         interaction = (
             interaction_registry.Registry.get_interaction_by_id(interaction_id))
@@ -3155,7 +3165,7 @@ title: Title
             ca_name = ca_spec.name
             ca_value = ca_spec.default_value
             traverse_schema_and_assign_content_ids(
-                ca_value, ca_spec.schema, ca_name)
+                ca_value, ca_spec.schema, 'ca_%s' % ca_name)
             # Here we use cast because these ca_values are fetched dynamically
             # and contain only default types.
             customization_args_value = cast(
@@ -3165,6 +3175,7 @@ title: Title
 
         state.update_interaction_id(interaction_id)
         state.update_interaction_customization_args(customization_args)
+        state.update_next_content_id_index(next_content_id_index_dict['value'])
 
     def save_new_valid_exploration(
         self,
@@ -3176,8 +3187,7 @@ title: Title
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
         end_state_name: Optional[str] = None,
         interaction_id: str = 'TextInput',
-        correctness_feedback_enabled: bool = False,
-        content_html: str = '',
+        correctness_feedback_enabled: bool = False
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration.
 
@@ -3192,7 +3202,6 @@ title: Title
             interaction_id: str. The id of the interaction.
             correctness_feedback_enabled: bool. Whether correctness feedback is
                 enabled for the exploration.
-            content_html: str. The html for the state content.
 
         Returns:
             Exploration. The exploration domain object.
@@ -3200,28 +3209,17 @@ title: Title
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
             language_code=language_code)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.content.html = content_html
         self.set_interaction_for_state(
-            init_state, interaction_id, content_id_generator)
+            exploration.states[exploration.init_state_name], interaction_id)
 
         exploration.objective = objective
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
-            exploration.add_state(
-                end_state_name,
-                content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT),
-                content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME))
+            exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
-            end_state.content.html = content_html
-            self.set_interaction_for_state(
-                end_state, 'EndExploration', content_id_generator)
+            self.set_interaction_for_state(end_state, 'EndExploration')
             end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
@@ -3237,8 +3235,6 @@ title: Title
             init_interaction.default_outcome.dest = end_state_name
             if correctness_feedback_enabled:
                 init_interaction.default_outcome.labelled_as_correct = True
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
@@ -3253,8 +3249,7 @@ title: Title
         category: str = 'A category',
         objective: str = 'An objective',
         language_code: str = constants.DEFAULT_LANGUAGE_CODE,
-        correctness_feedback_enabled: bool = False,
-        content_html: str = ''
+        correctness_feedback_enabled: bool = False
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration with a sequence of states.
 
@@ -3274,7 +3269,6 @@ title: Title
             language_code: str. The language_code of this exploration.
             correctness_feedback_enabled: bool. Whether the correctness feedback
                 is enabled or not for the exploration.
-            content_html: str. The html for the state content.
 
         Returns:
             Exploration. The exploration domain object.
@@ -3292,28 +3286,14 @@ title: Title
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
-
-        init_state = exploration.states[state_names[0]]
-        init_state.content.html = content_html
 
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
-        for state_name in state_names[1:]:
-            exploration.add_state(
-                state_name,
-                content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT),
-                content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME))
-            curent_state = exploration.states[state_name]
-            curent_state.content.html = content_html
+        exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 zip(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
             self.set_interaction_for_state(
-                from_state, next(iterable_interaction_ids),
-                content_id_generator)
+                from_state, next(iterable_interaction_ids))
             # Here, from_state is a State domain object and it is created using
             # 'create_default_state' method. So, 'from_state' is a default_state
             # and it is always going to contain a default_outcome. Thus to
@@ -3325,14 +3305,62 @@ title: Title
                 from_state.interaction.default_outcome.labelled_as_correct = (
                     True)
         end_state = exploration.states[state_names[-1]]
-        self.set_interaction_for_state(
-            end_state, 'EndExploration', content_id_generator)
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
+
+    def save_new_exp_with_custom_states_schema_version(
+        self,
+        exp_id: str,
+        user_id: str,
+        states_dict: state_domain.StateDict,
+        version: int
+    ) -> None:
+        """Saves a new default exploration with the given version of state dict.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+            version: int. Custom states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id, category='category', title='title',
+            objective='Old objective', language_code='en', tags=[], blurb='',
+            author_notes='', states_schema_version=version,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME, states=states_dict,
+            param_specs={}, param_changes=[])
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(user_id, commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id, title='title', category='category',
+            objective='Old objective', language_code='en', tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids, contributor_ids=[],
+            contributors_summary={})
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
 
     def publish_exploration(self, owner_id: str, exploration_id: str) -> None:
         """Publish the exploration with the given exploration_id.
@@ -3862,7 +3890,6 @@ title: Title
         owner_id: str,
         question_state_data: state_domain.State,
         linked_skill_ids: List[str],
-        next_content_id_index: int,
         inapplicable_skill_misconception_ids: Optional[List[str]] = None,
         language_code: str = constants.DEFAULT_LANGUAGE_CODE
     ) -> question_domain.Question:
@@ -3878,8 +3905,6 @@ title: Title
                 misconceptions ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
-            next_content_id_index: int. The next content Id index for generating
-                new content Id.
 
         Returns:
             Question. A newly-created question.
@@ -3889,8 +3914,7 @@ title: Title
         question = question_domain.Question(
             question_id, question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
-            linked_skill_ids, inapplicable_skill_misconception_ids or [],
-            next_content_id_index)
+            linked_skill_ids, inapplicable_skill_misconception_ids or [])
         question_services.add_question(owner_id, question)
         return question
 
@@ -3942,7 +3966,7 @@ title: Title
         skill_id: str,
         suggestion_id: Optional[str] = None,
         language_code: str = constants.DEFAULT_LANGUAGE_CODE
-    ) -> str:
+    ) -> Optional[str]:
         """Saves a new question suggestion with a default version 27 state data
         dict.
 
@@ -4104,43 +4128,30 @@ title: Title
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
     def _create_valid_question_data(
-        self,
-        default_dest_state_name: str,
-        content_id_generator: translation_domain.ContentIdGenerator
+        self, default_dest_state_name: str
     ) -> state_domain.State:
         """Creates a valid question_data dict.
 
         Args:
             default_dest_state_name: str. The default destination state.
-            content_id_generator: ContentIdGenerator. A ContentIdGenerator
-                object to be used for generating new content Id.
 
         Returns:
             dict. The default question_data dict.
         """
         state = state_domain.State.create_default_state(
-            default_dest_state_name,
-            content_id_generator.generate(
-                translation_domain.ContentType.CONTENT),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME),
-            is_initial_state=True)
+            default_dest_state_name, is_initial_state=True)
         state.update_interaction_id('TextInput')
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
             'explanation': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.SOLUTION),
+                'content_id': 'solution',
                 'html': '<p>This is a solution.</p>',
             },
         }
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    content_id_generator.generate(
-                        translation_domain.ContentType.HINT),
-                    '<p>This is a hint.</p>')),
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')),
         ]
         # Ruling out the possibility of None for mypy type checking, because
         # we above we are already updating the value of interaction_id.
@@ -4152,15 +4163,14 @@ title: Title
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': content_id_generator.generate(
-                        translation_domain.ContentType.CUSTOMIZATION_ARG,
-                        extra_prefix='placeholder'),
+                    'content_id': 'ca_placeholder',
                     'unicode_str': 'Enter text here',
                 },
             },
             'rows': {'value': 1},
             'catchMisspellings': {'value': False}
         })
+        state.update_next_content_id_index(2)
         # Here, state is a State domain object and it is created using
         # 'create_default_state' method. So, 'state' is a default_state
         # and it is always going to contain a default_outcome. Thus to
