@@ -275,7 +275,7 @@ describe('Skill Preview Tab Component', () => {
       '', null as unknown as AudioTranslationLanguageService);
 
     expect(component.displayedCard.isInteractionInline()).toBeFalse();
-  }); null as unknown as WrittenTranslations,
+  });
 
 
   it('should filter the questions', () => {
