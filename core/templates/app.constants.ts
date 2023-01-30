@@ -50,6 +50,9 @@ export const AppConstants = {
   EXPLORATION_DATA_URL_TEMPLATE: '/explorehandler/init/<exploration_id>',
   EXPLORATION_VERSION_DATA_URL_TEMPLATE: (
     '/explorehandler/init/<exploration_id>?v=<version>'),
+  ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE: (
+    '/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/' +
+    '<language_code>'),
   EXPLORATION_PROGRESS_PID_URL_TEMPLATE: (
     '/explorehandler/init/<exploration_id>?pid=<pid>'),
 

@@ -2017,7 +2017,8 @@ def update_translation_suggestion(
 def update_question_suggestion(
     suggestion_id: str,
     skill_difficulty: float,
-    question_state_data: state_domain.StateDict
+    question_state_data: state_domain.StateDict,
+    next_content_id_index: int
 ) -> Optional[suggestion_registry.BaseSuggestion]:
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
@@ -2026,6 +2027,8 @@ def update_question_suggestion(
         suggestion_id: str. The id of the suggestion to be updated.
         skill_difficulty: double. The difficulty level of the question.
         question_state_data: obj. Details of the question.
+        next_content_id_index: int. The next content Id index for the question's
+            content.
 
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
@@ -2056,8 +2059,9 @@ def update_question_suggestion(
                             'question_state_data_schema_version']),
                     'linked_skill_ids': question_dict['linked_skill_ids'],
                     'inapplicable_skill_misconception_ids': (
-                        question_dict[
-                            'inapplicable_skill_misconception_ids'])
+                        suggestion.change.question_dict[
+                            'inapplicable_skill_misconception_ids']),
+                    'next_content_id_index': next_content_id_index
                 },
                 'skill_id': suggestion.change.skill_id,
                 'skill_difficulty': skill_difficulty

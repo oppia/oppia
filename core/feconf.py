@@ -27,11 +27,6 @@ from core.constants import constants
 
 from typing import Callable, Dict, Final, List, TypedDict, Union
 
-MYPY = False
-if MYPY:  # pragma: no cover
-    # Here, we are importing 'state_domain' only for type checking.
-    from core.domain import state_domain
-
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
@@ -337,7 +332,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 54
+CURRENT_STATE_SCHEMA_VERSION = 55
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -407,29 +402,11 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
-# Default content id for the state's content.
-DEFAULT_NEW_STATE_CONTENT_ID = 'content'
-# Default content id for the interaction's default outcome.
-DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # Content id assigned to rule inputs that do not match any interaction
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
-# Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS: state_domain.RecordedVoiceoversDict = {
-    'voiceovers_mapping': {
-        'content': {},
-        'default_outcome': {}
-    }
-}
-# Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS: state_domain.WrittenTranslationsDict = {
-    'translations_mapping': {
-        'content': {},
-        'default_outcome': {}
-    }
-}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -439,6 +416,8 @@ DEFAULT_AUTO_TTS_ENABLED = False
 # Whether new explorations should have correctness-feedback enabled
 # by default.
 DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
+# Default value for next_content_id_index in exploration/question.
+DEFUALT_NEXT_CONTENT_ID_INDEX = 0
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -1664,6 +1643,8 @@ COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 # BaseTranslatableObject.
 ContentValueType = Union[str, List[str]]
 
+MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 10
+
 
 class TranslatableEntityType(enum.Enum):
     """Represents all possible entity types which support new translations
@@ -1679,3 +1660,4 @@ class TranslatedContentDict(TypedDict):
 
     content_value: ContentValueType
     needs_update: bool
+    content_format: str

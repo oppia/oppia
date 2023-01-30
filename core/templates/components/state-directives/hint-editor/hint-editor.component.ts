@@ -36,9 +36,6 @@ interface HintFormSchema {
   templateUrl: './hint-editor.component.html'
 })
 export class HintEditorComponent implements OnInit, OnDestroy {
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
-    new EventEmitter<string[]>();
-
   @Output() saveHint = new EventEmitter<void>();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -79,18 +76,6 @@ export class HintEditorComponent implements OnInit, OnDestroy {
 
   saveThisHint(): void {
     this.hintEditorIsOpen = false;
-    const contentHasChanged = (
-      this.hintMemento.hintContent.html !== this.hint.hintContent.html);
-
-    if (contentHasChanged) {
-      const hintContentId = this.hint.hintContent.contentId;
-      if (hintContentId === null) {
-        throw new Error('Expected content id to be non-null');
-      }
-      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
-        [hintContentId]);
-    }
-
     this.saveHint.emit();
   }
 

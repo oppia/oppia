@@ -485,6 +485,7 @@ export class StateGraphVisualization
       warnings =
       this.explorationWarningsService.getAllStateRelatedWarnings();
     }
+
     if (nodeLabel in warnings) {
       let warning = warnings[nodeLabel][0];
       return warning.toString();

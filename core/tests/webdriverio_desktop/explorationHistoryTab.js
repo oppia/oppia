@@ -102,7 +102,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       3: {
-        text: '  content_id: content',
+        text: '  content_id: content_0',
         highlighted: false
       },
       4: {
@@ -152,7 +152,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       15: {
-        text: '      content_id: default_outcome',
+        text: '      content_id: default_outcome_1',
         highlighted: false
       },
       16: {
@@ -196,11 +196,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       26: {
-        text: '    content: {}',
+        text: '    content_0: {}',
         highlighted: false
       },
       27: {
-        text: '    default_outcome: {}',
+        text: '    default_outcome_1: {}',
         highlighted: true
       },
       28: {
@@ -212,26 +212,6 @@ describe('Exploration history', function() {
         highlighted: false
       },
       30: {
-        text: 'written_translations:',
-        highlighted: false
-      },
-      31: {
-        text: '  translations_mapping:',
-        highlighted: false
-      },
-      32: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      33: {
-        text: '    default_outcome: {}',
-        highlighted: false
-      },
-      34: {
-        text: 'next_content_id_index: 0',
-        highlighted: true
-      },
-      35: {
         text: '',
         highlighted: false
       }
@@ -247,7 +227,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       3: {
-        text: '  content_id: content',
+        text: '  content_id: content_0',
         highlighted: false
       },
       4: {
@@ -303,7 +283,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       17: {
-        text: '          content_id: feedback_1',
+        text: '          content_id: feedback_2',
         highlighted: true
       },
       18: {
@@ -367,7 +347,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       33: {
-        text: '      content_id: default_outcome',
+        text: '      content_id: default_outcome_1',
         highlighted: false
       },
       34: {
@@ -411,15 +391,15 @@ describe('Exploration history', function() {
         highlighted: false
       },
       44: {
-        text: '    content: {}',
+        text: '    content_0: {}',
         highlighted: false
       },
       45: {
-        text: '    default_outcome: {}',
-        highlighted: false
+        text: '    default_outcome_1: {}',
+        highlighted: true
       },
       46: {
-        text: '    feedback_1: {}',
+        text: '    feedback_2: {}',
         highlighted: true
       },
       47: {
@@ -431,30 +411,6 @@ describe('Exploration history', function() {
         highlighted: false
       },
       49: {
-        text: 'written_translations:',
-        highlighted: false
-      },
-      50: {
-        text: '  translations_mapping:',
-        highlighted: false
-      },
-      51: {
-        text: '    content: {}',
-        highlighted: false
-      },
-      52: {
-        text: '    default_outcome: {}',
-        highlighted: false
-      },
-      53: {
-        text: '    feedback_1: {}',
-        highlighted: true
-      },
-      54: {
-        text: 'next_content_id_index: 2',
-        highlighted: true
-      },
-      55: {
         text: '',
         highlighted: false
       }
@@ -463,7 +419,7 @@ describe('Exploration history', function() {
     var STATE_2_STRING =
       'content:\n' +
       '  html: <p>this is card 2</p>\n' +
-      '  content_id: content\n' +
+      '  content_id: content_3\n' +
       'classifier_model_id: null\n' +
       'linked_skill_id: null\n' +
       'interaction:\n' +
@@ -473,13 +429,13 @@ describe('Exploration history', function() {
       '    buttonText:\n' +
       '      value:\n' +
       '        unicode_str: Continue\n' +
-      '        content_id: ca_buttonText_0\n' +
+      '        content_id: ca_buttonText_5\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    dest_if_really_stuck: null\n' +
       '    feedback:\n' +
       '      html: \'\'\n' +
-      '      content_id: default_outcome\n' +
+      '      content_id: default_outcome_4\n' +
       '    labelled_as_correct: false\n' +
       '    param_changes: []\n' +
       '    refresher_exploration_id: null\n' +
@@ -490,17 +446,11 @@ describe('Exploration history', function() {
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +
       '  voiceovers_mapping:\n' +
-      '    content: {}\n' +
-      '    default_outcome: {}\n' +
-      '    ca_buttonText_0: {}\n' +
+      '    content_3: {}\n' +
+      '    default_outcome_4: {}\n' +
+      '    ca_buttonText_5: {}\n' +
       'solicit_answer_details: false\n' +
       'card_is_checkpoint: false\n' +
-      'written_translations:\n' +
-      '  translations_mapping:\n' +
-      '    content: {}\n' +
-      '    default_outcome: {}\n' +
-      '    ca_buttonText_0: {}\n' +
-      'next_content_id_index: 1\n' +
       '';
 
     var expectedHistoryStates = [{
@@ -601,7 +551,7 @@ describe('Exploration history', function() {
       color: COLOR_CHANGED
     }, {
       label: 'second',
-      color: COLOR_UNCHANGED
+      color: COLOR_CHANGED
     }, {
       label: 'final card',
       color: COLOR_UNCHANGED
@@ -629,7 +579,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 54\n' +
+      'states_schema_version: 55\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -647,7 +597,7 @@ describe('Exploration history', function() {
       'tags: []\n' +
       'blurb: \'\'\n' +
       'author_notes: \'\'\n' +
-      'states_schema_version: 54\n' +
+      'states_schema_version: 55\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +

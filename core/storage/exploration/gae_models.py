@@ -234,6 +234,9 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
+    # The next_content_id index to use for generation of new content ids.
+    next_content_id_index = datastore_services.IntegerProperty(
+        required=True, default=0, indexed=True)
     # An boolean indicating whether further edits can be made to the
     # exploration.
     edits_allowed = datastore_services.BooleanProperty(
@@ -269,6 +272,7 @@ class ExplorationModel(base_models.VersionedModel):
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edits_allowed': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 

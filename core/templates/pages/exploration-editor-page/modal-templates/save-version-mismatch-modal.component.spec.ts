@@ -86,6 +86,8 @@ describe('Save Version Mismatch Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
+    content_id_for_state_content: 'content_0',
+    content_id_for_default_outcome: 'default_outcome_1'
   } as unknown as LostChange];
 
   let component: SaveVersionMismatchModalComponent;

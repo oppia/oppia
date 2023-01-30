@@ -30,7 +30,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { PlatformFeatureService } from 'services/platform-feature.service';
@@ -121,15 +120,8 @@ const dummyExplorationBackendDict = {
         id: 'Continue'
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
       card_is_checkpoint: true
     },
     'End State': {
@@ -158,22 +150,16 @@ const dummyExplorationBackendDict = {
         id: 'EndExploration'
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
       card_is_checkpoint: false
     }
   },
   title: 'Dummy Title',
   language_code: 'en',
   objective: 'Dummy Objective',
-  correctness_feedback_enabled: true
+  correctness_feedback_enabled: true,
+  next_content_id_index: 4
 };
 
 const dummyExplorationMetadata = {
@@ -212,6 +198,7 @@ const dummyExplorationBackendResponse = {
   furthest_reached_checkpoint_state_name: '',
   most_recently_reached_checkpoint_state_name: 'Introduction',
   most_recently_reached_checkpoint_exp_version: 0,
+  displayable_language_codes: []
 };
 
 describe('Checkpoint celebration modal component', function() {
@@ -227,7 +214,6 @@ describe('Checkpoint celebration modal component', function() {
   let windowDimensionsService: WindowDimensionsService;
   let urlInterpolationService: UrlInterpolationService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let platformFeatureService: PlatformFeatureService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
@@ -247,7 +233,6 @@ describe('Checkpoint celebration modal component', function() {
         PlayerPositionService,
         UrlInterpolationService,
         InteractionObjectFactory,
-        WrittenTranslationsObjectFactory,
         AudioTranslationLanguageService,
         ExplorationPlayerStateService,
         {
@@ -280,8 +265,6 @@ describe('Checkpoint celebration modal component', function() {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    writtenTranslationsObjectFactory = TestBed.inject(
-      WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
@@ -348,7 +331,6 @@ describe('Checkpoint celebration modal component', function() {
         }
       }),
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
   });
 

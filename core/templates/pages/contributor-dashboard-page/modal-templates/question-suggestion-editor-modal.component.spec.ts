@@ -286,12 +286,9 @@ describe('Question Suggestion Editor Modal Component', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {}
-        },
         linked_skill_id: null,
-        next_content_id_index: 6,
       },
+      next_content_id_index: 6,
       question_state_data_schema_version: 0,
       language_code: 'en',
       version: 1,
@@ -339,8 +336,9 @@ describe('Question Suggestion Editor Modal Component', () => {
       // because of the need to test validations.
       // @ts-ignore
       .and.callFake((
-          suggestionId, skillDifficulty, questionStateData, imagesData,
-          successCallback, errorCallback) => {
+          suggestionId, skillDifficulty, questionStateData, nextContentIdIndex,
+          imagesData, successCallback, errorCallback
+      ) => {
         // This throws "Argument of type 'null' is not assignable to parameter
         // of type 'string'." We need to suppress
         // this error because of the need to test validations.
@@ -367,8 +365,8 @@ describe('Question Suggestion Editor Modal Component', () => {
         // because of the need to test validations.
         // @ts-ignore
         .and.callFake((
-            suggestionId, skillDifficulty, questionStateData, imagesData,
-            successCallback, errorCallback) => {
+            suggestionId, skillDifficulty, questionStateData,
+            nextContentIdIndex, imagesData, successCallback, errorCallback) => {
           // This throws "Argument of type 'null' is not assignable to parameter
           // of type 'string'." We need to suppress
           // this error because of the need to test validations.

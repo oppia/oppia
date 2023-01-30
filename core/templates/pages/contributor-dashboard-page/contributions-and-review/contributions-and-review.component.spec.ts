@@ -301,10 +301,7 @@ describe('Contributions and review component', () => {
                     param_changes: [],
                     recorded_voiceovers: {
                       voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
+                    }
                   },
                 }
               },
@@ -399,10 +396,7 @@ describe('Contributions and review component', () => {
                     param_changes: [],
                     recorded_voiceovers: {
                       voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
+                    }
                   },
                 }
               },
@@ -553,7 +547,6 @@ describe('Contributions and review component', () => {
             classifier_model_id: null,
             card_is_checkpoint: null,
             linked_skill_id: null,
-            next_content_id_index: null,
             content: {
               html: 'Question 1',
               content_id: 'content_1'
@@ -652,20 +645,12 @@ describe('Contributions and review component', () => {
                 content_5: {}
               }
             },
-            written_translations: {
-              translations_mapping: {
-                content_1: {},
-                content_2: {},
-                content_3: {},
-                content_4: {},
-                content_5: {}
-              }
-            },
             solicit_answer_details: false
           },
           language_code: 'en',
           version: 1,
           linked_skill_ids: ['abc'],
+          next_content_id_index: 1,
           inapplicable_skill_misconception_ids: ['abc-2']
         });
       spyOn(contextService, 'setCustomEntityContext').and.stub();
@@ -869,7 +854,6 @@ describe('Contributions and review component', () => {
           classifier_model_id: null,
           card_is_checkpoint: null,
           linked_skill_id: null,
-          next_content_id_index: null,
           content: {
             html: 'Question 1',
             content_id: 'content_1'
@@ -968,20 +952,12 @@ describe('Contributions and review component', () => {
               content_5: {}
             }
           },
-          written_translations: {
-            translations_mapping: {
-              content_1: {},
-              content_2: {},
-              content_3: {},
-              content_4: {},
-              content_5: {}
-            }
-          },
           solicit_answer_details: false
         },
         language_code: 'en',
         version: 1,
         linked_skill_ids: ['abc'],
+        next_content_id_index: 6,
         inapplicable_skill_misconception_ids: ['abc-2']
       };
 
@@ -1086,10 +1062,7 @@ describe('Contributions and review component', () => {
                   param_changes: [],
                   recorded_voiceovers: {
                     voiceovers_mapping: {}
-                  },
-                  written_translations: {
-                    translations_mapping: {}
-                  },
+                  }
                 },
               }
             },

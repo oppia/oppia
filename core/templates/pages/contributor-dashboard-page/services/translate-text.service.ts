@@ -225,6 +225,7 @@ export class TranslateTextService {
       translation: string | string[], languageCode: string, imagesData:
       ImagesData[], dataFormat: string, successCallback: () => void,
       errorCallback: (reason: string) => void): void {
+    console.error(this.stateWiseContents);
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,
