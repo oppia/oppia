@@ -233,7 +233,7 @@ export class QuestionObjectFactory {
     return new Question(
       null, this.stateObject.createDefaultState(
         null, 'content_0', 'default_outcome_1'),
-      Appconstants.DEFAULT_LANGUAGE_CODE, 1, skillIds, [], 2);
+      AppConstants.DEFAULT_LANGUAGE_CODE, 1, skillIds, [], 2);
   }
 
   createFromBackendDict(questionBackendDict: QuestionBackendDict): Question {
