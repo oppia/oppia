@@ -70,9 +70,9 @@ STATE_PROPERTY_CONTENT: Final = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS: Final = 'solicit_answer_details'
 STATE_PROPERTY_CARD_IS_CHECKPOINT: Final = 'card_is_checkpoint'
 STATE_PROPERTY_RECORDED_VOICEOVERS: Final = 'recorded_voiceovers'
-DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
+STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID: Final = 'widget_id'
-DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
+STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
 STATE_PROPERTY_LINKED_SKILL_ID: Final = 'linked_skill_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS: Final = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS: Final = 'answer_groups'
@@ -85,8 +85,6 @@ STATE_PROPERTY_INTERACTION_SOLUTION: Final = 'solution'
 STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED: Final = (
     # Deprecated in state schema v27.
     'content_ids_to_audio_translations')
-STATE_PROPERTY_WRITTEN_TRANSLATIONS_DEPRECATED: Final = 'written_translations'
-STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED: Final = 'next_content_id_index'
 
 # These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS: Final = 'widget_handlers'
@@ -116,14 +114,11 @@ DEPRECATED_CMD_ADD_TRANSLATION: Final = 'add_translation'
 CMD_ADD_WRITTEN_TRANSLATION: Final = 'add_written_translation'
 # This takes additional 'content_id', 'language_code' and 'state_name'
 # parameters.
-DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
+CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE: Final = (
     'mark_written_translation_as_needing_update')
 # This takes additional 'content_id' and 'state_name' parameters.
-DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
+CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE: Final = (
     'mark_written_translations_as_needing_update')
-CMD_MARK_TRANSLATIONS_NEEDS_UPDATE: Final = 'mark_translations_needs_update'
-# This takes additional 'content_id' parameters.
-CMD_REMOVE_TRANSLATIONS: Final = 'remove_translations'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY: Final = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -299,7 +294,9 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_CARD_IS_CHECKPOINT,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
+        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
+        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
         STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
@@ -310,9 +307,7 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
         # Deprecated state properties.
-        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED,
-        STATE_PROPERTY_WRITTEN_TRANSLATIONS_DEPRECATED,
-        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED
+        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED
     ]
 
     # The allowed list of exploration properties which can be used in
@@ -321,7 +316,8 @@ class ExplorationChange(change_domain.BaseChange):
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        'next_content_id_index', 'edits_allowed']
+        'edits_allowed'
+    ]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
@@ -332,11 +328,7 @@ class ExplorationChange(change_domain.BaseChange):
         'deprecated_values': {}
     }, {
         'name': CMD_ADD_STATE,
-        'required_attribute_names': [
-            'state_name',
-            'content_id_for_state_content',
-            'content_id_for_default_outcome'
-        ],
+        'required_attribute_names': ['state_name'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -374,7 +366,7 @@ class ExplorationChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }, {
-        'name': DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+        'name': CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
         'required_attribute_names': [
             'content_id',
             'language_code',
@@ -385,22 +377,8 @@ class ExplorationChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }, {
-        'name': DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
+        'name': CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
         'required_attribute_names': ['content_id', 'state_name'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
-        'required_attribute_names': ['content_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_REMOVE_TRANSLATIONS,
-        'required_attribute_names': ['content_id'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -460,8 +438,6 @@ class AddExplorationStateCmd(ExplorationChange):
     """
 
     state_name: str
-    content_id_for_state_content: str
-    content_id_for_default_outcome: str
 
 
 class DeleteExplorationStateCmd(ExplorationChange):
@@ -573,6 +549,18 @@ class EditExpStatePropertyRecordedVoiceoversCmd(ExplorationChange):
     old_value: state_domain.RecordedVoiceoversDict
 
 
+class EditExpStatePropertyWrittenTranslationsCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_WRITTEN_TRANSLATIONS as allowed value.
+    """
+
+    property_name: Literal['written_translations']
+    state_name: str
+    new_value: state_domain.WrittenTranslationsDict
+    old_value: state_domain.WrittenTranslationsDict
+
+
 class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
     """Class representing the ExplorationChange's
     CMD_EDIT_STATE_PROPERTY command with
@@ -583,6 +571,18 @@ class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
     state_name: str
     new_value: str
     old_value: str
+
+
+class EditExpStatePropertyNextContentIdIndexCmd(ExplorationChange):
+    """Class representing the ExplorationChange's
+    CMD_EDIT_STATE_PROPERTY command with
+    STATE_PROPERTY_NEXT_CONTENT_ID_INDEX as allowed value.
+    """
+
+    property_name: Literal['next_content_id_index']
+    state_name: str
+    new_value: int
+    old_value: int
 
 
 class EditExpStatePropertyLinkedSkillIdCmd(ExplorationChange):
@@ -838,17 +838,6 @@ class EditExplorationPropertyCorrectnessFeedbackEnabledCmd(ExplorationChange):
     property_name: Literal['correctness_feedback_enabled']
     new_value: bool
     old_value: bool
-
-
-class EditExplorationPropertyNextContentIdIndexCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_EXPLORATION_PROPERTY command with
-    'next_content_id_index' as allowed value.
-    """
-
-    property_name: Literal['next_content_id_index']
-    new_value: int
-    old_value: int
 
 
 class EditExplorationPropertyEditsAllowedCmd(ExplorationChange):
@@ -1233,7 +1222,6 @@ class ExplorationDict(TypedDict):
     auto_tts_enabled: bool
     correctness_feedback_enabled: bool
     edits_allowed: bool
-    next_content_id_index: int
 
 
 class VersionedExplorationDict(ExplorationDict):
@@ -1253,7 +1241,6 @@ class ExplorationPlayerDict(TypedDict):
     objective: str
     language_code: str
     correctness_feedback_enabled: bool
-    next_content_id_index: int
 
 
 class VersionedExplorationStatesDict(TypedDict):
@@ -1315,7 +1302,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         version: int,
         auto_tts_enabled: bool,
         correctness_feedback_enabled: bool,
-        next_content_id_index: int,
         edits_allowed: bool,
         created_on: Optional[datetime.datetime] = None,
         last_updated: Optional[datetime.datetime] = None
@@ -1347,8 +1333,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
-            next_content_id_index: int. The next content_id index to use for
-                generation of new content_ids.
             edits_allowed: bool. True when edits to the exploration is allowed.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
@@ -1383,18 +1367,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
-        self.next_content_id_index = next_content_id_index
         self.edits_allowed = edits_allowed
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the exploration.
+        """Get all translatable fields/objects in the exploration.
 
         Returns:
-            TranslatableContentsCollection. An instance of
-            TranslatableContentsCollection class.
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
         """
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection())
@@ -1437,14 +1419,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             Exploration. The Exploration domain object with default
             values.
         """
-        content_id_generator = translation_domain.ContentIdGenerator()
         init_state_dict = state_domain.State.create_default_state(
-            init_state_name,
-            content_id_generator.generate(
-                translation_domain.ContentType.CONTENT),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME),
-            is_initial_state=True).to_dict()
+            init_state_name, is_initial_state=True).to_dict()
 
         states_dict = {
             init_state_name: init_state_dict
@@ -1455,8 +1431,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED,
-            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED,
-            content_id_generator.next_content_id_index, True)
+            feconf.DEFAULT_CORRECTNESS_FEEDBACK_ENABLED, True)
 
     @classmethod
     def from_dict(
@@ -1498,8 +1473,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.correctness_feedback_enabled = exploration_dict[
             'correctness_feedback_enabled']
-        exploration.next_content_id_index = exploration_dict[
-            'next_content_id_index']
         exploration.edits_allowed = exploration_dict['edits_allowed']
 
         exploration.param_specs = {
@@ -1511,15 +1484,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'states_schema_version']
         init_state_name = exploration_dict['init_state_name']
         exploration.rename_state(exploration.init_state_name, init_state_name)
+        exploration.add_states([
+            state_name for state_name in exploration_dict['states']
+            if state_name != init_state_name])
 
         for (state_name, sdict) in exploration_dict['states'].items():
-            if state_name != init_state_name:
-                exploration.add_state(
-                    state_name,
-                    # These are placeholder values which will be repalced with
-                    # correct values below.
-                    '<placeholder1>', '<placeholder2>')
-
             state = exploration.states[state_name]
 
             state.content = state_domain.SubtitledHtml(
@@ -1568,6 +1537,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state.recorded_voiceovers = (
                 state_domain.RecordedVoiceovers.from_dict(
                     sdict['recorded_voiceovers']))
+
+            state.written_translations = (
+                state_domain.WrittenTranslations.from_dict(
+                    sdict['written_translations']))
+
+            state.next_content_id_index = sdict['next_content_id_index']
 
             state.linked_skill_id = sdict['linked_skill_id']
 
@@ -1752,14 +1727,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
-
-        if not isinstance(self.next_content_id_index, int):
-            raise utils.ValidationError(
-                'Expected next_content_id_index to be an int, received '
-                '%s' % self.next_content_id_index)
-
-        # Validates translatable contents in the exploration.
-        self.validate_translatable_contents(self.next_content_id_index)
 
         if not isinstance(self.edits_allowed, bool):
             raise utils.ValidationError(
@@ -2126,9 +2093,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'following states: %s' % ', '.join(sorted_dead_end_states)
             )
 
-    def get_content_html(
-        self, state_name: str, content_id: str
-    ) -> Union[str, List[str]]:
+    def get_content_html(self, state_name: str, content_id: str) -> str:
         """Return the content for a given content id of a state.
 
         Args:
@@ -2343,55 +2308,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
-    def update_next_content_id_index(self, next_content_id_index: int) -> None:
-        """Update the interaction next content id index attribute.
-
-        Args:
-            next_content_id_index: int. The new next content id index to set.
-        """
-        self.next_content_id_index = next_content_id_index
-
+    # Methods relating to states.
     def add_states(self, state_names: List[str]) -> None:
-        """Adds new states in the exploration with the given state names.
+        """Adds multiple states to the exploration.
 
         Args:
-            state_names: list(str). The new state name.
-        """
-        content_id_generator = translation_domain.ContentIdGenerator(
-            self.next_content_id_index)
-        for state_name in state_names:
-            self.add_state(
-                state_name,
-                content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT),
-                content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME))
-        self.next_content_id_index = content_id_generator.next_content_id_index
-
-    def add_state(
-        self,
-        state_name: str,
-        content_id_for_state_content: str,
-        content_id_for_default_outcome: str
-    ) -> None:
-        """Adds new state in the exploration with the given state name.
-
-        Args:
-            state_name: str. The new state name.
-            content_id_for_state_content: str. The content_id for the new state
-                content.
-            content_id_for_default_outcome: str. The content_id for the default
-                outcome of the new state.
+            state_names: list(str). List of state names to add.
 
         Raises:
-            ValueError. State names cannot be duplicate.
+            ValueError. At least one of the new state names already exists in
+                the states dict.
         """
-        if state_name in self.states:
-            raise ValueError('Duplicate state name %s' % state_name)
+        for state_name in state_names:
+            if state_name in self.states:
+                raise ValueError('Duplicate state name %s' % state_name)
 
-        self.states[state_name] = state_domain.State.create_default_state(
-            state_name, content_id_for_state_content,
-            content_id_for_default_outcome)
+        for state_name in state_names:
+            self.states[state_name] = state_domain.State.create_default_state(
+                state_name)
 
     def rename_state(self, old_state_name: str, new_state_name: str) -> None:
         """Renames the given state.
@@ -2458,6 +2392,28 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         del self.states[state_name]
 
+    def get_translatable_text(
+        self, language_code: str
+    ) -> Dict[str, Dict[str, state_domain.TranslatableItem]]:
+        """Returns all the contents which needs translation in the given
+        language.
+
+        Args:
+            language_code: str. The language code in which translation is
+                required.
+
+        Returns:
+            dict(str, dict(str, str)). A dict where state_name is the key and a
+            dict with content_id as the key and html content as value.
+        """
+        state_names_to_content_id_mapping = {}
+        for state_name, state in self.states.items():
+            state_names_to_content_id_mapping[state_name] = (
+                state.get_content_id_mapping_needing_translations(
+                    language_code))
+
+        return state_names_to_content_id_mapping
+
     def get_trainable_states_dict(
         self,
         old_states: Dict[str, state_domain.State],
@@ -2521,6 +2477,58 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         new_state_name)
 
         return trainable_states_dict
+
+    def get_languages_with_complete_translation(self) -> List[str]:
+        """Returns a list of language code in which the exploration translation
+        is 100%.
+
+        Returns:
+            list(str). A list of language code in which the translation for the
+            exploration is complete i.e, 100%.
+        """
+        content_count = self.get_content_count()
+        language_code_list = []
+        for language_code, count in self.get_translation_counts().items():
+            if count == content_count:
+                language_code_list.append(language_code)
+
+        return language_code_list
+
+    def get_translation_counts(self) -> Dict[str, int]:
+        """Returns a dict representing the number of translations available in a
+        language for which there exists at least one translation in the
+        exploration.
+
+        Returns:
+            dict(str, int). A dict with language code as a key and number of
+            translation available in that language as the value.
+        """
+        exploration_translation_counts: Dict[
+            str, int
+        ] = collections.defaultdict(int)
+        for state in self.states.values():
+            state_translation_counts = state.get_translation_counts()
+            for language, count in state_translation_counts.items():
+                exploration_translation_counts[language] += count
+
+        return dict(exploration_translation_counts)
+
+    def get_content_count(self) -> int:
+        """Returns the total number of distinct content fields available in the
+        exploration which are user facing and can be translated into
+        different languages.
+
+        (The content field includes state content, feedback, hints, solutions.)
+
+        Returns:
+            int. The total number of distinct content fields available inside
+            the exploration.
+        """
+        content_count = 0
+        for state in self.states.values():
+            content_count += state.get_translatable_content_count()
+
+        return content_count
 
     def get_metadata(self) -> ExplorationMetadata:
         """Gets the ExplorationMetadata domain object for the exploration."""
@@ -2902,9 +2910,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         )
                     )
                 translations_mapping = (
-                    # Here we use MyPy ignore because the latest schema of state
-                    # dict doesn't contains written_translations property.
-                    state_dict['written_translations']['translations_mapping']) # type: ignore[misc]
+                    state_dict['written_translations']['translations_mapping'])
                 for content_id in translations_mapping:
                     if content_id in list_of_subtitled_unicode_content_ids:
                         for language_code in translations_mapping[content_id]:
@@ -3149,18 +3155,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     customisation_args[ca_name].get_content_ids()
                 )
 
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
         translations_mapping = (
-            state_dict['written_translations']['translations_mapping'])  # type: ignore[misc]
+            state_dict['written_translations']['translations_mapping'])
         new_translations_mapping = {
              content_id: translation_item for
              content_id, translation_item in translations_mapping.items()
              if content_id in content_id_list
         }
-        # Here we use MyPy ignore because the latest schema of state
-        # dict doesn't contains written_translations property.
-        state_dict['written_translations']['translations_mapping'] = (  # type: ignore[misc]
+        state_dict['written_translations']['translations_mapping'] = (
             new_translations_mapping)
 
         voiceovers_mapping = (
@@ -3394,9 +3396,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # Marking the content ids that needs update.
         for content_id in content_ids_of_choices_to_update:
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains written_translations property.
-            choice_translations = state_dict['written_translations'][  # type: ignore[misc]
+            choice_translations = state_dict['written_translations'][
                 'translations_mapping'][content_id]
             for translation in choice_translations.values():
                 translation['needs_update'] = True
@@ -3677,9 +3677,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             else:
                 button_text_subtitled_unicode_dict['unicode_str'] = 'Continue'
 
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains written_translations property.
-            continue_button_translations = state_dict['written_translations'][ # type: ignore[misc]
+            continue_button_translations = state_dict['written_translations'][
                 'translations_mapping'][content_id]
             for translation in continue_button_translations.values():
                 translation['needs_update'] = True
@@ -5032,10 +5030,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state['content']['html'] = cls.fix_content(html)
 
             # Fix tags for written translations.
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains written_translations property.
             written_translations = (
-                state['written_translations']['translations_mapping'])  # type: ignore[misc]
+                state['written_translations']['translations_mapping'])
             for translation_item in written_translations.values():
                 for translation in translation_item.values():
                     if isinstance(translation['translation'], list):
@@ -5091,36 +5087,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v54_dict_to_v55_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Tuple[Dict[str, state_domain.StateDict], int]:
-        """Converts from v54 to v55. Version 55 removes next_content_id_index
-        and WrittenTranslation from State. This version also updates the
-        content-ids for each translatable field in the state with its new
-        content-id.
-        """
-        for _, state_dict in states_dict.items():
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains next_content_id_index property.
-            del state_dict['next_content_id_index'] # type: ignore[misc]
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains written_translations property.
-            del state_dict['written_translations'] # type: ignore[misc]
-        states_dict, next_content_id_index = (
-            state_domain.State
-            .update_old_content_id_to_new_content_id_in_v54_states(states_dict)
-        )
-
-        return states_dict, next_content_id_index
-
-    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
         current_states_schema_version: int,
         init_state_name: str,
         language_code: str
-    ) -> Optional[int]:
+    ) -> None:
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -5138,9 +5111,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 schema version.
             init_state_name: str. Name of initial state.
             language_code: str. The language code of the exploration.
-
-        Returns:
-            None|int. The next content Id index for generating new content Id.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -5153,22 +5123,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
         elif current_states_schema_version == 52:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], language_code)
-        elif current_states_schema_version == 54:
-            versioned_exploration_states['states'], next_content_id_index = (
-                conversion_fn(versioned_exploration_states['states']))
-            assert isinstance(next_content_id_index, int)
-            return next_content_id_index
         else:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'])
-
-        return None
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 60
+    CURRENT_EXP_SCHEMA_VERSION = 59
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5490,34 +5453,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v59_dict_to_v60_dict(
-        cls, exploration_dict: VersionedExplorationDict
-    ) -> VersionedExplorationDict:
-        """Converts a v59 exploration dict into a v60 exploration dict.
-        Removes written_translation, next_content_id_index from state properties
-        and also introduces next_content_id_index variable into
-        exploration level.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v59.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v60.
-        """
-        exploration_dict['schema_version'] = 60
-
-        exploration_dict['states'], next_content_id_index = (
-            cls._convert_states_v54_dict_to_v55_dict(
-                exploration_dict['states'])
-        )
-        exploration_dict['states_schema_version'] = 55
-        exploration_dict['next_content_id_index'] = next_content_id_index
-
-        return exploration_dict
-
-    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -5624,11 +5559,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 exploration_dict)
             exploration_schema_version = 59
 
-        if exploration_schema_version == 59:
-            exploration_dict = cls._convert_v59_dict_to_v60_dict(
-                exploration_dict)
-            exploration_schema_version = 60
-
         return exploration_dict
 
     @classmethod
@@ -5696,7 +5626,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            'next_content_id_index': self.next_content_id_index,
             'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
@@ -5802,8 +5731,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'objective': self.objective,
             'language_code': self.language_code,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
-            'next_content_id_index': self.next_content_id_index
         }
+
+    def get_all_html_content_strings(self) -> List[str]:
+        """Gets all html content strings used in this exploration.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_list = []
+        for state in self.states.values():
+            content_html = state.content.html
+            interaction_html_list = (
+                state.interaction.get_all_html_content_strings())
+            html_list += [content_html] + interaction_html_list
+
+        return html_list
 
 
 class ExplorationSummaryMetadataDict(TypedDict):
@@ -6204,6 +6147,7 @@ class ExplorationChangeMergeVerifier:
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_INTERACTION_HINTS,
+        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_CUST_ARGS
@@ -6213,6 +6157,7 @@ class ExplorationChangeMergeVerifier:
     # in which if there are any changes then they are always mergeable.
     NON_CONFLICTING_PROPERTIES: List[str] = [
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
         STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_CARD_IS_CHECKPOINT
     ]
@@ -6233,6 +6178,42 @@ class ExplorationChangeMergeVerifier:
 
         for change in composite_change_list:
             self._parse_exp_change(change)
+
+    def _get_property_name_from_content_id(self, content_id: str) -> str:
+        """Returns property name from content id.
+
+        Args:
+            content_id: string. Id of the content.
+
+        Returns:
+            string. Name of the property of which the
+            content is part of.
+        """
+        property_name_to_content_id_identifier: Dict[
+            str, Callable[[str], bool]
+        ] = {
+            STATE_PROPERTY_CONTENT: (
+                lambda content_id: content_id == 'content'),
+            STATE_PROPERTY_INTERACTION_CUST_ARGS: (
+                lambda content_id: content_id[:3] == 'ca_'),
+            STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME: (
+                lambda content_id: content_id == 'default_outcome'),
+            STATE_PROPERTY_INTERACTION_SOLUTION: (
+                lambda content_id: content_id == 'solution'),
+            STATE_PROPERTY_INTERACTION_HINTS: (
+                lambda content_id: content_id[:4] == 'hint'),
+            STATE_PROPERTY_INTERACTION_ANSWER_GROUPS: (
+                lambda content_id: (
+                    content_id[:8] == 'feedback' or
+                    content_id[:10] == 'rule_input')),
+        }
+
+        for prop_name, identifier_function in (
+                property_name_to_content_id_identifier.items()):
+            if identifier_function(content_id):
+                property_name = prop_name
+                break
+        return property_name
 
     def _parse_exp_change(self, change: ExplorationChange) -> None:
         """This function take the change and according to the cmd
@@ -6274,6 +6255,18 @@ class ExplorationChangeMergeVerifier:
                 state_name = self.new_to_old_state_names[change.state_name]
             self.changed_properties[state_name].add(
                 change.property_name)
+        elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
+            changed_property = self._get_property_name_from_content_id(
+                change.content_id)
+            # A condition to store the name of the properties changed
+            # in changed_properties dict.
+            state_name = change.state_name
+            if state_name in self.new_to_old_state_names:
+                state_name = self.new_to_old_state_names[change.state_name]
+            self.changed_translations[state_name].add(
+                changed_property)
+            self.changed_properties[state_name].add(
+                STATE_PROPERTY_WRITTEN_TRANSLATIONS)
 
     def is_change_list_mergeable(
         self,
@@ -6466,6 +6459,28 @@ class ExplorationChangeMergeVerifier:
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
+            elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
+                state_name = state_names_of_renamed_states.get(
+                    change.state_name) or change.state_name
+                if state_name in old_to_new_state_names:
+                    # Here we will send the changelist, frontend_version,
+                    # backend_version and exploration to the admin, so
+                    # that the changes related to state renames can be
+                    # reviewed and the proper conditions can be written
+                    # to handle those cases.
+                    return False, True
+                changed_property = self._get_property_name_from_content_id(
+                    change.content_id)
+                if (changed_property not in
+                        (self.changed_properties[state_name] |
+                         self.changed_translations[state_name])):
+                    change_is_mergeable = True
+                if not self.changed_properties[state_name]:
+                    change_is_mergeable = True
+            elif change.cmd == CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE:
+                change_is_mergeable = True
+            elif change.cmd == CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE:
+                change_is_mergeable = True
             elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
                 change_is_mergeable = (
                     exp_at_change_list_version.__getattribute__(

@@ -155,7 +155,13 @@ describe('Question update service', function() {
           default_outcome: {}
         }
       },
-      solicit_answer_details: false
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
     };
 
     expectedOutputStateDict = {
@@ -216,7 +222,13 @@ describe('Question update service', function() {
           default_outcome: {}
         }
       },
-      solicit_answer_details: false
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
     };
 
     expectedOutputState = StateObjectFactory.createFromBackendDict(

@@ -84,6 +84,15 @@ describe('Exploration engine service ', () => {
             }
           },
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
+          },
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -148,6 +157,7 @@ describe('Exploration engine service ', () => {
             }
           },
           param_changes: [],
+          next_content_id_index: 3,
           card_is_checkpoint: true,
           linked_skill_id: null,
           content: {
@@ -163,6 +173,11 @@ describe('Exploration engine service ', () => {
             }
           },
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {}
+            }
+          },
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -177,6 +192,7 @@ describe('Exploration engine service ', () => {
             default_outcome: null
           },
           param_changes: [],
+          next_content_id_index: 0,
           card_is_checkpoint: false,
           linked_skill_id: null,
           content: {
@@ -196,6 +212,15 @@ describe('Exploration engine service ', () => {
             }
           },
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
+          },
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -260,6 +285,7 @@ describe('Exploration engine service ', () => {
             }
           },
           param_changes: [],
+          next_content_id_index: 3,
           card_is_checkpoint: false,
           linked_skill_id: null,
           content: {
@@ -285,7 +311,6 @@ describe('Exploration engine service ', () => {
       is_version_of_draft_valid: null,
       language_code: 'en',
       init_state_name: 'Start',
-      next_content_id_index: 5,
       draft_changes: null,
       exploration_metadata: {
         title: 'Exploration',
@@ -326,8 +351,7 @@ describe('Exploration engine service ', () => {
         title: '',
         language_code: '',
         objective: '',
-        correctness_feedback_enabled: false,
-        next_content_id_index: 1
+        correctness_feedback_enabled: false
       },
       exploration_metadata: {
         title: '',
@@ -352,7 +376,6 @@ describe('Exploration engine service ', () => {
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
       auto_tts_enabled: false,
-      displayable_language_codes: [],
       correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       has_viewed_lesson_info_modal_once: false,
@@ -432,7 +455,7 @@ describe('Exploration engine service ', () => {
     }).toThrowError('Cannot read properties of undefined (reading \'title\')');
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     const explorationTitle = explorationEngineService.getExplorationTitle();
     expect(explorationTitle).toBe('My Exploration Title');
@@ -462,7 +485,7 @@ describe('Exploration engine service ', () => {
 
     explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     const explorationTitle = explorationEngineService.getExplorationTitle();
     expect(explorationTitle).toBe('My Exploration Title');
@@ -491,7 +514,7 @@ describe('Exploration engine service ', () => {
 
       let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, 'content_id', audioTranslationLanguageService);
+        null, null, 'content_id', audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -501,7 +524,7 @@ describe('Exploration engine service ', () => {
         .and.returnValue(answerClassificationResult);
 
       explorationEngineService.init(
-        explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
 
       const isAnswerCorrect = explorationEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
@@ -532,7 +555,7 @@ describe('Exploration engine service ', () => {
 
       let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, 'content_id', audioTranslationLanguageService);
+        null, null, 'content_id', audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -542,7 +565,7 @@ describe('Exploration engine service ', () => {
         .and.returnValue(answerClassificationResult);
 
       explorationEngineService.init(
-        explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
 
       // Setting answer is being processed to true.
       explorationEngineService.answerIsBeingProcessed = true;
@@ -573,7 +596,7 @@ describe('Exploration engine service ', () => {
 
       let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, 'content_id', audioTranslationLanguageService);
+        null, null, 'content_id', audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -585,7 +608,7 @@ describe('Exploration engine service ', () => {
         alertsService, 'addWarning').and.callThrough();
 
       explorationEngineService.init(
-        explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
 
       explorationEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
@@ -615,7 +638,7 @@ describe('Exploration engine service ', () => {
 
       let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, 'content_id', audioTranslationLanguageService);
+        null, null, 'content_id', audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -630,7 +653,7 @@ describe('Exploration engine service ', () => {
         .and.returnValue(null);
 
       explorationEngineService.init(
-        explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
 
       explorationEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
@@ -660,7 +683,7 @@ describe('Exploration engine service ', () => {
 
       let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, 'content_id', audioTranslationLanguageService);
+        null, null, 'content_id', audioTranslationLanguageService);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -674,7 +697,7 @@ describe('Exploration engine service ', () => {
         alertsService, 'addWarning').and.callThrough();
 
       explorationEngineService.init(
-        explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
 
       explorationEngineService.submitAnswer(
         answer, textInputService, submitAnswerSuccessCb);
@@ -697,7 +720,7 @@ describe('Exploration engine service ', () => {
       .toBe(false);
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
     tick();
 
     const answerDetails = (
@@ -724,7 +747,7 @@ describe('Exploration engine service ', () => {
     }).toThrowError('Cannot read properties of undefined (reading \'title\')');
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     const explorationTitle = explorationEngineService.getExplorationTitle();
     expect(explorationTitle).toBe('My Exploration Title');
@@ -740,7 +763,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.getExplorationVersion()).toBe(1);
 
     explorationEngineService.init(
-      explorationDict, 2, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 2, null, true, ['en'], initSuccessCb);
 
     const explorationVersion = explorationEngineService.getExplorationVersion();
     expect(explorationVersion).toBe(2);
@@ -759,7 +782,7 @@ describe('Exploration engine service ', () => {
       '(reading \'getAuthorRecommendedExpIds\')');
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     expect(() => {
       explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
@@ -794,7 +817,7 @@ describe('Exploration engine service ', () => {
 
     let lastCard = StateCard.createNewCard(
       'Card 1', 'Content html', 'Interaction text', null,
-      null, 'content_id', audioTranslationLanguageService);
+      null, null, 'content_id', audioTranslationLanguageService);
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(playerTranscriptService, 'getLastStateName')
@@ -806,7 +829,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.currentStateName).toBe(undefined);
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     explorationEngineService.submitAnswer(
       answer, textInputService, submitAnswerSuccessCb);
@@ -845,7 +868,7 @@ describe('Exploration engine service ', () => {
       'Cannot read properties of undefined (reading \'initStateName\')');
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     expect(explorationEngineService.isCurrentStateInitial()).toBe(true);
   });
@@ -861,7 +884,7 @@ describe('Exploration engine service ', () => {
       'Cannot read properties of undefined (reading \'getState\')');
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     // Check for first state.
     lastStateNameSpy.and.returnValue('Start');
@@ -895,13 +918,13 @@ describe('Exploration engine service ', () => {
 
     // First exploration has language code 'en'.
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
     expect(explorationEngineService.getLanguageCode()).toBe('en');
 
     // Setting next exploration language code to 'bn'.
     explorationDict.language_code = 'bn';
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
     expect(explorationEngineService.getLanguageCode()).toBe('bn');
   });
 
@@ -937,7 +960,7 @@ describe('Exploration engine service ', () => {
     );
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     // Check for first state.
     let state = explorationEngineService.getStateFromStateName('Start');
@@ -961,7 +984,7 @@ describe('Exploration engine service ', () => {
     );
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     // Check for first state.
     let stateCard = explorationEngineService.getStateCardByName('Start');
@@ -980,7 +1003,7 @@ describe('Exploration engine service ', () => {
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
 
     explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
 
     // Check for first state.
     let shortestPathToState = explorationEngineService.getShortestPathToState(
