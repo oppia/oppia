@@ -27,9 +27,9 @@ import { ExplorationBackendDict, ExplorationObjectFactory } from
 import { ExtractImageFilenamesFromModelService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
-
+import { ContentTranslationManagerService } from
+  'pages/exploration-player-page/services/content-translation-manager.service';
 import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 
 describe('Extracting Image file names in the state service', () => {
@@ -37,20 +37,25 @@ describe('Extracting Image file names in the state service', () => {
   let eof: ExplorationObjectFactory;
   let sof: SkillObjectFactory;
   let ecs: ContextService;
+  let ctms: ContentTranslationManagerService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: { [x: string]: string[] };
   let skillDict: SkillBackendDict;
   let expectedImageFilenamesInSkill: string[];
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [CamelCaseToHyphensPipe]
     });
     eof = TestBed.inject(ExplorationObjectFactory);
     ecs = TestBed.inject(ContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
+    ctms = TestBed.inject(ContentTranslationManagerService);
     sof = TestBed.inject(SkillObjectFactory);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
+    spyOn(ctms, 'getTranslatedHtml').and.callFake(
+      (unusedWrittenTranslations, unusedLanguageCode, content) => {
+        return content.html;
+      });
 
     explorationDict = {
       correctness_feedback_enabled: false,
@@ -59,7 +64,6 @@ describe('Extracting Image file names in the state service', () => {
       language_code: 'en',
       draft_change_list_id: 0,
       title: 'My Title',
-      next_content_id_index: 3,
       init_state_name: 'Introduction',
       auto_tts_enabled: false,
       states: {
@@ -103,7 +107,15 @@ describe('Extracting Image file names in the state service', () => {
             hints: []
           },
           linked_skill_id: null,
+          next_content_id_index: 1,
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_buttonText_0: {},
+              default_outcome: {}
+            }
+          },
           classifier_model_id: null,
           card_is_checkpoint: false
         },
@@ -133,7 +145,14 @@ describe('Extracting Image file names in the state service', () => {
             hints: []
           },
           linked_skill_id: null,
+          next_content_id_index: 0,
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
           classifier_model_id: null,
           card_is_checkpoint: false
         },
@@ -232,7 +251,18 @@ describe('Extracting Image file names in the state service', () => {
             solution: null
           },
           linked_skill_id: null,
+          next_content_id_index: 5,
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          },
           card_is_checkpoint: false
         },
         'State 4': {
@@ -348,7 +378,18 @@ describe('Extracting Image file names in the state service', () => {
             ]
           },
           linked_skill_id: null,
+          next_content_id_index: 5,
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          },
           classifier_model_id: null,
           card_is_checkpoint: false
         },
@@ -554,8 +595,20 @@ describe('Extracting Image file names in the state service', () => {
             solution: null
           },
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              feedback_3: {},
+              feedback_4: {},
+              feedback_5: {}
+            }
+          },
           linked_skill_id: null,
           card_is_checkpoint: false,
+          next_content_id_index: 0
         },
         'State 6': {
           param_changes: [],
@@ -672,7 +725,19 @@ describe('Extracting Image file names in the state service', () => {
             },
           },
           linked_skill_id: null,
+          next_content_id_index: 4,
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_placeholder_3: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              hint_1: {},
+              solution: {}
+            }
+          },
           classifier_model_id: null,
           card_is_checkpoint: false
         },
@@ -796,7 +861,18 @@ describe('Extracting Image file names in the state service', () => {
               }
             ]
           },
+          next_content_id_index: 5,
           solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          },
           classifier_model_id: null,
           card_is_checkpoint: false,
           linked_skill_id: null

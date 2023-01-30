@@ -79,8 +79,7 @@ describe('Exploration Player State Service', () => {
       title: '',
       language_code: '',
       objective: '',
-      correctness_feedback_enabled: false,
-      next_content_id_index: 0
+      correctness_feedback_enabled: false
     },
     exploration_metadata: {
       title: '',
@@ -106,7 +105,6 @@ describe('Exploration Player State Service', () => {
     preferred_language_codes: [],
     auto_tts_enabled: false,
     correctness_feedback_enabled: true,
-    displayable_language_codes: [],
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
@@ -120,10 +118,20 @@ describe('Exploration Player State Service', () => {
     question_state_data: {
       classifier_model_id: null,
       param_changes: [],
+      next_content_id_index: 1,
       solicit_answer_details: false,
       content: {
         content_id: '1',
         html: 'Question 1'
+      },
+      written_translations: {
+        translations_mapping: {
+          1: {},
+          ca_placeholder_0: {},
+          feedback_id: {},
+          solution: {},
+          hint_1: {}
+        }
       },
       interaction: {
         answer_groups: [{
@@ -225,7 +233,6 @@ describe('Exploration Player State Service', () => {
     },
     question_state_data_schema_version: 2,
     language_code: '',
-    next_content_id_index: 4,
     version: 1,
     linked_skill_ids: [],
     inapplicable_skill_misconception_ids: []
@@ -460,7 +467,6 @@ describe('Exploration Player State Service', () => {
         title: '',
         draft_change_list_id: 0,
         language_code: '',
-        next_content_id_index: 0,
         exploration_metadata: {
           title: 'Exploration',
           category: 'Algebra',

@@ -16,16 +16,16 @@
  * @fileoverview Unit tests for ResponsesService.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
-import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {
   StateEditorService,
@@ -36,7 +36,6 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import {
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 describe('Responses Service', () => {
@@ -71,10 +70,22 @@ describe('Responses Service', () => {
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateSolutionService = TestBed.get(StateSolutionService);
 
-    savedMemento = new Solution(
-      explorationHtmlFormatterService, true, 'This is the correct answer',
-      new SubtitledHtml('', 'tesster')
-    );
+    savedMemento = {
+      ehfs: explorationHtmlFormatterService,
+      answerIsExclusive: true,
+      correctAnswer: 'This is the correct answer',
+      explanation: new SubtitledHtml('', 'tesster'),
+      toBackendDict: jasmine.createSpy('toBackendDict'),
+      getSummary: jasmine.createSpy('getSummary'),
+      setCorrectAnswer: jasmine.createSpy('setCorrectAnswer'),
+      setExplanation: jasmine.createSpy('setExplanation'),
+      getOppiaSolutionExplanationResponseHtml: jasmine.createSpy(
+        'getOppiaSolutionExplanationResponseHtml'
+      ),
+      getOppiaShortAnswerResponseHtml: jasmine.createSpy(
+        'getOppiaShortAnswerResponseHtml'
+      ),
+    };
 
     interactionData = interactionObjectFactory.createFromBackendDict({
       id: 'TextInput',
@@ -261,29 +272,58 @@ describe('Responses Service', () => {
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
 
-    const updatedAnswerGroup = new AnswerGroup(
-      [new Rule(
-        'Contains', {
-          x: {
-            contentId: 'rule_input_Contains',
-            normalizedStrSet: ['correct']
+    const updatedAnswerGroup = {
+      rules: [
+        {
+          type: 'Contains',
+          inputs: {
+            x: {
+              contentId: 'rule_input_Contains',
+              normalizedStrSet: ['correct']
+            },
           },
-        }, {})],
-      new Outcome(
-        'State', null,
-        new SubtitledHtml('', 'This is a new feedback text'),
-        true, [], 'test', 'test_skill_id'
-      ),
-      ['This is training data text'],
-      ''
-    );
-
+          inputTypes: {},
+          toBackendDict: jasmine.createSpy('toBackendDict'),
+        },
+      ],
+      outcome: {
+        dest: 'State',
+        destIfReallyStuck: null,
+        feedback: new SubtitledHtml('', 'This is a new feedback text'),
+        refresherExplorationId: 'test',
+        missingPrerequisiteSkillId: 'test_skill_id',
+        labelledAsCorrect: true,
+        paramChanges: [],
+        toBackendDict: jasmine.createSpy('toBackendDict'),
+        setDestination: jasmine.createSpy('setDestination'),
+        hasNonemptyFeedback: jasmine.createSpy('hasNonemptyFeedback'),
+        isConfusing: jasmine.createSpy('isConfusing'),
+      },
+      destIfReallyStuck: null,
+      trainingData: ['This is training data text'],
+      taggedSkillMisconceptionId: '',
+      toBackendDict: jasmine.createSpy('toBackendDict'),
+    };
     const callbackSpy = jasmine.createSpy('callback');
     responsesService.updateAnswerGroup(0, updatedAnswerGroup, callbackSpy);
 
     // Reassign only updated properties.
     const expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0] = updatedAnswerGroup;
+    expectedAnswerGroup[0].rules = updatedAnswerGroup.rules;
+    expectedAnswerGroup[0].taggedSkillMisconceptionId =
+      updatedAnswerGroup.taggedSkillMisconceptionId;
+    expectedAnswerGroup[0].outcome.feedback =
+      updatedAnswerGroup.outcome.feedback;
+    expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
+    expectedAnswerGroup[0].outcome.destIfReallyStuck =
+      updatedAnswerGroup.outcome.destIfReallyStuck;
+    expectedAnswerGroup[0].outcome.refresherExplorationId =
+      updatedAnswerGroup.outcome.refresherExplorationId;
+    expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
+      updatedAnswerGroup.outcome.missingPrerequisiteSkillId;
+    expectedAnswerGroup[0].outcome.labelledAsCorrect =
+      updatedAnswerGroup.outcome.labelledAsCorrect;
+    expectedAnswerGroup[0].trainingData = updatedAnswerGroup.trainingData;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(responsesService.getAnswerGroup(0)).toEqual(expectedAnswerGroup[0]);
@@ -294,7 +334,16 @@ describe('Responses Service', () => {
     stateEditorService.setInteraction(interactionData);
 
     const updatedAnswerGroup = {
-      rules: [new Rule('Contains', { x: 'correct'}, {})],
+      rules: [
+        {
+          type: 'Contains',
+          inputs: {
+            x: 'correct',
+          },
+          inputTypes: {},
+          toBackendDict: jasmine.createSpy('toBackendDict'),
+        },
+      ],
       outcome: {
         dest: 'State',
         destIfReallyStuck: null,
@@ -335,6 +384,8 @@ describe('Responses Service', () => {
     expectedAnswerGroup[0].outcome.feedback =
       updatedAnswerGroup.outcome.feedback;
     expectedAnswerGroup[0].outcome.dest = updatedAnswerGroup.outcome.dest;
+    expectedAnswerGroup[0].outcome.destIfReallyStuck =
+      updatedAnswerGroup.outcome.destIfReallyStuck;
     expectedAnswerGroup[0].outcome.refresherExplorationId =
       updatedAnswerGroup.outcome.refresherExplorationId;
     expectedAnswerGroup[0].outcome.missingPrerequisiteSkillId =
@@ -425,7 +476,7 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is ItemSelectionInput' +
-    ' and choices has its positions changed',
+      ' and choices has its positions changed',
     () => {
       responsesService.init(interactionDataWithRules);
       stateEditorService.setInteraction(interactionDataWithRules);
@@ -480,7 +531,7 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is ItemSelectionInput' +
-    ' and choices has its values changed',
+      ' and choices has its values changed',
     () => {
       responsesService.init(interactionDataWithRules);
       stateEditorService.setInteraction(interactionDataWithRules);
@@ -532,8 +583,8 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is' +
-    ' DragAndDropSortInput and rule type is' +
-    ' HasElementXAtPositionY',
+      ' DragAndDropSortInput and rule type is' +
+      ' HasElementXAtPositionY',
     () => {
       interactionDataWithRules.id = 'DragAndDropSortInput';
       interactionDataWithRules.answerGroups[0].rules[0].type =
@@ -584,8 +635,8 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is' +
-    ' DragAndDropSortInput and rule type is' +
-    ' HasElementXBeforeElementY',
+      ' DragAndDropSortInput and rule type is' +
+      ' HasElementXBeforeElementY',
     () => {
       interactionDataWithRules.id = 'DragAndDropSortInput';
       interactionDataWithRules.answerGroups[0].rules[0].type =
@@ -641,7 +692,7 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is' +
-    ' DragAndDropSortInput and choices had changed',
+      ' DragAndDropSortInput and choices had changed',
     () => {
       interactionDataWithRules.id = 'DragAndDropSortInput';
       // Any other method from DragAndDropSortInputRulesService.
@@ -698,7 +749,7 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is' +
-    ' DragAndDropSortInput and choices has its positions changed',
+      ' DragAndDropSortInput and choices has its positions changed',
     () => {
       responsesService.init(interactionDataWithRules);
       stateEditorService.setInteraction(interactionDataWithRules);
@@ -818,7 +869,7 @@ describe('Responses Service', () => {
 
   it(
     "should change interaction id when interaction is terminal and it's" +
-    ' not cached',
+      ' not cached',
     () => {
       responsesService.init(interactionData);
       stateEditorService.setInteraction(interactionData);

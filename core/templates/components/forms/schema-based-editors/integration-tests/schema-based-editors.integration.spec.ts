@@ -29,6 +29,8 @@ import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
 import { ApplyValidationDirective } from 'components/forms/custom-forms-directives/apply-validation.directive';
 import { CustomFormsComponentsModule } from 'components/forms/custom-forms-directives/custom-form-components.module';
 import { ObjectEditorComponent } from 'components/forms/custom-forms-directives/object-editor.directive';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
+import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 import { AudioSliderComponent } from 'components/forms/slider/audio-slider.component';
 import { DirectivesModule } from 'directives/directives.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
@@ -91,6 +93,8 @@ describe('Schema based editor', () => {
         SchemaBasedCustomEditorComponent,
         SchemaBasedDictEditorComponent,
         SchemaBasedEditorComponent,
+        MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
+        MarkAudioAsNeedingUpdateModalComponent,
         SchemaBasedExpressionEditorComponent,
         SchemaBasedFloatEditorComponent,
         SchemaBasedHtmlEditorComponent,

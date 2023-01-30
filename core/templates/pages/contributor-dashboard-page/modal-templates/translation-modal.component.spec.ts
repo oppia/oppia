@@ -74,8 +74,8 @@ describe('Translation Modal Component', () => {
   };
   const getContentTranslatableItemWithText = (text: string) => {
     return {
-      content_format: 'html',
-      content_value: text,
+      data_format: 'html',
+      content: text,
       content_type: 'content',
       interaction_id: null,
       rule_type: null
@@ -513,21 +513,20 @@ describe('Translation Modal Component', () => {
         files: {}
       };
       component.ngOnInit();
-      tick();
 
       const sampleStateWiseContentMapping = {
         stateName1: {contentId1: getContentTranslatableItemWithText('text1')},
         stateName2: {
           contentId2: {
-            content_format: 'unicode',
-            content_value: 'Continue',
+            data_format: 'unicode',
+            content: 'Continue',
             content_type: 'interaction',
             interaction_id: null,
             rule_type: null
           },
           contentId3: {
-            content_format: 'set_of_normalized_string',
-            content_value: ['answer1', 'answer2', 'answer3'],
+            data_format: 'set_of_normalized_string',
+            content: ['answer1', 'answer2', 'answer3'],
             content_type: 'rule',
             interaction_id: 'TextInput',
             rule_type: 'Contains'

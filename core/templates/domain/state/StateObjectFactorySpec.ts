@@ -66,10 +66,21 @@ describe('State Object Factory', () => {
     next_content_id_index: 0,
     param_changes: [],
     recorded_voiceovers: {
-      voiceovers_mapping: {}
+      voiceovers_mapping: {
+        content: {},
+        default_outcome: {}
+      }
     },
     solicit_answer_details: false,
-    card_is_checkpoint: false
+    card_is_checkpoint: false,
+    written_translations: {
+      translations_mapping: {
+        content: {},
+        default_outcome: {},
+        hint_1: {},
+        rule_input_2: {}
+      }
+    }
   };
 
   type DefaultOutcome = (
@@ -87,13 +98,13 @@ describe('State Object Factory', () => {
     stateObject = {
       classifier_model_id: null,
       content: {
-        content_id: 'content_0',
+        content_id: 'content',
         html: ''
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
-          content_0: {},
-          default_outcome_1: {}
+          content: {},
+          default_outcome: {}
         }
       },
       interaction: {
@@ -117,7 +128,7 @@ describe('State Object Factory', () => {
           dest: '(untitled state)',
           dest_if_really_stuck: null,
           feedback: {
-            content_id: 'default_outcome_1',
+            content_id: 'default_outcome',
             html: ''
           },
           param_changes: [],
@@ -130,9 +141,18 @@ describe('State Object Factory', () => {
         id: 'TextInput'
       },
       linked_skill_id: null,
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
-      card_is_checkpoint: false
+      card_is_checkpoint: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+          hint_1: {},
+          rule_input_2: {}
+        }
+      }
     };
   });
 
@@ -165,8 +185,7 @@ describe('State Object Factory', () => {
 
   it('should create a default state object', () => {
     const stateName = 'Default state';
-    const stateObjectDefault = sof.createDefaultState(
-      stateName, 'content_0', 'default_outcome_1');
+    const stateObjectDefault = sof.createDefaultState(stateName);
 
     const outcome = (
       stateObject.interaction.default_outcome as DefaultOutcome);
@@ -192,5 +211,26 @@ describe('State Object Factory', () => {
 
     expect(stateObjectDefault).toEqual(otherState);
     expect(stateObjectDefault.name).toEqual('Other state');
+  });
+
+  it('should correctly get required written translation content ids', () => {
+    const state = sof.createFromBackendDict('State name', stateObject);
+    state.interaction.id = null;
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content', 'rule_input_2']));
+
+    state.writtenTranslations.addContentId('feedback_1');
+    state.writtenTranslations.addWrittenTranslation(
+      'feedback_1', 'fr', 'html', '<p>Translation</p>');
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content', 'rule_input_2', 'feedback_1']));
+
+    state.interaction.id = 'TextInput';
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set([
+      'content', 'rule_input_2', 'feedback_1', 'hint_1', 'default_outcome']));
   });
 });
