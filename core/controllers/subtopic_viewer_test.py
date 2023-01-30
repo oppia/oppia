@@ -22,7 +22,6 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import translation_domain
 from core.domain import user_services
 from core.tests import test_utils
 
@@ -109,9 +108,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
+        self.written_translations_dict: state_domain.WrittenTranslationsDict = {
             'translations_mapping': {
                 'content': {}
             }

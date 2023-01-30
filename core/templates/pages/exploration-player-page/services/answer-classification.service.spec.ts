@@ -219,7 +219,15 @@ describe('Answer Classification Service', () => {
           hints: []
         },
         param_changes: [],
-        solicit_answer_details: false
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        }
       };
     });
 
@@ -568,6 +576,14 @@ describe('Answer Classification Service', () => {
         },
         param_changes: [],
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        }
       };
     });
 
@@ -737,6 +753,14 @@ describe('Answer Classification Service', () => {
         },
         param_changes: [],
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
+          }
+        }
       };
     });
 
