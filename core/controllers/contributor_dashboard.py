@@ -27,11 +27,11 @@ from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
-from core.domain import state_domain
 from core.domain import story_fetchers
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import translation_domain
 from core.domain import translation_services
 from core.domain import user_services
 
@@ -453,13 +453,14 @@ class TranslatableTextHandler(
         language_code = self.normalized_request['language_code']
         exp_id = self.normalized_request['exp_id']
 
+        exp = exp_fetchers.get_exploration_by_id(exp_id)
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):
             raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
-        exp = exp_fetchers.get_exploration_by_id(exp_id)
-        state_names_to_content_id_mapping = exp.get_translatable_text(
-            language_code)
+        state_names_to_content_id_mapping = (
+            translation_services.get_translatable_text(exp, language_code))
+
         reviewable_language_codes = []
         if self.user_id:
             contribution_rights = user_services.get_user_contribution_rights(
@@ -490,9 +491,9 @@ class TranslatableTextHandler(
     def _get_state_names_to_not_set_content_id_mapping(
         self,
         state_names_to_content_id_mapping: Dict[
-            str, Dict[str, state_domain.TranslatableItem]
+            str, Dict[str, translation_domain.TranslatableContent]
         ]
-    ) -> Dict[str, Dict[str, state_domain.TranslatableItem]]:
+    ) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents of which the data is set of strings.
 
@@ -514,7 +515,7 @@ class TranslatableTextHandler(
             content_id_to_not_set_translatable_item = {}
             for content_id, translatable_item in (
                     content_id_to_translatable_item.items()):
-                if not translatable_item.is_set_data_format():
+                if not translatable_item.is_data_format_list():
                     content_id_to_not_set_translatable_item[content_id] = (
                         translatable_item)
             if content_id_to_not_set_translatable_item:
@@ -525,10 +526,10 @@ class TranslatableTextHandler(
     def _get_state_names_to_not_in_review_content_id_mapping(
         self,
         state_names_to_content_id_mapping: Dict[
-            str, Dict[str, state_domain.TranslatableItem]
+            str, Dict[str, translation_domain.TranslatableContent]
         ],
         suggestions: List[suggestion_registry.BaseSuggestion]
-    ) -> Dict[str, Dict[str, state_domain.TranslatableItemDict]]:
+    ) -> Dict[str, Dict[str, translation_domain.TranslatableContentDict]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents found in suggestions.
 
@@ -686,8 +687,12 @@ class MachineTranslationStateTextsHandler(
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
             raise self.PageNotFoundException()
-        state_names_to_content_id_mapping = exp.get_translatable_text(
-            target_language_code)
+        state_names_to_content_id_mapping: (
+            Dict[str, Dict[str, translation_domain.TranslatableContent]]
+        ) = (
+            translation_services.get_translatable_text(
+                exp, target_language_code)
+        )
         if state_name not in state_names_to_content_id_mapping:
             raise self.PageNotFoundException()
         content_id_to_translatable_item_mapping = (
@@ -699,10 +704,16 @@ class MachineTranslationStateTextsHandler(
                 continue
 
             source_text = content_id_to_translatable_item_mapping[
-                content_id].content
+                content_id].content_value
+
+            # Here we use MyPy ignore because the flag the
+            # get_and_cache_machine_translation is not written correctly and it
+            # only handles str.
+            # TODO(#16621): Fix get_and_cache_machine_translation to handle
+            # translatable content of rule_spec [list(str)].
             translated_texts[content_id] = (
                 translation_services.get_and_cache_machine_translation(
-                    exp.language_code, target_language_code, source_text)
+                    exp.language_code, target_language_code, source_text) # type: ignore[arg-type]
             )
 
         self.values = {
