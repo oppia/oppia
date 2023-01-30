@@ -120,6 +120,7 @@ describe('State Name Editor component', () => {
         classifier_model_id: null,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'First State Content'
@@ -151,12 +152,19 @@ describe('State Name Editor component', () => {
           hints: []
         },
         param_changes: [],
-        solicit_answer_details: false
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
       },
       'Second State': {
         classifier_model_id: null,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'Second State Content'
@@ -189,11 +197,18 @@ describe('State Name Editor component', () => {
         },
         param_changes: [],
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
       },
       'Third State': {
         classifier_model_id: null,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'This is some content.'
@@ -233,8 +248,14 @@ describe('State Name Editor component', () => {
           }
         }],
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
       }
-    }, false);
+    });
     component.ngOnInit();
   });
 

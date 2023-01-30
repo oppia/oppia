@@ -275,15 +275,13 @@ export class ContributionAndReviewService {
 
   async updateQuestionSuggestionAsync(
       suggestionId: string, skillDifficulty: number,
-      questionStateData: StateBackendDict, nextContentIdIndex: number,
-      imagesData: ImagesData[],
+      questionStateData: StateBackendDict, imagesData: ImagesData[],
       onSuccess: (suggestionId: string) => void,
       onFailure: (suggestionId: string) => void
   ): Promise<void> {
     const payload = {
       skill_difficulty: skillDifficulty,
-      question_state_data: questionStateData,
-      next_content_id_index: nextContentIdIndex
+      question_state_data: questionStateData
     };
     const requestBody = new FormData();
     requestBody.append('payload', JSON.stringify(payload));

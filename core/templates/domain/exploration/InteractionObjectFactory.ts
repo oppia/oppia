@@ -68,7 +68,6 @@ import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 
 export interface InteractionBackendDict {
@@ -87,7 +86,7 @@ export interface InteractionBackendDict {
   'solution': SolutionBackendDict | null;
 }
 
-export class Interaction extends BaseTranslatableObject {
+export class Interaction {
   answerGroups: AnswerGroup[];
   confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
   customizationArgs: InteractionCustomizationArgs;
@@ -101,7 +100,6 @@ export class Interaction extends BaseTranslatableObject {
       customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome | null,
       hints: Hint[], id: string | null, solution: Solution | null) {
-    super();
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -109,24 +107,6 @@ export class Interaction extends BaseTranslatableObject {
     this.hints = hints;
     this.id = id;
     this.solution = solution;
-  }
-
-  getTranslatableFields(): (SubtitledUnicode | SubtitledHtml)[] {
-    return Interaction.getCustomizationArgContents(this.customizationArgs);
-  }
-
-  getTranslatableObjects(): BaseTranslatableObject[] {
-    let translatableObjects: BaseTranslatableObject[] = [
-      ...this.answerGroups, ...this.hints];
-
-    if (this.defaultOutcome) {
-      translatableObjects.push(this.defaultOutcome);
-    }
-
-    if (this.solution) {
-      translatableObjects.push(this.solution);
-    }
-    return translatableObjects;
   }
 
   setId(newValue: string): void {
@@ -198,16 +178,30 @@ export class Interaction extends BaseTranslatableObject {
     return customizationArgsBackendDict;
   }
 
-  static getCustomizationArgContents(
+  /**
+   * This function is used to properly set state in Questions. The state in
+   * Questions must handle its own WrittenTranslations and RecordedVoiceovers,
+   * so it must get all content ids in the state. See
+   * question-update.service.ts _updateContentIdsInAssets method for more
+   * details.
+   * @param {InteractionCustomizationArgs} customizationArgs The customization
+   *  arguments to get content ids for.
+   * @returns {(string | null)[]} List of content ids in customization args.
+   */
+  static getCustomizationArgContentIds(
       customizationArgs: InteractionCustomizationArgs
-  ): (SubtitledUnicode | SubtitledHtml)[] {
-    const contents: (SubtitledUnicode | SubtitledHtml)[] = [];
+  ): (string | null)[] {
+    // A null 'content_id' indicates that the 'SubtitledHtml' or
+    // 'SubtitledUnicode' has been created but not saved. Before the
+    // 'SubtitledHtml' or 'SubtitledUnicode' object is saved into a State,
+    // the 'content_id' should be set to a string.
+    const contentIds: (string | null)[] = [];
 
     const traverseValueAndRetrieveContentIdsFromSubtitled = (
         value: Object[] | Object
     ): void => {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
-        contents.push(value);
+        contentIds.push(value.contentId);
       } else if (value instanceof Array) {
         value.forEach(
           element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
@@ -220,15 +214,13 @@ export class Interaction extends BaseTranslatableObject {
       }
     };
 
-    if (customizationArgs) {
-      Object.values(customizationArgs).forEach(
-        caValue => {
-          traverseValueAndRetrieveContentIdsFromSubtitled(caValue.value);
-        }
-      );
-    }
+    Object.values(customizationArgs).forEach(
+      caValue => {
+        traverseValueAndRetrieveContentIdsFromSubtitled(caValue.value);
+      }
+    );
 
-    return contents;
+    return contentIds;
   }
 
   toBackendDict(): InteractionBackendDict {

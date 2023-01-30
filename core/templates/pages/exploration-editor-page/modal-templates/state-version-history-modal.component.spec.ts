@@ -107,9 +107,18 @@ describe('State version history modal', () => {
         id: 'TextInput'
       },
       linked_skill_id: null,
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
-      card_is_checkpoint: false
+      card_is_checkpoint: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+          hint_1: {},
+          rule_input_2: {}
+        }
+      }
     };
   });
 

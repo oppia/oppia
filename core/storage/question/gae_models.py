@@ -117,9 +117,6 @@ class QuestionModel(base_models.VersionedModel):
     # The schema version for the question state data.
     question_state_data_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
-    # The next_content_id index to use for generation of new content ids.
-    next_content_id_index = datastore_services.IntegerProperty(
-        required=True, default=0, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = (
         datastore_services.StringProperty(required=True, indexed=True))
@@ -158,8 +155,7 @@ class QuestionModel(base_models.VersionedModel):
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'inapplicable_skill_misconception_ids':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -250,8 +246,7 @@ class QuestionModel(base_models.VersionedModel):
         language_code: str,
         version: int,
         linked_skill_ids: List[str],
-        inapplicable_skill_misconception_ids: List[str],
-        next_content_id_index: int
+        inapplicable_skill_misconception_ids: List[str]
     ) -> QuestionModel:
         """Creates a new QuestionModel entry.
 
@@ -265,8 +260,6 @@ class QuestionModel(base_models.VersionedModel):
             inapplicable_skill_misconception_ids: list(str). The optional
                 skill misconception ids marked as not applicable to the
                 question.
-            next_content_id_index: int. The next content Id indext to generate
-                new content Id.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.
@@ -282,8 +275,7 @@ class QuestionModel(base_models.VersionedModel):
             version=version,
             linked_skill_ids=linked_skill_ids,
             inapplicable_skill_misconception_ids=(
-                inapplicable_skill_misconception_ids),
-            next_content_id_index=next_content_id_index)
+                inapplicable_skill_misconception_ids))
 
         return question_model_instance
 

@@ -110,7 +110,7 @@ describe('Tutor card component', () => {
       // type 'RecordedVoiceovers'." We need to suppress this error because of
       // the need to test validations.
       // @ts-ignore
-      null), [], null, '', null);
+      null), [], null, null, '', null);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
