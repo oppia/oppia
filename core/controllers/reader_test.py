@@ -41,7 +41,6 @@ from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -52,16 +51,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import stats_models
-    from mypy_imports import translation_models
 
-(
-    exp_models,
-    stats_models,
-    translation_models
-) = models.Registry.import_models([
-    models.Names.EXPLORATION,
-    models.Names.STATISTICS,
-    models.Names.TRANSLATION
+(exp_models, stats_models) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.STATISTICS
 ])
 
 
@@ -207,10 +199,6 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
-        exp_models.ExplorationContextModel(
-            id='0',
-            story_id='story1'
-        ).put()
 
         # Viewer opens exploration.
         self.login(self.VIEWER_EMAIL)
@@ -290,19 +278,13 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         story_services.update_story(
             'user', story_id, change_list, 'Updated Node 1.')
         question_id = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id, 'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_id_2 = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_2, 'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
@@ -370,20 +352,13 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         story_services.update_story(
             'user', story_id, change_list, 'Updated Node 1.')
         question_id = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id, 'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index
-        )
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, 'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index
-        )
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
@@ -426,21 +401,16 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.save_new_skill(self.skill_id, 'user', description='Description')
 
         self.question_id = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id, 'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5)
-        content_id_generator = translation_domain.ContentIdGenerator()
+
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, 'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, self.skill_id, 0.5)
 
@@ -465,12 +435,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.save_new_skill(skill_id_2, 'user', description='Description')
 
         question_id_3 = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_3, 'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, skill_id_2, 0.5)
         url = '%s?question_count=%s&skill_ids=%s,%s&fetch_by_difficulty=%s' % (
@@ -491,12 +458,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
             question_id = question_services.get_new_question_id()
-            content_id_generator = translation_domain.ContentIdGenerator()
             self.save_new_question(
                 question_id, 'user',
-                self._create_valid_question_data('ABC', content_id_generator),
-                [skill_id],
-                content_id_generator.next_content_id_index)
+                self._create_valid_question_data('ABC'), [skill_id])
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id, skill_id, 0.5)
 
@@ -3021,12 +2985,9 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
         question_id = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id, editor_id,
-            self._create_valid_question_data('ABC', content_id_generator),
-            ['skill_1'],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), ['skill_1'])
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
             state_reference = (
@@ -3578,34 +3539,22 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'b'
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': 'a'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'b',
-                'content_id_for_state_content': (
-                        content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT)
-                    ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                'new_state_name': 'a'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index,
-                'old_value': 0
-            })
-        ], 'A commit message.')
 
     def test_raises_error_when_version_history_does_not_exist(self) -> None:
         self.login(self.OWNER_EMAIL)
@@ -3756,32 +3705,3 @@ class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
             response, {
                 'checkpoints_feature_is_enabled': True,
             })
-
-
-class EntityTranslationHandlerTest(test_utils.GenericTestBase):
-    """Unit test for the EntityTranslationHandler."""
-
-    def test_fetching_entity_translations(self) -> None:
-        """Test giving feedback handler."""
-        translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
-            'content_0': {
-                'content_value': 'Translated content',
-                'content_format': 'html',
-                'needs_update': False
-            }
-        }
-        language_codes = ['hi', 'bn']
-        for language_code in language_codes:
-            translation_models.EntityTranslationsModel.create_new(
-                'exploration', 'exp1', 5, language_code, translations_mapping
-            ).put()
-
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-        self.login(self.VIEWER_EMAIL)
-        url = '/entity_translations_handler/exploration/exp1/5/hi'
-        entity_translation_dict = self.get_json(url)
-
-        self.assertEqual(
-            entity_translation_dict['translations'], translations_mapping)
-        self.logout()

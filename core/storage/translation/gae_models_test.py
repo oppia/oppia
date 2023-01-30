@@ -38,12 +38,10 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
     def test_create_new_model(self) -> None:
         enitity_translation_model = (
             translation_models.EntityTranslationsModel.create_new(
-                feconf.TranslatableEntityType.EXPLORATION.value,
-                'exp_id', 1, 'hi', {
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                     '123': {
                         'content_value': 'Hello world!',
-                        'needs_update': False,
-                        'content_format': 'html'
+                        'needs_update': False
                     }
                 })
         )
@@ -60,12 +58,10 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
 
     def test_get_model_method_returns_correctly(self) -> None:
         translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            'exp_id', 1, 'hi', {
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                 '123': {
                     'content_value': 'Hello world!',
-                    'needs_update': False,
-                    'content_format': 'html'
+                    'needs_update': False
                 }
             }
         ).put()
@@ -85,32 +81,26 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
 
     def test_get_all_for_entity_returns_correctly(self) -> None:
         translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            'exp_id', 1, 'en', {
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'en', {
                 '123': {
                     'content_value': 'Hey I am Jhon.',
-                    'needs_update': False,
-                    'content_format': 'html'
+                    'needs_update': False
                 }
             }
         ).put()
         translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            'exp_id2', 2, 'hi', {
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id2', 2, 'hi', {
                 '123': {
                     'content_value': 'Hello world!',
-                    'needs_update': False,
-                    'content_format': 'html'
+                    'needs_update': False
                 }
             }
         ).put()
         translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            'exp_id', 1, 'hi', {
+            feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi', {
                 '123': {
                     'content_value': 'Hey I am Nikhil.',
-                    'needs_update': False,
-                    'content_format': 'html'
+                    'needs_update': False
                 }
             }
         ).put()

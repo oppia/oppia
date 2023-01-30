@@ -38,7 +38,6 @@ import { AppConstants } from 'app.constants';
 import { StateEditorConstants } from '../state-editor.constants';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface DeleteValue {
@@ -55,6 +54,8 @@ export class StateSolutionEditorComponent implements OnInit {
   @Output() saveSolution: EventEmitter<Solution | null> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
   @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+  EventEmitter<Solution> = (new EventEmitter());
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -75,7 +76,6 @@ export class StateSolutionEditorComponent implements OnInit {
     private editabilityService: EditabilityService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private externalSaveService: ExternalSaveService,
-    private generateContentIdService: GenerateContentIdService,
     private ngbModal: NgbModal,
     private solutionValidityService: SolutionValidityService,
     private solutionVerificationService: SolutionVerificationService,
@@ -159,6 +159,10 @@ export class StateSolutionEditorComponent implements OnInit {
     this.saveSolution.emit(value);
   }
 
+  openMarkAllAudioAsNeedingUpdateModalIfRequired(value: Solution): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
+  }
+
   openAddOrUpdateSolutionModal(): void {
     this.alertsService.clearWarnings();
     this.externalSaveService.onExternalSave.emit();
@@ -193,7 +197,6 @@ export class StateSolutionEditorComponent implements OnInit {
         }
       }
     }, () => {
-      this.generateContentIdService.revertUnusedContentIdIndex();
       this.alertsService.clearWarnings();
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

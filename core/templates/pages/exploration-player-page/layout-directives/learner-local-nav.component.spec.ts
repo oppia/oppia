@@ -51,7 +51,6 @@ describe('Learner Local Nav Component ', () => {
   const explorationBackendResponse = {
     can_edit: true,
     draft_change_list_id: 0,
-    displayable_language_codes: [],
     exploration: {
       init_state_name: 'state_name',
       param_changes: [],
@@ -60,8 +59,7 @@ describe('Learner Local Nav Component ', () => {
       title: '',
       language_code: '',
       objective: '',
-      correctness_feedback_enabled: false,
-      next_content_id_index: 0
+      correctness_feedback_enabled: false
     },
     exploration_metadata: {
       title: '',

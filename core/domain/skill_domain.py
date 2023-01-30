@@ -26,7 +26,6 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
-from core.domain import translation_domain
 
 from typing import Callable, Dict, Final, List, Literal, Optional, TypedDict
 
@@ -736,7 +735,7 @@ class SkillContentsDict(TypedDict):
     explanation: state_domain.SubtitledHtmlDict
     worked_examples: List[WorkedExampleDict]
     recorded_voiceovers: state_domain.RecordedVoiceoversDict
-    written_translations: translation_domain.WrittenTranslationsDict
+    written_translations: state_domain.WrittenTranslationsDict
 
 
 class VersionedSkillContentsDict(TypedDict):
@@ -754,7 +753,7 @@ class SkillContents:
         explanation: state_domain.SubtitledHtml,
         worked_examples: List[WorkedExample],
         recorded_voiceovers: state_domain.RecordedVoiceovers,
-        written_translations: translation_domain.WrittenTranslations
+        written_translations: state_domain.WrittenTranslations
     ) -> None:
         """Constructs a SkillContents domain object.
 
@@ -845,8 +844,8 @@ class SkillContents:
              for example in skill_contents_dict['worked_examples']],
             state_domain.RecordedVoiceovers.from_dict(skill_contents_dict[
                 'recorded_voiceovers']),
-            translation_domain.WrittenTranslations.from_dict(
-                skill_contents_dict['written_translations'])
+            state_domain.WrittenTranslations.from_dict(skill_contents_dict[
+                'written_translations'])
         )
 
         return skill_contents
@@ -1287,7 +1286,7 @@ class Skill:
                     explanation_content_id: {}
                 }
             }),
-            translation_domain.WrittenTranslations.from_dict({
+            state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     explanation_content_id: {}
                 }
@@ -1334,6 +1333,10 @@ class Skill:
         """
         skill_contents_dict['explanation']['html'] = conversion_fn(
             skill_contents_dict['explanation']['html'])
+        skill_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                skill_contents_dict['written_translations'], conversion_fn))
 
         for value_index, value in enumerate(
                 skill_contents_dict['worked_examples']):

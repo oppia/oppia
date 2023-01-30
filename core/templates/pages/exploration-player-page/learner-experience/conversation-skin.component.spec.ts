@@ -78,6 +78,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from '@ngx-translate/core';
 import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
@@ -165,6 +166,7 @@ describe('Conversation skin component', () => {
   let platformFeatureService: PlatformFeatureService;
   let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let conceptCardManagerService: ConceptCardManagerService;
   let solutionObjectFactory: SolutionObjectFactory;
@@ -173,7 +175,7 @@ describe('Conversation skin component', () => {
   let displayedCard = new StateCard(
     null, null, null, new Interaction(
       [], [], null, null, [], '', null),
-    [], null, '', null);
+    [], null, null, '', null);
 
   let explorationDict = {
     states: {
@@ -189,6 +191,15 @@ describe('Conversation skin component', () => {
           }
         },
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -253,6 +264,7 @@ describe('Conversation skin component', () => {
           }
         },
         param_changes: [],
+        next_content_id_index: 3,
         card_is_checkpoint: true,
         linked_skill_id: null,
         content: {
@@ -268,6 +280,11 @@ describe('Conversation skin component', () => {
           }
         },
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {}
+          }
+        },
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -282,6 +299,7 @@ describe('Conversation skin component', () => {
           default_outcome: null
         },
         param_changes: [],
+        next_content_id_index: 0,
         card_is_checkpoint: false,
         linked_skill_id: null,
         content: {
@@ -301,6 +319,15 @@ describe('Conversation skin component', () => {
           }
         },
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            ca_placeholder_0: {},
+            feedback_1: {},
+            rule_input_2: {},
+            content: {},
+            default_outcome: {}
+          }
+        },
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -365,6 +392,7 @@ describe('Conversation skin component', () => {
           }
         },
         param_changes: [],
+        next_content_id_index: 3,
         card_is_checkpoint: false,
         linked_skill_id: null,
         content: {
@@ -382,7 +410,6 @@ describe('Conversation skin component', () => {
     correctness_feedback_enabled: true,
     init_state_name: 'Start',
     param_changes: [],
-    next_content_id_index: 4,
     param_specs: null,
     draft_changes: null,
   };
@@ -391,7 +418,6 @@ describe('Conversation skin component', () => {
     exploration_id: 'exp_id',
     is_logged_in: true,
     session_id: 'KERH',
-    displayable_language_codes: [],
     exploration: {
       init_state_name: 'Start',
       param_changes: [],
@@ -400,8 +426,7 @@ describe('Conversation skin component', () => {
       language_code: 'en',
       correctness_feedback_enabled: true,
       objective: 'To learn',
-      states: explorationDict.states,
-      next_content_id_index: explorationDict.next_content_id_index
+      states: explorationDict.states
     },
     exploration_metadata: {
       title: 'Exploration',
@@ -438,7 +463,6 @@ describe('Conversation skin component', () => {
     exploration_id: 'exp_id',
     is_logged_in: true,
     session_id: 'KERH',
-    displayable_language_codes: [],
     exploration: {
       init_state_name: 'Start',
       param_changes: [],
@@ -447,8 +471,7 @@ describe('Conversation skin component', () => {
       language_code: 'en',
       correctness_feedback_enabled: true,
       objective: 'To learn',
-      states: explorationDict.states,
-      next_content_id_index: explorationDict.next_content_id_index
+      states: explorationDict.states
     },
     exploration_metadata: {
       title: 'Exploration',
@@ -577,6 +600,8 @@ describe('Conversation skin component', () => {
     translateService = TestBed.inject(TranslateService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService);
+    writtenTranslationsObjectFactory = TestBed.inject(
+      WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
 
@@ -692,7 +717,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
     componentInstance.isLoggedIn = false;
     componentInstance.hasInteractedAtLeastOnce = true;
     componentInstance.displayedCard = displayedCard;
@@ -807,7 +832,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.hasInteractedAtLeastOnce = true;
@@ -912,7 +937,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
     componentInstance.isLoggedIn = false;
     componentInstance.isIframed = false;
     componentInstance.hasInteractedAtLeastOnce = true;
@@ -1017,7 +1042,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.hasInteractedAtLeastOnce = true;
@@ -1106,7 +1131,8 @@ describe('Conversation skin component', () => {
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
+
     componentInstance.triggerIfLearnerStuckAction();
     tick(
       ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
@@ -1143,7 +1169,8 @@ describe('Conversation skin component', () => {
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
+
     componentInstance.triggerIfLearnerStuckActionDirectly();
 
     expect(translateService.instant).toHaveBeenCalledWith(
@@ -1157,7 +1184,7 @@ describe('Conversation skin component', () => {
     componentInstance.nextCardIfStuck = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
 
     componentInstance.triggerRedirectionToStuckState();
 
@@ -1228,7 +1255,7 @@ describe('Conversation skin component', () => {
         stateName,
         '<p>Testing</p>', null, new Interaction(
           [], [], null, null, [], 'Continue', null),
-        [], null, 'content', null)
+        [], null, null, 'content', null)
       );
     }
     let alertMessageElement = document.createElement('div');
@@ -1347,7 +1374,7 @@ describe('Conversation skin component', () => {
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'EndExploration', null),
-        [], null, '', null);
+        [], null, null, '', null);
       componentInstance.isLoggedIn = true;
       spyOn(componentInstance, 'isSupplementalCardNonempty')
         .and.returnValues(false, true, true, false);
@@ -1454,7 +1481,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
 
     expect(componentInstance.isOnTerminalCard()).toBeTrue();
   });
@@ -1617,14 +1644,14 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'Continue', null),
-      [], null, '', null);
+      [], null, null, '', null);
 
     expect(componentInstance.isLearnAgainButton()).toBeFalse();
 
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'ImageClickInput', null),
-      [], null, '', null);
+      [], null, null, '', null);
 
     componentInstance.pendingCardWasSeenBefore = true;
     componentInstance.answerIsCorrect = false;
@@ -1732,7 +1759,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'NumberWithUnits', null),
-      [], null, '', null);
+      [], null, null, '', null);
     spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValues(
       false, true);
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript')
@@ -1801,7 +1828,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = new StateCard(
       null, null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
     componentInstance.isLoggedIn = true;
     spyOn(componentInstance, 'isSupplementalCardNonempty')
       .and.returnValues(false, true, true, false);
@@ -1896,7 +1923,7 @@ describe('Conversation skin component', () => {
     let stateCard = new StateCard(
       'stateName', null, null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, '', null);
+      [], null, null, '', null);
     stateCard.markAsCompleted();
     componentInstance.displayedCard = stateCard;
     componentInstance.nextCard = stateCard;
@@ -1979,7 +2006,7 @@ describe('Conversation skin component', () => {
     });
     let lastCard = StateCard.createNewCard(
       'Card 1', 'Content html', 'Interaction text', lastCardInteraction,
-      null, 'content_id', audioTranslationLanguageService);
+      null, null, 'content_id', audioTranslationLanguageService);
     spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
     spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
     spyOn(componentInstance, 'showPendingCard');
@@ -2029,7 +2056,7 @@ describe('Conversation skin component', () => {
       let stateCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'EndExploration', null),
-        [], null, '', null);
+        [], null, null, '', null);
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', '', false, '', true,
         false, true, null, '');
@@ -2049,7 +2076,7 @@ describe('Conversation skin component', () => {
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'TextInput', null),
-        [], null, '', null);
+        [], null, null, '', null);
       spyOn(explorationPlayerStateService, 'isInDiagnosticTestPlayerMode')
         .and.returnValue(true);
       successCallback(
@@ -2058,7 +2085,7 @@ describe('Conversation skin component', () => {
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'ImageClickInput', null),
-        [], null, '', null);
+        [], null, null, '', null);
       explorationModeSpy.and.returnValue(false);
       successCallback(
         stateCard, true, 'feedback', null, 'refresherId', 'skill_id', true,
@@ -2124,8 +2151,6 @@ describe('Conversation skin component', () => {
         .and.returnValue('en');
       spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
         .and.returnValue('es');
-      spyOn(contentTranslationManagerService, 'displayTranslations')
-        .and.returnValue();
       spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
       spyOn(componentInstance, 'isSupplementalCardNonempty').and.returnValue(
         false);
@@ -2150,7 +2175,7 @@ describe('Conversation skin component', () => {
       componentInstance.displayedCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'EndExploration', null),
-        [], null, '', null);
+        [], null, null, '', null);
 
       componentInstance.nextCard = displayedCard;
       componentInstance.showPendingCard();
@@ -2185,7 +2210,7 @@ describe('Conversation skin component', () => {
     () => {
       let mockStateCard = new StateCard(
         'Temp2', '', '', new Interaction([], [], null, null, [], null, null)
-        , [], null, '', null);
+        , [], null, null, '', null);
       componentInstance.displayedCard = mockStateCard;
       componentInstance.prevSessionStatesProgress = ['Temp1', 'Temp2'];
       expect(componentInstance.isDisplayedCardCompletedInPrevSession()).
@@ -2296,7 +2321,7 @@ describe('Conversation skin component', () => {
       componentInstance.nextCard = new StateCard(
         null, null, null, new Interaction(
           [], [], null, null, [], 'EndExploration', null),
-        [], null, '', null);
+        [], null, null, '', null);
       componentInstance.isLoggedIn = false;
       componentInstance.hasInteractedAtLeastOnce = true;
       componentInstance.displayedCard = displayedCard;
@@ -2337,6 +2362,7 @@ describe('Conversation skin component', () => {
       // Use unknown type conversion to test that the interaction is not
       // required to be a string.
       null as unknown as Interaction, null as unknown as RecordedVoiceovers,
+      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
 
     let callback = (successCallback: (nextCard: StateCard) => void) => {
