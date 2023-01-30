@@ -22,12 +22,14 @@ import { QuestionBackendApiService } from 'domain/question/question-backend-api.
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 
 
@@ -44,7 +46,8 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private currentInteractionService: CurrentInteractionService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
-    private questionObjectFactory: QuestionObjectFactory
+    private questionObjectFactory: QuestionObjectFactory,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   // These properties below are initialized using Angular lifecycle hooks
@@ -143,6 +146,15 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
         }
         return htmlContentIsMatching;
       });
+  }
+
+  canWindowShowTwoCards(): boolean {
+    return this.windowDimensionsService.getWidth() >
+    ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
+  }
+
+  isCurrentSupplementalCardNonEmpty(): boolean {
+    return this.displayedCard && !this.displayedCard.isInteractionInline();
   }
 
   selectQuestionToPreview(index: number): void {

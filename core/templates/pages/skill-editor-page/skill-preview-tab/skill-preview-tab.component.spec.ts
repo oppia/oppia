@@ -22,14 +22,22 @@ import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/cor
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
 import { UrlService } from 'services/contextual/url.service';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 import { SkillPreviewTabComponent } from './skill-preview-tab.component';
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { StateCard } from 'domain/state_card/state-card.model';
-
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 const questionDict = {
   id: 'question_id',
   question_state_data: {
@@ -124,6 +132,16 @@ describe('Skill Preview Tab Component', () => {
   let mockOnSkillChangeEmitter = new EventEmitter();
   let mockInteractionRule: InteractionRulesService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
+  let windowDimensionsService: WindowDimensionsService;
+
+
+  let displayedCard = new StateCard(
+    '', '', '', new Interaction(
+      [], [], null as unknown as InteractionCustomizationArgs, null,
+      [], null, null),
+    [], null as unknown as RecordedVoiceovers,
+    null as unknown as WrittenTranslations,
+    '', null as unknown as AudioTranslationLanguageService);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -190,6 +208,7 @@ describe('Skill Preview Tab Component', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionPlayerEngineService = (questionPlayerEngineService as unknown) as
       jasmine.SpyObj<QuestionPlayerEngineService>;
     let skillId = 'df432fe';
@@ -222,6 +241,43 @@ describe('Skill Preview Tab Component', () => {
     expect(component.displayCardIsInitialized).toEqual(false);
     component.initializeQuestionCard({} as StateCard);
     expect(component.displayCardIsInitialized).toEqual(true);
+  });
+
+  it('should tell if current supplemental card is non empty', () => {
+    component.displayedCard = displayedCard;
+    expect(component.isCurrentSupplementalCardNonEmpty()).toBeFalse();
+
+    component.displayedCard = new StateCard(
+      '', '', '', new Interaction(
+        [], [], null as unknown as InteractionCustomizationArgs, null,
+        [], 'ImageClickInput', null),
+      [], null as unknown as RecordedVoiceovers,
+      null as unknown as WrittenTranslations,
+      '', null as unknown as AudioTranslationLanguageService);
+
+    expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
+  });
+
+  it('should tell if window can show two cards', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1);
+
+    expect(component.canWindowShowTwoCards()).toBeTrue();
+  });
+
+  it('should tell if supplemental card is non empty', () => {
+    component.displayedCard = displayedCard;
+    expect(component.displayedCard.isInteractionInline()).toBeTrue();
+
+    component.displayedCard = new StateCard(
+      '', '', '', new Interaction(
+        [], [], null as unknown as InteractionCustomizationArgs, null,
+        [], 'ImageClickInput', null),
+      [], null as unknown as RecordedVoiceovers,
+      null as unknown as WrittenTranslations,
+      '', null as unknown as AudioTranslationLanguageService);
+
+    expect(component.displayedCard.isInteractionInline()).toBeFalse();
   });
 
   it('should filter the questions', () => {
