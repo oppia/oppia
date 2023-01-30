@@ -104,9 +104,16 @@ describe('Exploration object factory', () => {
       },
       param_changes: [],
       solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
       classifier_model_id: null,
       card_is_checkpoint: false,
       linked_skill_id: null,
+      next_content_id_index: 1
     };
     secondState = {
       content: {
@@ -147,9 +154,16 @@ describe('Exploration object factory', () => {
       },
       param_changes: [],
       solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
       classifier_model_id: null,
       card_is_checkpoint: false,
       linked_skill_id: null,
+      next_content_id_index: 1
     };
 
     const explorationDict: ExplorationBackendDict = {
@@ -159,8 +173,7 @@ describe('Exploration object factory', () => {
       auto_tts_enabled: false,
       states: {
         'first state': firstState,
-        'second state': secondState
-      },
+        'second state': secondState},
       param_specs: {},
       param_changes: [],
       draft_changes: [],
@@ -168,7 +181,6 @@ describe('Exploration object factory', () => {
       version: 1,
       draft_change_list_id: 0,
       correctness_feedback_enabled: false,
-      next_content_id_index: 4,
       exploration_metadata: {
         title: 'Exploration',
         category: 'Algebra',
@@ -316,14 +328,26 @@ describe('Exploration object factory', () => {
       exploration.getAuthorRecommendedExpIds('first state');
     }).toThrowError(
       'Tried to get recommendations for a non-terminal state: ' +
-        'first state');
+      'first state');
 
     expect(exploration.isStateTerminal('second state')).toBe(true);
     expect(exploration.getAuthorRecommendedExpIds('second state'))
       .toEqual([]);
   });
 
-  it('should return correct list of translatable objects', () => {
-    expect(exploration.getTranslatableObjects().length).toEqual(2);
-  });
+  it('should correctly get displayable written translation language codes',
+    () => {
+      expect(
+        exploration.getDisplayableWrittenTranslationLanguageCodes()
+      ).toEqual([]);
+
+      const firstState = exploration.getState('first state');
+
+      firstState.interaction.id = null;
+      firstState.writtenTranslations.addWrittenTranslation(
+        'content', 'fr', 'html', '<p>translation</p>');
+      expect(
+        exploration.getDisplayableWrittenTranslationLanguageCodes()
+      ).toEqual(['fr']);
+    });
 });

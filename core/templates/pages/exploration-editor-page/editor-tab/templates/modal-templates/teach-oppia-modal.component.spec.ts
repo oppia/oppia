@@ -122,7 +122,11 @@ describe('Teach Oppia Modal Component', () => {
       voiceovers_mapping: {}
     },
     solicit_answer_details: false,
+    written_translations: {
+      translations_mapping: {}
+    },
     card_is_checkpoint: false,
+    next_content_id_index: 0
   };
 
   class MockTrainingDataService {

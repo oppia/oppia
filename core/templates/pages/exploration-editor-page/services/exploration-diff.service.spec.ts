@@ -33,10 +33,8 @@ describe('Exploration Diff Service', () => {
 
   it('should throw error if try to access graph ' +
     'diff data with invalid command', () => {
-    let newState = stateObjectFactory.createDefaultState(
-      'newState', 'content_0', 'default_outcome_1');
-    let oldState = stateObjectFactory.createDefaultState(
-      'oldState', 'content_0', 'default_outcome_1');
+    let newState = stateObjectFactory.createDefaultState('newState');
+    let oldState = stateObjectFactory.createDefaultState('oldState');
     explorationGraphChangeList = [{
       changeList: [{
         cmd: 'invalidCommand',

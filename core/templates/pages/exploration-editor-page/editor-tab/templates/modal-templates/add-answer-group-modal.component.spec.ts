@@ -45,7 +45,6 @@ describe('Add Answer Group Modal Component', () => {
   let fixture: ComponentFixture<AddAnswerGroupModalComponent>;
   var outcomeObjectFactory: OutcomeObjectFactory;
   var stateEditorService: StateEditorService;
-  var generateContentIdService: GenerateContentIdService;
   var testSubscriptions: Subscription;
 
   const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
@@ -76,8 +75,7 @@ describe('Add Answer Group Modal Component', () => {
 
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
-    generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => {});
+
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
     testSubscriptions = new Subscription();
     testSubscriptions.add(stateEditorService.onSaveOutcomeDestDetails.subscribe(

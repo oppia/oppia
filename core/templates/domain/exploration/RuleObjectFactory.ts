@@ -22,7 +22,6 @@ import { Injectable } from '@angular/core';
 import isEqual from 'lodash/isEqual';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
-import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -39,33 +38,15 @@ export interface RuleInputTypes {
   [propName: string]: string;
 }
 
-export class Rule extends BaseTranslatableObject {
+export class Rule {
   type: string;
   inputs: RuleInputs;
   inputTypes: RuleInputTypes;
 
   constructor(type: string, inputs: RuleInputs, inputTypes: RuleInputTypes) {
-    super();
-
     this.type = type;
     this.inputs = inputs;
     this.inputTypes = inputTypes;
-  }
-
-  getTranslatableFields(): TranslatableField[] {
-    let translatableFields: TranslatableField[] = [];
-    Object.keys(this.inputs).forEach(inputName => {
-      const ruleInput = this.inputs[inputName];
-      if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-        // This throws Type error for ruleInput". We need to suppress this error
-        // because the type for RuleInputs is incorrect and bypass flag can be
-        // removed once we have correct type for RuleInputs.
-        // @ts-ignore
-        translatableFields.push(ruleInput);
-      }
-    });
-
-    return translatableFields;
   }
 
   toBackendDict(): RuleBackendDict {

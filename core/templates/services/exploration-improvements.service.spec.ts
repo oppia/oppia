@@ -41,7 +41,6 @@ import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory'
 import { StateStats } from 'domain/statistics/state-stats-model';
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { GenerateContentIdService } from './generate-content-id.service';
 import { ExplorationTask } from 'domain/improvements/exploration-task.model';
 
 class MockNgbModal {
@@ -66,7 +65,6 @@ describe('Exploration Improvements Service', () => {
   let explorationRightsService: ExplorationRightsService;
   let explorationStatesService: ExplorationStatesService;
   let explorationStatsService: ExplorationStatsService;
-  let generateContentIdService: GenerateContentIdService;
   let ngbModal: NgbModal;
   let pibasFetchIssuesSpy: jasmine.Spy;
   let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
@@ -129,9 +127,16 @@ describe('Exploration Improvements Service', () => {
       id: 'TextInput',
     },
     linked_skill_id: null,
+    next_content_id_index: 0,
     param_changes: [],
     solicit_answer_details: false,
-    card_is_checkpoint: false
+    card_is_checkpoint: false,
+    written_translations: {
+      translations_mapping: {
+        content: {},
+        default_outcome: {},
+      },
+    },
   };
   const statesBackendDict: StateObjectsBackendDict = {
     [stateName]: stateBackendDict,
@@ -183,8 +188,6 @@ describe('Exploration Improvements Service', () => {
     stateTopAnswersStatsService = TestBed.inject(StateTopAnswersStatsService);
     userExplorationPermissionsService = (
       TestBed.inject(UserExplorationPermissionsService));
-    generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => { });
 
     spyOn(contextService, 'getExplorationId').and.returnValue(expId);
     eibasGetTasksAsyncSpy = (
@@ -206,7 +209,7 @@ describe('Exploration Improvements Service', () => {
       new Map()));
 
     explorationImprovementsService.ngOnInit();
-    explorationStatesService.init(statesBackendDict, false);
+    explorationStatesService.init(statesBackendDict);
   });
 
   it('should enable improvements tab based on back-end response',

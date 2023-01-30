@@ -35,6 +35,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
 import { AlertsService } from 'services/alerts.service';
+import { StateNextContentIdIndexService } from '../state-editor-properties-services/state-next-content-id-index.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
@@ -45,7 +46,6 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { EditabilityService } from 'services/editability.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
@@ -78,6 +78,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
   @Output() navigateToState = new EventEmitter<string>();
   @Output() refreshWarnings = new EventEmitter<void>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+    new EventEmitter<string[]>());
 
   @Output() onSaveInapplicableSkillMisconceptionIds = (
     new EventEmitter<string[]>());
@@ -99,7 +101,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private stateInteractionIdService: StateInteractionIdService,
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
-    private generateContentIdService: GenerateContentIdService,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private answerGroupObjectFactory: AnswerGroupObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
     private convertToPlainText: ConvertToPlainTextPipe,
@@ -111,6 +113,10 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   sendOnSaveNextContentIdIndex(event: number): void {
     this.onSaveNextContentIdIndex.emit(event);
+  }
+
+  sendshowMarkAllAudioAsNeedingUpdateModalIfRequired(event: string[]): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(event);
   }
 
   drop(event: CdkDragSortEvent<AnswerGroup[]>): void {
@@ -319,7 +325,9 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.stateName = stateName;
 
     modalRef.result.then((result) => {
-      this.onSaveNextContentIdIndex.emit();
+      this.stateNextContentIdIndexService.saveDisplayedValue();
+      this.onSaveNextContentIdIndex.emit(
+        this.stateNextContentIdIndexService.displayed);
 
       // Create a new answer group.
       this.answerGroups.push(this.answerGroupObjectFactory.createNew(
@@ -342,7 +350,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       }
     }, () => {
       this.alertsService.clearWarnings();
-      this.generateContentIdService.revertUnusedContentIdIndex();
     });
   }
 

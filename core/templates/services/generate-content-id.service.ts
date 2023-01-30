@@ -21,19 +21,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-
+import { StateNextContentIdIndexService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GenerateContentIdService {
-  getNextIndex!: () => number;
-  revertUnusedIndexes!: () => void;
-
-  init(getNextIndex: () => number, revertUnusedIndexes: () => void): void {
-    this.getNextIndex = getNextIndex;
-    this.revertUnusedIndexes = revertUnusedIndexes;
-  }
+  constructor(
+      private stateNextContentIdIndexService: StateNextContentIdIndexService
+  ) {}
 
   generateIdForComponent(
       existingComponentIds: string[],
@@ -69,7 +67,10 @@ export class GenerateContentIdService {
   }
 
   _getNextStateId(prefix: string): string {
-    const contentIdIndex = this.getNextIndex();
+    // This function is used to generate content_ids for content that live in
+    // the State domain. This includes hints, feedback, and customization args.
+    const contentIdIndex = this.stateNextContentIdIndexService.displayed;
+    this.stateNextContentIdIndexService.displayed += 1;
     return `${prefix}_${contentIdIndex}`;
   }
 
@@ -81,10 +82,6 @@ export class GenerateContentIdService {
 
   getNextStateId(prefix: string): string {
     return this._getNextStateId(prefix);
-  }
-
-  revertUnusedContentIdIndex(): void {
-    this.revertUnusedIndexes();
   }
 }
 

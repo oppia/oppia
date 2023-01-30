@@ -20,6 +20,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import isEqual from 'lodash/isEqual';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -57,6 +58,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Output() onSaveAnswerGroupDestIfStuck = new EventEmitter<Outcome>();
   @Output() onSaveAnswerGroupFeedback = new EventEmitter<Outcome>();
   @Output() onSaveTaggedMisconception = new EventEmitter<TaggedMisconception>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
+    new EventEmitter<string[]>();
 
   rulesMemento: Rule[];
   directiveSubscriptions = new Subscription();
@@ -71,6 +74,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     private stateInteractionIdService: StateInteractionIdService,
     private ruleObjectFactory: RuleObjectFactory,
     private alertsService: AlertsService,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private trainingDataEditorPanelService: TrainingDataEditorPanelService,
     private externalSaveService: ExternalSaveService,
   ) {}
@@ -250,6 +254,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.changeActiveRuleIndex(this.rules.length - 1);
   }
 
+  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(event: string[]): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(event);
+  }
+
   deleteRule(index: number): void {
     this.rules.splice(index, 1);
     this.saveRules();
@@ -289,12 +297,17 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           contentIdsWithModifiedContent.push(contentId);
         }
       });
+
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
+        contentIdsWithModifiedContent);
     }
 
     this.changeActiveRuleIndex(-1);
     this.rulesMemento = null;
     this.onSaveAnswerGroupRules.emit(this.rules);
-    this.onSaveNextContentIdIndex.emit();
+    this.stateNextContentIdIndexService.saveDisplayedValue();
+    this.onSaveNextContentIdIndex.emit(
+      this.stateNextContentIdIndexService.displayed);
   }
 
   changeActiveRuleIndex(newIndex: number): void {

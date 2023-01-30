@@ -31,7 +31,6 @@ import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
 export type ExplorationPropertyValues = (
   null |
-  number |
   string |
   string[] |
   boolean |
@@ -75,7 +74,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string | number | boolean | ParamChange[] | ParamSpecs): void {
+  init(value: string | boolean | ParamChange[] | ParamSpecs): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }

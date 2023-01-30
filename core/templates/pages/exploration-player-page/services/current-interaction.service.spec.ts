@@ -27,7 +27,9 @@ import { ContextService } from 'services/context.service';
 import { InteractionRulesService } from './answer-classification.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
+import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
@@ -136,12 +138,15 @@ describe('Current Interaction Service', () => {
   it('should throw error on submitting when submitAnswerFn is null', () => {
     let interaction = new Interaction([], [], {}, null, [], null, null);
     let recordedVoiceovers = new RecordedVoiceovers({});
+    let writtenTranslations = new WrittenTranslations(
+      {}, new WrittenTranslationObjectFactory());
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       StateCard.createNewCard(
         'First State', 'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
-        interaction, recordedVoiceovers, '', audioTranslationLanguageService));
+        interaction, recordedVoiceovers, writtenTranslations, '',
+        audioTranslationLanguageService));
     spyOn(contextService, 'getExplorationId').and.returnValue('abc');
     spyOn(contextService, 'getPageContext').and.returnValue('learner');
 

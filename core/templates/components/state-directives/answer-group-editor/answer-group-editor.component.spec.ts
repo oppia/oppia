@@ -108,6 +108,7 @@ describe('Answer Group Editor Component', () => {
     expect(component.answerChoices).toEqual(undefined);
 
     component.ngOnInit();
+    component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(['oppia']);
 
     expect(component.rulesMemento).toBe(null);
     expect(component.activeRuleIndex).toBe(1);

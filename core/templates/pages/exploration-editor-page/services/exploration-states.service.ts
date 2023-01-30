@@ -41,6 +41,7 @@ import { StateEditorRefreshService } from 'pages/exploration-editor-page/service
 import { State } from 'domain/state/StateObjectFactory';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { DataFormatToDefaultValuesKey } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
@@ -51,21 +52,8 @@ import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
-import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
-
-interface ContentsMapping {
-  [contentId: string]: TranslatableField;
-}
-
-interface ContentExtractors {
-  [fieldName: string]: (
-    x: TranslatableField | BaseTranslatableObject | BaseTranslatableObject[]
-  ) => TranslatableField[];
-}
+import { TextInputRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -76,9 +64,6 @@ export class ExplorationStatesService {
   stateRenamedCallbacks: (
     (oldStateName: string, newStateName: string) => void
   )[] = [];
-
-  initalContentsMapping: ContentsMapping = {};
-  contentChangesCanAffectTranslations: boolean = true;
 
   stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
   private _states: States | null = null;
@@ -100,9 +85,6 @@ export class ExplorationStatesService {
     private stateEditorRefreshService: StateEditorRefreshService,
     private statesObjectFactory: StatesObjectFactory,
     private validatorsService: ValidatorsService,
-    private generateContentIdService: GenerateContentIdService,
-    private explorationNextContentIdIndexService: (
-      ExplorationNextContentIdIndexService)
   ) {}
 
   // Properties that have a different backend representation from the
@@ -169,119 +151,66 @@ export class ExplorationStatesService {
     param_changes: ['paramChanges'],
     param_specs: ['paramSpecs'],
     hints: ['interaction', 'hints'],
+    next_content_id_index: ['nextContentIdIndex'],
     solicit_answer_details: ['solicitAnswerDetails'],
     card_is_checkpoint: ['cardIsCheckpoint'],
     solution: ['interaction', 'solution'],
     widget_id: ['interaction', 'id'],
-    widget_customization_args: ['interaction', 'customizationArgs']
+    widget_customization_args: ['interaction', 'customizationArgs'],
+    written_translations: ['writtenTranslations']
   };
 
-  private _CONTENT_EXTRACTORS = {
-    answer_groups: (answerGroups: BaseTranslatableObject[]) => {
-      let contents: TranslatableField[] = [];
-      answerGroups.forEach(
-        answerGroup => {
-          contents = contents.concat(answerGroup.getAllContents());
+  private _CONTENT_ID_EXTRACTORS = {
+    answer_groups: (answerGroups: AnswerGroup[]) => {
+      let contentIds = new Set();
+      answerGroups.forEach((answerGroup) => {
+        contentIds.add(answerGroup.outcome.feedback.contentId);
+        answerGroup.rules.forEach((rule) => {
+          Object.keys(rule.inputs).forEach(inputName => {
+            const ruleInput = rule.inputs[inputName];
+            // All rules input types which are translatable are subclasses of
+            // BaseTranslatableObject having dict structure with contentId
+            // as a key.
+            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+              contentIds.add((ruleInput as TextInputRuleInputs).contentId);
+            }
+          });
         });
-      return contents;
-    },
-    default_outcome: (defaultOutcome: BaseTranslatableObject) => {
-      return defaultOutcome ? defaultOutcome.getAllContents() : [];
-    },
-    hints: (hints: BaseTranslatableObject[]) => {
-      let contents: TranslatableField[] = [];
-      hints.forEach(hint => {
-        contents = contents.concat(hint.getAllContents());
       });
-      return contents;
+      return contentIds;
     },
-    solution: (solution: BaseTranslatableObject) => {
-      return solution ? solution.getAllContents() : [];
+    default_outcome: (defaultOutcome: Outcome) => {
+      let contentIds = new Set();
+      if (defaultOutcome) {
+        contentIds.add(defaultOutcome.feedback.contentId);
+      }
+      return contentIds;
+    },
+    hints: (hints: Hint[]) => {
+      let contentIds = new Set();
+      hints.forEach((hint) => {
+        contentIds.add(hint.hintContent.contentId);
+      });
+      return contentIds;
+    },
+    solution: (solution: Solution) => {
+      let contentIds = new Set();
+      if (solution) {
+        contentIds.add(solution.explanation.contentId);
+      }
+      return contentIds;
     },
     widget_customization_args: (
-        customizationArgs: InteractionCustomizationArgs) => {
-      return customizationArgs ? Interaction.getCustomizationArgContents(
-        customizationArgs) : [];
+        customizationArgs: InteractionCustomizationArgs
+    ) => {
+      return new Set(
+        Interaction.getCustomizationArgContentIds(customizationArgs));
     }
-  } as ContentExtractors;
+  };
 
-  _extractContentIds(
-      backendName: string, value: StatePropertyValues
-  ): Set<string> {
-    let contents: TranslatableField[] = this._CONTENT_EXTRACTORS[backendName](
-      value as BaseTranslatableObject | BaseTranslatableObject[]);
-    return new Set(contents.map(content => (content.contentId as string)));
-  }
-
-  _verifyChangesInitialContents(
-      backendName: string, value: StatePropertyValues): void {
-    let contents: TranslatableField[];
-
-    if (backendName === 'content') {
-      contents = [value as SubtitledHtml];
-    } else if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
-      contents = this._CONTENT_EXTRACTORS[backendName](
-        value as BaseTranslatableObject | BaseTranslatableObject[]);
-    } else {
-      return;
-    }
-
-    for (const content of contents) {
-      const contentId = content.contentId as string;
-      if (!this.initalContentsMapping.hasOwnProperty(contentId)) {
-        continue;
-      }
-
-      let intialContent = this.initalContentsMapping[contentId];
-      if (
-        JSON.stringify(BaseTranslatableObject.getContentValue(content)) ===
-        JSON.stringify(BaseTranslatableObject.getContentValue(intialContent))) {
-        continue;
-      }
-
-      const modalRef = this.ngbModal.open(
-        MarkTranslationsAsNeedingUpdateModalComponent, {
-          size: 'lg',
-          backdrop: 'static',
-          // TODO(#12768): Remove the backdropClass & windowClass once the
-          // rte-component-modal is migrated to Angular. Currently, the custom
-          // class is used for correctly stacking AngularJS modal on top of
-          // Angular modal.
-          backdropClass: 'forced-modal-stack',
-          windowClass: 'forced-modal-stack'
-        });
-      modalRef.componentInstance.contentId = contentId;
-      modalRef.componentInstance.markNeedsUpdateHandler = (
-        this.markTranslationAndVoiceoverNeedsUpdate.bind(this));
-      modalRef.componentInstance.removeHandler = (
-        this.removeTranslationAndVoiceover.bind(this));
-      this.initalContentsMapping[contentId] = content;
-    }
-  }
-
-  markTranslationAndVoiceoverNeedsUpdate(contentId: string): void {
-    this.changeListService.markTranslationsAsNeedingUpdate(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
-  }
-
-  removeTranslationAndVoiceover(contentId: string): void {
-    this.changeListService.removeTranslations(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasVoiceovers(contentId)) {
-      recordedVoiceovers.voiceoversMapping[contentId] = {};
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
-  }
-
-  private _getElementsInFirstSetButNotInSecond(setA, setB): string[] {
+  private _getElementsInFirstSetButNotInSecond(
+      setA: Set<unknown>, setB: Set<unknown>
+  ): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
@@ -403,6 +332,9 @@ export class ExplorationStatesService {
       stateName: string, backendName: 'linked_skill_id', newValue: string
   ): void;
   saveStateProperty(
+      stateName: string, backendName: 'next_content_id_index', newValue: number
+  ): void;
+  saveStateProperty(
       stateName: string,
       backendName: StatePropertyNames,
       newValue: StatePropertyValues
@@ -418,28 +350,28 @@ export class ExplorationStatesService {
       oldBackendValue = (
         this.convertToBackendRepresentation(oldValue, backendName));
     }
+
     if (!isEqual(oldValue, newValue)) {
       this.changeListService.editStateProperty(
         stateName, backendName, newBackendValue, oldBackendValue);
 
       let newStateData = this._states.getState(stateName);
       let accessorList = this.PROPERTY_REF_DATA[backendName];
-      if (this.contentChangesCanAffectTranslations) {
-        this._verifyChangesInitialContents(backendName, newValue);
-      }
 
-      if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = this._extractContentIds(backendName, oldValue);
-        let newContentIds = this._extractContentIds(backendName, newValue);
+      if (this._CONTENT_ID_EXTRACTORS.hasOwnProperty(backendName)) {
+        let oldContentIds = this._CONTENT_ID_EXTRACTORS[backendName](oldValue);
+        let newContentIds = this._CONTENT_ID_EXTRACTORS[backendName](newValue);
         let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
           oldContentIds, newContentIds);
         let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
           newContentIds, oldContentIds);
         contentIdsToDelete.forEach((contentId) => {
           newStateData.recordedVoiceovers.deleteContentId(contentId);
+          newStateData.writtenTranslations.deleteContentId(contentId);
         });
         contentIdsToAdd.forEach((contentId) => {
           newStateData.recordedVoiceovers.addContentId(contentId);
+          newStateData.writtenTranslations.addContentId(contentId);
         });
       }
       let propertyRef = newStateData;
@@ -467,24 +399,19 @@ export class ExplorationStatesService {
     return conversionFunction(frontendValue);
   }
 
-  init(
-      statesBackendDict: StateObjectsBackendDict,
-      contentChangesCanAffectTranslations: boolean): void {
+  init(statesBackendDict: StateObjectsBackendDict): void {
     this._states = (
       this.statesObjectFactory.createFromBackendDict(statesBackendDict));
-    this.contentChangesCanAffectTranslations = (
-      contentChangesCanAffectTranslations);
     // Initialize the solutionValidityService.
     this.solutionValidityService.init(this._states.getStateNames());
     this._states.getStateNames().forEach((stateName: string) => {
-      const state = this._states.getState(stateName);
-      let solution = state.interaction.solution;
+      let solution = this._states.getState(stateName).interaction.solution;
       if (solution) {
-        let interactionId = state.interaction.id;
+        let interactionId = this._states.getState(stateName).interaction.id;
         let result = (
           this.answerClassificationService.getMatchingClassificationResult(
             stateName,
-            state.interaction,
+            this._states.getState(stateName).interaction,
             solution.correctAnswer,
             this.interactionRulesRegistryService.getRulesServiceByInteractionId(
               interactionId
@@ -495,9 +422,6 @@ export class ExplorationStatesService {
         this.solutionValidityService.updateValidity(
           stateName, solutionIsValid);
       }
-
-      state.getAllContents().forEach(
-        content => this.initalContentsMapping[content.contentId] = content);
     });
   }
 
@@ -575,6 +499,13 @@ export class ExplorationStatesService {
 
   saveLinkedSkillId(stateName: string, newLinkedSkillId: string): void {
     this.saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
+  }
+
+  saveNextContentIdIndex(
+      stateName: string, newNextContentIdIndex: number
+  ): void {
+    this.saveStateProperty(
+      stateName, 'next_content_id_index', newNextContentIdIndex);
   }
 
   getInteractionCustomizationArgsMemento(
@@ -676,6 +607,59 @@ export class ExplorationStatesService {
       stateName, 'card_is_checkpoint', newCardIsCheckpoint);
   }
 
+  getWrittenTranslationsMemento(stateName: string): WrittenTranslations {
+    return this._states.getState(stateName).writtenTranslations;
+  }
+
+  saveWrittenTranslation(
+      contentId: string,
+      dataFormat: DataFormatToDefaultValuesKey,
+      languageCode: string,
+      stateName: string,
+      translationHtml: string
+  ): void {
+    this.changeListService.addWrittenTranslation(
+      contentId, dataFormat, languageCode, stateName, translationHtml);
+    let stateData = this._states.getState(stateName);
+    if (
+      stateData.writtenTranslations.hasWrittenTranslation(
+        contentId, languageCode)
+    ) {
+      stateData.writtenTranslations.updateWrittenTranslation(
+        contentId, languageCode, translationHtml);
+    } else {
+      stateData.writtenTranslations.addWrittenTranslation(
+        contentId, languageCode, dataFormat, translationHtml);
+    }
+    this._states.setState(stateName, cloneDeep(stateData));
+  }
+
+  markWrittenTranslationAsNeedingUpdate(
+      contentId: string, languageCode: string, stateName: string
+  ): void {
+    this.changeListService.markTranslationAsNeedingUpdate(
+      contentId, languageCode, stateName);
+    let stateData = this._states.getState(stateName);
+    stateData.writtenTranslations.translationsMapping[contentId][
+      languageCode].markAsNeedingUpdate();
+    this._states.setState(stateName, cloneDeep(stateData));
+  }
+
+  markWrittenTranslationsAsNeedingUpdate(
+      contentId: string, stateName: string
+  ): void {
+    this.changeListService.markTranslationsAsNeedingUpdate(
+      contentId, stateName);
+    let stateData = this._states.getState(stateName);
+    const translationMapping = (
+      stateData.writtenTranslations.translationsMapping[contentId]);
+    for (const languageCode in translationMapping) {
+      stateData.writtenTranslations.translationsMapping[contentId][
+        languageCode].markAsNeedingUpdate();
+    }
+    this._states.setState(stateName, cloneDeep(stateData));
+  }
+
   isInitialized(): boolean {
     return this._states !== null;
   }
@@ -693,17 +677,9 @@ export class ExplorationStatesService {
     }
     this.alertsService.clearWarnings();
 
-    let contentIdForContent = this.generateContentIdService
-      .getNextStateId('content');
-    let contentIdForDefaultOutcome = this.generateContentIdService
-      .getNextStateId('default_outcome');
+    this._states.addState(newStateName);
 
-    this._states.addState(
-      newStateName, contentIdForContent, contentIdForDefaultOutcome);
-
-    this.changeListService.addState(
-      newStateName, contentIdForContent, contentIdForDefaultOutcome);
-    this.explorationNextContentIdIndexService.saveDisplayedValue();
+    this.changeListService.addState(newStateName);
     this.stateAddedCallbacks.forEach((callback) => {
       callback(newStateName);
     });

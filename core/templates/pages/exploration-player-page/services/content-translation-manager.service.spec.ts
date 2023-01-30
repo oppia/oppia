@@ -16,22 +16,27 @@
  * @fileoverview Unit tests for the content translation manager service.
  */
 
-import { discardPeriodicTasks, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 
-import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceovers } from
+  'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { SubtitledUnicodeObjectFactory } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { WrittenTranslations, WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
+import { ContentTranslationManagerService } from
+  'pages/exploration-player-page/services/content-translation-manager.service';
+import { PlayerTranscriptService } from
+  'pages/exploration-player-page/services/player-transcript.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
-import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
-import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
-import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { ExplorationHtmlFormatterService } from
+  'services/exploration-html-formatter.service';
+import { AudioTranslationLanguageService} from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
@@ -39,72 +44,19 @@ describe('Content translation manager service', () => {
   let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
   let suof: SubtitledUnicodeObjectFactory;
+  let wtof: WrittenTranslationsObjectFactory;
   let atls: AudioTranslationLanguageService;
-  let etbs: EntityTranslationBackendApiService;
-  let entityTranslation: EntityTranslation;
-  let imagePreloaderService: ImagePreloaderService;
+
+  let writtenTranslations: WrittenTranslations;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    }).compileComponents();
     ctms = TestBed.inject(ContentTranslationManagerService);
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     iof = TestBed.inject(InteractionObjectFactory);
     pts = TestBed.inject(PlayerTranscriptService);
     suof = TestBed.inject(SubtitledUnicodeObjectFactory);
+    wtof = TestBed.inject(WrittenTranslationsObjectFactory);
     atls = TestBed.inject(AudioTranslationLanguageService);
-    etbs = TestBed.inject(EntityTranslationBackendApiService);
-    imagePreloaderService = TestBed.inject(ImagePreloaderService);
-
-    entityTranslation = EntityTranslation.createFromBackendDict({
-      entity_id: 'exp',
-      entity_type: 'exploration',
-      entity_version: 5,
-      language_code: 'fr',
-      translations: {
-        content: {
-          content_format: 'html',
-          content_value: '<p>fr content</p>',
-          needs_update: false
-        },
-        hint_0: {
-          content_format: 'html',
-          content_value: '<p>fr hint</p>',
-          needs_update: false
-        },
-        solution: {
-          content_format: 'html',
-          content_value: '<p>fr solution</p>',
-          needs_update: false
-        },
-        ca_placeholder_0: {
-          content_format: 'unicode',
-          content_value: 'fr placeholder',
-          needs_update: false
-        },
-        outcome_1: {
-          content_format: 'html',
-          content_value: '<p>fr feedback</p>',
-          needs_update: false
-        },
-        default_outcome: {
-          content_format: 'html',
-          content_value: '<p>fr default outcome</p>',
-          needs_update: false
-        },
-        rule_input_3: {
-          content_format: 'set_of_normalized_string',
-          content_value: ['fr rule input 1', 'fr rule input 2'],
-          needs_update: false
-        }
-      }
-    });
-    spyOn(etbs, 'fetchEntityTranslationAsync').and.returnValue(
-      Promise.resolve(entityTranslation)
-    );
-    spyOn(imagePreloaderService, 'restartImagePreloader').and.returnValue(
-      undefined);
 
     let defaultOutcomeDict = {
       dest: 'dest_default',
@@ -182,6 +134,60 @@ describe('Content translation manager service', () => {
       solution: solutionDict
     };
 
+    writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: false
+          }
+        },
+        hint_0: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr hint</p>',
+            needs_update: false
+          }
+        },
+        solution: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr solution</p>',
+            needs_update: false
+          }
+        },
+        ca_placeholder_0: {
+          fr: {
+            data_format: 'html',
+            translation: 'fr placeholder',
+            needs_update: false
+          }
+        },
+        outcome_1: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr feedback</p>',
+            needs_update: false
+          }
+        },
+        default_outcome: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr default outcome</p>',
+            needs_update: false
+          }
+        },
+        rule_input_3: {
+          fr: {
+            data_format: 'set_of_normalized_string',
+            translation: ['fr rule input 1', 'fr rule input 2'],
+            needs_update: false
+          }
+        }
+      }
+    });
+
     const interaction = iof.createFromBackendDict(interactionDict);
 
     pts.addNewCard(
@@ -197,16 +203,16 @@ describe('Content translation manager service', () => {
         ),
         interaction,
         RecordedVoiceovers.createEmpty(),
+        writtenTranslations,
         'content',
         atls
       )
     );
   });
 
-  it('should switch to a new language', fakeAsync(() => {
+  it('should switch to a new language', () => {
     ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
-    tick();
 
     const card = pts.transcript[0];
     const interaction = card.getInteraction();
@@ -235,54 +241,46 @@ describe('Content translation manager service', () => {
     });
     expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>fr default outcome</p>');
-    discardPeriodicTasks();
-  }));
+  });
 
-  it('should switch to a new language expect invalid translations', fakeAsync(
-    () => {
-      ctms.setOriginalTranscript('en');
-      const card = pts.transcript[0];
-      const interaction = card.getInteraction();
-      const translatedCustomizationArgs = {
-        placeholder: {
-          value: suof.createFromBackendDict({
-            unicode_str: 'fr placeholder',
-            content_id: 'ca_placeholder_0'
-          })
-        },
-        rows: {value: 1},
-        catchMisspellings: {
-          value: false
-        }
-      };
+  it('should switch to a new language expect invalid translations', () => {
+    ctms.setOriginalTranscript('en');
 
-      entityTranslation.markTranslationAsNeedingUpdate('hint_0');
-      etbs.fetchEntityTranslationAsync = jasmine.createSpy().and.returnValue(
-        Promise.resolve(entityTranslation)
-      );
-      ctms.displayTranslations('fr');
-      tick();
+    const card = pts.transcript[0];
+    const interaction = card.getInteraction();
+    const translatedCustomizationArgs = {
+      placeholder: {
+        value: suof.createFromBackendDict({
+          unicode_str: 'fr placeholder',
+          content_id: 'ca_placeholder_0'
+        })
+      },
+      rows: {value: 1},
+      catchMisspellings: {
+        value: false
+      }
+    };
 
-      expect(card.contentHtml).toBe('<p>fr content</p>');
-      expect(interaction.hints[0].hintContent.html).toBe('<p>fr hint</p>');
-      expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
-      expect(interaction.customizationArgs).toEqual(
-        translatedCustomizationArgs);
-      expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
-        '<p>fr feedback</p>');
-      expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
-        contentId: 'rule_input_3',
-        normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
-      });
-      expect(interaction.defaultOutcome?.feedback.html).toBe(
-        '<p>fr default outcome</p>');
-      discardPeriodicTasks();
-    }));
+    writtenTranslations.toggleNeedsUpdateAttribute('hint_0', 'fr');
+    ctms.displayTranslations('fr');
 
-  it('should switch back to the original language', fakeAsync(() => {
+    expect(card.contentHtml).toBe('<p>fr content</p>');
+    expect(interaction.hints[0].hintContent.html).toBe('<p>en hint</p>');
+    expect(interaction.solution?.explanation.html).toBe('<p>fr solution</p>');
+    expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
+    expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
+      '<p>fr feedback</p>');
+    expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: 'rule_input_3',
+      normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
+    });
+    expect(interaction.defaultOutcome?.feedback.html).toBe(
+      '<p>fr default outcome</p>');
+  });
+
+  it('should switch back to the original language', () => {
     ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
-    tick();
     ctms.displayTranslations('en');
 
     const card = pts.transcript[0];
@@ -312,22 +310,128 @@ describe('Content translation manager service', () => {
     });
     expect(interaction.defaultOutcome?.feedback.html).toBe(
       '<p>en default outcome</p>');
-    discardPeriodicTasks();
-  }));
+  });
 
   it('should emit to onStateCardContentUpdateEmitter when the ' +
-     'language is changed', fakeAsync(() => {
+     'language is changed', () => {
     const onStateCardContentUpdate = spyOn(
       ctms.onStateCardContentUpdate, 'emit');
     ctms.setOriginalTranscript('en');
     ctms.displayTranslations('fr');
-    tick();
-
     expect(onStateCardContentUpdate).toHaveBeenCalled();
-    discardPeriodicTasks();
-  }));
+  });
+
+  it('should return default content HTML if translation is invalid', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, 'fr', content);
+    expect(translatedHtml).toEqual('<p>en content</p>');
+  });
+
+  it('should throw error if content id is not defined', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', null);
+    expect(() => {
+      ctms.getTranslatedHtml(writtenTranslations, 'fr', content);
+    }).toThrowError('Content ID does not exist');
+    expect(() => {
+      ctms._swapContent(writtenTranslations, 'fr', content);
+    }).toThrowError('Content ID does not exist');
+  });
+
+  it('should return default content HTML if translation is nonexistent', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, 'pt', content);
+    expect(translatedHtml).toEqual('<p>en content</p>');
+  });
+
+  it('should return valid translated content HTML', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: false
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, 'fr', content);
+    expect(translatedHtml).toEqual('<p>fr content</p>');
+  });
 
   it('should not switch rules if the replacement is empty', () => {
+    // This simulates the invalid case where the "fr" translation for the rule
+    // input is an empty list.
+    let newWrittenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: false
+          }
+        },
+        ca_placeholder_0: {
+          fr: {
+            data_format: 'html',
+            translation: 'fr placeholder',
+            needs_update: false
+          }
+        },
+        outcome_1: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr feedback</p>',
+            needs_update: false
+          }
+        },
+        rule_input_3: {
+          fr: {
+            data_format: 'set_of_normalized_string',
+            translation: [],
+            needs_update: false
+          }
+        }
+      }
+    });
+
     let newInteractionDict = {
       answer_groups: [{
         rule_specs: [{
@@ -387,6 +491,7 @@ describe('Content translation manager service', () => {
           null),
         newInteraction,
         RecordedVoiceovers.createEmpty(),
+        newWrittenTranslations,
         'content',
         atls
       )
@@ -437,18 +542,16 @@ describe('Content translation manager service', () => {
       delete InteractionSpecsConstants.INTERACTION_SPECS.DummyInteraction;
     });
 
-    it('should replace translatable customization args', fakeAsync(() => {
+    it('should replace translatable customization args', () => {
       const card = pts.transcript[0];
       const interaction = card.getInteraction();
 
-      entityTranslation.translationMapping.ca_0 = new TranslatedContent(
-        'fr 1', 'unicode', false);
-      entityTranslation.translationMapping.ca_1 = new TranslatedContent(
-        'fr 2', 'unicode', false);
-
-      etbs.fetchEntityTranslationAsync = jasmine.createSpy().and.returnValue(
-        Promise.resolve(entityTranslation)
-      );
+      writtenTranslations.addContentId('ca_0');
+      writtenTranslations.addWrittenTranslation(
+        'ca_0', 'fr', 'unicode', 'fr 1');
+      writtenTranslations.addContentId('ca_1');
+      writtenTranslations.addWrittenTranslation(
+        'ca_1', 'fr', 'unicode', 'fr 2');
 
       interaction.id = 'DummyInteraction';
       interaction.customizationArgs = {
@@ -470,8 +573,6 @@ describe('Content translation manager service', () => {
 
       ctms.setOriginalTranscript('en');
       ctms.displayTranslations('fr');
-      tick();
-
       expect(interaction.customizationArgs).toEqual({
         dummyCustArg: {value: [{
           content: suof.createFromBackendDict({
@@ -488,7 +589,6 @@ describe('Content translation manager service', () => {
           show: true
         }]}
       });
-      discardPeriodicTasks();
-    }));
+    });
   });
 });

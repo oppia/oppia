@@ -1488,7 +1488,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'Introduction',
                 'new_value': {
-                    'content_id': 'content_0',
+                    'content_id': 'content',
                     'html': (
                         '<oppia-noninteractive-collapsible content-with-value='
                         '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;'

@@ -58,7 +58,8 @@
                         (saveCorrectnessLabel)="sendOnSaveAnswerGroupCorrectnessLabel($event)"
                         [outcome]="outcome"
                         [addState]="addState"
-                        [areWarningsSuppressed]="suppressWarnings">
+                        [areWarningsSuppressed]="suppressWarnings"
+                        (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
   </oppia-outcome-editor>
 
   <oppia-question-misconception-editor [isEditable]="isEditable"

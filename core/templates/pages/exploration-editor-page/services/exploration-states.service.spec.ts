@@ -23,7 +23,6 @@ import { ContextService } from 'services/context.service';
 import { ExplorationStatesService } from './exploration-states.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -47,7 +46,6 @@ describe('ExplorationStatesService', () => {
   let explorationStatesService: ExplorationStatesService;
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let answerGroup: AnswerGroup;
-  let generateContentIdService: GenerateContentIdService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -68,8 +66,6 @@ describe('ExplorationStatesService', () => {
     contextService = TestBed.inject(ContextService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
-    generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => {});
   });
 
   beforeEach(() => {
@@ -147,10 +143,19 @@ describe('ExplorationStatesService', () => {
         },
         linked_skill_id: null,
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            rule_input: {}
+          },
+        },
         classifier_model_id: '0',
         card_is_checkpoint: false,
+        next_content_id_index: 1
       },
-    }, false);
+    });
   });
 
   describe('Callback Registration', () => {

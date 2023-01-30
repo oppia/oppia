@@ -99,7 +99,7 @@ class EntityTranslationsModel(base_models.BaseModel):
             [entity_type]-[entity_id]-[entity_version]-[language_code].
         """
         return '%s-%s-%s-%s' % (
-            entity_type.value, entity_id, str(entity_version), language_code)
+            entity_type.value, entity_id, entity_version, language_code)
 
     @classmethod
     def get_model(
@@ -137,7 +137,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         entity_type: feconf.TranslatableEntityType,
         entity_id: str,
         entity_version: int
-    ) -> Sequence[EntityTranslationsModel]:
+    ) -> Sequence[Optional[EntityTranslationsModel]]:
         """Gets EntityTranslationsModels corresponding to the given entity, for
         all languages in which such models exist.
 
@@ -163,7 +163,7 @@ class EntityTranslationsModel(base_models.BaseModel):
     @classmethod
     def create_new(
         cls,
-        entity_type: str,
+        entity_type: feconf.TranslatableEntityType,
         entity_id: str,
         entity_version: int,
         language_code: str,
@@ -184,10 +184,8 @@ class EntityTranslationsModel(base_models.BaseModel):
         """
         return cls(
             id=cls._generate_id(
-                feconf.TranslatableEntityType(
-                    entity_type),
-                entity_id, entity_version, language_code),
-            entity_type=entity_type,
+                entity_type, entity_id, entity_version, language_code),
+            entity_type=entity_type.value,
             entity_id=entity_id,
             entity_version=entity_version,
             language_code=language_code,

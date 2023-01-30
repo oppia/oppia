@@ -47,7 +47,8 @@ describe('State Translation Status Graph Component', () => {
 
   let stateName: string = 'State1';
   let state = {
-    recordedVoiceovers: {}
+    recordedVoiceovers: {},
+    writtenTranslations: {}
   } as State;
 
   beforeEach(waitForAsync(() => {

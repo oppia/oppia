@@ -41,6 +41,9 @@ interface AddOutcomeModalResponse {
   templateUrl: './outcome-editor.component.html'
 })
 export class OutcomeEditorComponent implements OnInit {
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+  EventEmitter<string[]> = new EventEmitter();
+
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveDestIfStuck: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
@@ -108,7 +111,7 @@ export class OutcomeEditorComponent implements OnInit {
 
     if (this.feedbackEditorIsOpen) {
       if (!this.invalidStateAfterFeedbackSave()) {
-        this.saveThisFeedback();
+        this.saveThisFeedback(false);
       } else {
         this.cancelThisFeedbackEdit();
       }
@@ -173,7 +176,7 @@ export class OutcomeEditorComponent implements OnInit {
 
       modalRef.result.then((result: AddOutcomeModalResponse): void => {
         this.outcome = result.outcome;
-        this.saveThisFeedback();
+        this.saveThisFeedback(true);
       }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
@@ -204,8 +207,11 @@ export class OutcomeEditorComponent implements OnInit {
     }
   }
 
-  saveThisFeedback(): void {
+  saveThisFeedback(fromClickSaveFeedbackButton: boolean): void {
     this.feedbackEditorIsOpen = false;
+    let contentHasChanged = (
+      this.savedOutcome.feedback.html !==
+      this.outcome.feedback.html);
     this.savedOutcome.feedback = cloneDeep(
       this.outcome.feedback);
 
@@ -223,6 +229,14 @@ export class OutcomeEditorComponent implements OnInit {
           'The active state name is null in the outcome editor.');
       }
       this.savedOutcome.dest = activeStateName;
+    }
+    if (fromClickSaveFeedbackButton && contentHasChanged) {
+      let contentId = this.savedOutcome.feedback.contentId;
+      if (contentId === null) {
+        throw new Error(
+          'The content ID is null in the outcome editor.');
+      }
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
     }
     this.saveFeedback.emit(this.savedOutcome);
   }

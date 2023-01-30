@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
@@ -28,12 +27,11 @@ from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import translation_services
 from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_migration_jobs
@@ -41,152 +39,31 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import stats_models
-    from mypy_imports import translation_models
 
 (
-    exp_models, opportunity_models,
-    stats_models, translation_models
+    exp_models,
+    opportunity_models,
+    stats_models
 ) = models.Registry.import_models([
-    models.Names.EXPLORATION, models.Names.OPPORTUNITY,
-    models.Names.STATISTICS, models.Names.TRANSLATION
+    models.Names.EXPLORATION,
+    models.Names.OPPORTUNITY,
+    models.Names.STATISTICS
 ])
 
 
-EXP_V46_DICT = utils.dict_from_yaml(
-"""
-author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Art
-correctness_feedback_enabled: true
-edits_allowed: true
-init_state_name: (untitled state)
-language_code: en
-objective: Objective for the exploration...
-param_changes: []
-param_specs: {}
-schema_version: 46
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - - <p>Choice 1</p>
-              - <p>Choice 2</p>
-          rule_type: IsEqualToOrdering
-        - inputs:
-            x:
-            - - <p>Choice 1</p>
-          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
-        - inputs:
-            x: <p>Choice 1</p>
-            y: 1
-          rule_type: HasElementXAtPositionY
-        - inputs:
-            x: <p>Choice 1</p>
-            y: <p>Choice 2</p>
-          rule_type: HasElementXBeforeElementY
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        allowMultipleItemsInSamePosition:
-          value: true
-        choices:
-          value:
-          - content_id: ca_choices_2
-            html: <p>Choice 1</p>
-          - content_id: ca_choices_3
-            html: <p>Choice 2</p>
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: DragAndDropSortInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 4
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_choices_2: {}
-        ca_choices_3: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 0
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-states_schema_version: 41
-tags: []
-title: Title of exploration
-""")
 # Exploration migration backend tests with BEAM jobs involves creating and
 # publishing the exploration. This requires a ElasticSearch stub for running
 # while the backend tests run. JobTestBase does not initialize a
 # ElasticSearch stub, so MigrateExplorationJobTests also inherits from
 # GenericTestBase to successfully emulate the exploration publishing and
 # verify the migration.
-
-
 class MigrateExplorationJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
@@ -309,93 +186,46 @@ class MigrateExplorationJobTests(
             'Added node.')
 
     def test_unmigrated_valid_published_exp_migrates(self) -> None:
-        exp_model = exp_models.ExplorationModel(
-            id=self.NEW_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title=EXP_V46_DICT['title'],
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.NEW_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        swap_states_schema_48 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
+        swap_exp_schema_53 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
 
-        for lang_code in ['hi', 'bn']:
-            translation_models.EntityTranslationsModel.create_new(
-                feconf.TranslatableEntityType.EXPLORATION.value,
-                exp_model.id,
-                exp_model.version,
-                lang_code,
-                {}
-            ).put()
+        with swap_states_schema_48, swap_exp_schema_53:
+            exploration = (
+                self.save_new_linear_exp_with_state_names_and_interactions(
+                    self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID,
+                    ['Introduction'], ['EndExploration'],
+                    title=self.EXP_TITLE, category='Algorithms',
+                    correctness_feedback_enabled=True
+            ))
+            owner_action = user_services.get_user_actions_info(
+                feconf.SYSTEM_COMMITTER_ID)
+            exp_services.publish_exploration_and_update_user_profiles(
+                owner_action, self.NEW_EXP_ID)
+            opportunity_model = (
+                opportunity_models.ExplorationOpportunitySummaryModel(
+                    id=self.NEW_EXP_ID,
+                    topic_id='topic_id1',
+                    topic_name='topic',
+                    story_id='story_id_1',
+                    story_title='A story title',
+                    chapter_title='Title 1',
+                    content_count=20,
+                    incomplete_translation_language_codes=['hi', 'ar'],
+                    translation_counts={'hi': 1, 'ar': 2},
+                    language_codes_needing_voice_artists=['en'],
+                    language_codes_with_assigned_voice_artists=[]))
+            opportunity_model.put()
 
-        all_translation_models: (
-            Sequence[translation_models.EntityTranslationsModel]) = (
-            translation_models.EntityTranslationsModel.get_all().fetch())
+            self.create_story_linked_to_exploration()
 
-        self.assertEqual(len(all_translation_models), 2)
-
-        owner_action = user_services.get_user_actions_info(
-            feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(
-            owner_action, self.NEW_EXP_ID)
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[]))
-        opportunity_model.put()
-
-        self.create_story_linked_to_exploration()
-
-        self.assertEqual(exp_model.states_schema_version, 41)
+            self.assertEqual(exploration.states_schema_version, 48)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1'),
             job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
             job_run_result.JobRunResult(
-                stdout='EXP RELATED MODELS GENERATED SUCCESS: 1')
+                stdout='EXP MIGRATED SUCCESS: 1', stderr='')
         ])
 
         updated_opp_model = (
@@ -411,188 +241,78 @@ class MigrateExplorationJobTests(
             'topic_name': 'topic',
             'chapter_title': 'Title 1',
             'story_title': 'A story title',
-            'content_count': 4,
-            'translation_counts': {
-                'hi': 0,
-                'bn': 0
-            },
+            'content_count': 1,
+            'translation_counts': {},
             'translation_in_review_counts': {}}
 
         self.assertEqual(
             updated_opp_summary.to_dict(), expected_opp_summary_dict)
 
-        all_translation_models = (
-            translation_models.EntityTranslationsModel.get_all().fetch())
-
-        self.assertEqual(len(all_translation_models), 4)
-        self.assertItemsEqual(
-            [m.entity_version for m in all_translation_models], [1, 1, 2, 2])
-
     def test_unmigrated_invalid_published_exp_raise_error(self) -> None:
-        exp_model = exp_models.ExplorationModel(
-            id=self.NEW_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title='',
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.NEW_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        swap_states_schema_48 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
+        swap_exp_schema_53 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
 
-        owner_action = user_services.get_user_actions_info(
-            feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(
-            owner_action, self.NEW_EXP_ID)
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[]))
-        opportunity_model.put()
+        with swap_states_schema_48, swap_exp_schema_53:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
+            exploration.states['Introduction'].update_interaction_id(None)
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
 
-        self.create_story_linked_to_exploration()
+            owner_action = user_services.get_user_actions_info(
+                feconf.SYSTEM_COMMITTER_ID)
+            exp_services.publish_exploration_and_update_user_profiles(
+                owner_action, self.NEW_EXP_ID)
+            opportunity_model = (
+                opportunity_models.ExplorationOpportunitySummaryModel(
+                    id=self.NEW_EXP_ID,
+                    topic_id='topic_id1',
+                    topic_name='topic',
+                    story_id='story_id_1',
+                    story_title='A story title',
+                    chapter_title='Title 1',
+                    content_count=20,
+                    incomplete_translation_language_codes=['hi', 'ar'],
+                    translation_counts={'hi': 1, 'ar': 2},
+                    language_codes_needing_voice_artists=['en'],
+                    language_codes_with_assigned_voice_artists=[]))
+            opportunity_model.put()
 
-        self.assertEqual(exp_model.states_schema_version, 41)
+            self.create_story_linked_to_exploration()
+
+            self.assertEqual(exploration.states_schema_version, 48)
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='', stderr=(
-                    'EXP PROCESSED ERROR: "(\'exp_1\', ValidationError("Please '
-                    'fix the following issues before saving this exploration: '
-                    '1. A title must be specified (in the \'Settings\' tab). '
-                    '"))": 1'
+                stderr=(
+                    'EXP PROCESSED ERROR: "(\'exp_1\', ''ValidationError('
+                    '\'This state does not have any interaction specified.\')'
+                    ')": 1'
                 )
             )
         ])
 
-    def test_unmigrated_exp_with_invalid_related_data_raise_error(self) -> None:
-        exp_model = exp_models.ExplorationModel(
-            id=self.NEW_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title='A title',
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.NEW_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        updated_opp_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.NEW_EXP_ID))
+        updated_opp_summary = (
+              opportunity_services
+                  .get_exploration_opportunity_summary_from_model(
+                      updated_opp_model))
 
-        owner_action = user_services.get_user_actions_info(
-            feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(
-            owner_action, self.NEW_EXP_ID)
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[]))
-        opportunity_model.put()
+        expected_opp_summary_dict = {
+            'id': 'exp_1',
+            'topic_name': 'topic',
+            'chapter_title': 'Title 1',
+            'story_title': 'A story title',
+            'content_count': 1,
+            'translation_counts': {},
+            'translation_in_review_counts': {}}
 
-        self.create_story_linked_to_exploration()
-
-        self.assertEqual(exp_model.states_schema_version, 41)
-
-        with self.swap_to_always_raise(
-            translation_services,
-            'compute_translation_related_change',
-            Exception('Error generating related models')
-        ):
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'EXP RELATED MODELS GENERATED ERROR: \"('
-                        '\'exp_1\', Exception('
-                        '\'Error generating related models\''
-                        '))\": 1'
-                    )
-                ),
-                job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1')
-
-            ])
+        self.assertEqual(
+            updated_opp_summary.to_dict(), expected_opp_summary_dict)
 
 
 # Exploration migration backend tests with BEAM jobs involves creating and
@@ -723,88 +443,42 @@ class AuditExplorationMigrationJobTests(
             'Added node.')
 
     def test_unmigrated_exp_is_migrated(self) -> None:
-        exp_model = exp_models.ExplorationModel(
-            id=self.NEW_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title=EXP_V46_DICT['title'],
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.NEW_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        swap_states_schema_48 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
+        swap_exp_schema_53 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
 
-        translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            exp_model.id,
-            exp_model.version,
-            'hi',
-            {}
-        ).put()
+        with swap_states_schema_48, swap_exp_schema_53:
+            exploration = (
+                self.save_new_linear_exp_with_state_names_and_interactions(
+                    self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID,
+                    ['Start'], ['Continue'],
+                    title=self.EXP_TITLE, category='Algorithms',
+                    correctness_feedback_enabled=True
 
-        all_translation_models: (
-            Sequence[translation_models.EntityTranslationsModel]) = (
-            translation_models.EntityTranslationsModel.get_all().fetch())
+                ))
+            owner_action = user_services.get_user_actions_info(
+                feconf.SYSTEM_COMMITTER_ID)
+            exp_services.publish_exploration_and_update_user_profiles(
+                owner_action, self.NEW_EXP_ID)
+            opportunity_model = (
+                opportunity_models.ExplorationOpportunitySummaryModel(
+                    id=self.NEW_EXP_ID,
+                    topic_id='topic_id1',
+                    topic_name='topic',
+                    story_id='story_id_1',
+                    story_title='A story title',
+                    chapter_title='Title 1',
+                    content_count=20,
+                    incomplete_translation_language_codes=['hi', 'ar'],
+                    translation_counts={'hi': 1, 'ar': 2},
+                    language_codes_needing_voice_artists=['en'],
+                    language_codes_with_assigned_voice_artists=[]))
+            opportunity_model.put()
 
-        self.assertEqual(
-            len(all_translation_models), 1)
+            self.create_story_linked_to_exploration()
 
-        owner_action = user_services.get_user_actions_info(
-            feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(
-            owner_action, self.NEW_EXP_ID)
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[]))
-        opportunity_model.put()
-
-        self.create_story_linked_to_exploration()
-
-        exploration_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
-        self.assertEqual(exploration_model.states_schema_version, 41)
+            self.assertEqual(exploration.states_schema_version, 48)
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
@@ -825,91 +499,54 @@ class AuditExplorationMigrationJobTests(
             'topic_name': 'topic',
             'chapter_title': 'Title 1',
             'story_title': 'A story title',
-            'content_count': 4,
-            'translation_counts': {
-                'hi': 0
-            },
-            'translation_in_review_counts': {}
-        }
+            'content_count': 1,
+            'translation_counts': {},
+            'translation_in_review_counts': {}}
 
         self.assertEqual(
             updated_opp_summary.to_dict(), expected_opp_summary_dict)
 
     def test_unmigrated_invalid_published_exp_raise_error(self) -> None:
-        exp_model = exp_models.ExplorationModel(
-            id=self.NEW_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title='',
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.NEW_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        swap_states_schema_48 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
+        swap_exp_schema_53 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
 
-        owner_action = user_services.get_user_actions_info(
-            feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(
-            owner_action, self.NEW_EXP_ID)
-        opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='topic',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='Title 1',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={'hi': 1, 'ar': 2},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[]))
-        opportunity_model.put()
+        with swap_states_schema_48, swap_exp_schema_53:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
 
-        self.create_story_linked_to_exploration()
+            owner_action = user_services.get_user_actions_info(
+                feconf.SYSTEM_COMMITTER_ID)
+            exp_services.publish_exploration_and_update_user_profiles(
+                owner_action, self.NEW_EXP_ID)
+            opportunity_model = (
+                opportunity_models.ExplorationOpportunitySummaryModel(
+                    id=self.NEW_EXP_ID,
+                    topic_id='topic_id1',
+                    topic_name='topic',
+                    story_id='story_id_1',
+                    story_title='A story title',
+                    chapter_title='Title 1',
+                    content_count=20,
+                    incomplete_translation_language_codes=['hi', 'ar'],
+                    translation_counts={'hi': 1, 'ar': 2},
+                    language_codes_needing_voice_artists=['en'],
+                    language_codes_with_assigned_voice_artists=[]))
+            opportunity_model.put()
 
-        self.assertEqual(exp_model.states_schema_version, 41)
+            self.create_story_linked_to_exploration()
+
+            self.assertEqual(exploration.states_schema_version, 48)
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='', stderr=(
-                    'EXP PROCESSED ERROR: "(\'exp_1\', ValidationError("Please '
-                    'fix the following issues before saving this exploration: '
-                    '1. A title must be specified (in the \'Settings\' tab). '
-                    '"))": 1'
+                stderr=(
+                    'EXP PROCESSED ERROR: "(\'exp_1\', ''ValidationError('
+                    '\'This state does not have any interaction specified.\')'
+                    ')": 1'
                 )
             )
         ])
@@ -1037,6 +674,71 @@ class ExpSnapshotsMigrationAuditJobTests(
     NEW_EXP_ID = 'exp_id1'
     EXP_TITLE = 'title'
 
+    def create_exploration_with_states_schema_version(
+        self,
+        states_schema_version: int,
+        exp_id: str,
+        user_id: str,
+        states_dict: Dict[str, state_domain.StateDict]
+    ) -> None:
+        """Saves a new default exploration with the given states dictionary in
+        the given state schema version. All passed state dictionaries in
+        'states_dict' must have the states schema version indicated by
+        'states_schema_version'.
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            states_schema_version: int. The state schema version.
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states, in the
+                given states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=states_schema_version,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
     def test_migration_audit_job_does_not_convert_up_to_date_exp(self) -> None:
         """Tests that the snapshot migration audit job does not convert a
         snapshot that is already the latest states schema version.
@@ -1045,12 +747,8 @@ class ExpSnapshotsMigrationAuditJobTests(
         # affected by the job.
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
-        content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(
-            init_state, 'EndExploration', content_id_generator)
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -1075,12 +773,8 @@ class ExpSnapshotsMigrationAuditJobTests(
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
-        content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(
-            init_state, 'EndExploration', content_id_generator)
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -1117,51 +811,17 @@ class ExpSnapshotsMigrationAuditJobTests(
         """Test that the audit job runs correctly on snapshots that use a
         previous state schema.
         """
-        exp_model = exp_models.ExplorationModel(
-            id=self.VALID_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title=EXP_V46_DICT['title'],
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.VALID_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        swap_states_schema_version = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_version = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
+        with swap_states_schema_version, swap_exp_schema_version:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
         self.assertLess(
-            exp_model.states_schema_version,
+            exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # Bring the main exploration to the latest schema.
@@ -1172,7 +832,7 @@ class ExpSnapshotsMigrationAuditJobTests(
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '46',
+                'from_version': '42',
                 'to_version': latest_schema_version
             })
         ]
@@ -1206,49 +866,15 @@ class ExpSnapshotsMigrationAuditJobTests(
         """Test that the audit job catches any errors that would otherwise
         occur during the migration.
         """
-        exp_model = exp_models.ExplorationModel(
-            id=self.VALID_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title=EXP_V46_DICT['title'],
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.VALID_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
 
         # Bring the main exploration to the latest schema.
         caching_services.delete_multi(
@@ -1279,7 +905,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
         with self.swap(
-            exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',
+            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
             mock_conversion
         ):
             self.assert_job_output_is([
@@ -1288,7 +914,7 @@ class ExpSnapshotsMigrationAuditJobTests(
                     stderr=(
                         'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("'
                         'Exploration snapshot exp_id0 failed migration to '
-                        'states v47: \'property_that_dne\'"))": 1'
+                        'states v42: \'property_that_dne\'"))": 1'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -1444,12 +1070,8 @@ class ExpSnapshotsMigrationJobTests(
         # job.
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
-        content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(
-            init_state, 'EndExploration', content_id_generator)
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -1469,49 +1091,18 @@ class ExpSnapshotsMigrationJobTests(
         ])
 
     def test_migration_job_succeeds_on_default_exploration(self) -> None:
-        exp_model = exp_models.ExplorationModel(
-            id=self.VALID_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title=EXP_V46_DICT['title'],
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.VALID_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        swap_states_schema_version = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_version = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
+        with swap_states_schema_version, swap_exp_schema_version:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
+        self.assertLess(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # Bring the main exploration to the latest schema.
         caching_services.delete_multi(
@@ -1521,7 +1112,7 @@ class ExpSnapshotsMigrationJobTests(
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '46',
+                'from_version': '42',
                 'to_version': latest_schema_version
             })
         ]
@@ -1557,12 +1148,8 @@ class ExpSnapshotsMigrationJobTests(
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
-        content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(
-            init_state, 'EndExploration', content_id_generator)
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -1652,49 +1239,15 @@ class ExpSnapshotsMigrationJobTests(
             ])
 
     def test_migration_job_audit_failure(self) -> None:
-        exp_model = exp_models.ExplorationModel(
-            id=self.VALID_EXP_ID,
-            category=EXP_V46_DICT['category'],
-            title=EXP_V46_DICT['title'],
-            objective=EXP_V46_DICT['objective'],
-            language_code=EXP_V46_DICT['language_code'],
-            tags=EXP_V46_DICT['tags'],
-            blurb=EXP_V46_DICT['blurb'],
-            author_notes=EXP_V46_DICT['author_notes'],
-            states_schema_version=EXP_V46_DICT['states_schema_version'],
-            init_state_name=EXP_V46_DICT['init_state_name'],
-            states=EXP_V46_DICT['states'],
-            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
-            correctness_feedback_enabled=EXP_V46_DICT[
-                'correctness_feedback_enabled']
-        )
-        rights_manager.create_new_exploration_rights(
-            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        exp_summary_model = exp_models.ExpSummaryModel(**{
-            'id': self.VALID_EXP_ID,
-            'title': exp_model.title,
-            'category': exp_model.category,
-            'objective': exp_model.objective,
-            'language_code': exp_model.language_code,
-            'tags': exp_model.tags,
-            'ratings': None,
-            'scaled_average_rating': 4.0,
-            'exploration_model_last_updated': exp_model.last_updated,
-            'exploration_model_created_on': exp_model.created_on,
-            'first_published_msec': None,
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
-            'community_owned': False,
-            'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
-            'editor_ids': [],
-            'voice_artist_ids': [],
-            'viewer_ids': [],
-            'contributor_ids': [],
-            'contributors_summary': {},
-            'version': exp_model.version
-        })
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration)
 
         # Bring the main exploration to the latest schema.
         caching_services.delete_multi(
@@ -1704,7 +1257,7 @@ class ExpSnapshotsMigrationJobTests(
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '46',
+                'from_version': '42',
                 'to_version': latest_schema_version
             })
         ]
@@ -1725,7 +1278,7 @@ class ExpSnapshotsMigrationJobTests(
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
         with self.swap(
-            exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',
+            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
             mock_conversion
         ):
             self.assert_job_output_is([
@@ -1734,7 +1287,7 @@ class ExpSnapshotsMigrationJobTests(
                     stderr=(
                         'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("'
                         'Exploration snapshot exp_id0 failed migration to '
-                        'states v47: \'property_that_dne\'"))": 1'
+                        'states v42: \'property_that_dne\'"))": 1'
                     )
                 ),
                 job_run_result.JobRunResult(

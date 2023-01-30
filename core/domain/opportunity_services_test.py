@@ -23,7 +23,6 @@ import logging
 from core import feconf
 from core.constants import constants
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -38,7 +37,6 @@ from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -72,8 +70,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     suggestion_target_version_at_submission: int = 1
     suggestion_change: Dict[str, str] = {
         'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-        'state_name': 'Introduction',
-        'content_id': 'content_0',
+        'state_name': 'End State',
+        'content_id': 'content',
         'language_code': 'hi',
         'content_html': '',
         'translation_html': '<p>This is translated html.</p>',
@@ -390,16 +388,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 0)
+        self.assertEqual(translation_opportunities[0].content_count, 2)
 
-        exp = exp_fetchers.get_exploration_by_id('0')
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index)
         answer_group_dict_inputs_value: Dict[str, Union[str, List[str]]] = {
-            'contentId': content_id_generator.generate(
-                translation_domain.ContentType.RULE,
-                extra_prefix='input'
-            ),
+            'contentId': 'rule_input_4',
             'normalizedStrSet': ['Test']
         }
 
@@ -408,9 +400,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
                 'feedback': {
-                    'content_id': content_id_generator.generate(
-                        translation_domain.ContentType.FEEDBACK
-                    ),
+                    'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
@@ -431,9 +421,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         hints_list = []
         hints_list.append({
             'hint_content': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.HINT
-                ),
+                'content_id': 'hint_1',
                 'html': '<p>hint one</p>'
             },
         })
@@ -442,9 +430,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
-                'content_id': content_id_generator.generate(
-                    translation_domain.ContentType.SOLUTION
-                ),
+                'content_id': 'solution',
                 'html': '<p>hello_world is a string</p>'
             },
         }
@@ -464,11 +450,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                     'new_value': {
                         'placeholder': {
                             'value': {
-                                'content_id': content_id_generator.generate(
-                                    translation_domain
-                                    .ContentType.CUSTOMIZATION_ARG,
-                                    extra_prefix='placeholder'
-                                ),
+                                'content_id': 'ca_placeholder_0',
                                 'unicode_str': ''
                             }
                         },
@@ -485,6 +467,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+                    'new_value': 4
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS),
                     'state_name': 'Introduction',
@@ -496,18 +485,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
                     'state_name': 'Introduction',
                     'new_value': solution_dict
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'next_content_id_index',
-                    'new_value': content_id_generator.next_content_id_index,
-                    'old_value': 0
                 })], 'Add state name')
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 4)
+        self.assertEqual(translation_opportunities[0].content_count, 6)
 
     def test_completing_translation_removes_language_from_incomplete_language_codes( # pylint: disable=line-too-long
         self
@@ -529,26 +512,45 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
+        change_list_solution_dict: state_domain.SubtitledHtmlDict = {
+            'html': '<p><strong>Test content</strong></p>',
+            'content_id': 'content',
+        }
+
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Introduction',
                 'property_name': 'content',
-                'new_value': {
-                    'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content_0',
-                }
-            })
+                'new_value': change_list_solution_dict
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p><strong>Test content</strong></p>',
+                'translation_html': '<p>Translated text</p>',
+                'data_format': 'html'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'End State',
+                'property_name': 'content',
+                'new_value': change_list_solution_dict
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'End State',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p><strong>Test content</strong></p>',
+                'translation_html': '<p>Translated text</p>',
+                'data_format': 'html'
+            }),
         ]
         exp_services.update_exploration(
             self.owner_id, '0', change_list, 'commit message')
-
-        (
-            opportunity_services
-            .update_translation_opportunity_with_accepted_suggestion(
-                '0', 'hi'
-            )
-        )
 
         # get_translation_opportunities should no longer return the opportunity
         # after translation completion.
@@ -560,8 +562,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         # The translation opportunity should be returned after marking a
         # translation as stale.
         translation_needs_update_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
-            'content_id': 'content_0'
+            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi'
         })]
         exp_services.update_exploration(
             self.owner_id, '0', translation_needs_update_change_list,
@@ -589,12 +593,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_create_skill_opportunity_counts_existing_linked_questions(
         self
     ) -> None:
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.SKILL_ID],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
@@ -735,12 +736,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        content_id_generator = translation_domain.ContentIdGenerator()
+
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.SKILL_ID],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
@@ -751,12 +750,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_create_question_skill_link_increments_question_count(self) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.SKILL_ID],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
 
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
@@ -771,12 +767,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC', content_id_generator),
-            ['skill_2'],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), ['skill_2'])
 
         question_services.link_multiple_skills_for_question(
             self.USER_ID, self.QUESTION_ID, [self.SKILL_ID], [0.3])
@@ -789,12 +782,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_delete_question_decrements_question_count(self) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.SKILL_ID],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
 
         question_services.delete_question(self.USER_ID, self.QUESTION_ID)
 
@@ -809,12 +799,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC', content_id_generator),
-            ['skill_2'],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), ['skill_2'])
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
@@ -1047,107 +1034,3 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_services.regenerate_opportunities_related_to_topic(
                 self.TOPIC_ID
             )
-
-
-class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
-        test_utils.GenericTestBase):
-    """Unit test validating opportunity gets updated after accepting translation
-    suggetion.
-    """
-
-    def setUp(self) -> None:
-        super().setUp()
-        supported_language_codes = set(
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES)
-        self.new_incomplete_translation_language_codes = list(
-            supported_language_codes - set(['en']))
-
-        self.opportunity_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id='exp_1',
-                topic_id='topic_id',
-                topic_name='topic_name',
-                story_id='story_id',
-                story_title='story_title',
-                chapter_title='chapter_title',
-                content_count=2,
-                incomplete_translation_language_codes=(
-                    self.new_incomplete_translation_language_codes),
-                translation_counts={},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[]
-            ))
-        self.opportunity_model.put()
-
-    def test_update_translation_opportunity_with_accepted_suggestion(
-        self
-    ) -> None:
-        (
-            opportunity_services
-            .update_translation_opportunity_with_accepted_suggestion(
-                'exp_1', 'hi'
-            )
-        )
-
-        opportunity = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['exp_1']
-            )
-        )
-        assert opportunity['exp_1'] is not None
-
-        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 1})
-
-    def test_fully_translated_content_in_language_updated_in_opportunity(
-        self
-    ) -> None:
-        (
-            opportunity_services
-            .update_translation_opportunity_with_accepted_suggestion(
-                'exp_1', 'hi'
-            )
-        )
-
-        opportunity = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['exp_1']
-            )
-        )
-        assert opportunity['exp_1'] is not None
-
-        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 1})
-        self.assertTrue(
-            'hi' in opportunity['exp_1'].incomplete_translation_language_codes)
-
-        (
-            opportunity_services
-            .update_translation_opportunity_with_accepted_suggestion(
-                'exp_1', 'hi'
-            )
-        )
-
-        opportunity = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                ['exp_1']
-            )
-        )
-        assert opportunity['exp_1'] is not None
-
-        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 2})
-        self.assertFalse(
-            'hi' in opportunity['exp_1'].incomplete_translation_language_codes)
-
-    def test_update_opportunity_with_updated_exploration(self) -> None:
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.save_new_default_exploration('exp_1', owner_id)
-        opportunity = (
-            opportunity_services
-            .compute_opportunity_models_with_updated_exploration(
-                'exp_1', 2, {'hi': 2}
-            )
-        )[0]
-
-        self.assertFalse(
-            'hi' in opportunity.incomplete_translation_language_codes)

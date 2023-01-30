@@ -66,8 +66,7 @@ def create_new_question(
         question_state_data_schema_version=(
             question.question_state_data_schema_version),
         inapplicable_skill_misconception_ids=(
-            question.inapplicable_skill_misconception_ids),
-        next_content_id_index=question.next_content_id_index
+            question.inapplicable_skill_misconception_ids)
     )
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
@@ -675,18 +674,8 @@ def apply_change_list(
                         change
                     )
                     question.update_inapplicable_skill_misconception_ids(
-                        update_skill_misconception_ids_cmd.new_value)
-                elif (change.property_name ==
-                      question_domain.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    # Here we use cast because this 'if' condition forces
-                    # change to have type
-                    # UpdateQuestionPropertyNextContentIdIndexCmd.
-                    cmd = cast(
-                        question_domain
-                        .UpdateQuestionPropertyNextContentIdIndexCmd,
-                        change
+                        update_skill_misconception_ids_cmd.new_value
                     )
-                    question.update_next_content_id_index(cmd.new_value)
 
         return question
 
@@ -733,7 +722,6 @@ def _save_question(
     question_model.linked_skill_ids = question.linked_skill_ids
     question_model.inapplicable_skill_misconception_ids = (
         question.inapplicable_skill_misconception_ids)
-    question_model.next_content_id_index = question.next_content_id_index
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1

@@ -297,6 +297,8 @@ describe('State Responses Component', () => {
         callback(null, null);
       });
     spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
+      .and.stub();
 
     const event = {
       previousIndex: 1,
@@ -304,8 +306,13 @@ describe('State Responses Component', () => {
     };
     component.drop(event as CdkDragSortEvent<AnswerGroup[]>);
     component.sendOnSaveNextContentIdIndex(0);
+    component.sendshowMarkAllAudioAsNeedingUpdateModalIfRequired([]);
+
     expect(responsesService.save).toHaveBeenCalled();
     expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalledWith(0);
+    expect(
+      component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalledWith([]);
   });
 
   it('should set component properties on initialization', () => {

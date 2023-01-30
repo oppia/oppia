@@ -23,14 +23,12 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -49,13 +47,12 @@ export class TranslationStatusService implements OnInit {
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   langCode!: string;
-  stateNeedsUpdateWarnings: Record<string, string[]> = {};
+  stateNeedsUpdateWarnings!: Record<string, string[]>;
   stateWiseStatusColor!: Record<string, string>;
   explorationTranslationContentRequiredCount!: number;
   explorationVoiceoverContentRequiredCount!: number;
   explorationTranslationContentNotAvailableCount!: number;
   explorationVoiceoverContentNotAvailableCount!: number;
-  entityTranslation!: EntityTranslation;
 
 
   constructor(
@@ -63,8 +60,7 @@ export class TranslationStatusService implements OnInit {
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
-    private entityTranslationsService: EntityTranslationsService,
-    private stateEditorService: StateEditorService
+    private stateWrittenTranslationsService: StateWrittenTranslationsService,
   ) { }
 
   ngOnInit(): void {
@@ -96,18 +92,22 @@ export class TranslationStatusService implements OnInit {
     return availabilityStatus;
   }
 
-  _getTranslationStatus(contentId: string): AvailabilityStatus {
+  _getTranslationStatus(
+      writtenTranslations: WrittenTranslations,
+      contentId: string): AvailabilityStatus {
     let availabilityStatus = {
       available: false,
       needsUpdate: false,
     };
-    if (this.entityTranslation && this.entityTranslation.hasWrittenTranslation(
-      contentId)) {
-      let translatedContent = this.entityTranslation.getWrittenTranslation(
-        contentId) as TranslatedContent;
-      if (translatedContent.translation !== '') {
+    this.langCode = this.translationLanguageService.getActiveLanguageCode();
+    let availableLanguages = (
+      writtenTranslations.getLanguageCodes(contentId));
+    if (availableLanguages.indexOf(this.langCode) !== -1) {
+      let writtenTranslation = (
+        writtenTranslations.getWrittenTranslation(contentId, this.langCode));
+      if (writtenTranslation.translation !== '') {
         availabilityStatus.available = true;
-        availabilityStatus.needsUpdate = translatedContent.needsUpdate;
+        availabilityStatus.needsUpdate = writtenTranslation.needsUpdate;
       }
     }
     return availabilityStatus;
@@ -115,10 +115,12 @@ export class TranslationStatusService implements OnInit {
 
   _getContentAvailabilityStatus(
       stateName: string, contentId: string): AvailabilityStatus {
+    this.langCode = this.translationLanguageService.getActiveLanguageCode();
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
-      return this._getTranslationStatus(contentId);
+      let writtenTranslations = (
+        this.explorationStatesService.getWrittenTranslationsMemento(stateName));
+      return this._getTranslationStatus(writtenTranslations, contentId);
     } else {
-      this.langCode = this.translationLanguageService.getActiveLanguageCode();
       let recordedVoiceovers = (
         this.explorationStatesService.getRecordedVoiceoversMemento(stateName));
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
@@ -128,7 +130,8 @@ export class TranslationStatusService implements OnInit {
   _getActiveStateContentAvailabilityStatus(
       contentId: string): AvailabilityStatus {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
-      return this._getTranslationStatus(contentId);
+      let writtenTranslations = this.stateWrittenTranslationsService.displayed;
+      return this._getTranslationStatus(writtenTranslations, contentId);
     } else {
       let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
       return this._getVoiceOverStatus(recordedVoiceovers, contentId);
@@ -166,14 +169,12 @@ export class TranslationStatusService implements OnInit {
             let contentIdToRemove = this._getContentIdListRelatedToComponent(
               AppConstants.COMPONENT_NAME_HINT,
               allContentIds);
+            // Excluding default_outcome content status as default outcome's
+            // content is left empty so the translation or voiceover is not
+            // required.
+            contentIdToRemove.push('default_outcome');
             allContentIds = allContentIds.filter(function(contentId) {
-              return !(
-                // Excluding default_outcome content status as default outcome's
-                // content is left empty so the translation or voiceover is not
-                // required.
-                contentId.startsWith('default_outcome_') ||
-                contentIdToRemove.indexOf(contentId) > 0
-              );
+              return contentIdToRemove.indexOf(contentId) < 0;
             });
           }
 
@@ -237,15 +238,23 @@ export class TranslationStatusService implements OnInit {
 
   _getContentIdListRelatedToComponent(
       componentName: string, availableContentIds: string[]): string[] {
-    let contentIdList: string[] = [];
+    let contentIdList = [];
 
     if (availableContentIds.length > 0) {
-      var searchKey = componentName + '_';
-      availableContentIds.forEach(function(contentId) {
-        if (contentId.indexOf(searchKey) > -1) {
-          contentIdList.push(contentId);
+      if (componentName === 'solution' || componentName === 'content') {
+        contentIdList.push(componentName);
+      } else {
+        let searchKey = componentName + '_';
+        availableContentIds.forEach((contentId) => {
+          if (contentId.indexOf(searchKey) > -1) {
+            contentIdList.push(contentId);
+          }
+        });
+
+        if (componentName === 'feedback') {
+          contentIdList.push('default_outcome');
         }
-      });
+      }
     }
     return contentIdList;
   }
@@ -272,8 +281,16 @@ export class TranslationStatusService implements OnInit {
   }
 
   _getAvailableContentIds(): string[] {
-    let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
-    return recordedVoiceovers.getAllContentIds();
+    let availableContentIds: string[] = [];
+    if (this.translationTabActiveModeService.isTranslationModeActive()) {
+      let writtenTranslations = this.stateWrittenTranslationsService.displayed;
+      availableContentIds = writtenTranslations.getAllContentIds();
+    } else if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+      let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
+      availableContentIds = recordedVoiceovers.getAllContentIds();
+    }
+
+    return availableContentIds;
   }
 
   _getActiveStateComponentNeedsUpdateStatus(componentName: string): boolean {
@@ -326,13 +343,7 @@ export class TranslationStatusService implements OnInit {
   }
 
   refresh(): void {
-    this.langCode = this.translationLanguageService.getActiveLanguageCode();
-    this.entityTranslation = (
-      this.entityTranslationsService.languageCodeToEntityTranslations[
-        this.langCode]
-    );
     this._computeAllStatesStatus();
-    this.stateEditorService.onRefreshStateTranslation.emit();
   }
 
   getAllStatesNeedUpdatewarning(): Record<string, string[]> {

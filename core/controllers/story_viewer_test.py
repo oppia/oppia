@@ -29,7 +29,6 @@ from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import translation_domain
 from core.domain import user_services
 from core.tests import test_utils
 
@@ -504,12 +503,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         csrf_token = self.get_new_csrf_token()
         self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description')
-        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             'question_1', self.admin_id,
-            self._create_valid_question_data('ABC', content_id_generator),
-            ['skill_1'],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'), ['skill_1'])
         question_services.create_new_question_skill_link(
             self.admin_id, 'question_1', 'skill_1', 0.3)
         old_value: List[str] = []

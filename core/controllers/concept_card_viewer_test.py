@@ -21,7 +21,6 @@ from core import feconf
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import translation_domain
 from core.domain import user_services
 from core.tests import test_utils
 
@@ -54,7 +53,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
                 }
             }),
-            translation_domain.WrittenTranslations.from_dict({
+            state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
                 }
@@ -69,7 +68,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
                 }
             }),
-            translation_domain.WrittenTranslations.from_dict({
+            state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {
                     '1': {}, '2': {}, '3': {}, '4': {}, '5': {}
                 }

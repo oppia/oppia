@@ -17,14 +17,18 @@
  */
 
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { StateNextContentIdIndexService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 
 describe('GenerateContentIdService', () => {
   let gcis: GenerateContentIdService;
+  let fakeSnciis: {};
 
   beforeEach(() => {
-    gcis = new GenerateContentIdService();
-    let currentIndex = 0;
-    gcis.init(() => currentIndex++, () => {});
+    fakeSnciis = { displayed: 0 };
+    gcis = new GenerateContentIdService(
+      fakeSnciis as StateNextContentIdIndexService);
   });
 
   it('should generate content id for new feedbacks using next content' +

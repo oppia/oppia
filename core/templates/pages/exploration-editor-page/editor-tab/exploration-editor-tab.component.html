@@ -49,7 +49,7 @@
                           [explorationIsLinkedToStory]="explorationIsLinkedToStory"
                           (onSaveStateContent)="saveStateContent($event)"
                           (onSaveInteractionCustomizationArgs)="saveInteractionCustomizationArgs($event)"
-                          (onSaveNextContentIdIndex)="saveNextContentIdIndex()"
+                          (onSaveNextContentIdIndex)="saveNextContentIdIndex($event)"
                           (onSaveInteractionId)="saveInteractionId($event)"
                           (onSaveInteractionDefaultOutcome)="saveInteractionDefaultOutcome($event)"
                           (onSaveInteractionAnswerGroups)="saveInteractionAnswerGroups($event)"
@@ -58,6 +58,7 @@
                           (onSaveHints)="saveHints($event)"
                           (onSaveSolicitAnswerDetails)="saveSolicitAnswerDetails($event)"
                           (recomputeGraph)="recomputeGraph()"
+                          (showMarkAllAudioAsNeedingUpdateModalIfRequired)="showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
                           (navigateToState)="navigateToState($event)"
                           (refreshWarnings)="refreshWarnings()">
       </oppia-state-editor>

@@ -37,6 +37,8 @@ interface ExplanationFormSchema {
 export class SolutionExplanationEditor
   implements OnDestroy, OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
+    EventEmitter<string[]> = new EventEmitter();
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -86,7 +88,18 @@ export class SolutionExplanationEditor
     ) {
       throw new Error('Solution is undefined');
     }
-
+    const contentHasChanged = (
+      this.stateSolutionService.displayed.explanation.html !==
+      this.stateSolutionService.savedMemento.explanation.html);
+    if (contentHasChanged) {
+      const solutionContentId = this.stateSolutionService.displayed.explanation
+        .contentId;
+      if (solutionContentId === null) {
+        throw new Error('Solution content id is undefined');
+      }
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
+        [solutionContentId]);
+    }
     this.stateSolutionService.saveDisplayedValue();
     this.saveSolution.emit(this.stateSolutionService.displayed);
     this.explanationEditorIsOpen = false;

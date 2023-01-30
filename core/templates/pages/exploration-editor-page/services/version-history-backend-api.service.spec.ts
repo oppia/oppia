@@ -56,15 +56,15 @@ describe('Version history backend api service', () => {
       last_edited_version_number: 1,
       state_name_in_previous_version: 'Introduction',
       state_dict_in_previous_version: stateObjectFactory.createDefaultState(
-        'Introduction', 'content_0', 'default_outcome_1'
+        'Introduction'
       ).toBackendDict(),
       last_edited_committer_username: 'user1'
     };
     const sampleStateVersionHistory = {
       lastEditedVersionNumber: 1,
       stateNameInPreviousVersion: 'Introduction',
-      stateInPreviousVersion: stateObjectFactory.createDefaultState(
-        'Introduction', 'content_0', 'default_outcome_1'),
+      stateInPreviousVersion: (
+        stateObjectFactory.createDefaultState('Introduction')),
       lastEditedCommitterUsername: 'user1'
     };
     versionHistoryBackendApiService.fetchStateVersionHistoryAsync(

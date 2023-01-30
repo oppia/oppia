@@ -148,7 +148,7 @@ export class PreviewTabComponent
       this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
         explorationId).then((returnDict) => {
         this.explorationEngineService.init(
-          returnDict, 0, null, false, [], [],
+          returnDict, 0, null, false, [],
           () => {
             this.loadPreviewState(initStateNameForPreview, []);
           });
@@ -189,7 +189,7 @@ export class PreviewTabComponent
           this.explorationParamChangesService.init(
             this.paramChangesObjectFactory.createFromBackendList(
               explorationData.param_changes));
-          this.explorationStatesService.init(explorationData.states, false);
+          this.explorationStatesService.init(explorationData.states);
           this.explorationInitStateNameService.init(
             explorationData.init_state_name);
           this.graphDataService.recompute();

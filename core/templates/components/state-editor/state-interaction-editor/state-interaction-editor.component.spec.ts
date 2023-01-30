@@ -29,6 +29,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { EditabilityService } from 'services/editability.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CustomizeInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
+import { StateNextContentIdIndexService } from '../state-editor-properties-services/state-next-content-id-index.service';
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
 import { StateContentService } from '../state-editor-properties-services/state-content.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -37,7 +38,6 @@ import { StateCustomizationArgsService } from '../state-editor-properties-servic
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 class MockNgbModal {
   modal: string;
@@ -46,7 +46,9 @@ class MockNgbModal {
     if (this.modal === 'add_interaction') {
       return {
         result: {
-          componentInstance: {},
+          componentInstance: {
+            showMarkAllAudioAsNeedingUpdateModalIfRequired: EventEmitter
+          },
           then: (
               successCallback: (result) => void,
               cancelCallback: () => void
@@ -89,7 +91,6 @@ describe('State Interaction component', () => {
   let editabilityService: EditabilityService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let fixture: ComponentFixture<StateInteractionEditorComponent>;
-  let generateContentIdService: GenerateContentIdService;
   let interactionDetailsCacheService: InteractionDetailsCacheService;
   let mockNgbModal: MockNgbModal;
   let responsesService: ResponsesService;
@@ -97,6 +98,7 @@ describe('State Interaction component', () => {
   let stateCustomizationArgsService: StateCustomizationArgsService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
+  let stateNextContentIdIndexService: StateNextContentIdIndexService;
   let stateSolutionService: StateSolutionService;
   let urlInterpolationService: UrlInterpolationService;
 
@@ -123,6 +125,7 @@ describe('State Interaction component', () => {
         StateCustomizationArgsService,
         StateEditorService,
         StateInteractionIdService,
+        StateNextContentIdIndexService,
         StateSolutionService,
         UrlInterpolationService
       ],
@@ -138,7 +141,6 @@ describe('State Interaction component', () => {
     editabilityService = TestBed.inject(EditabilityService);
     explorationHtmlFormatterService =
       TestBed.inject(ExplorationHtmlFormatterService);
-    generateContentIdService = TestBed.inject(GenerateContentIdService);
     interactionDetailsCacheService =
       TestBed.inject(InteractionDetailsCacheService);
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
@@ -148,6 +150,8 @@ describe('State Interaction component', () => {
       TestBed.inject(StateCustomizationArgsService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateNextContentIdIndexService =
+      TestBed.inject(StateNextContentIdIndexService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
@@ -177,7 +181,7 @@ describe('State Interaction component', () => {
     const state = new State(
       'shivam', 'id', 'some', null,
       new Interaction([], [], null, null, [], 'id', null),
-      null, null, true, true);
+      null, null, true, true, null, 7);
 
     component.ngOnInit();
     stateEditorService.onStateEditorInitialized.emit(state);
@@ -258,7 +262,6 @@ describe('State Interaction component', () => {
 
   it('should close modal when user click cancel', fakeAsync(() => {
     const mockEventEmitter = new EventEmitter();
-    generateContentIdService.init(() => 1, () => {});
     mockNgbModal.modal = 'add_interaction';
     stateContentService.savedMemento = new SubtitledHtml('html', 'contentID');
     stateCustomizationArgsService.savedMemento = {
@@ -273,12 +276,14 @@ describe('State Interaction component', () => {
 
     spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
       return (
-        {
-          componentInstance: {},
-          result: Promise.reject('reject')
+        { componentInstance: {
+          showMarkAllAudioAsNeedingUpdateModalIfRequired: mockEventEmitter
+        },
+        result: Promise.reject('reject')
         }
       ) as NgbModalRef;
     });
+    spyOn(stateNextContentIdIndexService, 'restoreFromMemento').and.stub();
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
@@ -287,12 +292,20 @@ describe('State Interaction component', () => {
     tick();
     mockEventEmitter.emit();
 
+    expect(stateNextContentIdIndexService.restoreFromMemento)
+      .toHaveBeenCalled();
+
     component.interactionIsDisabled = true;
     tick();
     component.openInteractionCustomizerModal();
+
+    expect(stateNextContentIdIndexService.restoreFromMemento)
+      .toHaveBeenCalledTimes(1);
   }));
 
   it('should save interaction when user click save', fakeAsync(() => {
+    stateNextContentIdIndexService.displayed = 2;
+    stateNextContentIdIndexService.savedMemento = 1;
     stateInteractionIdService.displayed = 'EndExploration';
     stateInteractionIdService.savedMemento = 'InteractiveMap';
     component.DEFAULT_TERMINAL_STATE_CONTENT = 'HTML Content';
@@ -317,18 +330,22 @@ describe('State Interaction component', () => {
       }
     };
 
+    const mockEventEmitter = new EventEmitter();
     mockNgbModal.modal = 'add_interaction';
     spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
       return (
-        {
-          componentInstance: {},
-          result: Promise.resolve('success')
+        { componentInstance: {
+          showMarkAllAudioAsNeedingUpdateModalIfRequired: mockEventEmitter
+        },
+        result: Promise.resolve('success')
         }
       ) as NgbModalRef;
     });
 
     spyOn(interactionDetailsCacheService, 'set').and.stub();
+    spyOn(stateNextContentIdIndexService, 'saveDisplayedValue').and.stub();
     spyOn(stateContentService, 'saveDisplayedValue').and.stub();
+    spyOn(stateNextContentIdIndexService, 'restoreFromMemento').and.stub();
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();

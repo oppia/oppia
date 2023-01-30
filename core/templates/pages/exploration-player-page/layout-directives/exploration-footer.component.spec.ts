@@ -41,6 +41,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
@@ -116,6 +117,7 @@ describe('ExplorationFooterComponent', () => {
     EditableExplorationBackendApiService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let userService: UserService;
   let urlInterpolationService: UrlInterpolationService;
@@ -197,6 +199,8 @@ describe('ExplorationFooterComponent', () => {
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    writtenTranslationsObjectFactory = TestBed.inject(
+      WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
     userService = TestBed.inject(UserService);
@@ -332,6 +336,7 @@ describe('ExplorationFooterComponent', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
 
     component.ngOnInit();
@@ -441,7 +446,7 @@ describe('ExplorationFooterComponent', () => {
     const stateCard = new StateCard(
       'End', '<p>Testing</p>', null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, 'content', null
+      [], null, null, 'content', null
     );
 
     const endState = {
@@ -452,6 +457,11 @@ describe('ExplorationFooterComponent', () => {
         }
       },
       solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {}
+        }
+      },
       interaction: {
         solution: null,
         confirmed_unclassified_answers: [],
@@ -466,6 +476,7 @@ describe('ExplorationFooterComponent', () => {
         default_outcome: null
       },
       param_changes: [],
+      next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: null,
       content: {
@@ -519,7 +530,7 @@ describe('ExplorationFooterComponent', () => {
       const stateCard = new StateCard(
         'End', '<p>Testing</p>', null, new Interaction(
           [], [], null, null, [], 'EndExploration', null),
-        [], null, 'content', null
+        [], null, null, 'content', null
       );
 
       const endState = {
@@ -530,6 +541,11 @@ describe('ExplorationFooterComponent', () => {
           }
         },
         solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {}
+          }
+        },
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -544,6 +560,7 @@ describe('ExplorationFooterComponent', () => {
           default_outcome: null
         },
         param_changes: [],
+        next_content_id_index: 0,
         card_is_checkpoint: false,
         linked_skill_id: null,
         content: {
@@ -621,7 +638,6 @@ describe('ExplorationFooterComponent', () => {
 
     let sampleExpResponse: FetchExplorationBackendResponse = {
       exploration_id: '0',
-      displayable_language_codes: [],
       is_logged_in: true,
       session_id: 'KERH',
       draft_change_list_id: 0,
@@ -630,7 +646,6 @@ describe('ExplorationFooterComponent', () => {
         param_changes: [],
         param_specs: null,
         title: 'Exploration',
-        next_content_id_index: 5,
         language_code: 'en',
         correctness_feedback_enabled: true,
         objective: 'To learn',
@@ -647,6 +662,15 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
             interaction: {
               solution: null,
               confirmed_unclassified_answers: [],
@@ -711,6 +735,7 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             param_changes: [],
+            next_content_id_index: 3,
             card_is_checkpoint: true,
             linked_skill_id: null,
             content: {
@@ -726,6 +751,11 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                content: {}
+              }
+            },
             interaction: {
               solution: null,
               confirmed_unclassified_answers: [],
@@ -740,6 +770,7 @@ describe('ExplorationFooterComponent', () => {
               default_outcome: null
             },
             param_changes: [],
+            next_content_id_index: 0,
             card_is_checkpoint: false,
             linked_skill_id: null,
             content: {
@@ -759,6 +790,15 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             solicit_answer_details: false,
+            written_translations: {
+              translations_mapping: {
+                ca_placeholder_0: {},
+                feedback_1: {},
+                rule_input_2: {},
+                content: {},
+                default_outcome: {}
+              }
+            },
             interaction: {
               solution: null,
               confirmed_unclassified_answers: [],
@@ -823,6 +863,7 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             param_changes: [],
+            next_content_id_index: 3,
             card_is_checkpoint: true,
             linked_skill_id: null,
             content: {
@@ -877,7 +918,7 @@ describe('ExplorationFooterComponent', () => {
     let stateCard = new StateCard(
       'End', '<p>Testing</p>', null, new Interaction(
         [], [], null, null, [], 'EndExploration', null),
-      [], null, 'content', null
+      [], null, null, 'content', null
     );
 
     spyOn(explorationEngineService, 'getStateCardByName')
@@ -989,6 +1030,7 @@ describe('ExplorationFooterComponent', () => {
       'State A', '<p>Content</p>', '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(explorationEngineService, 'getStateFromStateName')
@@ -1028,6 +1070,7 @@ describe('ExplorationFooterComponent', () => {
             solution: null
           },
           linked_skill_id: null,
+          next_content_id_index: 0,
           param_changes: [],
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -1037,6 +1080,12 @@ describe('ExplorationFooterComponent', () => {
           },
           solicit_answer_details: false,
           card_is_checkpoint: true,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          }
         }
 
       ));
@@ -1066,12 +1115,10 @@ describe('ExplorationFooterComponent', () => {
   it('should fetch number of checkpoints correctly', fakeAsync(() => {
     let sampleDataResults: FetchExplorationBackendResponse = {
       exploration_id: 'expId',
-      displayable_language_codes: [],
       is_logged_in: true,
       session_id: 'KERH',
       exploration: {
         init_state_name: 'Introduction',
-        next_content_id_index: 5,
         param_changes: [],
         param_specs: null,
         title: 'Exploration',
@@ -1085,7 +1132,9 @@ describe('ExplorationFooterComponent', () => {
             recorded_voiceovers: null,
             solicit_answer_details: true,
             card_is_checkpoint: true,
+            written_translations: null,
             linked_skill_id: null,
+            next_content_id_index: null,
             content: {
               html: '',
               content_id: 'content'
@@ -1160,7 +1209,6 @@ describe('ExplorationFooterComponent', () => {
   it('should check if user has viewed lesson info once', fakeAsync(() => {
     let sampleDataResults: FetchExplorationBackendResponse = {
       exploration_id: 'expId',
-      displayable_language_codes: [],
       is_logged_in: true,
       session_id: 'KERH',
       exploration: {
@@ -1168,7 +1216,6 @@ describe('ExplorationFooterComponent', () => {
         param_changes: [],
         param_specs: null,
         title: 'Exploration',
-        next_content_id_index: 5,
         language_code: 'en',
         correctness_feedback_enabled: true,
         objective: 'To learn',
@@ -1179,7 +1226,9 @@ describe('ExplorationFooterComponent', () => {
             recorded_voiceovers: null,
             solicit_answer_details: true,
             card_is_checkpoint: true,
+            written_translations: null,
             linked_skill_id: null,
+            next_content_id_index: null,
             content: {
               html: '',
               content_id: 'content'

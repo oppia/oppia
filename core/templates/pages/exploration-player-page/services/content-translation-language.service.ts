@@ -20,6 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { ContentTranslationManagerService } from
+  'pages/exploration-player-page/services/content-translation-manager.service';
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -33,6 +35,7 @@ import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from 'pages/exploration-playe
 export class ContentTranslationLanguageService {
   constructor(
     private languageUtilService: LanguageUtilService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
     private urlService: UrlService
   ) {}
 
@@ -111,6 +114,11 @@ export class ContentTranslationLanguageService {
       allContentLanguageCodesInExploration: string[],
       preferredContentLanguageCodes: string[],
       explorationLanguageCode: string): void {
+    // Original transcript needs to be set before initializing the rest of this
+    // service. This ensures that the transcript is restored correctly
+    // when selected language is the same as the exploration language.
+    this.contentTranslationManagerService.setOriginalTranscript(
+      explorationLanguageCode);
     this._init(
       allContentLanguageCodesInExploration, preferredContentLanguageCodes,
       explorationLanguageCode);
@@ -138,6 +146,8 @@ export class ContentTranslationLanguageService {
    */
   setCurrentContentLanguageCode(newLanguageCode: string): void {
     if (this.currentContentLanguageCode !== newLanguageCode) {
+      this.contentTranslationManagerService.displayTranslations(
+        newLanguageCode);
       this.currentContentLanguageCode = newLanguageCode;
     }
   }

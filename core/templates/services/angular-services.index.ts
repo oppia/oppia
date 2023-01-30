@@ -47,6 +47,7 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateNameService } from 'components/state-editor/state-editor-properties-services/state-name.service';
+import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import { StatePropertyService } from 'components/state-editor/state-editor-properties-services/state-property.service';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
@@ -380,7 +381,6 @@ import { NavigationService } from './navigation.service';
 import { OppiaRteParserService } from './oppia-rte-parser.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
-import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { LibraryPageBackendApiService } from 'pages/library-page/services/library-page-backend-api.service';
@@ -411,7 +411,6 @@ import { FaviconService } from './favicon.service';
 import { StalenessDetectionService } from './staleness-detection.service';
 import { ExplorationImprovementsService } from './exploration-improvements.service';
 import { PlaythroughIssuesService } from './playthrough-issues.service';
-import { EntityTranslationsService } from 'services/entity-translations.services';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
@@ -433,7 +432,6 @@ import { ExplorationSaveService } from 'pages/exploration-editor-page/services/e
 import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
 import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 import { CompareVersionsService } from 'pages/exploration-editor-page/history-tab/services/compare-versions.service';
-import { EntityTranslationBackendApiService } from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import { ContributionAndReviewStatsBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats-backend-api.service';
 import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
@@ -595,7 +593,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
   ['ExplorationStatesService', ExplorationStatesService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
-  ['EntityTranslationsService', EntityTranslationsService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationTagsService', ExplorationTagsService],
@@ -813,6 +810,7 @@ export const angularServices: [string, Type<{}>][] = [
     StateInteractionStatsBackendApiService],
   ['StateInteractionStatsService', StateInteractionStatsService],
   ['StateNameService', StateNameService],
+  ['StateNextContentIdIndexService', StateNextContentIdIndexService],
   ['StateObjectFactory', StateObjectFactory],
   ['StateParamChangesService', StateParamChangesService],
   ['StatePropertyService', StatePropertyService],
@@ -914,9 +912,6 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationAutomaticTextToSpeechService],
   ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService],
   ['CompareVersionsService', CompareVersionsService],
-  ['EntityTranslationBackendApiService', EntityTranslationBackendApiService],
-  ['ExplorationNextContentIdIndexService',
-    ExplorationNextContentIdIndexService],
   ['EntityCreationService', EntityCreationService],
   ['ClassroomAdminDataService', ClassroomAdminDataService],
   ['VoiceoverRecordingService', VoiceoverRecordingService],

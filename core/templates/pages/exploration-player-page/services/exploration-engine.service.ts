@@ -31,7 +31,6 @@ import { ExpressionInterpolationService } from 'expressions/expression-interpola
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
-import { EntityTranslationsService } from 'services/entity-translations.services';
 import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -39,7 +38,6 @@ import { AnswerClassificationService, InteractionRulesService } from './answer-c
 import { AudioPreloaderService } from './audio-preloader.service';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
 import { ContentTranslationLanguageService } from './content-translation-language.service';
-import { ContentTranslationManagerService } from './content-translation-manager.service';
 import { ImagePreloaderService } from './image-preloader.service';
 import { ExplorationParams, LearnerParamsService } from './learner-params.service';
 import { PlayerTranscriptService } from './player-transcript.service';
@@ -80,8 +78,6 @@ export class ExplorationEngineService {
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
     private contextService: ContextService,
-    private contentTranslationManagerService: ContentTranslationManagerService,
-    private entityTranslationsService: EntityTranslationsService,
     private explorationFeaturesBackendApiService:
       ExplorationFeaturesBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
@@ -256,6 +252,7 @@ export class ExplorationEngineService {
     let initialCard = StateCard.createNewCard(
       this.currentStateName, questionHtml, interactionHtml,
       interaction, initialState.recordedVoiceovers,
+      initialState.writtenTranslations,
       initialState.content.contentId, this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
   }
@@ -334,7 +331,6 @@ export class ExplorationEngineService {
       preferredAudioLanguage: string | null,
       autoTtsEnabled: boolean,
       preferredContentLanguageCodes: string[],
-      displayableLanguageCodes: string[],
       successCallback: (stateCard: StateCard, label: string) => void
   ): void {
     this.exploration = this.explorationObjectFactory.createFromBackendDict(
@@ -370,14 +366,8 @@ export class ExplorationEngineService {
       this.checkAlwaysAskLearnersForAnswerDetails();
       this._loadInitialState(successCallback);
     }
-
-    this.entityTranslationsService.init(
-      this._explorationId, 'exploration', this.version);
-    this.contentTranslationManagerService.setOriginalTranscript(
-      this.exploration.getLanguageCode());
-
     this.contentTranslationLanguageService.init(
-      displayableLanguageCodes,
+      this.exploration.getDisplayableWrittenTranslationLanguageCodes(),
       preferredContentLanguageCodes,
       this.exploration.getLanguageCode()
     );
@@ -560,6 +550,7 @@ export class ExplorationEngineService {
       this.nextStateName, questionHtml, nextInteractionHtml,
       this.exploration.getInteraction(this.nextStateName),
       this.exploration.getState(this.nextStateName).recordedVoiceovers,
+      this.exploration.getState(this.nextStateName).writtenTranslations,
       this.exploration.getState(this.nextStateName).content.contentId,
       this.audioTranslationLanguageService);
 
@@ -595,6 +586,8 @@ export class ExplorationEngineService {
         nextInteractionIfStuckHtml,
         this.exploration.getInteraction(this.nextStateIfStuckName),
         this.exploration.getState(this.nextStateIfStuckName).recordedVoiceovers,
+        this.exploration.getState(
+          this.nextStateIfStuckName).writtenTranslations,
         this.exploration.getState(this.nextStateIfStuckName).content.contentId,
         this.audioTranslationLanguageService);
     }
@@ -640,6 +633,7 @@ export class ExplorationEngineService {
       stateName, contentHtml, interactionHtml,
       this.exploration.getInteraction(stateName),
       this.exploration.getState(stateName).recordedVoiceovers,
+      this.exploration.getState(stateName).writtenTranslations,
       this.exploration.getState(stateName).content.contentId,
       this.audioTranslationLanguageService);
   }

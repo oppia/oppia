@@ -1038,10 +1038,6 @@ URLS = [
             .CategorizedAndUntriagedSkillsDataHandler),
 
     get_redirect_route(
-        r'/entity_translations_handler/<entity_type>/<entity_id>/'
-        r'<entity_version>/<language_code>',
-        reader.EntityTranslationHandler),
-    get_redirect_route(
         r'/create_learner_group_handler',
         learner_group.CreateLearnerGroupHandler),
     get_redirect_route(

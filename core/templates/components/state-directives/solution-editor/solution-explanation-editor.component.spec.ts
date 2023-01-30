@@ -55,6 +55,7 @@ describe('Solution explanation editor', () => {
 
   let contextService: ContextService;
   let editabilityService: EditabilityService;
+  let solutionObjectFactory: SolutionObjectFactory;
   let stateSolutionService: StateSolutionService;
   let externalSaveService: ExternalSaveService;
   let externalSaveServiceEmitter = new EventEmitter<void>();
@@ -84,6 +85,7 @@ describe('Solution explanation editor', () => {
 
     contextService = TestBed.inject(ContextService);
     editabilityService = TestBed.inject(EditabilityService);
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateSolutionService = TestBed.inject(StateSolutionService);
     externalSaveService = TestBed.inject(ExternalSaveService);
 
@@ -145,12 +147,16 @@ describe('Solution explanation editor', () => {
   });
 
   it('should save the explanation', fakeAsync(() => {
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
+      .and.stub();
     spyOn(component.saveSolution, 'emit').and.stub();
 
     component.explanationEditorIsOpen = true;
     externalSaveServiceEmitter.emit();
     tick();
 
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalled();
     expect(component.saveSolution.emit).toHaveBeenCalled();
     expect(component.explanationEditorIsOpen).toBe(false);
   }));
@@ -167,5 +173,22 @@ describe('Solution explanation editor', () => {
     expect(() => {
       component.saveThisExplanation();
     }).toThrowError('Solution is undefined');
+  });
+
+  it('should throw error if solution content id is invalid', () => {
+    stateSolutionService.displayed = solutionObjectFactory.createNew(
+      true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
+    );
+    stateSolutionService.savedMemento = solutionObjectFactory.createNew(
+      true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
+    );
+
+    stateSolutionService.displayed.explanation.html = '<p> Hint Index 0 </p>';
+    stateSolutionService.savedMemento.explanation.html = 'invalid_id';
+    stateSolutionService.displayed.explanation.contentId = null;
+
+    expect(() => {
+      component.saveThisExplanation();
+    }).toThrowError('Solution content id is undefined');
   });
 });

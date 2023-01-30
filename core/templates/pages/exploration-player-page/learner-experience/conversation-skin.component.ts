@@ -1553,7 +1553,7 @@ export class ConversationSkinComponent {
       this._addNewCard(
         StateCard.createNewCard(
           null, this.conceptCard.getExplanation().html, null, null, null,
-          null, this.audioTranslationLanguageService));
+          null, null, this.audioTranslationLanguageService));
       return;
     }
     /* This is for the following situation:

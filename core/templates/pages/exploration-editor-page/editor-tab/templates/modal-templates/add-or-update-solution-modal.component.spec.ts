@@ -22,14 +22,15 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
+import { ShortAnswerResponse, Solution, SolutionBackendDict, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { AddOrUpdateSolutionModalComponent } from './add-or-update-solution-modal.component';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 class MockActiveModal {
   close(): void {
@@ -51,7 +52,6 @@ describe('Add Or Update Solution Modal Component', () => {
   let solutionObjectFactory: SolutionObjectFactory;
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
-  let generateContentIdService: GenerateContentIdService;
 
   let answerEditorHtml: Solution;
   let mockInteractionRule: InteractionRulesService;
@@ -87,8 +87,6 @@ describe('Add Or Update Solution Modal Component', () => {
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateSolutionService = TestBed.inject(StateSolutionService);
-    generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => {});
   });
 
   describe('when solution is valid', () => {
@@ -100,9 +98,51 @@ describe('Add Or Update Solution Modal Component', () => {
       spyOn(explorationHtmlFormatterService, 'getInteractionHtml')
         .and.returnValue('<p>Interaction Html</p>');
 
-      answerEditorHtml = new Solution(
-        explorationHtmlFormatterService, true, 'solution',
-        SubtitledHtml.createDefault('Explanation html', 'cont_1'));
+      answerEditorHtml = {
+        ehfs: explorationHtmlFormatterService,
+        answerIsExclusive: true,
+        correctAnswer: 'solution',
+        explanation: SubtitledHtml.createDefault(
+          'Explanation html', 'cont_1'),
+
+        toBackendDict(): SolutionBackendDict {
+          return {
+            answer_is_exclusive: this.answerIsExclusive,
+            correct_answer: this.correctAnswer,
+            explanation: this.explanation.toBackendDict()
+          };
+        },
+
+        getSummary(interactionId: string): string {
+          return '';
+        },
+
+        setCorrectAnswer(correctAnswer: InteractionAnswer): void {
+          return;
+        },
+
+        setExplanation(explanation: SubtitledHtml): void {
+          return;
+        },
+
+        getOppiaShortAnswerResponseHtml(interaction: Interaction):
+          ShortAnswerResponse {
+          if (interaction.id === null) {
+            throw new Error('Interaction id is possibly null.');
+          }
+          return {
+            prefix: (this.answerIsExclusive ? 'The only' : 'One'),
+            answer: this.ehfs.getShortAnswerHtml(
+              this.correctAnswer, interaction.id,
+              interaction.customizationArgs
+            )
+          };
+        },
+
+        getOppiaSolutionExplanationResponseHtml(): string {
+          return '';
+        }
+      };
 
       stateSolutionService.init('', answerEditorHtml);
       stateInteractionIdService.init('', 'TextInput');
@@ -115,6 +155,12 @@ describe('Add Or Update Solution Modal Component', () => {
 
       expect(component.correctAnswerEditorHtml).toEqual(
         '<p>Interaction Html</p>');
+      expect(component.EMPTY_SOLUTION_DATA).toEqual({
+        answerIsExclusive: false,
+        correctAnswer: undefined,
+        explanationHtml: '',
+        explanationContentId: 'solution'
+      });
       expect(component.data).toEqual({
         answerIsExclusive: true,
         correctAnswer: undefined,

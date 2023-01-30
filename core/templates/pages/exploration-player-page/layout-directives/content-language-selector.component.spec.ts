@@ -32,9 +32,11 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
@@ -83,6 +85,8 @@ describe('Content language selector component', () => {
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let windowRef: MockWindowRef;
   let playerTranscriptService: PlayerTranscriptService;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  let imagePreloaderService: ImagePreloaderService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let interactionObjectFactory: InteractionObjectFactory;
 
@@ -110,15 +114,16 @@ describe('Content language selector component', () => {
       }]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [
-          SwitchContentLanguageRefreshRequiredModalComponent
-        ],
+        entryComponents: [SwitchContentLanguageRefreshRequiredModalComponent],
       }
     }).compileComponents();
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
+    writtenTranslationsObjectFactory = TestBed.get(
+      WrittenTranslationsObjectFactory);
+    imagePreloaderService = TestBed.get(ImagePreloaderService);
     audioTranslationLanguageService = TestBed.get(
       AudioTranslationLanguageService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
@@ -211,14 +216,16 @@ describe('Content language selector component', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
+    spyOn(imagePreloaderService, 'restartImagePreloader');
 
-    component.selectedLanguageCode = 'en';
     component.onSelectLanguage('fr');
 
     expect(setCurrentContentLanguageCodeSpy).toHaveBeenCalledWith('fr');
     expect(component.selectedLanguageCode).toBe('fr');
+    expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
   });
 
   it('should correctly open the refresh required modal when refresh is ' +
@@ -282,6 +289,7 @@ describe('Content language selector component', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     card.addInputResponsePair({
       learnerInput: '',
@@ -289,8 +297,10 @@ describe('Content language selector component', () => {
       isHint: false
     });
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
+    spyOn(imagePreloaderService, 'restartImagePreloader');
 
     component.onSelectLanguage('fr');
     expect(setCurrentContentLanguageCodeSpy).not.toHaveBeenCalled();
+    expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
   });
 });

@@ -2185,19 +2185,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_raises_error_if_none_destination_is_provided_for_checkpoint(
         self
     ) -> None:
-        state = state_domain.State.create_default_state(
-            'state_1', 'content_0', 'default_outcome_1')
+        state = state_domain.State.create_default_state('state_1')
         state_answer_group: List[state_domain.AnswerGroup] = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     None, None, state_domain.SubtitledHtml(
-                        'feedback_2', '<p>state outcome html</p>'),
+                        'feedback_1', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_3',
+                                'contentId': 'rule_input_1',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
                 ],
@@ -2219,13 +2218,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'destination', None, state_domain.SubtitledHtml(
-                        'feedback_4', '<p>state outcome html</p>'),
+                        'feedback_1', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_5',
+                                'contentId': 'rule_input_1',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
                 ],
@@ -2388,13 +2387,7 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value:
-            content_id: ca_placeholder_2
-            unicode_str: ''
-        rows:
-          value: 1
+      customization_args: {}
       default_outcome:
         dest: New state
         feedback:
@@ -2405,7 +2398,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: TextInput
+      id: null
       solution: null
     linked_skill_id: null
     next_content_id_index: 0
@@ -2414,7 +2407,6 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
-        ca_placeholder_2: {}
     solicit_answer_details: false
     card_is_checkpoint: false
     written_translations:

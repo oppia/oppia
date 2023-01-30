@@ -107,8 +107,7 @@ describe('Preview Tab Component', () => {
       auto_tts_enabled: false,
       correctness_feedback_enabled: true,
       edits_allowed: true
-    },
-    next_content_id_index: 5,
+    }
   };
   let parameters = [{
     paramName: 'paramName1',
@@ -137,8 +136,7 @@ describe('Preview Tab Component', () => {
                 paramChangeObjectFactory
                   .createEmpty(changeObjectName).toBackendDict()
               ],
-              states: [stateObjectFactory.createDefaultState(
-                stateName, 'content_0', 'default_outcome_1')],
+              states: [stateObjectFactory.createDefaultState(stateName)],
               init_state_name: stateName
             })
           }
@@ -323,7 +321,7 @@ describe('Preview Tab Component', () => {
     explorationInitStateNameService.savedMemento = 'state';
     spyOn(numberAttemptsService, 'reset').and.stub();
     spyOn(explorationEngineService, 'init').and.callFake(
-      (value, value1, value2, value3, value4, value5, callback) => {
+      (value, value1, value2, value3, value4, callback) => {
         // This throws "Type 'null' is not assignable to type 'State'."
         // We need to suppress this error because of the need to test
         // validations.

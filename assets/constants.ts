@@ -6025,12 +6025,22 @@ export default {
       "hints": [],
       "solution": null
     },
+    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
-      "voiceovers_mapping": {}
+      "voiceovers_mapping": {
+        "content": {},
+        "default_outcome": {}
+      }
     },
     "solicit_answer_details": false,
-    "card_is_checkpoint": false
+    "card_is_checkpoint": false,
+    "written_translations": {
+      "translations_mapping": {
+        "content": {},
+        "default_outcome": {}
+      }
+    }
   },
 
   // Data required for Firebase authentication.
@@ -6922,7 +6932,7 @@ export default {
     "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
     "edits_allowed"
   ],
-  "NON_METADATA_PROPERTIES": ["id", "states", "next_content_id_index"],
+  "NON_METADATA_PROPERTIES": ["id", "states"],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313
 } as const;
