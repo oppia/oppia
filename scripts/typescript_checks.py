@@ -172,8 +172,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/services/router.service.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/audio-translation-bar/audio-translation-bar.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/audio-translation-bar/audio-translation-bar.component.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.ts',
     'core/templates/pages/exploration-player-page/layout-directives/exploration-footer.component.spec.ts',

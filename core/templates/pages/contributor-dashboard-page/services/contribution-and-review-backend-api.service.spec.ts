@@ -307,16 +307,9 @@ describe('Contribution and review backend API service', () => {
         id: 'TextInput'
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
     };
     const payload = {
       skill_difficulty: 'easy',
@@ -332,6 +325,37 @@ describe('Contribution and review backend API service', () => {
     req.flush({});
     flushMicrotasks();
 
+    expect(successHandler).toHaveBeenCalled();
+    expect(failureHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fetch contributor certificate', fakeAsync(() => {
+    spyOn(carbas, 'downloadContributorCertificateAsync').and.callThrough();
+    const successHandler = jasmine.createSpy('success');
+    const failureHandler = jasmine.createSpy('failure');
+    const url = (
+      '/contributorcertificate/user/translate_content?' +
+      'from_date=2022-01-01&to_date=2022-01-02&language=hi'
+    );
+    const response = {
+      from_date: '1 Nov 2022',
+      to_date: '1 Dec 2022',
+      contribution_hours: 1.0,
+      team_lead: 'Test User',
+      language: 'Hindi'
+    };
+
+    carbas.downloadContributorCertificateAsync(
+      'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02'
+    ).then(successHandler, failureHandler);
+    const req = http.expectOne(url);
+    expect(req.request.method).toEqual('GET');
+    req.flush(response);
+    flushMicrotasks();
+
+    expect(carbas.downloadContributorCertificateAsync)
+      .toHaveBeenCalledWith(
+        'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02');
     expect(successHandler).toHaveBeenCalled();
     expect(failureHandler).not.toHaveBeenCalled();
   }));

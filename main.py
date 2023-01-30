@@ -304,6 +304,10 @@ URLS = [
         r'%s/<username>' % feconf.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL,
         contributor_dashboard.ContributorAllStatsSummariesHandler),
     get_redirect_route(
+        r'%s/<username>/<suggestion_type>' % (
+            feconf.CONTRIBUTOR_CERTIFICATE_URL),
+        contributor_dashboard.ContributorCertificateHandler),
+    get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
     get_redirect_route(
@@ -1033,6 +1037,10 @@ URLS = [
         topics_and_skills_dashboard
             .CategorizedAndUntriagedSkillsDataHandler),
 
+    get_redirect_route(
+        r'/entity_translations_handler/<entity_type>/<entity_id>/'
+        r'<entity_version>/<language_code>',
+        reader.EntityTranslationHandler),
     get_redirect_route(
         r'/create_learner_group_handler',
         learner_group.CreateLearnerGroupHandler),
