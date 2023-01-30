@@ -31,6 +31,7 @@ from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.tests import test_utils
 
 from typing import Callable, Dict, List
@@ -1008,9 +1009,12 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.url = feconf.MERGE_SKILLS_URL
 
         self.question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question(
             self.question_id, self.admin_id,
-            self._create_valid_question_data('ABC'), [self.linked_skill_id])
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.linked_skill_id],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             self.admin_id, self.question_id, self.linked_skill_id, 0.5)
 

@@ -248,6 +248,12 @@ class ExplorationHandler(
 
         exploration_data = exp_services.get_user_exploration_data(
             self.user_id, exploration_id)
+        # Here we use MyPy ignore because here we are defining a new
+        # 'exploration_is_linked_to_story' key on a well defined TypedDict
+        # dictionary.
+        exploration_data['exploration_is_linked_to_story'] = (  # type: ignore[misc]
+            exp_services.get_story_id_linked_to_exploration(
+                exploration_id) is not None)
 
         self.values.update(exploration_data)
         self.render_json(self.values)
