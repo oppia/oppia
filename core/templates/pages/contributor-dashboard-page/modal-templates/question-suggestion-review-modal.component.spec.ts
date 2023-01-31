@@ -399,7 +399,7 @@ describe('Question Suggestion Review Modal component', () => {
         };
       }
 
-      let questionDict = cloneDeep(
+      const questionDict = cloneDeep(
         component.suggestionIdToContribution[suggestionId]
           .suggestion.change.question_dict
       );
@@ -491,9 +491,9 @@ describe('Question Suggestion Review Modal component', () => {
       const newContentHtml = 'new html';
       const newSkillDifficulty = 1;
 
-      let suggestionChange = (
+      const suggestionChange = (
         component.suggestionIdToContribution[suggestionId].suggestion.change);
-      let newQuestionDict = cloneDeep(suggestionChange.question_dict);
+      const newQuestionDict = cloneDeep(suggestionChange.question_dict);
       newQuestionDict.question_state_data.content.html = newContentHtml;
 
       expect(
