@@ -1435,11 +1435,11 @@ class ExpImagesAuditJobTests(
             self.VALID_EXP_ID, self.ALBERT_EMAIL, end_state_name='End')
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID)
-        fs.commit(
-            'image/invalidsvg.svg',
-            '<svg><h4ck-tag><g random-attr="invalid"></g></h4ck-tag></svg>',
-            mimetype='image/svg+xml'
+        svg_image = (
+            '<svg><h4ck-tag><g random-attr="invalid"></g></h4ck-tag></svg>'
+            .encode()
         )
+        fs.commit('image/invalidsvg.svg', svg_image, mimetype='image/svg+xml')
         exp_services.update_exploration(
             self.ALBERT_EMAIL, self.VALID_EXP_ID, [
                 exp_domain.ExplorationChange({
