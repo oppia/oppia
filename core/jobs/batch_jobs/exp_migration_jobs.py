@@ -26,6 +26,9 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
+from core.domain import html_cleaner
+from core.domain import image_validation_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -890,3 +893,123 @@ class ExpSnapshotsMigrationJob(base_jobs.JobBase):
         )
 
         return migrated_exp_job_run_results
+
+
+class AuditExplorationImagesJob(base_jobs.JobBase):
+    """Job that audits images in Exploration models."""
+
+    @staticmethod
+    def _validate_images_in_exploration(
+        exp_model: exp_models.ExplorationModel
+    ) -> result.Result[
+        Tuple[str, exp_domain.Exploration],
+        Tuple[str, Exception]
+    ]:
+        """Validates images in the exploration model.
+
+        Args:
+            exp_model: ExplorationModel. The exploration model to migrate.
+
+        Returns:
+            Result((str, Exploration), (str, Exception)). Result containing
+            tuple that consists of exploration ID and either Exploration object
+            or Exception. Exploration object is returned when the validation
+            is successful and Exception is returned otherwise.
+        """
+        try:
+            exploration = exp_fetchers.get_exploration_from_model(exp_model)
+            images_filenames = (
+                exp_services.get_image_filenames_from_exploration(exploration)
+            )
+            fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration.id,
+            )
+            for filename in images_filenames:
+                filepath = 'image/%s' % filename
+                if not fs.isfile(filepath):
+                    raise Exception(
+                        'The file %s is not present in GCS.' % filename)
+                file_content = fs.get(filepath)
+                image_validation_services.validate_image_and_filename(
+                    file_content,
+                    filename,
+                    feconf.ENTITY_TYPE_EXPLORATION
+                )
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((exp_model.id, e))
+
+        return result.Ok((exp_model.id, exploration))
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from auditing exploration images.
+
+        Returns:
+            PCollection. A PCollection of results from the exploration
+            audit.
+        """
+
+        all_exploration_models = (
+            self.pipeline
+            | 'Get all non-deleted exploration models' >> (
+                ndb_io.GetModels(
+                    exp_models.ExplorationModel.get_all(
+                        include_deleted=False)))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda exp_model: exp_model.id)
+            # TODO(#15871): This filter should be removed after the explorations
+            # are fixed and it is possible to migrate them.
+            | 'Remove broken exploration' >> beam.Filter(
+                lambda id_and_exp: id_and_exp[0] not in (
+                    'umPkwp0L1M0-', '670bU6d9JGBh'))
+        )
+
+        audited_exp_results = (
+            all_exploration_models
+            | 'Transform and audit model' >> beam.Map( # pylint: disable=no-value-for-parameter
+                lambda exp_model: (
+                    self._validate_images_in_exploration(exp_model[1])
+                )
+            )
+        )
+
+        audited_exp = (
+            audited_exp_results
+            | 'Filter oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+
+        audited_exp_job_run_results = (
+            audited_exp_results
+            | 'Generate results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults('EXP PROCESSED'))
+        )
+
+        exp_objects_list = (
+            {
+                'exp_model': all_exploration_models,
+                'exploration': audited_exp,
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+        )
+
+        exp_objects_list_job_run_results = (
+            exp_objects_list
+            | 'Transform exp objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXP AUDITED'))
+        )
+
+        return (
+            (
+                audited_exp_job_run_results,
+                exp_objects_list_job_run_results
+            )
+            | beam.Flatten()
+        )

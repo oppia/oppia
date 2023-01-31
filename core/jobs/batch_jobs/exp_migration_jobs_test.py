@@ -18,12 +18,16 @@
 
 from __future__ import annotations
 
+import os
+
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -1364,3 +1368,142 @@ class ExpSnapshotsMigrationJobTests(
                         )
                     )
                 ])
+
+
+class ExpImagesAuditJobTests(
+    job_test_utils.JobTestBase,
+    test_utils.GenericTestBase
+):
+    JOB_CLASS = exp_migration_jobs.AuditExplorationImagesJob
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def test_auditing_exploration_with_no_images(self) -> None:
+        self.save_new_valid_exploration(
+            self.VALID_EXP_ID, self.ALBERT_EMAIL, end_state_name='End')
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='EXP PROCESSED SUCCESS: 1',
+                stderr=''
+            ),
+            job_run_result.JobRunResult(
+                stdout='EXP AUDITED SUCCESS: 1',
+                stderr=''
+            )
+        ])
+
+    def test_auditing_exploration_with_missing_image(self) -> None:
+        self.save_new_valid_exploration(
+            self.VALID_EXP_ID, self.ALBERT_EMAIL, end_state_name='End')
+        exp_services.update_exploration(
+            self.ALBERT_EMAIL, self.VALID_EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'old_value': state_domain.SubtitledHtml(
+                        'content', '').to_dict(),
+                    'new_value': state_domain.SubtitledHtml(
+                        'content',
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&quot;image-not-in-storage.svg&quot;" '
+                        'caption-with-value="&quot;'
+                        '&quot;" alt-with-value="&quot;Image&quot;">'
+                        '</oppia-noninteractive-image>').to_dict()
+                })], 'Add content')
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='',
+                stderr=(
+                    'EXP PROCESSED ERROR: "(\'exp_id0\', '
+                    'Exception(\'The file image-not-in-storage.svg is not '
+                    'present in GCS.\'))": 1'
+                )
+            ),
+            job_run_result.JobRunResult(
+                stdout='EXP AUDITED SUCCESS: 1',
+                stderr=''
+            )
+        ])
+
+    def test_auditing_exploration_with_invalid_image(self) -> None:
+        self.save_new_valid_exploration(
+            self.VALID_EXP_ID, self.ALBERT_EMAIL, end_state_name='End')
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID)
+        fs.commit(
+            'image/invalidsvg.svg',
+            '<svg><h4ck-tag><g random-attr="invalid"></g></h4ck-tag></svg>',
+            mimetype='image/svg+xml'
+        )
+        exp_services.update_exploration(
+            self.ALBERT_EMAIL, self.VALID_EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'old_value': state_domain.SubtitledHtml(
+                        'content', '').to_dict(),
+                    'new_value': state_domain.SubtitledHtml(
+                        'content',
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&quot;invalidsvg.svg&quot;" '
+                        'caption-with-value="&quot;'
+                        '&quot;" alt-with-value="&quot;Image&quot;">'
+                        '</oppia-noninteractive-image>').to_dict()
+                })], 'Add content')
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='',
+                stderr=(
+                    'EXP PROCESSED ERROR: "(\'exp_id0\', ValidationError("'
+                    'Unsupported tags/attributes found in the SVG:\\ntags: '
+                    '[\'h4ck-tag\']\\nattributes: [\'g:random-attr\']"))": 1'
+                )
+            ),
+            job_run_result.JobRunResult(
+                stdout='EXP AUDITED SUCCESS: 1',
+                stderr=''
+            )
+        ])
+
+    def test_auditing_exploration_with_valid_image(self) -> None:
+        self.save_new_valid_exploration(
+            self.VALID_EXP_ID, self.ALBERT_EMAIL, end_state_name='End')
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID)
+        fs.commit('image/validsvg.svg', raw_image, mimetype='image/svg+xml')
+        exp_services.update_exploration(
+            self.ALBERT_EMAIL, self.VALID_EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'Introduction',
+                    'old_value': state_domain.SubtitledHtml(
+                        'content', '').to_dict(),
+                    'new_value': state_domain.SubtitledHtml(
+                        'content',
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&quot;validsvg.svg&quot;" '
+                        'caption-with-value="&quot;'
+                        '&quot;" alt-with-value="&quot;Image&quot;">'
+                        '</oppia-noninteractive-image>').to_dict()
+                })], 'Add content')
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='EXP PROCESSED SUCCESS: 1',
+                stderr=''
+            ),
+            job_run_result.JobRunResult(
+                stdout='EXP AUDITED SUCCESS: 1',
+                stderr=''
+            )
+        ])
