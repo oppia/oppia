@@ -31,9 +31,8 @@ describe('Question player state service', () => {
     TestBed.configureTestingModule({}).compileComponents();
     stateObject = TestBed.inject(StateObjectFactory);
     question = new Question(
-      questionId,
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
-      '', 7, [], [], 2);
+      questionId, stateObject.createDefaultState('state'), '', 7, [], []
+    );
   }));
 
   beforeEach(() => {

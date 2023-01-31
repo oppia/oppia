@@ -39,6 +39,7 @@ if MYPY:  # pragma: no cover
 AllowedDraftChangeListTypes = Union[
     state_domain.SubtitledHtmlDict,
     state_domain.CustomizationArgsDictType,
+    state_domain.WrittenTranslationsDict,
     state_domain.OutcomeDict,
     List[state_domain.HintDict],
     state_domain.SolutionDict,
@@ -191,24 +192,41 @@ class DraftUpgradeUtil:
                             subtitled_html_new_value_dicts[value_index] = (
                                 conversion_fn(value)
                             )
-            elif change.property_name == 'written_translations':
-                # Here we use MyPy ignore because the latest schema of state
-                # dict doesn't contains translations_mapping of
-                # written_translations property.
-                translations_mapping = change.new_value['translations_mapping'] # type: ignore[index]
-                assert isinstance(translations_mapping, dict)
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                # Here we use cast because this 'elif' condition forces change
+                # to have type EditExpStatePropertyWrittenTranslationsCmd.
+                edit_written_translations_dict_cmd = cast(
+                    exp_domain.EditExpStatePropertyWrittenTranslationsCmd,
+                    change
+                )
+                new_value = edit_written_translations_dict_cmd.new_value
                 for content_id, language_code_to_written_translation in (
-                        translations_mapping.items()):
+                        new_value['translations_mapping'].items()):
                     for language_code in (
                             language_code_to_written_translation.keys()):
-                        translation_dict = translations_mapping[
+                        translation_dict = new_value['translations_mapping'][
                             content_id][language_code]
                         if 'html' in translation_dict:
-                            translations_mapping[
-                                content_id][language_code]['html'] = (
-                                    conversion_fn(
-                                        translations_mapping[content_id][
-                                            language_code]['html'])
+                            # Here we use MyPy ignore because in _convert_*
+                            # functions, we allow less strict typing because
+                            # here we are working with previous versions of
+                            # the domain object and in previous versions of
+                            # the domain object there are some fields that
+                            # are discontinued in the latest domain object
+                            # and here 'html' field is discontinued. So,
+                            # while accessing this discontinued 'html' field
+                            # MyPy throws an error. Thus to avoid the error,
+                            # we used ignore here.
+                            new_value['translations_mapping'][
+                                content_id][language_code]['html'] = (  # type: ignore[misc]
+                                    # Here we use MyPy ignore because here we
+                                    # are accessing deprecated 'html' key which
+                                    # causes MyPy to throw an error. Thus, to
+                                    # avoid the error, we used ignore here.
+                                    conversion_fn(new_value[
+                                        'translations_mapping'][content_id][
+                                            language_code]['html'])  # type: ignore[misc]
                                 )
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
@@ -307,31 +325,6 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v54_dict_to_v55_dict(
-        cls, draft_change_list: List[exp_domain.ExplorationChange]
-    ) -> List[exp_domain.ExplorationChange]:
-        """Converts draft change list from state version 54 to 55. Version 55
-        changes content ids for content and removes written_translation property
-        form the state, converting draft to anew version won't be possible.
-
-        Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
-
-        Returns:
-            list(ExplorationChange). The converted draft_change_list.
-
-        Raises:
-            InvalidDraftConversionException. The conversion cannot be
-                completed.
-        """
-        for exp_change in draft_change_list:
-            if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.')
-        return draft_change_list
-
-    @classmethod
     def _convert_states_v53_dict_to_v54_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:
@@ -398,7 +391,7 @@ class DraftUpgradeUtil:
                 exp_change.new_value['html'] = html
 
             elif exp_change.property_name == (
-                exp_domain.DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS
+                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
             ):
                 # Ruling out the possibility of any other type for mypy
                 # type checking.
@@ -447,14 +440,8 @@ class DraftUpgradeUtil:
         """
         for exp_change in draft_change_list:
             if exp_change.cmd in (
-                (
-                    exp_domain.
-                    DEPRECATED_CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE
-                ),
-                (
-                    exp_domain.
-                    DEPRECATED_CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE
-                ),
+                exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
+                exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
                 exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
             ):
@@ -466,7 +453,7 @@ class DraftUpgradeUtil:
             if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 if (
                     exp_change.property_name ==
-                    exp_domain.DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX
                 ):
                     # If we change the next content ID index in the draft
                     # we rather remove it as in the 51 to 52 conversion
