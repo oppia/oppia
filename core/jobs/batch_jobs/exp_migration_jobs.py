@@ -27,7 +27,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
-from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
