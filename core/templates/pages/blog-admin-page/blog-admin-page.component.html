@@ -33,7 +33,12 @@
                 </select>
               </div>
             </div>
-            <button type="submit" class="btn btn-success" [disabled]="!formData.updateRole.isValid()" value="update role">Update Role</button>
+            <button type="submit"
+                    class="btn btn-success oppia-blog-admin-update-role-button"
+                    [disabled]="!formData.updateRole.isValid()"
+                    value="update role">
+              Update Role
+            </button>
           </form>
         </mat-card>
 
@@ -52,8 +57,10 @@
               </div>
             </div>
             <button type="submit"
-                    class="btn btn-success"
-                    [disabled]="!formData.removeEditorRole.isValid()" value="update role">Remove Blog Editor
+                    class="btn btn-success oppia-blog-admin-remove-blog-editor-button"
+                    [disabled]="!formData.removeEditorRole.isValid()"
+                    value="update role">
+              Remove Blog Editor
             </button>
           </form>
         </mat-card>
