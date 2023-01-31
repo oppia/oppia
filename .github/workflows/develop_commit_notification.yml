@@ -17,7 +17,7 @@ jobs:
           app_id: ${{ secrets.NOTIFICATIONS_TOKEN_GENERATOR_GH_APP_ID }}
           private_key: ${{ secrets.NOTIFICATIONS_TOKEN_GENERATOR_GH_APP_PRIVATE_KEY }}
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@87c5425cae5ba8b5bc7da27674076c78588babf3
+        uses: peter-evans/repository-dispatch@b62528385c34dbc9f38e5f4225ac829252d1ea92
         with:
           token: ${{ steps.generate_token.outputs.token }}
           repository: oppia/release-scripts
