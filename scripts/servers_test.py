@@ -631,8 +631,11 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_to_always_return(
             os, 'listdir', value=['VBOX-123']))
 
-        managed_web_browser = servers.create_managed_web_browser(123)
-        self.assertIsNone(managed_web_browser)
+        servers.create_managed_web_browser(123)
+        self.assertRaisesRegex(
+            Exception,
+            'Unable to identify the Operating System and therefore, unable to '
+            'launch the web browser.')
 
         self.assertEqual(len(popen_calls), 0)
 
@@ -657,8 +660,11 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_to_always_return(
             os, 'listdir', value=[]))
 
-        managed_web_browser = servers.create_managed_web_browser(123)
-        self.assertIsNone(managed_web_browser)
+        servers.create_managed_web_browser(123)
+        self.assertRaisesRegex(
+            Exception,
+            'Unable to identify the Operating System and therefore, unable to '
+            'launch the web browser.')
 
         self.assertEqual(len(popen_calls), 0)
 
