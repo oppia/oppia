@@ -526,16 +526,9 @@ describe('Contribution and review service', () => {
         id: 'TextInput'
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
     };
 
     const payload = {
@@ -572,8 +565,7 @@ describe('Contribution and review service', () => {
         .returnValue(Promise.resolve());
 
       cars.updateQuestionSuggestionAsync(
-        'pqr', 2, questionStateData,
-        imagesData, onSuccess, onFailure);
+        'pqr', 2, questionStateData, 10, imagesData, onSuccess, onFailure);
       tick();
 
       expect(carbas.updateQuestionSuggestionAsync)
@@ -588,8 +580,7 @@ describe('Contribution and review service', () => {
         .returnValue(Promise.reject());
 
       cars.updateQuestionSuggestionAsync(
-        'pqr', 2, questionStateData,
-        imagesData, onSuccess, onFailure);
+        'pqr', 2, questionStateData, 10, imagesData, onSuccess, onFailure);
       tick();
 
       expect(carbas.updateQuestionSuggestionAsync)
