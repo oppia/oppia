@@ -1949,7 +1949,7 @@ class Question(translation_domain.BaseTranslatableObject):
         if interaction.default_outcome.labelled_as_correct:
             at_least_one_correct_answer = True
 
-        if interaction.default_outcome.dest:
+        if interaction.default_outcome.dest is not None:
             dest_is_specified = True
 
         if interaction.default_outcome.dest_if_really_stuck is not None:
