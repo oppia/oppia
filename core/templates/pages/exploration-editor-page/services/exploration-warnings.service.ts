@@ -108,7 +108,9 @@ export class ExplorationWarningsService {
     private stateTopAnswersStatsService: StateTopAnswersStatsService,
     private parameterMetadataService: ParameterMetadataService,
     private computeGraphService: ComputeGraphService,
-  ) { }
+  ) {
+    this.stateWarnings = {};
+  }
 
   _warningsList: _verifyParametersResult[] = [];
   stateWarnings: Record<string, string[]> = {};
