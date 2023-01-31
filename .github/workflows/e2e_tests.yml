@@ -74,47 +74,6 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite:
-          - accessibility
-          - additionalEditorFeatures
-          - additionalEditorFeaturesModals
-          - additionalPlayerFeatures
-          - adminPage
-          - blogDashboard
-          - blog
-          - checkpointFeatures
-          - classroomPage
-          - classroomPageFileUploadFeatures
-          - collections
-          - contributorDashboard
-          - coreEditorAndPlayerFeatures
-          - creatorDashboard
-          - diagnosticTestPage
-          - embedding
-          - explorationFeedbackTab
-          - explorationImprovementsTab
-          - explorationHistoryTab
-          - explorationStatisticsTab
-          - explorationTranslationTab
-          - extensions
-          - featureGating
-          - fileUploadExtensions
-          - fileUploadFeatures
-          - learner
-          - learnerDashboard
-          - library
-          - navigation
-          - playVoiceovers
-          - preferences
-          - profileFeatures
-          - profileMenu
-          - publication
-          - skillEditor
-          - subscriptions
-          - topicsAndSkillsDashboard
-          - topicAndStoryEditor
-          - topicAndStoryEditorFileUploadFeatures
-          - topicAndStoryViewer
-          - users
           - wipeout
     steps:
       - uses: actions/checkout@v3
@@ -174,7 +133,7 @@ jobs:
         run: sudo apt install ffmpeg
       - name: Run E2E Test ${{ matrix.suite }}
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
+        run: for run in {1..20}; do  xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env; done
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
