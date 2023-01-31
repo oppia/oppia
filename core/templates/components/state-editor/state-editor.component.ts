@@ -29,6 +29,7 @@ import { StateEditorService } from './state-editor-properties-services/state-edi
 import { StateHintsService } from './state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from './state-editor-properties-services/state-interaction-id.service';
 import { StateNameService } from './state-editor-properties-services/state-name.service';
+import { StateNextContentIdIndexService } from './state-editor-properties-services/state-next-content-id-index.service';
 import { StateParamChangesService } from './state-editor-properties-services/state-param-changes.service';
 import { StateLinkedSkillIdService } from './state-editor-properties-services/state-skill.service';
 import { StateSolicitAnswerDetailsService } from './state-editor-properties-services/state-solicit-answer-details.service';
@@ -67,6 +68,8 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() recomputeGraph = new EventEmitter<void>();
   @Output() refreshWarnings = new EventEmitter<void>();
   @Output() navigateToState = new EventEmitter<string>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+    new EventEmitter<string[]>());
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -100,6 +103,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     private stateInteractionIdService: StateInteractionIdService,
     private stateLinkedSkillIdService: StateLinkedSkillIdService,
     private stateNameService: StateNameService,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
     private stateParamChangesService: StateParamChangesService,
     private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
     private stateSolutionService: StateSolutionService,
@@ -157,6 +161,10 @@ export class StateEditorComponent implements OnInit, OnDestroy {
 
   sendOnSaveInteractionId($event: string): void {
     this.onSaveInteractionId.emit($event);
+  }
+
+  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event: string[]): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit($event);
   }
 
   sendOnSaveStateContent($event: SubtitledHtml): void {
@@ -219,6 +227,8 @@ export class StateEditorComponent implements OnInit, OnDestroy {
             this.stateName, stateData.interaction.id);
           this.stateCustomizationArgsService.init(
             this.stateName, stateData.interaction.customizationArgs);
+          this.stateNextContentIdIndexService.init(
+            this.stateName, stateData.nextContentIdIndex);
           this.stateNameService.init();
           this.stateParamChangesService.init(
             this.stateName, stateData.paramChanges);

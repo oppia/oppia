@@ -17,36 +17,38 @@
 */
 
 import { TestBed } from '@angular/core/testing';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
-import { TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
+import { RuleBackendDict } from 'domain/exploration/RuleObjectFactory';
 
 import { PopulateRuleContentIdsService } from
   'pages/exploration-editor-page/services/populate-rule-content-ids.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 describe('Populate Rule Content Ids Service', () => {
   let populateRuleContentIdsService: PopulateRuleContentIdsService;
-  let generateContentIdService: GenerateContentIdService;
 
   beforeEach(() => {
     populateRuleContentIdsService = TestBed.get(PopulateRuleContentIdsService);
-    generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => {});
   });
 
   it('should populate null content ids on save', () => {
-    let rule = new Rule(
-      'Equals', {
+    let rule = {
+      type: 'Equals',
+      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
+      inputs: {
         x: {
           contentId: null,
           normalizedStrSet: []
         }
-      }, { x: 'TranslatableSetOfNormalizedString' },
-    );
-    let content = rule.inputs.x as TranslatableSetOfNormalizedString;
-    expect(content.contentId).toBeNull();
+      },
+      toBackendDict(): RuleBackendDict {
+        return {
+          rule_type: this.type,
+          inputs: this.inputs
+        };
+      }
+    };
+    expect(rule.inputs.x.contentId).toBeNull();
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
-    expect(content.contentId).not.toBeNull();
+    expect(rule.inputs.x.contentId).not.toBeNull();
   });
 
   it('should not populate non-null content ids on save', () => {
@@ -54,18 +56,35 @@ describe('Populate Rule Content Ids Service', () => {
       contentId: 'rule_input',
       normalizedStrSet: []
     };
-    let rule = new Rule(
-      'Equals', { x: ruleInput }, { x: 'TranslatableSetOfNormalizedString' });
 
-    let content = rule.inputs.x as TranslatableSetOfNormalizedString;
+    let rule = {
+      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
+      inputs: {x: ruleInput},
+      type: 'Equals',
+      toBackendDict(): RuleBackendDict {
+        return {
+          rule_type: this.type,
+          inputs: this.inputs
+        };
+      }
+    };
+
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
-    expect(content.contentId).toBe('rule_input');
+    expect(rule.inputs.x.contentId).toBe('rule_input');
   });
 
   it('should not populate content ids if input does not need one', () => {
-    let rule = new Rule(
-      'HasNumberOfTermsEqualTo', { y: 1 }, { y: 'NonnegativeInt' });
-
+    let rule = {
+      type: 'HasNumberOfTermsEqualTo',
+      inputTypes: {y: 'NonnegativeInt'},
+      inputs: {y: 1},
+      toBackendDict(): RuleBackendDict {
+        return {
+          rule_type: this.type,
+          inputs: this.inputs
+        };
+      }
+    };
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
     expect(rule.inputs).toEqual({y: 1});
   });

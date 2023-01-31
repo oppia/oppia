@@ -21,7 +21,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationChangeAddState } from 'domain/exploration/exploration-draft.model';
 import { StateObjectsBackendDict, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -94,10 +93,8 @@ describe('Exploration save service ' +
               successCb(false, [
                 {
                   cmd: 'add_state',
-                  state_name: 'StateName',
-                  content_id_for_state_content: 'content_0',
-                  content_id_for_default_outcome: 'default_outcome_1'
-                } as ExplorationChangeAddState]);
+                  state_name: 'StateName'
+                }]);
             }
           }
         },
@@ -557,6 +554,7 @@ describe('Exploration save service ' +
       solicit_answer_details: false,
       card_is_checkpoint: true,
       linked_skill_id: '',
+      next_content_id_index: 0,
       content: {
         content_id: 'content',
         html: '{{HtmlValue}}'
@@ -603,13 +601,20 @@ describe('Exploration save service ' +
           },
         },
         hints: [],
-      }
+      },
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+        },
+      },
     },
     State: {
       classifier_model_id: '',
       solicit_answer_details: false,
       card_is_checkpoint: true,
       linked_skill_id: '',
+      next_content_id_index: 0,
       content: {
         content_id: 'content',
         html: 'content'
@@ -656,6 +661,12 @@ describe('Exploration save service ' +
           },
         },
         hints: []
+      },
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+        }
       }
     },
     State2: {
@@ -663,6 +674,7 @@ describe('Exploration save service ' +
       solicit_answer_details: false,
       card_is_checkpoint: true,
       linked_skill_id: '',
+      next_content_id_index: 0,
       content: {
         content_id: 'content',
         html: 'content'
@@ -709,6 +721,12 @@ describe('Exploration save service ' +
           },
         },
         hints: []
+      },
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+        }
       }
     },
     State3: {
@@ -716,6 +734,7 @@ describe('Exploration save service ' +
       solicit_answer_details: false,
       card_is_checkpoint: true,
       linked_skill_id: '',
+      next_content_id_index: 0,
       content: {
         content_id: 'content',
         html: 'content'
@@ -762,6 +781,12 @@ describe('Exploration save service ' +
           },
         },
         hints: []
+      },
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+        }
       }
     }
   };

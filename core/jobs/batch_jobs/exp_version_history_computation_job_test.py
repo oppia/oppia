@@ -21,7 +21,6 @@ from __future__ import annotations
 from core import feconf
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import translation_domain
 from core.domain import user_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_version_history_computation_job
@@ -72,29 +71,17 @@ class ComputeExplorationVersionHistoryJobTests(
         self
     ) -> None:
         assert self.user_1_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
-        )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit message.')
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.')
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -143,52 +130,32 @@ class ComputeExplorationVersionHistoryJobTests(
         self
     ) -> None:
         assert self.user_1_id is not None
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit message.')
         exp_services.revert_exploration(
             self.user_1_id, self.EXP_ID_1, 2, 1
         )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'Another new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'Another new state'
+                })
+            ],
+            'A commit message.'
+        )
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -249,29 +216,18 @@ class ComputeExplorationVersionHistoryJobTests(
         self
     ) -> None:
         assert self.user_1_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit message.')
         exp_services.revert_exploration(
             self.user_1_id, self.EXP_ID_1, 2, 1
         )
@@ -344,30 +300,19 @@ class ComputeExplorationVersionHistoryJobTests(
     ) -> None:
         assert self.user_1_id is not None
         assert self.user_2_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
-        )
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -421,30 +366,19 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_job_can_run_when_version_history_already_exists(self) -> None:
         assert self.user_1_id is not None
         assert self.user_2_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
-        )
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
         exp_services.revert_exploration(
             self.user_1_id, self.EXP_ID_1, 2, 1
         )
@@ -504,29 +438,18 @@ class ComputeExplorationVersionHistoryJobTests(
 
     def test_ignore_changes_in_deprecated_properties(self) -> None:
         assert self.user_1_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
         snapshot_metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get(
                 exp_models.ExplorationModel.get_snapshot_id(
@@ -558,29 +481,18 @@ class ComputeExplorationVersionHistoryJobTests(
 
     def test_with_invalid_change_list(self) -> None:
         assert self.user_1_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
 
         # Corrupting the commit logs manually.
         snapshot_metadata_model = (
@@ -659,61 +571,43 @@ class VerifyVersionHistoryModelsJobTests(
     def test_with_valid_version_history_models(self) -> None:
         assert self.user_1_id is not None
         assert self.user_2_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
-        )
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
         self.save_new_valid_exploration('3', self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
-
-        exp = self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.user_2_id, self.EXP_ID_2, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
-        exp_services.update_exploration(self.user_2_id, '3', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'Introduction',
-                'new_state_name': 'First state'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_2_id,
+            self.EXP_ID_2,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_2_id,
+            '3',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'First state'
+                })
+            ],
+            'A commit message.'
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
@@ -727,76 +621,69 @@ class VerifyVersionHistoryModelsJobTests(
     def test_with_invalid_version_history_models(self) -> None:
         assert self.user_1_id is not None
         assert self.user_2_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
-        )
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
         self.save_new_valid_exploration('3', self.user_2_id)
-        exp4 = self.save_new_valid_exploration('4', self.user_2_id)
+        self.save_new_valid_exploration('4', self.user_2_id)
         self.save_new_valid_exploration('5', self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
-        exp_services.update_exploration(self.user_2_id, self.EXP_ID_2, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'Introduction',
-                'new_state_name': 'First state'
-            })
-        ], 'A commit message.')
-        exp_services.update_exploration(self.user_2_id, '3', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'Introduction',
-                'new_state_name': 'First state'
-            })
-        ], 'A commit message.')
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp4.next_content_id_index
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.user_1_id, '4', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
-        exp_services.update_exploration(self.user_2_id, '5', [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'Introduction',
-                'new_state_name': 'Second state'
-            })
-        ], 'A commit message.')
+        exp_services.update_exploration(
+            self.user_2_id,
+            self.EXP_ID_2,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'First state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_2_id,
+            '3',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'First state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_1_id,
+            '4',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
+        )
+        exp_services.update_exploration(
+            self.user_2_id,
+            '5',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'Introduction',
+                    'new_state_name': 'Second state'
+                })
+            ],
+            'A commit message.'
+        )
 
         # Manually corrupting the version history model.
         vh_model_1 = exp_models.ExplorationVersionHistoryModel.get(
@@ -888,29 +775,18 @@ class VerifyVersionHistoryModelsJobTests(
 
     def test_ignore_changes_in_deprecated_properties(self) -> None:
         assert self.user_1_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
         snapshot_metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get(
                 exp_models.ExplorationModel.get_snapshot_id(
@@ -963,29 +839,18 @@ class DeleteExplorationVersionHistoryModelsJobTest(
 
     def test_with_vh_models(self) -> None:
         assert self.user_1_id is not None
-        exp = self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exp.next_content_id_index
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(
+            self.user_1_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'A new state'
+                })
+            ],
+            'A commit message.'
         )
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'A new state',
-                'content_id_for_state_content': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT)
-                ),
-                'content_id_for_default_outcome': (
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME)
-                )
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'next_content_id_index',
-                'new_value': content_id_generator.next_content_id_index
-            })
-        ], 'A commit messages.')
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('SUCCESS: 2')

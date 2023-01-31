@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import collections
 import copy
 import itertools
 import logging
@@ -36,13 +37,14 @@ from extensions import domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, Iterator, List, Literal, Mapping, Optional, Tuple,
-    Type, TypedDict, TypeVar, Union, cast, overload
+    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Tuple, Type,
+    TypedDict, TypeVar, Union, cast, overload
 )
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -136,7 +138,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the answer group.
 
@@ -152,17 +154,10 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 translatable_contents_collection
                 .add_fields_from_translatable_object(self.outcome)
             )
-        # TODO(#16256): Instead of hardcoding interactions name here,
-        # Interaction can have a flag indicating whether the rule_specs can have
-        # translations.
         for rule_spec in self.rule_specs:
-            if kwargs['interaction_id'] not in ['TextInput', 'SetInput']:
-                break
             (
                 translatable_contents_collection
-                .add_fields_from_translatable_object(
-                    rule_spec,
-                    interaction_id=kwargs['interaction_id'])
+                .add_fields_from_translatable_object(rule_spec)
             )
         return translatable_contents_collection
 
@@ -276,6 +271,85 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
 
         self.outcome.validate()
 
+    def get_all_html_content_strings(self, interaction_id: str) -> List[str]:
+        """Get all html content strings in the AnswerGroup.
+
+        Args:
+            interaction_id: str. The interaction id that the answer group is
+                associated with.
+
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+
+        Raises:
+            Exception. The Rule spec has an invalid format.
+            Exception. The Rule spec has no valid input variable
+                with HTML in it.
+        """
+        html_list = []
+
+        # TODO(#9413): Find a way to include a reference to the interaction
+        # type in the Draft change lists.
+        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
+        # the interaction-id from the rules_index_dict until issue-9413 has
+        # been fixed, because this method has no reference to the interaction
+        # type and draft changes use this method. The rules_index_dict below
+        # is used to figure out the assembly of the html in the rulespecs.
+
+        outcome_html = self.outcome.feedback.html
+        html_list += [outcome_html]
+
+        html_field_types_to_rule_specs = (
+            rules_registry.Registry.get_html_field_types_to_rule_specs())
+        for rule_spec in self.rule_specs:
+            for interaction_and_rule_details in (
+                    html_field_types_to_rule_specs.values()):
+                # Check that the value corresponds to the answer group's
+                # associated interaction id.
+                if (
+                        interaction_and_rule_details['interactionId'] !=
+                        interaction_id):
+                    continue
+
+                rule_type_has_html = (
+                    rule_spec.rule_type in
+                    interaction_and_rule_details['ruleTypes'].keys())
+                if rule_type_has_html:
+                    html_type_format = interaction_and_rule_details['format']
+                    input_variables_from_html_mapping = (
+                        interaction_and_rule_details['ruleTypes'][
+                            rule_spec.rule_type][
+                                'htmlInputVariables'])
+                    input_variable_match_found = False
+                    for input_variable in rule_spec.inputs.keys():
+                        if input_variable in input_variables_from_html_mapping:
+                            input_variable_match_found = True
+                            rule_input_variable = (
+                                rule_spec.inputs[input_variable])
+                            if (html_type_format ==
+                                    feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
+                                html_list += [rule_input_variable]
+                            elif (html_type_format ==
+                                  feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                                for value in rule_input_variable:
+                                    if isinstance(value, str):
+                                        html_list += [value]
+                            elif (html_type_format ==
+                                  feconf.
+                                  HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                                for rule_spec_html in rule_input_variable:
+                                    html_list += rule_spec_html
+                            else:
+                                raise Exception(
+                                    'The rule spec does not belong to a valid'
+                                    ' format.')
+                    if not input_variable_match_found:
+                        raise Exception(
+                            'Rule spec should have at least one valid input '
+                            'variable with Html in it.')
+
+        return html_list
+
     @staticmethod
     def convert_html_in_answer_group(
         answer_group_dict: AnswerGroupDict,
@@ -334,10 +408,9 @@ class Hint(translation_domain.BaseTranslatableObject):
         self.hint_content = hint_content
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the hint.
+        """Get all translatable fields/objects in the hint.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -347,9 +420,8 @@ class Hint(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            self.hint_content.content_id,
-            translation_domain.ContentType.HINT,
             translation_domain.TranslatableContentFormat.HTML,
+            self.hint_content.content_id,
             self.hint_content.html)
         return translatable_contents_collection
 
@@ -455,10 +527,9 @@ class Solution(translation_domain.BaseTranslatableObject):
         self.explanation = explanation
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the solution.
+        """Get all translatable fields/objects in the solution.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -468,9 +539,8 @@ class Solution(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            self.explanation.content_id,
-            translation_domain.ContentType.SOLUTION,
             translation_domain.TranslatableContentFormat.HTML,
+            self.explanation.content_id,
             self.explanation.html)
         return translatable_contents_collection
 
@@ -715,10 +785,9 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self.solution = solution
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the interaction instance.
+        """Get all translatable fields/objects in the interaction instance.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -735,17 +804,12 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         for answer_group in self.answer_groups:
             (
                 translatable_contents_collection
-                .add_fields_from_translatable_object(
-                    answer_group,
-                    interaction_id=self.id
-                )
+                .add_fields_from_translatable_object(answer_group)
             )
         for customization_arg in self.customization_args.values():
             (
                 translatable_contents_collection
-                .add_fields_from_translatable_object(
-                    customization_arg,
-                    interaction_id=self.id)
+                .add_fields_from_translatable_object(customization_arg)
             )
         for hint in self.hints:
             (
@@ -2106,9 +2170,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_interaction(
-        cls,
-        default_dest_state_name: Optional[str],
-        content_id_for_default_outcome: str
+        cls, default_dest_state_name: Optional[str]
     ) -> InteractionInstance:
         """Create a default InteractionInstance domain object:
             - customization_args: empty dictionary;
@@ -2120,8 +2182,6 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         Args:
             default_dest_state_name: str|None. The default destination state, or
                 None if no default destination is provided.
-            content_id_for_default_outcome: str. The content id for the default
-                outcome.
 
         Returns:
             InteractionInstance. The corresponding InteractionInstance domain
@@ -2131,10 +2191,80 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             default_dest_state_name,
             None,
             SubtitledHtml.create_default_subtitled_html(
-                content_id_for_default_outcome), False, [], None, None)
+                feconf.DEFAULT_OUTCOME_CONTENT_ID), False, [], None, None)
 
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], None)
+
+    def get_all_html_content_strings(self) -> List[str]:
+        """Get all html content strings in the interaction.
+
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+
+        Raises:
+            Exception. The solution has invalid type.
+        """
+        html_list = []
+
+        for answer_group in self.answer_groups:
+            # Here, we are asserting that self.id is never going to be None,
+            # because interaction_id can only be None when there are no answer
+            # groups.
+            assert self.id is not None
+            html_list += answer_group.get_all_html_content_strings(self.id)
+
+        if self.default_outcome:
+            default_outcome_html = self.default_outcome.feedback.html
+            html_list += [default_outcome_html]
+
+        for hint in self.hints:
+            hint_html = hint.hint_content.html
+            html_list += [hint_html]
+
+        if self.id is None:
+            return html_list
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.id))
+
+        if self.solution and interaction.can_have_solution:
+            solution_html = self.solution.explanation.html
+            html_list += [solution_html]
+            html_field_types_to_rule_specs = (
+                rules_registry.Registry.get_html_field_types_to_rule_specs())
+
+            if self.solution.correct_answer:
+                for html_type in html_field_types_to_rule_specs.keys():
+                    if html_type == interaction.answer_type:
+                        if (
+                                html_type ==
+                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+                            # Here we use cast because above 'if' clause forces
+                            # 'correct_answer' to be of type List[List[str]].
+                            list_of_set_of_html_answer = cast(
+                                List[List[str]], self.solution.correct_answer
+                            )
+                            for set_of_html_value in list_of_set_of_html_answer:
+                                html_list += set_of_html_value
+                        elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
+                            # Here we use cast because above 'elif' clause
+                            # forces 'correct_answer' to be of type List[str].
+                            set_of_html_answer = cast(
+                                List[str], self.solution.correct_answer
+                            )
+                            for html_value in set_of_html_answer:
+                                html_list += [html_value]
+                        else:
+                            raise Exception(
+                                'The solution does not have a valid '
+                                'correct_answer type.')
+
+        for ca_name in self.customization_args:
+            html_list += self.customization_args[ca_name].get_html()
+
+        return html_list
 
     @staticmethod
     def convert_html_in_interaction(
@@ -2274,10 +2404,10 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.schema = schema
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the interaction customization args.
+        """Get all translatable fields/objects in the interaction customization
+        args.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -2288,21 +2418,21 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 
         subtitled_htmls = self.get_subtitled_html()
         for subtitled_html in subtitled_htmls:
-            translatable_contents_collection.add_translatable_field(
-                subtitled_html.content_id,
-                translation_domain.ContentType.CUSTOMIZATION_ARG,
-                translation_domain.TranslatableContentFormat.HTML,
-                subtitled_html.html,
-                kwargs['interaction_id'])
+            html_string = subtitled_html.html
+            # Make sure we don't include content that only consists of
+            # numbers. See issue #13055.
+            if not html_string.isnumeric():
+                translatable_contents_collection.add_translatable_field(
+                    translation_domain.TranslatableContentFormat.HTML,
+                    subtitled_html.content_id,
+                    html_string)
 
         subtitled_unicodes = self.get_subtitled_unicode()
         for subtitled_unicode in subtitled_unicodes:
             translatable_contents_collection.add_translatable_field(
-                subtitled_unicode.content_id,
-                translation_domain.ContentType.CUSTOMIZATION_ARG,
                 translation_domain.TranslatableContentFormat.UNICODE_STRING,
-                subtitled_unicode.unicode_str,
-                kwargs['interaction_id'])
+                subtitled_unicode.content_id,
+                subtitled_unicode.unicode_str)
         return translatable_contents_collection
 
     def to_customization_arg_dict(self) -> Dict[
@@ -2463,6 +2593,20 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
              schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
             lambda x: x.content_id
+        )
+
+    def get_html(self) -> List[str]:
+        """Get all html from SubtitledHtml in the customization argument.
+
+        Returns:
+            list(str). All html strings in the customization argument.
+        """
+
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+            lambda x: x.html
         )
 
     def validate_subtitled_html(self) -> None:
@@ -2714,10 +2858,9 @@ class Outcome(translation_domain.BaseTranslatableObject):
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the outcome.
+        """Get all translatable fields/objects in the outcome.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -2727,9 +2870,8 @@ class Outcome(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            self.feedback.content_id,
-            translation_domain.ContentType.FEEDBACK,
             translation_domain.TranslatableContentFormat.HTML,
+            self.feedback.content_id,
             self.feedback.html)
         return translatable_contents_collection
 
@@ -2953,6 +3095,485 @@ class Voiceover:
                 self.duration_secs)
 
 
+class WrittenTranslationDict(TypedDict):
+    """Dictionary representing the WrittenTranslation object."""
+
+    data_format: str
+    translation: Union[str, List[str]]
+    needs_update: bool
+
+
+class WrittenTranslation:
+    """Value object representing a written translation for a content.
+
+    Here, "content" could mean a string or a list of strings. The latter arises,
+    for example, in the case where we are checking for equality of a learner's
+    answer against a given set of strings. In such cases, the number of strings
+    in the translation of the original object may not be the same as the number
+    of strings in the original object.
+    """
+
+    DATA_FORMAT_HTML: Final = 'html'
+    DATA_FORMAT_UNICODE_STRING: Final = 'unicode'
+    DATA_FORMAT_SET_OF_NORMALIZED_STRING: Final = 'set_of_normalized_string'
+    DATA_FORMAT_SET_OF_UNICODE_STRING: Final = 'set_of_unicode_string'
+
+    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE: Dict[
+        str, translatable_object_registry.TranslatableObjectNames
+    ] = {
+        DATA_FORMAT_HTML: 'TranslatableHtml',
+        DATA_FORMAT_UNICODE_STRING: 'TranslatableUnicodeString',
+        DATA_FORMAT_SET_OF_NORMALIZED_STRING: (
+            'TranslatableSetOfNormalizedString'),
+        DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
+    }
+
+    @classmethod
+    def is_data_format_list(cls, data_format: str) -> bool:
+        """Checks whether the content of translation with given format is of
+        a list type.
+
+        Args:
+            data_format: str. The format of the translation.
+
+        Returns:
+            bool. Whether the content of translation is a list.
+        """
+        return data_format in (
+            cls.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+            cls.DATA_FORMAT_SET_OF_UNICODE_STRING
+        )
+
+    def __init__(
+        self,
+        data_format: str,
+        translation: Union[str, List[str]],
+        needs_update: bool
+    ) -> None:
+        """Initializes a WrittenTranslation domain object.
+
+        Args:
+            data_format: str. One of the keys in
+                DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE. Indicates the
+                type of the field (html, unicode, etc.).
+            translation: str|list(str). A user-submitted string or list of
+                strings that matches the given data format.
+            needs_update: bool. Whether the translation is marked as needing
+                review.
+        """
+        self.data_format = data_format
+        self.translation = translation
+        self.needs_update = needs_update
+
+    def to_dict(self) -> WrittenTranslationDict:
+        """Returns a dict representing this WrittenTranslation domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of WrittenTranslation instance.
+        """
+        return {
+            'data_format': self.data_format,
+            'translation': self.translation,
+            'needs_update': self.needs_update,
+        }
+
+    @classmethod
+    def from_dict(
+        cls, written_translation_dict: WrittenTranslationDict
+    ) -> WrittenTranslation:
+        """Return a WrittenTranslation domain object from a dict.
+
+        Args:
+            written_translation_dict: dict. The dict representation of
+                WrittenTranslation object.
+
+        Returns:
+            WrittenTranslation. The corresponding WrittenTranslation domain
+            object.
+        """
+        return cls(
+            written_translation_dict['data_format'],
+            written_translation_dict['translation'],
+            written_translation_dict['needs_update'])
+
+    def validate(self) -> None:
+        """Validates properties of the WrittenTranslation, normalizing the
+        translation if needed.
+
+        Raises:
+            ValidationError. One or more attributes of the WrittenTranslation
+                are invalid.
+        """
+        if self.data_format not in (
+                self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE):
+            raise utils.ValidationError(
+                'Invalid data_format: %s' % self.data_format)
+
+        translatable_class_name = (
+            self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE[self.data_format])
+        translatable_obj_class = (
+            translatable_object_registry.Registry.get_object_class(
+                translatable_class_name))
+        self.translation = translatable_obj_class.normalize_value(
+            self.translation)
+
+        if not isinstance(self.needs_update, bool):
+            raise utils.ValidationError(
+                'Expected needs_update to be a bool, received %s' %
+                self.needs_update)
+
+        # Validate translations.
+        if self.data_format == 'html':
+            # Ruling out the possibility of different types for mypy
+            # type checking.
+            assert isinstance(self.translation, str)
+            html_cleaner.validate_rte_tags(self.translation)
+            html_cleaner.validate_tabs_and_collapsible_rte_tags(
+                self.translation)
+
+
+class WrittenTranslationsDict(TypedDict):
+    """Dictionary representing the WrittenTranslations object."""
+
+    translations_mapping: Dict[str, Dict[str, WrittenTranslationDict]]
+
+
+class WrittenTranslations:
+    """Value object representing a content translations which stores
+    translated contents of all state contents (like hints, feedback etc.) in
+    different languages linked through their content_id.
+    """
+
+    def __init__(
+        self,
+        translations_mapping: Dict[str, Dict[str, WrittenTranslation]]
+    ) -> None:
+        """Initializes a WrittenTranslations domain object.
+
+        Args:
+            translations_mapping: dict. A dict mapping the content Ids
+                to the dicts which is the map of abbreviated code of the
+                languages to WrittenTranslation objects.
+        """
+        self.translations_mapping = translations_mapping
+
+    def to_dict(self) -> WrittenTranslationsDict:
+        """Returns a dict representing this WrittenTranslations domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of WrittenTranslations instance.
+        """
+        translations_mapping: Dict[str, Dict[str, WrittenTranslationDict]] = {}
+        for (content_id, language_code_to_written_translation) in (
+                self.translations_mapping.items()):
+            translations_mapping[content_id] = {}
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.items()):
+                translations_mapping[content_id][language_code] = (
+                    written_translation.to_dict())
+        written_translations_dict: WrittenTranslationsDict = {
+            'translations_mapping': translations_mapping
+        }
+
+        return written_translations_dict
+
+    @classmethod
+    def from_dict(
+        cls, written_translations_dict: WrittenTranslationsDict
+    ) -> WrittenTranslations:
+        """Return a WrittenTranslations domain object from a dict.
+
+        Args:
+            written_translations_dict: dict. The dict representation of
+                WrittenTranslations object.
+
+        Returns:
+            WrittenTranslations. The corresponding WrittenTranslations domain
+            object.
+        """
+        translations_mapping: Dict[str, Dict[str, WrittenTranslation]] = {}
+        for (content_id, language_code_to_written_translation) in (
+                written_translations_dict['translations_mapping'].items()):
+            translations_mapping[content_id] = {}
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.items()):
+                translations_mapping[content_id][language_code] = (
+                    WrittenTranslation.from_dict(written_translation))
+
+        return cls(translations_mapping)
+
+    def get_content_ids_that_are_correctly_translated(
+        self, language_code: str
+    ) -> List[str]:
+        """Returns a list of content ids in which a correct translation is
+        available in the given language.
+
+        Args:
+            language_code: str. The abbreviated code of the language.
+
+        Returns:
+            list(str). A list of content ids in which the translations are
+            available in the given language.
+        """
+        correctly_translated_content_ids = []
+        for content_id, translations in self.translations_mapping.items():
+            if (
+                language_code in translations and
+                not translations[language_code].needs_update
+            ):
+                correctly_translated_content_ids.append(content_id)
+
+        return correctly_translated_content_ids
+
+    def add_translation(
+        self,
+        content_id: str,
+        language_code: str,
+        html: str
+    ) -> None:
+        """Adds a translation for the given content id in a given language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code of the translated html.
+            html: str. The translated html.
+        """
+        written_translation = WrittenTranslation(
+            WrittenTranslation.DATA_FORMAT_HTML, html, False)
+        self.translations_mapping[content_id][language_code] = (
+            written_translation)
+
+    def mark_written_translation_as_needing_update(
+        self, content_id: str, language_code: str
+    ) -> None:
+        """Marks translation as needing update for the given content id and
+        language code.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+        """
+        self.translations_mapping[content_id][language_code].needs_update = (
+            True
+        )
+
+    def mark_written_translations_as_needing_update(
+        self, content_id: str
+    ) -> None:
+        """Marks translation as needing update for the given content id in all
+        languages.
+
+        Args:
+            content_id: str. The id of the content.
+        """
+        for (language_code, written_translation) in (
+                self.translations_mapping[content_id].items()):
+            written_translation.needs_update = True
+            self.translations_mapping[content_id][language_code] = (
+                written_translation)
+
+    def validate(self, expected_content_id_list: Optional[List[str]]) -> None:
+        """Validates properties of the WrittenTranslations.
+
+        Args:
+            expected_content_id_list: list(str)|None. A list of content id which
+                are expected to be inside they WrittenTranslations.
+
+        Raises:
+            ValidationError. One or more attributes of the WrittenTranslations
+                are invalid.
+        """
+        if expected_content_id_list is not None:
+            if not set(self.translations_mapping.keys()) == (
+                    set(expected_content_id_list)):
+                raise utils.ValidationError(
+                    'Expected state written_translations to match the listed '
+                    'content ids %s, found %s' % (
+                        expected_content_id_list,
+                        list(self.translations_mapping.keys()))
+                    )
+
+        for (content_id, language_code_to_written_translation) in (
+                self.translations_mapping.items()):
+            if not isinstance(content_id, str):
+                raise utils.ValidationError(
+                    'Expected content_id to be a string, received %s'
+                    % content_id)
+            if not isinstance(language_code_to_written_translation, dict):
+                raise utils.ValidationError(
+                    'Expected content_id value to be a dict, received %s'
+                    % language_code_to_written_translation)
+            for (language_code, written_translation) in (
+                    language_code_to_written_translation.items()):
+                if not isinstance(language_code, str):
+                    raise utils.ValidationError(
+                        'Expected language_code to be a string, received %s'
+                        % language_code)
+                # Currently, we assume written translations are used by the
+                # voice-artist to voiceover the translated text so written
+                # translations can be in supported audio/voiceover languages.
+                allowed_language_codes = [language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)]
+                if language_code not in allowed_language_codes:
+                    raise utils.ValidationError(
+                        'Invalid language_code: %s' % language_code)
+
+                written_translation.validate()
+
+    def get_content_ids_for_text_translation(self) -> List[str]:
+        """Returns a list of content_id available for text translation.
+
+        Returns:
+            list(str). A list of content id available for text translation.
+        """
+        return list(sorted(self.translations_mapping.keys()))
+
+    def get_translated_content(
+        self, content_id: str, language_code: str
+    ) -> str:
+        """Returns the translated content for the given content_id in the given
+        language.
+
+        Args:
+            content_id: str. The ID of the content.
+            language_code: str. The language code for the translated content.
+
+        Returns:
+            str. The translated content for a given content id in a language.
+
+        Raises:
+            Exception. Translation doesn't exist in the given language.
+            Exception. The given content id doesn't exist.
+        """
+        if content_id in self.translations_mapping:
+            if language_code in self.translations_mapping[content_id]:
+                translation = self.translations_mapping[
+                    content_id][language_code].translation
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(translation, str)
+                return translation
+            else:
+                raise Exception(
+                    'Translation for the given content_id %s does not exist in '
+                    '%s language code' % (content_id, language_code))
+        else:
+            raise Exception('Invalid content_id: %s' % content_id)
+
+    def add_content_id_for_translation(self, content_id: str) -> None:
+        """Adds a content id as a key for the translation into the
+        content_translation dict.
+
+        Args:
+            content_id: str. The id representing a subtitled html.
+
+        Raises:
+            Exception. The content id isn't a string.
+        """
+        if not isinstance(content_id, str):
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id)
+        if content_id in self.translations_mapping:
+            raise Exception(
+                'The content_id %s already exist.' % content_id)
+
+        self.translations_mapping[content_id] = {}
+
+    def delete_content_id_for_translation(self, content_id: str) -> None:
+        """Deletes a content id from the content_translation dict.
+
+        Args:
+            content_id: str. The id representing a subtitled html.
+
+        Raises:
+            Exception. The content id isn't a string.
+        """
+        if not isinstance(content_id, str):
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id)
+        if content_id not in self.translations_mapping:
+            raise Exception(
+                'The content_id %s does not exist.' % content_id)
+
+        self.translations_mapping.pop(content_id, None)
+
+    def get_all_html_content_strings(self) -> List[str]:
+        """Gets all html content strings used in the WrittenTranslations.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_string_list = []
+        for translations in self.translations_mapping.values():
+            for written_translation in translations.values():
+                if (written_translation.data_format ==
+                        WrittenTranslation.DATA_FORMAT_HTML):
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(written_translation.translation, str)
+                    html_string_list.append(written_translation.translation)
+        return html_string_list
+
+    @staticmethod
+    def convert_html_in_written_translations(
+        written_translations_dict: WrittenTranslationsDict,
+        conversion_fn: Callable[[str], str]
+    ) -> WrittenTranslationsDict:
+        """Checks for HTML fields in the written translations and converts it
+        according to the conversion function.
+
+        Args:
+            written_translations_dict: dict. The written translations dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+
+        Returns:
+            dict. The converted written translations dict.
+        """
+        for content_id, language_code_to_written_translation in (
+                written_translations_dict['translations_mapping'].items()):
+            for language_code in (
+                    language_code_to_written_translation.keys()):
+                translation_dict = written_translations_dict[
+                    'translations_mapping'][content_id][language_code]
+                if 'data_format' in translation_dict:
+                    if (translation_dict['data_format'] ==
+                            WrittenTranslation.DATA_FORMAT_HTML):
+                        translation = written_translations_dict[
+                                'translations_mapping'
+                            ][content_id][language_code]['translation']
+                        # Ruling out the possibility of any other type for mypy
+                        # type checking.
+                        assert isinstance(translation, str)
+                        written_translations_dict['translations_mapping'][
+                            content_id][language_code]['translation'] = (
+                                conversion_fn(translation)
+                            )
+                elif 'html' in translation_dict:
+                    # TODO(#11950): Delete this once old schema migration
+                    # functions are deleted.
+                    # This "elif" branch is needed because, in states schema
+                    # v33, this function is called but the dict is still in the
+                    # old format (that doesn't have a "data_format" key).
+                    # Here we use MyPy ignore because in convert functions,
+                    # we allow less strict typing because here we are working
+                    # with previous versions of the domain object and in
+                    # previous versions of the domain object there are some
+                    # fields that are discontinued in the latest domain object
+                    # (eg. html). So, while accessing these discontinued fields
+                    # MyPy throws an error. Thus to avoid the error, we used
+                    # ignore here.
+                    written_translations_dict['translations_mapping'][
+                        content_id][language_code]['html'] = (  # type: ignore[misc]
+                            # Here we use MyPy ignore because we want to avoid
+                            # the error that was generated by accessing a 'html'
+                            # key, because this 'html' key was deprecated from
+                            # the latest domain object.
+                            conversion_fn(translation_dict['html']))  # type: ignore[misc]
+
+        return written_translations_dict
+
+
 class RecordedVoiceoversDict(TypedDict):
     """Dictionary representing the RecordedVoiceovers object."""
 
@@ -3156,10 +3777,9 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.inputs = inputs
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the rule spec.
+        """Get all translatable fields/objects in the rule spec.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -3171,22 +3791,16 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         for input_value in self.inputs.values():
             if 'normalizedStrSet' in input_value:
                 translatable_contents_collection.add_translatable_field(
-                    input_value['contentId'],
-                    translation_domain.ContentType.RULE,
                     translation_domain.TranslatableContentFormat
                     .SET_OF_NORMALIZED_STRING,
-                    input_value['normalizedStrSet'],
-                    kwargs['interaction_id'],
-                    self.rule_type)
+                    input_value['contentId'],
+                    input_value['normalizedStrSet'])
             if 'unicodeStrSet' in input_value:
                 translatable_contents_collection.add_translatable_field(
-                    input_value['contentId'],
-                    translation_domain.ContentType.RULE,
                     translation_domain.TranslatableContentFormat
                     .SET_OF_UNICODE_STRING,
-                    input_value['unicodeStrSet'],
-                    kwargs['interaction_id'],
-                    self.rule_type)
+                    input_value['contentId'],
+                    input_value['unicodeStrSet'])
         return translatable_contents_collection
 
     def to_dict(self) -> RuleSpecDict:
@@ -3583,6 +4197,83 @@ class SubtitledUnicode:
         return cls(content_id, '')
 
 
+class TranslatableItemDict(TypedDict):
+    """Dictionary representing the TranslatableItem object."""
+
+    content: str
+    data_format: str
+    content_type: str
+    interaction_id: Optional[str]
+    rule_type: Optional[str]
+
+
+class TranslatableItem:
+    """Value object representing item that can be translated."""
+
+    DATA_FORMAT_HTML: Final = 'html'
+    DATA_FORMAT_UNICODE_STRING: Final = 'unicode'
+    DATA_FORMAT_SET_OF_NORMALIZED_STRING: Final = 'set_of_normalized_string'
+    DATA_FORMAT_SET_OF_UNICODE_STRING: Final = 'set_of_unicode_string'
+    CONTENT_TYPE_CONTENT: Final = 'content'
+    CONTENT_TYPE_INTERACTION: Final = 'interaction'
+    CONTENT_TYPE_RULE: Final = 'rule'
+    CONTENT_TYPE_FEEDBACK: Final = 'feedback'
+    CONTENT_TYPE_HINT: Final = 'hint'
+    CONTENT_TYPE_SOLUTION: Final = 'solution'
+
+    def __init__(
+        self,
+        content: str,
+        data_format: str,
+        content_type: str,
+        interaction_id: Optional[str] = None,
+        rule_type: Optional[str] = None
+    ) -> None:
+        """Initializes a TranslatableItem domain object.
+
+        Args:
+            content: str|list(str). The translatable content text.
+            data_format: str. The data format of the translatable content.
+            content_type: str. One of `Content`, `Interaction`, ‘Rule`,
+                `Feedback`, `Hint`, `Solution`.
+            interaction_id: str|None. Interaction ID, e.g. `TextInput`, if the
+                content corresponds to an InteractionInstance, else None.
+            rule_type: str|None. Rule type if content_type == `Rule`, e.g.
+                “Equals”, “IsSubsetOf”, “Contains” else None.
+        """
+        self.content = content
+        self.data_format = data_format
+        self.content_type = content_type
+        self.interaction_id = interaction_id
+        self.rule_type = rule_type
+
+    def to_dict(self) -> TranslatableItemDict:
+        """Returns a dict representing this TranslatableItem domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of TranslatableItem instance.
+        """
+        return {
+            'content': self.content,
+            'data_format': self.data_format,
+            'content_type': self.content_type,
+            'interaction_id': self.interaction_id,
+            'rule_type': self.rule_type
+        }
+
+    def is_set_data_format(self) -> bool:
+        """Check whether the data format of the translatable content is set of
+        strings.
+
+        Returns:
+            bool. Whether the data format of the translatable content is set of
+            strings.
+        """
+        return self.data_format in [
+            TranslatableItem.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+            TranslatableItem.DATA_FORMAT_SET_OF_UNICODE_STRING]
+
+
 DomainObjectCustomizationArgsConversionFnTypes = Union[
     Callable[[SubtitledHtml, str], SubtitledHtml],
     Callable[[SubtitledHtml, str], SubtitledHtmlDict],
@@ -3608,8 +4299,10 @@ class StateDict(TypedDict):
     param_changes: List[param_domain.ParamChangeDict]
     interaction: InteractionInstanceDict
     recorded_voiceovers: RecordedVoiceoversDict
+    written_translations: WrittenTranslationsDict
     solicit_answer_details: bool
     card_is_checkpoint: bool
+    next_content_id_index: int
     linked_skill_id: Optional[str]
     classifier_model_id: Optional[str]
 
@@ -3623,8 +4316,10 @@ class State(translation_domain.BaseTranslatableObject):
         param_changes: List[param_domain.ParamChange],
         interaction: InteractionInstance,
         recorded_voiceovers: RecordedVoiceovers,
+        written_translations: WrittenTranslations,
         solicit_answer_details: bool,
         card_is_checkpoint: bool,
+        next_content_id_index: int,
         linked_skill_id: Optional[str] = None,
         classifier_model_id: Optional[str] = None
     ) -> None:
@@ -3639,11 +4334,15 @@ class State(translation_domain.BaseTranslatableObject):
                 associated with this state.
             recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the state contents and translations.
+            written_translations: WrittenTranslations. The written translations
+                for the state contents.
             solicit_answer_details: bool. Whether the creator wants to ask
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
             card_is_checkpoint: bool. If the card is marked as a checkpoint by
                 the creator or not.
+            next_content_id_index: int. The next content_id index to use for
+                generation of new content_ids.
             linked_skill_id: str or None. The linked skill ID associated with
                 this state.
             classifier_model_id: str or None. The classifier model ID
@@ -3665,14 +4364,15 @@ class State(translation_domain.BaseTranslatableObject):
         self.classifier_model_id = classifier_model_id
         self.recorded_voiceovers = recorded_voiceovers
         self.linked_skill_id = linked_skill_id
+        self.written_translations = written_translations
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
+        self.next_content_id_index = next_content_id_index
 
     def get_translatable_contents_collection(
-        self,
-        **kwargs: Optional[str]
+        self
     ) -> translation_domain.TranslatableContentsCollection:
-        """Get all translatable fields in the state.
+        """Get all translatable fields/objects in the state.
 
         Returns:
             translatable_contents_collection: TranslatableContentsCollection.
@@ -3682,9 +4382,8 @@ class State(translation_domain.BaseTranslatableObject):
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            self.content.content_id,
-            translation_domain.ContentType.CONTENT,
             translation_domain.TranslatableContentFormat.HTML,
+            self.content.content_id,
             self.content.html)
         translatable_contents_collection.add_fields_from_translatable_object(
             self.interaction)
@@ -3738,6 +4437,78 @@ class State(translation_domain.BaseTranslatableObject):
                     tagged_skill_misconception_id_required),
                 strict=strict)
 
+        content_id_list = []
+        content_id_list.append(self.content.content_id)
+        for answer_group in self.interaction.answer_groups:
+            feedback_content_id = answer_group.outcome.feedback.content_id
+            if feedback_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % feedback_content_id)
+            content_id_list.append(feedback_content_id)
+
+            for rule_spec in answer_group.rule_specs:
+                for param_name, value in rule_spec.inputs.items():
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                    if issubclass(param_type, objects.BaseTranslatableObject):
+                        if value['contentId'] in content_id_list:
+                            raise utils.ValidationError(
+                                'Found a duplicate content '
+                                'id %s' % value['contentId'])
+                        content_id_list.append(value['contentId'])
+
+        if self.interaction.default_outcome:
+            default_outcome_content_id = (
+                self.interaction.default_outcome.feedback.content_id)
+            if default_outcome_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s'
+                    % default_outcome_content_id)
+            content_id_list.append(default_outcome_content_id)
+        for hint in self.interaction.hints:
+            hint_content_id = hint.hint_content.content_id
+            if hint_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % hint_content_id)
+            content_id_list.append(hint_content_id)
+        if self.interaction.solution:
+            solution_content_id = (
+                self.interaction.solution.explanation.content_id)
+            if solution_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % solution_content_id)
+            content_id_list.append(solution_content_id)
+
+        if self.interaction.id is not None:
+            for ca_name in self.interaction.customization_args:
+                content_id_list.extend(
+                    self.interaction.customization_args[ca_name]
+                    .get_content_ids()
+                )
+
+        if len(set(content_id_list)) != len(content_id_list):
+            raise utils.ValidationError(
+                'Expected all content_ids to be unique, '
+                'received %s' % content_id_list)
+
+        for content_id in content_id_list:
+            content_id_suffix = content_id.split('_')[-1]
+
+            # Possible values of content_id_suffix are a digit, or from
+            # a 'outcome' (from 'default_outcome'). If the content_id_suffix
+            # is not a digit, we disregard it here.
+            if (
+                    content_id_suffix.isdigit() and
+                    int(content_id_suffix) > self.next_content_id_index
+            ):
+                raise utils.ValidationError(
+                    'Expected all content id indexes to be less than the "next '
+                    'content id index", but received content id %s' % content_id
+                )
+
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
                 'Expected solicit_answer_details to be a boolean, '
@@ -3754,13 +4525,32 @@ class State(translation_domain.BaseTranslatableObject):
                 'Expected card_is_checkpoint to be a boolean, '
                 'received %s' % self.card_is_checkpoint)
 
-        self.recorded_voiceovers.validate(self.get_translatable_content_ids())
+        self.written_translations.validate(content_id_list)
+        self.recorded_voiceovers.validate(content_id_list)
 
         if self.linked_skill_id is not None:
             if not isinstance(self.linked_skill_id, str):
                 raise utils.ValidationError(
                     'Expected linked_skill_id to be a str, '
                     'received %s.' % self.linked_skill_id)
+
+    def get_content_html(self, content_id: str) -> str:
+        """Returns the content belongs to a given content id of the object.
+
+        Args:
+            content_id: str. The id of the content.
+
+        Returns:
+            str. The html content corresponding to the given content id.
+
+        Raises:
+            ValueError. The given content_id does not exist.
+        """
+        content_id_to_translatable_item = self._get_all_translatable_content()
+        if content_id not in content_id_to_translatable_item:
+            raise ValueError('Content ID %s does not exist' % content_id)
+
+        return content_id_to_translatable_item[content_id].content
 
     def is_rte_content_supported_on_android(self) -> bool:
         """Checks whether the RTE components used in the state are supported by
@@ -3858,11 +4648,43 @@ class State(translation_domain.BaseTranslatableObject):
 
         return utils.yaml_from_dict(state.to_dict(), width=width)
 
+    def get_translation_counts(self) -> Dict[str, int]:
+        """Return a dict representing the number of translations available in a
+        languages in which there exists at least one translation in the state
+        object.
+
+        Note: This method only counts the translations which are translatable as
+        per _get_all_translatable_content method.
+
+        Returns:
+            dict(str, int). A dict with language code as a key and number of
+            translations available in that language as the value.
+        """
+        translation_counts: Dict[str, int] = collections.defaultdict(int)
+        translations_mapping = self.written_translations.translations_mapping
+
+        for content_id in self._get_all_translatable_content():
+            for language_code, translation in (
+                    translations_mapping[content_id].items()):
+                if not translation.needs_update:
+                    translation_counts[language_code] += 1
+        return translation_counts
+
+    def get_translatable_content_count(self) -> int:
+        """Returns the number of content fields available for translation in
+        the object.
+
+        Returns:
+            int. The number of content fields available for translation in
+            the state.
+        """
+        return len(self._get_all_translatable_content())
+
     def _update_content_ids_in_assets(
         self, old_ids_list: List[str], new_ids_list: List[str]
     ) -> None:
         """Adds or deletes content ids in assets i.e, other parts of state
-        object such as recorded_voiceovers.
+        object such as recorded_voiceovers and written_translations.
 
         Args:
             old_ids_list: list(str). A list of content ids present earlier
@@ -3878,6 +4700,8 @@ class State(translation_domain.BaseTranslatableObject):
         """
         content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
+        content_ids_for_text_translations = (
+            self.written_translations.get_content_ids_for_text_translation())
         content_ids_for_voiceovers = (
             self.recorded_voiceovers.get_content_ids_for_voiceovers())
         for content_id in content_ids_to_delete:
@@ -3885,16 +4709,86 @@ class State(translation_domain.BaseTranslatableObject):
                 raise Exception(
                     'The content_id %s does not exist in recorded_voiceovers.'
                     % content_id)
+            if not content_id in content_ids_for_text_translations:
+                raise Exception(
+                    'The content_id %s does not exist in written_translations.'
+                    % content_id)
 
             self.recorded_voiceovers.delete_content_id_for_voiceover(content_id)
+            self.written_translations.delete_content_id_for_translation(
+                content_id)
 
         for content_id in content_ids_to_add:
             if content_id in content_ids_for_voiceovers:
                 raise Exception(
                     'The content_id %s already exists in recorded_voiceovers'
                     % content_id)
+            if content_id in content_ids_for_text_translations:
+                raise Exception(
+                    'The content_id %s already exists in written_translations.'
+                    % content_id)
 
             self.recorded_voiceovers.add_content_id_for_voiceover(content_id)
+            self.written_translations.add_content_id_for_translation(content_id)
+
+    def add_translation(
+        self, content_id: str, language_code: str, translation_html: str
+    ) -> None:
+        """Adds translation to a given content id in a specific language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+            translation_html: str. The translated html content.
+        """
+        translation_html = html_cleaner.clean(translation_html)
+        self.written_translations.add_translation(
+            content_id, language_code, translation_html)
+
+    def add_written_translation(
+        self,
+        content_id: str,
+        language_code: str,
+        translation: Union[str, List[str]],
+        data_format: str
+    ) -> None:
+        """Adds a translation for the given content id in a given language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code of the translated html.
+            translation: str|list(str). The translated content.
+            data_format: str. The data format of the translated content.
+        """
+        written_translation = WrittenTranslation(
+            data_format, translation, False)
+        self.written_translations.translations_mapping[content_id][
+            language_code] = written_translation
+
+    def mark_written_translation_as_needing_update(
+        self, content_id: str, language_code: str
+    ) -> None:
+        """Marks translation as needing update for the given content id and
+        language code.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code.
+        """
+        self.written_translations.mark_written_translation_as_needing_update(
+            content_id, language_code)
+
+    def mark_written_translations_as_needing_update(
+        self, content_id: str
+    ) -> None:
+        """Marks translation as needing update for the given content id in all
+        languages.
+
+        Args:
+            content_id: str. The id of the content.
+        """
+        self.written_translations.mark_written_translations_as_needing_update(
+            content_id)
 
     def update_content(self, content: SubtitledHtml) -> None:
         """Update the content of this state.
@@ -3902,11 +4796,8 @@ class State(translation_domain.BaseTranslatableObject):
         Args:
             content: SubtitledHtml. Representation of updated content.
         """
-        old_content_id = self.content.content_id
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = content
-        self._update_content_ids_in_assets(
-            [old_content_id], [self.content.content_id])
 
     def update_param_changes(
         self, param_changes: List[param_domain.ParamChange]
@@ -3949,6 +4840,14 @@ class State(translation_domain.BaseTranslatableObject):
 
         self.interaction.id = interaction_id
         self.interaction.answer_groups = []
+
+    def update_next_content_id_index(self, next_content_id_index: int) -> None:
+        """Update the interaction next content id index attribute.
+
+        Args:
+            next_content_id_index: int. The new next content id index to set.
+        """
+        self.next_content_id_index = next_content_id_index
 
     def update_linked_skill_id(self, linked_skill_id: Optional[str]) -> None:
         """Update the state linked skill id attribute.
@@ -4209,6 +5108,17 @@ class State(translation_domain.BaseTranslatableObject):
         """
         self.recorded_voiceovers = recorded_voiceovers
 
+    def update_written_translations(
+        self, written_translations: WrittenTranslations
+    ) -> None:
+        """Update the written_translations of a state.
+
+        Args:
+            written_translations: WrittenTranslations. The new
+                WrittenTranslations object for the state.
+        """
+        self.written_translations = written_translations
+
     def update_solicit_answer_details(
         self, solicit_answer_details: bool
     ) -> None:
@@ -4243,6 +5153,156 @@ class State(translation_domain.BaseTranslatableObject):
                 % card_is_checkpoint)
         self.card_is_checkpoint = card_is_checkpoint
 
+    def _get_all_translatable_content(self) -> Dict[str, TranslatableItem]:
+        """Returns all content which can be translated into different languages.
+
+        Returns:
+            dict(str, TranslatableItem). Returns a dict with key as content
+            id and TranslatableItem as value with the appropriate data
+            format.
+        """
+        content_id_to_translatable_item = {}
+
+        content_id_to_translatable_item[self.content.content_id] = (
+            TranslatableItem(
+                self.content.html,
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_CONTENT))
+
+        # TODO(#6178): Remove empty html checks once we add a validation
+        # check that ensures each content in state should be non-empty html.
+        default_outcome = self.interaction.default_outcome
+        if default_outcome is not None and default_outcome.feedback.html != '':
+            content_id_to_translatable_item[
+                default_outcome.feedback.content_id
+            ] = TranslatableItem(
+                default_outcome.feedback.html,
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_FEEDBACK)
+
+        for answer_group in self.interaction.answer_groups:
+            if answer_group.outcome.feedback.html != '':
+                content_id_to_translatable_item[
+                    answer_group.outcome.feedback.content_id
+                ] = TranslatableItem(
+                    answer_group.outcome.feedback.html,
+                    TranslatableItem.DATA_FORMAT_HTML,
+                    TranslatableItem.CONTENT_TYPE_FEEDBACK)
+            # As of Aug 2021, only TextInput and SetInput have translatable rule
+            # inputs.
+            if self.interaction.id not in ['TextInput', 'SetInput']:
+                continue
+            for rule_spec in answer_group.rule_specs:
+                for input_value in rule_spec.inputs.values():
+                    if 'normalizedStrSet' in input_value:
+                        content_id_to_translatable_item[
+                            input_value['contentId']
+                        ] = TranslatableItem(
+                            input_value['normalizedStrSet'],
+                            TranslatableItem
+                            .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+                            TranslatableItem.CONTENT_TYPE_RULE,
+                            self.interaction.id,
+                            rule_spec.rule_type)
+                    if 'unicodeStrSet' in input_value:
+                        content_id_to_translatable_item[
+                            input_value['contentId']
+                        ] = TranslatableItem(
+                            input_value['unicodeStrSet'],
+                            TranslatableItem
+                            .DATA_FORMAT_SET_OF_UNICODE_STRING,
+                            TranslatableItem.CONTENT_TYPE_RULE,
+                            self.interaction.id,
+                            rule_spec.rule_type)
+
+        for hint in self.interaction.hints:
+            if hint.hint_content.html != '':
+                content_id_to_translatable_item[
+                    hint.hint_content.content_id
+                ] = TranslatableItem(
+                    hint.hint_content.html,
+                    TranslatableItem.DATA_FORMAT_HTML,
+                    TranslatableItem.CONTENT_TYPE_HINT)
+
+        solution = self.interaction.solution
+        if solution is not None and solution.explanation.html != '':
+            content_id_to_translatable_item[
+                solution.explanation.content_id
+            ] = TranslatableItem(
+                solution.explanation.html,
+                TranslatableItem.DATA_FORMAT_HTML,
+                TranslatableItem.CONTENT_TYPE_SOLUTION)
+
+        for ca_dict in self.interaction.customization_args.values():
+            subtitled_htmls = ca_dict.get_subtitled_html()
+            for subtitled_html in subtitled_htmls:
+                html_string = subtitled_html.html
+                stripped_html_string = html_cleaner.strip_html_tags(html_string)
+                if (
+                    stripped_html_string != '' and
+                    not stripped_html_string.isnumeric()
+                ):
+                    content_id_to_translatable_item[
+                        subtitled_html.content_id
+                    ] = TranslatableItem(
+                        html_string,
+                        TranslatableItem.DATA_FORMAT_HTML,
+                        TranslatableItem.CONTENT_TYPE_INTERACTION,
+                        self.interaction.id)
+
+            subtitled_unicodes = ca_dict.get_subtitled_unicode()
+            for subtitled_unicode in subtitled_unicodes:
+                if subtitled_unicode.unicode_str != '':
+                    content_id_to_translatable_item[
+                        subtitled_unicode.content_id
+                    ] = TranslatableItem(
+                        subtitled_unicode.unicode_str,
+                        TranslatableItem.DATA_FORMAT_UNICODE_STRING,
+                        TranslatableItem.CONTENT_TYPE_INTERACTION,
+                        self.interaction.id)
+
+        return content_id_to_translatable_item
+
+    def has_content_id(self, content_id: str) -> bool:
+        """Returns whether a given content ID is available in the translatable
+        content.
+
+        Args:
+            content_id: str. The content ID that needs to be checked for the
+                availability.
+
+        Returns:
+            bool. A boolean that indicates the availability of the content ID
+            in the translatable content.
+        """
+        available_translate_content = self._get_all_translatable_content()
+        return bool(content_id in available_translate_content)
+
+    def get_content_id_mapping_needing_translations(
+        self, language_code: str
+    ) -> Dict[str, TranslatableItem]:
+        """Returns all text html which can be translated in the given language.
+
+        Args:
+            language_code: str. The abbreviated code of the language.
+
+        Returns:
+            dict(str, TranslatableItem). A dict with key as content id and
+            value as TranslatableItem containing the content and the data
+            format.
+        """
+        content_id_to_translatable_item = self._get_all_translatable_content()
+        available_translation_content_ids = (
+            self.written_translations
+            .get_content_ids_that_are_correctly_translated(language_code))
+        for content_id in available_translation_content_ids:
+            content_id_to_translatable_item.pop(content_id, None)
+
+        # TODO(#7571): Add functionality to return the list of
+        # translations which needs update.
+
+        return content_id_to_translatable_item
+
     def to_dict(self) -> StateDict:
         """Returns a dict representing this State domain object.
 
@@ -4257,8 +5317,10 @@ class State(translation_domain.BaseTranslatableObject):
             'classifier_model_id': self.classifier_model_id,
             'linked_skill_id': self.linked_skill_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
+            'written_translations': self.written_translations.to_dict(),
             'solicit_answer_details': self.solicit_answer_details,
-            'card_is_checkpoint': self.card_is_checkpoint
+            'card_is_checkpoint': self.card_is_checkpoint,
+            'next_content_id_index': self.next_content_id_index
         }
 
     # TODO(#16467): Remove `validate` argument after validating all Question
@@ -4287,8 +5349,10 @@ class State(translation_domain.BaseTranslatableObject):
             InteractionInstance.from_dict(
                 state_dict['interaction'], validate=validate),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
+            WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['solicit_answer_details'],
             state_dict['card_is_checkpoint'],
+            state_dict['next_content_id_index'],
             state_dict['linked_skill_id'],
             state_dict['classifier_model_id'])
 
@@ -4296,8 +5360,6 @@ class State(translation_domain.BaseTranslatableObject):
     def create_default_state(
         cls,
         default_dest_state_name: Optional[str],
-        content_id_for_state_content: str,
-        content_id_for_default_outcome: str,
         is_initial_state: bool = False
     ) -> State:
         """Return a State domain object with default value.
@@ -4307,28 +5369,23 @@ class State(translation_domain.BaseTranslatableObject):
                 None if no default destination state is defined.
             is_initial_state: bool. Whether this state represents the initial
                 state of an exploration.
-            content_id_for_state_content: str. The content id for the content.
-            content_id_for_default_outcome: str. The content id for the default
-                outcome.
 
         Returns:
             State. The corresponding State domain object.
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
-
-        recorded_voiceovers = RecordedVoiceovers({})
-        recorded_voiceovers.add_content_id_for_voiceover(
-            content_id_for_state_content)
-        recorded_voiceovers.add_content_id_for_voiceover(
-            content_id_for_default_outcome)
-
+        content_id = feconf.DEFAULT_NEW_STATE_CONTENT_ID
         return cls(
-            SubtitledHtml(content_id_for_state_content, content_html),
+            SubtitledHtml(content_id, content_html),
             [],
             InteractionInstance.create_default_interaction(
-                default_dest_state_name, content_id_for_default_outcome),
-            recorded_voiceovers, False, is_initial_state)
+                default_dest_state_name),
+            RecordedVoiceovers.from_dict(copy.deepcopy(
+                feconf.DEFAULT_RECORDED_VOICEOVERS)),
+            WrittenTranslations.from_dict(
+                copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
+            False, is_initial_state, 0)
 
     @classmethod
     def convert_html_fields_in_state(
@@ -4384,6 +5441,12 @@ class State(translation_domain.BaseTranslatableObject):
                 AnswerGroup.convert_html_in_answer_group(
                     answer_group, conversion_fn, html_field_types_to_rule_specs)
             )
+
+        if 'written_translations' in state_dict.keys():
+            state_dict['written_translations'] = (
+                WrittenTranslations.
+                convert_html_in_written_translations(
+                    state_dict['written_translations'], conversion_fn))
 
         for hint_index, hint in enumerate(state_dict['interaction']['hints']):
             state_dict['interaction']['hints'][hint_index] = (
@@ -4469,339 +5532,17 @@ class State(translation_domain.BaseTranslatableObject):
 
         return state_dict
 
-    def get_content_html(self, content_id: str) -> Union[str, List[str]]:
-        """Returns the content belongs to a given content id of the object.
-
-        Args:
-            content_id: str. The id of the content.
+    def get_all_html_content_strings(self) -> List[str]:
+        """Get all html content strings in the state.
 
         Returns:
-            str. The html content corresponding to the given content id.
-
-        Raises:
-            ValueError. The given content_id does not exist.
+            list(str). The list of all html content strings in the interaction.
         """
-        content_id_to_translatable_content = (
-            self.get_translatable_contents_collection()
-            .content_id_to_translatable_content)
-
-        if content_id not in content_id_to_translatable_content:
-            raise ValueError('Content ID %s does not exist' % content_id)
-
-        return content_id_to_translatable_content[content_id].content_value
-
-    @classmethod
-    def traverse_v54_state_dict_for_contents(
-        cls,
-        state_dict: StateDict
-    ) -> Iterator[Tuple[
-        Union[SubtitledHtmlDict, Dict[str, Union[str, List[str]]]],
-        translation_domain.ContentType,
-        Optional[str]
-    ]]:
-        """This method iterates throughout the state dict and yields the value
-        for each field. The yielded value is used for generating and updating
-        the content-ids for the fields in the state in their respective methods.
-
-        Args:
-            state_dict: StateDict. State object represented in the dict format.
-
-        Yields:
-            (str|list(str), str). A tuple containing content and content-id.
-        """
-        yield (
-            state_dict['content'],
-            translation_domain.ContentType.CONTENT,
-            None)
-
-        interaction = state_dict['interaction']
-
-        default_outcome = interaction['default_outcome']
-        if default_outcome is not None:
-            yield (
-                default_outcome['feedback'],
-                translation_domain.ContentType.DEFAULT_OUTCOME,
-                None)
-
-        answer_groups = interaction['answer_groups']
-        for answer_group in answer_groups:
-            outcome = answer_group['outcome']
-            yield (
-                outcome['feedback'],
-                translation_domain.ContentType.FEEDBACK,
-                None)
-
-            if interaction['id'] not in ['TextInput', 'SetInput']:
-                continue
-
-            for rule_spec in answer_group['rule_specs']:
-                for input_name in sorted(rule_spec['inputs'].keys()):
-                    input_value = rule_spec['inputs'][input_name]
-                    if not isinstance(input_value, dict):
-                        continue
-                    if 'normalizedStrSet' in input_value:
-                        yield (
-                            input_value,
-                            translation_domain.ContentType.RULE,
-                            'input')
-                    if 'unicodeStrSet' in input_value:
-                        yield (
-                            input_value,
-                            translation_domain.ContentType.RULE,
-                            'input')
-
-        for hint in interaction['hints']:
-            yield (
-                hint['hint_content'], translation_domain.ContentType.HINT, None)
-
-        solution = interaction['solution']
-        if solution is not None:
-            yield (
-                solution['explanation'],
-                translation_domain.ContentType.SOLUTION,
-                None)
-
-        interaction_id = interaction['id']
-        customisation_args = interaction['customization_args']
-        interaction_specs = (
-            interaction_registry.Registry
-                .get_all_specs_for_state_schema_version(
-                    feconf.CURRENT_STATE_SCHEMA_VERSION,
-                    can_fetch_latest_specs=True
-               )
-        )
-        if interaction_id in interaction_specs:
-            ca_specs_dict = interaction_specs[interaction_id][
-                'customization_arg_specs']
-            for spec in ca_specs_dict:
-                customisation_arg = customisation_args[spec['name']]
-                contents = (
-                    InteractionCustomizationArg.traverse_by_schema_and_get(
-                        spec['schema'], customisation_arg['value'], [
-                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
-                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-                        lambda x: x
-                    )
-                )
-                for content in contents:
-                    yield (
-                        content,
-                        translation_domain.ContentType.CUSTOMIZATION_ARG,
-                        spec['name']
-                    )
-
-    @classmethod
-    def update_old_content_id_to_new_content_id_in_v54_states(
-        cls,
-        states_dict: Dict[str, StateDict]
-    ) -> Tuple[Dict[str, StateDict], int]:
-        """Updates the old content-ids from the state fields like hints,
-        solution, etc with the newly generated content id.
-
-        Args:
-            states_dict: list(dict(State)). List of dictionaries, where each
-                dict represents a state object.
-
-        Returns:
-            states_dict: list(dict(State)). List of state dicts, with updated
-            content-ids.
-        """
-        PossibleContentIdsType = Union[str, List[str], List[List[str]]]
-
-        def _replace_content_id(
-            old_id: PossibleContentIdsType,
-            id_mapping: Dict[str, str]
-        ) -> str:
-            """Replace old Id with the new Id."""
-            assert isinstance(old_id, str)
-
-            # INVALID_CONTENT_ID doesn't corresponds to any existing content in
-            # the state. Such Ids cannot be replaced with any new id.
-            if old_id == feconf.INVALID_CONTENT_ID:
-                return old_id
-
-            return id_mapping[old_id]
-
-        object_content_ids_replacers: Dict[
-            str,
-            Callable[
-                [PossibleContentIdsType, Dict[str, str]], PossibleContentIdsType
-            ]
-        ] = {}
-
-        object_content_ids_replacers['TranslatableHtmlContentId'] = (
-           _replace_content_id)
-
-        object_content_ids_replacers['SetOfTranslatableHtmlContentIds'] = (
-            lambda ids_set, id_mapping: [
-                _replace_content_id(old_id, id_mapping)
-                for old_id in ids_set
-            ]
-        )
-        object_content_ids_replacers[
-                'ListOfSetsOfTranslatableHtmlContentIds'] = (
-            lambda items, id_mapping: [
-                [_replace_content_id(old_id, id_mapping)for old_id in ids_set]
-                for ids_set in items
-            ]
-        )
-        content_id_generator = translation_domain.ContentIdGenerator()
-        for state_name in sorted(states_dict.keys()):
-            state: StateDict = states_dict[state_name]
-            new_voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]] = {}
-            old_to_new_content_id: Dict[str, str] = {}
-            old_voiceovers_mapping = state['recorded_voiceovers'][
-                'voiceovers_mapping']
-
-            for content, content_type, extra_prefix in (
-                cls.traverse_v54_state_dict_for_contents(state)
-            ):
-                new_content_id = content_id_generator.generate(
-                    content_type, extra_prefix=extra_prefix)
-                content_id_key = 'content_id'
-                if content_type == translation_domain.ContentType.RULE:
-                    content_id_key = 'contentId'
-
-                # Here we use MyPy ignore because the content Id key for the
-                # contents in the rule inputs is contentId instead of
-                # content_id.
-                old_content_id = content[content_id_key]  # type: ignore[misc]
-                # Here we use MyPy ignore because the content Id key for the
-                # contents in the rule inputs is contentId instead of
-                # content_id.
-                content[content_id_key] = new_content_id  # type: ignore[index]
-
-                assert isinstance(old_content_id, str)
-                old_to_new_content_id[old_content_id] = new_content_id
-
-                new_voiceovers_mapping[new_content_id] = old_voiceovers_mapping[
-                    old_content_id]
-
-            state['recorded_voiceovers']['voiceovers_mapping'] = (
-                new_voiceovers_mapping
-            )
-
-            interaction_specs = (
-                interaction_registry.Registry
-                    .get_all_specs_for_state_schema_version(
-                        feconf.CURRENT_STATE_SCHEMA_VERSION,
-                        can_fetch_latest_specs=True
-                )
-            )
-            interaction_id = state['interaction']['id']
-            if interaction_id is None:
-                continue
-
-            interaction = state['interaction']
-            answer_groups = interaction['answer_groups']
-            rule_descriptions = interaction_specs[interaction_id][
-                'rule_descriptions']
-            answer_type = interaction_specs[interaction_id]['answer_type']
-
-            if interaction['solution']:
-                solution_dict = interaction['solution']
-                assert solution_dict is not None
-                if answer_type in object_content_ids_replacers:
-                    # Here we use cast because correct_answer can be of
-                    # different types but the 'if' case above covers only for
-                    # the PossibleContentIdsType.
-                    correct_answer = cast(
-                        PossibleContentIdsType, solution_dict['correct_answer'])
-                    solution_dict['correct_answer'] = (
-                        object_content_ids_replacers[answer_type](
-                            correct_answer, old_to_new_content_id
-                        )
-                    )
-
-            if not rule_descriptions:
-                continue
-
-            rules_variables = {
-                name: re.findall(r'\{\{(.+?)\|(.+?)\}\}', description)
-                for name, description in rule_descriptions.items()
-            }
-
-            for answer_group in answer_groups:
-                for rule_spec in answer_group['rule_specs']:
-                    rule_inputs = rule_spec['inputs']
-                    rule_type = rule_spec['rule_type']
-                    for key, value_class in rules_variables[rule_type]:
-                        if value_class not in object_content_ids_replacers:
-                            continue
-                        # Here we use cast because rule input can be a dict but
-                        # the 'if' case above covers only for the
-                        # PossibleContentIdsType.
-                        rule_input = cast(
-                            PossibleContentIdsType, rule_inputs[key])
-                        rule_inputs[key] = object_content_ids_replacers[
-                            value_class](rule_input, old_to_new_content_id)
-
-        return states_dict, content_id_generator.next_content_id_index
-
-    @classmethod
-    def generate_old_content_id_to_new_content_id_in_v54_states(
-        cls,
-        states_dict: Dict[str, StateDict]
-    ) -> Tuple[Dict[str, Dict[str, str]], int]:
-        """Generates the new content-id for each state field based on
-        next_content_id_index variable.
-
-        Args:
-            states_dict: list(dict(State)). List of dictionaries, where each
-                dict represents a state object.
-
-        Returns:
-            (dict(str, dict(str, str)), str). A tuple with the first field as a
-            dict and the second field is the value of the next_content_id_index.
-            The first field is a dict with state name as a key and
-            old-content-id to new-content-id dict as a value.
-        """
-        content_id_generator = translation_domain.ContentIdGenerator()
-        states_to_content_id = {}
-
-        for state_name in sorted(states_dict.keys()):
-            old_id_to_new_id: Dict[str, str] = {}
-
-            for content, content_type, extra_prefix in (
-                cls.traverse_v54_state_dict_for_contents(
-                    states_dict[state_name])
-            ):
-                if content_type == translation_domain.ContentType.RULE:
-                    # Here we use MyPy ignore because the content Id key for the
-                    # contents in the rule inputs is contentId instead of
-                    # content_id.
-                    content_id = content['contentId']  # type: ignore[misc]
-                else:
-                    content_id = content['content_id']
-
-                assert isinstance(content_id, str)
-                old_id_to_new_id[content_id] = content_id_generator.generate(
-                    content_type, extra_prefix=extra_prefix)
-
-            states_to_content_id[state_name] = old_id_to_new_id
-
-        return (
-            states_to_content_id,
-            content_id_generator.next_content_id_index
-        )
-
-    def has_content_id(self, content_id: str) -> bool:
-        """Returns whether a given content ID is available in the translatable
-        content.
-
-        Args:
-            content_id: str. The content ID that needs to be checked for the
-                availability.
-
-        Returns:
-            bool. A boolean that indicates the availability of the content ID
-            in the translatable content.
-        """
-
-        available_translate_content = (
-            self.get_translatable_contents_collection()
-            .content_id_to_translatable_content)
-        return bool(content_id in available_translate_content)
+        html_list = (
+            self.written_translations.get_all_html_content_strings() +
+            self.interaction.get_all_html_content_strings() + [
+                self.content.html])
+        return html_list
 
 
 class StateVersionHistory:

@@ -207,7 +207,7 @@ describe('Change List Service when changes are mergable', () => {
       changeListService.autosaveInProgressEventEmitter, 'emit')
       .and.callThrough();
 
-    changeListService.addState('state', 'content_1', 'dafault_outcome_4');
+    changeListService.addState('state');
     flush();
 
     expect(saveSpy).toHaveBeenCalled();
@@ -225,35 +225,9 @@ describe('Change List Service when changes are mergable', () => {
       changeListService.autosaveInProgressEventEmitter, 'emit')
       .and.callThrough();
 
-    changeListService.addState('state', 'content_1', 'dafault_outcome_4');
+    changeListService.addState('state');
     flush();
 
-    expect(saveSpy).toHaveBeenCalled();
-  }));
-
-  it('should add change for markTranslationsAsNeedingUpdate', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
-    changeListService.explorationChangeList.length = 0;
-    changeListService.loadingMessage = '';
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
-
-    changeListService.markTranslationsAsNeedingUpdate('content_id_1');
-    flush();
-    expect(saveSpy).toHaveBeenCalled();
-  }));
-
-  it('should add change for removeTranslations', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
-    changeListService.explorationChangeList.length = 0;
-    changeListService.loadingMessage = '';
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
-
-    changeListService.removeTranslations('content_id_1');
-    flush();
     expect(saveSpy).toHaveBeenCalled();
   }));
 
@@ -371,6 +345,20 @@ describe('Change List Service when changes are mergable', () => {
     changeListService.explorationChangeList.length = 0;
     expect(changeListService.isExplorationLockedForEditing())
       .toBe(false);
+  });
+
+  it('should mark translation as needing update', () => {
+    expect(changeListService.getChangeList()[0]).toEqual(undefined);
+
+    changeListService.markTranslationAsNeedingUpdate(
+      'content', 'ar', 'Introduction');
+
+    expect(changeListService.getChangeList()[0]).toEqual({
+      cmd: 'mark_written_translation_as_needing_update',
+      content_id: 'content',
+      language_code: 'ar',
+      state_name: 'Introduction'
+    });
   });
 });
 
@@ -490,9 +478,7 @@ describe('Change List Service when internet is available', () => {
       .and.returnValue();
     changeListService.temporaryListOfChanges = [{
       cmd: 'add_state',
-      state_name: 'stateName',
-      content_id_for_state_content: 'content_0',
-      content_id_for_default_outcome: 'default_outcome_1'
+      state_name: 'stateName'
     }];
     changeListService.explorationChangeList.length = 2;
 
@@ -505,9 +491,7 @@ describe('Change List Service when internet is available', () => {
   it('should not undo changes when there are no changes', () => {
     changeListService.temporaryListOfChanges = [{
       cmd: 'add_state',
-      state_name: 'stateName',
-      content_id_for_state_content: 'content_0',
-      content_id_for_default_outcome: 'default_outcome_1'
+      state_name: 'stateName'
     }];
 
     changeListService.undoLastChange();
