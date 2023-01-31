@@ -27,8 +27,8 @@ describe('Translatable Texts model', () => {
   let sampleTranslatableTexts: TranslatableTexts;
   const getTranslatableItem = (text: string) => {
     return {
-      data_format: 'html',
-      content: text,
+      content_format: 'html',
+      content_value: text,
       content_type: 'content',
       interaction_id: null,
       rule_type: null

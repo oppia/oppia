@@ -18,10 +18,8 @@
 
 import { Component, ChangeDetectorRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
@@ -38,6 +36,7 @@ import { SolutionValidityService } from 'pages/exploration-editor-page/editor-ta
 import { EditabilityService } from 'services/editability.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { LoaderService } from 'services/loader.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 @Component({
   selector: 'oppia-question-editor',
@@ -56,55 +55,22 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   interactionIsShown!: boolean;
   oppiaBlackImgUrl!: string;
   stateEditorIsInitialized!: boolean;
+  nextContentIdIndexMemento!: number;
+  nextContentIdIndexDisplayedValue!: number;
 
   componentSubscriptions = new Subscription();
 
   constructor(
     private changeDetectionRef: ChangeDetectorRef,
     private editabilityService: EditabilityService,
+    private generateContentIdService: GenerateContentIdService,
     private loaderService: LoaderService,
-    private ngbModal: NgbModal,
     private questionUpdateService: QuestionUpdateService,
     private solutionValidityService: SolutionValidityService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
     private urlInterpolationService: UrlInterpolationService,
   ) { }
-
-  showMarkAllAudioAsNeedingUpdateModalIfRequired(contentIds: string[]): void {
-    const state = this.question.getStateData();
-    const recordedVoiceovers = state.recordedVoiceovers;
-    const writtenTranslations = state.writtenTranslations;
-
-    const shouldPrompt = contentIds.some(
-      (contentId) =>
-        recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
-    if (shouldPrompt) {
-      this.ngbModal.open(
-        MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
-          backdrop: 'static'
-        }).result.then(() => {
-        this._updateQuestion(() => {
-          contentIds.forEach(contentId => {
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-              recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                contentId);
-            }
-            if (
-              writtenTranslations.hasUnflaggedWrittenTranslations(
-                contentId)
-            ) {
-              writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                contentId);
-            }
-          });
-        });
-      }, () => {
-        // This callback is triggered when the Cancel button is
-        // clicked. No further action is needed.
-      });
-    }
-  }
 
   saveInteractionId(displayedValue: string): void {
     this._updateQuestion(() => {
@@ -134,11 +100,10 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveNextContentIdIndex(displayedValue: number): void {
-    this._updateQuestion(() => {
-      const stateData = this.question.getStateData();
-      stateData.nextContentIdIndex = cloneDeep(displayedValue);
-    });
+  saveNextContentIdIndex(): void {
+    this.questionUpdateService.setQuestionNextContentIdIndex(
+      this.question, this.nextContentIdIndexDisplayedValue);
+    this.nextContentIdIndexMemento = this.nextContentIdIndexDisplayedValue;
   }
 
   saveSolution(displayedValue: Solution): void {
@@ -198,6 +163,16 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
         this.question.getInapplicableSkillMisconceptionIds());
     }
     this.solutionValidityService.init(['question']);
+
+    this.generateContentIdService.init(() => {
+      let indexToUse = this.nextContentIdIndexDisplayedValue;
+      this.nextContentIdIndexDisplayedValue += 1;
+      return indexToUse;
+    }, () => {
+      this.nextContentIdIndexDisplayedValue = (
+        this.nextContentIdIndexMemento);
+    });
+
     const stateData = this.questionStateData;
     const outcome = stateData.interaction.defaultOutcome;
     if (outcome) {
@@ -245,6 +220,11 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
     this.interactionIsShown = false;
     this.stateEditorIsInitialized = false;
+
+    this.nextContentIdIndexMemento = this.question.getNextContentIdIndex();
+    this.nextContentIdIndexDisplayedValue = (
+      this.question.getNextContentIdIndex());
+
     this._init();
   }
 
