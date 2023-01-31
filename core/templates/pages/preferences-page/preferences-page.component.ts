@@ -174,6 +174,8 @@ export class PreferencesPageComponent {
       if (returnData.bulk_email_signup_message_should_be_shown) {
         this.canReceiveEmailUpdates = false;
         this.showEmailSignupLink = true;
+      } else {
+        this.alertsService.addInfoMessage('Saved!', 1000);
       }
     });
   }

@@ -437,24 +437,6 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['subscription_list']), 0)
         self.logout()
 
-    def test_can_update_profile_picture_data_url(self) -> None:
-        self.login(self.OWNER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        user_settings = user_services.get_user_settings(self.owner_id)
-        assert user_settings.profile_picture_data_url is not None
-        self.assertTrue(test_utils.check_image_png_or_webp(
-            user_settings.profile_picture_data_url))
-        self.put_json(
-            feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL,
-            {
-                'data': 'new_profile_picture_data_url'},
-            csrf_token=csrf_token)
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            user_settings.profile_picture_data_url,
-            'new_profile_picture_data_url')
-        self.logout()
-
     def test_can_update_default_dashboard(self) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -470,6 +452,32 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.owner_id)
         self.assertEqual(
             user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
+        self.logout()
+
+
+class ProfilePictureDataUrlHandlerTests(test_utils.GenericTestBase):
+
+    def test_profile_picture_data_url(self) -> None:
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        user_settings = user_services.get_user_settings(owner_id)
+        assert user_settings.profile_picture_data_url is not None
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            user_settings.profile_picture_data_url))
+        self.put_json(
+            feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL,
+            {
+                'data': 'new_profile_picture_data_url'},
+            csrf_token=csrf_token)
+        profile_picture_data_url = self.get_json(
+            feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL
+        )
+        self.assertEqual(
+            profile_picture_data_url['profile_picture_data_url'],
+            'new_profile_picture_data_url'
+        )
         self.logout()
 
 
@@ -696,7 +704,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-    def test_email_preferences_updates(self) -> None:
+
+class EmailPreferencesHandlerTests(test_utils.GenericTestBase):
+
+    def test_email_preferences(self) -> None:
         """Test that Preferences Handler correctly updates the email
         preferences of the user.
         """
@@ -705,6 +716,23 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'data': {
+                'can_receive_email_updates': False,
+                'can_receive_editor_role_email': True,
+                'can_receive_feedback_message_email': True,
+                'can_receive_subscription_email': True
+            }
+        }
+
+        # Check default email preferences.
+        email_preferences = self.get_json(feconf.EMAIL_PREFFERENCES)
+        self.assertDictContainsSubset(
+            payload['data'],
+            email_preferences,
+            msg='Wrong email preferences'
+        )
 
         payload = {
             'data': {
