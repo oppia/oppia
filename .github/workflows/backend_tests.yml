@@ -59,6 +59,7 @@ jobs:
         with:
           name: ${{ format('backend_test_coverage_shard_{0}', matrix.shard) }}
           path: .coverage
+          retention-days: 1
   check_combined_coverage:
     name: Check combined backend test coverage
     needs: run_tests

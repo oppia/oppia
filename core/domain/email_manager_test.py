@@ -6557,10 +6557,6 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.swap_webhook_feconf_return_secret = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', 'secret')
-        self.swap_webhook_feconf_return_none = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', None)
         self.swap_webhook_secrets_return_none = self.swap_to_always_return(
             secrets_services, 'get_secret', None)
         self.swap_webhook_secrets_return_secret = self.swap_with_checks(
@@ -6573,30 +6569,14 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
             ]
         )
 
-    def test_cloud_secrets_return_none_feconf_return_secret_passes(
-        self
-    ) -> None:
-        with self.swap_webhook_feconf_return_secret:
-            with self.swap_webhook_secrets_return_none:
-                self.assertTrue(email_manager.verify_mailchimp_secret('secret'))
+    def test_cloud_secrets_return_none_logs_exception(self) -> None:
+        with self.swap_webhook_secrets_return_none:
+            with self.capture_logging(min_level=logging.WARNING) as logs:
                 self.assertFalse(
-                    email_manager.verify_mailchimp_secret('not-secret'))
-
-    def test_cloud_secrets_return_none_feconf_return_secret_logs_exception(
-        self
-    ) -> None:
-        with self.swap_webhook_feconf_return_secret:
-            with self.swap_webhook_secrets_return_none:
-                with self.capture_logging(min_level=logging.WARNING) as logs:
-                    self.assertTrue(
-                        email_manager.verify_mailchimp_secret('secret'))
-                    self.assertEqual(
-                        [
-                            'Cloud Secret Manager is not able to get '
-                            'MAILCHIMP_WEBHOOK_SECRET.',
-                        ],
-                        logs
-                    )
+                    email_manager.verify_mailchimp_secret('secret'))
+                self.assertEqual(
+                    ['Mailchimp Webhook secret is not available.'], logs
+                )
 
     def test_cloud_secrets_return_secret_passes(self) -> None:
         with self.swap_webhook_secrets_return_secret:
@@ -6604,26 +6584,3 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
                 email_manager.verify_mailchimp_secret('secret'))
             self.assertFalse(
                 email_manager.verify_mailchimp_secret('not-secret'))
-
-    def test_cloud_secrets_return_none_feconf_return_none_passes(self) -> None:
-        with self.swap_webhook_feconf_return_none:
-            with self.swap_webhook_secrets_return_none:
-                self.assertFalse(
-                    email_manager.verify_mailchimp_secret('secret'))
-
-    def test_cloud_secrets_return_none_feconf_return_none_logs_exception(
-        self
-    ) -> None:
-        with self.swap_webhook_feconf_return_none:
-            with self.swap_webhook_secrets_return_none:
-                with self.capture_logging(min_level=logging.WARNING) as logs:
-                    self.assertFalse(
-                        email_manager.verify_mailchimp_secret('secret'))
-                    self.assertEqual(
-                        [
-                            'Cloud Secret Manager is not able to get '
-                            'MAILCHIMP_WEBHOOK_SECRET.',
-                            'Mailchimp webhook secret is not available.'
-                        ],
-                        logs
-                    )

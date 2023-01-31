@@ -220,64 +220,80 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     'valid@example.com', {}, 'Invalid',
                     can_receive_email_updates=True)
 
-    def test_get_mailchimp_class_error(self) -> None:
-        observed_log_messages = []
-
-        def _mock_logging_function(msg: str, *args: str) -> None:
-            """Mocks logging.exception().
-
-            Args:
-                msg: str. The logging message.
-                *args: list(*). A list of arguments.
-            """
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
-        with logging_swap:
-            swap_api_key_secrets_return_none = self.swap_with_checks(
-                secrets_services,
-                'get_secret',
-                lambda _: None,
-                expected_args=[('MAILCHIMP_API_KEY',)]
-            )
-            with swap_api_key_secrets_return_none:
-                mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
+    def test_get_mailchimp_class_errors_when_api_key_is_not_available(
+        self
+    ) -> None:
+        swap_get_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: None,
+            expected_args=[('MAILCHIMP_API_KEY',)]
+        )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with swap_get_secret:
+                self.assertIsNone(
+                    mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
+                )
                 self.assertItemsEqual(
-                    observed_log_messages,
-                    [
-                        'Cloud Secret Manager is not able to get '
-                        'MAILCHIMP_API_KEY.',
-                        'Mailchimp API key is not available.'
-                    ]
+                    logs, ['Mailchimp API key is not available.']
                 )
 
-            observed_log_messages = []
-            swap_api_key_secrets_return_key = self.swap_with_checks(
-                secrets_services,
-                'get_secret',
-                lambda _: 'key',
-                expected_args=[
-                    ('MAILCHIMP_API_KEY',),
-                    ('MAILCHIMP_API_KEY',),
-                    ('MAILCHIMP_API_KEY',)
-                ]
-            )
-            swap_api_key_feconf = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
-            with swap_api_key_feconf, swap_api_key_secrets_return_key:
-                mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
-                self.assertItemsEqual(
-                    observed_log_messages, ['Mailchimp username is not set.'])
-
-                mailchimp_bulk_email_services.permanently_delete_user_from_list(
-                    'sample_email')
-                self.assertFalse(
-                    mailchimp_bulk_email_services.add_or_update_user_status(
-                        'sample_email',
-                        {},
-                        'Web',
-                        can_receive_email_updates=True
-                    )
+    def test_get_mailchimp_class_errors_when_username_is_not_available(
+        self
+    ) -> None:
+        swap_mailchimp_username = self.swap(
+            feconf, 'MAILCHIMP_USERNAME', None
+        )
+        swap_get_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: 'key',
+            expected_args=[('MAILCHIMP_API_KEY',)]
+        )
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with swap_mailchimp_username, swap_get_secret:
+                self.assertIsNone(
+                    mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
                 )
+                self.assertItemsEqual(
+                    logs, ['Mailchimp username is not set.']
+                )
+
+    def test_add_or_update_user_status_returns_false_when_username_is_none(
+        self
+    ) -> None:
+        swap_get_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: 'key',
+            expected_args=[
+                ('MAILCHIMP_API_KEY',),
+            ]
+        )
+        with swap_get_secret:
+            self.assertFalse(
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    'sample_email',
+                    {},
+                    'Web',
+                    can_receive_email_updates=True
+                )
+            )
+
+    def test_permanently_delete_user_from_list_when_username_is_none(
+        self
+    ) -> None:
+        swap_get_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: 'key',
+            expected_args=[
+                ('MAILCHIMP_API_KEY',),
+            ]
+        )
+        with swap_get_secret:
+            mailchimp_bulk_email_services.permanently_delete_user_from_list(
+                'sample_email')
 
     def test_add_or_update_mailchimp_user_status(self) -> None:
         mailchimp = self.MockMailchimpClass()
@@ -285,7 +301,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
-        swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
         swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:
@@ -344,7 +360,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
-        swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
         swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:
@@ -366,7 +382,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
-        swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
         swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:
@@ -392,7 +408,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         swap_mailchimp_context = self.swap(
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
-        swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
         swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
         with swap_mailchimp_context, swap_api, swap_username:

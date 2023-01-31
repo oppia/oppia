@@ -40,7 +40,7 @@ export class OpportunitiesListComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() loadOpportunities!: ExplorationOpportunitiesFetcherFunction;
+  @Input() loadOpportunities?: ExplorationOpportunitiesFetcherFunction;
   @Input() loadMoreOpportunities!: ExplorationOpportunitiesFetcherFunction;
   @Input() opportunityHeadingTruncationLength!: number;
   @Input() opportunityType!: string;
@@ -63,6 +63,7 @@ export class OpportunitiesListComponent {
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
   more: boolean = false;
   userIsOnLastPage: boolean = true;
+  languageCode: string = '';
 
   constructor(
     private zone: NgZone,
@@ -118,6 +119,13 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
+    this.fetchAndLoadOpportunities();
+  }
+
+  fetchAndLoadOpportunities(): void {
+    if (!this.loadOpportunities) {
+      return;
+    }
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
       // migration is complete.
@@ -176,6 +184,11 @@ export class OpportunitiesListComponent {
       moreResults: boolean): boolean {
     const lastPageNumber = Math.ceil(opportunities.length / pageSize);
     return activePageNumber >= lastPageNumber && !moreResults;
+  }
+
+  onChangeLanguage(languageCode: string): void {
+    this.languageCode = languageCode;
+    this.fetchAndLoadOpportunities();
   }
 }
 

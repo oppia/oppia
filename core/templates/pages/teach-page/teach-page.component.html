@@ -223,12 +223,8 @@
         <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
       </h3>
       <div class="teach-arrows-container">
-        <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
-          arrow_back_ios
-        </span>
-        <span (click)="incrementDisplayedTestimonialId()" class="material-icons">
-          arrow_forward_ios
-        </span>
+        <span (click)="decrementDisplayedTestimonialId()" class="fas fa-chevron-left font-awesome-arrows"></span>
+        <span (click)="incrementDisplayedTestimonialId()" class="fas fa-chevron-right font-awesome-arrows"></span>
       </div>
     </div>
     <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
@@ -257,12 +253,8 @@
           <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
         </h3>
         <div class="teach-arrows-container">
-          <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
-            arrow_back_ios
-          </span>
-          <span (click)="incrementDisplayedTestimonialId()" class="material-icons">
-            arrow_forward_ios
-          </span>
+          <span (click)="decrementDisplayedTestimonialId()" class="fas fa-chevron-left font-awesome-arrows"></span>
+          <span (click)="incrementDisplayedTestimonialId()" class="fas fa-chevron-right font-awesome-arrows"></span>
         </div>
       </div>
     </div>
@@ -555,12 +547,13 @@
     text-align: center;
   }
 
-  .teach-page .material-icons {
+  .teach-page .font-awesome-arrows {
     color: #6d6d6d;
     cursor: pointer;
     font-size: 2.5em;
     margin-bottom: 50px ;
     margin-top: 50px;
+    padding: 0 1.5rem;
   }
 
   .teach-page .teach-student-image img {

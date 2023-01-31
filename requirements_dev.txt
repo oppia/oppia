@@ -92,6 +92,8 @@ wrapt==1.13.3
     # via
     #   astroid
     #   deprecated
+xmltodict==0.13.0
+    # via -r requirements_dev.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
