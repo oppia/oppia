@@ -24,7 +24,6 @@ from core import feconf
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.transforms import results_transforms
@@ -137,14 +136,20 @@ class MigrateTopicModels(beam.PTransform):
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult]
     ]:
-        """Returns a PCollection of results from the topic migration.
+        """Migrate topic objects and flush the input
+            in case of errors.
+
+        Args:
+            pipeline: Pipeline. Input beam pipeline.
 
         Returns:
-            PCollection. A PCollection of results from the topic migration.
+            (PCollection, PCollection). Tuple containing
+            PCollection of models which should be put into the datastore and
+            a PCollection of results from the topic migration.
         """
 
         unmigrated_topic_models = (
-            self.pipeline
+            pipeline
             | 'Get all non-deleted topic models' >> (
                 ndb_io.GetModels(topic_models.TopicModel.get_all()))
             # Pylint disable is needed becasue pylint is not able to correclty
@@ -236,9 +241,9 @@ class MigrateTopicModels(beam.PTransform):
         )
 
         job_run_results = (
-						migrated_topic_job_run_results,
-						already_migrated_job_run_results,
-						topic_objects_list_job_run_results
+            migrated_topic_job_run_results,
+            already_migrated_job_run_results,
+            topic_objects_list_job_run_results
         ) | 'Flatten job run results' >> beam.Flatten()
 
         return (
@@ -247,7 +252,6 @@ class MigrateTopicModels(beam.PTransform):
         )
 
 
-#migrate means it does save to data store
 class MigrateTopicJob(beam.PTransform):
     """Job that migrates Exploration models."""
 
@@ -307,6 +311,7 @@ class MigrateTopicJob(beam.PTransform):
             TopicSummaryModel. The updated topic summary model to put into the
             datastore.
         """
+
         topic_summary = topic_services.compute_summary_of_topic(migrated_topic)
         topic_summary.version += 1
         updated_topic_summary_model = (
@@ -318,6 +323,7 @@ class MigrateTopicJob(beam.PTransform):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the topic migration.
+
         Returns:
             PCollection. A PCollection of results from the topic
             migration.
@@ -363,6 +369,7 @@ class AuditTopicMigrateJob(beam.PTransform):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the audit of topic
         migration.
+
         Returns:
             PCollection. A PCollection of results from the topic
             migration.
