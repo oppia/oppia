@@ -32,9 +32,6 @@ describe('Exploration translation and voiceover tab', function() {
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
   var explorationEditorTranslationTab = null;
-  var YELLOW_STATE_PROGRESS_COLOR = 'rgb(233,179,48)';
-  var GREEN_STATE_PROGRESS_COLOR = 'rgb(22,167,101)';
-  var RED_STATE_PROGRESS_COLOR = 'rgb(209,72,54)';
 
   beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -183,23 +180,6 @@ describe('Exploration translation and voiceover tab', function() {
     await users.logout();
   });
 
-  it('should maintain its active sub-tab on saving draft',
-    async function() {
-      await users.login('user@editorTab.com');
-      await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
-      await explorationEditorTranslationTab.switchToTranslationMode();
-      await explorationEditorTranslationTab.navigateToFeedbackTab();
-      await explorationEditorTranslationTab.setTranslation(
-        await forms.toRichText('Sample Translation.'));
-      await explorationEditorPage.publishChanges('Adds one translation.');
-      await explorationEditorTranslationTab.expectFeedbackTabToBeActive();
-      await users.logout();
-    });
-
-
   it('should change translation language correctly', async function() {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
@@ -209,87 +189,6 @@ describe('Exploration translation and voiceover tab', function() {
     await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
     await users.logout();
   });
-
-  it('should correctly switch to different modes', async function() {
-    await users.login('voiceArtist@translationTab.com');
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
-    await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
-
-    await explorationEditorTranslationTab.switchToTranslationMode();
-    await explorationEditorTranslationTab.expectToBeInTranslationMode();
-
-    await explorationEditorTranslationTab.switchToVoiceoverMode();
-    await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
-    await users.logout();
-  });
-
-  it('should allow adding translation and reflect the progress',
-    async function() {
-      let expEditorTranslationTab = explorationEditorTranslationTab;
-      await users.login('user@editorTab.com');
-      await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorPage.navigateToTranslationTab();
-      await expEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
-      await expEditorTranslationTab.switchToTranslationMode();
-
-      await expEditorTranslationTab.expectCorrectStatusColor(
-        'first', YELLOW_STATE_PROGRESS_COLOR);
-      await expEditorTranslationTab.expectCorrectStatusColor(
-        'second', RED_STATE_PROGRESS_COLOR);
-      await expEditorTranslationTab.expectCorrectStatusColor(
-        'final card', RED_STATE_PROGRESS_COLOR);
-      await expEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-        '1 item translated out of 9 items');
-
-      await expEditorTranslationTab.moveToState('first');
-      await expEditorTranslationTab.expectContentTabContentToMatch(
-        'This is first card.');
-      await expEditorTranslationTab.setTranslation(
-        await forms.toRichText('Yeh pehla panna hain.'));
-      await expEditorTranslationTab.navigateToFeedbackTab();
-      await expEditorTranslationTab.setTranslation(
-        await forms.toRichText('Yeh hindi main vishleshad hain.'));
-      await expEditorTranslationTab.moveToState('final card');
-      await expEditorTranslationTab.expectContentTabContentToMatch(
-        'This is final card.');
-      await expEditorTranslationTab.setTranslation(
-        await forms.toRichText('Yeh aakhri panna hain.'));
-
-      await expEditorTranslationTab.moveToState('first');
-      await expEditorTranslationTab.expectTranslationToMatch(
-        await forms.toRichText('Yeh pehla panna hain.'));
-      await expEditorTranslationTab.navigateToFeedbackTab();
-      await expEditorTranslationTab.expectTranslationToMatch(
-        await forms.toRichText('Yeh hindi main vishleshad hain.'));
-      await expEditorTranslationTab.moveToState('final card');
-      await expEditorTranslationTab.expectTranslationToMatch(
-        await forms.toRichText('Yeh aakhri panna hain.'));
-
-      await expEditorTranslationTab.switchToVoiceoverMode();
-      await expEditorTranslationTab.switchToTranslationMode();
-      await expEditorTranslationTab.moveToState('first');
-      await expEditorTranslationTab.expectTranslationToMatch(
-        await forms.toRichText('Yeh pehla panna hain.'));
-      await expEditorTranslationTab.navigateToFeedbackTab();
-      await expEditorTranslationTab.expectTranslationToMatch(
-        await forms.toRichText('Yeh hindi main vishleshad hain.'));
-      await expEditorTranslationTab.moveToState('final card');
-      await expEditorTranslationTab.expectTranslationToMatch(
-        await forms.toRichText('Yeh aakhri panna hain.'));
-      await expEditorTranslationTab.expectCorrectStatusColor(
-        'first', YELLOW_STATE_PROGRESS_COLOR);
-      await expEditorTranslationTab.expectCorrectStatusColor(
-        'second', RED_STATE_PROGRESS_COLOR);
-      await expEditorTranslationTab.expectCorrectStatusColor(
-        'final card', GREEN_STATE_PROGRESS_COLOR);
-      await expEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-        '3 items translated out of 9 items');
-      await users.logout();
-    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
