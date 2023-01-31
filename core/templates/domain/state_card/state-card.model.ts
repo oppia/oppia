@@ -30,9 +30,9 @@ import { InteractionCustomizationArgs } from
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
-import { WrittenTranslations } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 export interface InputResponsePair {
   learnerInput: string;
@@ -49,7 +49,6 @@ export class StateCard {
   _interaction: Interaction;
   _inputResponsePairs: InputResponsePair[];
   _recordedVoiceovers: RecordedVoiceovers;
-  _writtenTranslations: WrittenTranslations;
   _contentId: string;
   _completed: boolean;
   audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -58,7 +57,6 @@ export class StateCard {
       interactionHtml: string, interaction: Interaction,
       inputResponsePairs: InputResponsePair[],
       recordedVoiceovers: RecordedVoiceovers,
-      writtenTranslations: WrittenTranslations,
       contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService) {
     this._stateName = stateName;
@@ -67,7 +65,6 @@ export class StateCard {
     this._inputResponsePairs = inputResponsePairs;
     this._interaction = interaction;
     this._recordedVoiceovers = recordedVoiceovers;
-    this._writtenTranslations = writtenTranslations;
     this._contentId = contentId;
     this._completed = false;
     this.audioTranslationLanguageService = audioTranslationLanguageService;
@@ -269,10 +266,6 @@ export class StateCard {
     this._interactionHtml = interactionHtml;
   }
 
-  get writtenTranslations(): WrittenTranslations {
-    return cloneDeep(this._writtenTranslations);
-  }
-
   get contentHtml(): string {
     return this._contentHtml;
   }
@@ -283,6 +276,15 @@ export class StateCard {
 
   get contentId(): string {
     return this._contentId;
+  }
+
+  swapContentsWithTranslation(entityTranslation: EntityTranslation): void {
+    let writtenTranslation = entityTranslation.getWrittenTranslation(
+      this._contentId) as TranslatedContent;
+    if (writtenTranslation && !writtenTranslation.needsUpdate) {
+      this.contentHtml = writtenTranslation.translation as string;
+    }
+    this._interaction.swapContentsWithTranslation(entityTranslation);
   }
 
   /**
@@ -300,13 +302,13 @@ export class StateCard {
   static createNewCard(
       stateName: string, contentHtml: string, interactionHtml: string,
       interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-      writtenTranslations: WrittenTranslations, contentId: string,
+      contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService
   ): StateCard {
     return new StateCard(
       stateName, contentHtml, interactionHtml,
       cloneDeep(interaction), [],
-      recordedVoiceovers, writtenTranslations, contentId,
+      recordedVoiceovers, contentId,
       audioTranslationLanguageService);
   }
 }

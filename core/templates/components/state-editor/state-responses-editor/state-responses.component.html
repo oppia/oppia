@@ -66,8 +66,7 @@
                                                (onSaveTaggedMisconception)="saveTaggedMisconception($event)"
                                                [isEditable]="editabilityService.isEditable()"
                                                [displayFeedback]="!isLinearWithNoFeedback(answerGroup.outcome)"
-                                               [addState]="addState"
-                                               (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendshowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                                               [addState]="addState">
                     </oppia-answer-group-editor>
                   </div>
                   <div class="btn btn-danger oppia-delete-response e2e-test-delete-response"
@@ -122,8 +121,7 @@
                                                (onSaveAnswerGroupDest)="saveDefaultOutcomeDest($event)"
                                                (onSaveAnswerGroupDestIfStuck)="saveDefaultOutcomeDestIfStuck($event)"
                                                (onSaveAnswerGroupCorrectnessLabel)="saveDefaultOutcomeCorrectnessLabel($event)"
-                                               (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
-                                               (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendshowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                                               (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)">
                     </oppia-answer-group-editor>
                   </div>
                 </div>

@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -71,6 +72,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'inapplicable_skill_misconception_ids': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE)
         }
@@ -80,12 +82,13 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_question_empty_skill_id_list(self) -> None:
-        state = state_domain.State.create_default_state('ABC')
+        state = state_domain.State.create_default_state(
+            'ABC', 'content_0', 'default_outcome_1')
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1
         question_model = question_models.QuestionModel.create(
-            question_state_data, language_code, version, [], [])
+            question_state_data, language_code, version, [], [], 2)
 
         self.assertEqual(
             question_model.question_state_data, question_state_data)
@@ -93,14 +96,15 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(question_model.linked_skill_ids, [])
 
     def test_create_question_with_skill_ids(self) -> None:
-        state = state_domain.State.create_default_state('ABC')
+        state = state_domain.State.create_default_state(
+            'ABC', 'content_0', 'default_outcome_1')
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
         language_code = 'en'
         version = 1
         question_model = question_models.QuestionModel.create(
             question_state_data, language_code, version,
-            linked_skill_ids, ['skill-1'])
+            linked_skill_ids, ['skill-1'], 2)
 
         self.assertEqual(
             question_model.question_state_data, question_state_data)
@@ -111,7 +115,8 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
     def test_create_question_with_inapplicable_skill_misconception_ids(
         self
     ) -> None:
-        state = state_domain.State.create_default_state('ABC')
+        state = state_domain.State.create_default_state(
+            'ABC', 'content_0', 'default_outcome_1')
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
         inapplicable_skill_misconception_ids = ['skill_id-1', 'skill_id-2']
@@ -119,23 +124,27 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         version = 1
         question_model = question_models.QuestionModel.create(
             question_state_data, language_code, version,
-            linked_skill_ids, inapplicable_skill_misconception_ids)
+            linked_skill_ids, inapplicable_skill_misconception_ids, 2)
 
         self.assertItemsEqual(
             question_model.inapplicable_skill_misconception_ids,
             inapplicable_skill_misconception_ids)
 
     def test_put_multi_questions(self) -> None:
-        question_state_data = self._create_valid_question_data('ABC')
+        content_id_generator = translation_domain.ContentIdGenerator()
+        question_state_data = self._create_valid_question_data(
+            'ABC', content_id_generator)
         linked_skill_ids = ['skill_id1', 'skill_id2']
         self.save_new_question(
             'question_id1', 'owner_id',
             question_state_data,
-            linked_skill_ids)
+            linked_skill_ids,
+            content_id_generator.next_content_id_index)
         self.save_new_question(
             'question_id2', 'owner_id',
             question_state_data,
-            linked_skill_ids)
+            linked_skill_ids,
+            content_id_generator.next_content_id_index)
         question_ids = ['question_id1', 'question_id2']
 
         question_model1 = question_models.QuestionModel.get(question_ids[0])
@@ -162,7 +171,8 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             updated_question_model2.linked_skill_ids, ['skill_id3'])
 
     def test_raise_exception_by_mocking_collision(self) -> None:
-        state = state_domain.State.create_default_state('ABC')
+        state = state_domain.State.create_default_state(
+            'ABC', 'content_0', 'default_outcome_1')
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1
@@ -178,7 +188,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
                     lambda x, y: True,
                     question_models.QuestionModel)):
                 question_models.QuestionModel.create(
-                    question_state_data, language_code, version, [], [])
+                    question_state_data, language_code, version, [], [], 2)
 
 
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):

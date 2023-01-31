@@ -29,6 +29,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -290,60 +291,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}">'
             '</oppia-noninteractive-math>')
-        written_translations_dict = {
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-        written_translations_dict_math = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': expected_html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         recorded_voiceovers = {
@@ -360,17 +313,17 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         }
         page_contents_dict = {
             'subtitled_html': {
-                'content_id': 'content', 'html': html_content
+                'content_id': 'content_0', 'html': html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
             'written_translations': written_translations_dict
         }
         expected_page_contents_dict = {
             'subtitled_html': {
-                'content_id': 'content', 'html': expected_html_content
+                'content_id': 'content_0', 'html': expected_html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict_math
+            'written_translations': written_translations_dict
         }
 
         subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
@@ -405,60 +358,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             ' caption-with-value="&amp;quot;&amp;quot;" '
             'filepath-with-value=\'\"img1.svg\"\'>'
             '</oppia-noninteractive-image>')
-        written_translations_dict = {
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-        written_translations_dict_math = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': expected_html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         recorded_voiceovers = {
@@ -475,17 +380,17 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         }
         page_contents_dict = {
             'subtitled_html': {
-                'content_id': 'content', 'html': html_content
+                'content_id': 'content_0', 'html': html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
             'written_translations': written_translations_dict
         }
         expected_page_contents_dict = {
             'subtitled_html': {
-                'content_id': 'content', 'html': expected_html_content
+                'content_id': 'content_0', 'html': expected_html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict_math
+            'written_translations': written_translations_dict
         }
 
         subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
@@ -515,60 +420,12 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         html_content = (
             '<p>1 Ã— 3 ðŸ˜• ðŸ˜Š</p>'
         )
-        written_translations_dict = {
+        written_translations_dict: (
+            translation_domain.WrittenTranslationsDict
+        ) = {
             'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-        written_translations_dict_math = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'data_format': 'html',
-                        'translation': expected_html_content,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': 'Testing!',
-                        'needs_update': False
-                    },
-                    'en': {
-                        'data_format': 'html',
-                        'translation': 'hello!',
-                        'needs_update': False
-                    }
-                }
+                'content1': {},
+                'feedback_1': {}
             }
         }
         recorded_voiceovers = {
@@ -585,17 +442,17 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         }
         page_contents_dict = {
             'subtitled_html': {
-                'content_id': 'content', 'html': html_content
+                'content_id': 'content_0', 'html': html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
             'written_translations': written_translations_dict
         }
         expected_page_contents_dict = {
             'subtitled_html': {
-                'content_id': 'content', 'html': expected_html_content
+                'content_id': 'content_0', 'html': expected_html_content
             },
             'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict_math
+            'written_translations': written_translations_dict
         }
 
         subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')

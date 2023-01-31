@@ -37,6 +37,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import translation_domain
 
 from typing import (
     Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, cast
@@ -79,7 +80,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     language_code: str
     last_updated: float
     edited_by_reviewer: bool
-    exploration_content_html: str
+    exploration_content_html: Union[str, List[str]]
 
 
 SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
@@ -241,13 +242,9 @@ class SuggestionHandler(
 
         suggestion_change = suggestion.change
         if (
-                suggestion_change.cmd == 'add_written_translation' and
-                suggestion_change.data_format in
-                (
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                suggestion_change.cmd == 'add_written_translation' and (
+                    translation_domain.TranslatableContentFormat
+                    .is_data_format_list(suggestion_change.data_format)
                 )
         ):
             self.render_json(self.values)
@@ -1027,6 +1024,7 @@ class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
 
     skill_difficulty: float
     question_state_data: state_domain.StateDict
+    next_content_id_index: int
 
 
 class UpdateQuestionSuggestionHandler(
@@ -1066,6 +1064,11 @@ class UpdateQuestionSuggestionHandler(
                         domain_objects_validator.validate_state_dict
                     )
                 }
+            },
+            'next_content_id_index': {
+                'schema': {
+                    'type': 'int'
+                }
             }
         }
     }
@@ -1088,7 +1091,9 @@ class UpdateQuestionSuggestionHandler(
         suggestion_services.update_question_suggestion(
             suggestion_id,
             self.normalized_payload['skill_difficulty'],
-            self.normalized_payload['question_state_data'])
+            self.normalized_payload['question_state_data'],
+            self.normalized_payload['next_content_id_index']
+        )
 
         self.render_json(self.values)
 

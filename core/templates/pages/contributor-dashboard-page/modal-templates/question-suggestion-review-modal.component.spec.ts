@@ -170,10 +170,7 @@ describe('Question Suggestion Review Modal component', () => {
               param_changes: [],
               recorded_voiceovers: {
                 voiceovers_mapping: {}
-              },
-              written_translations: {
-                translations_mapping: {}
-              },
+              }
             },
           },
           skill_difficulty: skillDifficulty,
@@ -283,10 +280,7 @@ describe('Question Suggestion Review Modal component', () => {
               param_changes: [],
               recorded_voiceovers: {
                 voiceovers_mapping: {}
-              },
-              written_translations: {
-                translations_mapping: {}
-              },
+              }
             },
           },
           skill_difficulty: skillDifficulty,

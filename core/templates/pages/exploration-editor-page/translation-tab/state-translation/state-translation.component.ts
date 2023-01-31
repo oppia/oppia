@@ -28,11 +28,9 @@ import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';
-import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { TranslationLanguageService } from '../services/translation-language.service';
 import { TranslationStatusService } from '../services/translation-status.service';
 import { TranslationTabActiveContentIdService } from '../services/translation-tab-active-content-id.service';
 import { TranslationTabActiveModeService } from '../services/translation-tab-active-mode.service';
@@ -47,13 +45,16 @@ import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { BaseTranslatableObject } from 'interactions/rule-input-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { EntityTranslationsService } from 'services/entity-translations.services';
+import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import { TranslationLanguageService } from '../services/translation-language.service';
 
 @Component({
   selector: 'oppia-state-translation',
   templateUrl: './state-translation.component.html'
 })
 export class StateTranslationComponent
-   implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy {
   @Input() isTranslationTabBusy: boolean;
 
   directiveSubscriptions = new Subscription();
@@ -82,76 +83,72 @@ export class StateTranslationComponent
   TAB_ID_CONTENT: string;
   stateDefaultOutcome: Outcome;
   answerChoices: AnswerChoice[];
+  activeTranslatedContent: TranslatedContent;
   interactionRuleTranslatableContents: {
     rule: Rule; inputName: string; contentId: string;
   }[];
 
   interactionCustomizationArgTranslatableContent: {
     name: string;
-   content: (SubtitledUnicode | SubtitledHtml); }[];
+    content: (SubtitledUnicode | SubtitledHtml);
+  }[];
 
   constructor(
-     private ckEditorCopyContentService: CkEditorCopyContentService,
-     private explorationCorrectnessFeedbackService:
-       ExplorationCorrectnessFeedbackService,
-     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-     private explorationLanguageCodeService: ExplorationLanguageCodeService,
-     private explorationStatesService: ExplorationStatesService,
-     private routerService: RouterService,
-     private stateEditorService: StateEditorService,
-     private translationLanguageService: TranslationLanguageService,
-     private translationStatusService: TranslationStatusService,
-     private translationTabActiveContentIdService:
-       TranslationTabActiveContentIdService,
-     private translationTabActiveModeService: TranslationTabActiveModeService,
-     private formatRtePreviewPipe: FormatRtePreviewPipe,
-     private ConvertToPlainTextPipe: ConvertToPlainTextPipe,
-     private truncatePipe: TruncatePipe,
-     private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
-     private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
+    private ckEditorCopyContentService: CkEditorCopyContentService,
+    private explorationCorrectnessFeedbackService:
+      ExplorationCorrectnessFeedbackService,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private explorationStatesService: ExplorationStatesService,
+    private routerService: RouterService,
+    private stateEditorService: StateEditorService,
+    private entityTranslationsService: EntityTranslationsService,
+    private translationLanguageService: TranslationLanguageService,
+    private translationStatusService: TranslationStatusService,
+    private translationTabActiveContentIdService:
+      TranslationTabActiveContentIdService,
+    private translationTabActiveModeService: TranslationTabActiveModeService,
+    private formatRtePreviewPipe: FormatRtePreviewPipe,
+    private ConvertToPlainTextPipe: ConvertToPlainTextPipe,
+    private truncatePipe: TruncatePipe,
+    private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
+    private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
   ) { }
 
   isVoiceoverModeActive(): boolean {
     return (this.translationTabActiveModeService.isVoiceoverModeActive());
   }
 
-  isTranslatedTextRequired(): boolean {
-    return (
-      this.translationTabActiveModeService.isVoiceoverModeActive() &&
-       this.translationLanguageService.getActiveLanguageCode() !== (
-         this.explorationLanguageCodeService.displayed));
-  }
-
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
-    let html = null;
-    if (this.isTranslatedTextRequired()) {
-      let contentId = subtitledHtml.contentId;
-      let activeLanguageCode = (
-        this.translationLanguageService.getActiveLanguageCode());
-      let writtenTranslations = (
-        this.explorationStatesService.getWrittenTranslationsMemento(
-          this.stateName));
-
-      if (writtenTranslations.hasWrittenTranslation(
-        contentId, activeLanguageCode)) {
-        let writtenTranslation = (
-          writtenTranslations.getWrittenTranslation(
-            contentId, activeLanguageCode));
-        html = writtenTranslation.getTranslation();
-      } else {
-        html = subtitledHtml.html;
-      }
-    } else {
-      html = subtitledHtml.html;
+    if (this.translationTabActiveModeService.isTranslationModeActive()) {
+      return subtitledHtml.html;
     }
-    return html;
+
+    let langCode = this.translationLanguageService.getActiveLanguageCode();
+    if (
+      !this.entityTranslationsService
+        .languageCodeToEntityTranslations.hasOwnProperty(langCode)
+    ) {
+      return subtitledHtml.html;
+    }
+
+    let translationContent = (
+      this.entityTranslationsService
+        .languageCodeToEntityTranslations[langCode].getWrittenTranslation(
+          subtitledHtml.contentId
+        )
+    );
+    if (!translationContent) {
+      return subtitledHtml.html;
+    }
+
+    return translationContent.translation as string;
   }
 
   getEmptyContentMessage(): string {
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
       return (
         'The translation for this section has not been created yet. ' +
-         'Switch to translation mode to add a text translation.');
+        'Switch to translation mode to add a text translation.');
     } else {
       return 'There is no text available to translate.';
     }
@@ -235,10 +232,25 @@ export class StateTranslationComponent
     this.translationTabActiveContentIdService.setActiveContent(
       activeContentId, activeDataFormat);
     this.activatedTabId = tabId;
+    this.updateTranslatedContent();
+  }
+
+  updateTranslatedContent(): void {
+    if (!this.translationTabActiveModeService.isVoiceoverModeActive()) {
+      let langCode = this.translationLanguageService.getActiveLanguageCode();
+      const entityTranslations = (
+        this.entityTranslationsService.languageCodeToEntityTranslations[
+          langCode]
+      );
+      if (entityTranslations) {
+        this.activeTranslatedContent = entityTranslations.getWrittenTranslation(
+          this.translationTabActiveContentIdService.getActiveContentId());
+      }
+    }
   }
 
   getHumanReadableRuleInputValues(
-      inputValue: {normalizedStrSet: string[]; unicodeStrSet: string[]},
+      inputValue: { normalizedStrSet: string[]; unicodeStrSet: string[] },
       inputType: string): string {
     if (inputType === 'TranslatableSetOfNormalizedString') {
       return ('[' + inputValue.normalizedStrSet.join(', ') + ']');
@@ -264,7 +276,7 @@ export class StateTranslationComponent
 
     if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
       summary =
-         INTERACTION_SPECS[interactionId].default_outcome_heading;
+        INTERACTION_SPECS[interactionId].default_outcome_heading;
     } else if (answerGroupCount > 0) {
       summary = 'All other answers';
     } else {
@@ -310,9 +322,9 @@ export class StateTranslationComponent
 
     if (hasFeedback) {
       summary += (
-         shortenRule ?
-           this.truncatePipe.transform(outcome.feedback.html, 30) :
-           this.ConvertToPlainTextPipe.transform(outcome.feedback.html));
+        shortenRule ?
+          this.truncatePipe.transform(outcome.feedback.html, 30) :
+          this.ConvertToPlainTextPipe.transform(outcome.feedback.html));
     }
     return summary;
   }
@@ -329,8 +341,8 @@ export class StateTranslationComponent
     if (
       tabId !== this.TAB_ID_CUSTOMIZATION_ARGS && (
         !this.stateInteractionId ||
-         INTERACTION_SPECS[this.stateInteractionId].is_linear ||
-         INTERACTION_SPECS[this.stateInteractionId].is_terminal
+        INTERACTION_SPECS[this.stateInteractionId].is_linear ||
+        INTERACTION_SPECS[this.stateInteractionId].is_terminal
       )
     ) {
       return true;
@@ -375,6 +387,7 @@ export class StateTranslationComponent
       this.stateHints[newIndex].hintContent.contentId);
     this.translationTabActiveContentIdService.setActiveContent(
       activeContentId, TRANSLATION_DATA_FORMAT_HTML);
+    this.updateTranslatedContent();
   }
 
   changeActiveRuleContentIndex(newIndex: number): void {
@@ -395,6 +408,7 @@ export class StateTranslationComponent
     this.translationTabActiveContentIdService.setActiveContent(
       activeContentId, activeDataFormat);
     this.activeRuleContentIndex = newIndex;
+    this.updateTranslatedContent();
   }
 
   changeActiveCustomizationArgContentIndex(newIndex: number): void {
@@ -423,6 +437,7 @@ export class StateTranslationComponent
     this.translationTabActiveContentIdService.setActiveContent(
       activeContentId, activeDataFormat);
     this.activeCustomizationArgContentIndex = newIndex;
+    this.updateTranslatedContent();
   }
 
   changeActiveAnswerGroupIndex(newIndex: number): void {
@@ -446,13 +461,14 @@ export class StateTranslationComponent
       this.translationTabActiveContentIdService.setActiveContent(
         activeContentId, TRANSLATION_DATA_FORMAT_HTML);
     }
+    this.updateTranslatedContent();
   }
 
   tabStatusColorStyle(tabId: string): object {
     if (!this.isDisabled(tabId)) {
       let color = this.translationStatusService
         .getActiveStateComponentStatusColor(tabId);
-      return {'border-top-color': color};
+      return { 'border-top-color': color };
     }
   }
 
@@ -472,7 +488,7 @@ export class StateTranslationComponent
     let color = this.translationStatusService
       .getActiveStateContentIdStatusColor(contentId);
 
-    return {'border-left': '3px solid ' + color};
+    return { 'border-left': '3px solid ' + color };
   }
 
   getSubtitledContentSummary(
@@ -485,8 +501,8 @@ export class StateTranslationComponent
   }
 
   getInteractionRuleTranslatableContents(): {
-     rule: Rule; inputName: string; contentId: string;
-   }[] {
+    rule: Rule; inputName: string; contentId: string;
+  }[] {
     const allRules = this.stateAnswerGroups.map(
       answerGroup => answerGroup.rules).flat();
 
@@ -511,7 +527,7 @@ export class StateTranslationComponent
 
   getInteractionCustomizationArgTranslatableContents(
       customizationArgs: InteractionCustomizationArgs
-  ): { name: string; content: SubtitledUnicode|SubtitledHtml }[] {
+  ): { name: string; content: SubtitledUnicode | SubtitledHtml }[] {
     const translatableContents = [];
 
     const camelCaseToSentenceCase = (s) => {
@@ -529,7 +545,7 @@ export class StateTranslationComponent
         value: Object[] | Object,
     ): void => {
       if (value instanceof SubtitledUnicode ||
-           value instanceof SubtitledHtml
+        value instanceof SubtitledHtml
       ) {
         translatableContents.push({
           name, content: value
@@ -581,11 +597,11 @@ export class StateTranslationComponent
     this.answerChoices = this.stateEditorService.getAnswerChoices(
       this.stateInteractionId, currentCustomizationArgs);
     this.interactionPreviewHtml = (
-       this.stateInteractionId ? (
-         this.explorationHtmlFormatterService.getInteractionHtml(
-           this.stateInteractionId,
-           this.stateInteractionCustomizationArgs, false, null, null)
-       ) : '');
+      this.stateInteractionId ? (
+        this.explorationHtmlFormatterService.getInteractionHtml(
+          this.stateInteractionId,
+          this.stateInteractionCustomizationArgs, false, null, null)
+      ) : '');
     this.interactionCustomizationArgTranslatableContent = (
       this.getInteractionCustomizationArgTranslatableContents(
         this.stateInteractionCustomizationArgs)
@@ -595,12 +611,13 @@ export class StateTranslationComponent
 
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
       this.needsUpdateTooltipMessage = 'Audio needs update to ' +
-         'match text. Please record new audio.';
+        'match text. Please record new audio.';
     } else {
       this.needsUpdateTooltipMessage = 'Translation needs update ' +
-         'to match text. Please re-translate the content.';
+        'to match text. Please re-translate the content.';
     }
     this.onTabClick(this.TAB_ID_CONTENT);
+    this.updateTranslatedContent();
   }
 
   ngOnInit(): void {
@@ -641,6 +658,6 @@ export class StateTranslationComponent
 }
 
 angular.module('oppia').directive('oppiaStateTranslation',
-   downgradeComponent({
-     component: StateTranslationComponent
-   }) as angular.IDirectiveFactory);
+  downgradeComponent({
+    component: StateTranslationComponent
+  }) as angular.IDirectiveFactory);

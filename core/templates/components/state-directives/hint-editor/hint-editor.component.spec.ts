@@ -22,7 +22,7 @@ import { HintEditorComponent } from './hint-editor.component';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
-import { HintBackendDict } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/HintObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('HintEditorComponent', () => {
@@ -52,16 +52,8 @@ describe('HintEditorComponent', () => {
     editabilityService = TestBed.inject(EditabilityService);
     externalSaveService = TestBed.inject(ExternalSaveService);
 
-    component.hint = {
-      hintContent: SubtitledHtml.createDefault(
-        'html text', 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID'));
 
     fixture.detectChanges();
   });
@@ -83,88 +75,24 @@ describe('HintEditorComponent', () => {
     let onExternalSaveEmitter = new EventEmitter();
     spyOnProperty(externalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
-      .and.callThrough();
-
     component.ngOnInit();
 
     component.hintEditorIsOpen = true;
-    component.hint = {
-      hintContent: SubtitledHtml.createDefault(
-        'change', 'data'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
-    component.hintMemento = {
-      hintContent: SubtitledHtml.createDefault(
-        'html text', 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('change', 'data'));
+    component.hintMemento = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID'));
 
     onExternalSaveEmitter.emit();
     tick();
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
   }));
-
-  it('should throw error if content id is invalid', () => {
-    component.hint = {
-      hintContent: new SubtitledHtml('<p>html text</p>', null),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
-    component.hintMemento = {
-      hintContent: SubtitledHtml.createDefault(
-        'html text', 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
-
-    expect(() => {
-      component.saveThisHint();
-    }).toThrowError('Expected content id to be non-null');
-  });
 
   it('should open hint editor when user clicks on \'Edit hint\'', () => {
     component.isEditable = true;
-    component.hintMemento = {
-      hintContent: SubtitledHtml.createDefault(
-        '<p> Hint Original</p>', 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
-    component.hint = {
-      hintContent: SubtitledHtml.createDefault(
-        '<p> Hint After Edit </p>', 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
+    component.hintMemento = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID'));
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('html text edited', 'contentID'));
     component.hintEditorIsOpen = false;
 
     component.openHintEditor();
@@ -177,26 +105,10 @@ describe('HintEditorComponent', () => {
     jasmine.createSpy('valid').and.returnValue(true);
 
     component.hintEditorIsOpen = true;
-    const earlierHint = component.hintMemento = {
-      hintContent: SubtitledHtml.createDefault(
-        '<p> Hint Original</p>', 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
-    component.hint = {
-      hintContent: SubtitledHtml.createDefault(
-        '<p> Hint After Edit </p>', 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
+    const earlierHint = component.hintMemento = new Hint(
+      SubtitledHtml.createDefault('html text', 'contentID'));
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('html text edited', 'contentID'));
 
     component.cancelThisHintEdit();
 
@@ -205,28 +117,12 @@ describe('HintEditorComponent', () => {
   });
 
   it('should check if hint HTML length exceeds 500 characters', () => {
-    component.hint = {
-      hintContent: SubtitledHtml.createDefault(
-        'a'.repeat(500), 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('a'.repeat(500), 'contentID'));
     expect(component.isHintLengthExceeded()).toBe(false);
 
-    component.hint = {
-      hintContent: SubtitledHtml.createDefault(
-        'a'.repeat(501), 'contentID'),
-
-      toBackendDict(): HintBackendDict {
-        return {
-          hint_content: this.hintContent.toBackendDict()
-        };
-      }
-    };
+    component.hint = new Hint(
+      SubtitledHtml.createDefault('a'.repeat(501), 'contentID'));
     expect(component.isHintLengthExceeded()).toBe(true);
   });
 

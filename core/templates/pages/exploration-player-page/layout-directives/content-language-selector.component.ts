@@ -17,13 +17,12 @@
  * playing an exploration.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
-import { ContextService } from 'services/context.service';
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { PlayerPositionService } from
@@ -33,8 +32,8 @@ import { PlayerTranscriptService } from
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
-import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
@@ -44,13 +43,13 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
-    private contextService: ContextService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private ngbModal: NgbModal,
-    private imagePreloaderService: ImagePreloaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef
   ) { }
@@ -86,24 +85,19 @@ export class ContentLanguageSelectorComponent implements OnInit {
     }
   }
 
-  onSelectLanguage(newLanguageCode: string): string {
+  onSelectLanguage(newLanguageCode: string): void {
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(
         SwitchContentLanguageRefreshRequiredModalComponent);
       modalRef.componentInstance.languageCode = newLanguageCode;
-    } else {
+    } else if (this.selectedLanguageCode !== newLanguageCode) {
       this.contentTranslationLanguageService.setCurrentContentLanguageCode(
         newLanguageCode);
+      this.contentTranslationManagerService.displayTranslations(
+        newLanguageCode);
       this.selectedLanguageCode = newLanguageCode;
+      this.changeDetectorRef.detectChanges();
     }
-
-    // Image preloading is disabled in the exploration editor preview mode.
-    if (!this.contextService.isInExplorationEditorPage()) {
-      this.imagePreloaderService.restartImagePreloader(
-        this.playerTranscriptService.getCard(0).getStateName());
-    }
-
-    return this.selectedLanguageCode;
   }
 
   shouldDisplaySelector(): boolean {

@@ -99,7 +99,7 @@ describe('Exploration Graph Component', () => {
   it('should show graph when exploration states service is initialized',
     () => {
       expect(component.isGraphShown()).toBe(false);
-      explorationStatesService.init({});
+      explorationStatesService.init({}, false);
       expect(component.isGraphShown()).toBe(true);
     });
 

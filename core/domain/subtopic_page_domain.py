@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
@@ -81,7 +82,7 @@ class SubtopicPageChange(change_domain.BaseChange):
 AllowedUpdateSubtopicPagePropertyCmdTypes = Union[
     state_domain.SubtitledHtmlDict,
     state_domain.RecordedVoiceoversDict,
-    state_domain.WrittenTranslationsDict
+    translation_domain.WrittenTranslationsDict
 ]
 
 
@@ -140,8 +141,8 @@ class UpdateSubtopicPagePropertyPageWrittenTranslationsCmd(SubtopicPageChange):
 
     subtopic_id: int
     property_name: Literal['page_written_translations']
-    new_value: state_domain.WrittenTranslationsDict
-    old_value: state_domain.WrittenTranslationsDict
+    new_value: translation_domain.WrittenTranslationsDict
+    old_value: translation_domain.WrittenTranslationsDict
 
 
 class SubtopicPageContentsDict(TypedDict):
@@ -149,7 +150,7 @@ class SubtopicPageContentsDict(TypedDict):
 
     subtitled_html: state_domain.SubtitledHtmlDict
     recorded_voiceovers: state_domain.RecordedVoiceoversDict
-    written_translations: state_domain.WrittenTranslationsDict
+    written_translations: translation_domain.WrittenTranslationsDict
 
 
 class VersionedSubtopicPageContentsDict(TypedDict):
@@ -166,7 +167,7 @@ class SubtopicPageContents:
         self,
         subtitled_html: state_domain.SubtitledHtml,
         recorded_voiceovers: state_domain.RecordedVoiceovers,
-        written_translations: state_domain.WrittenTranslations
+        written_translations: translation_domain.WrittenTranslations
     ) -> None:
         """Constructs a SubtopicPageContents domain object.
 
@@ -205,7 +206,7 @@ class SubtopicPageContents:
                 content_id),
             state_domain.RecordedVoiceovers.from_dict(
                 {'voiceovers_mapping': {content_id: {}}}),
-            state_domain.WrittenTranslations.from_dict(
+            translation_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {content_id: {}}}))
 
     def to_dict(self) -> SubtopicPageContentsDict:
@@ -240,7 +241,7 @@ class SubtopicPageContents:
             page_contents,
             state_domain.RecordedVoiceovers.from_dict(page_contents_dict[
                 'recorded_voiceovers']),
-            state_domain.WrittenTranslations.from_dict(page_contents_dict[
+            translation_domain.WrittenTranslations.from_dict(page_contents_dict[
                 'written_translations']))
 
 
@@ -355,11 +356,6 @@ class SubtopicPage:
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        subtopic_page_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
-            convert_html_in_written_translations(
-                subtopic_page_contents_dict['written_translations'],
-                conversion_fn))
         subtopic_page_contents_dict['subtitled_html']['html'] = (
             conversion_fn(
                 subtopic_page_contents_dict['subtitled_html']['html']))
@@ -479,7 +475,8 @@ class SubtopicPage:
 
     def update_page_contents_written_translations(
         self,
-        new_page_written_translations_dict: state_domain.WrittenTranslationsDict
+        new_page_written_translations_dict: (
+            translation_domain.WrittenTranslationsDict)
     ) -> None:
         """The new value for the written_translations data field.
 
@@ -488,7 +485,7 @@ class SubtopicPage:
                 the subtopic page.
         """
         self.page_contents.written_translations = (
-            state_domain.WrittenTranslations.from_dict(
+            translation_domain.WrittenTranslations.from_dict(
                 new_page_written_translations_dict))
 
     def validate(self) -> None:

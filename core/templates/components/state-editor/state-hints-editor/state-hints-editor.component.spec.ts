@@ -161,16 +161,6 @@ describe('StateHintsEditorComponent', () => {
     component.ngOnInit();
   });
 
-  it('should emit showMarkAllAudioAsNeedingUpdateModalIfRequired', () => {
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-
-    component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(
-      ['data', 'data']);
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
-  });
-
   it('should change list oder', () => {
     spyOn(stateHintsService, 'saveDisplayedValue').and.callThrough();
     spyOn(component.onSaveHints, 'emit').and.callThrough();
@@ -224,46 +214,11 @@ describe('StateHintsEditorComponent', () => {
     expect(component.getHintButtonText()).toBe('+ ADD HINT');
 
     stateHintsService.displayed = [
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      }
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1'))
     ];
 
     expect(component.getHintButtonText()).toBe('Limit Reached');
@@ -279,15 +234,7 @@ describe('StateHintsEditorComponent', () => {
     ' changing active hint index', fakeAsync(() => {
     spyOn(stateHintsService, 'getActiveHintIndex').and.returnValue(0);
     stateHintsService.displayed = [
-      {
-        hintContent: SubtitledHtml.createDefault('', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      }
-    ];
+      new Hint(SubtitledHtml.createDefault('', '1'))];
 
     component.changeActiveHintIndex(0);
     tick();
@@ -301,22 +248,8 @@ describe('StateHintsEditorComponent', () => {
       spyOn(stateHintsService, 'getActiveHintIndex').and.returnValue(0);
       spyOn(alertsService, 'addInfoMessage');
       stateHintsService.displayed = [
-        {
-          hintContent: SubtitledHtml.createDefault('', '1'),
-          toBackendDict(): HintBackendDict {
-            return {
-              hint_content: this.hintContent.toBackendDict()
-            };
-          }
-        },
-        {
-          hintContent: SubtitledHtml.createDefault('', '1'),
-          toBackendDict(): HintBackendDict {
-            return {
-              hint_content: this.hintContent.toBackendDict()
-            };
-          }
-        }
+        new Hint(SubtitledHtml.createDefault('', '1')),
+        new Hint(SubtitledHtml.createDefault('', '1'))
       ];
       stateSolutionService.savedMemento = null;
 
@@ -340,46 +273,11 @@ describe('StateHintsEditorComponent', () => {
   it('should not open add hints modal if number of hint is greater than' +
     ' or equal to 5', () => {
     stateHintsService.displayed = [
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      }
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1'))
     ];
 
     component.openAddHintModal();
@@ -390,14 +288,7 @@ describe('StateHintsEditorComponent', () => {
   it('should open add hints modal when user clicks on add hint button',
     fakeAsync(() => {
       stateHintsService.displayed = [
-        {
-          hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-          toBackendDict(): HintBackendDict {
-            return {
-              hint_content: this.hintContent.toBackendDict()
-            };
-          }
-        }
+        new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1'))
       ];
       ngbModalSpy.and.returnValue({
         result: Promise.resolve({
@@ -420,14 +311,7 @@ describe('StateHintsEditorComponent', () => {
 
   it('should close add hint modal when user clicks cancel', () => {
     stateHintsService.displayed = [
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      }
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1'))
     ];
 
     ngbModalSpy.and.returnValue({
@@ -443,14 +327,7 @@ describe('StateHintsEditorComponent', () => {
     ' delete hint button', fakeAsync(() => {
     spyOn(stateHintsService, 'getActiveHintIndex').and.returnValue(0);
     stateHintsService.displayed = [
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      }
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1'))
     ];
     stateHintsService.savedMemento = stateHintsService.displayed;
 
@@ -470,22 +347,8 @@ describe('StateHintsEditorComponent', () => {
     ' delete hint button', fakeAsync(() => {
     spyOn(stateHintsService, 'getActiveHintIndex').and.returnValue(0);
     stateHintsService.displayed = [
-      {
-        hintContent: SubtitledHtml.createDefault('<p> Hint Index 0 </p>', '0'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<p> Hint Index 1 </p>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      }
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '0')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '1'))
     ];
     stateHintsService.savedMemento = stateHintsService.displayed;
 

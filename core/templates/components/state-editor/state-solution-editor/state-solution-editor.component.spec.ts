@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { HintBackendDict } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -30,6 +30,7 @@ import { AlertsService } from 'services/alerts.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { StateHintsService } from '../state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
@@ -44,6 +45,7 @@ describe('State Solution Editor Component', () => {
   let convertToPlainTextPipe: ConvertToPlainTextPipe;
   let editabilityService: EditabilityService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  var generateContentIdService: GenerateContentIdService;
   let ngbModal: NgbModal;
   let solutionValidityService: SolutionValidityService;
   let solutionVerificationService: SolutionVerificationService;
@@ -98,6 +100,8 @@ describe('State Solution Editor Component', () => {
     alertsService = TestBed.inject(AlertsService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    generateContentIdService.init(() => 0, () => { });
 
     solution = solutionObjectFactory.createFromBackendDict({
       answer_is_exclusive: false,
@@ -202,22 +206,8 @@ describe('State Solution Editor Component', () => {
 
   it('should return the number of displayed hints', () => {
     stateHintsService.displayed = [
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      },
-      {
-        hintContent: SubtitledHtml.createDefault('<h1>work</h1>', '1'),
-        toBackendDict(): HintBackendDict {
-          return {
-            hint_content: this.hintContent.toBackendDict()
-          };
-        }
-      }
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '0')),
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '0'))
     ];
 
     expect(component.displayedHintsLength()).toBe(2);
@@ -340,16 +330,6 @@ describe('State Solution Editor Component', () => {
 
       expect(ngbModal.open).toHaveBeenCalled();
     }));
-
-  it('should open showMarkAllAudioAsNeedingUpdateModalIfRequired when' +
-    ' user clicks', () => {
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-
-    component.openMarkAllAudioAsNeedingUpdateModalIfRequired(solution);
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
-  });
 
   it('should save solution when user click', () => {
     spyOn(component.saveSolution, 'emit');

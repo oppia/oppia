@@ -34,8 +34,6 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslations } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 const questionDict = {
@@ -140,7 +138,6 @@ describe('Skill Preview Tab Component', () => {
       [], [], null as unknown as InteractionCustomizationArgs, null,
       [], null, null),
     [], null as unknown as RecordedVoiceovers,
-    null as unknown as WrittenTranslations,
     '', null as unknown as AudioTranslationLanguageService);
 
   beforeEach(waitForAsync(() => {
@@ -252,7 +249,6 @@ describe('Skill Preview Tab Component', () => {
         [], [], null as unknown as InteractionCustomizationArgs, null,
         [], 'ImageClickInput', null),
       [], null as unknown as RecordedVoiceovers,
-      null as unknown as WrittenTranslations,
       '', null as unknown as AudioTranslationLanguageService);
 
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
@@ -274,11 +270,11 @@ describe('Skill Preview Tab Component', () => {
         [], [], null as unknown as InteractionCustomizationArgs, null,
         [], 'ImageClickInput', null),
       [], null as unknown as RecordedVoiceovers,
-      null as unknown as WrittenTranslations,
       '', null as unknown as AudioTranslationLanguageService);
 
     expect(component.displayedCard.isInteractionInline()).toBeFalse();
   });
+
 
   it('should filter the questions', () => {
     component.questionDicts = [questionDict1, questionDict2,

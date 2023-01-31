@@ -54,20 +54,10 @@ describe('Question player engine service ', () => {
       question_state_data: {
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 1,
         solicit_answer_details: false,
         content: {
           content_id: '1',
           html: 'Question 1'
-        },
-        written_translations: {
-          translations_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {}
-          }
         },
         interaction: {
           answer_groups: [{
@@ -168,6 +158,7 @@ describe('Question player engine service ', () => {
         }
       },
       question_state_data_schema_version: 45,
+      next_content_id_index: 5,
       language_code: 'en',
       version: 1,
       linked_skill_ids: [],
@@ -179,20 +170,10 @@ describe('Question player engine service ', () => {
       question_state_data: {
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 1,
         solicit_answer_details: false,
         content: {
           content_id: '1',
           html: 'Question 1'
-        },
-        written_translations: {
-          translations_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {}
-          }
         },
         interaction: {
           answer_groups: [],
@@ -255,6 +236,7 @@ describe('Question player engine service ', () => {
       },
       question_state_data_schema_version: 45,
       language_code: 'en',
+      next_content_id_index: 6,
       version: 1,
       linked_skill_ids: [],
       inapplicable_skill_misconception_ids: [],
@@ -264,20 +246,10 @@ describe('Question player engine service ', () => {
       question_state_data: {
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 2,
         solicit_answer_details: false,
         content: {
           content_id: '2',
           html: 'Question 2'
-        },
-        written_translations: {
-          translations_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {}
-          }
         },
         interaction: {
           answer_groups: [],
@@ -340,6 +312,7 @@ describe('Question player engine service ', () => {
       },
       question_state_data_schema_version: 45,
       language_code: 'br',
+      next_content_id_index: 2,
       version: 1,
       linked_skill_ids: [],
       inapplicable_skill_misconception_ids: [],
@@ -349,20 +322,10 @@ describe('Question player engine service ', () => {
       question_state_data: {
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 1,
         solicit_answer_details: false,
         content: {
           content_id: '3',
           html: 'Question 3'
-        },
-        written_translations: {
-          translations_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {}
-          }
         },
         interaction: {
           answer_groups: [],
@@ -426,6 +389,7 @@ describe('Question player engine service ', () => {
       question_state_data_schema_version: 45,
       language_code: 'ab',
       version: 1,
+      next_content_id_index: 6,
       linked_skill_ids: [],
       inapplicable_skill_misconception_ids: [],
     }];
@@ -808,7 +772,7 @@ describe('Question player engine service ', () => {
       );
       let sampleCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id', audioTranslationLanguageService);
+        null, 'content_id', audioTranslationLanguageService);
 
       answerClassificationResult.outcome.labelledAsCorrect = true;
 

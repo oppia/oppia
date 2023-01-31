@@ -18,7 +18,6 @@
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ContextService } from 'services/context.service';
@@ -30,6 +29,7 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -66,7 +66,6 @@ export class AddOrUpdateSolutionModalComponent
   savedMemento!: InteractionAnswer | null;
   solutionType!: Solution | null;
   tempAnsOption!: string;
-  EMPTY_SOLUTION_DATA!: SolutionInterface;
   COMPONENT_NAME_SOLUTION: string = AppConstants.COMPONENT_NAME_SOLUTION;
 
   SOLUTION_EDITOR_FOCUS_LABEL: string = (
@@ -85,6 +84,7 @@ export class AddOrUpdateSolutionModalComponent
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private generateContentIdService: GenerateContentIdService,
     private ngbActiveModal: NgbActiveModal,
     private solutionObjectFactory: SolutionObjectFactory,
     private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -156,21 +156,22 @@ export class AddOrUpdateSolutionModalComponent
         this.savedMemento ? 'savedMemento()' : null)
     );
     this.answerIsValid = false;
-    this.EMPTY_SOLUTION_DATA = {
-      answerIsExclusive: false,
-      correctAnswer: undefined,
-      explanationHtml: '',
-      explanationContentId: this.COMPONENT_NAME_SOLUTION
-    };
-    this.data = this.solutionType ? {
-      answerIsExclusive: (
-        this.solutionType.answerIsExclusive),
-      correctAnswer: undefined,
-      explanationHtml: (
-        this.solutionType.explanation.html),
-      explanationContentId: (
-        this.solutionType.explanation.contentId)
-    } : cloneDeep(this.EMPTY_SOLUTION_DATA);
+    if (this.solutionType) {
+      this.data = {
+        answerIsExclusive: this.solutionType.answerIsExclusive,
+        correctAnswer: undefined,
+        explanationHtml: this.solutionType.explanation.html,
+        explanationContentId: this.solutionType.explanation.contentId
+      };
+    } else {
+      this.data = {
+        answerIsExclusive: false,
+        correctAnswer: undefined,
+        explanationHtml: '',
+        explanationContentId: this.generateContentIdService.getNextStateId(
+          this.COMPONENT_NAME_SOLUTION)
+      };
+    }
     this.currentInteractionService.setOnSubmitFn(
       (answer: InteractionAnswer) => {
         this.data.correctAnswer = answer;
