@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 
 from core import feconf
@@ -933,6 +934,89 @@ class ContributorStatsSummariesHandler(
                 }
 
         self.render_json(self.values)
+
+
+class ContributorCertificateHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Returns contributor certificate."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_USERNAME_LENGTH
+                }]
+            }
+        },
+        'suggestion_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': feconf.SUGGESTION_TYPE_CHOICES
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'from_date': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.DATE_REGEX
+                    }]
+                }
+            },
+            'to_date': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.DATE_REGEX
+                    }]
+                }
+            },
+            'language': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            },
+        }
+    }
+
+    @acl_decorators.can_fetch_all_contributor_dashboard_stats
+    def get(
+        self, username: str, suggestion_type: str
+    ) -> None:
+        """Handles GET requests."""
+        assert self.normalized_request is not None
+        from_date = self.normalized_request['from_date']
+        to_date = self.normalized_request['to_date']
+
+        # When generating the question contributors' certificates, we do not
+        # send language parameter. Hence, we will have to use
+        # self.normalized_request.get('language') in order to get the default
+        # value when language is not present in the request.
+        language = self.normalized_request.get('language')
+
+        from_datetime = datetime.datetime.strptime(from_date, '%Y-%m-%d')
+        to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
+        if to_datetime.date() > datetime.datetime.now().date():
+            raise self.InvalidInputException(
+                'To date should not be a future date.')
+
+        response = suggestion_services.generate_contributor_certificate_data(
+            username, suggestion_type, language, from_datetime,
+            to_datetime)
+
+        self.render_json(response)
 
 
 class ContributorAllStatsSummariesHandler(
