@@ -1823,6 +1823,52 @@ class QuestionReviewStats:
         }
 
 
+class ContributorCertificateInfoDict(TypedDict):
+    """Dictionary representing the ContributorCertificateInfo object."""
+
+    from_date: str
+    to_date: str
+    team_lead: str
+    contribution_hours: str
+    language: Optional[str]
+
+
+class ContributorCertificateInfo:
+    """Encapsulates key information that is used to generate contributor
+    certificate.
+    """
+
+    def __init__(
+        self,
+        from_date: str,
+        to_date: str,
+        team_lead: str,
+        contribution_hours: str,
+        language: Optional[str]
+    ) -> None:
+        self.from_date = from_date
+        self.to_date = to_date
+        self.team_lead = team_lead
+        self.contribution_hours = contribution_hours
+        self.language = language
+
+    def to_dict(self) -> ContributorCertificateInfoDict:
+        """Returns a dict representation of a ContributorCertificateInfo
+        domain object.
+
+        Returns:
+            dict. A dict representation of a ContributorCertificateInfo
+            domain object.
+        """
+        return {
+            'from_date': self.from_date,
+            'to_date': self.to_date,
+            'team_lead': self.team_lead,
+            'contribution_hours': self.contribution_hours,
+            'language': self.language
+        }
+
+
 class ContributorMilestoneEmailInfo:
     """Encapsulates key information that is used to create the email content for
     notifying contributors about milestones they achieved.
