@@ -24,6 +24,7 @@ from core import feconf
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.transforms import results_transforms
@@ -45,7 +46,12 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class MigrateTopicModels(beam.PTransform):
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
+class MigrateTopicModels(beam.PTransform):# type: ignore[misc]
     """Transform that gets all Topic models, performs migration
       and filters any error results.
     """
@@ -252,7 +258,7 @@ class MigrateTopicModels(beam.PTransform):
         )
 
 
-class MigrateTopicJob(beam.PTransform):
+class MigrateTopicJob(base_jobs.JobBase):
     """Job that migrates Exploration models."""
 
     @staticmethod
@@ -363,7 +369,7 @@ class MigrateTopicJob(beam.PTransform):
         return job_run_results
 
 
-class AuditTopicMigrateJob(beam.PTransform):
+class AuditTopicMigrateJob(base_jobs.JobBase):
     """Job that migrates Topic models."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
