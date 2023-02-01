@@ -97,7 +97,7 @@ export class TopicEditorStateService {
     this._topic = new Topic(
       'id', 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
     );
     this._topicRights = new TopicRights(false, false, false);
     this._subtopicPage = new SubtopicPage(
