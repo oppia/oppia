@@ -176,7 +176,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     const stateData = this.questionStateData;
     const outcome = stateData.interaction.defaultOutcome;
     if (outcome) {
-      outcome.setDestination(this.questionId);
+      outcome.setDestination(null);
     }
     if (stateData) {
       this.stateEditorService.onStateEditorInitialized.emit(stateData);
