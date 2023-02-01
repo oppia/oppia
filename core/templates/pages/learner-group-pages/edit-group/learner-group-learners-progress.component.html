@@ -13,8 +13,10 @@
       <div class="learner-progress-summary-header">
         <div class="learner-info">
           <picture>
-            <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
-            <source type="image/png" [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
+            <source type="image/webp"
+                    [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
+            <source type="image/png"
+                    [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
             <img [src]="getProfileImagePngDataUrl(learnerProgress.username)">
           </picture>
           <div>{{learnerProgress.username}}</div>

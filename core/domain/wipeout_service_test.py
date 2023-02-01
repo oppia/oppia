@@ -5762,7 +5762,8 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
         self.assertFalse(self.file_system_for_user_1.isfile(self.filename_webp))
 
     def test_log_error_when_profile_pictures_are_missing_while_deletion(
-        self) -> None:
+        self
+    ) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             wipeout_service.pre_delete_user(self.user_2_id)
             self.process_and_flush_pending_tasks()
@@ -5777,16 +5778,18 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
                 self.filename_webp, self.webp_binary)
 
         self.assertEqual(
-            logs[0],
-            '[WIPEOUT] Profile picture of username username2 in .png format '
-            'does not exists.')
-        self.assertEqual(
-            logs[1],
-            '[WIPEOUT] Profile picture of username username2 in .webp format '
-            'does not exists.')
+            logs,
+            [
+                '[WIPEOUT] Profile picture of username username2 in .png format '
+                'does not exists.',
+                '[WIPEOUT] Profile picture of username username2 in .webp format '
+                'does not exists.'
+            ]
+        )
 
     def test_log_error_when_profile_pictures_are_missing_while_verification(
-        self) -> None:
+        self
+    ) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             wipeout_service.pre_delete_user(self.user_2_id)
             self.process_and_flush_pending_tasks()
@@ -5803,10 +5806,11 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
                 self.user_2_id))
 
         self.assertEqual(
-            logs[0],
-            '[WIPEOUT] Profile picture in .png format is not deleted '
-            'for user having username username2.')
-        self.assertEqual(
-            logs[1],
-            '[WIPEOUT] Profile picture in .webp format is not deleted '
-            'for user having username username2.')
+            logs,
+            [
+                '[WIPEOUT] Profile picture in .png format is not deleted '
+                'for user having username username2.',
+                '[WIPEOUT] Profile picture in .webp format is not deleted '
+                'for user having username username2.'
+            ]
+        )

@@ -92,7 +92,7 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl,] = this.userService.getProfileImageDataUrlAsync(
+    let [pngImageUrl, ] = this.userService.getProfileImageDataUrlAsync(
       username);
     return pngImageUrl;
   }

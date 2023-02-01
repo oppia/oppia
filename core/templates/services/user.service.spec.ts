@@ -30,6 +30,7 @@ import { UserService } from 'services/user.service';
 import { UrlService } from './contextual/url.service';
 import { PreferencesBackendDict, UserBackendApiService } from './user-backend-api.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 class MockWindowRef {
   imageData = {};
@@ -58,7 +59,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('User Api Service', () => {
+describe('User Api Service', () => {
   let userService: UserService;
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
@@ -67,6 +68,7 @@ fdescribe('User Api Service', () => {
   let windowRef: MockWindowRef;
   let userBackendApiService: UserBackendApiService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let assetsBackendApiService: AssetsBackendApiService
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -224,18 +226,18 @@ fdescribe('User Api Service', () => {
 
   it('should return image path when in production mode',
     fakeAsync(() => {
-      AppConstants.EMULATOR_MODE = false;
+      spyOnProperty(AssetsBackendApiService, 'EMULATOR_MODE', 'get')
+        .and.returnValue(false);
       let expectedPngImage = (
         'https://storage.googleapis.com/app_default_bucket/user/' +
-        'tester/assets/profile_picture.png')
+        'tester/assets/profile_picture.png');
       let expectedWebpImage = (
         'https://storage.googleapis.com/app_default_bucket/user/' +
-        'tester/assets/profile_picture.webp')
+        'tester/assets/profile_picture.webp');
       let [profileImagePng, profileImageWebp] = (
         userService.getProfileImageDataUrlAsync('tester'));
       expect(profileImagePng).toEqual(expectedPngImage);
       expect(profileImageWebp).toEqual(expectedWebpImage);
-      AppConstants.EMULATOR_MODE = true;
 
       flushMicrotasks();
     }));
