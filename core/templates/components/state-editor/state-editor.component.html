@@ -43,7 +43,6 @@
       <div id="tutorialStateContent" class="oppia-editor-card-section state-content-editor-parent-container">
         <oppia-state-content-editor class="e2e-test-state-content-editor"
                                     (saveStateContent)="sendOnSaveStateContent($event)"
-                                    (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
                                     [stateContentPlaceholder]="stateContentPlaceholder"
                                     [stateContentSaveButtonPlaceholder]="stateContentSaveButtonPlaceholder">
         </oppia-state-content-editor>
@@ -59,7 +58,6 @@
                                   (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                   (onSaveSolution)="sendOnSaveSolution($event)"
                                   (recomputeGraph)="sendRecomputeGraph()"
-                                  (markAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
                                   [hidden]="!interactionIsShown">
   </oppia-state-interaction-editor>
 </div>
@@ -73,20 +71,17 @@
                            (onSaveInteractionDefaultOutcome)="sendOnSaveInteractionDefaultOutcome($event)"
                            (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                            (onSaveSolicitAnswerDetails)="sendOnSaveSolicitAnswerDetails($event)"
-                           (refreshWarnings)="sendRefreshWarnings()"
-                           (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                           (refreshWarnings)="sendRefreshWarnings()">
     </oppia-state-responses>
     <div>
       <oppia-state-hints-editor (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
                                 (onSaveSolution)="sendOnSaveSolution($event)"
-                                (onSaveHints)="sendOnSaveHints($event)"
-                                (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                                (onSaveHints)="sendOnSaveHints($event)">
       </oppia-state-hints-editor>
     </div>
     <div *ngIf="currentInteractionCanHaveSolution">
       <oppia-state-solution-editor (saveSolution)="sendOnSaveSolution($event)"
-                                   (refreshWarnings)="sendRefreshWarnings()"
-                                   (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                                   (refreshWarnings)="sendRefreshWarnings()">
       </oppia-state-solution-editor>
     </div>
     <div *ngIf="explorationIsLinkedToStory">

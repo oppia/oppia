@@ -89,15 +89,8 @@ describe('ExplorationFeatureService', () => {
           },
           linked_skill_id: null,
           solicit_answer_details: false,
-          card_is_checkpoint: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {}
-            }
-          },
-          next_content_id_index: 1,
-        },
+          card_is_checkpoint: false
+        }
       }
     };
     testParamChange = {
