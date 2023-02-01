@@ -618,23 +618,13 @@ class ManagedProcessTests(test_utils.TestBase):
 
         managed_web_browser = servers.create_managed_web_browser(123)
         self.assertIsNotNone(managed_web_browser)
+
         assert managed_web_browser is not None
         self.exit_stack.enter_context(managed_web_browser)
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args, ['xdg-open', 'http://localhost:123/'])
-
-    def test_managed_web_browser_on_virtualbox_os(self) -> None:
-        popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            os, 'listdir', value=['VBOX-123']))
-
-        managed_web_browser = servers.create_managed_web_browser(123)
-        self.assertIsNone(managed_web_browser)
-
-        self.assertEqual(len(popen_calls), 0)
 
     def test_managed_web_browser_on_mac_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -654,11 +644,32 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_web_browser_on_windows_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Windows'))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            os, 'listdir', value=[]))
 
-        managed_web_browser = servers.create_managed_web_browser(123)
-        self.assertIsNone(managed_web_browser)
+        with self.assertRaisesRegex(
+            Exception,
+            'Unable to identify the Operating System and therefore, unable to '
+            'launch the web browser.'
+            ):
+            self.exit_stack.enter_context(
+                servers.create_managed_web_browser(123))
+
+        self.assertEqual(len(popen_calls), 0)
+
+    def test_managed_web_browser_for_exception(self) -> None:
+        web_browser_error = 'Mock Exception while launching web browser.'
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
+        mock_create_managed_web_browser = self.swap_to_always_raise(
+                    servers, 'create_managed_web_browser',
+                    Exception(web_browser_error))
+
+        with mock_create_managed_web_browser:
+            with self.assertRaisesRegex(
+                Exception,
+                web_browser_error
+            ):
+                self.exit_stack.enter_context(
+                    servers.create_managed_web_browser(123))
 
         self.assertEqual(len(popen_calls), 0)
 

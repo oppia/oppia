@@ -26,6 +26,7 @@ from scripts import install_third_party_libs
 from scripts import servers
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
+MANAGED_WEB_BROWSER_ERROR = 'Mock Exception while launching web browser.'
 
 
 class MockCompiler:
@@ -104,6 +105,9 @@ class StartTests(test_utils.GenericTestBase):
             servers, 'create_managed_web_browser',
             lambda _: MockCompilerContextManager(),
             expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
+        self.swap_create_managed_web_browser = self.swap_to_always_raise(
+            servers, 'create_managed_web_browser',
+            Exception(MANAGED_WEB_BROWSER_ERROR))
 
     def test_start_servers_successfully(self) -> None:
         with self.swap_install_third_party_libs:
@@ -277,6 +281,42 @@ class StartTests(test_utils.GenericTestBase):
                     'Local development server is ready! Opening a default web '
                     'browser window pointing to it: '
                     'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
+                )
+            ],
+            self.print_arr)
+
+    def test_could_not_auto_launch_web_browser(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import start
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}])
+
+        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
+            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
+                with self.swap_create_managed_web_browser:
+                    with self.swap_webpack_compiler, self.swap_dev_appserver:
+                        with self.swap_extend_index_yaml, self.swap_print:
+                            with self.swap_firebase_auth_emulator:
+                                start.main(args=[])
+
+        self.assertIn(
+            [
+                'ERROR',
+                (
+                    'Error occurred while attempting to automatically launch '
+                    'the web browser: %s' % MANAGED_WEB_BROWSER_ERROR
+                )
+            ],
+            self.print_arr)
+
+        self.assertIn(
+            [
+                'INFORMATION',
+                (
+                    'Local development server is ready! You can access it by '
+                    'navigating to http://localhost:%s/ in a web '
+                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER
                 )
             ],
             self.print_arr)
