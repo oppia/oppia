@@ -10,10 +10,16 @@ jobs:
     runs-on: ubuntu-22.04
     if: github.repository == 'oppia/oppia'
     steps:
-    - name: Repository Dispatch
-      uses: peter-evans/repository-dispatch@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        repository: oppia/release-scripts
-        event-type: develop-commit
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@da40f50387c080df631aba01ea5c6df3857145b7
+        with:
+          app_id: ${{ secrets.NOTIFICATIONS_TOKEN_GENERATOR_GH_APP_ID }}
+          private_key: ${{ secrets.NOTIFICATIONS_TOKEN_GENERATOR_GH_APP_PRIVATE_KEY }}
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@87c5425cae5ba8b5bc7da27674076c78588babf3
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          repository: oppia/release-scripts
+          event-type: develop-commit
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
