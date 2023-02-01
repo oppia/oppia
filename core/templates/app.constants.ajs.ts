@@ -23,8 +23,7 @@ import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 
 for (var constantName in constants) {
-  angular.module('oppia').constant(
-    constantName, constants[constantName]);
+  angular.module('oppia').constant(constantName, constants[constantName]);
 }
 
 // Translations of strings that are loaded in the front page. They are listed
