@@ -55,6 +55,7 @@ describe('Audio preloader service', () => {
     language_code: 'en',
     title: 'My Title',
     init_state_name: 'Introduction',
+    next_content_id_index: 7,
     states: {
       'State 1': {
         param_changes: [],
@@ -101,15 +102,8 @@ describe('Audio preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: 0,
       },
       'State 3': {
         param_changes: [],
@@ -144,14 +138,8 @@ describe('Audio preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: 0,
       },
       'State 2': {
         param_changes: [],
@@ -198,15 +186,8 @@ describe('Audio preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: 0,
       },
       Introduction: {
         param_changes: [],
@@ -304,16 +285,8 @@ describe('Audio preloader service', () => {
         },
         solicit_answer_details: false,
         card_is_checkpoint: true,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        },
         linked_skill_id: null,
         classifier_model_id: null,
-        next_content_id_index: 0,
       }
     },
     param_specs: {},
