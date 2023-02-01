@@ -267,7 +267,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 self.assertFalse(
                     feature_services.is_feature_enabled(self.dev_feature.name))
 
-    def test_evaluate_prod_feature_for_prod_server_returns_false(self) -> None:
+    def test_evaluate_test_feature_for_prod_server_returns_false(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'OPPIA_PROJECT_ID', 'oppiaserver'):
                 self.assertFalse(

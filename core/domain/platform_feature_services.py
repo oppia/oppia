@@ -155,8 +155,9 @@ def _get_server_mode() -> platform_parameter_domain.ServerMode:
 
     Returns:
         Enum(SERVER_MODES). The server mode of Oppia. This is "dev" if Oppia is
-        running in development mode, "test" if Oppia is running on a test
-        server, and "prod" if Oppia is running in full production mode.
+        running in development mode, "test" if Oppia is running in production
+        mode but not on the main website, and "prod" if Oppia is running in
+        full production mode on the main website.
     """
     return (
         platform_parameter_domain.ServerMode.DEV
