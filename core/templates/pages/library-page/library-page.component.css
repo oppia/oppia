@@ -7,7 +7,7 @@ oppia-library-page .oppia-classroom-div {
   background-color: whitesmoke;
   border: 4px solid #04857c;
   border-radius: 10px;
-  height: 340px;
+  height: 400px;
   margin: 0 45px;
   overflow: hidden;
   padding: 30px 45px 45px 45px;
@@ -227,10 +227,10 @@ oppia-library-page .oppia-search-bar-container {
     font-size: 1.75em;
   }
   oppia-library-page .oppia-classroom-h1 {
-    font-size: 2em;
+    font-size: 2.5em;
   }
   oppia-library-page .oppia-classroom-h2 {
-    font-size: 1.0em;
+    font-size: 1.75em;
   }
   oppia-library-page .oppia-classroom-p {
     font-size: 1.05em;
