@@ -27,6 +27,9 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
 import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import cloneDeep from 'lodash/cloneDeep';
 
 class MockActiveModal {
   close(): void {
@@ -396,10 +399,17 @@ describe('Question Suggestion Review Modal component', () => {
         };
       }
 
+      const questionDict = cloneDeep(
+        component.suggestionIdToContribution[suggestionId]
+          .suggestion.change.question_dict
+      );
+
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return (
             { componentInstance: MockNgbModalRef,
-              result: Promise.resolve()
+              result: Promise.resolve(
+                {questionDict: questionDict, skillDifficulty: 0.3}
+              )
             }) as NgbModalRef;
       });
 
@@ -437,7 +447,7 @@ describe('Question Suggestion Review Modal component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-    it('should return nothing when edit question modal is' +
+    it('should update review question modal when edit question modal is' +
       ' resolved', fakeAsync(() => {
       class MockNgbModalRef {
         componentInstance = {
@@ -450,10 +460,30 @@ describe('Question Suggestion Review Modal component', () => {
         };
       }
 
+      const newContentHtml = 'new html';
+      const newSkillDifficulty = 1;
+
+      const suggestionChange = (
+        component.suggestionIdToContribution[suggestionId].suggestion.change);
+      const newQuestionDict = cloneDeep(suggestionChange.question_dict);
+      newQuestionDict.question_state_data.content.html = newContentHtml;
+
+      expect(
+        component.question.getStateData().content.html
+      ).toEqual(contentHtml);
+      expect(
+        suggestionChange.question_dict.question_state_data.content.html
+      ).toEqual(contentHtml);
+      expect(component.skillDifficulty).toBe(skillDifficulty);
+      expect(suggestionChange.skill_difficulty).toEqual(skillDifficulty);
+
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return (
             { componentInstance: MockNgbModalRef,
-              result: Promise.resolve()
+              result: Promise.resolve({
+                questionDict: newQuestionDict,
+                skillDifficulty: newSkillDifficulty
+              })
             }) as NgbModalRef;
       });
 
@@ -461,6 +491,18 @@ describe('Question Suggestion Review Modal component', () => {
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
+      expect(
+        component.question.getStateData().content.html
+      ).toEqual(newContentHtml);
+      expect(
+        suggestionChange.question_dict.question_state_data.content.html
+      ).toEqual(newContentHtml);
+      expect(component.skillDifficulty).toBe(newSkillDifficulty);
+      expect(suggestionChange.skill_difficulty).toEqual(newSkillDifficulty);
+
+      suggestionChange.question_dict.question_state_data.content.html = (
+        contentHtml);
+      suggestionChange.skill_difficulty = skillDifficulty;
     }));
 
     it('should initialize properties after component is initialized',
