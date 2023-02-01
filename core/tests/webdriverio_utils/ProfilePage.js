@@ -37,7 +37,7 @@ var ProfilePage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectCurrUserToHaveProfilePhoto = async function() {
+  this.expectUserToHaveProfilePhoto = async function() {
     await waitFor.visibilityOf(
       userProfilePhoto,
       'User profile photo taking too long to display');

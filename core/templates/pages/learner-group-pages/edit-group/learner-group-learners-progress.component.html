@@ -101,8 +101,10 @@
                     title="progress">
               <div class="learner-info">
                 <picture>
-                  <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(specificLearnerProgress.username)">
-                  <source type="image/png" [srcset]="getProfileImagePngDataUrl(specificLearnerProgress.username)">
+                  <source type="image/webp"
+                          [srcset]="getProfileImageWebpDataUrl(specificLearnerProgress.username)">
+                  <source type="image/png"
+                          [srcset]="getProfileImagePngDataUrl(specificLearnerProgress.username)">
                   <img [src]="getProfileImagePngDataUrl(specificLearnerProgress.username)">
                 </picture>
                 <div>{{specificLearnerProgress.username}}</div>
@@ -115,9 +117,12 @@
                 <li ngbDropdownItem>
                   <div class="learner-info" (click)="updateLearnerSpecificProgress(learnerProgress)">
                     <picture>
-                      <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
-                      <source type="image/png" [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
-                      <img [src]="getProfileImagePngDataUrl(learnerProgress.username)" alt="User profile picture">
+                      <source type="image/webp"
+                              [srcset]="getProfileImageWebpDataUrl(learnerProgress.username)">
+                      <source type="image/png"
+                              [srcset]="getProfileImagePngDataUrl(learnerProgress.username)">
+                      <img [src]="getProfileImagePngDataUrl(learnerProgress.username)"
+                           alt="User profile picture">
                     </picture>
                     <div>{{learnerProgress.username}}</div>
                   </div>

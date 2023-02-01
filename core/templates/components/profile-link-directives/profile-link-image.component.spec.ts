@@ -19,7 +19,6 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { ProfileLinkImageBackendApiService } from './profile-link-image-backend-api.service';
 import { ProfileLinkImageComponent } from './profile-link-image.component';
 
 /**
@@ -30,7 +29,6 @@ describe('ProfileLinkImageComponent', () => {
   let component: ProfileLinkImageComponent;
   let fixture: ComponentFixture<ProfileLinkImageComponent>;
   let urlInterpolationService: UrlInterpolationService;
-  let profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -55,8 +53,6 @@ describe('ProfileLinkImageComponent', () => {
     fixture = TestBed.createComponent(ProfileLinkImageComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    profileLinkImageBackendApiService = TestBed.inject(
-      ProfileLinkImageBackendApiService);
   });
 
   it('should show profile picture on initialisation', fakeAsync(() => {
@@ -64,14 +60,9 @@ describe('ProfileLinkImageComponent', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'default-image-url');
 
-    spyOn(profileLinkImageBackendApiService, 'fetchProfilePictureDataAsync')
-      .and.returnValue(Promise.resolve('path/to/base64-profile-picture-url'));
-
     component.ngOnInit();
     tick();
 
-    expect(component.profileImageUrl).toBe(
-      '/preferenceshandler/profile_picture_by_username/user1');
     expect(component.profilePicture).toBe('path/to/base64-profile-picture-url');
   }));
 
@@ -80,9 +71,6 @@ describe('ProfileLinkImageComponent', () => {
     component.username = 'user1';
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'default-image-url');
-
-    spyOn(profileLinkImageBackendApiService, 'fetchProfilePictureDataAsync')
-      .and.returnValue(Promise.resolve(null));
 
     component.ngOnInit();
     tick();

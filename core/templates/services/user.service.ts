@@ -61,22 +61,21 @@ export class UserService {
   }
 
   getProfileImageDataUrlAsync(username: string): [string, string] {
-    let defaultUrlWebp = this.urlInterpolationService.getStaticImageUrl(
-      AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
-    let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(
-      AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
-    // We store profile images to the browser-local-storage when in the
-    // emulator mode. In general we return the tuple of png image URL
-    // and web image url but as we are only storing the image in the
-    // local storage we return tuple of localStoredImage, one for png
-    // and other for webp.
-    let localStoredImage = this.imageLocalStorageService.getRawImageData(
-      username + '_profile_picture.png');
-    if (localStoredImage !== null) {
-      return [localStoredImage, localStoredImage];
-    }
     if (AppConstants.EMULATOR_MODE) {
-      return [defaultUrlPng, defaultUrlWebp];
+      let localStoredImage = this.imageLocalStorageService.getRawImageData(
+        username + '_profile_picture.png');
+      let defaultUrlWebp = this.urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
+      let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
+      if (localStoredImage == null) {
+        return [defaultUrlPng, defaultUrlWebp];
+      }
+      // Normally, we return a tuple of PNG image URL and WebP image URL. 
+      // In emulator mode we use local storage and we only store the PNG image.
+      // To handle this we return a tuple of the same PNG images in
+      // emulator mode.
+      return [localStoredImage, localStoredImage];
     } else {
       let pngImageUrl = this.urlInterpolationService.interpolateUrl(
         this.assetsBackendApiService.profileImagePngUrlTemplate,

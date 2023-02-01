@@ -20,6 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 
+import { AppConstants } from 'app.constants';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -28,11 +29,27 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserService } from 'services/user.service';
 import { UrlService } from './contextual/url.service';
 import { PreferencesBackendDict, UserBackendApiService } from './user-backend-api.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
 class MockWindowRef {
+  imageData = {};
   _window = {
     location: {
       pathname: 'home'
+    },
+    sessionStorage: {
+      removeItem: (name: string) => {
+        this.imageData = {};
+      },
+      setItem: (filename: string, rawImage: string) => {
+        this.imageData[filename] = rawImage;
+      },
+      getItem: (filename: string) => {
+        if (this.imageData[filename] === undefined) {
+          return null;
+        }
+        return this.imageData[filename];
+      }
     }
   };
 
@@ -41,7 +58,7 @@ class MockWindowRef {
   }
 }
 
-describe('User Api Service', () => {
+fdescribe('User Api Service', () => {
   let userService: UserService;
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
@@ -49,6 +66,7 @@ describe('User Api Service', () => {
   let csrfService: CsrfTokenService;
   let windowRef: MockWindowRef;
   let userBackendApiService: UserBackendApiService;
+  let imageLocalStorageService: ImageLocalStorageService;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -62,6 +80,7 @@ describe('User Api Service', () => {
     urlService = TestBed.get(UrlService);
     csrfService = TestBed.get(CsrfTokenService);
     userBackendApiService = TestBed.inject(UserBackendApiService);
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       async() => {
@@ -76,7 +95,6 @@ describe('User Api Service', () => {
   });
 
   it('should return userInfo data', fakeAsync(() => {
-    // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
       roles: ['USER_ROLE'],
       is_moderator: false,
@@ -135,8 +153,7 @@ describe('User Api Service', () => {
       });
     }));
 
-  it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
-    // Creating a test user for checking profile picture of user.
+  it('should not fetch userInfo if it was fetched before', fakeAsync(() => {
     const sampleUserInfoBackendObject = {
       roles: ['USER_ROLE'],
       is_moderator: false,
@@ -167,7 +184,6 @@ describe('User Api Service', () => {
   }));
 
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
-    // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
       role: 'USER_ROLE',
       is_moderator: false,
@@ -192,93 +208,48 @@ describe('User Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should return image data', fakeAsync(() => {
-    var requestUrl = '/preferenceshandler/profile_picture';
-    // Creating a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
-      is_moderator: false,
-      is_curriculum_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: true
-    };
-
-    userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-      expect(dataUrl).toBe('image data');
-    });
-
-    const req1 = httpTestingController.expectOne('/userinfohandler');
-    expect(req1.request.method).toEqual('GET');
-    req1.flush(sampleUserInfoBackendObject);
-
-    flushMicrotasks();
-
-    const req2 = httpTestingController.expectOne(requestUrl);
-    expect(req2.request.method).toEqual('GET');
-    req2.flush({profile_picture_data_url: 'image data'});
-
-    flushMicrotasks();
-  }));
-
-  it('should return image data when second GET request returns 404',
+  it('should return image stored in session storage while in emulator mode',
     fakeAsync(() => {
-      var requestUrl = '/preferenceshandler/profile_picture';
-      // Creating a test user for checking profile picture of user.
-      var sampleUserInfoBackendObject = {
-        is_moderator: false,
-        is_curriculum_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: true,
-        preferred_site_language_code: null,
-        username: 'tester',
-        email: 'test@test.com',
-        user_is_logged_in: true
-      };
-
-      userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-        expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.webp'));
-      });
-      const req1 = httpTestingController.expectOne('/userinfohandler');
-      expect(req1.request.method).toEqual('GET');
-      req1.flush(sampleUserInfoBackendObject);
+      let filename = 'tester_profile_picture.png';
+      const imageData = 'data:image/png;base64,JUMzJTg3JTJD';
+      imageLocalStorageService.saveImage(filename, imageData);
+      let [profileImagePng, profileImageWebp] = (
+        userService.getProfileImageDataUrlAsync('tester'));
+      expect(profileImagePng).toEqual(imageData);
+      expect(profileImageWebp).toEqual(imageData);
+      imageLocalStorageService.deleteImage(filename);
 
       flushMicrotasks();
+  }));
 
-      const req2 = httpTestingController.expectOne(requestUrl);
-      expect(req2.request.method).toEqual('GET');
-      req2.flush(404);
+  it('should return image path when in production mode',
+    fakeAsync(() => {
+      AppConstants.EMULATOR_MODE = false;
+      let expectedPngImage = (
+        'https://storage.googleapis.com/app_default_bucket/user/' +
+        'tester/assets/profile_picture.png')
+      let expectedWebpImage = (
+        'https://storage.googleapis.com/app_default_bucket/user/' +
+        'tester/assets/profile_picture.webp')
+      let [profileImagePng, profileImageWebp] = (
+        userService.getProfileImageDataUrlAsync('tester'));
+      expect(profileImagePng).toEqual(expectedPngImage);
+      expect(profileImageWebp).toEqual(expectedWebpImage);
+      AppConstants.EMULATOR_MODE = true;
 
       flushMicrotasks();
     }));
 
-  it('should return the default profile image path when user is not logged',
+  it('should return the default profile image path when in emulator mode',
     fakeAsync(() => {
-      // Creating a test user for checking profile picture of user.
-      const sampleUserInfoBackendObject = {
-        is_moderator: false,
-        is_curriculum_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: true,
-        preferred_site_language_code: null,
-        username: 'tester',
-        email: 'test@test.com',
-        user_is_logged_in: false
-      };
-
-      userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-        expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.webp'));
-      });
-      const req = httpTestingController.expectOne('/userinfohandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleUserInfoBackendObject);
+      let defaultUrlWebp = urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
+      let defaultUrlPng = urlInterpolationService.getStaticImageUrl(
+        AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
+      let [profileImagePng, profileImageWebp] = (
+        userService.getProfileImageDataUrlAsync('tester'));
+      expect(profileImagePng).toEqual(defaultUrlPng);
+      expect(profileImageWebp).toEqual(defaultUrlWebp);
 
       flushMicrotasks();
     }));
