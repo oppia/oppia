@@ -130,7 +130,7 @@ describe('Outcome Editor Component', () => {
 
     onExternalSaveEmitter.emit();
 
-    expect(component.saveThisFeedback).toHaveBeenCalledWith(false);
+    expect(component.saveThisFeedback).toHaveBeenCalled();
   });
 
   it('should cancel feedback edit on external save event when' +
@@ -528,7 +528,7 @@ describe('Outcome Editor Component', () => {
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
 
-    component.saveThisFeedback(false);
+    component.saveThisFeedback();
 
     expect(component.savedOutcome.dest).toBe('Hola');
   });
@@ -556,62 +556,8 @@ describe('Outcome Editor Component', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
 
     expect(() => {
-      component.saveThisFeedback(false);
+      component.saveThisFeedback();
     }).toThrowError('The active state name is null in the outcome editor.');
-  });
-
-  it('should throw error when saving feedback with invalid content id', () => {
-    component.savedOutcome = new Outcome(
-      'Dest',
-      null,
-      new SubtitledHtml('<p>Saved Outcome</p>', null),
-      false,
-      [],
-      'ExpId',
-      'SkillId',
-    );
-    component.outcome = new Outcome(
-      'Dest',
-      null,
-      new SubtitledHtml('<p>Outcome</p>', null),
-      true,
-      [],
-      '',
-      '',
-    );
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-
-    expect(() => {
-      component.saveThisFeedback(true);
-    }).toThrowError('The content ID is null in the outcome editor.');
-  });
-
-  it('should emit showMarkAllAudioAsNeedingUpdateModalIfRequired', () => {
-    component.savedOutcome = new Outcome(
-      'Dest',
-      null,
-      new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
-      false,
-      [],
-      'ExpId',
-      'SkillId',
-    );
-    component.outcome = new Outcome(
-      'Dest',
-      null,
-      new SubtitledHtml('<p>Outcome</p>', 'contentId'),
-      true,
-      [],
-      '',
-      '',
-    );
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
-
-    component.saveThisFeedback(true);
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalledWith(['contentId']);
   });
 
   it('should set refresher exploration ID as null on saving destination' +

@@ -51,7 +51,7 @@ datastore_services = models.Registry.import_datastore_services()
 def _migrate_states_schema(
     versioned_exploration_states: exp_domain.VersionedExplorationStatesDict,
     init_state_name: str, language_code: str
-) -> None:
+) -> Optional[int]:
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
@@ -71,6 +71,9 @@ def _migrate_states_schema(
         init_state_name: str. Name of initial state.
         language_code: str. The language code of the exploration.
 
+    Returns:
+        None|int. The next content Id index for generating new content Id.
+
     Raises:
         Exception. The given states_schema_version is invalid.
     """
@@ -86,12 +89,26 @@ def _migrate_states_schema(
                 feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
                 feconf.CURRENT_STATE_SCHEMA_VERSION))
 
+    next_content_id_index = None
     while (states_schema_version <
            feconf.CURRENT_STATE_SCHEMA_VERSION):
-        exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states,
-            states_schema_version, init_state_name, language_code)
+        if states_schema_version == 54:
+            # State conversion function from 54 to 55 removes
+            # next_content_id_index from the state level, hence this if case
+            # populates the next_content_id_index from the old state, which will
+            # be used for introducing next_content_id_index into
+            # exploration level.
+            next_content_id_index = (
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states,
+                    states_schema_version, init_state_name, language_code)
+            )
+        else:
+            exp_domain.Exploration.update_states_from_model(
+                versioned_exploration_states,
+                states_schema_version, init_state_name, language_code)
         states_schema_version += 1
+    return next_content_id_index
 
 
 def get_new_exploration_id() -> str:
@@ -189,14 +206,17 @@ def get_exploration_from_model(
         'states': copy.deepcopy(exploration_model.states)
     }
     init_state_name = exploration_model.init_state_name
+    next_content_id_index = None
     language_code = exploration_model.language_code
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_states_schema(
+        next_content_id_index = _migrate_states_schema(
             versioned_exploration_states, init_state_name, language_code)
+    if next_content_id_index is not None:
+        exploration_model.next_content_id_index = next_content_id_index
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -209,6 +229,7 @@ def get_exploration_from_model(
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.auto_tts_enabled,
         exploration_model.correctness_feedback_enabled,
+        exploration_model.next_content_id_index,
         exploration_model.edits_allowed,
         created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
