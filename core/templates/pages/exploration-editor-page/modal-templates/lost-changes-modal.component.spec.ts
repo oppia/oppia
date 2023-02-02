@@ -53,6 +53,8 @@ describe('Lost Changes Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
+    content_id_for_state_content: 'content_0',
+    content_id_for_default_outcome: 'default_outcome_1',
     utilsService: new UtilsService,
     isEndingExploration: () => false,
     isAddingInteraction: () => false,

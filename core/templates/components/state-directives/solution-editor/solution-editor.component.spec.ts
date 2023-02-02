@@ -127,18 +127,6 @@ describe('Solution editor component', () => {
     expect(component.openSolutionEditorModal.emit).toHaveBeenCalled();
   });
 
-  it('should show open mark all audio as needing update modal', () => {
-    const modalData = ['value', 'value 2'];
-
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
-      .and.stub();
-
-    component.openMarkAllAudioAsNeedingUpdateModalIfRequired(modalData);
-
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalledOnceWith(modalData);
-  });
-
   it('should save new solution', () => {
     let solution = solutionObjectFactory.createNew(
       true, 'answer', 'Html', 'XyzID');

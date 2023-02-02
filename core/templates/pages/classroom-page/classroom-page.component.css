@@ -40,7 +40,8 @@
 
 .oppia-classroom-viewer-container,
 .oppia-classroom-search-section {
-  display: block;
+  display: grid;
+  justify-content: center;
   margin-left: auto;
   margin-right: auto;
   width: 75vw;
@@ -127,11 +128,6 @@ classroom-page .oppia-classroom-page-subheading-text {
   .oppia-classroom-viewer-container,
   .oppia-classroom-search-section {
     width: 75vw;
-  }
-
-  .oppia-classroom-search-container {
-    margin-bottom: -54px;
-    margin-left: -12.5vw;
   }
 }
 
