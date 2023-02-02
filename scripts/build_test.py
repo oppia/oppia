@@ -1070,8 +1070,11 @@ class BuildTests(test_utils.GenericTestBase):
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
         clean_swap = self.swap(build, 'clean', mock_clean)
-        install_python_dev_dependencies_swap = self.swap_to_always_return(
-            install_python_dev_dependencies, 'main', None
+        install_python_dev_dependencies_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'main',
+            lambda _: None,
+            expected_args=[(['--uninstall'],)]
         )
 
         with ensure_files_exist_swap, build_using_webpack_swap:
