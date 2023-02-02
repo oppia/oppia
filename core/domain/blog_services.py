@@ -424,11 +424,12 @@ def get_published_blog_post_summaries_by_user_id(
             max_limit, offset=offset
         )
     )
-    if blog_post_summary_models is None:
+    if len(blog_post_summary_models) == 0:
         return []
     blog_post_summaries = [
         get_blog_post_summary_from_model(model)
-        for model in blog_post_summary_models if model is not None]
+        for model in blog_post_summary_models if model is not None
+    ]
     return blog_post_summaries
 
 
