@@ -129,7 +129,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'Expected a filename ending in .png'
         )
-        base64_encoded_string = "SGVsbG8gV29ybGQh"
+        base64_encoded_string = 'SGVsbG8gV29ybGQh'
         self._assert_image_validation_error(
             base64_encoded_string,
             'image.svg',
@@ -143,4 +143,4 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'image.svg',
             feconf.ENTITY_TYPE_EXPLORATION
         )
-        self.assertEqual('svg',validated_image)
+        self.assertEqual('svg', validated_image)
