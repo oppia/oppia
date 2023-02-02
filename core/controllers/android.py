@@ -23,6 +23,8 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -46,7 +48,7 @@ from core.domain import topic_services
 from core.domain import translation_domain
 from core.domain import user_services
 
-from typing import Dict, List, TypedDict, Union
+from typing import Dict, List, Optional, TypedDict, Union
 
 
 class InitializeAndroidTestDataHandler(
@@ -383,7 +385,8 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
-                        constants.ACTIVITY_TYPE_LEARN_TOPIC
+                        constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                        constants.ACTIVITY_TYPE_CLASSROOM
                     ]
                 },
             },
@@ -395,7 +398,8 @@ class AndroidActivityHandler(base.BaseHandler[
             'activity_version': {
                 'schema': {
                     'type': 'int'
-                }
+                },
+                'default_value': None
             }
         }
     }
@@ -419,34 +423,43 @@ class AndroidActivityHandler(base.BaseHandler[
         assert self.normalized_request is not None
         activity_id = self.normalized_request['activity_id']
         activity_type = self.normalized_request['activity_type']
-        activity_version = self.normalized_request['activity_version']
-        activity: Union[
+        activity_version = self.normalized_request.get('activity_version')
+        activity: Optional[Union[
             exp_domain.Exploration,
             story_domain.Story,
             skill_domain.Skill,
             subtopic_page_domain.SubtopicPage,
+            classroom_config_domain.Classroom,
             topic_domain.Topic
-        ]
-        try:
-            if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-                activity = exp_fetchers.get_exploration_by_id(
-                    activity_id, version=activity_version)
-            elif activity_type == constants.ACTIVITY_TYPE_STORY:
-                activity = story_fetchers.get_story_by_id(
-                    activity_id, version=activity_version)
-            elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-                activity = skill_fetchers.get_skill_by_id(
-                    activity_id, version=activity_version)
-            elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-                topic_id, subtopic_page_id = activity_id.split('-')
-                activity = subtopic_page_services.get_subtopic_page_by_id(
-                    topic_id,
-                    int(subtopic_page_id),
-                    version=activity_version
-                )
-            else:
-                activity = topic_fetchers.get_topic_by_id(
-                    activity_id, version=activity_version)
-        except Exception as e:
-            raise self.PageNotFoundException from e
+        ]] = None
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+            activity = exp_fetchers.get_exploration_by_id(
+                activity_id, strict=False, version=activity_version)
+        elif activity_type == constants.ACTIVITY_TYPE_STORY:
+            activity = story_fetchers.get_story_by_id(
+                activity_id, strict=False, version=activity_version)
+        elif activity_type == constants.ACTIVITY_TYPE_SKILL:
+            activity = skill_fetchers.get_skill_by_id(
+                activity_id, strict=False, version=activity_version)
+        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
+            topic_id, subtopic_page_id = activity_id.split('-')
+            activity = subtopic_page_services.get_subtopic_page_by_id(
+                topic_id,
+                int(subtopic_page_id),
+                strict=False,
+                version=activity_version
+            )
+        elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
+            if activity_version is not None:
+                raise self.InvalidInputException(
+                    'Version cannot be specified for classroom')
+            activity = classroom_config_services.get_classroom_by_url_fragment(
+                activity_id)
+        else:
+            activity = topic_fetchers.get_topic_by_id(
+                activity_id, strict=False, version=activity_version)
+
+        if activity is None:
+            raise self.PageNotFoundException('Activity does not exist')
+
         self.render_json(activity.to_dict())

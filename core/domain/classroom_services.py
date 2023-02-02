@@ -24,6 +24,12 @@ from core.domain import config_domain
 
 from typing import Optional
 
+# TODO(#xxxxx): Currently, the classroom data is stored in the config model and
+# we are planning to migrate the storage into a new Classroom model. After the
+# successful migration, this file should be renamed as classroom_domain and
+# the exiting classroom domain file should be deleted, until then both of
+# the files will exist simultaneously.
+
 
 def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     """Returns the classroom url fragment for the provided topic id.

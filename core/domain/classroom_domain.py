@@ -20,6 +20,12 @@ from __future__ import annotations
 
 from typing import List
 
+# TODO(#xxxxx): Currently, the classroom data is stored in the config model and
+# we are planning to migrate the storage into a new Classroom model. After the
+# successful migration, this file should be renamed as classroom_domain and
+# the exiting classroom domain file should be deleted, until then both of
+# the files will exist simultaneously.
+
 
 class Classroom:
     """Domain object for a classroom."""

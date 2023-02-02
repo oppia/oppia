@@ -37,7 +37,7 @@ from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-posit
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import generate_sample_data # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -80,6 +80,10 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--contributor_dashboard_debug',
+    help='DEPRECATED: use \'--generate_sample_data\' instead',
+    action='store_true')
+_PARSER.add_argument(
+    '--generate_sample_data',
     help='optional; if specified, populate sample data that can be used to help'
          'develop for the contributor dashboard.',
     action='store_true')
@@ -151,6 +155,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         stack.callback(notify_about_successful_shutdown)
         stack.callback(call_extend_index_yaml)
 
+        if parsed_args.contributor_dashboard_debug:
+            raise Exception(
+                'The \'--contributor_dashboard_debug\' flag is deprecated'
+                'use \'--generate_sample_data\' instead.'
+            )
+
         build_args = []
         if parsed_args.prod_env:
             build_args.append('--prod_env')
@@ -188,13 +198,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             skip_sdk_update_check=True,
             port=PORT_NUMBER_FOR_GAE_SERVER))
 
-        if parsed_args.contributor_dashboard_debug:
+        if parsed_args.generate_sample_data:
             initializer = (
-                contributor_dashboard_debug
-                .ContributorDashboardDebugInitializer(
+                generate_sample_data.GenerateSampleData(
                     base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER)
             )
-            initializer.populate_debug_data()
+            initializer.generate_sample_data()
 
         if parsed_args.no_browser:
             common.print_each_string_after_two_new_lines([
