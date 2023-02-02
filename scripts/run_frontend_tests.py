@@ -201,6 +201,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.')
 
+    if 'Disconnected , because no message' in concatenated_output:
+        main()
+
     if parsed_args.check_coverage:
         if task.returncode:
             sys.exit(
