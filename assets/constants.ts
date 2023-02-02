@@ -318,6 +318,10 @@ export default {
   // eslint-disable-next-line max-len
   "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
 
+  // This regex validates whether a given string is in the format of YYYY-MM-DD
+  // format.
+  "DATE_REGEX": "^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$",
+
   // The SVG tag-specific attribute allowlist is based on the list of tags and
   // and attributes specified in this project:
   // https://github.com/cure53/DOMPurify
@@ -6021,22 +6025,12 @@ export default {
       "hints": [],
       "solution": null
     },
-    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
-      "voiceovers_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
+      "voiceovers_mapping": {}
     },
     "solicit_answer_details": false,
-    "card_is_checkpoint": false,
-    "written_translations": {
-      "translations_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
-    }
+    "card_is_checkpoint": false
   },
 
   // Data required for Firebase authentication.
@@ -6928,5 +6922,7 @@ export default {
     "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
     "edits_allowed"
   ],
-  "NON_METADATA_PROPERTIES": ["id", "states"]
+  "NON_METADATA_PROPERTIES": ["id", "states", "next_content_id_index"],
+  "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
+  "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313
 } as const;

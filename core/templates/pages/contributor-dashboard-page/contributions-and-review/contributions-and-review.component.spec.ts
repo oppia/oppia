@@ -36,6 +36,7 @@ import { AlertsService } from 'services/alerts.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 
 
 class MockNgbModalRef {
@@ -108,7 +109,8 @@ describe('Contributions and review component', () => {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService
         },
-        UserService
+        UserService,
+        OpportunitiesListComponent
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -299,10 +301,7 @@ describe('Contributions and review component', () => {
                     param_changes: [],
                     recorded_voiceovers: {
                       voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
+                    }
                   },
                 }
               },
@@ -397,10 +396,7 @@ describe('Contributions and review component', () => {
                     param_changes: [],
                     recorded_voiceovers: {
                       voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
+                    }
                   },
                 }
               },
@@ -551,7 +547,6 @@ describe('Contributions and review component', () => {
             classifier_model_id: null,
             card_is_checkpoint: null,
             linked_skill_id: null,
-            next_content_id_index: null,
             content: {
               html: 'Question 1',
               content_id: 'content_1'
@@ -650,20 +645,12 @@ describe('Contributions and review component', () => {
                 content_5: {}
               }
             },
-            written_translations: {
-              translations_mapping: {
-                content_1: {},
-                content_2: {},
-                content_3: {},
-                content_4: {},
-                content_5: {}
-              }
-            },
             solicit_answer_details: false
           },
           language_code: 'en',
           version: 1,
           linked_skill_ids: ['abc'],
+          next_content_id_index: 1,
           inapplicable_skill_misconception_ids: ['abc-2']
         });
       spyOn(contextService, 'setCustomEntityContext').and.stub();
@@ -704,6 +691,24 @@ describe('Contributions and review component', () => {
 
         expect(component.activeExplorationId).toBeNull();
       }));
+
+    it('should be able to change language', fakeAsync(() => {
+      component.opportunitiesListRef = TestBed.inject(
+        OpportunitiesListComponent);
+      spyOn(component.opportunitiesListRef, 'onChangeLanguage')
+        .and.callFake(() => {
+          return;
+        });
+
+      expect(component.languageCode).toBeUndefined();
+
+      component.onChangeLanguage('es');
+
+      expect(component.languageCode).toBe('es');
+      expect(
+        component.opportunitiesListRef.onChangeLanguage
+      ).toHaveBeenCalledWith('es');
+    }));
 
     it('should return true on Review Translations tab', fakeAsync(() => {
       component.contributionTabs = [
@@ -849,7 +854,6 @@ describe('Contributions and review component', () => {
           classifier_model_id: null,
           card_is_checkpoint: null,
           linked_skill_id: null,
-          next_content_id_index: null,
           content: {
             html: 'Question 1',
             content_id: 'content_1'
@@ -948,20 +952,12 @@ describe('Contributions and review component', () => {
               content_5: {}
             }
           },
-          written_translations: {
-            translations_mapping: {
-              content_1: {},
-              content_2: {},
-              content_3: {},
-              content_4: {},
-              content_5: {}
-            }
-          },
           solicit_answer_details: false
         },
         language_code: 'en',
         version: 1,
         linked_skill_ids: ['abc'],
+        next_content_id_index: 6,
         inapplicable_skill_misconception_ids: ['abc-2']
       };
 
@@ -1066,10 +1062,7 @@ describe('Contributions and review component', () => {
                   param_changes: [],
                   recorded_voiceovers: {
                     voiceovers_mapping: {}
-                  },
-                  written_translations: {
-                    translations_mapping: {}
-                  },
+                  }
                 },
               }
             },

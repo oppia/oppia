@@ -31,11 +31,14 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_cleaner
+from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
+from core.domain import translation_domain
+from core.domain import translation_services
 from core.domain import user_services
 from core.platform import models
 from extensions import domain
@@ -538,7 +541,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         assert self.final_reviewer_id is not None
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, change_list,
-            commit_message, is_suggestion=True)
+            commit_message)
 
     def pre_update_validate(
         self, change: exp_domain.EditExpStatePropertyContentCmd
@@ -747,31 +750,42 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
 
-    def accept(self, commit_message: str) -> None:
-        """Accepts the suggestion.
+    def accept(self, unused_commit_message: str) -> None:
+        """Accepts the suggestion."""
+        translated_content = translation_domain.TranslatedContent(
+            self.change.translation_html,
+            translation_domain.TranslatableContentFormat(
+                self.change.data_format),
+            needs_update=False
+        )
 
-        Args:
-            commit_message: str. The commit message.
-        """
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.target_id,
+            self.target_version_at_submission,
+            self.language_code,
+            self.change.content_id,
+            translated_content)
+
+        (
+            opportunity_services.
+            update_translation_opportunity_with_accepted_suggestion(
+                self.target_id, self.language_code)
+        )
+
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
         # Before calling this accept method we are already checking if user
         # with 'final_reviewer_id' exists or not.
         assert self.final_reviewer_id is not None
         if (
-                hasattr(self.change, 'data_format') and
-                state_domain.WrittenTranslation.is_data_format_list(
-                    self.change.data_format)
+            hasattr(self.change, 'data_format') and
+            translation_domain.TranslatableContentFormat.is_data_format_list(
+                self.change.data_format)
         ):
-            exp_services.update_exploration(
-                self.final_reviewer_id, self.target_id, [self.change],
-                commit_message, is_suggestion=True)
             return
 
         self._copy_new_images_to_target_entity_storage()
-        exp_services.update_exploration(
-            self.final_reviewer_id, self.target_id, [self.change],
-            commit_message, is_suggestion=True)
 
     def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in this suggestion.
@@ -983,19 +997,20 @@ class SuggestionAddQuestion(BaseSuggestion):
         # provided as None which causes MyPy to throw 'invalid argument
         # type' error. Thus, to avoid the error, we used ignore here.
         question = question_domain.Question(
-            None,  # type: ignore[arg-type]
+            None, # type: ignore[arg-type]
             state_domain.State.from_dict(
-                question_dict['question_state_data']
+                self.change.question_dict['question_state_data']
             ),
-            question_dict['question_state_data_schema_version'],
-            question_dict['language_code'],
+            self.change.question_dict['question_state_data_schema_version'],
+            self.change.question_dict['language_code'],
             # Here we use MyPy ignore because here we are building Question
             # domain object only for validation purpose, so 'version' is
             # provided as None which causes MyPy to throw 'invalid argument
             # type' error. Thus, to avoid the error, we use ignore here.
             None,  # type: ignore[arg-type]
-            question_dict['linked_skill_ids'],
-            question_dict['inapplicable_skill_misconception_ids'])
+            self.change.question_dict['linked_skill_ids'],
+            self.change.question_dict['inapplicable_skill_misconception_ids'],
+            self.change.question_dict['next_content_id_index'])
         question_state_data_schema_version = (
             question_dict['question_state_data_schema_version'])
         if question_state_data_schema_version != (
@@ -1820,6 +1835,52 @@ class QuestionReviewStats:
                 self.first_contribution_date.strftime('%b %Y')),
             'last_contribution_date': (
                 self.last_contribution_date.strftime('%b %Y'))
+        }
+
+
+class ContributorCertificateInfoDict(TypedDict):
+    """Dictionary representing the ContributorCertificateInfo object."""
+
+    from_date: str
+    to_date: str
+    team_lead: str
+    contribution_hours: str
+    language: Optional[str]
+
+
+class ContributorCertificateInfo:
+    """Encapsulates key information that is used to generate contributor
+    certificate.
+    """
+
+    def __init__(
+        self,
+        from_date: str,
+        to_date: str,
+        team_lead: str,
+        contribution_hours: str,
+        language: Optional[str]
+    ) -> None:
+        self.from_date = from_date
+        self.to_date = to_date
+        self.team_lead = team_lead
+        self.contribution_hours = contribution_hours
+        self.language = language
+
+    def to_dict(self) -> ContributorCertificateInfoDict:
+        """Returns a dict representation of a ContributorCertificateInfo
+        domain object.
+
+        Returns:
+            dict. A dict representation of a ContributorCertificateInfo
+            domain object.
+        """
+        return {
+            'from_date': self.from_date,
+            'to_date': self.to_date,
+            'team_lead': self.team_lead,
+            'contribution_hours': self.contribution_hours,
+            'language': self.language
         }
 
 

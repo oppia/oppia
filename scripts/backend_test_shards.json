@@ -48,6 +48,7 @@
         "extensions.value_generators.models.generators_test",
         "core.controllers.admin_test",
         "core.controllers.android_e2e_config_test",
+        "core.jobs.batch_jobs.translation_migration_jobs_test",
         "core.controllers.release_coordinator_test"
     ],
     "2": [
@@ -369,6 +370,7 @@
         "core.domain.expression_parser_test",
         "core.domain.improvements_services_test",
         "core.domain.suggestion_registry_test",
+        "core.jobs.batch_jobs.suggestion_migration_jobs_test",
         "core.controllers.feedback_test",
         "core.controllers.moderator_test",
         "core.domain.rte_component_registry_test",
