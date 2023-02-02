@@ -103,10 +103,12 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         Returns:
             user_model: user_models.UserSettingsModel. The updated user model.
         """
-        if user_model.profile_picture_data_url is None:
+        profile_picture = user_model.profile_picture_data_url
+        if profile_picture is None:
             user_model.profile_picture_data_url = (
                 user_services.fetch_gravatar(user_model.email))
-
+        elif profile_picture.startswith('unsafe:'):
+            user_model.profile_picture_data_url = profile_picture[7:]
         return user_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -145,6 +147,12 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
             | 'Total webp images wrote to GCS' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'TOTAL WEBP IMAGES'))
+        )
+
+        unused_put_results = (
+            users_with_valid_username
+            | 'Updating the datastore with valid profile images'
+            >> ndb_io.PutModels()
         )
 
         return (
