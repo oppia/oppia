@@ -40,6 +40,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 
 from typing import Dict, List
@@ -259,13 +260,20 @@ class InitializeAndroidTestDataHandler(
         Returns:
             Question. The dummy question with given values.
         """
+        content_id_generator = translation_domain.ContentIdGenerator()
         state = state_domain.State.create_default_state(
-            'ABC', is_initial_state=True)
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': 'ca_placeholder_0',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG),
                     'unicode_str': ''
                 }
             },
@@ -275,26 +283,21 @@ class InitializeAndroidTestDataHandler(
             }
         })
 
-        state.update_next_content_id_index(1)
         state.update_linked_skill_id(None)
-        state.update_content(state_domain.SubtitledHtml('1', question_content))
-        recorded_voiceovers = state_domain.RecordedVoiceovers({})
-        written_translations = state_domain.WrittenTranslations({})
-        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
-        recorded_voiceovers.add_content_id_for_voiceover('1')
-        recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
-        written_translations.add_content_id_for_translation('ca_placeholder_0')
-        written_translations.add_content_id_for_translation('1')
-        written_translations.add_content_id_for_translation('default_outcome')
+        state.update_content(state_domain.SubtitledHtml(
+            state.content.content_id, question_content))
 
-        state.update_recorded_voiceovers(recorded_voiceovers)
-        state.update_written_translations(written_translations)
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                'solution', '<p>This is a solution.</p>'))
+                content_id_generator.generate(
+                    translation_domain.ContentType.SOLUTION),
+                '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+                state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>This is a hint.</p>')
             )
         ]
 
@@ -303,14 +306,17 @@ class InitializeAndroidTestDataHandler(
         state.update_interaction_default_outcome(
             state_domain.Outcome(
                 None, None, state_domain.SubtitledHtml(
-                    'feedback_id', '<p>Dummy Feedback</p>'),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME),
+                    '<p>Dummy Feedback</p>'),
                 True, [], None, None
             )
         )
         question = question_domain.Question(
             question_id, state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
+            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [],
+            content_id_generator.next_content_id_index)
         return question
 
     def _create_dummy_skill(
