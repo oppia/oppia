@@ -893,11 +893,11 @@ describe('Questions List Component', () => {
 
   it('should remove skill linked to a question', () => {
     component.associatedSkillSummaries = [
-      SkillDifficulty.create('skillId1', '', 0.9),
-      SkillDifficulty.create('skillId2', '', 0.6)
+      SkillDifficulty.create('skillId1', 'Skill Description', 0.9),
+      SkillDifficulty.create('skillId2', 'Skill Description', 0.6)
     ];
     component.skillLinkageModificationsArray = [];
-    component.removeSkill('1');
+    component.removeSkill('skillId1');
 
     expect(component.associatedSkillSummaries).toEqual([
       SkillDifficulty.create('skillId2', '', 0.6)
