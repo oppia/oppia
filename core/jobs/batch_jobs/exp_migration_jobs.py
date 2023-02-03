@@ -149,11 +149,6 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
             # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda exp_model: exp_model.id)
-            # TODO(#15871): This filter should be removed after the explorations
-            # are fixed and it is possible to migrate them.
-            | 'Remove broken exploration' >> beam.Filter(
-                lambda id_and_exp: id_and_exp[0] not in (
-                    'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
         exp_publication_status = (
@@ -166,11 +161,6 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
                     exp_rights.status == constants.ACTIVITY_STATUS_PUBLIC
                 )
             )
-            # TODO(#15871): This filter should be removed after the explorations
-            # are fixed and it is possible to migrate them.
-            | 'Remove exp rights for broken exps' >> beam.Filter(
-                lambda exp_rights: exp_rights[0] not in (
-                    'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
         all_migrated_exp_results = (
@@ -270,7 +260,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_model: exp_models.ExplorationModel,
         migrated_exp: exp_domain.Exploration,
         exp_changes: Sequence[exp_domain.ExplorationChange]
-    ) -> Sequence[base_models.BaseModel]:
+    ) -> result.Result[
+        Tuple[base_models.BaseModel],
+        Tuple[str, Exception]
+    ]:
         """Generates newly updated exploration models.
 
         Args:
@@ -280,33 +273,38 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 object.
             exp_changes: Sequence(ExplorationChange). The exploration changes
                 to apply.
-
         Returns:
             Sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
-        updated_exp_model = (
-            exp_services.populate_exp_model_fields(
-                exp_model, migrated_exp))
+        try:
+            updated_exp_model = (
+                exp_services.populate_exp_model_fields(
+                    exp_model, migrated_exp))
 
-        commit_message = (
-            'Update exploration states schema version to %d.'
-        ) % (
-            feconf.CURRENT_STATE_SCHEMA_VERSION
-        )
-        models_to_put_values = []
-        with datastore_services.get_ndb_context():
-            models_to_put_values = (
-                exp_services.compute_models_to_put_when_saving_new_exp_version(
-                    feconf.MIGRATION_BOT_USERNAME,
-                    updated_exp_model.id,
-                    exp_changes,
-                    commit_message,
-                )
+            commit_message = (
+                'Update exploration states schema version to %d.'
+            ) % (
+                feconf.CURRENT_STATE_SCHEMA_VERSION
             )
-        datastore_services.update_timestamps_multi(list(models_to_put_values))
+            models_to_put_values = []
+            with datastore_services.get_ndb_context():
+                models_to_put_values = (
+                    exp_services
+                    .compute_models_to_put_when_saving_new_exp_version(
+                        feconf.MIGRATION_BOT_USERNAME,
+                        updated_exp_model.id,
+                        exp_changes,
+                        commit_message,
+                    )
+                )
+            datastore_services.update_timestamps_multi(
+                list(models_to_put_values))
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((exp_model.id, e))
 
-        return models_to_put_values
+        return result.Ok(models_to_put_values)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the exploration migration.
@@ -322,9 +320,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 MigrateExplorationModels())
         )
 
-        exp_related_models_to_put = (
+        exp_related_models_results = (
             transformed_exp_objects_list
-            | 'Generate exploration models to put' >> beam.FlatMap(
+            | 'Generate exploration models to put' >> beam.Map(
                 lambda exp_objects: self._update_exploration(
                     exp_objects['exp_model'],
                     exp_objects['exploration'],
@@ -332,13 +330,33 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 ))
         )
 
+        exp_related_models_to_put = (
+            exp_related_models_results
+            | 'Filter results with oks' >> beam.Filter(
+                lambda result_item: result_item.is_ok())
+            | 'Unwrap models' >> beam.FlatMap(
+                lambda result_item: result_item.unwrap())
+        )
+
+        exp_related_models_job_results = (
+            exp_related_models_results
+            | 'Generate results for exp related models' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'EXP RELATED MODELS GENERATED'))
+        )
         unused_put_results = (
                 exp_related_models_to_put
                 | 'Filter None models' >> beam.Filter(lambda x: x is not None)
                 | 'Put models into datastore' >> ndb_io.PutModels()
             )
 
-        return job_run_results
+        return (
+            (
+                job_run_results,
+                exp_related_models_job_results
+            )
+            | beam.Flatten()
+        )
 
 
 class AuditExplorationMigrationJob(base_jobs.JobBase):
