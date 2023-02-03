@@ -15,8 +15,7 @@
   </div>
   <div class="oppia-opportunity-pagination-container" *ngIf="visibleOpportunities.length > 0">
     <div class="button-wraper">
-      <button *ngIf="activePageNumber > 1" 
-              type="button"
+      <button *ngIf="activePageNumber > 1" type="button"
               class="oppia-pagination-button"
               (click)="gotoPage(activePageNumber - 1)"
               [disabled]="activePageNumber == 1">
@@ -24,8 +23,7 @@
       </button>
     </div>
     <div class="button-wraper">
-      <button *ngIf="!userIsOnLastPage"
-              type="button"
+      <button *ngIf="!userIsOnLastPage" type="button"
               class="oppia-pagination-button"
               (click)="gotoPage(activePageNumber + 1)"
               [disabled]="loadingOpportunityData || userIsOnLastPage">
@@ -80,7 +78,7 @@
     min-width: 100px;
     text-align: center;
   }
-  .button-wraper{
+  .button-wraper {
     display: flex;
     flex-grow: 1;
     justify-content: center;
