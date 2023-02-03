@@ -14,7 +14,7 @@
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
   </div>
   <div class="oppia-opportunity-pagination-container" *ngIf="visibleOpportunities.length > 0">
-    <div class="button-wraper">
+    <div class="oppia-pagination-button-wrapper">
       <button *ngIf="activePageNumber > 1" type="button"
               class="oppia-pagination-button"
               (click)="gotoPage(activePageNumber - 1)"
@@ -22,7 +22,7 @@
         <span class="material-icons">navigate_before</span>Previous
       </button>
     </div>
-    <div class="button-wraper">
+    <div class="oppia-pagination-button-wrapper">
       <button *ngIf="!userIsOnLastPage" type="button"
               class="oppia-pagination-button"
               (click)="gotoPage(activePageNumber + 1)"
@@ -78,7 +78,7 @@
     min-width: 100px;
     text-align: center;
   }
-  .button-wraper {
+  .oppia-pagination-button-wrapper {
     display: flex;
     flex-grow: 1;
     justify-content: center;
