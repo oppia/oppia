@@ -161,16 +161,7 @@ describe('Solution Verification Service', () => {
           }]
         },
         param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            hint_1: {},
-            hint_2: {}
-          }
-        }
+        solicit_answer_details: false
       },
       'End State': {
         content: {
@@ -224,14 +215,7 @@ describe('Solution Verification Service', () => {
           hints: []
         },
         param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        }
+        solicit_answer_details: false
       }
     });
   }));

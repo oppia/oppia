@@ -27,6 +27,7 @@ describe('Versioned exploration caching service', () => {
     is_logged_in: true,
     session_id: 'KERH',
     draft_change_list_id: 0,
+    displayable_language_codes: [],
     exploration: {
       init_state_name: 'Introduction',
       param_changes: [],
@@ -35,6 +36,7 @@ describe('Versioned exploration caching service', () => {
       language_code: 'en',
       correctness_feedback_enabled: true,
       objective: 'To learn',
+      next_content_id_index: 5,
       states: {
         Introduction: {
           param_changes: [],
@@ -44,11 +46,7 @@ describe('Versioned exploration caching service', () => {
           },
           solicit_answer_details: true,
           card_is_checkpoint: true,
-          written_translations: {
-            translations_mapping: {}
-          },
           linked_skill_id: null,
-          next_content_id_index: 0,
           content: {
             html: '',
             content_id: 'content'

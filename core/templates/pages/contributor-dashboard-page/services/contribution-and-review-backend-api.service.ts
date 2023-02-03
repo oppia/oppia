@@ -30,6 +30,14 @@ interface FetchSuggestionsResponse {
   next_offset: number;
 }
 
+export interface ContributorCertificateResponse {
+  'from_date': string;
+  'to_date': string;
+  'contribution_hours': number;
+  'team_lead': string;
+  'language': string | null;
+}
+
 interface ReviewExplorationSuggestionRequestBody {
   action: string;
   'review_message': string;
@@ -67,6 +75,9 @@ export class ContributionAndReviewBackendApiService {
 
   private UPDATE_QUESTION_HANDLER_URL = (
     '/updatequestionsuggestionhandler/<suggestion_id>');
+
+  private CONTRIBUTOR_CERTIFICATE_HANDLER_URL = (
+    '/contributorcertificate/<username>/<suggestion_type>');
 
   private SUBMITTED_QUESTION_SUGGESTIONS = (
     'SUBMITTED_QUESTION_SUGGESTIONS');
@@ -215,5 +226,34 @@ export class ContributionAndReviewBackendApiService {
       }
     );
     return this.http.post<void>(url, requestBody).toPromise();
+  }
+
+  async downloadContributorCertificateAsync(
+      username: string,
+      suggestionType: string,
+      language: string | null,
+      fromDate: string,
+      toDate: string
+  ): Promise<ContributorCertificateResponse> {
+    const url = this.urlInterpolationService.interpolateUrl(
+      this.CONTRIBUTOR_CERTIFICATE_HANDLER_URL, {
+        username: username,
+        suggestion_type: suggestionType
+      }
+    );
+    let params: {
+      from_date: string;
+      to_date: string;
+      language?: string;
+    } = {
+      from_date: fromDate,
+      to_date: toDate
+    };
+    if (language) {
+      params.language = language;
+    }
+    return this.http.get<ContributorCertificateResponse>(
+      url, { params }
+    ).toPromise();
   }
 }
