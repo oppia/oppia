@@ -303,7 +303,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
   }
 
-  removeSkill(skillId: string): void {
+  removeSkill(skillId: string, difficulty: number): void {
     if (this.associatedSkillSummaries.length === 1) {
       this.alertsService.addInfoMessage(
         'A question should be linked to at least one skill.');
@@ -312,7 +312,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     this.skillLinkageModificationsArray.push({
       id: skillId,
-      task: 'remove'
+      task: 'remove',
+      difficulty: this.difficulty
     } as SkillLinkageModificationsArray);
 
     this.associatedSkillSummaries =
