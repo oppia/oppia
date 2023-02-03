@@ -352,7 +352,7 @@ describe('Parameter Metadata Service', () => {
       }, {
         paramName: 'HtmlValue',
         stateName: 'Hola',
-      },]);
+      }]);
     expect(parameterMetadataService.getUnsetParametersInfo(
       ['State', 'State3']))
       .toEqual([{

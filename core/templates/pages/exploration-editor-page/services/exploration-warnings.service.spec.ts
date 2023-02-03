@@ -28,7 +28,6 @@ import { ExplorationWarningsService } from './exploration-warnings.service';
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import _ from 'lodash';
 
  class MockNgbModal {
    open() {
