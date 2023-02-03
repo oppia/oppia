@@ -7618,44 +7618,40 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         with testapp_swap:
             with swap_api_key_secrets_return_none:
                 response = self.get_json(
-                    '/mock_secret_page/%s' % self.secret,
-                    expected_status_int=404
+                    '/mock_secret_page/secret',
+                    expected_status_int=401
                 )
 
-        error_msg = (
-            'Could not find the page http://localhost'
-            '/mock_secret_page/%s.' % self.secret
+        self.assertEqual(
+            response['error'],
+            'The incoming request is not a valid Oppia Android build request.'
         )
-        self.assertEqual(response['error'], error_msg)
-        self.assertEqual(response['status_code'], 404)
 
     def test_error_when_given_api_key_is_invalid(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
-            secrets_services, 'get_secret', self.secret)
+            secrets_services, 'get_secret', 'secret')
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
-                '/mock_secret_page/%s' % self.invalid_secret,
-                expected_status_int=404
+                '/mock_secret_page/nonsecret',
+                expected_status_int=401
             )
 
-        error_msg = (
-            'Could not find the page http://localhost'
-            '/mock_secret_page/%s.' % self.invalid_secret
+        self.assertEqual(
+            response['error'],
+            'The incoming request is not a valid Oppia Android build request.'
         )
-        self.assertEqual(response['error'], error_msg)
-        self.assertEqual(response['status_code'], 404)
 
     def test_no_error_when_given_api_key_is_valid(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
-            secrets_services, 'get_secret', self.secret)
+            secrets_services, 'get_secret', 'secret')
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
-                '/mock_secret_page/%s' % self.secret,
+                '/mock_secret_page/secret',
                 expected_status_int=200
             )
 
-        self.assertEqual(response['secret'], self.secret)
+        self.assertEqual(response['secret'], 'secret')
