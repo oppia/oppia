@@ -253,7 +253,19 @@ class StartTests(test_utils.GenericTestBase):
             ],
             self.print_arr)
 
-    def test_start_servers_successfully_in_contributor_dashboard_debug_mode(
+    def test_start_servers_with_contributor_dashboard_debug_flag_fails(
+        self
+    ) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import start
+        with self.assertRaisesRegexp(
+            Exception,
+            'The \'--contributor_dashboard_debug\' flag is deprecated'
+            'use \'--generate_sample_data\' instead.'
+        ):
+            start.main(args=['--contributor_dashboard_debug'])
+
+    def test_start_servers_successfully_with_generate_sample_data_flag(
         self
     ) -> None:
         with self.swap_install_third_party_libs:

@@ -140,6 +140,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    if parsed_args.contributor_dashboard_debug:
+        raise Exception(
+            'The \'--contributor_dashboard_debug\' flag is deprecated'
+            'use \'--generate_sample_data\' instead.'
+        )
+
     if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
             'WARNING',
@@ -154,12 +160,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         # ExitStack unwinds in reverse-order, so this will be the final action.
         stack.callback(notify_about_successful_shutdown)
         stack.callback(call_extend_index_yaml)
-
-        if parsed_args.contributor_dashboard_debug:
-            raise Exception(
-                'The \'--contributor_dashboard_debug\' flag is deprecated'
-                'use \'--generate_sample_data\' instead.'
-            )
 
         build_args = []
         if parsed_args.prod_env:
