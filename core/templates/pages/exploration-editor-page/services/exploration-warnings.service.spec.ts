@@ -28,6 +28,7 @@ import { ExplorationWarningsService } from './exploration-warnings.service';
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import _ from 'lodash';
 
  class MockNgbModal {
    open() {
@@ -397,12 +398,8 @@ describe('Exploration Warnings Service', () => {
     }, {
       type: 'error',
       message: 'The following card has errors: Hola.'
-    }, {
-      type: 'error',
-      message: 'In \'Hola\', the following answer group has a classifier' +
-         ' with no training data: 0'
     }]);
-    expect(explorationWarningsService.countWarnings()).toBe(4);
+    expect(explorationWarningsService.countWarnings()).toBe(3);
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [

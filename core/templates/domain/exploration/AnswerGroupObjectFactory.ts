@@ -90,11 +90,11 @@ export class AnswerGroupObjectFactory {
 
   createFromBackendDict(
       answerGroupBackendDict: AnswerGroupBackendDict,
-      interactionId: string | null,
+      interactionId: string,
   ): AnswerGroup {
     return new AnswerGroup(
-      interactionId ? this.generateRulesFromBackendDict(
-        answerGroupBackendDict.rule_specs, interactionId) : [],
+      this.generateRulesFromBackendDict(
+        answerGroupBackendDict.rule_specs, interactionId),
       this.outcomeObjectFactory.createFromBackendDict(
         answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,
