@@ -137,9 +137,9 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'Image not recognized'
         )
         xmlns_attribute_svg = '<svg xmlns="http://www.w3.org/2000/svg" ></svg>'
-        base64_encoded_string = xmlns_attribute_svg.encode('utf-8')
+        base64_encoded_xmlns_attribute_svg = xmlns_attribute_svg.encode('utf-8')
         validated_image = image_validation_services.validate_image_and_filename(
-            base64_encoded_string,
+            base64_encoded_xmlns_attribute_svg,
             'image.svg',
             feconf.ENTITY_TYPE_EXPLORATION
         )
