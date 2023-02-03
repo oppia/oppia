@@ -273,6 +273,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 object.
             exp_changes: Sequence(ExplorationChange). The exploration changes
                 to apply.
+
         Returns:
             Sequence(BaseModel). Sequence of models which should be put into
             the datastore.
