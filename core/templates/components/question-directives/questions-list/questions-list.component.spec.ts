@@ -900,7 +900,7 @@ describe('Questions List Component', () => {
     component.removeSkill('skillId1');
 
     expect(component.associatedSkillSummaries).toEqual([
-      SkillDifficulty.create('skillId2', '', 0.6)
+      SkillDifficulty.create('skillId2', 'Skill Description', 0.6)
     ]);
     expect(component.skillLinkageModificationsArray).toEqual([
       {
