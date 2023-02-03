@@ -270,7 +270,11 @@ class MigrateExplorationJobTests(
         )
         rights_manager.create_new_exploration_rights(
             self.EXP_ID_TWO, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+        exp_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Created new exploration',
+            commit_cmds
+        )
 
         self.assertEqual(exp_model.states_schema_version, 41)
         self.assert_job_output_is([
