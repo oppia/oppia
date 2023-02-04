@@ -96,7 +96,7 @@ describe('Parameter Metadata Service', () => {
               confirmed_unclassified_answers: [],
               customization_args: {},
               solution: null,
-              id: null,
+              id: 'EndExploration',
               answer_groups: [{
                 rule_specs: [],
                 training_data: [],
@@ -156,7 +156,7 @@ describe('Parameter Metadata Service', () => {
               confirmed_unclassified_answers: [],
               customization_args: {},
               solution: null,
-              id: null,
+              id: 'EndExploration',
               answer_groups: [{
                 rule_specs: [],
                 training_data: [],
@@ -216,7 +216,7 @@ describe('Parameter Metadata Service', () => {
               confirmed_unclassified_answers: [],
               customization_args: {},
               solution: null,
-              id: null,
+              id: 'EndExploration',
               answer_groups: [{
                 rule_specs: [],
                 training_data: [],
@@ -276,7 +276,7 @@ describe('Parameter Metadata Service', () => {
               confirmed_unclassified_answers: [],
               customization_args: {},
               solution: null,
-              id: null,
+              id: 'EndExploration',
               answer_groups: [{
                 rule_specs: [],
                 training_data: [],
@@ -352,12 +352,21 @@ describe('Parameter Metadata Service', () => {
       }, {
         paramName: 'HtmlValue',
         stateName: 'Hola',
+      }, {
+        paramName: 'FeedbackValue',
+        stateName: 'Hola'
+      }, {
+        paramName: 'StateFeedbackValue',
+        stateName: 'State'
       }]);
     expect(parameterMetadataService.getUnsetParametersInfo(
       ['State', 'State3']))
       .toEqual([{
         paramName: 'ParamChange2',
         stateName: null
+      },  {
+        paramName: 'StateFeedbackValue',
+        stateName: 'State'
       }]);
   });
 });
