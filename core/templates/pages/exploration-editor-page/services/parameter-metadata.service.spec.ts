@@ -331,6 +331,7 @@ describe('Parameter Metadata Service', () => {
         paramName: 'StateFeedbackValue',
         stateName: 'State'
       }]);
+      
     expect(parameterMetadataService.getUnsetParametersInfo(
       ['State', 'State3']))
       .toEqual([{
