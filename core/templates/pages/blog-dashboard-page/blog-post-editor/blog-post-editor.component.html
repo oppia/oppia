@@ -90,11 +90,13 @@
           </em>
         </span>
         <span class="oppia-input-box-subtitle" *ngIf="!isTitlePatternValid()">
-          <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_INVALID_CHARACTERS_ERROR' | translate">
+          <em>
+            {{ 'I18N_BLOG_POST_EDITOR_TITLE_INVALID_CHARACTERS_ERROR' | translate }}
           </em>
         </span>
         <span class="oppia-input-box-subtitle" *ngIf="blogPostData.titleIsDuplicate">
-          <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_IS_DUPLICATE_ERROR' | translate">
+          <em>
+            {{ 'I18N_BLOG_POST_EDITOR_TITLE_IS_DUPLICATE_ERROR' | translate }}
           </em>
         </span>
       </div>
