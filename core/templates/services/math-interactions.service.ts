@@ -171,51 +171,35 @@ export class MathInteractionsService {
       return false;
     }
     if (expressionString.match(/^(\+$)|^(\(\+\))/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number before' +
-        'the + operator.');
+      this.warningText = ('Answer seems to be missing a number before + operator.');
       return false;
     }
     if (expressionString.match(/^\d\+$|^\(\d\+\)/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number after' +
-        'the + operator.');
+      this.warningText = ('Answer seems to be missing a number after + operator.');
       return false;
     }
     if (expressionString.match(/^(\*$)|^(\(\*\))|^(\(\*\d\))|^(\*\d)/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number before' +
-        'the × operator.');
+      this.warningText = ('Answer seems to be missing a number before × operator.');
       return false;
     }
     if (expressionString.match(/^\d\*$|^\(\d\*\)/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number after' +
-        'the × operator.');
+      this.warningText = ('Answer seems to be missing a number after × operator.');
       return false;
     }
     if (expressionString.match(/^(\/$)|^(\(\/\))|^(\(\/\d\))|^(\/\d)/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number before' +
-        'the ÷ operator.');
+      this.warningText = ('Answer seems to be missing a number before ÷ operator.');
       return false;
     }
     if (expressionString.match(/^\d\/$|^\(\d\/\)/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number after' +
-        'the ÷ operator.');
+      this.warningText = ('Answer seems to be missing a number after ÷ operator.');
       return false;
     }
     if (expressionString.match(/^(\-$)|^(\(\-\))/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number before' +
-        'the - operator.');
+      this.warningText = ('Answer seems to be missing a number before - operator.');
       return false;
     }
     if (expressionString.match(/^\d\-$|^\(\d\-\)/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number after' +
-        'the - operator.');
+      this.warningText = ('Answer seems to be missing a number after - operator.');
       return false;
     }
     let invalidIntegers = expressionString.match(
