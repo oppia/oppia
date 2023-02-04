@@ -3551,20 +3551,20 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
              ('target_id', self.exploration_id)])[0]
-        self.suggestion_id = suggestion.suggestion_id
+        self.id = suggestion.suggestion_id
 
     def test_author_can_resubmit_suggestion(self) -> None:
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.suggestion_id)
-        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+            response = self.get_json('/mock/%s' % self.id)
+        self.assertEqual(response['suggestion_id'], self.id)
         self.logout()
 
     def test_non_author_cannot_resubmit_suggestion(self) -> None:
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.suggestion_id, expected_status_int=401)
+                '/mock/%s' % self.id, expected_status_int=401)
         self.logout()
 
     def test_error_with_invalid_suggestion_id(self) -> None:
@@ -3685,15 +3685,15 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
             self.EXPLORATION_ID, self.TARGET_VERSION_ID,
             self.author_id,
             change_dict, '')
-        self.suggestion_id_1 = self.suggestion_1.suggestion_id
-        self.suggestion_id_2 = self.suggestion_2.suggestion_id
-        self.suggestion_id_3 = self.suggestion_3.suggestion_id
+        self.id_1 = self.suggestion_1.suggestion_id
+        self.id_2 = self.suggestion_2.suggestion_id
+        self.id_3 = self.suggestion_3.suggestion_id
 
     def test_guest_cannot_accept_suggestion(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id_1),
+                % (self.EXPLORATION_ID, self.id_1),
                 expected_status_int=401)
         self.assertEqual(
             response['error'],
@@ -3704,8 +3704,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id_1))
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_1)
+                % (self.EXPLORATION_ID, self.id_1))
+        self.assertEqual(response['suggestion_id'], self.id_1)
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
@@ -3717,8 +3717,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         with testapp_swap, review_swap:
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id_1))
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_1)
+                % (self.EXPLORATION_ID, self.id_1))
+        self.assertEqual(response['suggestion_id'], self.id_1)
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
@@ -3732,8 +3732,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         with testapp_swap, translation_review_swap:
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id_2))
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_2)
+                % (self.EXPLORATION_ID, self.id_2))
+        self.assertEqual(response['suggestion_id'], self.id_2)
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
@@ -3747,8 +3747,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         with testapp_swap, question_review_swap:
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id_3))
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_3)
+                % (self.EXPLORATION_ID, self.id_3))
+        self.assertEqual(response['suggestion_id'], self.id_3)
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
@@ -3757,8 +3757,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
-                % (self.EXPLORATION_ID, self.suggestion_id_1))
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_1)
+                % (self.EXPLORATION_ID, self.id_1))
+        self.assertEqual(response['suggestion_id'], self.id_1)
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
