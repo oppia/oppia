@@ -27,8 +27,6 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
 import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
-import { Question } from 'domain/question/QuestionObjectFactory';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import cloneDeep from 'lodash/cloneDeep';
 
 class MockActiveModal {
