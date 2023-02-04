@@ -336,7 +336,7 @@ describe('Parameter Metadata Service', () => {
       .toEqual([{
         paramName: 'ParamChange2',
         stateName: null
-      },  {
+      }, {
         paramName: 'StateFeedbackValue',
         stateName: 'State'
       }]);
