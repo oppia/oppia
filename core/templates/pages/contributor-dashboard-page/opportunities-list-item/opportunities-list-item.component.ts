@@ -19,7 +19,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
@@ -64,12 +64,12 @@ export class OpportunitiesListItemComponent {
   translatedProgressStyle!: { width: string };
   inReviewProgressStyle!: { width: string };
   untranslatedProgressStyle!: { width: string };
-  targetNumQuestionsPerSkill: number = constants.MAX_QUESTIONS_PER_SKILL;
+  targetNumQuestionsPerSkill: number = AppConstants.MAX_QUESTIONS_PER_SKILL;
   cardsAvailable: number = 0;
   onMobile!: boolean;
   resizeSubscription!: Subscription;
   mobileBreakpoint: number = (
-    constants.OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT);
+    AppConstants.OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT);
 
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter());
@@ -102,7 +102,10 @@ export class OpportunitiesListItemComponent {
       if (this.opportunity.progressPercentage) {
         this.progressPercentage =
           `${Math.floor(this.opportunity.progressPercentage)}%`;
-        if (this.opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
+        if (
+          this.opportunityType ===
+          AppConstants.OPPORTUNITY_TYPE_TRANSLATION
+        ) {
           this.translationProgressBar = true;
           const translatedPercentage = (
             this.opportunity.translationsCount / this.opportunity.totalCount

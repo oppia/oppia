@@ -19,14 +19,14 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { TopicEditorStateService } from './topic-editor-state.service';
-import subtopicValidationConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SubtopicValidationService {
   private _VALID_URL_FRAGMENT_REGEX = new RegExp(
-    subtopicValidationConstants.VALID_URL_FRAGMENT_REGEX);
+    AppConstants.VALID_URL_FRAGMENT_REGEX);
 
   constructor(
     private topicEditorStateService: TopicEditorStateService

@@ -19,7 +19,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
@@ -44,13 +44,15 @@ export class OnScreenKeyboardComponent {
   guppyInstance!: Guppy;
   interactionType!: string;
   customLetters!: string[];
-  functionsTab: string = constants.OSK_FUNCTIONS_TAB;
-  lettersTab: string = constants.OSK_LETTERS_TAB;
-  mainTab: string = constants.OSK_MAIN_TAB;
+  functionsTab: string = AppConstants.OSK_FUNCTIONS_TAB;
+  lettersTab: string = AppConstants.OSK_LETTERS_TAB;
+  mainTab: string = AppConstants.OSK_MAIN_TAB;
   greekSymbols: string[] = Object.values(
-    constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
 
-  greekLetters: string[] = Object.keys(constants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+  greekLetters: string[] = Object.keys(
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
   currentTab: string = this.mainTab;
   lettersInKeyboardLayout: string[] = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
   functions: string[] = [

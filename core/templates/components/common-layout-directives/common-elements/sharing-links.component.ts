@@ -15,7 +15,8 @@
 /**
  * @fileoverview Component for the Social Sharing Links.
  */
-import constants from 'assets/constants';
+
+import { AppConstants } from 'app.constants';
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -34,6 +35,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   templateUrl: './sharing-links.component.html',
   styleUrls: []
 })
+
 export class SharingLinksComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -81,13 +83,13 @@ export class SharingLinksComponent implements OnInit {
     if (this.shareType === 'blog') {
       this.escapedTwitterText = (
         this.htmlEscaperService.unescapedStrToEscapedStr(
-          constants.DEFUALT_BLOG_POST_SHARE_TWITTER_TEXT
+          AppConstants.DEFUALT_BLOG_POST_SHARE_TWITTER_TEXT
         )
       );
     } else {
       this.escapedTwitterText = (
         this.htmlEscaperService.unescapedStrToEscapedStr(
-          constants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
+          AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
     }
 
     this.classroomUrl = this.urlInterpolationService.getStaticImageUrl(

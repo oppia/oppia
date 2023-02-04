@@ -22,7 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { SvgSanitizerService } from './svg-sanitizer.service';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -99,7 +99,7 @@ export class ImageUploadHelperService {
         '_vertical_' + verticalPadding +
         '.' + 'svg'
     );
-    let filenameRegexString = constants.MATH_SVG_FILENAME_REGEX;
+    let filenameRegexString = AppConstants.MATH_SVG_FILENAME_REGEX;
     let filenameRegex = RegExp(filenameRegexString, 'g');
     if (filenameRegex.exec(filename)) {
       return filename;

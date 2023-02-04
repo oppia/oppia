@@ -21,7 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { DeleteMisconceptionModalComponent } from './delete-misconception-modal.component';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 class MockActiveModal {
   close(value: string): void {
@@ -76,7 +76,7 @@ describe('Delete Misconception Modal Component', () => {
     };
 
     let rubricDict = {
-      difficulty: constants.SKILL_DIFFICULTIES[0],
+      difficulty: AppConstants.SKILL_DIFFICULTIES[0],
       explanations: ['explanation']
     };
 

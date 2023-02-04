@@ -34,7 +34,7 @@ import {
   SubtitledHtml
 } from 'domain/exploration/subtitled-html.model';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface StateBackendDict {
@@ -129,7 +129,7 @@ export class StateObjectFactory {
     private paramchangesObject: ParamChangesObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
-    return constants.NEW_STATE_TEMPLATE as StateBackendDict;
+    return AppConstants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
   // TODO(#14313): Remove the createDefaultState so that full state can be

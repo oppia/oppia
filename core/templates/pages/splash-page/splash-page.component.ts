@@ -17,7 +17,7 @@
  */
 import { Component, OnInit } from '@angular/core';
 
-import splashConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -162,7 +162,7 @@ export class SplashPageComponent implements OnInit {
     this.testimonials = this.getTestimonials();
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {

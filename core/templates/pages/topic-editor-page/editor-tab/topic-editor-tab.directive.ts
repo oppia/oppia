@@ -20,10 +20,7 @@ import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/chang
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { Subscription } from 'rxjs';
-
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import topicConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 
 require(
@@ -96,7 +93,7 @@ angular.module('oppia').directive('topicEditorTab', [
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
-            topicConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
+            AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
@@ -129,7 +126,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.allowedBgColors = (
-              topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+              AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
             $scope.topicNameExists = false;
             $scope.topicUrlFragmentExists = false;
             $scope.hostname = WindowRef.nativeWindow.location.hostname;
@@ -427,7 +424,7 @@ angular.module('oppia').directive('topicEditorTab', [
               skillQuestionCounts.reduce((a: number, b: number) => a + b, 0));
             return (
               numberOfPracticeQuestions >=
-              topicConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE
+              AppConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE
             );
           };
 

@@ -16,7 +16,7 @@
  * @fileoverview Component for home tab in the Learner Dashboard page.
  */
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
@@ -26,7 +26,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './home-tab.component.css';
-
 
  @Component({
    selector: 'oppia-home-tab',
@@ -112,10 +111,8 @@ export class HomeTabComponent {
       return false;
     } else if (this.currentGoalsLength === this.goalTopicsLength) {
       return true;
-    } else if (this.currentGoalsLength === constants.MAX_CURRENT_GOALS_COUNT) {
-      return true;
     }
-    return false;
+    return this.currentGoalsLength === AppConstants.MAX_CURRENT_GOALS_COUNT;
   }
 
   getWidth(length: number): number {

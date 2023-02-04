@@ -23,7 +23,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { CreateNewSubtopicModalComponent } from './create-new-subtopic-modal.component';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -152,9 +152,9 @@ describe('create new subtopic modal', function() {
     expect(component.subtopicUrlFragmentExists).toBe(false);
     expect(component.errorMsg).toBe(null);
     expect(component.MAX_CHARS_IN_SUBTOPIC_TITLE)
-      .toBe(constants.MAX_CHARS_IN_SUBTOPIC_TITLE);
+      .toBe(AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE);
     expect(component.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
-      .toBe(constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
+      .toBe(AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
 
     component.localValueChange('working fine');
     expect(component.htmlData).toBe('working fine');

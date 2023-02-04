@@ -19,7 +19,7 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { CollectionSummaryTileConstants } from 'components/summary-tile/collection-summary-tile.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -79,7 +79,7 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     }
     this.checkIfMobileCardToBeShown();
     this.defaultEmptyTitle = CollectionSummaryTileConstants.DEFAULT_EMPTY_TITLE;
-    this.activityTypeCollection = constants.ACTIVITY_TYPE_COLLECTION;
+    this.activityTypeCollection = AppConstants.ACTIVITY_TYPE_COLLECTION;
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
       .subscribe(event => {
         this.checkIfMobileCardToBeShown();

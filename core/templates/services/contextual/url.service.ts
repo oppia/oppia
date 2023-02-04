@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -117,7 +117,7 @@ export class UrlService {
       if (
         this.getUrlParams().hasOwnProperty('topic_url_fragment') &&
         this.getUrlParams().topic_url_fragment.match(
-          constants.VALID_URL_FRAGMENT_REGEX)) {
+          AppConstants.VALID_URL_FRAGMENT_REGEX)) {
         return this.getUrlParams().topic_url_fragment;
       }
     }
@@ -139,7 +139,7 @@ export class UrlService {
       if (
         this.getUrlParams().hasOwnProperty('story_url_fragment') &&
         this.getUrlParams().story_url_fragment.match(
-          constants.VALID_URL_FRAGMENT_REGEX)) {
+          AppConstants.VALID_URL_FRAGMENT_REGEX)) {
         return this.getUrlParams().story_url_fragment;
       }
     }
@@ -166,7 +166,7 @@ export class UrlService {
       if (
         this.getUrlParams().hasOwnProperty('classroom_url_fragment') &&
         this.getUrlParams().classroom_url_fragment.match(
-          constants.VALID_URL_FRAGMENT_REGEX)) {
+          AppConstants.VALID_URL_FRAGMENT_REGEX)) {
         return this.getUrlParams().classroom_url_fragment;
       }
     }

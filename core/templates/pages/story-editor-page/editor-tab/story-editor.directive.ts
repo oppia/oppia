@@ -18,9 +18,7 @@
 
 import { Subscription } from 'rxjs';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import storyConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -98,7 +96,7 @@ angular.module('oppia').directive('storyEditor', [
               $scope.linearNodesList = [];
               $scope.nodes = [];
               $scope.allowedBgColors = (
-                storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
+                AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
               if ($scope.storyContents &&
                   $scope.storyContents.getNodes().length > 0) {
                 $scope.nodes = $scope.storyContents.getNodes();

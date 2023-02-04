@@ -20,7 +20,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import AppConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import { Topic } from 'domain/topic/topic-object.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
