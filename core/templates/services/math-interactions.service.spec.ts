@@ -204,7 +204,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a/', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-    'Your answer seems to be missing a number after the ÷ operator.');
+      'Your answer seems to be missing a number after the ÷ operator.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(a/)', ['a'])).toBeFalse();
