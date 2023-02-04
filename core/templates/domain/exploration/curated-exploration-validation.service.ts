@@ -26,7 +26,6 @@ import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse }
   './read-only-exploration-backend-api.service';
 import { MultipleChoiceInputCustomizationArgsBackendDict } from
   'extensions/interactions/customization-args-defs';
-import constants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -70,7 +69,7 @@ export class CuratedExplorationValidationService {
           let isCategoryPresent = false;
           if (summaries.length === 1) {
             let category = summaries[0].category;
-            for (let i of constants.ALL_CATEGORIES) {
+            for (let i of AppConstants.ALL_CATEGORIES) {
               if (i === category) {
                 isCategoryPresent = true;
               }
