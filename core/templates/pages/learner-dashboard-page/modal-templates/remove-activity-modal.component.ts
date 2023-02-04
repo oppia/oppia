@@ -20,7 +20,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 
@@ -48,17 +48,17 @@ export class RemoveActivityModalComponent implements OnInit {
     if (this.subsectionName ===
       LearnerDashboardPageConstants
         .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-      activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+      activityType = AppConstants.ACTIVITY_TYPE_EXPLORATION;
     } else if (this.subsectionName ===
       LearnerDashboardPageConstants
         .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
         .COLLECTIONS) {
-      activityType = constants.ACTIVITY_TYPE_COLLECTION;
+      activityType = AppConstants.ACTIVITY_TYPE_COLLECTION;
     } else if (this.subsectionName ===
       LearnerDashboardPageConstants
         .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
         .LEARN_TOPIC) {
-      activityType = constants.ACTIVITY_TYPE_LEARN_TOPIC;
+      activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
     } else {
       throw new Error('Subsection name is not valid.');
     }
