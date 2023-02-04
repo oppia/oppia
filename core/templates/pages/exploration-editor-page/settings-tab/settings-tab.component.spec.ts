@@ -57,7 +57,6 @@ import { VersionHistoryBackendApiService } from '../services/version-history-bac
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 describe('Settings Tab Component', () => {
   let component: SettingsTabComponent;
@@ -484,8 +483,7 @@ describe('Settings Tab Component', () => {
       spyOn(explorationStatesService, 'getState').and.returnValue(
         new State(
           null, null, null, {} as SubtitledHtml, {} as Interaction,
-          [], {} as RecordedVoiceovers, false, false,
-          {} as WrittenTranslations, 0));
+          [], {} as RecordedVoiceovers, false, false));
       spyOn(explorationInitStateNameService, 'saveDisplayedValue');
 
       component.saveExplorationInitStateName();
