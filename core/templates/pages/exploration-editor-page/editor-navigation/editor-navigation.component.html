@@ -129,7 +129,7 @@
                     (click)="showPublishExplorationModal()"
                     [disabled]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
               <span *ngIf="!publishIsInProcess">
-                <i class="fa fa-cloud-upload-alt" alt="Publish to Oppia Library"></i>
+                <i class="fa fa-cloud-upload-alt"></i>
                 <span>Publish</span>
               </span>
               <span *ngIf="publishIsInProcess">
