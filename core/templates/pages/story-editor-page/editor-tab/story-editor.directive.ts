@@ -212,7 +212,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       windowClass: 'create-new-chapter',
     });
     modalRef.componentInstance.nodeTitles = nodeTitles;
-    modalRef.componentInstance.result.then(() => {
+    modalRef.result.then(() => {
       this._initEditor();
       // If the first node is added, open it just after creation.
       if (this.story.getStoryContents().getNodes().length === 1) {

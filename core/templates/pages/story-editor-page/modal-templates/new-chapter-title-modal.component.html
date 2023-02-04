@@ -17,7 +17,10 @@
       </div>
       <input class="form-control e2e-test-new-chapter-title-field oppia-new-chapter-title-field"
              placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
-             [(ngModel)]="title" (change)="resetErrorMsg()" maxlength="MAX_CHARS_IN_EXPLORATION_TITLE" autofocus>
+             [(ngModel)]="title"
+             [ngModelOptions]="{standalone: true}"
+             (change)="resetErrorMsg()"
+             maxlength="MAX_CHARS_IN_EXPLORATION_TITLE" autofocus>
       <span class="oppia-input-box-subtitle">
         <i>
           Chapter title should be at most {{ MAX_CHARS_IN_EXPLORATION_TITLE }} characters.
@@ -32,7 +35,10 @@
       <div class="chapter-input-header">
         <span>Exploration ID*</span>
       </div>
-      <input (change)="resetErrorMsg()" [(ngModel)]="explorationId" class="form-control e2e-test-chapter-exploration-input">
+      <input (change)="resetErrorMsg()"
+             [(ngModel)]="explorationId"
+             [ngModelOptions]="{standalone: true}"
+             class="form-control e2e-test-chapter-exploration-input">
       <div *ngIf="invalidExpId || explorationId && !validateExplorationId()">
         <div *ngFor="let invalidExpErrorString of invalidExpErrorStrings" class="new-chapter-error-msg e2e-test-invalid-exp-id">
           <span>{{ invalidExpErrorString }}</span>

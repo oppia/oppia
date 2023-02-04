@@ -92,10 +92,10 @@
             </div>
             <div class="story-thumbnail e2e-test-story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>
-              <oppia-thumbnail-uploader [filename]="story.getThumbnailFilename()"
+              <oppia-thumbnail-uploader [filename]="story?.getThumbnailFilename()"
                                         [useLocalStorage]="false"
                                         (updateFilename)="updateStoryThumbnailFilename($event)"
-                                        [bgColor]="story.getThumbnailBgColor()"
+                                        [bgColor]="story?.getThumbnailBgColor()"
                                         (updateBgColor)="updateStoryThumbnailBgColor($event)"
                                         [allowedBgColors]="allowedBgColors"
                                         [aspectRatio]="'4:3'"
@@ -113,7 +113,7 @@
                     </i>
                     <div class="oppia-state-content-display oppia-transition-200 oppia-prevent-selection"
                          title="Story notes">
-                      <span class="oppia-placeholder" [hidden]="!editableNotes === ''">
+                      <span class="oppia-placeholder" [hidden]="!(editableNotes === '')">
                           Add notes about the story to help other contributors.
                       </span>
                       <oppia-rte-output-display class="story-notes e2e-test-story-notes" [rteString]="editableNotes">
@@ -202,30 +202,42 @@
                 <span>Name</span>
               </div>
               <div class="story-nodes-container">
-                <!-- <div ng-repeat="node in linearNodesList track by $index">
+
+
+                <div *ngFor="let node of linearNodesList;index as idx">
                   <div class="story-editor-node"
                        [ngClass]="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                       (click)="navigateToChapterWithId(node.getId(), $index)"
+                       (click)="navigateToChapterWithId(node.getId(), idx)"
                        dnd-draggable="node"
                        dnd-list="linearNodesList"
                        dnd-effect-allowed="move"
-                       dnd-dragstart="onMoveChapterStart($index, node.getId())"
-                       dnd-drop="rearrangeNodeInStory($index)">
+                       dnd-dragstart="onMoveChapterStart(idx, node.getId())"
+                       dnd-drop="rearrangeNodeInStory(idx)">
                     <div class="story-editor-node-title">
-                      <span> {{ $index+1 }}. </span>
+                      <span> {{ idx+1 }}. </span>
                       <span class="e2e-test-chapter-title">{{ node.getTitle() }}</span>
                     </div>
                     <div class="edit-options-container">
-                      <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options" (click)="toggleChapterEditOptions($index);$event.stopPropagation()" aria-label="Chapter edit"></i>
+                      <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
+                         (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
+                         aria-label="Chapter edit">
+                      </i>
                     </div>
-                    <div class="chapter-option-box" *ngIf="selectedChapterIndex === $index" ng-mouseleave="toggleChapterEditOptions(-1)" (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
-                      <div class="chapter-edit-option e2e-test-delete-chapter-button" (click)="deleteNode(node.getId())">
+                    <div class="chapter-option-box"
+                         *ngIf="selectedChapterIndex === idx"
+                         (mouseleave)="toggleChapterEditOptions(-1)"
+                         (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                      <div class="chapter-edit-option e2e-test-delete-chapter-button"
+                           (click)="deleteNode(node.getId())">
                         <i class="fa fa-trash"></i>
                         <span>Delete</span>
                       </div>
                     </div>
                   </div>
-                </div> -->
+                </div>
+
+
+                
               </div>
             </div>
           </div>

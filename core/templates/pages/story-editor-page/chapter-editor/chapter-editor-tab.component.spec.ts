@@ -13,27 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for chapter editor tab controller.
+ * @fileoverview Unit tests for chapter editor tab component.
  */
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-
-import { EditableStoryBackendApiService } from
-  'domain/story/editable-story-backend-api.service';
-import { StoryEditorNavigationService } from
-  'pages/story-editor-page/services/story-editor-navigation.service';
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
+import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Chapter Editor tab', function() {
-  var $scope = null;
-  var ctrl = null;
-  var MockStoryEditorNavigationService = null;
-  var storyInitializedEventEmitter = null;
-  var storyReinitializedEventEmitter = null;
-  importAllAngularServices();
+describe('Chapter Editor tab', () => {
+  let MockStoryEditorNavigationService;
+  let storyInitializedEventEmitter;
+  let storyReinitializedEventEmitter;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,21 +35,16 @@ describe('Chapter Editor tab', function() {
         EditableStoryBackendApiService]
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'EditableStoryBackendApiService',
-      TestBed.get(EditableStoryBackendApiService));
-    $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));
-    $provide.value(
-      'StoryEditorNavigationService',
-      TestBed.get(StoryEditorNavigationService));
-  }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
-    var storyObjectFactory = $injector.get('StoryObjectFactory');
-    var StoryEditorStateService = $injector.get('StoryEditorStateService');
-    $scope = $rootScope.$new();
+  beforeEach(() => {
+    editableStoryBackendApiService = TestBed.inject(EditableStoryBackendApiService);
+    storyObjectFactory = TestBed.inject(StoryObjectFactory);
+    storyEditorNavigationService = TestBed.inject(StoryEditorNavigationService);
+    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+
+  });
+
+  beforeEach(() => {
     MockStoryEditorNavigationService = {
       activeTab: 'chapter',
       getActiveTab: () => this.activeTab,
@@ -67,7 +55,7 @@ describe('Chapter Editor tab', function() {
       }
     };
 
-    var newStory = storyObjectFactory.createFromBackendDict({
+    let newStory = storyObjectFactory.createFromBackendDict({
       id: 'storyId_0',
       title: 'Story title',
       description: 'Story Description',
@@ -95,11 +83,11 @@ describe('Chapter Editor tab', function() {
     storyReinitializedEventEmitter = new EventEmitter();
 
     spyOnProperty(StoryEditorStateService, 'onStoryInitialized').and.callFake(
-      function() {
+      () {
         return storyInitializedEventEmitter;
       });
     spyOnProperty(StoryEditorStateService, 'onStoryReinitialized').and.callFake(
-      function() {
+      () {
         return storyReinitializedEventEmitter;
       });
 
@@ -115,21 +103,21 @@ describe('Chapter Editor tab', function() {
     ctrl.$onDestroy();
   });
 
-  it('should set initialize chapter index from the story', function() {
+  it('should set initialize chapter index from the story', () {
     ctrl.$onInit();
     expect(ctrl.chapterId).toEqual('node_1');
     expect(ctrl.chapterIndex).toEqual(0);
   });
 
   it('should call StoryEditorNavigationService to navigate to story editor',
-    function() {
+    () {
       ctrl.$onInit();
       ctrl.navigateToStoryEditor();
       expect(MockStoryEditorNavigationService.getActiveTab()).toEqual('story');
     });
 
   it('should called initEditor on calls from story being initialized',
-    function() {
+    () {
       spyOn(ctrl, 'initEditor').and.callThrough();
       ctrl.$onInit();
       storyInitializedEventEmitter.emit();

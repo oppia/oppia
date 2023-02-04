@@ -325,11 +325,11 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.storyEditorStalenessDetectionService.init();
+    // this.storyEditorStalenessDetectionService.init();
     this.windowRef.nativeWindow.addEventListener(
       'beforeunload', this.onClosingStoryEditorBrowserTab);
-    this.localStorageService.registerNewStorageEventListener(
-      this.onCreateOrUpdateStoryEditorBrowserTabsInfo);
+    // this.localStorageService.registerNewStorageEventListener(
+    //   this.onCreateOrUpdateStoryEditorBrowserTabsInfo);
   }
 
   ngOnDestroy(): void {
