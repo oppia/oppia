@@ -352,6 +352,7 @@ describe('Chapter editor functionality', function() {
           await richTextEditor.addRteComponent(
             'Skillreview', 'Description', 'skillFromChapterEditor0');
         }, true);
+      await explorationEditorMainTab.leaveTranslationsAsIs();
       await explorationEditorPage.navigateToPreviewTab();
       await explorationPlayerPage.expectContentToMatch(
         async function(richTextChecker) {
