@@ -893,44 +893,30 @@ describe('Questions List Component', () => {
 
   it('should remove skill linked to a question', () => {
     component.associatedSkillSummaries = [
-      SkillDifficulty.create('skillId1', '', 0.9),
-      SkillDifficulty.create('skillId2', '', 0.6)
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: '1',
+        skill_description: 'Skill Description'
+      }),
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: '2',
+        skill_description: 'Skill Description'
+      })
     ];
     component.skillLinkageModificationsArray = [];
-    component.removeSkill('skillId1');
+    component.removeSkill('1');
 
     expect(component.associatedSkillSummaries).toEqual([
-      SkillDifficulty.create('skillId2', '', 0.6)
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: '2',
+        skill_description: 'Skill Description'
+      })
     ]);
     expect(component.skillLinkageModificationsArray).toEqual([
       {
-        id: 'skillId1',
-        task: 'remove',
-        difficulty: 0.9
+        id: '1',
+        task: 'remove'
       } as SkillLinkageModificationsArray
     ]);
-  });
-
-  it('should check that question is not savable if there are no' +
-    ' changes', () => {
-    component.skillLinkageModificationsArray = [];
-    component.isSkillDifficultyChanged = false;
-    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
-
-    expect(component.isQuestionSavable()).toBe(false);
-  });
-
-  it('should check if question is savable', () => {
-    component.questionIsBeingUpdated = false;
-    component.newQuestionSkillDifficulties = [0.9];
-    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
-    spyOn(questionValidationService, 'isQuestionValid')
-      .and.returnValues(true, false);
-
-    expect(component.isQuestionSavable()).toBe(true);
-
-    component.questionIsBeingUpdated = true;
-    expect(component.isQuestionSavable()).toBe(false);
   });
 
   it('should show solution if interaction can have solution', () => {
