@@ -19,7 +19,7 @@
 import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerDashboardActivityBackendApiService } from
@@ -108,11 +108,11 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   belongsToLearnerPlaylist(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         return (
           this.learnerDashboardActivityIds.belongsToExplorationPlaylist(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         return (
           this.learnerDashboardActivityIds.belongsToCollectionPlaylist(
             this.activityId));
@@ -124,19 +124,19 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   belongsToCompletedActivities(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         return (
           this.learnerDashboardActivityIds.belongsToCompletedExplorations(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         return (
           this.learnerDashboardActivityIds.belongsToCompletedCollections(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_STORY) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_STORY) {
         return (
           this.learnerDashboardActivityIds.belongsToCompletedStories(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_LEARN_TOPIC) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_LEARN_TOPIC) {
         return (
           this.learnerDashboardActivityIds.belongsToLearntTopics(
             this.activityId));
@@ -148,15 +148,15 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   belongsToIncompleteActivities(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         return (
           this.learnerDashboardActivityIds.belongsToIncompleteExplorations(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         return (
           this.learnerDashboardActivityIds.belongsToIncompleteCollections(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_LEARN_TOPIC) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_LEARN_TOPIC) {
         return (
           this.learnerDashboardActivityIds.belongsToPartiallyLearntTopics(
             this.activityId));
@@ -170,10 +170,10 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
       this.learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
         activityId, activityType));
     if (isSuccessfullyAdded) {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         this.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
           activityId);
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         this.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
           activityId);
       }
