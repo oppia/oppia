@@ -27,6 +27,9 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
 import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import cloneDeep from 'lodash/cloneDeep';
 
 class MockActiveModal {
   close(): void {
@@ -55,16 +58,16 @@ describe('Question Suggestion Review Modal component', () => {
   let skillBackendApiService: SkillBackendApiService;
   let skillObjectFactory: SkillObjectFactory;
   let contextService: ContextService;
-  let cancelSuggestionSpy = null;
+  let cancelSuggestionSpy: jasmine.Spy;
   let threadDataBackendApiService: ThreadDataBackendApiService;
   const authorName = 'Username 1';
   const contentHtml = 'Content html';
-  let question = null;
+  let question: Question;
   const questionHeader = 'Question header';
   const reviewable = true;
   const skillDifficulty = 0.3;
   const suggestionId = '1';
-  let misconceptionsBySkill = null;
+  let misconceptionsBySkill: MisconceptionSkillMap;
   let suggestionIdToContribution = {
     1: {
       details: {
@@ -168,10 +171,7 @@ describe('Question Suggestion Review Modal component', () => {
               param_changes: [],
               recorded_voiceovers: {
                 voiceovers_mapping: {}
-              },
-              written_translations: {
-                translations_mapping: {}
-              },
+              }
             },
           },
           skill_difficulty: skillDifficulty,
@@ -281,10 +281,7 @@ describe('Question Suggestion Review Modal component', () => {
               param_changes: [],
               recorded_voiceovers: {
                 voiceovers_mapping: {}
-              },
-              written_translations: {
-                translations_mapping: {}
-              },
+              }
             },
           },
           skill_difficulty: skillDifficulty,
@@ -402,6 +399,39 @@ describe('Question Suggestion Review Modal component', () => {
         };
       }
 
+      const questionDict = cloneDeep(
+        component.suggestionIdToContribution[suggestionId]
+          .suggestion.change.question_dict
+      );
+
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+            { componentInstance: MockNgbModalRef,
+              result: Promise.resolve(
+                {questionDict: questionDict, skillDifficulty: 0.3}
+              )
+            }) as NgbModalRef;
+      });
+
+      component.suggestion.change.skill_id = 'skill_1';
+      component.edit();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
+
+    it('should throw error edit if skill id is null', fakeAsync(() => {
+      class MockNgbModalRef {
+        componentInstance = {
+          suggestionId: suggestionId,
+          question: question,
+          questionId: '',
+          questionStateData: question.getStateData(),
+          skill: null,
+          skillDifficulty: 0.3
+        };
+      }
+
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return (
             { componentInstance: MockNgbModalRef,
@@ -409,10 +439,11 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
-      component.edit();
-      tick();
-
-      expect(ngbModal.open).toHaveBeenCalled();
+      component.suggestion.change.skill_id = undefined;
+      expect(() => {
+        component.edit();
+        tick();
+      }).toThrowError();
     }));
 
     it('should open edit question modal when clicking on' +
@@ -436,6 +467,7 @@ describe('Question Suggestion Review Modal component', () => {
             }) as NgbModalRef;
       });
 
+      component.suggestion.change.skill_id = 'skill_1';
       component.edit();
       tick();
 
@@ -443,7 +475,7 @@ describe('Question Suggestion Review Modal component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-    it('should return nothing when edit question modal is' +
+    it('should update review question modal when edit question modal is' +
       ' resolved', fakeAsync(() => {
       class MockNgbModalRef {
         componentInstance = {
@@ -456,17 +488,50 @@ describe('Question Suggestion Review Modal component', () => {
         };
       }
 
+      const newContentHtml = 'new html';
+      const newSkillDifficulty = 1;
+
+      const suggestionChange = (
+        component.suggestionIdToContribution[suggestionId].suggestion.change);
+      const newQuestionDict = cloneDeep(suggestionChange.question_dict);
+      newQuestionDict.question_state_data.content.html = newContentHtml;
+
+      expect(
+        component.question.getStateData().content.html
+      ).toEqual(contentHtml);
+      expect(
+        suggestionChange.question_dict.question_state_data.content.html
+      ).toEqual(contentHtml);
+      expect(component.skillDifficulty).toBe(skillDifficulty);
+      expect(suggestionChange.skill_difficulty).toEqual(skillDifficulty);
+
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return (
             { componentInstance: MockNgbModalRef,
-              result: Promise.resolve()
+              result: Promise.resolve({
+                questionDict: newQuestionDict,
+                skillDifficulty: newSkillDifficulty
+              })
             }) as NgbModalRef;
       });
 
+      component.suggestion.change.skill_id = 'skill_1';
       component.edit();
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
+      expect(
+        component.question.getStateData().content.html
+      ).toEqual(newContentHtml);
+      expect(
+        suggestionChange.question_dict.question_state_data.content.html
+      ).toEqual(newContentHtml);
+      expect(component.skillDifficulty).toBe(newSkillDifficulty);
+      expect(suggestionChange.skill_difficulty).toEqual(newSkillDifficulty);
+
+      suggestionChange.question_dict.question_state_data.content.html = (
+        contentHtml);
+      suggestionChange.skill_difficulty = skillDifficulty;
     }));
 
     it('should initialize properties after component is initialized',
@@ -493,7 +558,7 @@ describe('Question Suggestion Review Modal component', () => {
       () => {
         component.validationError = 'component is an error message';
         component.questionChanged();
-        expect(component.validationError).toBe(null);
+        expect(component.validationError).toBeNull();
       });
 
     it('should accept suggestion in suggestion modal when clicking accept' +
@@ -620,17 +685,40 @@ describe('Question Suggestion Review Modal component', () => {
     expect(component.isFirstItem).toBeTrue();
   }));
 
+  it('should throw Error if selection is null', fakeAsync(() => {
+    component.remainingContributionIdStack = [];
+    expect(() => {
+      component.goToNextItem();
+    }).toThrowError();
+  }));
+
+  it('should throw Error if skip contribution id is null', fakeAsync(() => {
+    component.isFirstItem = false;
+    component.skippedContributionIds = [];
+    expect(() => {
+      component.goToPreviousItem();
+    }).toThrowError();
+  }));
+
   it('should not navigate if the corresponding opportunity is deleted',
     function() {
       spyOn(component, 'cancel');
       let details1 = component.allContributions['1'].details;
       let details2 = component.allContributions['2'].details;
+      // This throws "Type 'null' is not assignable to type
+      // 'ActiveContributionDetailsDict'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       component.allContributions['2'].details = null;
 
       component.goToNextItem();
       expect(component.cancel).toHaveBeenCalled();
       component.allContributions['2'].details = details2;
       component.goToNextItem();
+      // This throws "Type 'null' is not assignable to type
+      // 'ActiveContributionDetailsDict'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
       component.allContributions['1'].details = null;
 
       component.goToPreviousItem();

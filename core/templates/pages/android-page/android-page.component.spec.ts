@@ -17,10 +17,10 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter, ElementRef } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
-import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 
 import { AndroidPageComponent } from './android-page.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -28,28 +28,6 @@ import { PageTitleService } from 'services/page-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-
-class MockIntersectionObserver {
-  observe: () => void;
-  unobserve: () => void;
-
-  constructor(
-    public callback: (entries: IntersectionObserverEntry[]) => void
-  ) {
-    this.observe = () => {
-      callback([{
-        isIntersecting: true,
-        boundingClientRect: new DOMRectReadOnly(),
-        intersectionRatio: 1,
-        intersectionRect: new DOMRectReadOnly(),
-        rootBounds: null,
-        target: document.createElement('div'),
-        time: 1
-      }]);
-    };
-    this.unobserve = jasmine.createSpy('unobserve');
-  }
-}
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -61,7 +39,7 @@ class MockTranslateService {
 describe('Android page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
-  let androidUpdatesBackendApiService: AndroidUpdatesBackendApiService;
+  let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
 
   beforeEach(async() => {
@@ -70,7 +48,7 @@ describe('Android page', () => {
       declarations: [AndroidPageComponent, MockTranslatePipe],
       providers: [
         AlertsService,
-        AndroidUpdatesBackendApiService,
+        MailingListBackendApiService,
         UrlInterpolationService,
         PageTitleService,
         {
@@ -89,8 +67,8 @@ describe('Android page', () => {
       AndroidPageComponent);
     component = androidPageComponent.componentInstance;
     alertsService = TestBed.inject(AlertsService);
-    androidUpdatesBackendApiService = TestBed.inject(
-      AndroidUpdatesBackendApiService);
+    mailingListBackendApiService = TestBed.inject(
+      MailingListBackendApiService);
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
   });
@@ -106,6 +84,14 @@ describe('Android page', () => {
     component.ngOnInit();
 
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+  });
+
+  it('should set page title on init', () => {
+    spyOn(component, 'setPageTitle');
+
+    component.ngAfterViewInit();
+
+    expect(component.setPageTitle).toHaveBeenCalled();
   });
 
   it('should obtain translated page title whenever the selected' +
@@ -144,7 +130,7 @@ describe('Android page', () => {
 
   it('should change feature selection', () => {
     component.ngOnInit();
-    expect(component.featuresShown).toBe(1);
+    expect(component.featuresShown).toBe(0);
 
     component.changeFeaturesShown(3);
 
@@ -166,15 +152,15 @@ describe('Android page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.resolve(true));
+      component.userHasSubscribed = false;
 
       component.subscribeToAndroidList();
 
       flushMicrotasks();
 
-      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-        'Done!', 1000);
+      expect(component.userHasSubscribed).toBeTrue();
     }));
 
   it('should fail to add user to android mailing list and return status',
@@ -184,7 +170,7 @@ describe('Android page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.resolve(false));
 
       component.subscribeToAndroidList();
@@ -203,7 +189,7 @@ describe('Android page', () => {
       tick();
       component.emailAddress = 'validEmail@example.com';
       component.name = 'validName';
-      spyOn(androidUpdatesBackendApiService, 'subscribeUserToAndroidList')
+      spyOn(mailingListBackendApiService, 'subscribeUserToMailingList')
         .and.returnValue(Promise.reject(false));
 
       component.subscribeToAndroidList();
@@ -214,26 +200,4 @@ describe('Android page', () => {
         'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
         'to be added to the mailing list.', 10000);
     }));
-
-  it('should attach intersection observers', () => {
-    // eslint-disable-next-line
-    (window as any).IntersectionObserver = MockIntersectionObserver;
-    component.androidUpdatesSectionRef = new ElementRef(
-      document.createElement('div'));
-    component.featuresMainTextRef = new ElementRef(
-      document.createElement('div'));
-    component.featureRef1 = new ElementRef(document.createElement('div'));
-    component.featureRef2 = new ElementRef(document.createElement('div'));
-    component.featureRef3 = new ElementRef(document.createElement('div'));
-    component.featureRef4 = new ElementRef(document.createElement('div'));
-    component.androidUpdatesSectionIsSeen = false;
-    component.featuresMainTextIsSeen = false;
-    spyOn(component, 'setPageTitle');
-
-    component.ngAfterViewInit();
-
-    expect(component.setPageTitle).toHaveBeenCalled();
-    expect(component.androidUpdatesSectionIsSeen).toBe(true);
-    expect(component.featuresMainTextIsSeen).toBe(true);
-  });
 });

@@ -29,6 +29,7 @@ from scripts import common  # isort:skip pylint: disable=wrong-import-position, 
 from core import utils  # isort:skip
 
 from typing import List  # isort:skip
+import yaml  # isort:skip
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
@@ -48,14 +49,14 @@ def get_e2e_suite_names_from_ci_config_file() -> List[str]:
         list(str). An alphabetically-sorted list of names of test suites
         from the script section in the CI config files.
     """
-    suites_list = []
-    # The following line extracts the test suites from patterns like
-    # python -m scripts.run_e2e_tests --suite="accessibility".
-    e2e_test_suite_regex = re.compile(r'--suite="([a-zA-Z_-]*)"')
+    suites = []
     file_contents = read_and_parse_ci_config_files()
+
     for file_content in file_contents:
-        suites_list.extend(e2e_test_suite_regex.findall(file_content))
-    return sorted(suites_list)
+        workflow_dict = yaml.load(file_content, Loader=yaml.Loader)
+        suites += workflow_dict[
+            'jobs']['e2e_test']['strategy']['matrix']['suite']
+    return sorted(suites)
 
 
 def get_e2e_suite_names_from_webdriverio_file() -> List[str]:
@@ -97,7 +98,7 @@ def read_and_parse_ci_config_files() -> List[str]:
     """
     ci_dicts = []
     for filepath in os.listdir(CI_PATH):
-        if re.search(r'e2e_.*\.yml', filepath):
+        if re.fullmatch(r'e2e_.*\.yml', filepath):
             ci_file_content = utils.open_file(
                 os.path.join(CI_PATH, filepath), 'r').read()
             ci_dicts.append(ci_file_content)

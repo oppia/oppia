@@ -19,14 +19,13 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
-import { TranslationOpportunity } from '../modal-templates/translation-modal.component';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
@@ -57,7 +56,7 @@ interface GetPresentableOpportunitiesResponse {
 })
 export class QuestionOpportunitiesComponent implements OnInit {
   userIsLoggedIn: boolean = false;
-  allOpportunities = [];
+  allOpportunities: Record<string, Opportunity> = {};
 
   constructor(
     private alertsService: AlertsService,
@@ -73,17 +72,18 @@ export class QuestionOpportunitiesComponent implements OnInit {
   getPresentableOpportunitiesData(
       opportunitiesObject: GetSkillOpportunitiesResponse
   ): GetPresentableOpportunitiesResponse {
-    const opportunitiesDicts = [];
+    const opportunitiesDicts: Opportunity[] = [];
     const more = opportunitiesObject.more;
 
     for (let index in opportunitiesObject.opportunities) {
       const opportunity = opportunitiesObject.opportunities[index];
       const heading = opportunity.getOpportunityHeading();
       const subheading = opportunity.getOpportunitySubheading();
+      let maxQuestionsPerSkill = AppConstants.MAX_QUESTIONS_PER_SKILL;
       const progressPercentage = (
-        (opportunity.getQuestionCount() / constants.MAX_QUESTIONS_PER_SKILL) *
-        100).toFixed(2);
-      const opportunityDict = {
+        (opportunity.getQuestionCount() / maxQuestionsPerSkill) * 100
+      ).toFixed(2);
+      const opportunityDict: Opportunity = {
         id: opportunity.id,
         heading: heading,
         subheading: subheading,
@@ -127,7 +127,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
   }
 
   loadMoreOpportunities(): Promise<{
-    opportunitiesDicts: TranslationOpportunity[];
+    opportunitiesDicts: Opportunity[];
     more: boolean;
   }> {
     return (
@@ -137,7 +137,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
   }
 
   loadOpportunities(): Promise<{
-    opportunitiesDicts: TranslationOpportunity[];
+    opportunitiesDicts: Opportunity[];
     more: boolean;
   }> {
     return (

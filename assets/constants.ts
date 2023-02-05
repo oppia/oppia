@@ -3,7 +3,7 @@
 // "eslint disable next line" for each of them.
 /* eslint-disable oppia/no-multiline-disable */
 /* eslint-disable quote-props */
-/* eslint-disable quotes */
+/* eslint-disable  @typescript-eslint/quotes */
 /* Don't modify anything outside the {} brackets.
  * Insides of the {} brackets should be formatted as a JSON object.
  * JSON rules:
@@ -309,11 +309,18 @@ export default {
   "ROLE_VOICE_ARTIST": "voice artist",
   "ROLE_VIEWER": "viewer",
 
+  // The supported tags for the mailing list subscriptions.
+  "MAILING_LIST_ANDROID_TAG": "Android",
+  "MAILING_LIST_WEB_TAG": "Web",
   // Regex to validate the format of Math rich-text component SVGs. If this is
   // changed in the future, the existing filenames on the server should be
   // handled as well.
   // eslint-disable-next-line max-len
   "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
+
+  // This regex validates whether a given string is in the format of YYYY-MM-DD
+  // format.
+  "DATE_REGEX": "^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$",
 
   // The SVG tag-specific attribute allowlist is based on the list of tags and
   // and attributes specified in this project:
@@ -4983,6 +4990,11 @@ export default {
     "direction": "ltr",
     "decimal_separator": ","
   }, {
+    "code": "am",
+    "description": "አማርኛ (Amharic)",
+    "direction": "ltr",
+    "decimal_separator": "."
+  }, {
     "code": "az",
     "description": "Azeri (Azerbaijani)",
     "direction": "ltr",
@@ -5349,6 +5361,11 @@ export default {
     "id": "sq",
     "description": "shqip (Albanian)",
     "relatedLanguages": ["sq"],
+    "direction": "ltr"
+  }, {
+    "id": "am",
+    "description": "አማርኛ (Amharic)",
+    "relatedLanguages": ["am"],
     "direction": "ltr"
   }, {
     "id": "ar",
@@ -5844,6 +5861,8 @@ export default {
     "translation", "voiceover", "question", "submit_question"
   ],
 
+  "SUGGESTIONS_SORT_KEY_DATE": "Date",
+
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
   "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
   "USER_FILTER_CRITERION_USERNAME": "username",
@@ -6006,22 +6025,12 @@ export default {
       "hints": [],
       "solution": null
     },
-    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
-      "voiceovers_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
+      "voiceovers_mapping": {}
     },
     "solicit_answer_details": false,
-    "card_is_checkpoint": false,
-    "written_translations": {
-      "translations_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
-    }
+    "card_is_checkpoint": false
   },
 
   // Data required for Firebase authentication.
@@ -6907,12 +6916,13 @@ export default {
 
   "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
 
-  "CAN_FETCH_VERSION_HISTORY_DATA": false,
   "METADATA_PROPERTIES": [
     "title", "category", "objective", "language_code", "tags", "blurb",
     "author_notes", "states_schema_version", "init_state_name", "param_specs",
     "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
     "edits_allowed"
   ],
-  "NON_METADATA_PROPERTIES": ["id", "states"]
+  "NON_METADATA_PROPERTIES": ["id", "states", "next_content_id_index"],
+  "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
+  "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313
 } as const;

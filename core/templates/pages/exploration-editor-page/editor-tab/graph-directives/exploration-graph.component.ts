@@ -35,7 +35,10 @@ import { ExplorationGraphModalComponent } from '../templates/modal-templates/exp
   templateUrl: './exploration-graph.component.html'
 })
 export class ExplorationGraphComponent {
-  checkpointCountWarning: string;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  checkpointCountWarning!: string;
 
   constructor(
     private alertsService: AlertsService,
@@ -63,7 +66,8 @@ export class ExplorationGraphComponent {
     this.routerService.navigateToMainTab(stateName);
   }
 
-  getActiveStateName(): string {
+  // Return null if their is no active state name.
+  getActiveStateName(): string | null {
     return this.stateEditorService.getActiveStateName();
   }
 

@@ -55,6 +55,10 @@ describe('Exploration Save Modal component', () => {
     fixture = TestBed.createComponent(ExplorationSaveModalComponent);
     component = fixture.componentInstance;
 
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'DiffNodeData'." We need to suppress this error because of the need
+    // to test validations.
+    // @ts-ignore
     component.diffData = null;
     component.isExplorationPrivate = isExplorationPrivate;
 

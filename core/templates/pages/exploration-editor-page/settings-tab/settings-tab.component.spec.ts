@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
@@ -49,6 +49,14 @@ import { ExplorationPermissions } from 'domain/exploration/exploration-permissio
 import { State } from 'domain/state/StateObjectFactory';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { MetadataDiffData, VersionHistoryService } from '../services/version-history.service';
+import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
+import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Settings Tab Component', () => {
   let component: SettingsTabComponent;
@@ -74,9 +82,9 @@ describe('Settings Tab Component', () => {
   let userService: UserService;
   let windowRef: WindowRef;
   let settingTabBackendApiService: SettingTabBackendApiService;
-  let ngbModal: NgbModal = null;
-  let eeabas: ExplorationEditsAllowedBackendApiService = null;
-  let editabilityService: EditabilityService = null;
+  let ngbModal: NgbModal;
+  let eeabas: ExplorationEditsAllowedBackendApiService;
+  let editabilityService: EditabilityService;
   let explorationId = 'exp1';
   let userPermissions = {
     canDelete: true,
@@ -88,6 +96,9 @@ describe('Settings Tab Component', () => {
   let mockExplorationTagsServiceonPropertyChanged = new EventEmitter();
   let mockEventEmitterRouterService = new EventEmitter();
   let mockEventEmitteruserExplorationPermissionsService = new EventEmitter();
+  let versionHistoryService: VersionHistoryService;
+  let paramSpecObjectFactory: ParamSpecObjectFactory;
+  let versionHistoryBackendApiService: VersionHistoryBackendApiService;
 
   class MockChangeDetectorRef {
     detectChanges(): void {}
@@ -127,7 +138,35 @@ describe('Settings Tab Component', () => {
             data: {
               param_changes: []
             },
-            getDataAsync: () => Promise.resolve(),
+            getDataAsync: () => Promise.resolve({
+              draft_change_list_id: 3,
+              version: undefined,
+              draft_changes: [],
+              is_version_of_draft_valid: true,
+              init_state_name: 'init',
+              param_changes: [],
+              param_specs: {randomProp: {obj_type: 'randomVal'}},
+              states: {},
+              title: 'Test Exploration',
+              language_code: 'en',
+              correctness_feedback_enabled: false,
+              exploration_metadata: {
+                title: 'Exploration',
+                category: 'Algebra',
+                objective: 'To learn',
+                language_code: 'en',
+                tags: [],
+                blurb: '',
+                author_notes: '',
+                states_schema_version: 50,
+                init_state_name: 'Introduction',
+                param_specs: {},
+                param_changes: [],
+                auto_tts_enabled: false,
+                correctness_feedback_enabled: true,
+                edits_allowed: true
+              }
+            }),
             autosaveChangeListAsync() {
               return;
             }
@@ -181,6 +220,10 @@ describe('Settings Tab Component', () => {
     userEmailPreferencesService = TestBed.inject(
       UserEmailPreferencesService);
     userService = TestBed.inject(UserService);
+    versionHistoryService = TestBed.inject(VersionHistoryService);
+    paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
+    versionHistoryBackendApiService = TestBed.inject(
+      VersionHistoryBackendApiService);
 
     spyOn(explorationTagsService, 'onExplorationPropertyChanged')
       .and.returnValue(mockExplorationTagsServiceonPropertyChanged);
@@ -200,6 +243,9 @@ describe('Settings Tab Component', () => {
     spyOnProperty(
       userExplorationPermissionsService, 'onUserExplorationPermissionsFetched')
       .and.returnValue(mockEventEmitteruserExplorationPermissionsService);
+    spyOn(
+      versionHistoryService, 'getLatestVersionOfExploration'
+    ).and.returnValue(3);
 
     fixture.detectChanges();
   });
@@ -419,8 +465,11 @@ describe('Settings Tab Component', () => {
   it('should not save exploration init state name if it\'s invalid',
     () => {
       explorationInitStateNameService.init('First State');
-      spyOn(explorationStatesService, 'getState').and.returnValue(
-        null);
+      // This throws "Argument of type 'null' is not assignable to
+      // parameter of type 'state'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      spyOn(explorationStatesService, 'getState').and.returnValue(null);
       spyOn(alertsService, 'addWarning');
 
       component.saveExplorationInitStateName();
@@ -433,8 +482,8 @@ describe('Settings Tab Component', () => {
       explorationInitStateNameService.init('Introduction');
       spyOn(explorationStatesService, 'getState').and.returnValue(
         new State(
-          null, null, null, null, null,
-          null, null, null, null, null, null));
+          null, null, null, {} as SubtitledHtml, {} as Interaction,
+          [], {} as RecordedVoiceovers, false, false));
       spyOn(explorationInitStateNameService, 'saveDisplayedValue');
 
       component.saveExplorationInitStateName();
@@ -1025,7 +1074,7 @@ describe('Settings Tab Component', () => {
 
   it('should disable save button when adding another role to itself',
     () => {
-      component.newMemberUsername = component.loggedInUser;
+      component.newMemberUsername = component.loggedInUser as string;
       component.rolesSaveButtonEnabled = true;
       explorationTitleService.init('Exploration title');
       component.saveExplorationTitle();
@@ -1098,4 +1147,116 @@ describe('Settings Tab Component', () => {
     tick();
     expect(component.basicSettingIsShown).toEqual(true);
   }));
+
+  it('should get the last edited version number for the ' +
+  'exploration metadata', () => {
+    spyOn(
+      versionHistoryService, 'getBackwardMetadataDiffData'
+    ).and.returnValue({
+      oldVersionNumber: 3
+    } as MetadataDiffData);
+
+    expect(component.getLastEditedVersionNumber()).toEqual(3);
+  });
+
+  it('should throw error when last edited version number is null', () => {
+    spyOn(
+      versionHistoryService, 'getBackwardMetadataDiffData'
+    ).and.returnValue({
+      oldVersionNumber: null
+    } as MetadataDiffData);
+
+    expect(
+      () =>component.getLastEditedVersionNumber()
+    ).toThrowError('Last edited version number cannot be null');
+  });
+
+  it('should get the last edited committer username for exploration metadata',
+    () => {
+      spyOn(
+        versionHistoryService, 'getBackwardMetadataDiffData'
+      ).and.returnValue({
+        committerUsername: 'some'
+      } as MetadataDiffData);
+
+      expect(component.getLastEditedCommitterUsername()).toEqual('some');
+    });
+
+  it('should fetch the version history data from the backend',
+    fakeAsync(() => {
+      const explorationMetadata = new ExplorationMetadata(
+        'title', 'category', 'objective', 'en',
+        [], '', '', 55, 'Introduction',
+        new ParamSpecs({}, paramSpecObjectFactory), [], false, true, true
+      );
+      spyOn(
+        versionHistoryBackendApiService, 'fetchMetadataVersionHistoryAsync'
+      ).and.resolveTo({
+        lastEditedVersionNumber: 3,
+        lastEditedCommitterUsername: '',
+        metadataInPreviousVersion: explorationMetadata
+      });
+
+      component.updateMetadataVersionHistory();
+      tick();
+      flushMicrotasks();
+
+      expect(
+        versionHistoryBackendApiService.fetchMetadataVersionHistoryAsync
+      ).toHaveBeenCalled();
+    }));
+
+  it('should fetch show validation error if the backend api fails',
+    fakeAsync(() => {
+      spyOn(
+        versionHistoryBackendApiService, 'fetchMetadataVersionHistoryAsync'
+      ).and.resolveTo(null);
+
+      expect(component.validationErrorIsShown).toBeFalse();
+
+      component.updateMetadataVersionHistory();
+      tick();
+      flushMicrotasks();
+
+      expect(component.validationErrorIsShown).toBeTrue();
+    }));
+
+  it('should open the metadata version history modal on clicking the explore ' +
+    'version history button', () => {
+      class MockComponentInstance {
+        compoenentInstance = {
+          newMetadata: null,
+          oldMetadata: null,
+          headers: {
+            leftPane: '',
+            rightPane: '',
+          },
+        };
+      }
+      spyOn(ngbModal, 'open').and.returnValues({
+        componentInstance: MockComponentInstance,
+        result: Promise.resolve()
+      } as NgbModalRef, {
+        componentInstance: MockComponentInstance,
+        result: Promise.reject()
+      } as NgbModalRef);
+      const explorationMetadata = new ExplorationMetadata(
+        'title', 'category', 'objective', 'en',
+        [], '', '', 55, 'Introduction',
+        new ParamSpecs({}, paramSpecObjectFactory), [], false, true, true
+      );
+      spyOn(
+        versionHistoryService, 'getBackwardMetadataDiffData'
+      ).and.returnValue({
+        oldMetadata: explorationMetadata,
+        newMetadata: explorationMetadata,
+        oldVersionNumber: 3
+      } as MetadataDiffData);
+
+      component.onClickExploreVersionHistoryButton();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+
+      component.onClickExploreVersionHistoryButton();
+  });
 });

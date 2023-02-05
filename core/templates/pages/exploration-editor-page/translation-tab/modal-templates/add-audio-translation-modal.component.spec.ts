@@ -143,6 +143,6 @@ describe('Add Audio Translation Modal component', () => {
       expect(ngbActiveModal.close).not.toHaveBeenCalled();
 
       component.clearUploadedFile();
-      expect(component.errorMessage).toBe(null);
+      expect(component.errorMessage).toBeNull();
     }));
 });

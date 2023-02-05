@@ -30,7 +30,7 @@ import './topic-viewer-stories-list.component.css';
 @Component({
   selector: 'stories-list',
   templateUrl: './topic-viewer-stories-list.component.html',
-  styleUrls: []
+  styleUrls: ['./topic-viewer-stories-list.component.css']
 })
 export class StoriesListComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

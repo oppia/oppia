@@ -36,8 +36,6 @@ interface ExplanationFormSchema {
 })
 export class SolutionEditor implements OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
-    EventEmitter<string[]> = new EventEmitter();
 
   @Output() openSolutionEditorModal: EventEmitter<void> = new EventEmitter();
 
@@ -52,7 +50,7 @@ export class SolutionEditor implements OnInit {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateSolutionService: StateSolutionService,
+    public stateSolutionService: StateSolutionService,
   ) {}
 
   getAnswerHtml(): string {
@@ -67,10 +65,6 @@ export class SolutionEditor implements OnInit {
 
   updateNewSolution(value: Solution): void {
     this.saveSolution.emit(value);
-  }
-
-  openMarkAllAudioAsNeedingUpdateModalIfRequired(value: string[]): void {
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(value);
   }
 
   openEditorModal(): void {

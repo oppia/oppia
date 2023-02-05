@@ -32,10 +32,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-import { StoriesListComponent } from
-  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
-import { SubtopicsListComponent } from
-  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { TopicViewerPageComponent } from
   'pages/topic-viewer-page/topic-viewer-page.component';
@@ -55,18 +51,15 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     SmartRouterModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
+    TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    StoriesListComponent,
-    SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent,
     PracticeSessionConfirmationModal
   ],
   entryComponents: [
-    StoriesListComponent,
-    SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent,
     PracticeSessionConfirmationModal
@@ -102,6 +95,7 @@ class TopicViewerPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { TopicPlayerViewerCommonModule } from './topic-viewer-player-common.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

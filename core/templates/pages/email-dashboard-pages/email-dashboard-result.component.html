@@ -1,6 +1,5 @@
 <div class="oppia-email-form">
   <p *ngIf="emailSubmitted" class="success">Emails sent successfully. Redirecting to the Email Dashboard...</p>
-  <p *ngIf="testEmailSentSuccessfully" class="success">Test email sent successfully. Please check your inbox.</p>
   <p *ngIf="emailCancelled" class="warning">Emails cancelled. Redirecting to the Email Dashboard...</p>
   <p *ngIf="invalid.subject" class="invalid-input">Please enter a valid email subject</p>
   <p *ngIf="invalid.body" class="invalid-input">Please enter a valid email body</p>

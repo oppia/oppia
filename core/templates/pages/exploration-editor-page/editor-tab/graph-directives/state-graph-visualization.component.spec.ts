@@ -206,14 +206,14 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       nativeElement: {
         height: {
           baseVal: {
-            convertToSpecifiedUnits(value) {
+            convertToSpecifiedUnits(value: number) {
               return 1000;
             }
           }
         },
         width: {
           baseVal: {
-            convertToSpecifiedUnits(value) {
+            convertToSpecifiedUnits(value: number) {
               return 1000;
             }
           }
@@ -221,6 +221,10 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       }
     };
 
+    // This throws "Type 'null' is not assignable to parameter of
+    // type 'State'." We need to suppress this error because of
+    // the need to test validations.
+    // @ts-ignore
     spyOn(explorationStatesService, 'getState').and.returnValue(null);
     spyOn(stateGraphLayoutService, 'computeLayout')
       .and.returnValue(nodes);
@@ -229,11 +233,11 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         'This is a label for node 1': ['red', 'green']
       });
     spyOn(stateGraphLayoutService, 'getAugmentedLinks').and.returnValue([{
-      source: null,
-      target: null,
-      d: null,
-      style: '',
-      connectsDestIfStuck: false
+      // This throws "Type 'null' is not assignable to parameter of
+      // type 'NodeData'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      source: null, target: null, d: null, style: '', connectsDestIfStuck: false
     }]);
 
     component.linkPropertyMapping = {
@@ -256,6 +260,10 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
   it('should call redrawGraph when graphData has updated', fakeAsync(() => {
     spyOn(component, 'redrawGraph').and.stub();
 
+    // This throws "Type 'null' is not assignable to parameter of type
+    // 'GraphData'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     component.versionGraphData = null;
     mockUpdateGraphDataEmitter.emit(graphData);
     tick();
@@ -416,7 +424,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     // Spies for d3 library.
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
-        on: (evt, callback) => {
+        on: (evt: string, callback: () => void) => {
           callback();
           return {
             apply: () => {}
@@ -468,7 +476,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     // Spies for d3 library.
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
-        on: (evt, callback) => {
+        on: (evt: string, callback: () => void) => {
           callback();
           return {
             apply: () => {}

@@ -31,7 +31,7 @@ import { StateNameEditorComponent } from './state-name-editor.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 class MockExplorationDataService {
-  explorationId: 0;
+  explorationId!: 0;
   autosaveChangeListAsync() {
     return;
   }
@@ -50,9 +50,9 @@ describe('State Name Editor component', () => {
   let routerService: RouterService;
   let stateEditorService: StateEditorService;
   let stateNameService: StateNameService;
-  let mockExternalSaveEventEmitter = null;
+  let mockExternalSaveEventEmitter: EventEmitter<void>;
   let explorationDataService: MockExplorationDataService;
-  let autosaveChangeListSpy;
+  let autosaveChangeListSpy: jasmine.Spy;
 
   class MockNgbModal {
     open() {
@@ -120,7 +120,6 @@ describe('State Name Editor component', () => {
         classifier_model_id: null,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'First State Content'
@@ -132,8 +131,8 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
+          confirmed_unclassified_answers: [],
+          customization_args: {},
           solution: null,
           id: null,
           answer_groups: [],
@@ -152,19 +151,12 @@ describe('State Name Editor component', () => {
           hints: []
         },
         param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
+        solicit_answer_details: false
       },
       'Second State': {
         classifier_model_id: null,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'Second State Content'
@@ -176,8 +168,8 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
+          confirmed_unclassified_answers: [],
+          customization_args: {},
           solution: null,
           id: null,
           answer_groups: [],
@@ -197,18 +189,11 @@ describe('State Name Editor component', () => {
         },
         param_changes: [],
         solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
       },
       'Third State': {
         classifier_model_id: null,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'This is some content.'
@@ -220,8 +205,8 @@ describe('State Name Editor component', () => {
           }
         },
         interaction: {
-          confirmed_unclassified_answers: null,
-          customization_args: null,
+          confirmed_unclassified_answers: [],
+          customization_args: {},
           solution: null,
           id: null,
           answer_groups: [],
@@ -248,14 +233,8 @@ describe('State Name Editor component', () => {
           }
         }],
         solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
       }
-    });
+    }, false);
     component.ngOnInit();
   });
 
@@ -354,4 +333,12 @@ describe('State Name Editor component', () => {
     mockExternalSaveEventEmitter.emit();
     expect(component.saveStateName).toHaveBeenCalledWith('SampleState');
   });
+
+  it('should throw error if state name is null', fakeAsync(() => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    expect(() => {
+      component.openStateNameEditor();
+      tick();
+    }).toThrowError();
+  }));
 });

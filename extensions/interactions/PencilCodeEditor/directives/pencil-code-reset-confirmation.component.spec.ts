@@ -62,7 +62,7 @@ describe('Pencil Code Reset Confirmation Modal', () => {
 
   it('should close the modal when confirmed', () => {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-    component.confirm('some value');
+    component.confirm();
     expect(closeSpy).toHaveBeenCalled();
   });
 

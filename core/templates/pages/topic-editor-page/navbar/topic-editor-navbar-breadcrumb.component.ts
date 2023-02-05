@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 
@@ -27,7 +27,10 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
   templateUrl: './topic-editor-navbar-breadcrumb.component.html'
 })
 export class TopicEditorNavbarBreadcrumbComponent {
-  topic: Topic;
+  // This property is initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topic!: Topic;
 
   constructor(
     private topicEditorRoutingService: TopicEditorRoutingService,

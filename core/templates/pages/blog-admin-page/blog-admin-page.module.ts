@@ -24,18 +24,19 @@ import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
 import { RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { APP_BASE_HREF } from '@angular/common';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
-import { RolesAndActionsVisualizerComponent } from 'pages/admin-page/roles-tab/roles-and-actions-visualizer.component';
 import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AdminBlogAdminCommonModule } from 'pages/admin-page/admin-blog-admin-common.module';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 declare var angular: ng.IAngularStatic;
@@ -51,18 +52,18 @@ declare var angular: ng.IAngularStatic;
     RouterModule.forRoot([]),
     MatCardModule,
     ReactiveFormsModule,
+    BrowserAnimationsModule,
     SharedComponentsModule,
+    AdminBlogAdminCommonModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     BlogAdminNavbarComponent,
-    BlogAdminPageComponent,
-    RolesAndActionsVisualizerComponent
+    BlogAdminPageComponent
   ],
   entryComponents: [
     BlogAdminNavbarComponent,
-    BlogAdminPageComponent,
-    RolesAndActionsVisualizerComponent
+    BlogAdminPageComponent
   ],
   providers: [
     {

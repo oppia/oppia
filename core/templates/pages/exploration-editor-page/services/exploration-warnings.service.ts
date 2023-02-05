@@ -50,6 +50,8 @@ import { PencilCodeEditorValidationService } from 'interactions/PencilCodeEditor
 import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
 import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
+import { States } from 'domain/exploration/StatesObjectFactory';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 var Dequeue = require('dequeue');
 interface _getStatesAndAnswerGroupsWithEmptyClassifiersResult {
@@ -106,16 +108,18 @@ export class ExplorationWarningsService {
     private stateTopAnswersStatsService: StateTopAnswersStatsService,
     private parameterMetadataService: ParameterMetadataService,
     private computeGraphService: ComputeGraphService,
-  ) { }
+  ) {
+    this.stateWarnings = {};
+  }
 
-  _warningsList = [];
-  stateWarnings = {};
+  _warningsList: _verifyParametersResult[] = [];
+  stateWarnings: Record<string, string[]> = {};
   checkpointCountWarning: string = '';
   hasCriticalStateWarning: boolean = false;
   statesWithInvalidRedirection: string[] = [];
 
   _getStatesWithoutInteractionIds(): string[] {
-    let statesWithoutInteractionIds = [];
+    let statesWithoutInteractionIds: string[] = [];
 
     let states = this.explorationStatesService.getStates();
 
@@ -129,7 +133,7 @@ export class ExplorationWarningsService {
   }
 
   _getStatesWithIncorrectSolution(): string[] {
-    let statesWithIncorrectSolution = [];
+    let statesWithIncorrectSolution: string[] = [];
 
     let states = this.explorationStatesService.getStates();
     states.getStateNames().forEach((stateName) => {
@@ -154,7 +158,7 @@ export class ExplorationWarningsService {
       initNodeIds: string[],
       nodes: GraphNodes, edges: GraphLink[]): string[] {
     let queue = initNodeIds;
-    let seen = {};
+    let seen: Record<string, boolean> = {};
     for (let i = 0; i < initNodeIds.length; i++) {
       seen[initNodeIds[i]] = true;
     }
@@ -198,7 +202,7 @@ export class ExplorationWarningsService {
     let unsetParametersInfo = (
       this.parameterMetadataService.getUnsetParametersInfo(initNodeIds));
 
-    let paramWarningsList = [];
+    let paramWarningsList: _verifyParametersResult[] = [];
     unsetParametersInfo.forEach((unsetParameterData) => {
       if (!unsetParameterData.stateName) {
         // The parameter value is required in the initial list of parameter
@@ -243,7 +247,7 @@ export class ExplorationWarningsService {
   _getStatesWithInvalidRedirection(
       initStateId: string, links: GraphLink[]
   ): string[] {
-    let results = [];
+    let results: string[] = [];
     let states = this.explorationStatesService.getStates();
     let bfsStateList = this.computeGraphService.computeBfsTraversalOfStates(
       initStateId, states, initStateId);
@@ -276,8 +280,8 @@ export class ExplorationWarningsService {
 
   _getStatesAndAnswerGroupsWithEmptyClassifiers():
     _getStatesAndAnswerGroupsWithEmptyClassifiersResult[] {
-    let results = [];
-    let states = this.explorationStatesService.getStates();
+    let results: {groupIndexes: number[]; stateName: string}[] = [];
+    let states: States = this.explorationStatesService.getStates();
 
     states.getStateNames().forEach((stateName) => {
       let groupIndexes = this._getAnswerGroupIndexesWithEmptyClassifiers(
@@ -294,7 +298,7 @@ export class ExplorationWarningsService {
   }
 
   _getStatesWithAnswersThatMustBeResolved(): string[] {
-    let states = this.explorationStatesService.getStates();
+    let states: States = this.explorationStatesService.getStates();
     return this.stateTopAnswersStatsService.getStateNamesWithStats()
       .filter((stateName) => {
         let mustResolveState = (
@@ -319,7 +323,7 @@ export class ExplorationWarningsService {
     this.checkpointCountWarning = '';
     this.hasCriticalStateWarning = false;
 
-    let _extendStateWarnings = (stateName, newWarning) => {
+    let _extendStateWarnings = (stateName: string, newWarning: string) => {
       if (this.stateWarnings.hasOwnProperty(stateName)) {
         this.stateWarnings[stateName].push(newWarning);
       } else {
@@ -339,7 +343,8 @@ export class ExplorationWarningsService {
           _states.getState(stateName).interaction.id + 'ValidationService';
 
         let validatorService = this.injector.get(
-          INTERACTION_SERVICE_MAPPING[validatorServiceName]);
+          INTERACTION_SERVICE_MAPPING[
+            validatorServiceName as keyof typeof INTERACTION_SERVICE_MAPPING]);
 
         let interactionWarnings = validatorService.getAllWarnings(
           stateName, interaction.customizationArgs,
@@ -413,18 +418,21 @@ export class ExplorationWarningsService {
     }
 
     let initStateName = this.explorationInitStateNameService.displayed;
-    let initState = _states.getState((initStateName) as string);
+    let initState = _states.getState(initStateName as string);
     if (initState && !initState.cardIsCheckpoint) {
       _extendStateWarnings(
-        initStateName, AppConstants.CHECKPOINT_ERROR_MESSAGES.INIT_CARD);
+        initStateName as string,
+        AppConstants.CHECKPOINT_ERROR_MESSAGES.INIT_CARD);
     }
 
-    let nonInitialCheckpointStateNames = [];
+    let nonInitialCheckpointStateNames: string[] = [];
     let terminalStateCount = 0;
     _states.getStateNames().forEach(stateName => {
       let state = _states.getState(stateName);
       let interactionId = state.interaction.id;
-      if (interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
+      if (Boolean(interactionId) && INTERACTION_SPECS[
+        interactionId as InteractionSpecsKey
+      ].is_terminal) {
         if (state.cardIsCheckpoint && stateName !== initStateName) {
           _extendStateWarnings(
             stateName, AppConstants.CHECKPOINT_ERROR_MESSAGES.TERMINAL_CARD);
@@ -447,9 +455,9 @@ export class ExplorationWarningsService {
     }
 
     for (let i in nonInitialCheckpointStateNames) {
-      let links = _graphData.links;
-      let newLinks = [];
-      let newNodes = _graphData.nodes;
+      let links: GraphLink[] = _graphData.links;
+      let newLinks: GraphLink[] = [];
+      let newNodes: GraphNodes = _graphData.nodes;
       delete newNodes[nonInitialCheckpointStateNames[i]];
 
       links.forEach(edge => {
@@ -464,7 +472,9 @@ export class ExplorationWarningsService {
       let terminalUnreachableStateCount = 0;
       unreachableNodeNames.forEach((stateName) => {
         let interactionId = _states.getState(stateName).interaction.id;
-        if (interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
+        if (Boolean(interactionId) && INTERACTION_SPECS[
+          interactionId as InteractionSpecsKey
+        ].is_terminal) {
           terminalUnreachableStateCount++;
         }
       });
@@ -511,7 +521,7 @@ export class ExplorationWarningsService {
     return this._warningsList.length;
   }
 
-  getAllStateRelatedWarnings(): object {
+  getAllStateRelatedWarnings(): Record<string, string[]> {
     return this.stateWarnings;
   }
 

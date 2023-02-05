@@ -19,7 +19,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
@@ -28,25 +27,18 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditabilityService } from 'services/editability.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { QuestionEditorComponent } from './question-editor.component';
-
-class MockNgbModal {
-  open() {
-    return {
-      result: Promise.resolve()
-    };
-  }
-}
 
 describe('Question Editor Component', () => {
   let component: QuestionEditorComponent;
   let fixture: ComponentFixture<QuestionEditorComponent>;
-  let ngbModal: NgbModal;
   let questionObjectFactory: QuestionObjectFactory;
   let editabilityService: EditabilityService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
   let questionUpdateService: QuestionUpdateService;
+  let generateContentIdService: GenerateContentIdService;
   let question = null;
 
   beforeEach(waitForAsync(() => {
@@ -61,10 +53,7 @@ describe('Question Editor Component', () => {
         StateEditorService,
         StateInteractionIdService,
         QuestionUpdateService,
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal
-        }
+        GenerateContentIdService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -79,7 +68,7 @@ describe('Question Editor Component', () => {
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     editabilityService = TestBed.inject(EditabilityService);
     questionUpdateService = TestBed.inject(QuestionUpdateService);
-    ngbModal = TestBed.inject(NgbModal);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
 
     question = questionObjectFactory.createFromBackendDict({
       id: '1',
@@ -103,7 +92,7 @@ describe('Question Editor Component', () => {
               missing_prerequisite_skill_id: null,
             },
             rule_specs: [],
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null
           }],
           confirmed_unclassified_answers: [],
@@ -120,7 +109,7 @@ describe('Question Editor Component', () => {
             }
           },
           default_outcome: {
-            dest: null,
+            dest: 'dest',
             dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
@@ -166,24 +155,13 @@ describe('Question Editor Component', () => {
             }
           }
         },
-        written_translations: {
-          translations_mapping: {
-            content: {
-              en: {
-                data_format: '',
-                needs_update: false,
-                translation: ''
-              }
-            }
-          }
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: null,
       },
-      inapplicable_skill_misconception_ids: null,
+      next_content_id_index: 1,
+      inapplicable_skill_misconception_ids: [],
       language_code: 'en',
       linked_skill_ids: [],
       question_state_data_schema_version: 44,
@@ -207,7 +185,7 @@ describe('Question Editor Component', () => {
   });
 
   it('should set component properties on initialization', () => {
-    expect(component.oppiaBlackImgUrl).toBe(undefined);
+    expect(component.oppiaBlackImgUrl).toBeUndefined();
     expect(component.interactionIsShown).toBe(undefined);
     expect(component.stateEditorIsInitialized).toBe(undefined);
 
@@ -333,10 +311,10 @@ describe('Question Editor Component', () => {
   it('should save interaction answer groups when interaction is saved', () => {
     spyOn(stateEditorService, 'setInteractionAnswerGroups');
 
-    component.saveInteractionAnswerGroups(null);
+    component.saveInteractionAnswerGroups([]);
 
     expect(stateEditorService.setInteractionAnswerGroups).toHaveBeenCalledWith(
-      null
+      []
     );
   });
 
@@ -362,6 +340,10 @@ describe('Question Editor Component', () => {
   it('should set interaction solution when interaction is saved', () => {
     spyOn(stateEditorService, 'setInteractionSolution');
 
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'ExplorationHtmlFormatterService'." We need to suppress this error
+    // because of the need to test validations.
+    // @ts-ignore
     let solution = new Solution(null, null, null, null);
     component.saveSolution(solution);
 
@@ -388,24 +370,33 @@ describe('Question Editor Component', () => {
       .toHaveBeenCalledWith(['InapplicableID']);
   });
 
-  it('should save next content ID index when interaction is saved', () => {
-    expect(component.questionStateData.nextContentIdIndex).toBe(null);
+  it('should save next content ID index after generating new id', () => {
+    component.ngOnInit();
 
-    component.saveNextContentIdIndex(2);
+    expect(component.nextContentIdIndexDisplayedValue).toBe(1);
+    expect(component.nextContentIdIndexMemento).toBe(1);
 
-    expect(component.questionStateData.nextContentIdIndex).toBe(2);
+    generateContentIdService.getNextStateId('interaction');
+    component.saveNextContentIdIndex();
+
+    expect(component.nextContentIdIndexDisplayedValue).toBe(2);
+    expect(component.nextContentIdIndexMemento).toBe(2);
   });
 
-  it('should show mark all audio needing update modal and mark all unflagged' +
-    ' voiceovers and translations as needing update', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
-    } as NgbModalRef);
+  it('should restore next content ID index if needed', () => {
+    component.ngOnInit();
 
-    component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['content']);
-    tick();
+    expect(component.nextContentIdIndexDisplayedValue).toBe(1);
+    expect(component.nextContentIdIndexMemento).toBe(1);
 
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(questionUpdateService.setQuestionStateData).toHaveBeenCalled();
-  }));
+    generateContentIdService.getNextStateId('interaction');
+
+    expect(component.nextContentIdIndexDisplayedValue).toBe(2);
+    expect(component.nextContentIdIndexMemento).toBe(1);
+
+    generateContentIdService.revertUnusedContentIdIndex();
+
+    expect(component.nextContentIdIndexDisplayedValue).toBe(1);
+    expect(component.nextContentIdIndexMemento).toBe(1);
+  });
 });

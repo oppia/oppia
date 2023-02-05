@@ -47,7 +47,8 @@ interface UserDisplayedStatistic {
 
 @Component({
   selector: 'oppia-profile-page',
-  templateUrl: './profile-page.component.html'
+  templateUrl: './profile-page.component.html',
+  styleUrls: ['./profile-page.component.css']
 })
 export class ProfilePageComponent {
   DEFAULT_PROFILE_PICTURE_URL: string = '';

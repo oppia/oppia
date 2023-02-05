@@ -42,8 +42,8 @@ from core.domain import user_services
 from core.platform import models
 
 from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Match, Optional, Sequence,
-    Set, Tuple, Union, cast, overload
+    Callable, Dict, Final, List, Literal, Mapping, Match, Optional,
+    Sequence, Set, Tuple, Union, cast, overload
 )
 
 MYPY = False
@@ -982,7 +982,9 @@ def get_reviewable_translation_suggestions_by_offset(
     user_id: str,
     opportunity_summary_exp_ids: Optional[List[str]],
     limit: Optional[int],
-    offset: int
+    offset: int,
+    sort_key: Optional[str],
+    language: Optional[str] = None
 ) -> Tuple[List[suggestion_registry.SuggestionTranslateContent], int]:
     """Returns a list of translation suggestions matching the
      passed opportunity IDs which the user can review.
@@ -998,8 +1000,11 @@ def get_reviewable_translation_suggestions_by_offset(
             IDs are fetched.
         limit: int|None. The maximum number of results to return. If None,
             all available results are returned.
+        sort_key: str|None. The key to sort the suggestions by.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
+        language: str. ISO 639-1 language code for which to filter. If it is
+            None, all available languages will be returned.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1012,6 +1017,11 @@ def get_reviewable_translation_suggestions_by_offset(
         user_id)
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
+
+    # No language means all languages.
+    if language is not None:
+        language_codes = [language] if language in language_codes else []
+
     # The user cannot review any translations, so return early.
     if len(language_codes) == 0:
         return [], offset
@@ -1024,14 +1034,20 @@ def get_reviewable_translation_suggestions_by_offset(
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_translation_suggestions_by_offset(
-                limit, offset,
-                user_id, language_codes))
+                limit,
+                offset,
+                user_id,
+                sort_key,
+                language_codes))
     elif len(opportunity_summary_exp_ids) > 0:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_translation_suggestions_with_exp_ids_by_offset(
-                limit, offset,
-                user_id, language_codes,
+                limit,
+                offset,
+                user_id,
+                sort_key,
+                language_codes,
                 opportunity_summary_exp_ids))
 
     translation_suggestions = []
@@ -1050,7 +1066,8 @@ def get_reviewable_translation_suggestions_by_offset(
 def get_reviewable_question_suggestions_by_offset(
     user_id: str,
     limit: int,
-    offset: int
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
     """Returns a list of question suggestions which the user
        can review.
@@ -1060,6 +1077,7 @@ def get_reviewable_question_suggestions_by_offset(
         limit: int. The maximum number of results to return.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
+        sort_key: str|None. The key to sort the suggestions by.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1070,7 +1088,8 @@ def get_reviewable_question_suggestions_by_offset(
     """
     suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel
-        .get_in_review_question_suggestions_by_offset(limit, offset, user_id))
+        .get_in_review_question_suggestions_by_offset(
+            limit, offset, user_id, sort_key))
 
     question_suggestions = []
     for suggestion_model in suggestions:
@@ -1503,7 +1522,8 @@ def get_submitted_suggestions_by_offset(
     user_id: str,
     suggestion_type: Literal['add_question'],
     limit: int,
-    offset: int
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[
     Sequence[suggestion_registry.SuggestionAddQuestion], int
 ]: ...
@@ -1514,7 +1534,8 @@ def get_submitted_suggestions_by_offset(
     user_id: str,
     suggestion_type: Literal['translate_content'],
     limit: int,
-    offset: int
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[
     Sequence[suggestion_registry.SuggestionTranslateContent], int
 ]: ...
@@ -1522,12 +1543,20 @@ def get_submitted_suggestions_by_offset(
 
 @overload
 def get_submitted_suggestions_by_offset(
-    user_id: str, suggestion_type: str, limit: int, offset: int
+    user_id: str,
+    suggestion_type: str,
+    limit: int,
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
 
 
 def get_submitted_suggestions_by_offset(
-    user_id: str, suggestion_type: str, limit: int, offset: int
+    user_id: str,
+    suggestion_type: str,
+    limit: int,
+    offset: int,
+    sort_key: Optional[str]
 ) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
@@ -1538,6 +1567,7 @@ def get_submitted_suggestions_by_offset(
         limit: int. The maximum number of results to return.
         offset: int. The number of results to skip from the beginning
             of all results matching the query.
+        sort_key: str|None. The key to sort the suggestions by.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1552,7 +1582,8 @@ def get_submitted_suggestions_by_offset(
                 limit,
                 offset,
                 suggestion_type,
-                user_id))
+                user_id,
+                sort_key))
     suggestions = ([
         get_suggestion_from_model(s) for s in submitted_suggestion_models
     ])
@@ -1986,7 +2017,8 @@ def update_translation_suggestion(
 def update_question_suggestion(
     suggestion_id: str,
     skill_difficulty: float,
-    question_state_data: state_domain.StateDict
+    question_state_data: state_domain.StateDict,
+    next_content_id_index: int
 ) -> Optional[suggestion_registry.BaseSuggestion]:
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
@@ -1995,6 +2027,8 @@ def update_question_suggestion(
         suggestion_id: str. The id of the suggestion to be updated.
         skill_difficulty: double. The difficulty level of the question.
         question_state_data: obj. Details of the question.
+        next_content_id_index: int. The next content Id index for the question's
+            content.
 
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
@@ -2025,8 +2059,9 @@ def update_question_suggestion(
                             'question_state_data_schema_version']),
                     'linked_skill_ids': question_dict['linked_skill_ids'],
                     'inapplicable_skill_misconception_ids': (
-                        question_dict[
-                            'inapplicable_skill_misconception_ids'])
+                        suggestion.change.question_dict[
+                            'inapplicable_skill_misconception_ids']),
+                    'next_content_id_index': next_content_id_index
                 },
                 'skill_id': suggestion.change.skill_id,
                 'skill_difficulty': skill_difficulty
@@ -2437,6 +2472,7 @@ def update_translation_contribution_stats_at_submission(
         suggestion: Suggestion. The suggestion domain object that is being
             submitted.
     """
+    content_word_count = 0
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2446,9 +2482,14 @@ def update_translation_contribution_stats_at_submission(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     translation_contribution_stat_model = (
         suggestion_models.TranslationContributionStatsModel.get(
@@ -2494,6 +2535,7 @@ def update_translation_contribution_stats_at_review(
         suggestion: Suggestion. The suggestion domain object that is being
             reviewed.
     """
+    content_word_count = 0
     exp_opportunity = (
         opportunity_services.get_exploration_opportunity_summary_by_id(
             suggestion.target_id))
@@ -2503,9 +2545,14 @@ def update_translation_contribution_stats_at_review(
     assert exp_opportunity is not None
     topic_id = exp_opportunity.topic_id
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     suggestion_is_accepted = (
         suggestion.status == suggestion_models.STATUS_ACCEPTED
@@ -2571,6 +2618,7 @@ def update_translation_review_stats(
     Raises:
         Exception. The final_reviewer_id of the suggestion should not be None.
     """
+    content_word_count = 0
     if suggestion.final_reviewer_id is None:
         raise Exception(
             'The final_reviewer_id in the suggestion should not be None.'
@@ -2587,9 +2635,14 @@ def update_translation_review_stats(
         suggestion.status == suggestion_models.STATUS_ACCEPTED
     )
 
-    content_plain_text = html_cleaner.strip_html_tags(
-        suggestion.change.translation_html)
-    content_word_count = len(content_plain_text.split())
+    if isinstance(suggestion.change.translation_html, list):
+        for content in suggestion.change.translation_html:
+            content_plain_text = html_cleaner.strip_html_tags(content)
+            content_word_count += len(content_plain_text.split())
+    else:
+        content_plain_text = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html)
+        content_word_count = len(content_plain_text.split())
 
     translation_review_stat_model = (
         # This function is called when reviewing a translation and hence
@@ -2895,7 +2948,8 @@ def enqueue_contributor_ranking_notification_email_task(
     contribution_sub_type: str, language_code: str, rank_name: str,
 ) -> None:
     """Adds a 'send feedback email' (instant) task into the task queue.
-    Attributes:
+
+    Args:
         contributor_user_id: str. The ID of the contributor.
         contribution_type: str. The type of the contribution i.e.
             translation or question.
@@ -2941,3 +2995,200 @@ def enqueue_contributor_ranking_notification_email_task(
     taskqueue_services.enqueue_task(
         feconf.TASK_URL_CONTRIBUTOR_DASHBOARD_ACHIEVEMENT_NOTIFICATION_EMAILS,
         payload, 0)
+
+
+def generate_contributor_certificate_data(
+    username: str,
+    suggestion_type: str,
+    language_code: Optional[str],
+    from_date: datetime.datetime,
+    to_date: datetime.datetime
+) -> suggestion_registry.ContributorCertificateInfoDict:
+    """Returns data to generate the certificate.
+
+    Args:
+        username: str. The username of the contributor.
+        language_code: str|None. The language for which the contributions should
+            be considered.
+        suggestion_type: str. The type of suggestion that the certificate
+            needs to generate.
+        from_date: datetime.datetime. The start of the date range for which the
+            contributions were created.
+        to_date: datetime.datetime. The end of the date range for which the
+            contributions were created.
+
+    Returns:
+        ContributorCertificateInfoDict. Data to generate the certificate.
+
+    Raises:
+        Exception. The suggestion type is invalid.
+        Exception. There is no user for the given username.
+    """
+    user_id = user_services.get_user_id_from_username(username)
+    if user_id is None:
+        raise Exception('There is no user for the given username.')
+
+    if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        # For the suggestion_type translate_content, there should be a
+        # corresponding language_code.
+        assert isinstance(language_code, str)
+        data = _generate_translation_contributor_certificate_data(
+            language_code, from_date, to_date, user_id)
+
+    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+        data = _generate_question_contributor_certificate_data(
+            from_date, to_date, user_id)
+
+    else:
+        raise Exception('The suggestion type is invalid.')
+
+    return data.to_dict()
+
+
+def _generate_translation_contributor_certificate_data(
+    language_code: str,
+    from_date: datetime.datetime,
+    to_date: datetime.datetime,
+    user_id: str
+) -> suggestion_registry.ContributorCertificateInfo:
+    """Returns data to generate translation submitter certificate.
+
+    Args:
+        language_code: str. The language for which the contributions should
+            be considered.
+        from_date: datetime.datetime. The start of the date range for which
+            the contributions were created.
+        to_date: datetime.datetime. The end of the date range for which
+            the contributions were created.
+        user_id: str. The user ID of the contributor.
+
+    Returns:
+        ContributorCertificateInfo. Data to generate translation submitter
+        certificate.
+
+    Raises:
+        Exception. The language is invalid.
+    """
+    signature = feconf.TRANSLATION_TEAM_LEAD
+
+    # Adds one date to the to_date to make sure the contributions within
+    # the to_date are also counted for the certificate.
+    to_date_to_fetch_contributions = to_date + datetime.timedelta(days=1)
+
+    language = next(filter(
+        lambda lang: lang['id'] == language_code,
+        constants.SUPPORTED_AUDIO_LANGUAGES), None)
+    if language is None:
+        raise Exception('The provided language is invalid.')
+    language_description = language['description']
+    if ' (' in language_description:
+        language_description = language_description[
+            language_description.find('(') + 1:language_description.find(')')]
+
+    suggestions = (
+        suggestion_models.GeneralSuggestionModel
+        .get_translation_suggestions_submitted_within_given_dates(
+            from_date,
+            to_date_to_fetch_contributions,
+            user_id,
+            language_code
+        )
+    )
+
+    words_count = 0
+    for model in suggestions:
+        suggestion = get_suggestion_from_model(model)
+
+        # Retrieve the html content that is emphasized on the
+        # Contributor Dashboard pages. This content is what stands
+        # out for each suggestion when a user views a list of
+        # suggestions.
+        get_html_representing_suggestion = (
+            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                suggestion.suggestion_type]
+        )
+        plain_text = _get_plain_text_from_html_content_string(
+            get_html_representing_suggestion(suggestion))
+
+        words = plain_text.split(' ')
+        words_without_empty_strings = [
+            word for word in words if word != '']
+        words_count += len(words_without_empty_strings)
+    # Go to the below link for more information about how we count hours
+    # contributed.# Goto the below link for more information.
+    # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
+    hours_contributed = round(words_count / 300, 2)
+
+    if words_count == 0:
+        raise Exception(
+            'There are no contributions for the given time range.')
+
+    return suggestion_registry.ContributorCertificateInfo(
+        from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),
+        signature, str(hours_contributed), language_description
+    )
+
+
+def _generate_question_contributor_certificate_data(
+    from_date: datetime.datetime,
+    to_date: datetime.datetime,
+    user_id: str
+) -> suggestion_registry.ContributorCertificateInfo:
+    """Returns data to generate question submitter certificate.
+
+    Args:
+        from_date: datetime.datetime. The start of the date range for which
+            the contributions were created.
+        to_date: datetime.datetime. The end of the date range for which
+            the contributions were created.
+        user_id: str. The user ID of the contributor.
+
+    Returns:
+        ContributorCertificateInfo. Data to generate question submitter
+        certificate.
+
+    Raises:
+        Exception. The suggestion type given to generate the certificate is
+            invalid.
+    """
+    signature = feconf.QUESTION_TEAM_LEAD
+
+    # Adds one date to the to_date to make sure the contributions within
+    # the to_date are also counted for the certificate.
+    to_date_to_fetch_contributions = to_date + datetime.timedelta(days=1)
+
+    suggestions = (
+        suggestion_models.GeneralSuggestionModel
+            .get_question_suggestions_submitted_within_given_dates(
+                from_date, to_date_to_fetch_contributions, user_id))
+
+    minutes_contributed = 0
+    for model in suggestions:
+        suggestion = get_suggestion_from_model(model)
+        # Retrieve the html content that is emphasized on the
+        # Contributor Dashboard pages. This content is what stands
+        # out for each suggestion when a user views a list of
+        # suggestions.
+        get_html_representing_suggestion = (
+            SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS[
+                suggestion.suggestion_type]
+        )
+        html_content = get_html_representing_suggestion(suggestion)
+
+        if 'oppia-noninteractive-image' in html_content:
+            minutes_contributed += 20
+        else:
+            minutes_contributed += 12
+    # Go to the below link for more information about how we count hours
+    # contributed.
+    # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit?usp=sharing
+    hours_contributed = round(minutes_contributed / 60, 2)
+
+    if minutes_contributed == 0:
+        raise Exception(
+            'There are no contributions for the given time range.')
+
+    return suggestion_registry.ContributorCertificateInfo(
+        from_date.strftime('%d %b %Y'), to_date.strftime('%d %b %Y'),
+        signature, str(hours_contributed), None
+    )

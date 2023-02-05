@@ -43,8 +43,8 @@ import {
 // https://webpack.js.org/guides/dependency-management/#context-module-api
 // as a reference.
 interface RequireContext {
-  context(
-      directory: string, useSubdirectories: boolean, regExp: RegExp): Context;
+  context: (
+      directory: string, useSubdirectories: boolean, regExp: RegExp) => Context;
 }
 
 interface Context {

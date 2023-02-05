@@ -27,7 +27,10 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
   providedIn: 'root'
 })
 export class GraphDataService {
-  _graphData: GraphData | null = null;
+  // This property is initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  _graphData!: GraphData;
   updateGraphData = new EventEmitter();
 
   constructor(

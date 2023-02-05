@@ -41,7 +41,8 @@ interface AudioLangaugeChoice {
 
 @Component({
   selector: 'oppia-preferences-page',
-  templateUrl: './preferences-page.component.html'
+  templateUrl: './preferences-page.component.html',
+  styleUrls: ['./preferences-page.component.css']
 })
 export class PreferencesPageComponent {
   // These properties are initialized using Angular lifecycle hooks

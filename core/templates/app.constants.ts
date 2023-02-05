@@ -50,6 +50,9 @@ export const AppConstants = {
   EXPLORATION_DATA_URL_TEMPLATE: '/explorehandler/init/<exploration_id>',
   EXPLORATION_VERSION_DATA_URL_TEMPLATE: (
     '/explorehandler/init/<exploration_id>?v=<version>'),
+  ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE: (
+    '/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/' +
+    '<language_code>'),
   EXPLORATION_PROGRESS_PID_URL_TEMPLATE: (
     '/explorehandler/init/<exploration_id>?pid=<pid>'),
 
@@ -210,5 +213,27 @@ export const AppConstants = {
   CONTRIBUTION_STATS_TYPE_TRANSLATION: 'translation',
   CONTRIBUTION_STATS_TYPE_QUESTION: 'question',
   CONTRIBUTION_STATS_SUBTYPE_SUBMISSION: 'submission',
-  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review'
+  CONTRIBUTION_STATS_SUBTYPE_REVIEW: 'review',
+  CONTRIBUTION_STATS_SUBTYPE_CORRECTION: 'correction',
+  CONTRIBUTION_STATS_TYPES: {
+    TRANSLATION_CONTRIBUTION: {
+      NAME: 'translationContribution',
+      DISPLAY_NAME: 'Translation Contributions'
+    },
+    TRANSLATION_REVIEW: {
+      NAME: 'translationReview',
+      DISPLAY_NAME: 'Translation Reviews'
+    },
+    QUESTION_CONTRIBUTION: {
+      NAME: 'questionContribution',
+      DISPLAY_NAME: 'Question Contributions'
+    },
+    QUESTION_REVIEW: {
+      NAME: 'questionReview',
+      DISPLAY_NAME: 'Question Reviews'
+    }
+  },
+  CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500],
+  CONTRIBUTOR_CERTIFICATE_LOGO:
+    '/assets/images/contributor_dashboard/oppia-logo.jpg'
 } as const;

@@ -183,6 +183,7 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
 
     else:
         build.main(args=[])
+        common.run_ng_compilation()
         run_webpack_compilation(source_maps=source_maps)
 
 

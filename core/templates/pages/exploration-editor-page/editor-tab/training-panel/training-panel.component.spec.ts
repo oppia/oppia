@@ -27,6 +27,8 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
 import { TrainingDataService } from './training-data.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { ResponsesService } from '../services/responses.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 class MockNgbModal {
   open() {
@@ -49,7 +51,7 @@ class MockExplorationStatesService {
 }
 
 class MockTrainingDataService {
-  getAllPotentialOutcomes(item) {
+  getAllPotentialOutcomes() {
     return [];
   }
 }
@@ -59,6 +61,7 @@ describe('Training Panel Component', () => {
   let fixture: ComponentFixture<TrainingPanelComponent>;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let responsesService: ResponsesService;
+  let generateContentIdService: GenerateContentIdService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -97,16 +100,22 @@ describe('Training Panel Component', () => {
     explorationHtmlFormatterService =
       TestBed.inject(ExplorationHtmlFormatterService);
     responsesService = TestBed.inject(ResponsesService);
-
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    generateContentIdService.init(() => 0, () => { });
     spyOn(explorationHtmlFormatterService, 'getAnswerHtml')
       .and.returnValue('answerTemplate');
 
     component.classification = {
       answerGroupIndex: 0,
       newOutcome: new Outcome(
-        'dest', null, null, true, [], '', '')
+        'dest', '', new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+        true, [], '', '')
     };
     component.addingNewResponse = false;
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'InteractionAnswer'." We need to suppress this error because of the
+    // need to test validations.
+    // @ts-ignore
     component.answer = null;
     component.ngOnInit();
 
@@ -129,9 +138,11 @@ describe('Training Panel Component', () => {
   it('should add new feedback and select it', () => {
     component.allOutcomes = [
       new Outcome(
-        'dest', null, null, true, [], '', ''),
+        'dest', '', new SubtitledHtml('<p>Saved Outcome</p>', 'Id'), true,
+        [], '', ''),
       new Outcome(
-        'dest', null, null, true, [], '', '')
+        'dest', '', new SubtitledHtml('<p>Saved Outcome</p>', 'Id'), true,
+        [], '', '')
     ];
     spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(0);
     expect(component.allOutcomes.length).toBe(2);

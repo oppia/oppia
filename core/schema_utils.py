@@ -26,6 +26,7 @@ following Python types: bool, dict, float, int, list, unicode.
 
 from __future__ import annotations
 
+import io
 import numbers
 import re
 import urllib
@@ -37,6 +38,8 @@ from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import user_domain
 from extensions.objects.models import objects
+
+import mutagen
 
 from typing import Any, Callable, Dict, List, Optional, cast
 
@@ -790,4 +793,39 @@ class _Validators:
             if choice['html'] in seen_choices:
                 return False
             seen_choices.append(choice['html'])
+        return True
+
+    @staticmethod
+    def is_valid_audio_file(obj: bytes) -> bool:
+        """Checks if given audio file is a valid audio file.
+
+        Args:
+            obj: str. The raw audio file to validate.
+
+        Returns:
+            bool. Returns True if obj is a valid audio file.
+
+        Raises:
+            Exception. The obj is not a valid audio file.
+        """
+        if not obj:
+            raise Exception('No audio supplied')
+        tempbuffer = io.BytesIO()
+        tempbuffer.write(obj)
+        tempbuffer.seek(0)
+
+        # .mp3 is the only allowed extension.
+        extension = 'mp3'
+        try:
+            audio = mutagen.mp3.MP3(tempbuffer)
+        except mutagen.MutagenError as e:
+            raise Exception(
+                'Audio not recognized as a %s file' % extension
+            ) from e
+
+        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
+            raise Exception(
+                'Audio files must be under %s seconds in length. The uploaded '
+                'file is %.2f seconds long.' % (
+                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
         return True

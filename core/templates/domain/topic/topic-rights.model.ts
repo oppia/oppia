@@ -86,12 +86,4 @@ export class TopicRights {
       topicRightsBackendObject.can_edit_topic
     );
   }
-
-  // This creates an interstitial topic rights object which acts as a
-  // placeholder until the actual topic rights object is fetched from
-  // the backend. Since it is acting as a placeholder, it should be valid and
-  // hence the most restrictive rights are given to the object.
-  static createInterstitialRights(): TopicRights {
-    return new TopicRights(false, false, false);
-  }
 }

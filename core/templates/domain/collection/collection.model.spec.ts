@@ -25,7 +25,7 @@ describe('Collection model', () => {
   let _sampleCollection: Collection;
 
   beforeEach(() => {
-    var sampleCollectionBackendObject = {
+    let sampleCollectionBackendObject = {
       id: 'sample_collection_id',
       title: 'a title',
       objective: 'an objective',

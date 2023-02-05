@@ -108,7 +108,7 @@ describe('Skill question tab component', () => {
 
   it('should not initialize when skill is not available', () => {
     const fetchSkillSpy = spyOn(
-      skillEditorStateService, 'getSkill').and.returnValue(undefined);
+      skillEditorStateService, 'getSkill');
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
 
     component.ngOnInit();

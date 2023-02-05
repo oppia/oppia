@@ -29,16 +29,14 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Any, Dict, Final, List, TypedDict
+from typing import Dict, Final, List, TypedDict, Union, cast
 
 
-# TODO(#15982): Here we use type Any because `customization_args` can accept
-# various data types.
 class ComponentsDict(TypedDict):
     """Dictionary that represents RTE Components."""
 
     id: str
-    customization_args: Dict[str, Any]
+    customization_args: Dict[str, Union[str, int, str, bool, Dict[str, str]]]
 
 
 def filter_a(tag: str, name: str, value: str) -> bool:
@@ -151,13 +149,22 @@ def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
 
     for rte_comp in all_rte_components:
         if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
-            filenames.append(
-                rte_comp['customization_args']['filepath-with-value'])
+            # Here we use cast because the above 'if' condition forces
+            # 'filepath' customization arg to have type str.
+            filename = cast(
+                str, rte_comp['customization_args']['filepath-with-value']
+            )
+            filenames.append(filename)
         elif ('id' in rte_comp and
               rte_comp['id'] == 'oppia-noninteractive-math'):
-            filenames.append(
-                rte_comp['customization_args']['math_content-with-value'][
-                    'svg_filename'])
+            # Here we use cast because the above 'elif' condition forces
+            # 'math_content' customization arg to have type Dict[str, str].
+            content_to_filename_dict = cast(
+                Dict[str, str],
+                rte_comp['customization_args']['math_content-with-value']
+            )
+            filename = content_to_filename_dict['svg_filename']
+            filenames.append(filename)
 
     return list(set(filenames))
 

@@ -44,8 +44,11 @@ export class StateTopAnswersStatsService {
   private initializationHasStarted: boolean;
   private topAnswersStatsByStateName: Map<string, AnswerStatsEntry>;
 
-  private resolveInitPromise: () => void;
-  private rejectInitPromise: (_) => void;
+  // These properties are initialized using int method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private resolveInitPromise!: () => void;
+  private rejectInitPromise!: (_: Error) => void;
   private initPromise: Promise<void>;
 
   constructor(
@@ -80,7 +83,7 @@ export class StateTopAnswersStatsService {
         }
         this.resolveInitPromise();
       } catch (error) {
-        this.rejectInitPromise(error);
+        this.rejectInitPromise(error as Error);
       }
     }
     return this.initPromise;
@@ -99,10 +102,11 @@ export class StateTopAnswersStatsService {
   }
 
   getStateStats(stateName: string): AnswerStats[] {
-    if (!this.hasStateStats(stateName)) {
+    let topAnswersStats = this.topAnswersStatsByStateName.get(stateName);
+    if (!this.hasStateStats(stateName) || !topAnswersStats) {
       throw new Error(stateName + ' does not exist.');
     }
-    return [...this.topAnswersStatsByStateName.get(stateName).answers];
+    return [...topAnswersStats.answers];
   }
 
   getUnresolvedStateStats(stateName: string): AnswerStats[] {
@@ -118,7 +122,7 @@ export class StateTopAnswersStatsService {
 
   onStateAdded(stateName: string): void {
     this.topAnswersStatsByStateName.set(
-      stateName, new AnswerStatsEntry([], null));
+      stateName, new AnswerStatsEntry([], ''));
   }
 
   onStateDeleted(stateName: string): void {
@@ -126,8 +130,11 @@ export class StateTopAnswersStatsService {
   }
 
   onStateRenamed(oldStateName: string, newStateName: string): void {
-    this.topAnswersStatsByStateName.set(
-      newStateName, this.topAnswersStatsByStateName.get(oldStateName));
+    let topAnswersStats = this.topAnswersStatsByStateName.get(oldStateName);
+    if (topAnswersStats === undefined) {
+      throw new Error(oldStateName + ' does not exist.');
+    }
+    this.topAnswersStatsByStateName.set(newStateName, topAnswersStats);
     this.topAnswersStatsByStateName.delete(oldStateName);
   }
 
@@ -138,15 +145,20 @@ export class StateTopAnswersStatsService {
   private refreshAddressedInfo(updatedState: State): void {
     const stateName = updatedState.name;
 
-    if (!this.topAnswersStatsByStateName.has(stateName)) {
+    if (stateName === null || !this.topAnswersStatsByStateName.has(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
 
-    const stateStats = this.topAnswersStatsByStateName.get(stateName);
+    const stateStats = this.topAnswersStatsByStateName.get(
+      stateName) as AnswerStatsEntry;
 
-    if (stateStats.interactionId !== updatedState.interaction.id) {
+    let interactionId = updatedState.interaction.id;
+    if (interactionId === null) {
+      throw new Error('Interaction ID cannot be null.');
+    }
+    if (stateStats.interactionId !== interactionId) {
       this.topAnswersStatsByStateName.set(
-        stateName, new AnswerStatsEntry([], updatedState.interaction.id));
+        stateName, new AnswerStatsEntry([], interactionId));
     } else {
       stateStats.answers.forEach(a => a.isAddressed = (
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(

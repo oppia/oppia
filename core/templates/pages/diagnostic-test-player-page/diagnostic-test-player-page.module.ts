@@ -38,6 +38,9 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.component';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { SummaryTilesModule } from 'components/summary-tile/summary-tile.module';
+
 
 declare var angular: ng.IAngularStatic;
 
@@ -54,7 +57,9 @@ declare var angular: ng.IAngularStatic;
     MatCardModule,
     MatTooltipModule,
     ReactiveFormsModule,
+    InteractionExtensionsModule,
     SharedComponentsModule,
+    SummaryTilesModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [

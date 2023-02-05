@@ -1,0 +1,88 @@
+<div *ngIf="isUnlocked && contributionType === 'question'" class="question-badge-container">
+  <img class="question-badge"
+       src="/assets/images/contributor_dashboard/question-{{contributionSubType}}-badge.component.svg">
+  <div class="question-badge-value">
+      {{contributionCount}}
+  </div>
+  <div class="question-badge-caption">
+      {{contributionSubTypeText}}
+  </div>
+</div>
+<div *ngIf="isUnlocked && contributionType === 'translation'"
+     class="translation-badge-container">
+  <img class="translation-badge"
+       src="/assets/images/contributor_dashboard/translation-{{contributionSubType}}-badge.component.svg">
+  <div class="translation-badge-value">
+    {{contributionCount}}
+  </div>
+  <div class="translation-badge-caption">
+    {{contributionSubTypeText}}
+  </div>
+  <div class="translation-badge-language"
+       [ngStyle]="{'font-size': fontSize, 'line-height': lineHeight}">
+    {{language}}
+  </div>
+</div>
+<div *ngIf="!isUnlocked"
+     ngbPopover="{{contributionCount}} more {{contributionSubTypeText.toLowerCase()}} to achieve this badge"
+     class="locked-badge-container"
+     container="body"
+     placement="bottom">
+  <img class="locked-badge"
+       src="/assets/images/contributor_dashboard/locked-badge.svg">
+</div>
+<style>
+  .locked-badge-container {
+    position: relative;
+    width: 90px;
+  }
+  .question-badge-container {
+    position: relative;
+    width: 100px;
+  }
+  .question-badge-value {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 100%;
+  }
+  .question-badge-caption {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 7px;
+    position: absolute;
+    text-align: center;
+    top: 70%;
+    width: 100%;
+  }
+  .translation-badge-container {
+    position: relative;
+    width: 100px;
+  }
+  .translation-badge-value {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    position: absolute;
+    text-align: center;
+    top: 22%;
+    width: 100%;
+  }
+  .translation-badge-caption {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 8px;
+    position: absolute;
+    text-align: center;
+    top: 46%;
+    width: 100%;
+  }
+  .translation-badge-language {
+    color: white;
+    height: 20px;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 71%;
+    width: 70px;
+  }
+</style>

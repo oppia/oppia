@@ -38,6 +38,7 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { TeachOppiaModalBackendApiService } from './teach-oppia-modal-backend-api.service';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 describe('Teach Oppia Modal Component', () => {
   let component: TeachOppiaModalComponent;
@@ -121,23 +122,19 @@ describe('Teach Oppia Modal Component', () => {
       voiceovers_mapping: {}
     },
     solicit_answer_details: false,
-    written_translations: {
-      translations_mapping: {}
-    },
     card_is_checkpoint: false,
-    next_content_id_index: 0
   };
 
   class MockTrainingDataService {
-    associateWithDefaultResponse(item) {}
+    associateWithDefaultResponse() {}
 
-    associateWithAnswerGroup(item) {}
+    associateWithAnswerGroup() {}
 
-    isConfirmedUnclassifiedAnswer(item) {}
+    isConfirmedUnclassifiedAnswer() {}
   }
 
   class MockTrainingModalService {
-    openTrainUnresolvedAnswerModal(item1, item2, item3) {}
+    openTrainUnresolvedAnswerModal() {}
 
     onFinishTrainingCallback = onchange;
   }
@@ -202,14 +199,14 @@ describe('Teach Oppia Modal Component', () => {
           answer: 'Answer Text',
           answerTemplate: '',
           classificationResult: new AnswerClassificationResult(
-            null, null, null, null),
+            {} as Outcome, 0, 0, ''),
           feedbackHtml: 'This is a html feedback'
         },
         {
           answer: 'Answer Text',
           answerTemplate: '',
           classificationResult: new AnswerClassificationResult(
-            null, null, null, null),
+            {} as Outcome, 0, 0, ''),
           feedbackHtml: 'This is a html feedback'
         }
       ];
@@ -233,7 +230,7 @@ describe('Teach Oppia Modal Component', () => {
       spyOn(responsesService, 'getConfirmedUnclassifiedAnswers').and
         .returnValue([]);
       spyOn(responsesService, 'getAnswerGroups').and
-        .returnValue([new AnswerGroup([], null, [], '')]);
+        .returnValue([new AnswerGroup([], {} as Outcome, [], '')]);
 
       spyOn(explorationHtmlFormatterService, 'getAnswerHtml').and
         .returnValue('');
@@ -281,14 +278,14 @@ describe('Teach Oppia Modal Component', () => {
             answer: 'Answer Text',
             answerTemplate: '',
             classificationResult: new AnswerClassificationResult(
-              null, null, null, 'default_outcome'),
+              {} as Outcome, 0, 0, 'default_outcome'),
             feedbackHtml: 'This is a html feedback'
           },
           {
             answer: 'Answer Text',
             answerTemplate: '',
             classificationResult: new AnswerClassificationResult(
-              null, null, null, 'default_outcome'),
+              {} as Outcome, 0, 0, 'default_outcome'),
             feedbackHtml: 'This is a html feedback'
           }
         ];
@@ -344,11 +341,11 @@ describe('Teach Oppia Modal Component', () => {
         false, [], '', '');
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(
-          new AnswerClassificationResult(outcome, null, null, 'Answers'));
+          new AnswerClassificationResult(outcome, 0, 0, 'Answers'));
       spyOn(trainingDataService, 'isConfirmedUnclassifiedAnswer')
         .and.returnValue(false);
       let unresolvedAnswers = [{
-        answer: null
+        answer: {} as InteractionAnswer,
       }];
       component.showUnresolvedAnswers(unresolvedAnswers);
     });
@@ -357,7 +354,7 @@ describe('Teach Oppia Modal Component', () => {
       fakeAsync(() => {
         let response = {
           data: {
-            unresolved_answers: null
+            unresolved_answers: [],
           }
         };
 

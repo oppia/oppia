@@ -34,13 +34,12 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-
 import './classroom-page.component.css';
-
 
 @Component({
   selector: 'oppia-classroom-page',
-  templateUrl: './classroom-page.component.html'
+  templateUrl: './classroom-page.component.html',
+  styleUrls: ['./classroom-page.component.css']
 })
 export class ClassroomPageComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -52,6 +51,9 @@ export class ClassroomPageComponent implements OnDestroy {
   classroomUrlFragment!: string;
   bannerImageFileUrl!: string;
   classroomData!: ClassroomData;
+  beginWithFirstTopicButtonText: string = '';
+  begineWithFirstTopicDescriptionText: string = '';
+  firstTopicUrl: string = '';
 
   constructor(
     private accessValidationBackendApiService:
@@ -91,6 +93,25 @@ export class ClassroomPageComponent implements OnDestroy {
         this.loaderService.hideLoadingScreen();
         this.classroomBackendApiService.onInitializeTranslation.emit();
         this.siteAnalyticsService.registerClassroomPageViewed();
+        if (classroomData && classroomData.getTopicSummaries().length > 0) {
+          let firstTopic = classroomData.getTopicSummaries()[0].name;
+          this.firstTopicUrl = '/learn/math/' + (
+            classroomData.getTopicSummaries()[0].urlFragment);
+
+          this.beginWithFirstTopicButtonText = this.translateService.instant(
+            'I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON', {
+              firstTopic: firstTopic
+            }
+          );
+
+          this.begineWithFirstTopicDescriptionText = (
+            this.translateService.instant(
+              'I18N_CLASSROOM_PAGE_NEW_TO_MATH_TEXT', {
+                firstTopic: firstTopic
+              }
+            )
+          );
+        }
       }, (errorResponse) => {
         if (AppConstants.FATAL_ERROR_CODES.indexOf(
           errorResponse.status) !== -1) {

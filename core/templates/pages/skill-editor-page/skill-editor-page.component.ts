@@ -58,6 +58,7 @@ export class SkillEditorPageComponent implements OnInit {
   skill: Skill;
   skillIsInitialized = false;
   directiveSubscriptions = new Subscription();
+  warningsAreShown = false;
 
   getActiveTabName(): string {
     return this.skillEditorRoutingService.getActiveTabName();

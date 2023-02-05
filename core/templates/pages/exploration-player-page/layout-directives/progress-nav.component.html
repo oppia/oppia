@@ -3,7 +3,7 @@
     even when the first button is not present. -->
   <div class="row-item row-item-previous-card">
     <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
-    <div *ngIf="hasPrevious && !helpCardHasContinueButton">
+    <div *ngIf="hasPrevious && !helpCardHasContinueButton && navigationThroughCardHistoryIsEnabled">
       <button mat-raised-button
               aria-label="Previous Card"
               (click)="validateIndexAndChangeCard(displayedCardIndex-1)"
@@ -12,7 +12,7 @@
       </button>
     </div>
   </div>
-  <div *ngIf="hasNext" class="row-item row-item-next-card">
+  <div *ngIf="hasNext && navigationThroughCardHistoryIsEnabled" class="row-item row-item-next-card">
     <button mat-raised-button
             (click)="validateIndexAndChangeCard(displayedCardIndex+1)"
             aria-label="Next Card"
@@ -22,6 +22,12 @@
   </div>
   <div *ngIf="!hasNext">
     <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button">
+      <button mat-button
+              class="btn btn-secondary  oppia-skip-button e2e-test-skip-question-button"
+              *ngIf="skipButtonIsShown"
+              (click)="skipCurrentQuestion()">
+        I don't know
+      </button>
       <!-- Special case for the 'Continue' interaction. -->
       <button mat-button
               *ngIf="interactionId === 'Continue'"
@@ -43,6 +49,12 @@
                            [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
                            [isLearnAgainButton]="isLearnAgainButton"
                            (clickContinueButton)="clickContinueButton.emit()"
+                           class="d-block continue-button">
+    </oppia-continue-button>
+    <oppia-continue-button *ngIf="!shouldContinueButtonBeShown() && showContinueToReviseButton"
+                           [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
+                           [isLearnAgainButton]="isLearnAgainButton"
+                           (clickContinueButton)="clickContinueToReviseButton.emit()"
                            class="d-block continue-button">
     </oppia-continue-button>
   </div>

@@ -21,14 +21,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ExplorationSnapshot } from '../history-tab/services/version-tree.service';
 
-interface HistoryTabDict {
+export interface HistoryTabDict {
   summaries: string[];
-  snapshots?: ExplorationSnapshot[];
+  snapshots: ExplorationSnapshot[];
 }
 
 interface HistoryTabCheckRevertValidDict {
   valid: boolean;
-  details: string | null;
+  details: string;
 }
 
 interface HistoryTabData{

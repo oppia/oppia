@@ -25,7 +25,7 @@
           <div *ngIf="stateHintsService.displayed.length > 0">
             <div cdkDropList
                  (cdkDropListDropped)="drop($event)"
-                 class="nav oppia-option-list-hint nav-stacked nav-pills">
+                 class="oppia-option-list-hint nav-stacked nav-pills">
               <div [cdkDragDisabled]="stateHintsService.getActiveHintIndex() === index ? true : false"
                    cdkDrag
                    *ngFor="let hint of stateHintsService.displayed; let index = index"
@@ -57,8 +57,7 @@
                   <div class="oppia-editor-card-section e2e-test-hint-body-{{index}}">
                     <oppia-hint-editor [hint]="hint"
                                        [indexPlusOne]="index + 1"
-                                       (saveHint)="onSaveInlineHint()"
-                                       (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                                       (saveHint)="onSaveInlineHint()">
                     </oppia-hint-editor>
                   </div>
                 </div>

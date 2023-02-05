@@ -89,7 +89,10 @@ CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
 CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 
-CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version' # pylint: disable=line-too-long
+CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_subtopic_schema_to_latest_version')
+CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_story_reference_schema_to_latest_version')
 
 
 class TopicChange(change_domain.BaseChange):
@@ -110,6 +113,8 @@ class TopicChange(change_domain.BaseChange):
         - 'update_subtopic_property' (with subtopic_id, property_name,
         new_value and old_value)
         - 'migrate_subtopic_schema_to_latest_version' (with
+        from_version and to_version)
+        - 'migrate_story_reference_schema_to_latest_version' (with
         from_version and to_version)
         - 'create_new' (with name)
     """
@@ -283,6 +288,13 @@ class TopicChange(change_domain.BaseChange):
         'deprecated_values': {}
     }, {
         'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],

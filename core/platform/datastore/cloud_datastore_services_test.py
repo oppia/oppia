@@ -17,11 +17,14 @@
 from __future__ import annotations
 
 import datetime
+import logging
 
 from core import feconf
 from core.platform import models
 from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
+
+from google.cloud import ndb
 
 from typing import Sequence, Tuple
 
@@ -140,6 +143,38 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
                     ('UserQueryModel', ['query_id'])
                 ]
             )
+
+    def test_get_multi_throws_error_on_failure(
+        self
+    ) -> None:
+        observed_log_messages = []
+
+        def _mock_logging_function(msg: str, *args: str) -> None:
+
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+        dummy_keys = [
+            ndb.Key('model1', 'id1'),
+            ndb.Key('model2', 'id2'),
+            ndb.Key('model3', 'id3')
+        ]
+        error_msg = (
+            'get_multi failed after %s retries' %
+            cloud_datastore_services.MAX_GET_RETRIES
+        )
+        with self.swap_to_always_raise(
+            ndb,
+            'get_multi',
+            Exception('Mock key error')
+        ), self.swap(logging, 'exception', _mock_logging_function):
+            with self.assertRaisesRegex(Exception, error_msg):
+                cloud_datastore_services.get_multi(dummy_keys)
+        self.assertEqual(
+            observed_log_messages,
+            ['Exception raised: Mock key error',
+            'Exception raised: Mock key error',
+            'Exception raised: Mock key error']
+        )
 
     def test_ndb_query_with_filters(self) -> None:
         user_query_model1 = user_models.UserQueryModel(

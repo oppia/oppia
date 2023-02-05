@@ -107,19 +107,10 @@ describe('Graph Data Service', () => {
         },
         linked_skill_id: null,
         solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            rule_input: {}
-          },
-        },
         classifier_model_id: '0',
         card_is_checkpoint: false,
-        next_content_id_index: 1
       },
-    });
+    }, false);
   });
 
   it('should recompute graph data', () => {
@@ -151,7 +142,7 @@ describe('Graph Data Service', () => {
     };
 
     graphDataService.recompute();
-    expect(graphDataService.getGraphData()).toBeNull();
+    expect(graphDataService.getGraphData()).toBeUndefined();
 
     explorationInitStateNameService.init('property_1');
     graphDataService.recompute();

@@ -27,117 +27,11 @@ from core.domain import customization_args_util
 from core.domain import interaction_registry
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Union
 
 
 class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
     """Test customization args generation and validation."""
-
-    def test_get_full_customization_args(self) -> None:
-        """Test get full customization args method."""
-        ca_continue_specs = interaction_registry.Registry.get_interaction_by_id(
-            'Continue').customization_arg_specs
-        complete_customization_args = {
-            'buttonText': {
-                'value': {
-                    'content_id': None,
-                    'unicode_str': 'Please Continue'
-                }
-            }
-        }
-
-        complete_customization_args_with_extra_arg: (
-            Dict[str, Dict[str, Union[str, Dict[str, Optional[str]]]]]
-        ) = {
-            'buttonText': {
-                'value': {
-                    'content_id': None,
-                    'unicode_str': 'Please Continue'
-                }
-            },
-            'extraArg': {'value': ''}
-        }
-
-        # Check if no new key is added to customization arg dict if all specs
-        # are present.
-        self.assertEqual(
-            complete_customization_args,
-            customization_args_util.get_full_customization_args(
-                complete_customization_args, ca_continue_specs
-            )
-        )
-
-        # Check if no new key is added to customization arg dict and extra keys
-        # are not removed if all specs are present.
-        self.assertEqual(
-            complete_customization_args_with_extra_arg,
-            customization_args_util.get_full_customization_args(
-                complete_customization_args_with_extra_arg,
-                ca_continue_specs
-            )
-        )
-
-        ca_fraction_input_specs = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'FractionInput').customization_arg_specs
-        )
-
-        incomplete_customization_args = {
-            'requireSimplestForm': {'value': False},
-            'allowNonzeroIntegerPart': {'value': False}
-        }
-
-        incomplete_customization_args_with_extra_arg: (
-            Dict[str, Dict[str, Union[str, bool]]]
-        ) = {
-            'requireSimplestForm': {'value': False},
-            'allowNonzeroIntegerPart': {'value': False},
-            'extraArg': {'value': ''}
-        }
-
-        expected_complete_customization_args = {
-            'requireSimplestForm': {'value': False},
-            'allowImproperFraction': {'value': True},
-            'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {
-                'value': {
-                    'content_id': None,
-                    'unicode_str': ''
-                }
-            }
-        }
-
-        expected_complete_customization_args_with_extra_arg = {
-            'requireSimplestForm': {'value': False},
-            'allowImproperFraction': {'value': True},
-            'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {
-                'value': {
-                    'content_id': None,
-                    'unicode_str': ''
-                }
-            },
-            'extraArg': {'value': ''}
-        }
-
-        # Check if missing specs are added to customization arg dict without
-        # making any other change.
-        self.assertEqual(
-            expected_complete_customization_args,
-            customization_args_util.get_full_customization_args(
-                incomplete_customization_args, ca_fraction_input_specs
-            )
-        )
-
-        # Check if missing specs are added to customization arg dict without
-        # making any other change and without removing extra args.
-        self.assertEqual(
-            expected_complete_customization_args_with_extra_arg,
-            customization_args_util.get_full_customization_args(
-                incomplete_customization_args_with_extra_arg,
-                ca_fraction_input_specs
-            )
-        )
 
     def test_validate_customization_args_and_values(self) -> None:
         """Test validate customization args and values method."""

@@ -35,4 +35,8 @@ describe('Diagnostic test player status service', () => {
   it('should access the test progress data', () => {
     expect(dtpss.onDiagnosticTestSessionProgressChange).toBeDefined();
   });
+
+  it('should access on skip question event', () => {
+    expect(dtpss.onDiagnosticTestSkipButtonClick).toBeDefined();
+  });
 });

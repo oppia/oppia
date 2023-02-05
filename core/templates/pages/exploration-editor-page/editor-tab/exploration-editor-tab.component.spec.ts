@@ -25,12 +25,12 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationDataService } from '../services/exploration-data.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
 import { ExplorationStatesService } from '../services/exploration-states.service';
@@ -42,19 +42,19 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
 import { ExplorationEditorTabComponent } from './exploration-editor-tab.component';
 import { DomRefService, JoyrideDirective, JoyrideOptionsService, JoyrideService, JoyrideStepsContainerService, JoyrideStepService, LoggerService, TemplatesService } from 'ngx-joyride';
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { Router } from '@angular/router';
 import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
-import { State } from 'domain/state/StateObjectFactory';
+import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { TranslationBackendDict } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ExplorationNextContentIdIndexService } from '../services/exploration-next-content-id-index.service';
+import { VersionHistoryService } from '../services/version-history.service';
+import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
   let fixture: ComponentFixture<ExplorationEditorTabComponent>;
-  let ngbModal: NgbModal;
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let editabilityService: EditabilityService;
   let explorationFeaturesService: ExplorationFeaturesService;
@@ -72,15 +72,14 @@ describe('Exploration editor tab component', () => {
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let focusManagerService: FocusManagerService;
   let contextService: ContextService;
+  var generateContentIdService: GenerateContentIdService;
+  var explorationNextContentIdIndexService:
+    ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
-
-  class MockNgbModal {
-    open() {
-      return {
-        result: Promise.resolve()
-      };
-    }
-  }
+  let versionHistoryService: VersionHistoryService;
+  let stateObjectFactory: StateObjectFactory;
+  let stateObject: StateBackendDict;
+  let versionHistoryBackendApiService: VersionHistoryBackendApiService;
 
   class MockJoyrideService {
     startTour() {
@@ -152,7 +151,6 @@ describe('Exploration editor tab component', () => {
       declarations: [
         JoyrideDirective,
         ExplorationEditorTabComponent,
-        MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent,
       ],
       providers: [
         JoyrideStepService,
@@ -174,10 +172,6 @@ describe('Exploration editor tab component', () => {
           useClass: MockJoyrideService,
         },
         {
-          provide: NgbModal,
-          useClass: MockNgbModal
-        },
-        {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
@@ -185,7 +179,8 @@ describe('Exploration editor tab component', () => {
               return;
             }
           }
-        }
+        },
+        VersionHistoryService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -197,11 +192,11 @@ describe('Exploration editor tab component', () => {
 
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
     hintObjectFactory = TestBed.inject(HintObjectFactory);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
-    ngbModal = TestBed.inject(NgbModal);
     stateEditorService = TestBed.inject(StateEditorService);
     stateCardIsCheckpointService = TestBed.inject(
       StateCardIsCheckpointService);
@@ -217,6 +212,12 @@ describe('Exploration editor tab component', () => {
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService);
     contextService = TestBed.inject(ContextService);
+    explorationNextContentIdIndexService = TestBed.inject(
+      ExplorationNextContentIdIndexService);
+    versionHistoryService = TestBed.inject(VersionHistoryService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    versionHistoryBackendApiService = TestBed.inject(
+      VersionHistoryBackendApiService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
     spyOn(contextService, 'getExplorationId').and.returnValue(
@@ -232,6 +233,57 @@ describe('Exploration editor tab component', () => {
     let element = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue((
       element as HTMLElement));
+    spyOn(
+      versionHistoryService, 'getLatestVersionOfExploration'
+    ).and.returnValue(3);
+
+    stateObject = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: false
+    };
 
     explorationStatesService.init({
       'First State': {
@@ -294,7 +346,6 @@ describe('Exploration editor tab component', () => {
           hints: []
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         recorded_voiceovers: {
@@ -308,15 +359,6 @@ describe('Exploration editor tab component', () => {
                 needs_update: false,
                 duration_secs: 1.2
               }
-            }
-          }
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {
-              en: {} as TranslationBackendDict
             }
           }
         }
@@ -381,18 +423,10 @@ describe('Exploration editor tab component', () => {
           hints: []
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        }
+        solicit_answer_details: false
       }
-    });
+    }, false);
 
     component.ngOnInit();
   });
@@ -441,8 +475,32 @@ describe('Exploration editor tab component', () => {
       expect(component.interactionIsShown).toBe(false);
     });
 
+  it('should correctly initialize generateContentIdService', () => {
+    explorationNextContentIdIndexService.init(5);
+
+    generateContentIdService.getNextStateId('content');
+    expect(explorationNextContentIdIndexService.displayed).toBe(6);
+    expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+
+    generateContentIdService.revertUnusedContentIdIndex();
+    expect(explorationNextContentIdIndexService.displayed).toBe(5);
+    expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+  });
+
+  it('should correctly save next contentId index', () => {
+    explorationNextContentIdIndexService.init(5);
+    generateContentIdService.getNextStateId('content');
+    expect(explorationNextContentIdIndexService.displayed).toBe(6);
+    expect(explorationNextContentIdIndexService.savedMemento).toBe(5);
+
+    component.saveNextContentIdIndex();
+
+    expect(explorationNextContentIdIndexService.displayed).toBe(6);
+    expect(explorationNextContentIdIndexService.savedMemento).toBe(6);
+  });
+
   it('should get state content placeholder text when init state name' +
-     ' is equal to active state name', () => {
+      ' is equal to active state name', () => {
     stateEditorService.setActiveStateName('First State');
     explorationInitStateNameService.init('First State');
 
@@ -513,18 +571,6 @@ describe('Exploration editor tab component', () => {
     component.saveInteractionId(newInteractionId);
 
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
-  });
-
-  it('should save state next content id index', () => {
-    stateEditorService.setActiveStateName('First State');
-    expect(
-      explorationStatesService.getState('First State').nextContentIdIndex
-    ).toEqual(0);
-
-    component.saveNextContentIdIndex(2);
-    expect(
-      explorationStatesService.getState('First State').nextContentIdIndex
-    ).toBe(2);
   });
 
   it('should save linked skill id', () => {
@@ -726,61 +772,6 @@ describe('Exploration editor tab component', () => {
     expect(stateEditorService.cardIsCheckpoint).toBe(true);
   });
 
-  it('should mark all audio as needing update when closing modal',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve()
-      } as NgbModalRef);
-      stateEditorService.setActiveStateName('First State');
-
-      expect(
-        explorationStatesService.getState('First State')
-          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-        false);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(undefined);
-
-      component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
-      tick();
-
-      expect(
-        explorationStatesService.getState('First State')
-          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-        true);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(true);
-
-      flush();
-    }));
-
-  it('should not mark all audio as needing update when dismissing modal',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject()
-      } as NgbModalRef);
-      stateEditorService.setActiveStateName('First State');
-
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(undefined);
-
-      component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
-
-      expect(
-        explorationStatesService.getState('First State')
-          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-        false);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(undefined);
-    }));
-
   it('should navigate to main tab in specific state name', () => {
     spyOn(routerService, 'navigateToMainTab');
 
@@ -806,7 +797,7 @@ describe('Exploration editor tab component', () => {
     const state = new State(
       'stateName', 'id', 'some', null,
       new Interaction([], [], null, null, [], 'id', null),
-      null, null, true, true, null, 7);
+      null, null, true, true);
     component.stateName = 'stateName';
 
     spyOn(explorationStatesService, 'getState').and.returnValues(
@@ -832,7 +823,7 @@ describe('Exploration editor tab component', () => {
     const state = new State(
       'stateName', 'id', 'some', null,
       new Interaction([], [], null, null, [], 'id', null),
-      null, null, true, true, null, 7);
+      null, null, true, true);
     component.stateName = 'stateName';
     spyOn(explorationStatesService, 'getState').and.returnValues(
       state
@@ -898,4 +889,48 @@ describe('Exploration editor tab component', () => {
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(component.tutorialInProgress).toBe(false);
   });
+
+  it('should get the last edited version number in case of error', () => {
+    versionHistoryService.insertStateVersionHistoryData(4, null, '');
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toEqual(4);
+  });
+
+  it('should fetch the version history data on initialization of state editor',
+    fakeAsync(() => {
+      stateEditorService.setActiveStateName('First State');
+      let stateData = stateObjectFactory.createFromBackendDict(
+        'State', stateObject);
+      spyOn(
+        versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+      ).and.resolveTo({
+        lastEditedVersionNumber: 2,
+        stateNameInPreviousVersion: 'State',
+        stateInPreviousVersion: stateData,
+        lastEditedCommitterUsername: 'some'
+      });
+
+      component.initStateEditor();
+      tick();
+      flush();
+
+      expect(
+        versionHistoryBackendApiService.fetchStateVersionHistoryAsync
+      ).toHaveBeenCalled();
+    }));
+
+  it('should show error message if the backend api fails', fakeAsync(() => {
+    stateEditorService.setActiveStateName('First State');
+    spyOn(
+      versionHistoryBackendApiService, 'fetchStateVersionHistoryAsync'
+    ).and.resolveTo(null);
+
+    expect(component.validationErrorIsShown).toBeFalse();
+
+    component.initStateEditor();
+    tick();
+    flush();
+
+    expect(component.validationErrorIsShown).toBeTrue();
+  }));
 });

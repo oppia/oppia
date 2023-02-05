@@ -670,7 +670,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_email_prefs.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-    def test_add_user_to_android_list(self) -> None:
+    def test_add_user_to_mailing_list(self) -> None:
         def _mock_add_or_update_user_status(
             unused_email: str,
             merge_fields: Dict[str, str],
@@ -689,8 +689,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             _mock_add_or_update_user_status)
         with fn_swap:
             self.assertTrue(
-                user_services.add_user_to_android_list(
-                    'email@example.com', 'Name'))
+                user_services.add_user_to_mailing_list(
+                    'email@example.com', 'Name', 'Android'))
 
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
@@ -2185,18 +2185,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_raises_error_if_none_destination_is_provided_for_checkpoint(
         self
     ) -> None:
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state_answer_group: List[state_domain.AnswerGroup] = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     None, None, state_domain.SubtitledHtml(
-                        'feedback_1', '<p>state outcome html</p>'),
+                        'feedback_2', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_1',
+                                'contentId': 'rule_input_3',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
                 ],
@@ -2218,13 +2219,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'destination', None, state_domain.SubtitledHtml(
-                        'feedback_1', '<p>state outcome html</p>'),
+                        'feedback_4', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_1',
+                                'contentId': 'rule_input_5',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
                 ],
@@ -2387,7 +2388,13 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
         dest: New state
         feedback:
@@ -2398,7 +2405,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: null
+      id: TextInput
       solution: null
     linked_skill_id: null
     next_content_id_index: 0
@@ -2407,6 +2414,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+        ca_placeholder_2: {}
     solicit_answer_details: false
     card_is_checkpoint: false
     written_translations:

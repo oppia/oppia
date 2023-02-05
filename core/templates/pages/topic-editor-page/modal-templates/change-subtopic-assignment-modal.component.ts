@@ -28,8 +28,12 @@ import { Subtopic } from 'domain/topic/subtopic.model';
 
 export class ChangeSubtopicAssignmentModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  subtopics: Subtopic[];
-  selectedSubtopicId: number;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  subtopics!: Subtopic[];
+  // Selected subtopic id is null when the user not selects any subtopic.
+  selectedSubtopicId!: number | null;
   constructor(
     private ngbActiveModal: NgbActiveModal,
   ) {
@@ -40,7 +44,7 @@ export class ChangeSubtopicAssignmentModalComponent
     this.selectedSubtopicId = null;
   }
 
-  changeSelectedSubtopic(subtopicId: number): void {
+  changeSelectedSubtopic(subtopicId: number | null): void {
     this.selectedSubtopicId = subtopicId;
   }
 }

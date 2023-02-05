@@ -1006,6 +1006,46 @@ describe('Classroom Admin Page component ', () => {
     }));
 
   it(
+    'should mark the topic dependency flag to false when all topics ' +
+    'are deleted', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {},
+          result: Promise.resolve()
+        } as NgbModalRef
+      );
+
+      component.topicIdsToTopicName = {
+        topicId1: 'Dummy topic 1',
+      };
+
+      component.topicNameToPrerequisiteTopicNames = {
+        'Dummy topic 1': []
+      };
+
+      component.tempClassroomData = (
+        ExistingClassroomData.createClassroomFromDict({
+          classroomId: 'classroomId',
+          name: 'math',
+          urlFragment: 'math',
+          courseDetails: '',
+          topicListIntro: '',
+          topicIdToPrerequisiteTopicIds: {
+            topicId1: []
+          }
+        }));
+      component.classroomData = cloneDeep(component.tempClassroomData);
+
+      component.topicDependencyIsLoaded = true;
+
+      component.deleteTopic('Dummy topic 1');
+      tick();
+
+      expect(component.topicIdsToTopicName).toEqual({});
+      expect(component.topicDependencyIsLoaded).toBeFalse();
+    }));
+
+  it(
     'should be able to handle rejection handler on topic deletion modal',
     fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue(

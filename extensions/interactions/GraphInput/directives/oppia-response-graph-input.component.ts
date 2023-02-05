@@ -24,7 +24,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/html-escaper.service.ts');
 
-require('interactions/interactions-extension.constants.ajs.ts');
+import 'interactions/interactions-extension.constants';
 import { Component, Input } from '@angular/core';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { HtmlEscaperService } from 'services/html-escaper.service';

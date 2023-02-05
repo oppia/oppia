@@ -27,7 +27,7 @@ import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.cons
 
 @Component({
   selector: 'oppia-learner-topic-summary-tile',
-  templateUrl: 'learner-topic-summary-tile.component.html'
+  templateUrl: './learner-topic-summary-tile.component.html'
 })
 export class LearnerTopicSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -39,6 +39,7 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   totalPublishedNodeCount!: number;
   topicTitle!: string;
   thumbnailBgColor!: string;
+  openInNewWindow = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,

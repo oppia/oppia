@@ -27,14 +27,14 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { AppConstants } from 'app.constants';
-import { AndroidUpdatesBackendApiService } from 'domain/android-updates/android-updates-backend-api.service';
+import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 
 import './android-page.component.css';
 
 @Component({
   selector: 'android-page',
   templateUrl: './android-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./android-page.component.css'],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
@@ -78,6 +78,9 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   featuresMainTextIsSeen = false;
   emailAddress: string | null = null;
   name: string | null = null;
+  userCanSubscribe: boolean = false;
+  userHasSubscribed: boolean = false;
+
   OPPIA_AVATAR_IMAGE_URL = (
     this.urlInterpolationService
       .getStaticImageUrl('/avatar/oppia_avatar_large_100px.svg'));
@@ -89,7 +92,7 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   constructor(
     private alertsService: AlertsService,
-    private androidUpdatesBackendApiService: AndroidUpdatesBackendApiService,
+    private mailingListBackendApiService: MailingListBackendApiService,
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
     private urlInterpolationService: UrlInterpolationService,
@@ -102,40 +105,11 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    if (this.windowDimensionsService.getWidth() < 1000) {
-      this.featuresShown = 1;
-    }
+    this.featuresShown = 0;
   }
 
   ngAfterViewInit(): void {
     this.setPageTitle();
-
-    const featuresSectionObserver = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        ++this.featuresShown;
-      }
-    });
-    const androidUpdatesSectionObserver = (
-      new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting && !this.androidUpdatesSectionIsSeen) {
-          this.androidUpdatesSectionIsSeen = true;
-        }
-      })
-    );
-    const featuresMainTextObserver = (
-      new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting && !this.featuresMainTextIsSeen) {
-          this.featuresMainTextIsSeen = true;
-        }
-      })
-    );
-    featuresSectionObserver.observe(this.featureRef1.nativeElement);
-    featuresSectionObserver.observe(this.featureRef2.nativeElement);
-    featuresSectionObserver.observe(this.featureRef3.nativeElement);
-    featuresSectionObserver.observe(this.featureRef4.nativeElement);
-    androidUpdatesSectionObserver.observe(
-      this.androidUpdatesSectionRef.nativeElement);
-    featuresMainTextObserver.observe(this.featuresMainTextRef.nativeElement);
   }
 
   changeFeaturesShown(featureNumber: number): void {
@@ -149,11 +123,13 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
   }
 
   subscribeToAndroidList(): void {
-    this.androidUpdatesBackendApiService.subscribeUserToAndroidList(
-      String(this.emailAddress), String(this.name)
+    this.mailingListBackendApiService.subscribeUserToMailingList(
+      String(this.emailAddress),
+      String(this.name),
+      AppConstants.MAILING_LIST_ANDROID_TAG
     ).then((status) => {
       if (status) {
-        this.alertsService.addInfoMessage('Done!', 1000);
+        this.userHasSubscribed = true;
       } else {
         this.alertsService.addInfoMessage(
           'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +

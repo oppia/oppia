@@ -19,7 +19,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -37,6 +37,7 @@ import './exploration-summary-tile.component.css';
 @Component({
   selector: 'oppia-exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
+  styleUrls: ['./exploration-summary-tile.component.css']
 })
 export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -106,7 +107,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
-    this.activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+    this.activityType = AppConstants.ACTIVITY_TYPE_EXPLORATION;
     let contributorsSummary: HumanReadableContributorsSummary = (
       this.contributorsSummary || {});
     this.contributors = Object.keys(

@@ -82,7 +82,7 @@ export class VersionTreeService {
    * in general or reverted version if commit is a reversion.
    * The parent of the root (version 1) is -1.
    */
-  getVersionTree(): {} {
+  getVersionTree(): Record<number, number> {
     if (this._treeParents === undefined) {
       throw new Error('version tree not initialized.');
     }

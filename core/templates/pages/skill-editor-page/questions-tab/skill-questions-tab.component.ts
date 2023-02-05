@@ -18,6 +18,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Rubric } from 'domain/skill/rubric.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Subscription } from 'rxjs';
 import { GroupedSkillSummaries, SkillEditorStateService } from '../services/skill-editor-state.service';
@@ -27,9 +28,12 @@ import { GroupedSkillSummaries, SkillEditorStateService } from '../services/skil
   templateUrl: './skill-questions-tab.component.html'
 })
 export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
-  skill: Skill;
-  groupedSkillSummaries: GroupedSkillSummaries;
-  skillIdToRubricsObject = {};
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  skill!: Skill;
+  groupedSkillSummaries!: GroupedSkillSummaries;
+  skillIdToRubricsObject: Record<string, Rubric[]> = {};
 
   constructor(
     private skillEditorStateService: SkillEditorStateService

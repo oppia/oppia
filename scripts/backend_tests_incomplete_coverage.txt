@@ -23,7 +23,6 @@ core.controllers.voice_artist_test
 core.domain.action_registry_test
 core.domain.app_feedback_report_domain_test
 core.domain.app_feedback_report_services_test
-core.domain.auth_services_test
 core.domain.beam_job_services_test
 core.domain.blog_domain_test
 core.domain.blog_services_test
@@ -46,13 +45,11 @@ core.domain.html_validation_service_test
 core.domain.image_validation_services_test
 core.domain.interaction_registry_test
 core.domain.learner_goals_services_test
-core.domain.learner_group_domain_test
 core.domain.learner_group_fetchers_test
 core.domain.learner_group_services_test
 core.domain.learner_playlist_services_test
 core.domain.learner_progress_services_test
 core.domain.opportunity_services_test
-core.domain.param_domain_test
 core.domain.platform_parameter_domain_test
 core.domain.platform_parameter_registry_test
 core.domain.playthrough_issue_registry_test
@@ -69,7 +66,6 @@ core.domain.skill_services_test
 core.domain.state_domain_test
 core.domain.stats_domain_test
 core.domain.stats_services_test
-core.domain.story_domain_test
 core.domain.story_fetchers_test
 core.domain.story_services_test
 core.domain.subtopic_page_domain_test
@@ -102,7 +98,6 @@ main_test
 scripts.build_test
 scripts.common_test
 scripts.concurrent_task_utils_test
-scripts.docstrings_checker_test
 scripts.install_python_prod_dependencies_test
 scripts.install_third_party_test
 scripts.linters.html_linter_test

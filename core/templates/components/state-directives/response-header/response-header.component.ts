@@ -50,7 +50,7 @@ export class ResponseHeaderComponent {
   constructor(
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    private editabilityService: EditabilityService,
+    public editabilityService: EditabilityService,
   ) {}
 
   returnToState(): void {

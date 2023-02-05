@@ -530,15 +530,6 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             self.system_user, '0')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
-        mock_accepted_audio_extensions = {
-            'mp3': ['audio/mp3'],
-            'flac': ['audio/flac']
-        }
-
-        self.accepted_audio_extensions_swap = self.swap(
-            feconf, 'ACCEPTED_AUDIO_EXTENSIONS',
-            mock_accepted_audio_extensions)
-
     def test_guest_can_not_upload(self) -> None:
         csrf_token = self.get_new_csrf_token()
 
@@ -572,7 +563,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
             upload_files=[('raw_audio_file', 'unused_filename', raw_audio)],
-            expected_status_int=404
+            expected_status_int=400
         )
         self.logout()
 
@@ -590,7 +581,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
             upload_files=[
-                ('raw_audio_file', self.TEST_AUDIO_FILE_MP3, raw_audio)]
+                ('raw_audio_file', self.TEST_AUDIO_FILE_MP3, raw_audio)],
+            expected_status_int=200
         )
         self.logout()
 
@@ -608,16 +600,21 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
-        with self.accepted_audio_extensions_swap:
-            self.post_json(
-                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-                {'filename': self.TEST_AUDIO_FILE_FLAC},
-                csrf_token=csrf_token,
-                upload_files=[
-                    ('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)]
-            )
-
-        self.assertTrue(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
+        response_dict = self.post_json(
+            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+            {'filename': self.TEST_AUDIO_FILE_FLAC},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=[
+                ('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)]
+        )
+        error_msg = (
+            'Schema validation for \'raw_audio_file\' failed: '
+            'Audio not recognized as a mp3 file\n'
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac')
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
@@ -627,28 +624,26 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         # Use an accepted audio extension in mismatched_filename
         # that differs from the uploaded file's audio type.
-        mismatched_filename = 'test.flac'
+        mismatched_filename = 'test.mp3'
         with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
             'rb', encoding=None
         ) as f:
             raw_audio = f.read()
 
-        with self.accepted_audio_extensions_swap:
-            response_dict = self.post_json(
-                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-                {'filename': mismatched_filename},
-                csrf_token=csrf_token,
-                expected_status_int=400,
-                upload_files=[
-                    ('raw_audio_file', mismatched_filename, raw_audio)]
-            )
-
+        response_dict = self.post_json(
+            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+            {'filename': mismatched_filename},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=[
+                ('raw_audio_file', mismatched_filename, raw_audio)]
+        )
         self.logout()
-        self.assertIn(
-            'Although the filename extension indicates the file is a flac '
-            'file, it was not recognized as one. Found mime types:',
-            response_dict['error'])
+        error_msg = (
+            'Schema validation for \'raw_audio_file\' failed: '
+            'Audio not recognized as a mp3 file')
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_detect_non_audio_file(self) -> None:
         """Test that filenames with extensions that don't match the audio are
@@ -664,17 +659,22 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         ) as f:
             raw_audio = f.read()
 
-        with self.accepted_audio_extensions_swap:
-            response_dict = self.post_json(
-                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-                {'filename': self.TEST_AUDIO_FILE_FLAC},
-                csrf_token=csrf_token,
-                expected_status_int=400,
-                upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
-            )
+        response_dict = self.post_json(
+            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+            {'filename': self.TEST_AUDIO_FILE_FLAC},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+        )
         self.logout()
-        self.assertEqual(
-            response_dict['error'], 'Audio not recognized as a flac file')
+
+        error_msg = (
+            'Schema validation for \'raw_audio_file\' failed: '
+            'Audio not recognized as a mp3 file\n'
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac')
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_audio_upload_mpeg_container(self) -> None:
         self.login(self.EDITOR_EMAIL)
@@ -690,7 +690,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE_MPEG_CONTAINER},
             csrf_token=csrf_token,
-            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)],
+            expected_status_int=200
         )
         self.logout()
 
@@ -719,11 +720,11 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'],
-            'Invalid filename extension: it should have '
-            'one of the following extensions: %s'
-            % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test.wav')
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_upload_empty_audio(self) -> None:
         """Test upload of empty audio."""
@@ -740,7 +741,9 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(response_dict['error'], 'No audio supplied')
+        self.assertEqual(
+            response_dict['error'], 'Schema validation for '
+            '\'raw_audio_file\' failed: No audio supplied')
 
     def test_upload_bad_audio(self) -> None:
         """Test upload of malformed audio."""
@@ -758,7 +761,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
-            response_dict['error'], 'Audio not recognized as a mp3 file')
+            response_dict['error'], 'Schema validation for \'raw_audio_file\''
+            ' failed: Audio not recognized as a mp3 file')
 
     def test_missing_extensions_are_detected(self) -> None:
         """Test upload of filenames with no extensions are caught."""
@@ -781,11 +785,11 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'],
-            'No filename extension: it should have '
-            'one of the following extensions: '
-            '%s' % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test')
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_exceed_max_length_detected(self) -> None:
         """Test that audio file is less than max playback length."""
@@ -839,7 +843,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
-            response_dict['error'], 'Audio not recognized as a mp3 file')
+            response_dict['error'], 'Schema validation for \'raw_audio_file\' '
+            'failed: Audio not recognized as a mp3 file')
 
     def test_upload_check_for_duration_sec_as_response(self) -> None:
         """Tests the file upload and trying to confirm the

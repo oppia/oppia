@@ -36,7 +36,7 @@ describe('StateHintsEditorComponent', () => {
   let externalSaveService: ExternalSaveService;
   let stateContentService: StateContentService;
 
-  var _getContent = function(contentId, contentString) {
+  let _getContent = function(contentId: string, contentString: string) {
     return SubtitledHtml.createFromBackendDict({
       content_id: contentId,
       html: contentString
@@ -129,7 +129,6 @@ describe('StateHintsEditorComponent', () => {
   });
 
   it('should check that content edits are saved correctly', function() {
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit');
     spyOn(component.saveStateContent, 'emit');
 
     component.ngOnInit();
@@ -148,10 +147,7 @@ describe('StateHintsEditorComponent', () => {
       'content', 'And now for something completely different.');
     component.onSaveContentButtonClicked();
 
-    expect(component.saveStateContent.emit)
-      .toHaveBeenCalled();
-    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalled();
+    expect(component.saveStateContent.emit).toHaveBeenCalled();
   });
 
   it('should not save changes to content when edit is cancelled', function() {

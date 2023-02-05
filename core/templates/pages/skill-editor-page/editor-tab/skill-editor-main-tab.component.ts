@@ -22,7 +22,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { PageTitleService } from 'services/page-title.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SkillEditorRoutingService } from '../services/skill-editor-routing.service';
@@ -34,12 +34,17 @@ import { AssignedSkillTopicData, SkillEditorStateService } from '../services/ski
 })
 export class SkillEditorMainTabComponent implements OnInit,
  AfterContentChecked {
-  subtopicName: string;
-  topicName: string;
-  assignedSkillTopicData: AssignedSkillTopicData;
-  skill: Skill;
-  selectedTopic: Topic;
-  topicDropdownEnabled = false;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  subtopicName!: string;
+  topicName!: string;
+  // Assigned skill topic data is null when the skill is not assigned to any
+  // topic.
+  assignedSkillTopicData!: AssignedSkillTopicData | null;
+  skill!: Skill;
+  selectedTopic!: Topic;
+  topicDropdownEnabled: boolean = false;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -101,8 +106,11 @@ export class SkillEditorMainTabComponent implements OnInit,
   }
 
   changeSelectedTopic(topicName: string): void {
-    this.subtopicName = (
-      this.assignedSkillTopicData[topicName]);
+    let assignedSkillTopicData = this.assignedSkillTopicData;
+    if (!assignedSkillTopicData) {
+      return;
+    }
+    this.subtopicName = assignedSkillTopicData[topicName];
   }
 
   hasLoadedSkill(): boolean {

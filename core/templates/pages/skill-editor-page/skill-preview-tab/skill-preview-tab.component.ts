@@ -22,12 +22,14 @@ import { QuestionBackendApiService } from 'domain/question/question-backend-api.
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
 
 
@@ -44,21 +46,25 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private currentInteractionService: CurrentInteractionService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
-    private questionObjectFactory: QuestionObjectFactory
+    private questionObjectFactory: QuestionObjectFactory,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
-  displayedCard: StateCard;
-  skillId: string;
-  questionTextFilter: string;
-  interactionFilter: string;
-  displayCardIsInitialized = false;
-  questionsFetched: boolean;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  displayedCard!: StateCard;
+  skillId!: string;
+  questionTextFilter!: string;
+  interactionFilter!: string;
+  questionsFetched!: boolean;
+  skill!: Skill;
+  htmlData!: string;
+  questionDicts!: QuestionBackendDict[];
+  displayedQuestions!: QuestionBackendDict[];
+  displayCardIsInitialized: boolean = false;
   ALLOWED_QUESTION_INTERACTIONS: string[] = [];
-  skill: Skill;
-  htmlData: string;
-  questionDicts: QuestionBackendDict[];
-  displayedQuestions: QuestionBackendDict[];
-  QUESTION_COUNT = 20;
+  QUESTION_COUNT: number = 20;
   INTERACTION_TYPES = {
     ALL: 'All',
     TEXT_INPUT: 'Text Input',
@@ -70,6 +76,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
+    const that = this;
     this.skillId = this.urlService.getSkillIdFromUrl();
     this.skillEditorStateService.loadSkill(this.skillId);
     this.questionTextFilter = '';
@@ -77,7 +84,8 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.questionsFetched = false;
     for (let interaction in this.INTERACTION_TYPES) {
       this.ALLOWED_QUESTION_INTERACTIONS.push(
-        this.INTERACTION_TYPES[interaction]);
+        this.INTERACTION_TYPES[
+          interaction as keyof typeof that.INTERACTION_TYPES]);
     }
     this.skill = this.skillEditorStateService.getSkill();
     this.htmlData = (
@@ -140,6 +148,15 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       });
   }
 
+  canWindowShowTwoCards(): boolean {
+    return this.windowDimensionsService.getWidth() >
+    ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
+  }
+
+  isCurrentSupplementalCardNonEmpty(): boolean {
+    return this.displayedCard && !this.displayedCard.isInteractionInline();
+  }
+
   selectQuestionToPreview(index: number): void {
     this.questionPlayerEngineService.clearQuestions();
     this.displayCardIsInitialized = false;
@@ -149,7 +166,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
           this.displayedQuestions[index]
         )
       ],
-      this.initializeQuestionCard.bind(this)
+      this.initializeQuestionCard.bind(this), () => {}
     );
   }
 

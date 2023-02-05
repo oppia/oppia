@@ -181,6 +181,9 @@ def main(args: Optional[List[str]] = None) -> None:
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    # Verify if Chrome is installed.
+    common.setup_chrome_bin_env_variable()
+
     if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
         server_mode = SERVER_MODE_DEV
@@ -193,6 +196,7 @@ def main(args: Optional[List[str]] = None) -> None:
         build.main(args=['--prod_env'])
     else:
         build.main(args=[])
+        common.run_ng_compilation()
         run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:

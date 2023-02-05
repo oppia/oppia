@@ -77,45 +77,24 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
       AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
     this.guppyInitializationService.init(
       'guppy-div-creator', translatedPlaceholder, this.value);
-    let eventType = (
-      this.deviceInfoService.isMobileUserAgent() &&
-      this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
-    if (eventType === 'focus') {
-      // We need the 'focus' event while using the on screen keyboard (only
-      // for touch-based devices) to capture input from user and the 'change'
-      // event while using the normal keyboard.
-      Guppy.event('focus', (focusObj: FocusObj) => {
-        const activeGuppyObject = (
-          this.guppyInitializationService.findActiveGuppyObject());
-        if (activeGuppyObject !== undefined) {
-          this.hasBeenTouched = true;
-          this.currentValue = activeGuppyObject.guppyInstance.asciimath();
-        }
-        if (!focusObj.focused) {
-          this.isCurrentAnswerValid();
-        }
-      });
-    } else {
-      // We need the 'focus' event while using the on screen keyboard (only
-      // for touch-based devices) to capture input from user and the 'change'
-      // event while using the normal keyboard.
-      Guppy.event('change', (focusObj: FocusObj) => {
-        const activeGuppyObject = (
-          this.guppyInitializationService.findActiveGuppyObject());
-        if (activeGuppyObject !== undefined) {
-          this.hasBeenTouched = true;
-          this.currentValue = activeGuppyObject.guppyInstance.asciimath();
-        }
-        if (!focusObj.focused) {
-          this.isCurrentAnswerValid();
-        }
-      });
-      Guppy.event('focus', (focusObj: FocusObj) => {
-        if (!focusObj.focused) {
-          this.isCurrentAnswerValid();
-        }
-      });
-    }
+
+    Guppy.event('change', (focusObj: FocusObj) => {
+      const activeGuppyObject = (
+        this.guppyInitializationService.findActiveGuppyObject());
+      if (activeGuppyObject !== undefined) {
+        this.hasBeenTouched = true;
+        this.currentValue = activeGuppyObject.guppyInstance.asciimath();
+        this.isCurrentAnswerValid();
+      }
+      if (!focusObj.focused) {
+        this.isCurrentAnswerValid();
+      }
+    });
+    Guppy.event('focus', (focusObj: FocusObj) => {
+      if (!focusObj.focused) {
+        this.isCurrentAnswerValid();
+      }
+    });
   }
 
 

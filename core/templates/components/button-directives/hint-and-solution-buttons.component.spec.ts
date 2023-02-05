@@ -20,9 +20,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
@@ -40,7 +39,6 @@ describe('HintAndSolutionButtonsComponent', () => {
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
   let playerPositionService: PlayerPositionService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let interactionObjectFactory: InteractionObjectFactory;
   let playerTranscriptService: PlayerTranscriptService;
   let hintAndSolutionModalService: HintAndSolutionModalService;
@@ -65,8 +63,6 @@ describe('HintAndSolutionButtonsComponent', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     hintsAndSolutionManagerService = TestBed
       .inject(HintsAndSolutionManagerService);
-    writtenTranslationsObjectFactory = TestBed.inject(
-      WrittenTranslationsObjectFactory);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
@@ -147,7 +143,6 @@ describe('HintAndSolutionButtonsComponent', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
   });
 
@@ -174,8 +169,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     ' card is opened', fakeAsync(() => {
     let oldCard: StateCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
-      null, RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
+      {} as Interaction, RecordedVoiceovers.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
@@ -251,8 +245,6 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(hintsAndSolutionManagerService, 'isHintViewable')
       .and.returnValues(false, true, true);
 
-    component.displayedCard = null;
-
     expect(component.isHintButtonVisible(0)).toBe(false);
 
     // StateCard with EndExploration interaction, which does not supports hints.
@@ -267,7 +259,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         hints: [],
         solution: null,
       }), RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(), 'content',
+      'content',
       audioTranslationLanguageService);
 
     expect(component.isHintButtonVisible(0)).toBe(false);

@@ -47,9 +47,11 @@ import { UrlInterpolationService } from
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { ExplorationChange } from './exploration-draft.model';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
 
 export interface ExplorationBackendDict {
-  'auto_tts_enabled'?: boolean;
+  'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'draft_changes': ExplorationChange[];
   'is_version_of_draft_valid': boolean;
@@ -61,10 +63,12 @@ export interface ExplorationBackendDict {
   'language_code': string;
   'draft_change_list_id': number;
   'version'?: number;
+  'next_content_id_index': number;
   'edits_allowed'?: boolean;
+  'exploration_metadata': ExplorationMetadataBackendDict;
 }
 
-export class Exploration {
+export class Exploration extends BaseTranslatableObject {
   initStateName: string;
   paramChanges: ParamChange[];
   paramSpecs: ParamSpecs;
@@ -73,12 +77,16 @@ export class Exploration {
   languageCode: string;
   logger: LoggerService;
   urlInterpolationService: UrlInterpolationService;
+  nextContentIdIndex: number;
 
   constructor(
       initStateName: string, paramChanges: ParamChange[],
       paramSpecs: ParamSpecs, states: States, title: string,
-      languageCode: string, loggerService: LoggerService,
+      nextContentIdIndex: number, languageCode: string,
+      loggerService: LoggerService,
       urlInterpolationService: UrlInterpolationService) {
+    super();
+
     this.initStateName = initStateName;
     this.paramChanges = paramChanges;
     this.paramSpecs = paramSpecs;
@@ -87,6 +95,11 @@ export class Exploration {
     this.languageCode = languageCode;
     this.logger = loggerService;
     this.urlInterpolationService = urlInterpolationService;
+    this.nextContentIdIndex = nextContentIdIndex;
+  }
+
+  getTranslatableObjects(): BaseTranslatableObject[] {
+    return Object.values(this.states.getStateObjects());
   }
 
   // ---- Instance methods ----
@@ -188,17 +201,6 @@ export class Exploration {
   getAllVoiceoverLanguageCodes(): string[] {
     return this.states.getAllVoiceoverLanguageCodes();
   }
-
-  getDisplayableWrittenTranslationLanguageCodes(): string[] {
-    const allLanguageCodes = (
-      this.states.getAllWrittenTranslationLanguageCodes());
-
-    const displayableLanguageCodes = allLanguageCodes.filter(
-      languageCode => this.states.areWrittenTranslationsDisplayable(
-        languageCode));
-
-    return displayableLanguageCodes;
-  }
 }
 
 @Injectable({
@@ -223,6 +225,7 @@ export class ExplorationObjectFactory {
       this.statesObjectFactory.createFromBackendDict(
         explorationBackendDict.states),
       explorationBackendDict.title,
+      explorationBackendDict.next_content_id_index,
       explorationBackendDict.language_code,
       this.logger, this.urlInterpolationService);
   }

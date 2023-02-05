@@ -32,7 +32,10 @@ export class TopicEditorRoutingService {
   private _TOPIC_PREVIEW_TAB = 'topic_preview';
   private _QUESTIONS_TAB = 'questions';
   private _lastTabVisited = 'main';
-  private _lastSubtopicId = null;
+  // This property is initialized using private methods and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private _lastSubtopicId!: number;
   private _activeTabName = this._MAIN_TAB;
   private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
 

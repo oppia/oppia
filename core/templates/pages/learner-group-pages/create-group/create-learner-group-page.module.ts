@@ -29,11 +29,7 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { CreateLearnerGroupPageComponent } from
   './create-learner-group-page.component';
-import { LearnerGroupDetailsComponent } from
-  './learner-group-details.component';
-import { AddSyllabusItemsComponent } from './add-syllabus-items.component';
-import { InviteLearnersComponent } from './invite-learners.component';
-
+import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/shared-learner-group-component.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
@@ -47,19 +43,14 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     SmartRouterModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    SharedLearnerGroupComponentsModule
   ],
   declarations: [
-    CreateLearnerGroupPageComponent,
-    LearnerGroupDetailsComponent,
-    AddSyllabusItemsComponent,
-    InviteLearnersComponent
+    CreateLearnerGroupPageComponent
   ],
   entryComponents: [
     CreateLearnerGroupPageComponent,
-    LearnerGroupDetailsComponent,
-    AddSyllabusItemsComponent,
-    InviteLearnersComponent
   ],
   providers: [
     {

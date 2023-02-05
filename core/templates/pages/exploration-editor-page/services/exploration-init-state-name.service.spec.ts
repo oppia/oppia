@@ -22,7 +22,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
 
 describe('Exploration Init State Name Service', () => {
-  let eisns: ExplorationInitStateNameService = null;
+  let eisns: ExplorationInitStateNameService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

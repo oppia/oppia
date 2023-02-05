@@ -47,6 +47,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
     }
   };
   class MockGuppy {
+    static focused = true;
     constructor(id: string, config: Object) {}
 
     asciimath() {
@@ -55,7 +56,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
 
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler({focused: true});
+      handler({focused: MockGuppy.focused});
     }
 
     static configure(name: string, val: Object): void {}
@@ -94,7 +95,16 @@ describe('AlgebraicExpressionInputInteractive', () => {
 
   beforeEach(() => {
     windowRef = TestBed.inject(WindowRef);
-    windowRef.nativeWindow.Guppy = MockGuppy;
+    // TODO(#16734): Introduce the "as unknown as X" convention for testing
+    // and remove comments that explain it.
+    // We need to mock guppy for the test. The mock guppy only has partial
+    // functionality when compared to the Guppy. This is because we only use
+    // certain methods or data from the Guppy in the test we are testing.
+    // Mocking the full object is a waste of time and effort. However,
+    // the typescript strict checks will complain about this assignment. In
+    // order to get around this, we typecast the Mock to unknown and then
+    // to the type which we are mocking.
+    windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     fixture = TestBed.createComponent(
@@ -152,5 +162,13 @@ describe('AlgebraicExpressionInputInteractive', () => {
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
     component.showOsk();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
+  });
+
+  it('should initialize component.value with an empty string', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject as GuppyObject);
+    MockGuppy.focused = false;
+    component.ngOnInit();
+    expect(component.value).not.toBeNull();
   });
 });

@@ -304,6 +304,10 @@ URLS = [
         r'%s/<username>' % feconf.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL,
         contributor_dashboard.ContributorAllStatsSummariesHandler),
     get_redirect_route(
+        r'%s/<username>/<suggestion_type>' % (
+            feconf.CONTRIBUTOR_CERTIFICATE_URL),
+        contributor_dashboard.ContributorCertificateHandler),
+    get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
     get_redirect_route(
@@ -418,7 +422,7 @@ URLS = [
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
     get_redirect_route(
-        r'%s' % feconf.CLASSROOM_ID_HANDLER_URL,
+        r'%s' % feconf.NEW_CLASSROOM_ID_HANDLER_URL,
         classroom.NewClassroomIdHandler),
     get_redirect_route(
         r'%s/<classroom_id>' % feconf.CLASSROOM_HANDLER_URL,
@@ -426,6 +430,10 @@ URLS = [
     get_redirect_route(
         r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_URL_FRAGMENT_HANDLER,
         classroom.ClassroomUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_ID_HANDLER_URL,
+        classroom.ClassroomIdHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -564,8 +572,8 @@ URLS = [
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(
-        r'/androidlistsubscriptionhandler',
-        profile.AndroidListSubscriptionHandler),
+        r'/mailinglistsubscriptionhandler',
+        profile.MailingListSubscriptionHandler),
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
@@ -1029,6 +1037,10 @@ URLS = [
         topics_and_skills_dashboard
             .CategorizedAndUntriagedSkillsDataHandler),
 
+    get_redirect_route(
+        r'/entity_translations_handler/<entity_type>/<entity_id>/'
+        r'<entity_version>/<language_code>',
+        reader.EntityTranslationHandler),
     get_redirect_route(
         r'/create_learner_group_handler',
         learner_group.CreateLearnerGroupHandler),

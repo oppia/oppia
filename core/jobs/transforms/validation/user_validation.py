@@ -113,33 +113,6 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):  # type: ignore[misc]
                 model, incorrect_keys)
 
 
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to
-# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
-# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-@validation_decorators.AuditsExisting(user_models.UserQueryModel)
-class ValidateOldModelsMarkedDeleted(beam.DoFn):  # type: ignore[misc]
-    """DoFn to validate old models and mark them for deletion"""
-
-    def process(
-        self, input_model: user_models.UserQueryModel
-    ) -> Iterator[user_validation_errors.ModelExpiringError]:
-        """Function that checks if a model is old enough to mark them deleted.
-
-        Args:
-            input_model: user_models.UserQueryModel. Entity to validate.
-
-        Yields:
-            ModelExpiringError. An error class for expiring models.
-        """
-        model = job_utils.clone_model(input_model)
-        expiration_date = (
-            datetime.datetime.utcnow() -
-            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
-        if expiration_date > model.last_updated:
-            yield user_validation_errors.ModelExpiringError(model)
-
-
 @validation_decorators.RelationshipsOf(user_models.CompletedActivitiesModel)
 def completed_activities_model_relationships(
     model: Type[user_models.CompletedActivitiesModel]

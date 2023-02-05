@@ -17,7 +17,7 @@
  */
 
 import { DebugElement, SimpleChanges } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { OppiaRteParserService } from 'services/oppia-rte-parser.service';
 import { RichTextComponentsModule } from './rich-text-components.module';
@@ -110,4 +110,69 @@ describe('RTE display component', () => {
       component.ngAfterViewInit();
     }).toThrowError();
   }));
+
+  it('should not display type 3 nodes', fakeAsync(() => {
+    const removeChildSpy = jasmine.createSpy('Remove child node');
+
+    component.elementRef = {
+      nativeElement: {
+        childNodes: [
+          {
+            nodeType: 3,
+            parentElement: {
+              removeChild: removeChildSpy
+            }
+          }
+        ]
+      }
+    };
+    let rteString = (
+      '<p>Hi<em>Hello</em>Hello</p>' +
+      '<pre> Hello </pre>');
+
+    let changes: SimpleChanges = {
+      rteString: {
+        previousValue: '',
+        currentValue: rteString,
+        firstChange: true,
+        isFirstChange: () => true
+      }
+    };
+
+    component.ngOnChanges(changes);
+    tick(100);
+
+    expect(removeChildSpy).toHaveBeenCalled();
+  }));
+
+  it('should remove text nodes which are outside ng container bounds',
+    fakeAsync(() => {
+      let rteString = (
+        '<p>Hi<em>Hello</em>Hello</p>');
+
+      let changes: SimpleChanges = {
+        rteString: {
+          previousValue: '',
+          currentValue: rteString,
+          firstChange: true,
+          isFirstChange: () => true
+        }
+      };
+
+      const node = document.createTextNode(
+        'Congratulations! You have finished');
+      component.elementRef.nativeElement.parentNode.insertBefore(
+        node, component.elementRef.nativeElement);
+      component.rteString = rteString;
+
+      fixture.detectChanges();
+
+      component.ngOnChanges(changes);
+
+      tick(100);
+      fixture.detectChanges();
+
+      expect(component.elementRef.nativeElement.innerText).toEqual(
+        'HiHelloHello');
+    }));
 });

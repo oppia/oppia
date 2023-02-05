@@ -25,6 +25,7 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
@@ -36,6 +37,7 @@ import { NumberAttemptsService } from './number-attempts.service';
 import { PlayerCorrectnessFeedbackEnabledService } from './player-correctness-feedback-enabled.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
+import { DiagnosticTestPlayerEngineService } from './diagnostic-test-player-engine.service';
 import { StatsReportingService } from './stats-reporting.service';
 
 interface QuestionPlayerConfigDict {
@@ -54,12 +56,18 @@ export class ExplorationPlayerStateService {
   private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> = (
     new EventEmitter());
 
-  currentEngineService: ExplorationEngineService | QuestionPlayerEngineService;
-  explorationMode: string = ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
+  currentEngineService: (
+    ExplorationEngineService |
+    QuestionPlayerEngineService |
+    DiagnosticTestPlayerEngineService
+  );
+
+  explorationMode: string;
   editorPreviewMode: boolean;
   questionPlayerMode: boolean;
+  diagnosticTestPlayerMode: boolean;
   explorationId: string;
-  version: number;
+  version: number | null;
   storyUrlFragment: string;
   lastCompletedCheckpoint: string;
   isLoggedOutProgressTracked: boolean = false;
@@ -86,6 +94,8 @@ export class ExplorationPlayerStateService {
     private questionBackendApiService: QuestionBackendApiService,
     private questionObjectFactory: QuestionObjectFactory,
     private questionPlayerEngineService: QuestionPlayerEngineService,
+    private diagnosticTestPlayerEngineService:
+      DiagnosticTestPlayerEngineService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
@@ -162,12 +172,15 @@ export class ExplorationPlayerStateService {
         title: returnDict.exploration.title,
         draft_change_list_id: returnDict.draft_change_list_id,
         language_code: returnDict.exploration.language_code,
-        version: returnDict.version
+        version: returnDict.version,
+        next_content_id_index: returnDict.exploration.next_content_id_index,
+        exploration_metadata: returnDict.exploration_metadata
       },
       returnDict.version,
       returnDict.preferred_audio_language_code,
       returnDict.auto_tts_enabled,
       returnDict.preferred_language_codes,
+      returnDict.displayable_language_codes,
       arePretestsAvailable ? () => {} : callback);
   }
 
@@ -211,6 +224,12 @@ export class ExplorationPlayerStateService {
     this.currentEngineService = this.questionPlayerEngineService;
   }
 
+  setDiagnosticTestPlayerMode(): void {
+    this.explorationMode = (
+      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER);
+    this.currentEngineService = this.diagnosticTestPlayerEngineService;
+  }
+
   setStoryChapterMode(): void {
     this.explorationMode = ExplorationPlayerConstants
       .EXPLORATION_MODE.STORY_CHAPTER;
@@ -234,7 +253,7 @@ export class ExplorationPlayerStateService {
         states: explorationData.states
       }, featuresData);
       this.explorationEngineService.init(
-        explorationData, null, null, null, null, callback);
+        explorationData, null, null, null, null, [], callback);
       this.playerCorrectnessFeedbackEnabledService.init(
         explorationData.correctness_feedback_enabled);
       this.numberAttemptsService.reset();
@@ -311,8 +330,21 @@ export class ExplorationPlayerStateService {
     this.initQuestionPlayer(config, successCallback, errorCallback);
   }
 
+  initializeDiagnosticPlayer(
+      diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
+      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void
+  ): void {
+    this.setDiagnosticTestPlayerMode();
+    this.diagnosticTestPlayerEngineService.init(
+      diagnosticTestTopicTrackerModel,
+      successCallback
+    );
+  }
+
   getCurrentEngineService():
-    ExplorationEngineService | QuestionPlayerEngineService {
+    ExplorationEngineService |
+    QuestionPlayerEngineService |
+    DiagnosticTestPlayerEngineService {
     return this.currentEngineService;
   }
 
@@ -330,6 +362,39 @@ export class ExplorationPlayerStateService {
   isInQuestionPlayerMode(): boolean {
     return this.explorationMode === ExplorationPlayerConstants
       .EXPLORATION_MODE.QUESTION_PLAYER;
+  }
+
+  isPresentingIsolatedQuestions(): boolean {
+    // The method returns a boolean value by checking whether the current mode
+    // is only presenting the questions or not.
+    // The diagnostic player mode, question player mode, and pretest mode are
+    // the ones in which only questions are presented to the learner, while in
+    // the exploration mode and story chapter mode the learning contents along
+    // with questions are presented.
+    if (
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.QUESTION_PLAYER ||
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER ||
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.PRETEST
+    ) {
+      return true;
+    } else if (
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.EXPLORATION ||
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER) {
+      return false;
+    } else {
+      throw new Error('Invalid mode received: ' + this.explorationMode + '.');
+    }
+  }
+
+  isInDiagnosticTestPlayerMode(): boolean {
+    return (
+      this.explorationMode ===
+      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER);
   }
 
   isInStoryChapterMode(): boolean {
@@ -385,6 +450,10 @@ export class ExplorationPlayerStateService {
 
   recordNewCardAdded(): void {
     return this.currentEngineService.recordNewCardAdded();
+  }
+
+  skipCurrentQuestion(successCallback: (stateCard: StateCard) => void): void {
+    this.diagnosticTestPlayerEngineService.skipCurrentQuestion(successCallback);
   }
 
   get onTotalQuestionsReceived(): EventEmitter<number> {

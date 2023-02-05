@@ -149,9 +149,10 @@ def run_shell_cmd(
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env)
     last_stdout_bytes, last_stderr_bytes = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
-    # compatible with rest of the code.
-    last_stdout_str = last_stdout_bytes.decode('utf-8')
-    last_stderr_str = last_stderr_bytes.decode('utf-8')
+    # compatible with rest of the code. Sometimes we get invalid bytes, in which
+    # case we replace them with U+FFFD.
+    last_stdout_str = last_stdout_bytes.decode('utf-8', 'replace')
+    last_stderr_str = last_stderr_bytes.decode('utf-8', 'replace')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
@@ -442,7 +443,7 @@ def check_test_results(
                 if (
                         spec.test_target not in coverage_exclusions
                         and float(coverage) != 100.0):
-                    print('INCOMPLETE COVERAGE (%s%%): %s' % (
+                    print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
                         coverage, spec.test_target))
                     incomplete_coverage += 1
                     print(task.task_results[0].get_report()[-3])

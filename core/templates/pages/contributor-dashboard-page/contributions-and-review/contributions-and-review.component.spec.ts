@@ -35,6 +35,8 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 
 
 class MockNgbModalRef {
@@ -54,10 +56,19 @@ class MockNgbModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ContributorDashboardAccomplishments: {
+      isEnabled: false
+    }
+  };
+}
+
 describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   var contextService: ContextService;
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
@@ -94,7 +105,12 @@ describe('Contributions and review component', () => {
         CsrfTokenService,
         AlertsService,
         TranslationTopicService,
-        UserService
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
+        UserService,
+        OpportunitiesListComponent
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -285,10 +301,7 @@ describe('Contributions and review component', () => {
                     param_changes: [],
                     recorded_voiceovers: {
                       voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
+                    }
                   },
                 }
               },
@@ -383,10 +396,7 @@ describe('Contributions and review component', () => {
                     param_changes: [],
                     recorded_voiceovers: {
                       voiceovers_mapping: {}
-                    },
-                    written_translations: {
-                      translations_mapping: {}
-                    },
+                    }
                   },
                 }
               },
@@ -470,6 +480,8 @@ describe('Contributions and review component', () => {
         },
         more: false
       }));
+    mockPlatformFeatureService.
+      status.ContributorDashboardAccomplishments.isEnabled = true;
 
     fixture.detectChanges();
 
@@ -535,7 +547,6 @@ describe('Contributions and review component', () => {
             classifier_model_id: null,
             card_is_checkpoint: null,
             linked_skill_id: null,
-            next_content_id_index: null,
             content: {
               html: 'Question 1',
               content_id: 'content_1'
@@ -634,20 +645,12 @@ describe('Contributions and review component', () => {
                 content_5: {}
               }
             },
-            written_translations: {
-              translations_mapping: {
-                content_1: {},
-                content_2: {},
-                content_3: {},
-                content_4: {},
-                content_5: {}
-              }
-            },
             solicit_answer_details: false
           },
           language_code: 'en',
           version: 1,
           linked_skill_ids: ['abc'],
+          next_content_id_index: 1,
           inapplicable_skill_misconception_ids: ['abc-2']
         });
       spyOn(contextService, 'setCustomEntityContext').and.stub();
@@ -689,8 +692,68 @@ describe('Contributions and review component', () => {
         expect(component.activeExplorationId).toBeNull();
       }));
 
+    it('should be able to change language', fakeAsync(() => {
+      component.opportunitiesListRef = TestBed.inject(
+        OpportunitiesListComponent);
+      spyOn(component.opportunitiesListRef, 'onChangeLanguage')
+        .and.callFake(() => {
+          return;
+        });
+
+      expect(component.languageCode).toBeUndefined();
+
+      component.onChangeLanguage('es');
+
+      expect(component.languageCode).toBe('es');
+      expect(
+        component.opportunitiesListRef.onChangeLanguage
+      ).toHaveBeenCalledWith('es');
+    }));
+
     it('should return true on Review Translations tab', fakeAsync(() => {
-      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Questions',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Translations',
+          enabled: true
+        }
+      ];
+      component.accomplishmentsTabs = [
+        {
+          tabSubType: 'stats',
+          tabType: 'accomplishments',
+          text: 'Contribution Stats',
+          enabled: true
+        },
+        {
+          tabSubType: 'badges',
+          tabType: 'accomplishments',
+          text: 'Badges',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
+      component.switchToTab('reviews', 'translate_content');
       spyOn(alertsService, 'addSuccessMessage').and.stub();
 
       let suggestion = {
@@ -710,16 +773,18 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.isReviewTranslationsTab()).toBeTrue();
+      expect(component.isReviewQuestionsTab()).toBeFalse();
       expect(alertsService.addSuccessMessage)
         .toHaveBeenCalledWith('Submitted suggestion review.');
     }));
 
-    it('should return false on Review Questions tab', () => {
+    it('should return true on Review Questions tab', () => {
       spyOn(component, 'openQuestionSuggestionModal').and.callFake(() => {
         return;
       });
 
       component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
+      expect(component.isReviewQuestionsTab()).toBeTrue();
       expect(component.isReviewTranslationsTab()).toBeFalse();
 
       component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
@@ -740,6 +805,14 @@ describe('Contributions and review component', () => {
       };
 
       component.onClickViewSuggestion('SUGGESTION');
+    });
+
+    it('should change the sort key of reviewable questions', () => {
+      expect(component.reviewableQuestionsSortKey).toBe('Date');
+
+      component.setReviewableQuestionsSortKey('Name');
+
+      expect(component.reviewableQuestionsSortKey).toBe('Name');
     });
 
     it('should open question suggestion modal', fakeAsync(() => {
@@ -781,7 +854,6 @@ describe('Contributions and review component', () => {
           classifier_model_id: null,
           card_is_checkpoint: null,
           linked_skill_id: null,
-          next_content_id_index: null,
           content: {
             html: 'Question 1',
             content_id: 'content_1'
@@ -880,20 +952,12 @@ describe('Contributions and review component', () => {
               content_5: {}
             }
           },
-          written_translations: {
-            translations_mapping: {
-              content_1: {},
-              content_2: {},
-              content_3: {},
-              content_4: {},
-              content_5: {}
-            }
-          },
           solicit_answer_details: false
         },
         language_code: 'en',
         version: 1,
         linked_skill_ids: ['abc'],
+        next_content_id_index: 6,
         inapplicable_skill_misconception_ids: ['abc-2']
       };
 
@@ -998,10 +1062,7 @@ describe('Contributions and review component', () => {
                   param_changes: [],
                   recorded_voiceovers: {
                     voiceovers_mapping: {}
-                  },
-                  written_translations: {
-                    translations_mapping: {}
-                  },
+                  }
                 },
               }
             },
@@ -1307,14 +1368,14 @@ describe('Contributions and review component', () => {
       spyOn(component, 'getContributionSummaries').and.returnValue(null);
 
       component.activeTabType = 'activeTabType';
-      component.activeSuggestionType = 'activeSuggestionType';
+      component.activeTabSubtype = 'activeTabSubtype';
       component.contributions = {
         1: null,
         2: null,
       };
 
       component.tabNameToOpportunityFetchFunction = {
-        activeSuggestionType: {
+        activeTabSubtype: {
           activeTabType: (shouldResetOffset) => {
             return Promise.resolve({
               suggestionIdToDetails: {
@@ -1416,11 +1477,11 @@ describe('Contributions and review component', () => {
       spyOn(component, 'getTranslationContributionsSummary').and.stub();
       spyOn(component, 'getQuestionContributionsSummary').and.stub();
 
-      component.activeSuggestionType = component.SUGGESTION_TYPE_TRANSLATE;
+      component.activeTabSubtype = component.SUGGESTION_TYPE_TRANSLATE;
       component.getContributionSummaries(null);
       tick();
 
-      component.activeSuggestionType = component.SUGGESTION_TYPE_QUESTION;
+      component.activeTabSubtype = component.SUGGESTION_TYPE_QUESTION;
       component.getContributionSummaries(null);
       tick();
 
@@ -1534,7 +1595,7 @@ describe('Contributions and review component', () => {
     it('should initialize $scope properties after controller is' +
     ' initialized', () => {
       expect(component.activeTabType).toBe('reviews');
-      expect(component.activeSuggestionType).toBe('add_question');
+      expect(component.activeTabSubtype).toBe('add_question');
       expect(component.activeDropdownTabChoice).toBe('Review Questions');
       expect(component.userIsLoggedIn).toBe(true);
       expect(component.userDetailsLoading).toBe(false);
@@ -1584,11 +1645,40 @@ describe('Contributions and review component', () => {
     });
 
     it('should return correctly check the active tab', () => {
-      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
-      component.isActiveTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Questions',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Translations',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
 
-      component.switchToTab(component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-      component.isActiveTab(component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+      component.switchToTab('reviews', 'translate_content');
+      component.isActiveTab('reviews', 'translate_content');
+
+      component.switchToTab('contributions', 'add_question');
+      component.isActiveTab('contributions', 'add_question');
     });
 
     it('should toggle dropdown when it is clicked', () => {
@@ -1602,26 +1692,128 @@ describe('Contributions and review component', () => {
     });
 
     it('should set active dropdown choice correctly', () => {
-      component.activeTabType = component.TAB_TYPE_REVIEWS;
-      component.activeSuggestionType = 'add_question';
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Translations',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Questions',
+          enabled: true
+        }
+      ];
+      component.accomplishmentsTabs = [
+        {
+          tabSubType: 'stats',
+          tabType: 'accomplishments',
+          text: 'Contribution Stats',
+          enabled: true
+        },
+        {
+          tabSubType: 'badges',
+          tabType: 'accomplishments',
+          text: 'Badges',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Review Questions');
-
-      component.activeTabType = component.TAB_TYPE_REVIEWS;
-      component.activeSuggestionType = 'translate_content';
-
-      expect(component.getActiveDropdownTabChoice())
+      expect(
+        component.getActiveDropdownTabText(
+          'reviews',
+          'add_question')).toBe('Review Questions');
+      expect(
+        component.getActiveDropdownTabText(
+          'reviews',
+          'translate_content'))
         .toBe('Review Translations');
 
-      component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
-      component.activeSuggestionType = 'add_question';
+      expect(
+        component.getActiveDropdownTabText(
+          'contributions',
+          'add_question')).toBe('Questions');
+      expect(
+        component.getActiveDropdownTabText(
+          'contributions',
+          'translate_content')).toBe('Translations');
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Questions');
+      expect(
+        component.getActiveDropdownTabText(
+          'accomplishments',
+          'stats')).toBe('Contribution Stats');
+      expect(
+        component.getActiveDropdownTabText(
+          'accomplishments',
+          'badges')).toBe('Badges');
+    });
 
-      component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
-      component.activeSuggestionType = 'translate_content';
+    it('should throw an error when invalid tab names given', () => {
+      component.contributionTabs = [
+        {
+          tabType: 'contributions',
+          tabSubType: 'translate_content',
+          text: 'Translations',
+          enabled: false
+        },
+        {
+          tabType: 'contributions',
+          tabSubType: 'add_question',
+          text: 'Questions',
+          enabled: true
+        }
+      ];
+      component.accomplishmentsTabs = [
+        {
+          tabSubType: 'stats',
+          tabType: 'accomplishments',
+          text: 'Contribution Stats',
+          enabled: true
+        },
+        {
+          tabSubType: 'badges',
+          tabType: 'accomplishments',
+          text: 'Badges',
+          enabled: true
+        }
+      ];
+      component.reviewTabs = [
+        {
+          tabType: 'reviews',
+          tabSubType: 'add_question',
+          text: 'Review Questions',
+          enabled: false
+        },
+        {
+          tabType: 'reviews',
+          tabSubType: 'translate_content',
+          text: 'Review Translations',
+          enabled: false
+        }
+      ];
 
-      expect(component.getActiveDropdownTabChoice()).toBe('Translations');
+      expect(() => {
+        component.getActiveDropdownTabText(
+          'xxx',
+          'xxx');
+        tick();
+      }).toThrowError();
     });
 
     it('should close dropdown when a click is made outside', () => {

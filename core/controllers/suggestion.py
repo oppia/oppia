@@ -37,6 +37,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import translation_domain
 
 from typing import (
     Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, cast
@@ -79,7 +80,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     language_code: str
     last_updated: float
     edited_by_reviewer: bool
-    exploration_content_html: str
+    exploration_content_html: Union[str, List[str]]
 
 
 SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
@@ -92,7 +93,11 @@ SuggestionsProviderHandlerArgsSchemaDictType = Dict[
         str,
         Dict[
             str,
-            Optional[Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]]
+            Union[
+                Optional[
+                    Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]],
+                List[str]
+            ]
         ]
     ]
 ]
@@ -221,15 +226,25 @@ class SuggestionHandler(
             self.normalized_payload['description']
         )
 
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
+            (
+                suggestion_services
+            ).update_translation_contribution_stats_at_submission(suggestion)
+
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_ADD_QUESTION
+        ):
+            (
+                suggestion_services
+            ).update_question_contribution_stats_at_submission(suggestion)
+
         suggestion_change = suggestion.change
         if (
-                suggestion_change.cmd == 'add_written_translation' and
-                suggestion_change.data_format in
-                (
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                suggestion_change.cmd == 'add_written_translation' and (
+                    translation_domain.TranslatableContentFormat
+                    .is_data_format_list(suggestion_change.data_format)
                 )
         ):
             self.render_json(self.values)
@@ -367,6 +382,11 @@ class SuggestionToExplorationActionHandler(
                 suggestion_id, self.user_id,
                 self.normalized_payload['review_message']
             )
+
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.suggestion_type == (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
 
@@ -574,6 +594,10 @@ class SuggestionToSkillActionHandler(
                 self.normalized_payload['review_message']
             )
 
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            suggestion_services.update_question_review_stats(suggestion)
+
         self.render_json(self.values)
 
 
@@ -654,6 +678,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
 
     limit: int
     offset: int
+    sort_key: str
     exploration_id: Optional[str]
 
 
@@ -700,6 +725,12 @@ class ReviewableSuggestionsHandler(
                     }]
                 }
             },
+            'sort_key': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': feconf.SUGGESTIONS_SORT_KEYS,
+            },
             'exploration_id': {
                 'schema': {
                     'type': 'basestring'
@@ -723,6 +754,7 @@ class ReviewableSuggestionsHandler(
             target_type, suggestion_type)
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
+        sort_key = self.normalized_request['sort_key']
         exploration_id = self.normalized_request.get('exploration_id')
         exp_ids = [exploration_id] if exploration_id else []
 
@@ -732,7 +764,7 @@ class ReviewableSuggestionsHandler(
             reviewable_suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_translation_suggestions_by_offset(
-                    self.user_id, exp_ids, limit, offset))
+                    self.user_id, exp_ids, limit, offset, sort_key))
             # Filter out obsolete translation suggestions, i.e. suggestions with
             # translations that no longer match the current exploration content
             # text. See issue #16536 for more details.
@@ -744,7 +776,7 @@ class ReviewableSuggestionsHandler(
             suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset))
+                    self.user_id, limit, offset, sort_key))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -755,6 +787,7 @@ class UserSubmittedSuggestionsHandlerNormalizedRequestDict(TypedDict):
 
     limit: int
     offset: int
+    sort_key: str
 
 
 class UserSubmittedSuggestionsHandler(
@@ -800,6 +833,12 @@ class UserSubmittedSuggestionsHandler(
                         'min_value': 0
                     }]
                 }
+            },
+            'sort_key': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'choices': feconf.SUGGESTIONS_SORT_KEYS,
             }
         }
     }
@@ -818,9 +857,10 @@ class UserSubmittedSuggestionsHandler(
             target_type, suggestion_type)
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
+        sort_key = self.normalized_request['sort_key']
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
-                self.user_id, suggestion_type, limit, offset
+                self.user_id, suggestion_type, limit, offset, sort_key
             )
         )
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -850,7 +890,8 @@ class UserSubmittedSuggestionsHandler(
                         self.user_id,
                         feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                         limit,
-                        next_offset
+                        next_offset,
+                        sort_key
                     )
                 )
                 suggestions_with_translatable_exps = (
@@ -983,6 +1024,7 @@ class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
 
     skill_difficulty: float
     question_state_data: state_domain.StateDict
+    next_content_id_index: int
 
 
 class UpdateQuestionSuggestionHandler(
@@ -1022,6 +1064,11 @@ class UpdateQuestionSuggestionHandler(
                         domain_objects_validator.validate_state_dict
                     )
                 }
+            },
+            'next_content_id_index': {
+                'schema': {
+                    'type': 'int'
+                }
             }
         }
     }
@@ -1044,7 +1091,9 @@ class UpdateQuestionSuggestionHandler(
         suggestion_services.update_question_suggestion(
             suggestion_id,
             self.normalized_payload['skill_difficulty'],
-            self.normalized_payload['question_state_data'])
+            self.normalized_payload['question_state_data'],
+            self.normalized_payload['next_content_id_index']
+        )
 
         self.render_json(self.values)
 

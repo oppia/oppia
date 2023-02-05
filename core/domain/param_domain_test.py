@@ -144,6 +144,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         """Test the ParamChange class."""
         param_change = param_domain.ParamChange(
             'abc', 'Copier', {'value': '3', 'parse_with_jinja': True})
+        param_change.validate()
         self.assertEqual(param_change.name, 'abc')
         self.assertEqual(param_change.generator.id, 'Copier')
         self.assertEqual(param_change.to_dict(), {
@@ -160,4 +161,5 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             'customization_args': self.sample_customization_args
         }
         param_change = param_domain.ParamChange.from_dict(sample_dict)
+        param_change.validate()
         self.assertEqual(param_change.to_dict(), sample_dict)

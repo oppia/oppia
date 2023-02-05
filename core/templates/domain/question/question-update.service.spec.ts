@@ -155,13 +155,7 @@ describe('Question update service', function() {
           default_outcome: {}
         }
       },
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
+      solicit_answer_details: false
     };
 
     expectedOutputStateDict = {
@@ -222,13 +216,7 @@ describe('Question update service', function() {
           default_outcome: {}
         }
       },
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
+      solicit_answer_details: false
     };
 
     expectedOutputState = StateObjectFactory.createFromBackendDict(
@@ -272,7 +260,7 @@ describe('Question update service', function() {
       .toBe(undefined);
 
     QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(
-      sampleQuestion, ['id1']);
+      sampleQuestion, 'id1');
 
     expect(sampleQuestion.getInapplicableSkillMisconceptionIds())
       .toEqual(['id1']);

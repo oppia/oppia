@@ -24,6 +24,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -36,7 +37,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List
+from typing import Dict, List, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -80,6 +81,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         user_services.allow_user_to_review_translation_in_language(
             self.admin_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.admin_id, 'es')
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -87,7 +90,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         ) for i in range(3)]
 
         for exp in explorations:
@@ -424,9 +428,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
@@ -444,6 +448,65 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # suggestions in review (exploration 0).
         self.assertEqual(
             response['opportunities'], [self.expected_opportunity_dict_1])
+
+    def test_get_reviewable_translation_opportunities_filtering_language( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        # Create a translation suggestion in Hindi.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': 'Content',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.owner_id, change_dict, 'description')
+
+        # Create a translation suggestion in Spanish.
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content_0',
+            'language_code': 'es',
+            'content_html': 'Content',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content 2.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '1', 1, self.owner_id, change_dict, 'description 2')
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'language_code': 'es'})
+        # Should only return opportunities in Spanish.
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_2])
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'language_code': 'hi'})
+        # Should only return opportunities in Hindi.
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_1])
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            params={'language_code': 'pt'})
+        # Should be empty.
+        self.assertEqual(
+            response['opportunities'], [])
+
+        response = self.get_json(
+            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL)
+        # Should return all opportunities.
+        self.assertEqual(
+            response['opportunities'], [self.expected_opportunity_dict_1, self.expected_opportunity_dict_2])
 
     def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
         # Create a new exploration and linked story.
@@ -488,7 +551,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -497,9 +561,18 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Create a translation suggestion for continue text.
         continue_state = exp_100.states['continue state']
-        content_id_of_continue_button_text = (
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
+        subtitled_unicode_of_continue_button_text = cast(
+            state_domain.SubtitledUnicode,
             continue_state.interaction.customization_args[
-                'buttonText'].value.content_id)
+                'buttonText'].value
+        )
+        content_id_of_continue_button_text = (
+            subtitled_unicode_of_continue_button_text.content_id
+        )
         change_dict = {
             'cmd': 'add_translation',
             'content_id': content_id_of_continue_button_text,
@@ -573,7 +646,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -582,9 +656,18 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Create a translation suggestion for the continue text.
         continue_state = exp_100.states['continue state']
-        content_id_of_continue_button_text = (
+        # Here we use cast because we are narrowing down the type from various
+        # customization args value types to 'SubtitledUnicode' type, and this
+        # is done because here we are accessing 'buttontext' key from continue
+        # customization arg whose value is always of SubtitledUnicode type.
+        subtitled_unicode_of_continue_button_text = cast(
+            state_domain.SubtitledUnicode,
             continue_state.interaction.customization_args[
-                'buttonText'].value.content_id)
+                'buttonText'].value
+        )
+        content_id_of_continue_button_text = (
+            subtitled_unicode_of_continue_button_text.content_id
+        )
         change_dict = {
             'cmd': 'add_translation',
             'content_id': content_id_of_continue_button_text,
@@ -651,9 +734,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
@@ -688,7 +771,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 10',
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_10.id)
         exp_20 = self.save_new_valid_exploration(
@@ -696,7 +780,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 20',
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_20.id)
         exp_30 = self.save_new_valid_exploration(
@@ -704,7 +789,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 30',
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_30.id)
 
@@ -733,9 +819,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create translation suggestions for the explorations.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
@@ -875,7 +961,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         ) for i in range(2)]
 
         for exp in explorations:
@@ -961,7 +1048,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'Introduction',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': '<p>A content to translate.</p>'
                 }
             })], 'Changes content.')
@@ -975,19 +1062,21 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'version': 2,
             'state_names_to_content_id_mapping': {
                 'Introduction': {
-                    'content': {
-                        'content': (
+                    'content_0': {
+                        'content_value': (
                             '<p>A content to translate.</p>'),
-                        'data_format': 'html',
+                        'content_id': 'content_0',
+                        'content_format': 'html',
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None
                     }
                 },
                 'End State': {
-                    'content': {
-                        'content': '',
-                        'data_format': 'html',
+                    'content_3': {
+                        'content_value': 'Content',
+                        'content_id': 'content_3',
+                        'content_format': 'html',
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None
@@ -1002,9 +1091,9 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         change_dict = {
             'cmd': 'add_written_translation',
             'state_name': 'Introduction',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'translation_html': '<p>Translation for content.</p>',
             'data_format': 'html'
         }
@@ -1022,9 +1111,10 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'version': 1,
             'state_names_to_content_id_mapping': {
                 'End State': {
-                    'content': {
-                        'content': '',
-                        'data_format': 'html',
+                    'content_3': {
+                        'content_value': 'Content',
+                        'content_id': 'content_3',
+                        'content_format': 'html',
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None
@@ -1140,7 +1230,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'End State',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'Please continue.'
                 }
             })], 'Changes content.')
@@ -1149,14 +1239,14 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
                 'state_name': 'End State',
-                'content_ids': '["invalid_content_id", "content"]',
+                'content_ids': '["invalid_content_id", "content_0"]',
                 'target_language_code': 'es'
             }, expected_status_int=200
         )
 
         expected_output = {
             'translated_texts': {
-                'content': 'Por favor continua.',
+                'content_0': 'Por favor continua.',
                 'invalid_content_id': None
             }
         }
@@ -1214,7 +1304,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'Introduction',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'Please continue.'
                 }
             })], 'Changes content.')
@@ -1224,14 +1314,14 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             params={
                 'exp_id': self.exp_id,
                 'state_name': 'Introduction',
-                'content_ids': '["content"]',
+                'content_ids': '["content_0"]',
                 'target_language_code': 'es'
             },
             expected_status_int=200
         )
 
         expected_output = {
-            'translated_texts': {'content': 'Por favor continua.'}
+            'translated_texts': {'content_0': 'Por favor continua.'}
         }
         self.assertEqual(output, expected_output)
 
@@ -1861,5 +1951,77 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             response['error'],
             'The user %s is not allowed to fetch the stats of other users.' % (
                 self.OWNER_USERNAME))
+
+        self.logout()
+
+    def test_get_contributor_certificate(self) -> None:
+        score_category: str = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        change_cmd = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'state_name': 'Introduction',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
+            self.OWNER_USERNAME, change_cmd, score_category,
+            'exploration.exp1.thread_6', 'hi')
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date_str = from_date.strftime('%Y-%m-%d')
+        to_date = datetime.datetime.today()
+        to_date_str = to_date.strftime('%Y-%m-%d')
+
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorcertificate/%s/%s?language=%s&'
+            'from_date=%s&to_date=%s' % (
+                self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi', from_date_str, to_date_str
+            )
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'from_date': from_date.strftime('%d %b %Y'),
+                'to_date': to_date.strftime('%d %b %Y'),
+                'contribution_hours': '0.01',
+                'team_lead': feconf.TRANSLATION_TEAM_LEAD,
+                'language': 'Hindi'
+            }
+        )
+
+        self.logout()
+
+    def test_get_contributor_certificate_raises_invalid_date_exception(
+        self
+    ) -> None:
+        from_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        from_date_str = from_date.strftime('%Y-%m-%d')
+        to_date = datetime.datetime.today() + datetime.timedelta(days=1)
+        to_date_str = to_date.strftime('%Y-%m-%d')
+
+        self.login(self.OWNER_EMAIL)
+
+        response = self.get_json(
+            '/contributorcertificate/%s/%s?language=%s&'
+            'from_date=%s&to_date=%s' % (
+                self.OWNER_USERNAME, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                'hi', from_date_str, to_date_str
+            ),
+            expected_status_int=400
+        )
+
+        self.assertEqual(
+            response['error'],
+            'To date should not be a future date.'
+        )
 
         self.logout()
