@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Model class for creating and mutating instances of frontend
- * story model class.
+ * story domain objects.
  */
 
 import { AppConstants } from 'app.constants';
