@@ -93,9 +93,28 @@ describe('Parameter Metadata Service', () => {
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
-              customization_args: {},
-              solution: null,
-              id: 'EndExploration',
+              customization_args: {
+                "placeholder": {
+                    "value": {
+                        "content_id": "ca_placeholder_2",
+                        "unicode_str": ""
+                    }
+                },
+                "rows": {
+                    "value": 1
+                },
+                "catchMisspellings": {
+                    "value": false
+                }
+              },
+              solution: {
+                "answer_is_exclusive": true,
+                "correct_answer": "1",
+                "explanation": {
+                    "content_id": "solution_5",
+                    "html": "<p>1</p>"
+              }},
+              id: 'TextInput',
               answer_groups: [{
                 rule_specs: [],
                 training_data: [],
@@ -146,9 +165,28 @@ describe('Parameter Metadata Service', () => {
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
-              customization_args: {},
-              solution: null,
-              id: 'EndExploration',
+              customization_args: {
+                "placeholder": {
+                    "value": {
+                        "content_id": "ca_placeholder_2",
+                        "unicode_str": ""
+                    }
+                },
+                "rows": {
+                    "value": 1
+                },
+                "catchMisspellings": {
+                    "value": false
+                }
+              },
+              solution: {
+                "answer_is_exclusive": true,
+                "correct_answer": "1",
+                "explanation": {
+                    "content_id": "solution_5",
+                    "html": "<p>1</p>"
+              }},
+              id: 'TextInput',
               answer_groups: [{
                 rule_specs: [],
                 training_data: [],
@@ -199,9 +237,28 @@ describe('Parameter Metadata Service', () => {
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
-              customization_args: {},
-              solution: null,
-              id: 'EndExploration',
+              customization_args: {
+                "placeholder": {
+                    "value": {
+                        "content_id": "ca_placeholder_2",
+                        "unicode_str": ""
+                    }
+                },
+                "rows": {
+                    "value": 1
+                },
+                "catchMisspellings": {
+                    "value": false
+                }
+              },
+              solution: {
+                "answer_is_exclusive": true,
+                "correct_answer": "1",
+                "explanation": {
+                    "content_id": "solution_5",
+                    "html": "<p>1</p>"
+              }},
+              id: 'TextInput',
               answer_groups: [{
                 rule_specs: [],
                 training_data: [],
@@ -224,7 +281,7 @@ describe('Parameter Metadata Service', () => {
                 param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
-                dest: 'State2',
+                dest: 'TextInput',
                 dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'default_outcome',
@@ -252,9 +309,28 @@ describe('Parameter Metadata Service', () => {
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
-              customization_args: {},
-              solution: null,
-              id: 'EndExploration',
+              customization_args: {
+                "placeholder": {
+                    "value": {
+                        "content_id": "ca_placeholder_2",
+                        "unicode_str": ""
+                    }
+                },
+                "rows": {
+                    "value": 1
+                },
+                "catchMisspellings": {
+                    "value": false
+                }
+              },
+              solution: {
+                "answer_is_exclusive": true,
+                "correct_answer": "1",
+                "explanation": {
+                    "content_id": "solution_5",
+                    "html": "<p>1</p>"
+              }},
+              id: 'TextInput',
               answer_groups: [{
                 rule_specs: [],
                 training_data: [],

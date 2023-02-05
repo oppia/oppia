@@ -526,6 +526,7 @@ export class ExplorationWarningsService {
   }
 
   getWarnings(): object[] | string[] {
+    console.log(this._warningsList);
     return this._warningsList;
   }
 
