@@ -71,17 +71,11 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     mailchimp_api_key: Optional[str] = secrets_services.get_secret(
         'MAILCHIMP_API_KEY')
     if not mailchimp_api_key:
-        logging.exception(
-            'Cloud Secret Manager is not able to get MAILCHIMP_API_KEY.')
-        # TODO(#16197): Remove MAILCHIMP_API_KEY from feconf after we verify
-        # that secrets work.
-        mailchimp_api_key = feconf.MAILCHIMP_API_KEY
-        if not mailchimp_api_key:
-            logging.exception('Mailchimp API key is not available.')
-            return None
+        logging.error('Mailchimp API key is not available.')
+        return None
 
     if not feconf.MAILCHIMP_USERNAME:
-        logging.exception('Mailchimp username is not set.')
+        logging.error('Mailchimp username is not set.')
         return None
 
     # The following is a class initialized in the library with the API key and
@@ -175,11 +169,11 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
 
 def add_or_update_user_status(
-        user_email: str,
-        merge_fields: Dict[str, str],
-        tag: str,
-        *,
-        can_receive_email_updates: bool
+    user_email: str,
+    merge_fields: Dict[str, str],
+    tag: str,
+    *,
+    can_receive_email_updates: bool
 ) -> bool:
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.

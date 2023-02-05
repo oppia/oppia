@@ -25,12 +25,14 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
 import { SchemaDefaultValue, SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 describe('Schema Based List Editor Component', () => {
   let component: SchemaBasedListEditorComponent;
   let fixture: ComponentFixture<SchemaBasedListEditorComponent>;
   let schemaDefaultValueService: SchemaDefaultValueService;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
+  let focusManagerService: FocusManagerService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -42,6 +44,7 @@ describe('Schema Based List Editor Component', () => {
       providers: [
         SchemaDefaultValueService,
         SchemaFormSubmittedService,
+        FocusManagerService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -51,6 +54,7 @@ describe('Schema Based List Editor Component', () => {
     fixture = TestBed.createComponent(SchemaBasedListEditorComponent);
     component = fixture.componentInstance;
     schemaDefaultValueService = TestBed.inject(SchemaDefaultValueService);
+    focusManagerService = TestBed.inject(FocusManagerService);
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
 
     component.itemSchema = {
@@ -129,6 +133,9 @@ describe('Schema Based List Editor Component', () => {
   });
 
   it('should add element to the item list', () => {
+    let focusSpy = spyOnProperty(
+      focusManagerService, 'schemaBasedListEditorIsActive', 'set'
+    ).and.callThrough();
     component.isOneLineInput = true;
     component.localValue = ['item1'];
 
@@ -136,6 +143,7 @@ describe('Schema Based List Editor Component', () => {
 
     const expectedValue = ['item1', 'default'];
     expect(component.localValue).toEqual(expectedValue);
+    expect(focusSpy).toHaveBeenCalled();
   });
 
   it('should check if the item list has duplicate values or not', () => {

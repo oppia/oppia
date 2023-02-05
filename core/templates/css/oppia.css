@@ -806,9 +806,6 @@ textarea {
   padding: 0;
   width: 100%;
 }
-.navbar-form {
-  padding-left: 15px;
-}
 
 .nav {
   list-style: none;
@@ -4102,4 +4099,13 @@ oppia-response-text-input {
   .conversation-skin-oppia-avatar {
     display: none;
   }
+}
+
+mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.story-save-draft-warning {
+  color: #fc0;
 }

@@ -206,18 +206,15 @@ describe('Questions List Component', () => {
         recorded_voiceovers: {
           voiceovers_mapping: {}
         },
-        written_translations: {
-          translations_mapping: {}
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: null,
       },
       inapplicable_skill_misconception_ids: null,
       language_code: 'en',
       linked_skill_ids: [],
+      next_content_id_index: 5,
       question_state_data_schema_version: 44,
       version: 45
     });
@@ -896,28 +893,20 @@ describe('Questions List Component', () => {
 
   it('should remove skill linked to a question', () => {
     component.associatedSkillSummaries = [
-      ShortSkillSummary.createFromBackendDict({
-        skill_id: '1',
-        skill_description: 'Skill Description'
-      }),
-      ShortSkillSummary.createFromBackendDict({
-        skill_id: '2',
-        skill_description: 'Skill Description'
-      })
+      SkillDifficulty.create('skillId1', '', 0.9),
+      SkillDifficulty.create('skillId2', '', 0.6)
     ];
     component.skillLinkageModificationsArray = [];
-    component.removeSkill('1');
+    component.removeSkill('skillId1');
 
     expect(component.associatedSkillSummaries).toEqual([
-      ShortSkillSummary.createFromBackendDict({
-        skill_id: '2',
-        skill_description: 'Skill Description'
-      })
+      SkillDifficulty.create('skillId2', '', 0.6)
     ]);
     expect(component.skillLinkageModificationsArray).toEqual([
       {
-        id: '1',
-        task: 'remove'
+        id: 'skillId1',
+        task: 'remove',
+        difficulty: 0.9
       } as SkillLinkageModificationsArray
     ]);
   });

@@ -17,7 +17,7 @@
  * story model class.
  */
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 import {
   StoryContentsBackendDict,
@@ -158,7 +158,7 @@ export class Story {
       issues.push('Story title should not be empty');
     }
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
-      constants.VALID_URL_FRAGMENT_REGEX);
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
     if (!this._urlFragment) {
       issues.push(
         'Url Fragment should not be empty.');
@@ -170,10 +170,11 @@ export class Story {
       }
       if (
         this._urlFragment.length >
-        constants.MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+        AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT
+      ) {
         issues.push(
           'Url Fragment should not be greater than ' +
-          `${constants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
+          `${AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
       }
     }
     issues = issues.concat(this._storyContents.validate());
@@ -181,7 +182,7 @@ export class Story {
   }
 
   prepublishValidate(): string[] {
-    const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
+    const metaTagContentCharLimit = AppConstants.MAX_CHARS_IN_META_TAG_CONTENT;
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Story should have a thumbnail.');

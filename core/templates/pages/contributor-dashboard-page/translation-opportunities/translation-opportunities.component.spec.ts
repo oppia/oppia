@@ -107,7 +107,8 @@ describe('Translation opportunities component', () => {
         },
         translation_in_review_counts: {
           en: 2
-        }
+        },
+        language_code: 'en'
       }),
       ExplorationOpportunitySummary.createFromBackendDict({
         id: '2',
@@ -120,7 +121,8 @@ describe('Translation opportunities component', () => {
         },
         translation_in_review_counts: {
           en: 4
-        }
+        },
+        language_code: 'en'
       })
     ];
 

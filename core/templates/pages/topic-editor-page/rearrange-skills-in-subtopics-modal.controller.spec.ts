@@ -19,7 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
