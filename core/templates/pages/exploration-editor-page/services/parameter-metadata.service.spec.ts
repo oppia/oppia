@@ -94,25 +94,24 @@ describe('Parameter Metadata Service', () => {
             interaction: {
               confirmed_unclassified_answers: [],
               customization_args: {
-                "placeholder": {
-                    "value": {
-                        "content_id": "ca_placeholder_2",
-                        "unicode_str": ""
-                    }
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_2',
+                    unicode_str: ''
+                  }
                 },
-                "rows": {
-                    "value": 1
+                rows: {
+                  value: 1
                 },
-                "catchMisspellings": {
-                    "value": false
-                }
-              },
+                catchMisspellings: {
+                  value: false
+              }},
               solution: {
-                "answer_is_exclusive": true,
-                "correct_answer": "1",
-                "explanation": {
-                    "content_id": "solution_5",
-                    "html": "<p>1</p>"
+                answer_is_exclusive: true,
+                correct_answer: '1',
+                explanation: {
+                  content_id: 'solution_5',
+                  html: '<p>1</p>'
               }},
               id: 'TextInput',
               answer_groups: [{
@@ -166,25 +165,24 @@ describe('Parameter Metadata Service', () => {
             interaction: {
               confirmed_unclassified_answers: [],
               customization_args: {
-                "placeholder": {
-                    "value": {
-                        "content_id": "ca_placeholder_2",
-                        "unicode_str": ""
-                    }
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_2',
+                    unicode_str: ''
+                  }
                 },
-                "rows": {
-                    "value": 1
+                rows: {
+                  value: 1
                 },
-                "catchMisspellings": {
-                    "value": false
-                }
-              },
+                catchMisspellings: {
+                  value: false
+              }},
               solution: {
-                "answer_is_exclusive": true,
-                "correct_answer": "1",
-                "explanation": {
-                    "content_id": "solution_5",
-                    "html": "<p>1</p>"
+                answer_is_exclusive: true,
+                correct_answer: '1',
+                explanation: {
+                  content_id: 'solution_5',
+                  html: '<p>1</p>'
               }},
               id: 'TextInput',
               answer_groups: [{
@@ -238,25 +236,24 @@ describe('Parameter Metadata Service', () => {
             interaction: {
               confirmed_unclassified_answers: [],
               customization_args: {
-                "placeholder": {
-                    "value": {
-                        "content_id": "ca_placeholder_2",
-                        "unicode_str": ""
-                    }
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_2',
+                    unicode_str: ''
+                  }
                 },
-                "rows": {
-                    "value": 1
+                rows: {
+                  value: 1
                 },
-                "catchMisspellings": {
-                    "value": false
-                }
-              },
+                catchMisspellings: {
+                  value: false
+              }},
               solution: {
-                "answer_is_exclusive": true,
-                "correct_answer": "1",
-                "explanation": {
-                    "content_id": "solution_5",
-                    "html": "<p>1</p>"
+                answer_is_exclusive: true,
+                correct_answer: '1',
+                explanation: {
+                  content_id: 'solution_5',
+                  html: '<p>1</p>'
               }},
               id: 'TextInput',
               answer_groups: [{
@@ -310,25 +307,24 @@ describe('Parameter Metadata Service', () => {
             interaction: {
               confirmed_unclassified_answers: [],
               customization_args: {
-                "placeholder": {
-                    "value": {
-                        "content_id": "ca_placeholder_2",
-                        "unicode_str": ""
-                    }
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_2',
+                    unicode_str: ''
+                  }
                 },
-                "rows": {
-                    "value": 1
+                rows: {
+                  value: 1
                 },
-                "catchMisspellings": {
-                    "value": false
-                }
-              },
+                catchMisspellings: {
+                  value: false
+              }},
               solution: {
-                "answer_is_exclusive": true,
-                "correct_answer": "1",
-                "explanation": {
-                    "content_id": "solution_5",
-                    "html": "<p>1</p>"
+                answer_is_exclusive: true,
+                correct_answer: '1',
+                explanation: {
+                  content_id: 'solution_5',
+                  html: '<p>1</p>'
               }},
               id: 'TextInput',
               answer_groups: [{
