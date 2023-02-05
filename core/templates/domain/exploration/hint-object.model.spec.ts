@@ -13,21 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for hint object factory.
+ * @fileoverview Unit tests for hint object model class.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { Hint } from 'domain/exploration/hint-object.model';
 
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-
-describe('Hint object factory', () => {
-  var hof: HintObjectFactory;
+describe('Hint object model', () => {
+  var hof: Hint;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [HintObjectFactory]
+      providers: [Hint]
     });
 
-    hof = TestBed.get(HintObjectFactory);
+    hof = TestBed.get(Hint);
   });
 
   it('should create a Hint from dict and convert a Hint Object to' +

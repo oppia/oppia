@@ -20,7 +20,7 @@
 // question-update.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -67,8 +67,6 @@ describe('Question update service', function() {
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(),
         new RuleObjectFactory()));
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory());
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());

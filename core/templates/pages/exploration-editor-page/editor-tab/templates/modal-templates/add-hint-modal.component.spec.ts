@@ -20,7 +20,7 @@ import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { AddHintModalComponent } from './add-hint-modal.component';
@@ -40,7 +40,6 @@ describe('Add Hint Modal Component', () => {
   let fixture: ComponentFixture<AddHintModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let contextService: ContextService;
-  let hintObjectFactory: HintObjectFactory;
   let generateContentIdService: GenerateContentIdService;
   let stateHintsService: StateHintsService;
 
@@ -65,7 +64,6 @@ describe('Add Hint Modal Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AddHintModalComponent);
     component = fixture.componentInstance;
-    hintObjectFactory = TestBed.inject(HintObjectFactory);
     stateHintsService = TestBed.inject(StateHintsService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
@@ -90,7 +88,7 @@ describe('Add Hint Modal Component', () => {
 
   it('should save hint when closing the modal', () => {
     let contentId = 'cont_1';
-    let hintExpected = hintObjectFactory.createNew(contentId, '');
+    let hintExpected = Hint.createNew(contentId, '');
     spyOn(ngbActiveModal, 'close');
     spyOn(
       generateContentIdService, 'getNextStateId'
