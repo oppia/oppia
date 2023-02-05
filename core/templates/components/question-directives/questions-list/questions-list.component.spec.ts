@@ -919,6 +919,28 @@ describe('Questions List Component', () => {
     ]);
   });
 
+  it('should check that question is not savable if there are no' +
+    ' changes', () => {
+    component.skillLinkageModificationsArray = [];
+    component.isSkillDifficultyChanged = false;
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+
+    expect(component.isQuestionSavable()).toBe(false);
+  });
+
+  it('should check if question is savable', () => {
+    component.questionIsBeingUpdated = false;
+    component.newQuestionSkillDifficulties = [0.9];
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionValidationService, 'isQuestionValid')
+      .and.returnValues(true, false);
+
+    expect(component.isQuestionSavable()).toBe(true);
+
+    component.questionIsBeingUpdated = true;
+    expect(component.isQuestionSavable()).toBe(false);
+  });
+
   it('should show solution if interaction can have solution', () => {
     component.question = question;
     spyOn(component.question, 'getStateData').and.returnValue({
