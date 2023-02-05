@@ -96,7 +96,7 @@ export class AnswerGroupObjectFactory {
 
   createFromBackendDict(
       answerGroupBackendDict: AnswerGroupBackendDict,
-      interactionId: string,
+      interactionId: string
   ): AnswerGroup {
     return new AnswerGroup(
       this.generateRulesFromBackendDict(

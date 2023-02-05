@@ -284,7 +284,7 @@ describe('Parameter Metadata Service', () => {
                 param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
-                dest: 'TextInput',
+                dest: 'State2',
                 dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'default_outcome',
