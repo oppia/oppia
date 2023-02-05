@@ -142,7 +142,7 @@ export class ParameterMetadataService {
     let graphData = this.graphDataService.getGraphData();
 
     let states = this.explorationStatesService.getStates();
-    
+
     // Determine all parameter names that are used within this exploration.
     let allParamNames: string[] = [];
     let expParamChangesMetadata = this.getMetadataFromParamChanges(
