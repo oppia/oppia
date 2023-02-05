@@ -5168,7 +5168,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 60
+    CURRENT_EXP_SCHEMA_VERSION = 61
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5515,6 +5515,23 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['states_schema_version'] = 55
         exploration_dict['next_content_id_index'] = next_content_id_index
 
+        return exploration_dict
+
+    @classmethod
+    def _convert_v60_dict_to_v61_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v60 exploration dict into a v61 exploration dict.
+        Dummy function.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v59.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v61.
+        """
         return exploration_dict
 
     @classmethod
