@@ -74,9 +74,6 @@ module.exports = class puppeteerUtilities {
    */
   async signUpNewUser(userName, signInEmail) {
     await this.signInWithEmail(signInEmail);
-    if (this.page.url() === testConstants.URLs.LearnerDashboard) {
-      return;
-    }
     await this.type('input.e2e-test-username-input', userName);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
