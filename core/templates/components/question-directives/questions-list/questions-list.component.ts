@@ -377,6 +377,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       allowSkillsFromOtherTopics);
     modalRef.componentInstance.untriagedSkillSummaries = (
       this.untriagedSkillSummaries);
+    modalRef.componentInstance.associatedSkillSummaries = (
+      this.associatedSkillSummaries);
 
     modalRef.result.then((summary) => {
       for (let idx in this.associatedSkillSummaries) {
