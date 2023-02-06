@@ -1594,6 +1594,34 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             question_suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
 
+    def test_get_translation_suggestions_in_review(self) -> None:
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_in_review(self.target_id_1))
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert suggestions[0] is not None
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[0].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        # Ruling out the possibility of None for mypy type checking.
+        assert suggestions[1] is not None
+        self.assertEqual(suggestions[1].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[1].suggestion_type,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[1].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
     def test_get_translation_suggestions_in_review_by_exploration(self) -> None:
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('hi')

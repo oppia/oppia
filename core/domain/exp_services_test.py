@@ -45,6 +45,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
+from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
@@ -71,6 +72,7 @@ if MYPY:  # pragma: no cover
     opportunity_models,
     recommendations_models,
     stats_models,
+    suggestion_models,
     user_models
 ) = models.Registry.import_models([
     models.Names.FEEDBACK,
@@ -78,6 +80,7 @@ if MYPY:  # pragma: no cover
     models.Names.OPPORTUNITY,
     models.Names.RECOMMENDATIONS,
     models.Names.STATISTICS,
+    models.Names.SUGGESTION,
     models.Names.USER
 ])
 
@@ -3479,6 +3482,70 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertNotIn('new state', exploration.states)
 
+    def test_delete_state_cmd_rejects_obsolete_translation_suggestions(
+        self
+    ) -> None:
+        """Test deleting a state name."""
+        # Add a new state with content.
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'new state',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': '<p>old content html</p>'
+                }
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, '')
+        # Create a translation suggestion for the state content.
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'new state',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID, 1, self.owner_id,
+            add_translation_change_dict, 'test description')
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertIn('new state', exploration.states)
+
+        # The new translation suggestion should be in review.
+        in_review_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+        self.assertEqual(
+            in_review_suggestion.status,
+            suggestion_models.STATUS_IN_REVIEW)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state',
+            })], 'delete state')
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertNotIn('new state', exploration.states)
+
+        # The translation suggestion should be rejected after the corresponding
+        # state is deleted.
+        rejected_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+        self.assertEqual(
+            rejected_suggestion.status,
+            suggestion_models.STATUS_REJECTED)
+
     def test_update_param_changes(self) -> None:
         """Test updating of param_changes."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3717,6 +3784,73 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             button_text_subtitle_unicode.unicode_str,
             'Continue')
+
+    def test_update_interaction_customization_args_rejects_obsolete_translation_suggestions(
+        self
+    ) -> None:
+        # Add a Continue button interaction to the exploration.
+        content_id = 'ca_buttonText_1'
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            _get_change_list(
+                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'Continue') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'buttonText': {
+                        'value': {
+                            'content_id': content_id,
+                            'unicode_str': 'Continue'
+                        }
+                    }
+                }),
+            '')
+
+        # Create a translation suggestion for the Continue button content.
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': self.init_state_name,
+            'content_id': content_id,
+            'language_code': 'hi',
+            'content_html': 'Continue',
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID, 1, self.owner_id,
+            add_translation_change_dict, 'test description')
+        # The new translation suggestion should be in review.
+        in_review_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+        self.assertEqual(
+            in_review_suggestion.status,
+            suggestion_models.STATUS_IN_REVIEW)
+
+        # Replace the Continue button content ID.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'buttonText': {
+                        'value': {
+                            'content_id': 'new_content_id',
+                            'unicode_str': 'Continue'
+                        }
+                    }
+                }),
+            '')
+
+        # The translation suggestion should be rejected after the corresponding
+        # content ID is deleted.
+        rejected_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+        self.assertEqual(
+            rejected_suggestion.status,
+            suggestion_models.STATUS_REJECTED)
 
     def test_update_interaction_handlers_fails(self) -> None:
         """Test legacy interaction handler updating."""

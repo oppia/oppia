@@ -59,6 +59,7 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -494,9 +495,22 @@ def apply_change_list(
                     change
                 )
                 exploration.delete_state(delete_state_cmd.state_name)
+                # Auto-reject corresponding pending translation suggestions.
+                # 1. Lookup in-review translation suggestions with target_id == exp.id
+                # 2. Filter for suggestions that have change with matching
+                #    state name.
+                # TODO: test.
+                (
+                    suggestion_services
+                    .auto_reject_translation_suggestions_for_state(
+                        exploration_id, delete_state_cmd.state_name)
+                )
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state: state_domain.State = exploration.states[
                     change.state_name]
+                old_translatable_content_ids = (
+                    state.written_translations
+                    .get_content_ids_for_text_translation())
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     # Here we use cast because this 'if' condition forces
@@ -743,6 +757,20 @@ def apply_change_list(
                         state_domain.WrittenTranslations.from_dict(
                             cleaned_written_translations_dict))
                     state.update_written_translations(written_translations)
+                # Auto-reject any pending translation suggestions that are now
+                # obsolete due to the corresponding content being deleted.
+                # See issue #16022 for context.
+                new_translatable_content_ids = (
+                    state.written_translations
+                    .get_content_ids_for_text_translation())
+                deleted_content_ids = (
+                    set(old_translatable_content_ids) -
+                    set(new_translatable_content_ids))
+                (
+                    suggestion_services
+                    .auto_reject_translation_suggestions_for_content_ids(
+                        exploration_id, change.state_name, deleted_content_ids))
+
             elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
                 # DEPRECATED: This command is deprecated. Please do not use.
                 # The command remains here to support old suggestions.
