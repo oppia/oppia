@@ -258,7 +258,7 @@ class StartTests(test_utils.GenericTestBase):
     ) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             Exception,
             'The \'--contributor_dashboard_debug\' flag is deprecated'
             'use \'--generate_sample_data\' instead.'

@@ -146,7 +146,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             secrets_services, 'get_secret', 'secret')
 
     def test_get_without_api_key_returns_error(self) -> None:
-        self.get_json('/android_data', expected_status_int=400)
+        self.get_json('/android_data', expected_status_int=404)
 
     def test_get_with_wrong_api_key_returns_error(self) -> None:
         secrets_swap = self.swap_to_always_return(
