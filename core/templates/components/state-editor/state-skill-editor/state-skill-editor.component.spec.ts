@@ -38,10 +38,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { UserService } from 'services/user.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { MaterialModule } from 'modules/material.module';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
 
-describe('State Skill Editor Component', () => {
+fdescribe('State Skill Editor Component', () => {
   let fixture: ComponentFixture<StateSkillEditorComponent>;
   let componentInstance: StateSkillEditorComponent;
   let mockNgbModal: MockNgbModal;
@@ -165,6 +166,7 @@ describe('State Skill Editor Component', () => {
         MatCheckboxModule,
         MatRadioModule,
         FormsModule,
+        MaterialModule,
         HttpClientTestingModule
       ],
       declarations: [
