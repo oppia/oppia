@@ -55,5 +55,4 @@ export class Hint extends BaseTranslatableObject {
       SubtitledHtml.createDefault(
         hintContent, hintContentId));
   }
-
 }
