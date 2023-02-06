@@ -495,11 +495,9 @@ def apply_change_list(
                     change
                 )
                 exploration.delete_state(delete_state_cmd.state_name)
-                # Auto-reject corresponding pending translation suggestions.
-                # 1. Lookup in-review translation suggestions with target_id == exp.id
-                # 2. Filter for suggestions that have change with matching
-                #    state name.
-                # TODO: test.
+                # Auto-reject any pending translation suggestions that are now
+                # obsolete due to the corresponding state being deleted.
+                # See issue #16022 for context.
                 (
                     suggestion_services
                     .auto_reject_translation_suggestions_for_state(
