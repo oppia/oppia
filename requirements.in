@@ -6,6 +6,7 @@
 apache-beam[gcp]==2.38.0
 beautifulsoup4==4.10.0
 bleach==4.1.0
+certifi==2021.5.30
 deepdiff==5.8.1
 defusedxml==0.7.1
 elasticsearch==7.17.0
@@ -27,6 +28,7 @@ mutagen==1.45.1
 pillow==9.0.1
 pylatexenc==2.10
 pytest==6.2.5
+PyYAML==6.0
 redis==3.5.3
 requests==2.26.0
 requests-mock==1.9.3
@@ -40,11 +42,3 @@ typing-extensions==3.10.0.2
 urllib3==1.26.7
 webapp2==3.0.0b1
 webencodings==0.5.1
-# TODO(#13506): Remove these after we refactor the Python library
-# handling process.
-# These libraries are already in oppia_tools folder, but are also needed here
-# since the oppia_tools folder is used for tooling and is not deployed to the
-# server. These libraries need to be in the oppia_tools folder because we need
-# them earlier than we are able to install the libraries from this file.
-PyYAML==6.0
-certifi==2021.5.30

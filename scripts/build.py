@@ -27,16 +27,14 @@ import shutil
 import subprocess
 import threading
 
+from core import utils
+from scripts import common
+from scripts import install_python_dev_dependencies
+from scripts import install_third_party_libs
+from scripts import servers
+
 import rcssmin
-
-# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common # isort:skip pylint: disable=wrong-import-position
-from core import utils # isort:skip pylint: disable=wrong-import-position
-from scripts import servers # isort:skip pylint: disable=wrong-import-position
-
-from typing import ( # isort:skip pylint: disable=wrong-import-position
+from typing import (
     Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict)
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
@@ -1378,9 +1376,20 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
 
 def generate_python_package() -> None:
     """Generates Python package using setup.py."""
-    print('Building Oppia package...')
-    subprocess.check_call('python setup.py -q sdist -d build', shell=True)
-    print('Oppia package build completed.')
+
+    # We first remove this dev dependencies because they should not be needed
+    # for the package build and we need to verify that they are actually not
+    # needed.
+    try:
+        print('Remove dev dependencies')
+        install_python_dev_dependencies.main(['--uninstall'])
+
+        print('Building Oppia package...')
+        subprocess.check_call('python setup.py -q sdist -d build', shell=True)
+        print('Oppia package build completed.')
+    finally:
+        install_third_party_libs.main()
+        print('Dev dependencies reinstalled')
 
 
 def clean() -> None:
