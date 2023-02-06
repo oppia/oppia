@@ -4,7 +4,7 @@
       <strong>Exploration Overview</strong>
     </span>
     <div>
-      <span *ngIf="!showCheckpointCountWarningSign()">&#11088;</span>
+      <span *ngIf="!showCheckpointCountWarningSign()"><i class="fa fa-star"></i></span>
       <span ngbTooltip="{{checkpointCountWarning}}"
             placement="top-right"
             *ngIf="showCheckpointCountWarningSign()">
@@ -22,7 +22,7 @@
       <span ngbTooltip="Learners start at their last saved checkpoint when returning back from the lesson."
             placement="right-top"
             class="clickable">
-        <strong>&#x24D8;</strong>
+        <i class="fa fa-info-circle"></i>
       </span>
     </div>
     <mat-card class="oppia-state-graph-card">
