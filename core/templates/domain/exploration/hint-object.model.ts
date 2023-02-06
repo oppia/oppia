@@ -43,16 +43,17 @@ export class Hint extends BaseTranslatableObject {
       hint_content: this.hintContent.toBackendDict()
     };
   }
-}
 
-  createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
+  static createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
     return new Hint(
       SubtitledHtml.createFromBackendDict(
         hintBackendDict.hint_content));
   }
 
-  createNew(hintContentId: string, hintContent: string): Hint {
+  static createNew(hintContentId: string, hintContent: string): Hint {
     return new Hint(
       SubtitledHtml.createDefault(
         hintContent, hintContentId));
   }
+
+}
