@@ -41,7 +41,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   untriagedSkillSummaries!: SkillSummaryBackendDict[];
   selectedSkillId!: string;
   allowSkillsFromOtherTopics: boolean = false;
-  associatedSkillSummaries: ShortSkillSummary[];
+  associatedSkillSummaries!: ShortSkillSummary[];
   errorMessage: string =
     'This skill is already linked to the current question.';
 
