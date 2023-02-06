@@ -259,7 +259,7 @@ class MigrateTopicModels(beam.PTransform):# type: ignore[misc]
 
 
 class MigrateTopicJob(base_jobs.JobBase):
-    """Job that migrates Exploration models."""
+    """Job that migrates Topic models."""
 
     @staticmethod
     def _update_topic(
