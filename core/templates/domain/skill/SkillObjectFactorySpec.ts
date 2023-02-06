@@ -29,7 +29,7 @@ import { Rubric, RubricBackendDict } from
 import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 describe('Skill object factory', () => {
   let skillObjectFactory: SkillObjectFactory;
@@ -42,7 +42,7 @@ describe('Skill object factory', () => {
   let rubricDict: RubricBackendDict;
   let skillContentsDict: ConceptCardBackendDict;
   let skillDict: SkillBackendDict;
-  let skillDifficulties: typeof constants.SKILL_DIFFICULTIES;
+  let skillDifficulties: typeof AppConstants.SKILL_DIFFICULTIES;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -52,7 +52,7 @@ describe('Skill object factory', () => {
     });
     conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
-    skillDifficulties = constants.SKILL_DIFFICULTIES;
+    skillDifficulties = AppConstants.SKILL_DIFFICULTIES;
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     misconceptionDict1 = {
       id: 2,
