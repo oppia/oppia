@@ -34,24 +34,24 @@ export class Hint extends BaseTranslatableObject {
     this.hintContent = hintContent;
   }
 
-  getTranslatableFields(): SubtitledHtml[] {
+  static getTranslatableFields(): SubtitledHtml[] {
     return [this.hintContent];
   }
 
-  toBackendDict(): HintBackendDict {
+  static toBackendDict(): HintBackendDict {
     return {
       hint_content: this.hintContent.toBackendDict()
     };
   }
 }
 
-  static createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
+  createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
     return new Hint(
       SubtitledHtml.createFromBackendDict(
         hintBackendDict.hint_content));
   }
 
-  static createNew(hintContentId: string, hintContent: string): Hint {
+  createNew(hintContentId: string, hintContent: string): Hint {
     return new Hint(
       SubtitledHtml.createDefault(
         hintContent, hintContentId));

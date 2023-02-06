@@ -506,7 +506,7 @@ describe('Editor state service', () => {
   });
 
   it('should set interaction hints', () => {
-    let newHints = [hof.createFromBackendDict({
+    let newHints = [Hint.createFromBackendDict({
       hint_content: {
         content_id: '',
         html: 'This is a hint'

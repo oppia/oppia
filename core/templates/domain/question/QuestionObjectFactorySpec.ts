@@ -20,7 +20,6 @@
 // QuestionObjectFactory.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { Hint } from 'domain/exploration/hint-object.model';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { OutcomeObjectFactory } from
