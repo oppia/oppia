@@ -42,7 +42,7 @@ import { MaterialModule } from 'modules/material.module';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
 
-fdescribe('State Skill Editor Component', () => {
+describe('State Skill Editor Component', () => {
   let fixture: ComponentFixture<StateSkillEditorComponent>;
   let componentInstance: StateSkillEditorComponent;
   let mockNgbModal: MockNgbModal;
