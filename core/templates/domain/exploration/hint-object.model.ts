@@ -34,11 +34,11 @@ export class Hint extends BaseTranslatableObject {
     this.hintContent = hintContent;
   }
 
-  static getTranslatableFields(): SubtitledHtml[] {
+  getTranslatableFields(): SubtitledHtml[] {
     return [this.hintContent];
   }
 
-  static toBackendDict(): HintBackendDict {
+  toBackendDict(): HintBackendDict {
     return {
       hint_content: this.hintContent.toBackendDict()
     };
