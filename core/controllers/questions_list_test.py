@@ -23,7 +23,6 @@ from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.domain import translation_domain
 from core.domain import user_services
 from core.tests import test_utils
 
@@ -68,12 +67,10 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
     def test_get_questions_succeeds(self) -> None:
         for _ in range(4):
             question_id = question_services.get_new_question_id()
-            content_id_generator = translation_domain.ContentIdGenerator()
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data('ABC', content_id_generator),
-                [self.skill_id, self.skill_id_2],
-                content_id_generator.next_content_id_index)
+                self._create_valid_question_data('ABC'),
+                [self.skill_id, self.skill_id_2])
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id, 0.5)
             question_services.create_new_question_skill_link(
@@ -170,19 +167,16 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question_id_1 = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
+
         self.save_new_question(
             question_id, self.admin_id,
-            self._create_valid_question_data('ABC', content_id_generator),
-            [self.skill_id],
-            content_id_generator.next_content_id_index)
+            self._create_valid_question_data('ABC'),
+            [self.skill_id])
 
-        content_id_generator_2 = translation_domain.ContentIdGenerator()
         self.save_new_question(
             question_id_1, self.admin_id,
-            self._create_valid_question_data('ABC2', content_id_generator_2),
-            [self.skill_id_2],
-            content_id_generator_2.next_content_id_index)
+            self._create_valid_question_data('ABC2'),
+            [self.skill_id_2])
 
         question_services.create_new_question_skill_link(
             self.admin_id, question_id, self.skill_id, 0.5)

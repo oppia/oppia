@@ -33,9 +33,16 @@ import {
   SubtitledHtmlBackendDict,
   SubtitledHtml
 } from 'domain/exploration/subtitled-html.model';
+import {
+  WrittenTranslationsBackendDict,
+  WrittenTranslations,
+  WrittenTranslationsObjectFactory
+} from 'domain/exploration/WrittenTranslationsObjectFactory';
 
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import { AppConstants } from 'app.constants';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 export interface StateBackendDict {
   // The classifier model ID associated with a state, if applicable,
@@ -47,11 +54,13 @@ export interface StateBackendDict {
   'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
   'card_is_checkpoint': boolean;
+  'written_translations': WrittenTranslationsBackendDict;
   // This property is null if no skill is linked to the State.
   'linked_skill_id': string | null;
+  'next_content_id_index': number;
 }
 
-export class State extends BaseTranslatableObject {
+export class State {
   // Name is null before saving a state.
   name: string | null;
   classifierModelId: string | null;
@@ -62,14 +71,16 @@ export class State extends BaseTranslatableObject {
   recordedVoiceovers: RecordedVoiceovers;
   solicitAnswerDetails: boolean;
   cardIsCheckpoint: boolean;
+  writtenTranslations: WrittenTranslations;
+  nextContentIdIndex: number;
 
   constructor(
       name: string | null, classifierModelId: string | null,
       linkedSkillId: string | null,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
-      solicitAnswerDetails: boolean, cardIsCheckpoint: boolean) {
-    super();
+      solicitAnswerDetails: boolean, cardIsCheckpoint: boolean,
+      writtenTranslations: WrittenTranslations, nextContentIdIndex: number) {
     this.name = name;
     this.classifierModelId = classifierModelId;
     this.linkedSkillId = linkedSkillId;
@@ -79,14 +90,8 @@ export class State extends BaseTranslatableObject {
     this.recordedVoiceovers = recordedVoiceovers;
     this.solicitAnswerDetails = solicitAnswerDetails;
     this.cardIsCheckpoint = cardIsCheckpoint;
-  }
-
-  getTranslatableFields(): SubtitledHtml[] {
-    return [this.content];
-  }
-
-  getTranslatableObjects(): BaseTranslatableObject[] {
-    return [this.interaction];
+    this.writtenTranslations = writtenTranslations;
+    this.nextContentIdIndex = nextContentIdIndex;
   }
 
   setName(newName: string): void {
@@ -105,6 +110,8 @@ export class State extends BaseTranslatableObject {
       recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
       solicit_answer_details: this.solicitAnswerDetails,
       card_is_checkpoint: this.cardIsCheckpoint,
+      written_translations: this.writtenTranslations.toBackendDict(),
+      next_content_id_index: this.nextContentIdIndex
     };
   }
 
@@ -117,6 +124,35 @@ export class State extends BaseTranslatableObject {
     this.recordedVoiceovers = otherState.recordedVoiceovers;
     this.solicitAnswerDetails = otherState.solicitAnswerDetails;
     this.cardIsCheckpoint = otherState.cardIsCheckpoint;
+    this.writtenTranslations = otherState.writtenTranslations;
+    this.nextContentIdIndex = otherState.nextContentIdIndex;
+  }
+
+  getRequiredWrittenTranslationContentIds(): Set<string> {
+    let interactionId = this.interaction.id;
+
+    let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
+
+    // As of now we do not delete interaction.hints when a user deletes
+    // interaction, so these hints' written translations are not counted in
+    // checking status of a state.
+    if (
+      !interactionId ||
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear ||
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal
+    ) {
+      allContentIds.forEach(contentId => {
+        if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
+          allContentIds.delete(contentId);
+        }
+      });
+      // Excluding default_outcome content status as default outcome's
+      // content is left empty so the translation or voiceover is not
+      // required.
+      allContentIds.delete('default_outcome');
+    }
+
+    return allContentIds;
   }
 }
 
@@ -126,7 +162,8 @@ export class State extends BaseTranslatableObject {
 export class StateObjectFactory {
   constructor(
     private interactionObject: InteractionObjectFactory,
-    private paramchangesObject: ParamChangesObjectFactory) {}
+    private paramchangesObject: ParamChangesObjectFactory,
+    private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE as StateBackendDict;
@@ -136,10 +173,7 @@ export class StateObjectFactory {
   // created from start.
   // Create a default state until the actual state is saved.
   // Passes name as null before saving a state.
-  createDefaultState(
-      newStateName: string | null,
-      contentIdForContent: string,
-      contentIdForDefaultOutcome: string): State {
+  createDefaultState(newStateName: string | null): State {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
@@ -149,20 +183,17 @@ export class StateObjectFactory {
       param_changes: newStateTemplate.param_changes,
       recorded_voiceovers: newStateTemplate.recorded_voiceovers,
       solicit_answer_details: newStateTemplate.solicit_answer_details,
-      card_is_checkpoint: newStateTemplate.card_is_checkpoint
+      card_is_checkpoint: newStateTemplate.card_is_checkpoint,
+      written_translations: newStateTemplate.written_translations,
+      next_content_id_index: newStateTemplate.next_content_id_index
     });
-    newState.content.contentId = contentIdForContent;
-    let defaultOutcome = newState.interaction.defaultOutcome;
-
-    if (defaultOutcome) {
-      defaultOutcome.feedback.contentId = contentIdForDefaultOutcome;
-    }
-    if (defaultOutcome !== null && newStateName !== null) {
+    if (
+      newState.interaction.defaultOutcome !== null &&
+      newStateName !== null
+    ) {
+      let defaultOutcome = newState.interaction.defaultOutcome;
       defaultOutcome.dest = newStateName as string;
     }
-    newState.recordedVoiceovers.addContentId(contentIdForContent);
-    newState.recordedVoiceovers.addContentId(contentIdForDefaultOutcome);
-
     return newState;
   }
 
@@ -181,7 +212,10 @@ export class StateObjectFactory {
       RecordedVoiceovers.createFromBackendDict(
         stateDict.recorded_voiceovers),
       stateDict.solicit_answer_details,
-      stateDict.card_is_checkpoint);
+      stateDict.card_is_checkpoint,
+      this.writtenTranslationsObject.createFromBackendDict(
+        stateDict.written_translations),
+      stateDict.next_content_id_index);
   }
 }
 

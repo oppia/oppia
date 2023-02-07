@@ -17,8 +17,8 @@
  */
 
 export interface TranslatableItemBackendDict {
-  'content_value': string | string[];
-  'content_format': string;
+  'content': string | string[];
+  'data_format': string;
   'content_type': string;
   'interaction_id': string | null;
   'rule_type': string | null;
@@ -36,8 +36,8 @@ export class TranslatableItem {
   static createFromBackendDict(
       backendDict: TranslatableItemBackendDict): TranslatableItem {
     return new TranslatableItem(
-      backendDict.content_value,
-      backendDict.content_format,
+      backendDict.content,
+      backendDict.data_format,
       backendDict.content_type,
       backendDict.interaction_id,
       backendDict.rule_type);

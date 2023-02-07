@@ -57,10 +57,8 @@ describe('State Diff Modal Component', () => {
   });
 
   beforeEach(() => {
-    newState = stateObjectFactory.createDefaultState(
-      newStateName, 'content_0', 'default_outcome_1');
-    oldState = stateObjectFactory.createDefaultState(
-      oldStateName, 'content_0', 'default_outcome_1');
+    newState = stateObjectFactory.createDefaultState(newStateName);
+    oldState = stateObjectFactory.createDefaultState(oldStateName);
 
     component.headers = headers;
     component.newState = newState;
