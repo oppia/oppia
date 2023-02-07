@@ -29,7 +29,7 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StaleTabInfoModalComponent } from 'components/stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from 'components/unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -73,7 +73,7 @@ export class SkillEditorStalenessDetectionService {
       skillEditorBrowserTabsInfo &&
       skillEditorBrowserTabsInfo.getLatestVersion() !== skill.getVersion()
     ) {
-      this.faviconService.setFavicon(constants.FAVICON_ALERT_PATH);
+      this.faviconService.setFavicon(AppConstants.FAVICON_ALERT_PATH);
       this.ngbModal.dismissAll();
       const modalRef = this.ngbModal.open(
         StaleTabInfoModalComponent, {
