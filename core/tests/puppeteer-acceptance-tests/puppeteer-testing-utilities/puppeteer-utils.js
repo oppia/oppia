@@ -43,6 +43,11 @@ module.exports = class puppeteerUtilities {
         this.page = await browser.newPage();
         await this.page.setViewport({ width: 0, height: 0 });
         // Accepting the alerts that appear in between the tests.
+        // We are doing this generically for all tests because browser alerts
+        // only work with event listeners when the page instance gets
+        // initialized, so there is no way to handle them in between the tests
+        // (where our action is popping up an alert). and it wouldn't be good
+        // to have explicit if-else conditions for handling such situations.
         this.page.on('dialog', async(dialog) => {
           await dialog.accept();
         });
