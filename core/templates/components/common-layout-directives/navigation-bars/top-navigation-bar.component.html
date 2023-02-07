@@ -240,7 +240,12 @@
                             enter: ACTION_CLOSE
                           })
                         "
-                        (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT; $event.stopPropagation()"
+                        (click)="
+                          navigateToClassroomPage(
+                            '/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT
+                          );
+                          $event.stopPropagation()
+                        "
                         tabindex="0"
                         class="underline nav-item-bottom-link"
                         href="/learn/{{ DEFAULT_CLASSROOM_URL_FRAGMENT }}"
