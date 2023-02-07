@@ -28,7 +28,6 @@ import { LanguageIdAndText, LanguageUtilService } from
   'domain/utilities/language-util.service';
 import { NavigationService } from 'services/navigation.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import constants from 'assets/constants';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import {
@@ -44,7 +43,6 @@ import { AppConstants } from 'app.constants';
 
 import './add-syllabus-items.component.css';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-
 
 interface SearchDropDownItems {
   id: string;
@@ -186,7 +184,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   }
 
   searchDropdownCategories(): SearchDropDownItems[] {
-    return constants.SEARCH_DROPDOWN_CLASSROOMS.map((classroomName) => {
+    return AppConstants.SEARCH_DROPDOWN_CLASSROOMS.map((classroomName) => {
       return {
         id: classroomName,
         text: this.constructTranslationIdsService.getClassroomTitleId(
@@ -196,7 +194,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   }
 
   searchDropdownTypes(): SearchDropDownItems[] {
-    return constants.SEARCH_DROPDOWN_TYPES.map((typeName) => {
+    return AppConstants.SEARCH_DROPDOWN_TYPES.map((typeName) => {
       return {
         id: typeName,
         text: this.constructTranslationIdsService.getSyllabusTypeTitleId(
