@@ -672,4 +672,3 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
   });
 });
-
