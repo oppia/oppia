@@ -19,7 +19,6 @@
 let testConstants = {
   URLs: {
     home: 'http://localhost:8181/',
-    LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
     BlogAdmin: 'http://localhost:8181/blog-admin',
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
