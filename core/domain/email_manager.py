@@ -79,10 +79,10 @@ NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
         'description': 'questions',
         'rights_message': 'review question suggestions made by contributors'
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTIONS:{
-        'review_category' : 'submit_question',
-        'description':'submit questions',
-        'right_message':'contributors submit questions'
+    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTIONS: {
+        'review_category': 'submit_question',
+        'description': 'submit questions',
+        'right_message': 'contributors submit questions'
 
     }
 }
@@ -2152,14 +2152,12 @@ def send_email_to_new_contribution_reviewer(
 def send_email_to_new_contribution_submit_questions(
     recipient_id: str,
     review_category: str,
-    language_code: Optional[str] = None
 ) -> None:
     """Sends an email to user who is assigned to submit questions.
 
     Args:
         recipient_id: str. The ID of the user.
-        review_category: str. submit_question.
-        
+        review_category: str. submit_question.        
 
     Raises:
         Exception. The review category is not valid.
