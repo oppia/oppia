@@ -501,20 +501,9 @@ def apply_change_list(
                     change
                 )
                 exploration.delete_state(delete_state_cmd.state_name)
-                # Auto-reject any pending translation suggestions that are now
-                # obsolete due to the corresponding state being deleted.
-                # See issue #16022 for context.
-                (
-                    suggestion_services
-                    .auto_reject_translation_suggestions_for_state(
-                        exploration_id, delete_state_cmd.state_name)
-                )
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state: state_domain.State = exploration.states[
                     change.state_name]
-                old_translatable_content_ids = (
-                    state.written_translations
-                    .get_content_ids_for_text_translation())
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     # Here we use cast because this 'if' condition forces
@@ -723,19 +712,6 @@ def apply_change_list(
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                # Auto-reject any pending translation suggestions that are now
-                # obsolete due to the corresponding content being deleted.
-                # See issue #16022 for context.
-                new_translatable_content_ids = (
-                    state.written_translations
-                    .get_content_ids_for_text_translation())
-                deleted_content_ids = (
-                    set(old_translatable_content_ids) -
-                    set(new_translatable_content_ids))
-                (
-                    suggestion_services
-                    .auto_reject_translation_suggestions_for_content_ids(
-                        exploration_id, change.state_name, deleted_content_ids))
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     # Here we use cast because this 'if' condition forces
@@ -2076,11 +2052,6 @@ def compute_models_to_put_when_saving_new_exp_version(
 
     Raises:
         ValueError. No commit message is supplied and the exploration is public.
-        ValueError. The update is due to a suggestion and the commit message is
-            invalid.
-        ValueError. The update is not due to a suggestion, and the commit
-            message starts with the same prefix as the commit message for
-            accepted suggestions.
 
     Returns:
         list(BaseModel). A list of the models that were updated.
@@ -2145,6 +2116,17 @@ def compute_models_to_put_when_saving_new_exp_version(
         )
     )
     models_to_put.extend(new_translation_models)
+    # Auto-reject any pending translation suggestions that are now obsolete due
+    # to the corresponding content being deleted. See issue #16022 for context.
+    # TODO(#16022): Refactor to compute the suggestion, suggestion stats, and
+    # feedback message models that are put to the datastore during the
+    # suggestion rejection flow instead of applying the datastore changes here.
+    if len(content_ids_corresponding_translations_to_remove) > 0:
+        (
+            suggestion_services
+            .auto_reject_translation_suggestions_for_content_ids(
+                exploration_id,
+                content_ids_corresponding_translations_to_remove))
 
     exp_user_data_model_to_put = get_exp_user_data_model_with_draft_discarded(
         exploration_id, committer_id

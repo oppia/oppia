@@ -3613,30 +3613,55 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_delete_state_cmd_rejects_obsolete_translation_suggestions(
         self
     ) -> None:
-        """Test deleting a state name."""
+        """Verify deleting a state name rejects corresponding suggestions."""
         # Add a new state with content.
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        content_id = content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT)
         change_list = [
+            # Add state.
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
+                'content_id_for_state_content': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT)
+                ),
+                'content_id_for_default_outcome': (
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME)
+                )
             }),
+            # Add content.
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'new state',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': content_id,
                     'html': '<p>old content html</p>'
                 }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'next_content_id_index',
+                'new_value': content_id_generator.next_content_id_index
             })
         ]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list, '')
+            self.owner_id, self.EXP_0_ID, change_list, 'Initial commit')
+
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertIn('new state', exploration.states)
+
         # Create a translation suggestion for the state content.
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'new state',
-            'content_id': 'content',
+            'content_id': content_id,
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>Translation for original content.</p>',
@@ -3646,9 +3671,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID, 1, self.owner_id,
             add_translation_change_dict, 'test description')
-
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertIn('new state', exploration.states)
 
         # The new translation suggestion should be in review.
         in_review_suggestion = suggestion_services.get_suggestion_by_id(
@@ -3918,8 +3940,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     ) -> None:
         # Add a Continue button interaction to the exploration.
         content_id = 'ca_buttonText_1'
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID,
+        change_list = (
             _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'Continue') +
@@ -3933,8 +3954,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'Continue'
                         }
                     }
-                }),
-            '')
+                }))
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Initial commit')
 
         # Create a translation suggestion for the Continue button content.
         add_translation_change_dict = {
@@ -3970,7 +3992,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                         }
                     }
                 }),
-            '')
+            'Replace Continue button content ID')
 
         # The translation suggestion should be rejected after the corresponding
         # content ID is deleted.

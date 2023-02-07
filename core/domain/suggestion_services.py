@@ -902,49 +902,24 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
 
 
-def auto_reject_translation_suggestions_for_state(
-    exp_id: str,
-    state_name: str
-) -> None:
-    """Rejects all translation suggestions with target ID matching the supplied
-    exploration ID and change state name matching the supplied exploration state
-    name. These suggestions are being rejected because their corresponding
-    exploration state was deleted. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
-
-    Args:
-        exp_id: str. The exploration ID.
-        state_name: str. The exploration state name.
-    """
-    obsolete_suggestion_ids = [
-        suggestion.suggestion_id
-        for suggestion in get_translation_suggestions_in_review(exp_id)
-        if suggestion.change.state_name == state_name]
-    reject_suggestions(
-        obsolete_suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
-        suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
-
-
 def auto_reject_translation_suggestions_for_content_ids(
     exp_id: str,
-    state_name: str,
-    content_ids: Set
+    content_ids: Set[str]
 ) -> None:
     """Rejects all translation suggestions with target ID matching the supplied
-    exploration ID, change state name matching the supplied exploration state
-    name, and change content ID matching one of the supplied content IDs. These
-    suggestions are being rejected because their corresponding exploration
-    content was deleted. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
+    exploration ID and change content ID matching one of the supplied content
+    IDs. These suggestions are being rejected because their corresponding
+    exploration content was deleted. Reviewer ID is set to
+    SUGGESTION_BOT_USER_ID.
 
     Args:
         exp_id: str. The exploration ID.
-        state_name: str. The exploration state name.
-        content_ids: list(str). List of exploration content IDs.
+        content_ids: list(str). The list of exploration content IDs.
     """
     obsolete_suggestion_ids = [
         suggestion.suggestion_id
         for suggestion in get_translation_suggestions_in_review(exp_id)
-        if suggestion.change.state_name == state_name
-        and suggestion.change.content_id in content_ids]
+        if suggestion.change.content_id in content_ids]
     reject_suggestions(
         obsolete_suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
