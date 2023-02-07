@@ -30,7 +30,8 @@ import './learner-group-learners-progress.component.css';
 
 @Component({
   selector: 'oppia-learner-group-learners-progress',
-  templateUrl: './learner-group-learners-progress.component.html'
+  templateUrl: './learner-group-learners-progress.component.html',
+  styleUrls: ['./learner-group-learners-progress.component.css']
 })
 export class LearnerGroupLearnersProgressComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;

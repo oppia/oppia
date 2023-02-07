@@ -34,7 +34,8 @@ import './hint-and-solution-buttons.component.css';
 
 @Component({
   selector: 'oppia-hint-and-solution-buttons',
-  templateUrl: './hint-and-solution-buttons.component.html'
+  templateUrl: './hint-and-solution-buttons.component.html',
+  styleUrls: ['./hint-and-solution-buttons.component.css']
 })
 export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

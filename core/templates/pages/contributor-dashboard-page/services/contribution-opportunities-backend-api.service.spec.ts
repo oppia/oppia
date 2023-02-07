@@ -59,7 +59,8 @@ describe('Contribution Opportunities backend API service', function() {
     },
     translation_in_review_counts: {
       hi: 15
-    }
+    },
+    language_code: 'hi'
   }];
   const translationOpportunityResponse = {
     opportunities: translationOpportunities,
@@ -268,6 +269,28 @@ describe('Contribution Opportunities backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should fetch reviewable translation opportunities by language',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      contributionOpportunitiesBackendApiService
+        .fetchReviewableTranslationOpportunitiesAsync('All', 'hi').then(
+          successHandler, failHandler
+        );
+
+      const req = httpTestingController.expectOne(
+        urlInterpolationService.interpolateUrl(
+          '/getreviewableopportunitieshandler?language_code=<language_code>',
+          {
+            language_code: 'hi'
+          }
+        )
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({opportunities: translationOpportunities});
+    }));
 
   it('should fail to fetch reviewable translation opportunities ' +
     'given invalid topic name when calling ' +

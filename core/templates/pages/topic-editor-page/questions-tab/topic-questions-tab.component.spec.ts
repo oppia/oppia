@@ -27,7 +27,7 @@ import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TopicQuestionsTabComponent } from './topic-questions-tab.component';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 
 let skillSummaryBackendDict: SkillSummaryBackendDict = {
   id: 'test_id',

@@ -24,7 +24,8 @@ import './learner-group-details.component.css';
 
 @Component({
   selector: 'oppia-learner-group-details',
-  templateUrl: './learner-group-details.component.html'
+  templateUrl: './learner-group-details.component.html',
+  styleUrls: ['./learner-group-details.component.css']
 })
 export class LearnerGroupDetailsComponent {
   @Input() learnerGroupTitle!: string;

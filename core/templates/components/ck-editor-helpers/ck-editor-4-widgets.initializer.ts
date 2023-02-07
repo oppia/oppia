@@ -159,6 +159,7 @@ export class CkEditorInitializerService {
                           newWidgetSelector);
                         if (widgetElement) {
                           widgetElement.remove();
+                          editor.fire('change');
                         }
                       }
                     }

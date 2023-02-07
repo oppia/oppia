@@ -42,7 +42,8 @@ import './create-learner-group-page.component.css';
 
 @Component({
   selector: 'oppia-create-learner-group-page',
-  templateUrl: './create-learner-group-page.component.html'
+  templateUrl: './create-learner-group-page.component.html',
+  styleUrls: ['./create-learner-group-page.component.css']
 })
 export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

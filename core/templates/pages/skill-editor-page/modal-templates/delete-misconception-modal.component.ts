@@ -36,7 +36,7 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 
   constructor(
     private skillEditorStateService: SkillEditorStateService,
-    protected modalInstance: NgbActiveModal
+    public modalInstance: NgbActiveModal
   ) {
     super(modalInstance);
   }

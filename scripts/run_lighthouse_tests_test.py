@@ -85,6 +85,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         def mock_context_manager() -> MockCompilerContextManager:
             return MockCompilerContextManager()
+        self.swap_ng_build = self.swap(
+            servers, 'managed_ng_build', mock_context_manager)
         self.swap_webpack_compiler = self.swap(
             servers, 'managed_webpack_compiler', mock_context_manager)
         self.swap_redis_server = self.swap(
@@ -179,16 +181,20 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr)
 
     def test_subprocess_error_results_in_failed_webpack_compilation(
-        self) -> None:
+        self
+    ) -> None:
         class MockFailedCompiler:
             def wait(self) -> None: # pylint: disable=missing-docstring
                 raise subprocess.CalledProcessError(
                     returncode=1, cmd='', output='Subprocess execution failed.')
-        class MockFailedCompilerContextManager():
+
+        class MockFailedCompilerContextManager:
             def __init__(self) -> None:
                 pass
+
             def __enter__(self) -> MockFailedCompiler:
                 return MockFailedCompiler()
+
             def __exit__(self, *unused_args: str) -> None:
                 pass
 
@@ -272,10 +278,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[{'args': []}])
         swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
 
-        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+        with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
-                with self.swap_redis_server, swap_emulator_mode:
-                    with swap_popen, swap_build, swap_run_lighthouse_tests:
+                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
+                    with self.swap_redis_server, swap_run_lighthouse_tests:
                         run_lighthouse_tests.main(
                             args=['--mode', 'accessibility', '--shard', '1'])
 

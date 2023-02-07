@@ -31,6 +31,8 @@ var DiagnosticTestPage = function() {
   var recommendedTopicSummaryTilesSelector = function() {
     return $$('.e2e-test-recommended-topic-summary-tile');
   };
+  var recommendedTopicSummaryTilesLocator = (
+    '.e2e-test-recommended-topic-summary-tile');
   var classroomTileSelector = $('.e2e-test-classroom-tile');
   var editClassroomConfigButton = $('.e2e-test-edit-classroom-config-button');
   var addTopicToClassroomButton = $('.e2e-test-add-topic-to-classroom-button');
@@ -101,7 +103,9 @@ var DiagnosticTestPage = function() {
         recommendedTopicSummaryTile,
         'Recommended topic summary tile is not visible'
       );
-      expect(recommendedTopicSummaryTiles.length).toEqual(count);
+      await waitFor.numberOfElementsToBe(
+        recommendedTopicSummaryTilesLocator,
+        'Recommended topic summary tile', count);
     } else {
       expect(recommendedTopicSummaryTiles.length).toEqual(0);
     }

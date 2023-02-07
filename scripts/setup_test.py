@@ -123,7 +123,7 @@ class SetupTests(test_utils.GenericTestBase):
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
         self.version_info_py38_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=8, micro=12)
+            sys, 'version_info', version_info(major=3, minor=8, micro=15)
         )
         self.python2_print_swap = self.swap_with_checks(
             builtins,

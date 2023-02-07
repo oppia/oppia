@@ -231,6 +231,7 @@
                 <div>
                   <oppia-filtered-choices-field [choices]="sortOptions"
                                                 placeholder="Sort Options"
+                                                [isSearchable]="false"
                                                 searchLabel="Search"
                                                 [(selection)]="filterObject.sort"
                                                 (selectionChange)="applyFilters()">

@@ -25,15 +25,16 @@ from core.tests import test_utils
 class LearnerGroupTest(test_utils.GenericTestBase):
     """Tests for LearnerGroup domain object."""
 
-    def test_initialization(self) -> None:
-        learner_group = learner_group_domain.LearnerGroup(
-            '3232', 'title', 'description',
-            ['user_1'],
-            ['user_2', 'user_3', 'user_4'],
-            ['user_5', 'user_6'],
-            ['subtopic_1', 'subtopic_2'],
-            ['story_1', 'story_2'])
+    VALID_LEARNER_GROUP = learner_group_domain.LearnerGroup(
+        '3232', 'title', 'description',
+        ['user_1'],
+        ['user_2', 'user_3', 'user_4'],
+        ['user_5', 'user_6'],
+        ['subtopic_1', 'subtopic_2'],
+        ['story_1', 'story_2'])
 
+    def test_initialization(self) -> None:
+        learner_group = self.VALID_LEARNER_GROUP
         expected_learner_group_dict = {
             'group_id': '3232',
             'title': 'title',
@@ -63,14 +64,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
             expected_learner_group_dict)
 
     def test_to_dict(self) -> None:
-        learner_group = learner_group_domain.LearnerGroup(
-            '3232', 'title', 'description',
-            ['user_1'],
-            ['user_2', 'user_3', 'user_4'],
-            ['user_5', 'user_6'],
-            ['subtopic_1', 'subtopic_2'],
-            ['story_1', 'story_2'])
-
+        learner_group = self.VALID_LEARNER_GROUP
         expected_learner_group_dict = {
             'group_id': '3232',
             'title': 'title',
@@ -126,3 +120,7 @@ class LearnerGroupTest(test_utils.GenericTestBase):
                 ['subtopic_1', 'subtopic_2'],
                 ['story_1', 'story_2']),
             'Learner group facilitator cannot be invited to join the group.')
+
+        # Valid object should not raise exception during validation.
+        learner_group = self.VALID_LEARNER_GROUP
+        learner_group.validate()

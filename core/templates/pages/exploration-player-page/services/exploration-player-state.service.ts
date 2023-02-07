@@ -62,7 +62,7 @@ export class ExplorationPlayerStateService {
     DiagnosticTestPlayerEngineService
   );
 
-  explorationMode: string = ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
+  explorationMode: string;
   editorPreviewMode: boolean;
   questionPlayerMode: boolean;
   diagnosticTestPlayerMode: boolean;
@@ -173,12 +173,14 @@ export class ExplorationPlayerStateService {
         draft_change_list_id: returnDict.draft_change_list_id,
         language_code: returnDict.exploration.language_code,
         version: returnDict.version,
+        next_content_id_index: returnDict.exploration.next_content_id_index,
         exploration_metadata: returnDict.exploration_metadata
       },
       returnDict.version,
       returnDict.preferred_audio_language_code,
       returnDict.auto_tts_enabled,
       returnDict.preferred_language_codes,
+      returnDict.displayable_language_codes,
       arePretestsAvailable ? () => {} : callback);
   }
 
@@ -251,7 +253,7 @@ export class ExplorationPlayerStateService {
         states: explorationData.states
       }, featuresData);
       this.explorationEngineService.init(
-        explorationData, null, null, null, null, callback);
+        explorationData, null, null, null, null, [], callback);
       this.playerCorrectnessFeedbackEnabledService.init(
         explorationData.correctness_feedback_enabled);
       this.numberAttemptsService.reset();
@@ -382,12 +384,7 @@ export class ExplorationPlayerStateService {
       this.explorationMode ===
       ExplorationPlayerConstants.EXPLORATION_MODE.EXPLORATION ||
       this.explorationMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER ||
-      this.explorationMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.OTHER
-    ) {
-      // TODO(#16582): Remove "other" mode from exploration player
-      // state service.
+      ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER) {
       return false;
     } else {
       throw new Error('Invalid mode received: ' + this.explorationMode + '.');
@@ -403,18 +400,6 @@ export class ExplorationPlayerStateService {
   isInStoryChapterMode(): boolean {
     return this.explorationMode ===
     ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER;
-  }
-
-  isInExplorationMode(): boolean {
-    return this.explorationMode ===
-    ExplorationPlayerConstants.EXPLORATION_MODE.EXPLORATION;
-  }
-
-  isInOtherMode(): boolean {
-    // TODO(#16582): Remove "other" mode from exploration player
-    // state service.
-    return this.explorationMode ===
-    ExplorationPlayerConstants.EXPLORATION_MODE.OTHER;
   }
 
   moveToExploration(

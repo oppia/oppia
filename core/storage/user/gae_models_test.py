@@ -1178,6 +1178,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
                 username='username' + creator_id,
                 email=creator_id + '@example.com'
             ).put()
+            user_models.UserSubscriptionsModel(id=creator_id).put()
 
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_2,
@@ -1261,10 +1262,18 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             }
         )
 
-    def test_apply_deletion_policy(self) -> None:
+    def test_apply_deletion_policy_deletes_model_for_user(self) -> None:
         user_models.UserSubscriptionsModel.apply_deletion_policy(self.USER_ID_1)
         self.assertIsNone(
             user_models.UserSubscriptionsModel.get_by_id(self.USER_ID_1))
+
+    def test_apply_deletion_policy_deletes_user_from_creator_ids(self) -> None:
+        user_models.UserSubscriptionsModel.apply_deletion_policy(self.USER_ID_5)
+        user_subscriptions_model = (
+            user_models.UserSubscriptionsModel.get_by_id(self.USER_ID_2))
+        self.assertNotIn(self.USER_ID_5, user_subscriptions_model.creator_ids)
+
+    def test_apply_deletion_policy_for_non_existing_user_passes(self) -> None:
         # Test that calling apply_deletion_policy with no existing model
         # doesn't fail.
         user_models.UserSubscriptionsModel.apply_deletion_policy(
@@ -1358,16 +1367,25 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
         user_models.UserSubscribersModel(
             id=self.USER_ID_1, subscriber_ids=[self.USER_ID_3]).put()
         user_models.UserSubscribersModel(id=self.USER_ID_2, deleted=True).put()
+        user_models.UserSubscribersModel(id=self.USER_ID_3).put()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             user_models.UserSubscribersModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy(self) -> None:
+    def test_apply_deletion_policy_deletes_model_for_user(self) -> None:
         user_models.UserSubscribersModel.apply_deletion_policy(self.USER_ID_1)
         self.assertIsNone(
             user_models.UserSubscribersModel.get_by_id(self.USER_ID_1))
+
+    def test_apply_deletion_policy_deletes_user_from_creator_ids(self) -> None:
+        user_models.UserSubscribersModel.apply_deletion_policy(self.USER_ID_3)
+        user_subscribers_model = (
+            user_models.UserSubscribersModel.get_by_id(self.USER_ID_1))
+        self.assertNotIn(self.USER_ID_3, user_subscribers_model.subscriber_ids)
+
+    def test_apply_deletion_policy_for_non_existing_user_passes(self) -> None:
         # Test that calling apply_deletion_policy with no existing model
         # doesn't fail.
         user_models.UserSubscribersModel.apply_deletion_policy(

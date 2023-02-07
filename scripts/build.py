@@ -27,16 +27,14 @@ import shutil
 import subprocess
 import threading
 
+from core import utils
+from scripts import common
+from scripts import install_python_dev_dependencies
+from scripts import install_third_party_libs
+from scripts import servers
+
 import rcssmin
-
-# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common # isort:skip pylint: disable=wrong-import-position
-from core import utils # isort:skip pylint: disable=wrong-import-position
-from scripts import servers # isort:skip pylint: disable=wrong-import-position
-
-from typing import ( # isort:skip pylint: disable=wrong-import-position
+from typing import (
     Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict)
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
@@ -665,6 +663,20 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
     _execute_tasks(
         _generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], webfonts_dir))
+
+
+def build_using_ng() -> None:
+    """Execute angular build process. This runs the angular compiler and
+    generates an ahead of time compiled bundle. This bundle can be found in the
+    dist/oppia-angular-prod folder.
+    """
+    print('Building using angular cli')
+    managed_ng_build_process = servers.managed_ng_build(
+        use_prod_env=True, watch_mode=False)
+    with managed_ng_build_process as p:
+        p.wait()
+    assert get_file_count('dist/oppia-angular-prod') > 0, (
+        'angular generated bundle should be non-empty')
 
 
 def build_using_webpack(config_path: str) -> None:
@@ -1364,9 +1376,20 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
 
 def generate_python_package() -> None:
     """Generates Python package using setup.py."""
-    print('Building Oppia package...')
-    subprocess.check_call('python setup.py -q sdist -d build', shell=True)
-    print('Oppia package build completed.')
+
+    # We first remove this dev dependencies because they should not be needed
+    # for the package build and we need to verify that they are actually not
+    # needed.
+    try:
+        print('Remove dev dependencies')
+        install_python_dev_dependencies.main(['--uninstall'])
+
+        print('Building Oppia package...')
+        subprocess.check_call('python setup.py -q sdist -d build', shell=True)
+        print('Oppia package build completed.')
+    finally:
+        install_third_party_libs.main()
+        print('Dev dependencies reinstalled')
 
 
 def clean() -> None:
@@ -1414,6 +1437,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
         else:
             build_using_webpack(WEBPACK_PROD_CONFIG)
+        build_using_ng()
         generate_app_yaml(
             deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)

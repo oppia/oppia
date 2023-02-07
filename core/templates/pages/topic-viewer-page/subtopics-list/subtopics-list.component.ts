@@ -28,7 +28,7 @@ import './subtopics-list.component.css';
 @Component({
   selector: 'subtopics-list',
   templateUrl: './subtopics-list.component.html',
-  styleUrls: []
+  styleUrls: ['./subtopics-list.component.css']
 })
 export class SubtopicsListComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

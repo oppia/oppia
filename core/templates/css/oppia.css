@@ -131,6 +131,14 @@ why they need to be overriden.  */
   transform: none !important;
 }
 
+.embedded-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
 .md-button {
   font-size: 16px;
   line-height: 22px;
@@ -797,9 +805,6 @@ textarea {
   margin-bottom: 0;
   padding: 0;
   width: 100%;
-}
-.navbar-form {
-  padding-left: 15px;
 }
 
 .nav {
@@ -2967,7 +2972,7 @@ oppia-noninteractive-link {
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: normal;
   -ms-hyphens: auto;
   -moz-hyphens: auto;
@@ -3119,6 +3124,7 @@ oppia-noninteractive-link {
   overflow: hidden;
   padding: 12px;
   text-overflow: ellipsis;
+  word-break: break-word;
 }
 .oppia-activity-summary-tile-pre-hover-preview {
   margin-bottom: 35px;
@@ -4093,4 +4099,13 @@ oppia-response-text-input {
   .conversation-skin-oppia-avatar {
     display: none;
   }
+}
+
+mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.story-save-draft-warning {
+  color: #fc0;
 }

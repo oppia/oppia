@@ -18,7 +18,7 @@
 
 import { Subscription } from 'rxjs';
 import { Subject } from 'rxjs';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -32,9 +32,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslateService } from '@ngx-translate/core';
-
 import './search-bar.component.css';
-
 
 interface SearchDropDownCategories {
   id: string;
@@ -48,7 +46,8 @@ interface LanguageIdAndText {
 
 @Component({
   selector: 'oppia-search-bar',
-  templateUrl: './search-bar.component.html'
+  templateUrl: './search-bar.component.html',
+  styleUrls: ['./search-bar.component.css']
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -257,7 +256,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   searchDropdownCategories(): SearchDropDownCategories[] {
-    return constants.SEARCH_DROPDOWN_CATEGORIES.map((categoryName) => {
+    return AppConstants.SEARCH_DROPDOWN_CATEGORIES.map((categoryName) => {
       return {
         id: categoryName,
         text: this.constructTranslationIdsService.getLibraryId(

@@ -70,18 +70,19 @@ export class DonatePageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    this.windowRef.nativeWindow.onhashchange = () => {
-      let newHash: string = this.windowRef.nativeWindow.location.hash;
-      if (newHash === '#thank-you') {
-        this.ngbModal.open(
-          ThanksForDonatingModalComponent,
-          {
-            backdrop: 'static',
-            size: 'xl'
-          }
-        );
-      }
-    };
+    this.showThanksForDonatingModal();
+  }
+
+  showThanksForDonatingModal(): void {
+    if (this.windowRef.nativeWindow.location.hash === '#thank-you') {
+      this.ngbModal.open(
+        ThanksForDonatingModalComponent,
+        {
+          backdrop: 'static',
+          size: 'xl'
+        }
+      );
+    }
   }
 
   setPageTitle(): void {

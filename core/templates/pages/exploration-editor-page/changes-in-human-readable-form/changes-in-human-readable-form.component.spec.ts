@@ -38,7 +38,7 @@ describe('Changes in Human Readable Form Component', () => {
       // Removes Unecessary white spaces and new lines.
       .replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2')
       // Removes Comments.
-      .replace(/<\!--.*?-->/g, '')
+      .replace(/<\!--.*?-->/gm, '')
       // Removes marker.
       .replace(/::marker/, '');
   };
@@ -71,6 +71,8 @@ describe('Changes in Human Readable Form Component', () => {
     component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'add_state',
       state_name: 'State name',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     })];
 
     fixture.detectChanges();

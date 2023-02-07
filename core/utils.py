@@ -56,10 +56,6 @@ T = TypeVar('T')
 TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
-# TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
-# These will be removed after python3 migration and adding stubs for new python3
-# libraries.
-
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""
@@ -1401,7 +1397,7 @@ def url_open(
     """
     # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
     # check is refactored.
-    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
+    context = ssl.create_default_context(cafile=certifi.where())
     return urllib.request.urlopen(source_url, context=context)
 
 

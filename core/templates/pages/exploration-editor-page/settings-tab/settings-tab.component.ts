@@ -131,7 +131,7 @@ export class SettingsTabComponent
     private alertsService: AlertsService,
     private changeListService: ChangeListService,
     private contextService: ContextService,
-    private editabilityService: EditabilityService,
+    public editabilityService: EditabilityService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private explorationAutomaticTextToSpeechService:
@@ -149,7 +149,7 @@ export class SettingsTabComponent
     private explorationObjectiveService: ExplorationObjectiveService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationParamSpecsService: ExplorationParamSpecsService,
-    private explorationRightsService: ExplorationRightsService,
+    public explorationRightsService: ExplorationRightsService,
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService,
@@ -645,7 +645,9 @@ export class SettingsTabComponent
     }).result.then(() => {
       this.editableExplorationBackendApiService.deleteExplorationAsync(
         this.explorationId).then(() => {
-        this.windowRef.nativeWindow.location = this.CREATOR_DASHBOARD_PAGE_URL;
+        this.windowRef.nativeWindow.location = (
+          // TODO(#13015): Remove use of unknown as a type.
+          this.CREATOR_DASHBOARD_PAGE_URL as unknown as Location);
       });
     }, () => {
       this.alertsService.clearWarnings();

@@ -32,16 +32,15 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
-import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -69,13 +68,21 @@ class MockI18nLanguageCodeService {
   }
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: 'http://localhost:8181/explore/wZiXFx1iV5bz',
+      pathname: '/explore/wZiXFx1iV5bz'
+    }
+  };
+}
+
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
+  let windowRef: MockWindowRef;
   let playerTranscriptService: PlayerTranscriptService;
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
-  let imagePreloaderService: ImagePreloaderService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let interactionObjectFactory: InteractionObjectFactory;
 
@@ -92,6 +99,9 @@ describe('Content language selector component', () => {
         SwitchContentLanguageRefreshRequiredModalComponent
       ],
       providers: [{
+        provide: WindowRef,
+        useClass: MockWindowRef
+      }, {
         provide: ContentTranslationLanguageService,
         useClass: MockContentTranslationLanguageService
       }, {
@@ -100,31 +110,45 @@ describe('Content language selector component', () => {
       }]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [SwitchContentLanguageRefreshRequiredModalComponent],
+        entryComponents: [
+          SwitchContentLanguageRefreshRequiredModalComponent
+        ],
       }
     }).compileComponents();
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    writtenTranslationsObjectFactory = TestBed.get(
-      WrittenTranslationsObjectFactory);
-    imagePreloaderService = TestBed.get(ImagePreloaderService);
     audioTranslationLanguageService = TestBed.get(
       AudioTranslationLanguageService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
+    windowRef = TestBed.inject(WindowRef);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
 
-  it('should correctly initialize selectedLanguageCode and ' +
-     'languagesInExploration', () => {
+  it('should correctly initialize selectedLanguageCode, ' +
+    'and languagesInExploration', () => {
     expect(component.selectedLanguageCode).toBe('fr');
     expect(component.languageOptions).toEqual([
-      {value: 'fr', displayed: 'français (French)'},
-      {value: 'zh', displayed: '中文 (Chinese)'},
-      {value: 'en', displayed: 'English'}
+      { value: 'fr', displayed: 'français (French)' },
+      { value: 'zh', displayed: '中文 (Chinese)' },
+      { value: 'en', displayed: 'English' }
     ]);
+  });
+
+  it('should correcly initialize newLanguageCode', () => {
+    component.ngOnInit();
+    expect(component.newLanguageCode).toBe('fr');
+
+    windowRef.nativeWindow.location.href = (
+      'http://localhost:8181/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
+    windowRef.nativeWindow.location.pathname = (
+      '/explore/wZiXFx1iV5bz?initialContentLanguageCode=en');
+
+    component.ngOnInit();
+
+    expect(component.newLanguageCode).toBe('en');
   });
 
   it('should correctly select an option when refresh is not needed', () => {
@@ -187,16 +211,14 @@ describe('Content language selector component', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
-    spyOn(imagePreloaderService, 'restartImagePreloader');
 
+    component.selectedLanguageCode = 'en';
     component.onSelectLanguage('fr');
 
     expect(setCurrentContentLanguageCodeSpy).toHaveBeenCalledWith('fr');
     expect(component.selectedLanguageCode).toBe('fr');
-    expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
   });
 
   it('should correctly open the refresh required modal when refresh is ' +
@@ -260,7 +282,6 @@ describe('Content language selector component', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     card.addInputResponsePair({
       learnerInput: '',
@@ -268,10 +289,8 @@ describe('Content language selector component', () => {
       isHint: false
     });
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
-    spyOn(imagePreloaderService, 'restartImagePreloader');
 
     component.onSelectLanguage('fr');
     expect(setCurrentContentLanguageCodeSpy).not.toHaveBeenCalled();
-    expect(imagePreloaderService.restartImagePreloader).toHaveBeenCalled();
   });
 });

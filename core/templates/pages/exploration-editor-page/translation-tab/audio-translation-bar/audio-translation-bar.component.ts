@@ -556,7 +556,10 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     $('.oppia-translation-tab').on('drop', (evt) => {
       evt.preventDefault();
       if (
-        (evt.target as Element).classList.contains(
+        // TODO(#13015): Remove use of unknown as a type.
+        // The way to remove this unknown is migrating jQuery.
+        // So probably #12882 also.
+        (evt.target as unknown as Element).classList.contains(
           'oppia-drop-area-message'
         ) && this.dropAreaIsAccessible
       ) {

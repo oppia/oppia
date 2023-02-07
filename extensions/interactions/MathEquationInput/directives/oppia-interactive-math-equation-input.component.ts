@@ -24,14 +24,18 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { MathEquationInputRulesService } from './math-equation-input-rules.service';
 import { TranslateService } from '@ngx-translate/core';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
+
+interface FocusObj {
+  focused: boolean;
+}
+
 
 @Component({
   selector: 'oppia-interactive-math-equation-input',
@@ -52,17 +56,18 @@ export class InteractiveMathEquationInput implements OnInit {
     private currentInteractionService: CurrentInteractionService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
-    private deviceInfoService: DeviceInfoService,
     private htmlEscaperService: HtmlEscaperService,
     private mathEquationInputRulesService: MathEquationInputRulesService,
     private mathInteractionsService: MathInteractionsService,
     private translateService: TranslateService,
   ) {}
 
-  isCurrentAnswerValid(): boolean {
+  isCurrentAnswerValid(checkForTouched = true): boolean {
     let activeGuppyObject = (
       this.guppyInitializationService.findActiveGuppyObject());
-    if (this.hasBeenTouched && activeGuppyObject === undefined) {
+    if (
+      (!checkForTouched || this.hasBeenTouched) &&
+      activeGuppyObject === undefined) {
       // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
       // is not compatible with nerdamer or with the backend validations.
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
@@ -77,7 +82,7 @@ export class InteractiveMathEquationInput implements OnInit {
   }
 
   submitAnswer(): void {
-    if (!this.isCurrentAnswerValid()) {
+    if (!this.isCurrentAnswerValid(false)) {
       return;
     }
     this.currentInteractionService.onSubmit(
@@ -95,7 +100,7 @@ export class InteractiveMathEquationInput implements OnInit {
     this.guppyConfigurationService.changeDivSymbol(
       JSON.parse(this.useFractionForDivisionWithValue || 'false'));
     let translatedPlaceholder = this.translateService.instant(
-      constants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
     this.guppyInitializationService.init(
       'guppy-div-learner',
       translatedPlaceholder,
@@ -105,18 +110,25 @@ export class InteractiveMathEquationInput implements OnInit {
     this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
         this.allowedVariablesWithValue) as unknown as string[]);
-    let eventType = (
-      this.deviceInfoService.isMobileUserAgent() &&
-      this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
-    // We need the 'focus' event while using the on screen keyboard (only
-    // for touch-based devices) to capture input from user and the 'change'
-    // event while using the normal keyboard.
-    Guppy.event(eventType, () => {
+
+    Guppy.event('change', (focusObj: FocusObj) => {
       let activeGuppyObject = (
         this.guppyInitializationService.findActiveGuppyObject());
       if (activeGuppyObject !== undefined) {
         this.hasBeenTouched = true;
         this.value = activeGuppyObject.guppyInstance.asciimath();
+      }
+      if (!focusObj.focused) {
+        this.isCurrentAnswerValid();
+      }
+    });
+    Guppy.event('done', () => {
+      this.submitAnswer();
+    });
+
+    Guppy.event('focus', (focusObj: FocusObj) => {
+      if (!focusObj.focused) {
+        this.isCurrentAnswerValid();
       }
     });
 

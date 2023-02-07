@@ -843,7 +843,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        improvements_models.TaskEntryModel(
+        improvements_models.ExplorationStatsTaskEntryModel(
             id=self.GENERIC_MODEL_ID,
             composite_entity_id=self.GENERIC_MODEL_ID,
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
@@ -1141,7 +1141,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learner_playlist': learner_playlist_data,
             'learner_group': expected_learner_group_model_data,
             'learner_groups_user': expected_learner_grp_user_model_data,
-            'task_entry': task_entry_data,
+            'exploration_stats_task_entry': task_entry_data,
             'topic_rights': topic_rights_data,
             'collection_progress': collection_progress_data,
             'story_progress': story_progress_data,
@@ -1871,7 +1871,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learner_playlist': expected_learner_playlist_data,
             'learner_group': expected_learner_group_data,
             'learner_groups_user': expected_learner_groups_user_data,
-            'task_entry': expected_task_entry_data,
+            'exploration_stats_task_entry': expected_task_entry_data,
             'topic_rights': expected_topic_data,
             'collection_progress': expected_collection_progress_data,
             'story_progress': expected_story_progress_data,

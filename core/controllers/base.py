@@ -79,16 +79,26 @@ class ResponseValueDict(TypedDict):
 
 
 @functools.lru_cache(maxsize=128)
-def load_template(filename: str) -> str:
+def load_template(
+    filename: str, *, template_is_aot_compiled: bool
+) -> str:
     """Return the HTML file contents at filepath.
 
     Args:
         filename: str. Name of the requested HTML file.
+        template_is_aot_compiled: bool. Used to determine which bundle to use.
 
     Returns:
         str. The HTML file content.
     """
-    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
+    filepath = os.path.join(
+        (
+            feconf.FRONTEND_AOT_DIR
+            if template_is_aot_compiled
+            else feconf.FRONTEND_TEMPLATES_DIR
+        ),
+        filename
+    )
     with utils.open_file(filepath, 'r') as f:
         html_text = f.read()
     return html_text
@@ -647,7 +657,11 @@ class BaseHandler(
         super(webapp2.Response, self.response).write(file.getvalue())  # type: ignore[misc] # pylint: disable=bad-super-call
 
     def render_template(
-        self, filepath: str, iframe_restriction: Optional[str] = 'DENY'
+        self,
+        filepath: str,
+        iframe_restriction: Optional[str] = 'DENY',
+        *,
+        template_is_aot_compiled: bool = False
     ) -> None:
         """Prepares an HTML response to be sent to the client.
 
@@ -659,6 +673,8 @@ class BaseHandler(
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
+            template_is_aot_compiled: bool. False by default. Use
+                True when the template is compiled by angular AoT compiler.
 
         Raises:
             Exception. Invalid X-Frame-Options.
@@ -683,8 +699,9 @@ class BaseHandler(
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
-
-        self.response.write(load_template(filepath))
+        self.response.write(load_template(
+            filepath, template_is_aot_compiled=template_is_aot_compiled
+        ))
 
     def _render_exception_json_or_html(
         self, return_type: str, values: ResponseValueDict

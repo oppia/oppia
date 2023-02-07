@@ -51,7 +51,7 @@ export class ImageUploaderComponent {
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
   constructor(
-    private blogDashboardPageService: BlogDashboardPageService,
+    public blogDashboardPageService: BlogDashboardPageService,
     private idGenerationService: IdGenerationService,
     private windowRef: WindowRef,
     private contextService: ContextService,

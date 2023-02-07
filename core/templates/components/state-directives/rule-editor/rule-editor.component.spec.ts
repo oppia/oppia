@@ -130,6 +130,33 @@ describe('Rule Editor Component', () => {
       );
     }));
 
+  it('should intitialize properties of TranslatableHtmlContentId',
+    fakeAsync(() => {
+      component.rule = new Rule(
+        'HasElementXAtPositionY', {
+          x: null,
+          y: 1
+        }, {
+          x: 'TranslatableHtmlContentId',
+          y: 'DragAndDropPositiveInt'
+        });
+
+      component.ruleDescriptionChoices = [
+        {
+          id: '1',
+          val: 'data 1',
+        }
+      ];
+      stateInteractionIdService.savedMemento = 'DragAndDropSortInput';
+
+      tick();
+      component.ngOnInit();
+
+      expect(component.currentInteractionId).toBe('DragAndDropSortInput');
+      expect(component.rule.inputs.x).toEqual('data 1');
+      flush();
+    }));
+
   it('should set component properties on initialization', () => {
     component.rule = new Rule(
       null, null, null);

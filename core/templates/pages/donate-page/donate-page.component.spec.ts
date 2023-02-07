@@ -115,6 +115,7 @@ describe('Donate page', () => {
     mailingListBackendApiService = TestBed.inject(
       MailingListBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
+    spyOn(ngbModal, 'open');
   });
 
   it('should successfully instantiate the component from beforeEach block',
@@ -235,16 +236,27 @@ describe('Donate page', () => {
     expect(component.getStaticImageUrl).toHaveBeenCalled();
   });
 
-  it('should show thank you modal on hash change',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open');
-      component.ngOnInit();
+  it('should show thank you modal on hash change', () => {
+    windowRef.nativeWindow.location.hash = '#nothing';
+    component.ngOnInit();
 
-      expect(ngbModal.open).not.toHaveBeenCalled();
+    expect(ngbModal.open).not.toHaveBeenCalled();
 
-      windowRef.nativeWindow.onhashchange();
-      tick();
+    windowRef.nativeWindow.location.hash = '#thank-you';
+    component.showThanksForDonatingModal();
 
-      expect(ngbModal.open).toHaveBeenCalled();
-    }));
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
+
+  it('should show thank you modal on init', () => {
+    windowRef.nativeWindow.location.hash = '#nothing';
+    component.ngOnInit();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+
+    windowRef.nativeWindow.location.hash = '#thank-you';
+    component.ngOnInit();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
 });

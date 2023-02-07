@@ -149,7 +149,16 @@ class BeamJobRunModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model doesn't contain any data directly corresponding to a user."""
+        """Model doesn't contain any data directly corresponding to a user.
+
+        This model is marked as deleted after a period of time after its
+        creation. See MODEL_CLASSES_TO_MARK_AS_DELETED and
+        mark_outdated_models_as_deleted() in cron_services.py.
+
+        This model is being deleted because it has no significance without these
+        other models, but note that this is being done only for data consistency
+        and is not a requirement of the wipeout process.
+        """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -201,7 +210,12 @@ class BeamJobRunResultModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model doesn't contain any data directly corresponding to a user."""
+        """Model doesn't contain any data directly corresponding to a user.
+
+        This model is marked as deleted after a period of time after its
+        creation. See MODEL_CLASSES_TO_MARK_AS_DELETED and
+        mark_outdated_models_as_deleted() in cron_services.py.
+        """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod

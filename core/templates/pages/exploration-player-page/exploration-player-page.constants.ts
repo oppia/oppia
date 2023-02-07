@@ -90,7 +90,6 @@ export const ExplorationPlayerConstants = {
     PRETEST: 'pretest',
     QUESTION_PLAYER: 'question_player',
     STORY_CHAPTER: 'story_chapter',
-    OTHER: 'other'
   },
 
   STATS_EVENT_TYPES: {

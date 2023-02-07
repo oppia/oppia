@@ -159,7 +159,7 @@ export class SignupPageComponent {
   submitPrerequisitesForm(
       agreedToTerms: boolean,
       username: string,
-      canReceiveEmailUpdates: string | null): void {
+      canReceiveEmailUpdates: string | null = null): void {
     if (!agreedToTerms) {
       this.alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
       return;

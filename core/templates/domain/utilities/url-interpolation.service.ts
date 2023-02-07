@@ -25,7 +25,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 
 import { AppConstants } from 'app.constants';
-const hashes = require('hashes.json');
+import resourceHashes from 'utility/hashes';
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.
@@ -69,6 +69,7 @@ export class UrlInterpolationService {
    * @return {string} The resource path with cache slug.
    */
   _getUrlWithSlug(resourcePath: string): string {
+    const hashes = resourceHashes.hashes;
     if (!this.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');

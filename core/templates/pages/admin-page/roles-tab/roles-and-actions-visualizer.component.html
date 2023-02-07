@@ -68,8 +68,8 @@
     </li>
     <li class="nav-item">
       <button class="nav-link"
-              [ngClass]="activeTab===TAB_ASSIGNED_USER ? 'active' : ''"
-              (click)="activeTab=TAB_ASSIGNED_USER; showAssignedUsers()"
+              [ngClass]="activeTab===TAB_ASSIGNED_USERS ? 'active' : ''"
+              (click)="activeTab=TAB_ASSIGNED_USERS; showAssignedUsers()"
               [class.disabled]="viewableRoles.includes(activeRole) ? null : true">
         Assigned users
       </button>
@@ -84,7 +84,7 @@
         <li *ngFor="let action of roleToReadableActions[activeRole]">{{ action }}</li>
       </ul>
     </div>
-    <div *ngIf="activeTab===TAB_ASSIGNED_USER" class="container">
+    <div *ngIf="activeTab===TAB_ASSIGNED_USERS" class="container">
       <div class="oppia-usernames-loading-spinner" *ngIf="loadingAssignedUsernames">
         <mat-spinner class="center-block" [diameter]="40"></mat-spinner>
       </div>

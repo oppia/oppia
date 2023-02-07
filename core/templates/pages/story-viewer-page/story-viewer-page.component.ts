@@ -48,7 +48,8 @@ interface IconParametersArray {
 
 @Component({
   selector: 'oppia-story-viewer-page',
-  templateUrl: './story-viewer-page.component.html'
+  templateUrl: './story-viewer-page.component.html',
+  styleUrls: ['./story-viewer-page.component.css']
 })
 export class StoryViewerPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

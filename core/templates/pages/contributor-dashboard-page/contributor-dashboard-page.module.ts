@@ -28,10 +28,10 @@ import { OppiaAngularRootComponent } from
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
-import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
+import { ReviewTranslationLanguageSelectorComponent } from './translation-language-selector/review-translation-language-selector.component';
 import { TranslationTopicSelectorComponent } from
   './translation-topic-selector/translation-topic-selector.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
@@ -66,15 +66,17 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     SharedComponentsModule,
     NgbModalModule,
     SharedFormsModule,
+    OppiaCkEditorCopyToolBarModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
-    CkEditorCopyToolbarComponent,
+    CertificateDownloadModalComponent,
     ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
+    ReviewTranslationLanguageSelectorComponent,
     ContributorStatsComponent,
     BadgeComponent,
     TranslationLanguageSelectorComponent,
@@ -84,15 +86,17 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     TranslationModalComponent,
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
-    ContributorDashboardPageComponent
+    ContributorDashboardPageComponent,
+    ContributorBadgesComponent
   ],
   entryComponents: [
-    CkEditorCopyToolbarComponent,
+    CertificateDownloadModalComponent,
     ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
     OpportunitiesListItemComponent,
     OpportunitiesListComponent,
+    ReviewTranslationLanguageSelectorComponent,
     ContributorStatsComponent,
     BadgeComponent,
     TranslationLanguageSelectorComponent,
@@ -136,7 +140,9 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
+import { OppiaCkEditorCopyToolBarModule } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import { ContributorStatsComponent } from './contributor-stats/contributor-stats.component';
+import { CertificateDownloadModalComponent } from './modal-templates/certificate-download-modal.component';
 import { ContributorBadgesComponent } from './contributor-badges/contributor-badges.component';
 import { BadgeComponent } from './badge/badge.component';
 

@@ -56,7 +56,8 @@ describe('Contribution Opportunities Service', () => {
       },
       translation_in_review_counts: {
         hi: 20
-      }
+      },
+      language_code: 'hi'
     }],
     next_cursor: '6',
     more: true

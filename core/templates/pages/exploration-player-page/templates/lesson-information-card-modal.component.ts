@@ -50,7 +50,8 @@ import './lesson-information-card-modal.component.css';
 
  @Component({
    selector: 'oppia-lesson-information-card-modal',
-   templateUrl: './lesson-information-card-modal.component.html'
+   templateUrl: './lesson-information-card-modal.component.html',
+   styleUrls: ['./lesson-information-card-modal.component.css']
  })
 export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks

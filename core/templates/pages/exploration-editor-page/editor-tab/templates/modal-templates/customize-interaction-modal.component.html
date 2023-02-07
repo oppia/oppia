@@ -17,7 +17,6 @@
   <div [hidden]="!isinteractionOpen">
     <nav ngbNav
          #nav="ngbNav"
-         [(activeId)]="active"
          class="nav-tabs">
       <ng-container ngbNavItem
                     *ngFor="let category of allowedInteractionCategories">

@@ -30,7 +30,7 @@ import './collection-footer.component.css';
 @Component({
   selector: 'collection-footer',
   templateUrl: './collection-footer.component.html',
-  styleUrls: []
+  styleUrls: ['./collection-footer.component.css']
 })
 export class CollectionFooterComponent implements OnInit {
   collectionId: string = '';

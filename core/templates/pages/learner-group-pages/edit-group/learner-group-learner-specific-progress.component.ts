@@ -32,7 +32,8 @@ import './learner-group-learner-specific-progress.component.css';
 
 @Component({
   selector: 'oppia-learner-group-learner-specific-progress',
-  templateUrl: './learner-group-learner-specific-progress.component.html'
+  templateUrl: './learner-group-learner-specific-progress.component.html',
+  styleUrls: ['./learner-group-learner-specific-progress.component.css']
 })
 export class LearnerGroupLearnerSpecificProgressComponent {
   @Input() learnerProgress!: LearnerGroupUserProgress;

@@ -32,6 +32,26 @@ oppia-tutor-card .oppia-learner-view-card-top-content {
   width: 100%;
 }
 
+oppia-tutor-card .oppia-content-language-selector-container {
+  float: right;
+  margin-bottom: 12px;
+  margin-right: 0;
+}
+oppia-tutor-card .oppia-content-language-selector-icon {
+  color: rgb(75, 74, 74);
+  font-size: 25px;
+  margin-right: 4px;
+}
+oppia-tutor-card .oppia-content-language-selector {
+  border-radius: 9px;
+  font-size: 15px;
+  margin-left: 5px;
+  padding-left: 3px;
+}
+oppia-tutor-card .oppia-exploration-language {
+  padding: 0 5px 0 5px;
+}
+
 oppia-tutor-card .oppia-learner-view-card-content {
   word-wrap: break-word;
 }

@@ -27,7 +27,7 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 
 @Component({
   selector: 'oppia-collection-editor-pre-publish-modal',
-  templateUrl: 'collection-editor-pre-publish-modal.component.html'
+  templateUrl: './collection-editor-pre-publish-modal.component.html'
 })
 export class CollectionEditorPrePublishModalComponent
   extends ConfirmOrCancelModal {

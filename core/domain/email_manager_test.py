@@ -32,6 +32,7 @@ from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -2428,7 +2429,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': translation_html,
@@ -2455,6 +2456,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         """
         with self.swap(
             feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html):
+            content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
                 str, Union[str, float, question_domain.QuestionDict]
             ] = {
@@ -2465,12 +2467,14 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     'id': 'test_id',
                     'version': 12,
                     'question_state_data': self._create_valid_question_data(
-                        'default_state').to_dict(),
+                        'default_state', content_id_generator).to_dict(),
                     'language_code': constants.DEFAULT_LANGUAGE_CODE,
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                    'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                    'next_content_id_index': (
+                        content_id_generator.next_content_id_index)
                 },
                 'skill_id': self.skill_id,
                 'skill_difficulty': 0.3
@@ -4034,7 +4038,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': translation_html,
@@ -4061,6 +4065,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         """
         with self.swap(
             feconf, 'DEFAULT_INIT_STATE_CONTENT_STR', question_html):
+            content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
                 str, Union[str, float, question_domain.QuestionDict]
             ] = {
@@ -4071,12 +4076,14 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     'id': 'test_id',
                     'version': 12,
                     'question_state_data': self._create_valid_question_data(
-                        'default_state').to_dict(),
+                        'default_state', content_id_generator).to_dict(),
                     'language_code': constants.DEFAULT_LANGUAGE_CODE,
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                    'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                    'next_content_id_index': (
+                        content_id_generator.next_content_id_index)
                 },
                 'skill_id': self.skill_id,
                 'skill_difficulty': 0.3
@@ -4844,7 +4851,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'content_id': 'content_0',
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
             'translation_html': '<p>This is the translated content.</p>',
@@ -4861,6 +4868,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def _create_question_suggestion(self) -> suggestion_registry.BaseSuggestion:
         """Creates a question suggestion."""
+        content_id_generator = translation_domain.ContentIdGenerator()
         add_question_change_dict: Dict[
             str, Union[str, float, question_domain.QuestionDict]
         ] = {
@@ -4869,12 +4877,14 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 'id': 'test_id',
                 'version': 12,
                 'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
+                    'default_state', content_id_generator).to_dict(),
                 'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index)
             },
             'skill_id': self.skill_id,
             'skill_difficulty': 0.3
@@ -6557,10 +6567,6 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.swap_webhook_feconf_return_secret = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', 'secret')
-        self.swap_webhook_feconf_return_none = self.swap(
-            feconf, 'MAILCHIMP_WEBHOOK_SECRET', None)
         self.swap_webhook_secrets_return_none = self.swap_to_always_return(
             secrets_services, 'get_secret', None)
         self.swap_webhook_secrets_return_secret = self.swap_with_checks(
@@ -6573,30 +6579,14 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
             ]
         )
 
-    def test_cloud_secrets_return_none_feconf_return_secret_passes(
-        self
-    ) -> None:
-        with self.swap_webhook_feconf_return_secret:
-            with self.swap_webhook_secrets_return_none:
-                self.assertTrue(email_manager.verify_mailchimp_secret('secret'))
+    def test_cloud_secrets_return_none_logs_exception(self) -> None:
+        with self.swap_webhook_secrets_return_none:
+            with self.capture_logging(min_level=logging.WARNING) as logs:
                 self.assertFalse(
-                    email_manager.verify_mailchimp_secret('not-secret'))
-
-    def test_cloud_secrets_return_none_feconf_return_secret_logs_exception(
-        self
-    ) -> None:
-        with self.swap_webhook_feconf_return_secret:
-            with self.swap_webhook_secrets_return_none:
-                with self.capture_logging(min_level=logging.WARNING) as logs:
-                    self.assertTrue(
-                        email_manager.verify_mailchimp_secret('secret'))
-                    self.assertEqual(
-                        [
-                            'Cloud Secret Manager is not able to get '
-                            'MAILCHIMP_WEBHOOK_SECRET.',
-                        ],
-                        logs
-                    )
+                    email_manager.verify_mailchimp_secret('secret'))
+                self.assertEqual(
+                    ['Mailchimp Webhook secret is not available.'], logs
+                )
 
     def test_cloud_secrets_return_secret_passes(self) -> None:
         with self.swap_webhook_secrets_return_secret:
@@ -6604,26 +6594,3 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
                 email_manager.verify_mailchimp_secret('secret'))
             self.assertFalse(
                 email_manager.verify_mailchimp_secret('not-secret'))
-
-    def test_cloud_secrets_return_none_feconf_return_none_passes(self) -> None:
-        with self.swap_webhook_feconf_return_none:
-            with self.swap_webhook_secrets_return_none:
-                self.assertFalse(
-                    email_manager.verify_mailchimp_secret('secret'))
-
-    def test_cloud_secrets_return_none_feconf_return_none_logs_exception(
-        self
-    ) -> None:
-        with self.swap_webhook_feconf_return_none:
-            with self.swap_webhook_secrets_return_none:
-                with self.capture_logging(min_level=logging.WARNING) as logs:
-                    self.assertFalse(
-                        email_manager.verify_mailchimp_secret('secret'))
-                    self.assertEqual(
-                        [
-                            'Cloud Secret Manager is not able to get '
-                            'MAILCHIMP_WEBHOOK_SECRET.',
-                            'Mailchimp webhook secret is not available.'
-                        ],
-                        logs
-                    )

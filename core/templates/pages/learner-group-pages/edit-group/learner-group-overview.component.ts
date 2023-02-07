@@ -32,7 +32,8 @@ import './learner-group-overview.component.css';
 
 @Component({
   selector: 'oppia-learner-group-overview',
-  templateUrl: './learner-group-overview.component.html'
+  templateUrl: './learner-group-overview.component.html',
+  styleUrls: ['./learner-group-overview.component.css']
 })
 export class LearnerGroupOverviewComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
