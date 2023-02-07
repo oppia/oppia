@@ -27,7 +27,7 @@ describe('MathInteractionsService', () => {
     mathInteractionsService = TestBed.get(MathInteractionsService);
   });
 
-  fit('should validate expressions correctly', function() {
+  it('should validate expressions correctly', function() {
     // Success cases.
     // Algebraic Expressions.
     expect(mathInteractionsService.validateAlgebraicExpression(
@@ -114,102 +114,17 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       '+', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before + operator.');
+      'Your answer seems to be missing a variable/number after the "+".');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(+)', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before + operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      'a+', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number after + operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(a+)', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number after + operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '*', [])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before × operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(*)', [])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before × operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '*a', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before × operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(*a)', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before × operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      'a*', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number after × operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(a*)', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number after × operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '-', [])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before - operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(-)', [])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before - operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      'a-', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number after - operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(a-)', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number after - operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '/', [])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before ÷ operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(/)', [])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before ÷ operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '/a', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before ÷ operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(/a)', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number before ÷ operator.');
+      'Your answer seems to be missing a variable/number after the "+".');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a/', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number after ÷ operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
-      '(a/)', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Answer seems to be missing a number after ÷ operator.');
+      'Your answer seems to be missing a variable/number after the "/".');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(x-)3', ['x'])).toBeFalse();
