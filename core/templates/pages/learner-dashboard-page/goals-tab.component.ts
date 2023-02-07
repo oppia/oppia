@@ -16,7 +16,7 @@
  * @fileoverview Component for goals tab in the Learner Dashboard page.
  */
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
@@ -31,12 +31,11 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './goals-tab.component.css';
 
-
- @Component({
-   selector: 'oppia-goals-tab',
-   templateUrl: './goals-tab.component.html',
-   styleUrls: ['./goals-tab.component.css']
- })
+@Component({
+  selector: 'oppia-goals-tab',
+  templateUrl: './goals-tab.component.html',
+  styleUrls: ['./goals-tab.component.css']
+})
 export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
@@ -77,7 +76,7 @@ export class GoalsTabComponent implements OnInit {
     NEITHER: 2
   };
 
-  activityType: string = constants.ACTIVITY_TYPE_LEARN_TOPIC;
+  activityType: string = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
   completedGoalsTopicPageUrl: string[] = [];
   editGoalsTopicClassification: number[] = [];
@@ -87,7 +86,7 @@ export class GoalsTabComponent implements OnInit {
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
-    this.MAX_CURRENT_GOALS_LENGTH = constants.MAX_CURRENT_GOALS_COUNT;
+    this.MAX_CURRENT_GOALS_LENGTH = AppConstants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
     this.currentGoalsStoryIsShown[0] = true;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
@@ -161,7 +160,7 @@ export class GoalsTabComponent implements OnInit {
       topic: LearnerTopicSummary, topicId: string,
       index: number): Promise<void> {
     var activityId = topicId;
-    var activityType = constants.ACTIVITY_TYPE_LEARN_TOPIC;
+    var activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
     if (!this.topicIdsInCurrentGoals.includes(activityId)) {
       var isSuccessfullyAdded = (
         await this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
