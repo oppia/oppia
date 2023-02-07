@@ -19,7 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
@@ -79,9 +79,10 @@ export class QuestionOpportunitiesComponent implements OnInit {
       const opportunity = opportunitiesObject.opportunities[index];
       const heading = opportunity.getOpportunityHeading();
       const subheading = opportunity.getOpportunitySubheading();
+      let maxQuestionsPerSkill = AppConstants.MAX_QUESTIONS_PER_SKILL;
       const progressPercentage = (
-        (opportunity.getQuestionCount() / constants.MAX_QUESTIONS_PER_SKILL) *
-        100).toFixed(2);
+        (opportunity.getQuestionCount() / maxQuestionsPerSkill) * 100
+      ).toFixed(2);
       const opportunityDict: Opportunity = {
         id: opportunity.id,
         heading: heading,
