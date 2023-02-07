@@ -22,7 +22,6 @@ import { AppConstants } from 'app.constants';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { UserProfile } from 'domain/user/user-profile.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -95,7 +94,6 @@ export class ProfilePageComponent {
     private ratingComputationService: RatingComputationService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private urlInterpolationService: UrlInterpolationService
   ) { }
 
   ngOnInit(): void {

@@ -37,7 +37,7 @@ export class UserService {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService,
+    private userBackendApiService: UserBackendApiService
   ) {}
 
   // This property will be null when the user does not have
