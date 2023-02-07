@@ -2157,7 +2157,7 @@ def send_email_to_new_contribution_submit_questions(
 
     Args:
         recipient_id: str. The ID of the user.
-        review_category: str. submit_question.
+        review_category: str. Submit questions.
 
     Raises:
         Exception. The review category is not valid.
