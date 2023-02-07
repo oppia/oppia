@@ -17,7 +17,6 @@
  * blog post domain objects.
  */
 
-import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
 export interface BlogPostBackendDict {
   'id': string ;
@@ -135,7 +134,7 @@ export class BlogPostData {
   validate(): string[] {
     let issues = [];
     let validTitleRegex: RegExp = new RegExp(
-      constants.VALID_BLOG_POST_TITLE_REGEX
+      AppConstants.VALID_BLOG_POST_TITLE_REGEX
     );
     if (this._titleIsDuplicate) {
       issues.push(
@@ -168,7 +167,7 @@ export class BlogPostData {
   prepublishValidate(maxTags: number): string[] {
     let issues = [];
     let validTitleRegex: RegExp = new RegExp(
-      constants.VALID_BLOG_POST_TITLE_REGEX
+      AppConstants.VALID_BLOG_POST_TITLE_REGEX
     );
     if (this._titleIsDuplicate) {
       issues.push(

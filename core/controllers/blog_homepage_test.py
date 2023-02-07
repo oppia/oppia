@@ -18,7 +18,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.constants import constants
 from core.domain import blog_services
 from core.domain import config_domain
 from core.platform import models
@@ -32,11 +31,7 @@ if MYPY:  # pragma: no cover
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
-MAX_CHARS_IN_BLOG_POST_URL: Final = (
-    constants.MAX_CHARS_IN_BLOG_POST_TITLE
-    + len('-')
-    + constants.BLOG_POST_ID_LENGTH
-)
+MAX_CHARS_IN_BLOG_POST_URL: Final = feconf.MAX_CHARS_IN_BLOG_POST_URL
 
 
 class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
@@ -365,10 +360,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         )
         # Blog post URL fragment fails minimum character validation.
         self.get_json(
-            '%s/%s' % (
-                feconf.BLOG_HOMEPAGE_DATA_URL,
-                'aa'
-            ),
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, 'aa'),
             expected_status_int=400
         )
 

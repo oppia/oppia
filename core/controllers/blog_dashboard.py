@@ -103,19 +103,23 @@ class BlogDashboardDataHandler(
                 'schema': {
                     'type': 'basestring',
                 },
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_AUTHOR_NAME_LENGTH
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_AUTHOR_NAME_LENGTH
+                    }
+                ]
             },
             'author_bio': {
                 'schema': {
                     'type': 'basestring',
                 },
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO
+                    }
+                ]
             },
         },
     }
@@ -217,14 +221,16 @@ class BlogPostHandler(
         'blog_post_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.BLOG_POST_ID_LENGTH
-                },
-                {
-                'id': 'has_length_at_least',
-                'min_value': constants.BLOG_POST_ID_LENGTH
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.BLOG_POST_ID_LENGTH
+                    },
+                    {
+                    'id': 'has_length_at_least',
+                    'min_value': constants.BLOG_POST_ID_LENGTH
+                    }
+                ]
             },
         }
     }
@@ -359,16 +365,19 @@ class BlogPostHandler(
         self.render_json(self.values)
 
 
-class BlogPostTitleHandlerNormalizedRequestDict(TypedDict):
+class BlogPostTitleHandlerNormalizedDict(TypedDict):
     """Dict representation of BlogPostTitleHandler's normalized_request
-    dictionary.
+    and payload dictionary.
     """
 
     title: str
 
 
 class BlogPostTitleHandler(
-    base.BaseHandler[Dict[str, str], BlogPostTitleHandlerNormalizedRequestDict]
+    base.BaseHandler[
+    BlogPostTitleHandlerNormalizedDict,
+    BlogPostTitleHandlerNormalizedDict
+    ]
 ):
     """A data handler for checking if a blog post with given title exists."""
 
@@ -377,14 +386,16 @@ class BlogPostTitleHandler(
         'blog_post_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.BLOG_POST_ID_LENGTH
-                },
-                {
-                'id': 'has_length_at_least',
-                'min_value': constants.BLOG_POST_ID_LENGTH,
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.BLOG_POST_ID_LENGTH
+                    },
+                    {
+                    'id': 'has_length_at_least',
+                    'min_value': constants.BLOG_POST_ID_LENGTH,
+                    }
+                ]
             }
         }
     }
@@ -393,10 +404,12 @@ class BlogPostTitleHandler(
             'title': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_CHARS_IN_BLOG_POST_TITLE
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_CHARS_IN_BLOG_POST_TITLE
+                        }
+                    ]
                 }
             }
         },
@@ -409,11 +422,10 @@ class BlogPostTitleHandler(
         """
         assert self.normalized_request is not None
         title = self.normalized_request['title']
-        self.values.update({
+        self.render_json({
             'blog_post_exists': (
                 blog_services.does_blog_post_with_title_exist(
                     title, blog_post_id
                 )
             )
         })
-        self.render_json(self.values)

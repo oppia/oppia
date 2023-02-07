@@ -645,8 +645,7 @@ def generate_url_fragment(title: str, blog_post_id: str) -> str:
     lower_title = title.lower()
     # Removing special characters from url fragment.
     simple_title = re.sub(r'[^a-zA-Z0-9 ]', '', lower_title)
-    hyphenated_title = (
-        simple_title.replace('-', ' ').replace('  ', ' ').replace(' ', '-'))
+    hyphenated_title = re.sub(r'[\s-]+', '-', simple_title)
     lower_id = blog_post_id.lower()
     return hyphenated_title + '-' + lower_id
 
@@ -772,8 +771,10 @@ def does_blog_post_with_title_exist(title: str, blog_post_id: str) -> bool:
         ).fetch()
     )
     if len(blog_post_models) > 0:
-        if (len(blog_post_models) > 1 or (
-                blog_post_models[0].id != blog_post_id)):
+        if (
+                len(blog_post_models) > 1 or
+                blog_post_models[0].id != blog_post_id
+        ):
             return True
     return False
 

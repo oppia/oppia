@@ -35,13 +35,7 @@ BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST: Final = (
     feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST
 )
-
-
-MAX_CHARS_IN_BLOG_POST_URL: Final = (
-    constants.MAX_CHARS_IN_BLOG_POST_TITLE
-    + len('-')
-    + constants.BLOG_POST_ID_LENGTH
-)
+MAX_CHARS_IN_BLOG_POST_URL: Final = feconf.MAX_CHARS_IN_BLOG_POST_URL
 
 
 class BlogCardSummaryDict(TypedDict):

@@ -373,7 +373,8 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
                 self.blog_post.last_updated)
         }
         self.assertEqual(
-            expected_blog_post_dict, json_response['blog_post_dict'])
+            expected_blog_post_dict, json_response['blog_post_dict']
+        )
         self.assertEqual(10, json_response['max_no_of_tags'])
         self.logout()
 
@@ -533,7 +534,8 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.login(self.BLOG_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, 123456),
-            expected_status_int=400)
+            expected_status_int=400
+        )
         self.logout()
 
         self.login(self.BLOG_ADMIN_EMAIL)
@@ -572,8 +574,10 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json(
             '%s/%s' % (
-                feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
-            expected_status_int=401)
+                feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id
+            ),
+            expected_status_int=401
+        )
 
         self.logout()
 
@@ -621,7 +625,7 @@ class BlogPostTitleHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_TITLE_HANDLER, self.new_blog_post_id),
             params=params,
-            )
+        )
         self.assertEqual(json_response['blog_post_exists'], False)
 
     def test_blog_post_title_handler_when_duplicate(self) -> None:
@@ -635,5 +639,5 @@ class BlogPostTitleHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_TITLE_HANDLER, self.new_blog_post_id),
             params=params,
-            )
+        )
         self.assertEqual(json_response['blog_post_exists'], True)

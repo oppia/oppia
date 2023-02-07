@@ -251,9 +251,9 @@ class BlogPost:
                 raise utils.ValidationError('Title should not be empty')
             if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
                 raise utils.ValidationError(
-                    'Title field contains invalid characters. Only words'
-                    '(a-zA-Z0-9(\'!)) separated by spaces, hyphens(-), comma(,)'
-                    ', ampersand(&) and colon(:) are allowed.'
+                    'Title field contains invalid characters. Only words '
+                    '(a-zA-Z0-9(\'!)) separated by spaces, hyphens (-), comma ('
+                    ',), ampersand (&) and colon (:) are allowed.'
                     'Received %s' % title)
 
     @classmethod
@@ -279,7 +279,8 @@ class BlogPost:
         if len(url_fragment) > MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not exceed %d characters.'
-                % (MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
+                % MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+            )
 
         if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
             raise utils.ValidationError(
@@ -527,7 +528,8 @@ class BlogPostSummary:
         if len(url_fragment) > MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not exceed %d characters.'
-                % (MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
+                % MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+            )
 
         if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
             raise utils.ValidationError(

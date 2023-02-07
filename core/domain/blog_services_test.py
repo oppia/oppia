@@ -153,10 +153,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         number_of_published_blogs = (
             blog_services.get_published_blog_post_summaries(1, 1)
         )
-        self.assertEqual(
-            len(number_of_published_blogs),
-            0
-        )
+        self.assertEqual(len(number_of_published_blogs), 0)
 
     def test_get_total_number_of_published_blog_post_summaries_by_author(
         self

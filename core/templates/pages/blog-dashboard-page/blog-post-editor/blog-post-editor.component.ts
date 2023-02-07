@@ -21,7 +21,7 @@ interface EditorSchema {
   'ui_config': object;
 }
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
@@ -32,7 +32,6 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
 import { BlogPostData } from 'domain/blog/blog-post.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
-import { AppConstants } from 'app.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
 import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
@@ -79,7 +78,7 @@ export class BlogPostEditorComponent implements OnInit {
     }
   };
 
-  BLOG_POST_TITLE_PATTERN: string = constants.VALID_BLOG_POST_TITLE_REGEX;
+  BLOG_POST_TITLE_PATTERN: string = AppConstants.VALID_BLOG_POST_TITLE_REGEX;
 
   constructor(
     private alertsService: AlertsService,
@@ -382,7 +381,8 @@ export class BlogPostEditorComponent implements OnInit {
     if (this.blogPostData.titleIsDuplicate) {
       return true;
     } else if (
-      this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0) {
+      this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0
+    ) {
       return true;
     } else if (this.newChangesAreMade) {
       return false;
