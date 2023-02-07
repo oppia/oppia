@@ -235,7 +235,7 @@ export class PreferencesPageComponent {
       this.username = userInfo.getUsername();
       this.email = userInfo.getEmail();
       [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-        this.userService.getProfileImageDataUrlAsync(this.username));
+        this.userService.getProfileImageDataUrl(this.username));
     });
 
     this.AUDIO_LANGUAGE_CHOICES = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(

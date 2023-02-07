@@ -46,7 +46,6 @@ describe('Blog home page backend api service', () => {
     url_fragment: 'sample-url',
     last_updated: '3232323',
     published_on: '1212121',
-    profile_pic_url: 'sample_url',
   };
   let blogPost: BlogPostBackendDict = {
     id: 'sampleBlogId',
@@ -117,7 +116,6 @@ describe('Blog home page backend api service', () => {
       authorUsername: 'test_username',
       blogPostDict: blogPostObject,
       summaryDicts: [],
-      profilePictureDataUrl: 'imageUrl',
     };
     blogAuthorProfileBackendResponse = {
       author_details: blogAuthorBackendDetails,
@@ -129,7 +127,6 @@ describe('Blog home page backend api service', () => {
       blogPostSummaries: [],
       displayedAuthorName: 'new_displayed_author_name',
       authorBio: 'general bio',
-      profilePictureDataUrl: 'imageUrl',
     };
   });
 

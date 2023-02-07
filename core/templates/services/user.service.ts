@@ -60,8 +60,9 @@ export class UserService {
     return this.userInfo;
   }
 
-  getProfileImageDataUrlAsync(username: string): [string, string] {
-    if (AppConstants.EMULATOR_MODE) {
+  getProfileImageDataUrl(username: string): [string, string] {
+    console.log('user service ' + AssetsBackendApiService.EMULATOR_MODE);
+    if (AssetsBackendApiService.EMULATOR_MODE) {
       let localStoredImage = this.imageLocalStorageService.getRawImageData(
         username + '_profile_picture.png');
       let defaultUrlWebp = this.urlInterpolationService.getStaticImageUrl(

@@ -170,7 +170,7 @@ export class TutorCardComponent {
     this.username = userInfo.getUsername();
     if (!this._editorPreviewMode) {
       [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-        this.userService.getProfileImageDataUrlAsync(this.username));
+        this.userService.getProfileImageDataUrl(this.username));
     } else {
       this.profilePictureWebpDataUrl = (
         this.urlInterpolationService.getStaticImageUrl(

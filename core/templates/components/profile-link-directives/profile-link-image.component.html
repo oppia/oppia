@@ -6,4 +6,8 @@
   </picture>
 </a>
 
-<img *ngIf="!isUsernameLinkable(username)" [src]="profilePictureWebpDataUrl" alt="">
+<picture *ngIf="!isUsernameLinkable(username)">
+  <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+  <source type="image/png" [srcset]="profilePicturePngDataUrl">
+  <img [src]="profilePicturePngDataUrl" class="rounded-circle" alt="User Avatar">
+</picture>

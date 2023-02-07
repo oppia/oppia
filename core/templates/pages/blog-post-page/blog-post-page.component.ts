@@ -69,7 +69,7 @@ export class BlogPostPageComponent implements OnInit {
     this.blogPostPageService.blogPostId = this.blogPostPageData.blogPostDict.id;
     this.postsToRecommend = this.blogPostPageData.summaryDicts;
     [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
-      this.userService.getProfileImageDataUrlAsync(this.authorUsername));
+      this.userService.getProfileImageDataUrl(this.authorUsername));
     if (this.blogPost.publishedOn) {
       this.publishedDateString = this.getDateStringInWords(
         this.blogPost.publishedOn);

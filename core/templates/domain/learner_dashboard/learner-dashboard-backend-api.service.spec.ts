@@ -908,8 +908,6 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let url = '/threadhandler/exploration.4.Wfafsafd';
     let result = [{
-      author_picture_data_url:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA',
       author_username: 'User',
       created_on_msecs: 1617712024611.706,
       message_id: 1,
@@ -928,8 +926,6 @@ describe('Learner Dashboard Backend API Service', () => {
     req.flush(
       {
         message_summary_list: [{
-          author_picture_data_url:
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA',
           author_username: 'User',
           created_on_msecs: 1617712024611.706,
           message_id: 1,

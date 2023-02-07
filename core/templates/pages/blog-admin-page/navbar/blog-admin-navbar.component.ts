@@ -70,7 +70,7 @@ export class BlogAdminNavbarComponent implements OnInit {
           username: this.username
         }));
     [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-      this.userService.getProfileImageDataUrlAsync(this.username));
+      this.userService.getProfileImageDataUrl(this.username));
   }
 
   ngOnInit(): void {

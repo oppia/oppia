@@ -58,6 +58,7 @@ export class AssetsBackendApiService {
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {
     let urlPrefix = '/assetsdevhandler';
+    console.log('assets ' + AssetsBackendApiService.EMULATOR_MODE);
     if (!AssetsBackendApiService.EMULATOR_MODE) {
       urlPrefix = (
         'https://storage.googleapis.com/' +

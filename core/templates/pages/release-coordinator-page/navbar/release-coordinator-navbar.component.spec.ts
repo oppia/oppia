@@ -30,8 +30,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 
 describe('Release coordinator navbar component', () => {
   let component: ReleaseCoordinatorNavbarComponent;
-  let userService = null;
-  let userProfileImage = 'profile-data-url';
+  let userService: UserService;
   let userInfo = {
     isModerator: () => true,
     getUsername: () => 'username1',
@@ -60,8 +59,8 @@ describe('Release coordinator navbar component', () => {
     userService = TestBed.inject(UserService);
     fixture.detectChanges();
 
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo(userProfileImage);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo as UserInfo);
     spyOn(component.activeTabChange, 'emit');
@@ -69,7 +68,10 @@ describe('Release coordinator navbar component', () => {
   }));
 
   it('should initialize component properties correctly', () => {
-    expect(component.profilePictureDataUrl).toBe(userProfileImage);
+    expect(component.profilePicturePngDataUrl).toEqual(
+      'default-image-url-png');
+    expect(component.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
     expect(component.username).toBe('username1');
     expect(component.profileUrl).toEqual(profileUrl);
     expect(component.logoutUrl).toEqual('/logout');

@@ -59,7 +59,7 @@ export class BlogCardComponent implements OnInit {
           this.blogPostSummary.thumbnailFilename);
     }
     [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
-      this.userService.getProfileImageDataUrlAsync(
+      this.userService.getProfileImageDataUrl(
         this.blogPostSummary.authorUsername));
     const publishedOn = this.blogPostSummary.publishedOn;
     if (publishedOn === undefined) {

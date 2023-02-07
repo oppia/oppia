@@ -188,7 +188,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       if (username) {
         this.username = username;
         [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-          this.userService.getProfileImageDataUrlAsync(username));
+          this.userService.getProfileImageDataUrl(username));
       } else {
         this.profilePictureWebpDataUrl = (
           this.urlInterpolationService.getStaticImageUrl(
@@ -286,6 +286,18 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  getauthorPicturePngDataUrl(username: string) {
+    let [pngImageUrl, ] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getauthorPictureWebpDataUrl(username: string) {
+    let [, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
   }
 
   setPageTitle(): void {

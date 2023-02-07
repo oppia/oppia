@@ -88,9 +88,6 @@ export class UserBackendApiService {
 
   private SITE_LANGUAGE_URL = '/save_site_language';
 
-  // Cache of current user's profile image.
-  private profileImageCache: Blob;
-
   async getUserInfoAsync(): Promise<UserInfo> {
     return this.http.get<UserInfoBackendDict>(
       this.USER_INFO_URL).toPromise().then(

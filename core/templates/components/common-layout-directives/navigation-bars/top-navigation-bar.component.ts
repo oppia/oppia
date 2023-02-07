@@ -105,16 +105,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   labelForClearingFocus!: string;
   sidebarIsShown: boolean = false;
   windowIsNarrow: boolean = false;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
 
-  // The 'username', 'profilePageUrl' and 'profilePictureDataUrl' properties
+  // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
   // which sends a HTTP request to the backend.
   // Until the response object is received and the method returns,
   // these properties remain undefined.
   username: string | undefined;
   profilePageUrl: string | undefined;
-  profilePicturePngDataUrl: string | undefined;
-  profilePictureWebpDataUrl: string | undefined;
 
   // The 'activeMenuName' property is not initialized in the constructor
   // or in a lifecycle hook, and is set based on certain
@@ -267,7 +267,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
             username: this.username
           });
         [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-          this.userService.getProfileImageDataUrlAsync(this.username));
+          this.userService.getProfileImageDataUrl(this.username));
       } else {
         this.profilePicturePngDataUrl = (
           this.urlInterpolationService.getStaticImageUrl(

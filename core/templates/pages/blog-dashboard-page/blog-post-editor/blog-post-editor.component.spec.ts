@@ -42,6 +42,8 @@ import { UploadBlogPostThumbnailComponent } from '../modal-templates/upload-blog
 import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UserService } from 'services/user.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 describe('Blog Post Editor Component', () => {
   let fixture: ComponentFixture<BlogPostEditorComponent>;
@@ -58,6 +60,7 @@ describe('Blog Post Editor Component', () => {
   let imageLocalStorageService: ImageLocalStorageService;
   let windowDimensionsService: WindowDimensionsService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let userService: UserService;
 
   let sampleBlogPostBackendDict = {
     id: 'sampleBlogId',
@@ -154,6 +157,7 @@ describe('Blog Post Editor Component', () => {
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService);
     ngbModal = TestBed.inject(NgbModal);
+    userService = TestBed.inject(UserService);
     sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('sampleBlogId');
@@ -167,13 +171,28 @@ describe('Blog Post Editor Component', () => {
   });
 
   it('should initialize', () => {
-    let defaultImageUrl = 'banner_image_url';
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue(defaultImageUrl);
+    const sampleUserInfoBackendObject = {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+    const sampleUserInfo = UserInfo.createFromBackendDict(
+      sampleUserInfoBackendObject);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(component, 'initEditor');
     spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough();
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(sampleUserInfo));
 
     component.ngOnInit();
 
@@ -182,7 +201,8 @@ describe('Blog Post Editor Component', () => {
     expect(component.MAX_CHARS_IN_BLOG_POST_TITLE).toBe(
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
     expect(component.initEditor).toHaveBeenCalled;
-    expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual(defaultImageUrl);
+    expect(component.authorProfilePicPngUrl).toEqual('default-image-url-png');
+    expect(component.authorProfilePicWebpUrl).toEqual('default-image-url-webp');
     expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
     expect(component.windowIsNarrow).toBe(true);
     expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
@@ -205,7 +225,6 @@ describe('Blog Post Editor Component', () => {
   it('should successfully fetch blog post editor data', fakeAsync(() => {
     let blogPostEditorData = {
       displayedAuthorName: 'test_user',
-      profilePictureDataUrl: 'sample_url',
       listOfDefaulTags: ['news', 'Learners'],
       maxNumOfTags: 2,
       blogPostDict: sampleBlogPostData,
@@ -221,7 +240,6 @@ describe('Blog Post Editor Component', () => {
       .toHaveBeenCalled();
     expect(component.authorName).toEqual('test_user');
     expect(component.blogPostData).toEqual(sampleBlogPostData);
-    expect(component.authorProfilePictureUrl).toEqual('sample_url');
     expect(component.defaultTagsList).toEqual(['news', 'Learners']);
     expect(component.maxAllowedTags).toEqual(2);
     expect(component.thumbnailDataUrl).toEqual(
@@ -439,14 +457,11 @@ describe('Blog Post Editor Component', () => {
   it('should open preview of the blog post model', () => {
     spyOn(ngbModal, 'open');
     component.blogPostData = sampleBlogPostData;
-    component.authorProfilePictureUrl = 'sample-url';
 
     component.showPreview();
 
     expect(blogDashboardPageService.blogPostData).toEqual(
       sampleBlogPostData);
-    expect(blogDashboardPageService.authorPictureUrl).toEqual(
-      'sample-url');
     expect(ngbModal.open).toHaveBeenCalled();
   });
 

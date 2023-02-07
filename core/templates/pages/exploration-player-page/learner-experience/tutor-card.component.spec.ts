@@ -206,7 +206,7 @@ describe('Tutor card component', () => {
     spyOnProperty(explorationPlayerStateService, 'onOppiaFeedbackAvailable')
       .and.returnValue(mockOnOppiaFeedbackAvailableEventEmitter);
     spyOn(componentInstance, 'getInputResponsePairId').and.returnValue('hash');
-    spyOn(userService, 'getProfileImageDataUrlAsync').and.returnValue(
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
       Promise.resolve(profilePicture));
     componentInstance.displayedCard = mockDisplayedCard;
 

@@ -61,7 +61,6 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
-
     this.username = userInfo.getUsername();
     if (this.username === null) {
       throw new Error('User name is null.');
@@ -72,7 +71,7 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
         })
       );
       [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-        this.userService.getProfileImageDataUrlAsync(this.username));
+        this.userService.getProfileImageDataUrl(this.username));
     }
   }
 

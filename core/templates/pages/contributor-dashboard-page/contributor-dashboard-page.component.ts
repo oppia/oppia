@@ -55,9 +55,7 @@ export class ContributorDashboardPageComponent
   languageCode!: string;
   topicName!: string;
   activeTabName!: string;
-  // The following property is set to null when the
-  // user is not logged in.
-  username: string | null = null;
+  username!: string;
 
   constructor(
     private contributionAndReviewService: ContributionAndReviewService,
@@ -193,7 +191,7 @@ export class ContributorDashboardPageComponent
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
         [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-          this.userService.getProfileImageDataUrlAsync(this.username));
+          this.userService.getProfileImageDataUrl(this.username));
       } else {
         this.userIsLoggedIn = false;
         this.username = '';

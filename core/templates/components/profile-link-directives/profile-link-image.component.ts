@@ -18,8 +18,6 @@
 
 import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { AppConstants } from 'app.constants';
 import { UserService } from 'services/user.service';
 
@@ -42,7 +40,6 @@ export class ProfileLinkImageComponent implements OnInit {
   );
 
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
     private userService: UserService
   ) {}
 
@@ -51,16 +48,13 @@ export class ProfileLinkImageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.profilePictureWebpDataUrl = (
-      this.urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
     this.profileUrl = (
       '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
         ':username_fragment', this.username
       )
     );
     [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-      this.userService.getProfileImageDataUrlAsync(this.username));
+      this.userService.getProfileImageDataUrl(this.username));
   }
 }
 

@@ -43,7 +43,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   authorProfilePicPngUrl!: string;
   authorProfilePicWebpUrl!: string;
   blogDashboardData!: BlogDashboardData;
-  username!: string;
+  username!: string | null;
   windowIsNarrow: boolean = false;
   activeView: string = 'gridView';
   directiveSubscriptions = new Subscription();
@@ -88,7 +88,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
     [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
-      this.userService.getProfileImageDataUrlAsync(this.username));
+      this.userService.getProfileImageDataUrl(this.username));
   }
 
   initMainTab(): void {

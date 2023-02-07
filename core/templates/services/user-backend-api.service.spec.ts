@@ -168,7 +168,6 @@ describe('User Backend Api Service', () => {
       preferred_language_codes: ['en', 'hi'],
       preferred_site_language_code: 'en',
       preferred_audio_language_code: 'en',
-      profile_picture_data_url: '',
       default_dashboard: 'learner',
       user_bio: '',
       subject_interests: '',

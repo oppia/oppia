@@ -83,7 +83,7 @@ export class BlogAuthorProfilePageComponent implements OnInit {
         this.blogPostSummariesToShow = this.blogPostSummaries;
         this.calculateLastPostOnPageNum();
         [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
-          this.userService.getProfileImageDataUrlAsync(this.authorUsername));
+          this.userService.getProfileImageDataUrl(this.authorUsername));
       } else {
         this.noResultsFound = true;
       }

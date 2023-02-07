@@ -216,7 +216,7 @@ describe('User Api Service', () => {
       const imageData = 'data:image/png;base64,JUMzJTg3JTJD';
       imageLocalStorageService.saveImage(filename, imageData);
       let [profileImagePng, profileImageWebp] = (
-        userService.getProfileImageDataUrlAsync('tester'));
+        userService.getProfileImageDataUrl('tester'));
       expect(profileImagePng).toEqual(imageData);
       expect(profileImageWebp).toEqual(imageData);
       imageLocalStorageService.deleteImage(filename);
@@ -228,6 +228,8 @@ describe('User Api Service', () => {
     fakeAsync(() => {
       spyOnProperty(AssetsBackendApiService, 'EMULATOR_MODE', 'get')
         .and.returnValue(false);
+      console.log('*********************');
+      console.log('user service spec' + AssetsBackendApiService.EMULATOR_MODE);
       let expectedPngImage = (
         'https://storage.googleapis.com/app_default_bucket/user/' +
         'tester/assets/profile_picture.png');
@@ -235,7 +237,7 @@ describe('User Api Service', () => {
         'https://storage.googleapis.com/app_default_bucket/user/' +
         'tester/assets/profile_picture.webp');
       let [profileImagePng, profileImageWebp] = (
-        userService.getProfileImageDataUrlAsync('tester'));
+        userService.getProfileImageDataUrl('tester'));
       expect(profileImagePng).toEqual(expectedPngImage);
       expect(profileImageWebp).toEqual(expectedWebpImage);
 
@@ -249,7 +251,7 @@ describe('User Api Service', () => {
       let defaultUrlPng = urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
       let [profileImagePng, profileImageWebp] = (
-        userService.getProfileImageDataUrlAsync('tester'));
+        userService.getProfileImageDataUrl('tester'));
       expect(profileImagePng).toEqual(defaultUrlPng);
       expect(profileImageWebp).toEqual(defaultUrlWebp);
 

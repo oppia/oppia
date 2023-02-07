@@ -159,6 +159,8 @@ describe('Preferences Page Component', () => {
         id: 'en',
         text: 'English'
       }]);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
     componentInstance.ngOnInit();
     tick();
     tick();
@@ -171,8 +173,10 @@ describe('Preferences Page Component', () => {
       preferencesData.subject_interests);
     expect(componentInstance.preferredLanguageCodes).toEqual(
       preferencesData.preferred_language_codes);
-    expect(componentInstance.profilePictureDataUrl).toEqual(
-      preferencesData.profile_picture_data_url);
+    expect(componentInstance.profilePicturePngDataUrl).toEqual(
+      'default-image-url-png');
+    expect(componentInstance.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
     expect(componentInstance.defaultDashboard).toEqual(
       preferencesData.default_dashboard);
     expect(componentInstance.canReceiveEmailUpdates).toEqual(

@@ -57,7 +57,7 @@ export class BlogPostEditorComponent implements OnInit {
   title!: string;
   defaultTagsList!: string[];
   maxAllowedTags!: number;
-  username!: string;
+  username!: string | null;
   localEditedContent!: string;
   thumbnailDataUrl!: string;
   MAX_CHARS_IN_BLOG_POST_TITLE!: number;
@@ -94,8 +94,20 @@ export class BlogPostEditorComponent implements OnInit {
     private userService: UserService
   ) {}
 
+  async getUserInfoAsync(): Promise<void> {
+    const userInfo = await this.userService.getUserInfoAsync();
+    this.username = userInfo.getUsername();
+    console.log('username ' + this.username);
+    console.log('user info ' + userInfo);
+    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+      this.userService.getProfileImageDataUrl(this.username));
+    console.log('author png ' + this.authorProfilePicPngUrl);
+    console.log('author webp ' + this.authorProfilePicWebpUrl);
+  }
+
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
+    this.getUserInfoAsync();
     this.blogPostId = this.blogDashboardPageService.blogPostId;
     this.initEditor();
     this.MAX_CHARS_IN_BLOG_POST_TITLE = (
@@ -115,15 +127,7 @@ export class BlogPostEditorComponent implements OnInit {
     return this.HTML_SCHEMA;
   }
 
-  async getUserInfoAsync(): Promise<void> {
-    const userInfo = await this.userService.getUserInfoAsync();
-    this.username = userInfo.getUsername();
-    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
-      this.userService.getProfileImageDataUrlAsync(this.username));
-  }
-
   initEditor(): void {
-    this.getUserInfoAsync();
     this.blogPostEditorBackendService.fetchBlogPostEditorData(this.blogPostId)
       .then(
         (editorData: BlogPostEditorData) => {

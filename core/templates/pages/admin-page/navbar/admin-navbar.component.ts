@@ -111,7 +111,7 @@ export class AdminNavbarComponent implements OnInit {
         })
     );
     [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-      this.userService.getProfileImageDataUrlAsync(this.username));
+      this.userService.getProfileImageDataUrl(this.username));
   }
 
   ngOnInit(): void {

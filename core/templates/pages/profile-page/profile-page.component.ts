@@ -171,17 +171,8 @@ export class ProfilePageComponent {
         this.subjectInterests = data.subjectInterests;
         this.firstContributionMsec = data.firstContributionMsec;
 
-        if (data.username) {
-          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-            this.userService.getProfileImageDataUrlAsync(data.username));
-        } else {
-          this.profilePictureWebpDataUrl = (
-            this.urlInterpolationService.getStaticImageUrl(
-              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-          this.profilePicturePngDataUrl = (
-            this.urlInterpolationService.getStaticImageUrl(
-              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
-        }
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(this.username.value));
         this.loaderService.hideLoadingScreen();
       });
   }

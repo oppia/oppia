@@ -17,7 +17,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UserService } from 'services/user.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ProfileLinkImageComponent } from './profile-link-image.component';
 
@@ -28,7 +28,7 @@ import { ProfileLinkImageComponent } from './profile-link-image.component';
 describe('ProfileLinkImageComponent', () => {
   let component: ProfileLinkImageComponent;
   let fixture: ComponentFixture<ProfileLinkImageComponent>;
-  let urlInterpolationService: UrlInterpolationService;
+  let userService: UserService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -52,29 +52,19 @@ describe('ProfileLinkImageComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProfileLinkImageComponent);
     component = fixture.componentInstance;
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    userService = TestBed.inject(UserService);
   });
 
   it('should show profile picture on initialisation', fakeAsync(() => {
     component.username = 'user1';
-    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      'default-image-url');
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
 
     component.ngOnInit();
     tick();
 
-    expect(component.profilePicture).toBe('path/to/base64-profile-picture-url');
-  }));
-
-  it('should show the default profile picture user hasn\'t set or has' +
-    ' removed their profile picture', fakeAsync(() => {
-    component.username = 'user1';
-    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      'default-image-url');
-
-    component.ngOnInit();
-    tick();
-    expect(component.profilePicture).toBe('default-image-url');
+    expect(component.profilePicturePngDataUrl).toBe('default-image-url-png');
+    expect(component.profilePictureWebpDataUrl).toBe('default-image-url-webp');
   }));
 
   it('should link the username/profile to the image if linkable', () => {
