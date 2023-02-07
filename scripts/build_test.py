@@ -35,6 +35,7 @@ from typing import Deque, Dict, Iterator, List, Tuple, Union
 
 from . import build
 from . import common
+from . import install_python_dev_dependencies
 from . import scripts_test_utils
 from . import servers
 
@@ -1053,8 +1054,7 @@ class BuildTests(test_utils.GenericTestBase):
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(
-            unused_first_dir: str,
-            unused_second_dir: str
+            unused_first_dir: str, unused_second_dir: str
         ) -> None:
             check_function_calls['compare_file_count_gets_called'] = True
 
@@ -1070,10 +1070,16 @@ class BuildTests(test_utils.GenericTestBase):
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
         clean_swap = self.swap(build, 'clean', mock_clean)
+        install_python_dev_dependencies_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'main',
+            lambda _: None,
+            expected_args=[(['--uninstall'],)]
+        )
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
-                with clean_swap:
+                with clean_swap, install_python_dev_dependencies_swap:
                     build.main(args=['--prod_env', '--source_maps'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
