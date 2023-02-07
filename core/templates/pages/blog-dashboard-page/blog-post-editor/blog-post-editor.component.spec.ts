@@ -26,7 +26,6 @@ import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MaterialModule } from 'modules/material.module';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { BlogPostEditorComponent } from './blog-post-editor.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { LoaderService } from 'services/loader.service';
 import { AlertsService } from 'services/alerts.service';
@@ -48,7 +47,6 @@ import { UserInfo } from 'domain/user/user-info.model';
 describe('Blog Post Editor Component', () => {
   let fixture: ComponentFixture<BlogPostEditorComponent>;
   let component: BlogPostEditorComponent;
-  let urlInterpolationService: UrlInterpolationService;
   let blogDashboardPageService: BlogDashboardPageService;
   let blogPostUpdateService: BlogPostUpdateService;
   let loaderService: LoaderService;
@@ -133,7 +131,6 @@ describe('Blog Post Editor Component', () => {
         BlogPostUpdateService,
         BlogPostEditorBackendApiService,
         LoaderService,
-        UrlInterpolationService,
         AlertsService,
         UrlService,
       ],
@@ -144,7 +141,6 @@ describe('Blog Post Editor Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BlogPostEditorComponent);
     component = fixture.componentInstance;
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
     loaderService = TestBed.inject(LoaderService);
@@ -163,6 +159,8 @@ describe('Blog Post Editor Component', () => {
     spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('sampleBlogId');
     spyOn(preventPageUnloadEventService, 'addListener');
     spyOn(preventPageUnloadEventService, 'removeListener');
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
     component.ngOnInit();
   });
 
@@ -185,8 +183,6 @@ describe('Blog Post Editor Component', () => {
     };
     const sampleUserInfo = UserInfo.createFromBackendDict(
       sampleUserInfoBackendObject);
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(component, 'initEditor');

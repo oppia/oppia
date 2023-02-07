@@ -68,7 +68,6 @@ describe('User Api Service', () => {
   let windowRef: MockWindowRef;
   let userBackendApiService: UserBackendApiService;
   let imageLocalStorageService: ImageLocalStorageService;
-  let assetsBackendApiService: AssetsBackendApiService
 
   beforeEach(() => {
     windowRef = new MockWindowRef();

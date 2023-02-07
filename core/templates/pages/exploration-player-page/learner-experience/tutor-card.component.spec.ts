@@ -181,6 +181,8 @@ describe('Tutor card component', () => {
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   afterEach(() => {
@@ -191,7 +193,6 @@ describe('Tutor card component', () => {
     let mockOnActiveCardChangedEventEmitter = new EventEmitter<void>();
     let mockOnOppiaFeedbackAvailableEventEmitter = new EventEmitter<void>();
     let isIframed = false;
-    let profilePicture = 'profile_url';
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValues(
       true, false);
@@ -206,8 +207,6 @@ describe('Tutor card component', () => {
     spyOnProperty(explorationPlayerStateService, 'onOppiaFeedbackAvailable')
       .and.returnValue(mockOnOppiaFeedbackAvailableEventEmitter);
     spyOn(componentInstance, 'getInputResponsePairId').and.returnValue('hash');
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      Promise.resolve(profilePicture));
     componentInstance.displayedCard = mockDisplayedCard;
 
     componentInstance.ngOnInit();
@@ -219,7 +218,10 @@ describe('Tutor card component', () => {
 
     componentInstance.ngOnInit();
     tick();
-    expect(componentInstance.profilePicture).toEqual(profilePicture);
+    expect(componentInstance.profilePicturePngDataUrl).toEqual(
+      'default-image-url-png');
+    expect(componentInstance.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
 
     expect(componentInstance.isIframed).toEqual(isIframed);
     expect(contextService.isInExplorationEditorPage).toHaveBeenCalled();

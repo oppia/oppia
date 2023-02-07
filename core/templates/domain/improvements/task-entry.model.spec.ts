@@ -49,7 +49,6 @@ describe('Task entry model', function() {
     expect(task.isObsolete()).toBeFalse();
     expect(task.isOpen()).toBeFalse();
     expect(task.resolverUsername).toEqual('test_user');
-    expect(task.resolverProfilePictureDataUrl).toEqual('./image.png');
     expect(task.resolvedOnMsecs).toEqual(123456789);
 
     expect(task.toBackendDict()).toEqual(taskBackendDict);

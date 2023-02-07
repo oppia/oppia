@@ -182,8 +182,8 @@ export class TutorCardComponent {
   }
 
   ngOnInit(): void {
-    this.getUserInfoAsync();
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+    this.getUserInfoAsync();
     this.isIframed = this.urlService.isIframed();
     this.getCanAskLearnerForAnswerInfo = (
       this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo);
