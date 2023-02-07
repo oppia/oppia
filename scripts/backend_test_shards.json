@@ -284,7 +284,6 @@
         "scripts.install_third_party_test",
         "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
-        "scripts.release_scripts.update_changelog_and_credits_test",
         "scripts.setup_test",
         "core.storage.feedback.gae_models_test",
         "scripts.pre_commit_hook_test",
