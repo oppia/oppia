@@ -2157,7 +2157,7 @@ def send_email_to_new_contribution_submit_questions(
 
     Args:
         recipient_id: str. The ID of the user.
-        review_category: str. submit_question.        
+        review_category: str. submit_question.
 
     Raises:
         Exception. The review category is not valid.
@@ -2168,7 +2168,6 @@ def send_email_to_new_contribution_submit_questions(
     review_category_data = NEW_REVIEWER_EMAIL_DATA[review_category]
     email_subject = 'You have been invited at Oppia to %s' % (
         review_category_data['description'])
-
 
     email_body_template = (
         'Hi %s,<br><br>'
