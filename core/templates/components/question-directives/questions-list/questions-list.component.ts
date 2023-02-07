@@ -93,6 +93,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   showDifficultyChoices: boolean;
   skillLinkageModificationsArray: SkillLinkageModificationsArray[];
   directiveSubscriptions = new Subscription();
+  MAX_SKILLS_PER_QUESTION: number = AppConstants.MAX_SKILLS_PER_QUESTION;
 
   constructor(
     private alertsService: AlertsService,

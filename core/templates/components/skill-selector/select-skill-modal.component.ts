@@ -73,7 +73,6 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
 
   setSelectedSkillId(skillId: string): void {
     this.selectedSkillId = skillId;
-    this.isSaveButtonEnabled();
   }
 
   isSaveButtonEnabled(): boolean {
