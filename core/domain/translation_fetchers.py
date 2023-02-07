@@ -166,7 +166,3 @@ def get_entity_translation(
     return translation_domain.EntityTranslation.create_empty(
         entity_type, entity_id, language_code, entity_version=entity_version
     )
-
-
-# get_entity_translation
-# check translations dict.
