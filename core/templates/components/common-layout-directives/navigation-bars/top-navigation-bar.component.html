@@ -142,10 +142,12 @@
                     </div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <span class="link">
-                        {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
+                      <span class="underline">
+                        <span class="link">
+                          {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
+                        </span>
+                        <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                       </span>
-                      <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
                   </div>
                 </a>
@@ -178,10 +180,12 @@
                     <div class="des" [innerHTML]="'I18N_TOPNAV_ANDROID_APP_DESCRIPTION' | translate"></div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <span class="link">
-                        {{ 'I18N_TOPNAV_TRY_ANDROID_APP_TEXT' | translate }}
+                      <span class = "underline">
+                        <span class="link">
+                          {{ 'I18N_TOPNAV_TRY_ANDROID_APP_TEXT' | translate }}
+                        </span>
+                        <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                       </span>
-                      <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
                     </div>
                   </a>
                 </span>
