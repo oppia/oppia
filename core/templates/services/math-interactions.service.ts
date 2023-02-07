@@ -207,8 +207,8 @@ export class MathInteractionsService {
 
     if (expressionString.match(/(\/$)|(\(\/\))|(\(\/\d\))|(\/\d)/g)) {
       this.warningText = (
-          'Your answer seems to be missing a number before' +
-          ' the ÷ operator.');
+        'Your answer seems to be missing a number before' +
+        ' the ÷ operator.');
       return false;
     }
 
