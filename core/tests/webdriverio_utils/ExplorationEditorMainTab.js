@@ -838,6 +838,7 @@ var ExplorationEditorMainTab = function() {
   // ---- STATE GRAPH ----
 
   this.deleteState = async function(stateName) {
+    await waitFor.pageToFullyLoad();
     await action.waitForAutosave();
     await general.scrollToTop();
     var nodeElement = await explorationGraph.$(
@@ -847,6 +848,10 @@ var ExplorationEditorMainTab = function() {
       'State ' + stateName + ' takes too long to appear or does not exist');
     var deleteNode = await nodeElement.$(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
+    // Might need to use browser.pause() – checking for visibility of
+    // element before it even appears.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
       confirmDeleteStateButton, 'Deleting state takes too long');

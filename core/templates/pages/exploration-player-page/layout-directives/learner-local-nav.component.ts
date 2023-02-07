@@ -19,7 +19,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { AttributionService } from 'services/attribution.service';
@@ -103,7 +103,8 @@ export class LearnerLocalNavComponent implements OnInit {
       this.username = userInfo.getUsername();
       if (
         this.username === null &&
-        !constants.ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS) {
+        !AppConstants.ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS
+      ) {
         this.feedbackOptionIsShown = false;
       }
       this.loaderService.hideLoadingScreen();
