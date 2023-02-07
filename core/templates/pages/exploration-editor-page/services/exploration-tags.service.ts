@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationPropertyService } from './exploration-property.service';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ChangeListService } from './change-list.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -59,7 +59,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
   _isValid(value: string[]) {
     // Every tag should match the TAG_REGEX.
     for (let i = 0; i < value.length; i++) {
-      let tagRegex = new RegExp(constants.TAG_REGEX);
+      let tagRegex = new RegExp(AppConstants.TAG_REGEX);
       if (!value[i].match(tagRegex)) {
         return false;
       }
