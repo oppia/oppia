@@ -1122,7 +1122,6 @@
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1": "Votre progression d’apprentissage sera automatiquement enregistrée si vous avez un compte.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "Vous avez déjà un compte ?",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3": "Utilisez le lien ci-dessous pour enregistrer la progression pendant 72 heures.",
-	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4": "Vous pouvez perdre votre progression après 72 heures.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5": "Écrivez ou copiez le lien ci-dessous",
 	"I18N_SAVE_PROGRESS": "Connectez-vous ou inscrivez-vous pour enregistrer votre progression et continuer jusqu’à la leçon suivante.",
 	"I18N_SAVE_PROGRESS_BUTTON_TEXT": "Copier",
