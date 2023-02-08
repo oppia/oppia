@@ -43,14 +43,14 @@ import json
 import re
 import subprocess
 
+from core import constants
+from core import utils
+from scripts import common
+
 from typing import Final, List, Optional, Pattern, Tuple
 
-# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
-from core import constants  # isort:skip  # pylint: disable=wrong-import-position
-from core import utils  # isort:skip  # pylint: disable=wrong-import-position
+BRANCH_TYPE_HOTFIX = 'hotfix'
+BRANCH_TYPE_RELEASE = 'release'
 
 
 def require_release_version_to_have_correct_format(
@@ -231,7 +231,7 @@ def _get_release_branch_type_and_name(target_version: str) -> Tuple[str, str]:
         tuple(str, str). The type and name of release branch.
     """
     return (
-        constants.release_constants.BRANCH_TYPE_RELEASE,
+        BRANCH_TYPE_RELEASE,
         'release-%s' % target_version)
 
 
@@ -248,7 +248,7 @@ def _get_hotfix_branch_type_and_name(
         tuple(str, str). The type and name of hotfix branch.
     """
     return (
-        constants.release_constants.BRANCH_TYPE_HOTFIX,
+        BRANCH_TYPE_HOTFIX,
         'release-%s-hotfix-%s' % (target_version, hotfix_number))
 
 
@@ -306,7 +306,7 @@ def execute_branch_cut(target_version: str, hotfix_number: int) -> None:
                 branch_to_check))
 
     # Cut a new release or hotfix branch.
-    if new_branch_type == constants.release_constants.BRANCH_TYPE_HOTFIX:
+    if new_branch_type == BRANCH_TYPE_HOTFIX:
         verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             remote_alias, target_version, hotfix_number)
         if hotfix_number == 1:
@@ -326,7 +326,7 @@ def execute_branch_cut(target_version: str, hotfix_number: int) -> None:
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
     # Push the new release branch to GitHub.
-    if new_branch_type == constants.release_constants.BRANCH_TYPE_RELEASE:
+    if new_branch_type == BRANCH_TYPE_RELEASE:
         print('Pushing new %s branch to GitHub.' % new_branch_type)
         subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
     else:
