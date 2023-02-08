@@ -41,7 +41,9 @@
                  aria-label="Edit profile picture button">
             </div>
             <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"
-               tabindex="0"></i>
+               tabindex="0"
+               (keydown.enter)="showEditProfilePictureModal()">
+            </i>
             <img *ngIf="profilePictureDataUrl"
                  [src]="profilePictureDataUrl"
                  class="img-thumbnail e2e-test-custom-photo"
