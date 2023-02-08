@@ -46,8 +46,8 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
-      - name: Build Webpack
-        run: python -m scripts.build --prod_env
+      # - name: Build Webpack
+      #   run: python -m scripts.build --prod_env
       # - name: Zip build files
       #   run: |
       #     zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
