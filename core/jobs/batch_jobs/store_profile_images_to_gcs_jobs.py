@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import io
-import numpy
 
 from core import utils
 from core.domain import user_services
@@ -110,10 +109,6 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
                 user_services.fetch_gravatar(user_model.email))
         elif profile_picture.startswith('unsafe:'):
             user_model.profile_picture_data_url = profile_picture[7:]
-
-        user_model.profile_picture_data_url = (
-            user_model.profile_picture_data_url.replace(
-                '%2B', '+').replace('%3D', '=').replace('%0A', ''))
         return user_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -189,11 +184,6 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
         return utils.convert_png_or_webp_binary_to_data_url(
             webp_binary, 'webp')
 
-    def print_values(self, model):
-        print("******************")
-        print(model)
-        return model
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         users_with_valid_username = (
             self.pipeline
@@ -206,7 +196,10 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
         username_with_profile_data = (
             users_with_valid_username
             | 'Map username and data url' >> beam.Map(
-                lambda model: (model.username, model.profile_picture_data_url))
+                lambda model: (
+                    model.username,
+                    model.profile_picture_data_url.replace(
+                        '%2B', '+').replace('%3D', '=').replace('%0A', '')))
         )
 
         # Audit png images.
@@ -224,7 +217,8 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                 lambda data: (
                     data[0].split('/')[1],
                     utils.convert_png_or_webp_binary_to_data_url(
-                        data[1], 'png')))
+                        data[1], 'png').replace('%2B', '+').replace(
+                            '%3D', '=').replace('%0A', '')))
         )
 
         mismatched_png_images_on_gcs_and_model = (
@@ -238,7 +232,6 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                     object_image[1]['gcs_picture'] !=
                     object_image[1]['model_picture'])
             )
-            | 'output' >> beam.Map(self.print_values)
         )
 
         report_mismatched_png_images_on_gcs_and_model = (
