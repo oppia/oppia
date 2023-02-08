@@ -61,7 +61,6 @@ export class UserService {
   }
 
   getProfileImageDataUrl(username: string): [string, string] {
-    console.log('user service ' + AssetsBackendApiService.EMULATOR_MODE);
     if (AssetsBackendApiService.EMULATOR_MODE) {
       let localStoredImage = this.imageLocalStorageService.getRawImageData(
         username + '_profile_picture.png');
