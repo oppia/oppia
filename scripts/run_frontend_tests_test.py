@@ -88,6 +88,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_check_frontend_coverage() -> None:
             self.frontend_coverage_checks_called = True
 
+        def mock_chrome_disconnected() -> None:
+            mock_print('Disconnected , because no message')
+
         self.swap_success_Popen = self.swap(
             subprocess, 'Popen', mock_success_check_call)
         self.swap_failed_Popen = self.swap(
@@ -100,6 +103,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'main', lambda: None)
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
+        self.swap_chrome_disconnected = self.swap(
+            run_frontend_tests, 'main', mock_chrome_disconnected)
 
     def test_run_dtslint_type_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
@@ -235,3 +240,19 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Downloaded the combined-tests.spec.js file and stored'
             'in ../karma_coverage_reports', self.print_arr)
+
+    def test_frontend_tests_are_rerun_when_chrome_disconnected(self) -> None:
+        with self.swap_failed_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    with self.swap_chrome_disconnected, self.swap_sys_exit:
+                        run_frontend_tests.main()
+
+        cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+        self.assertIn(cmd, self.cmd_token_list)
+        self.assertIn(
+            'View interactive frontend test coverage reports by navigating to',
+            self.print_arr)
