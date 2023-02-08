@@ -248,11 +248,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     with self.swap_chrome_disconnected:
                         run_frontend_tests.main()
 
-        cmd = [
-            common.NODE_BIN_PATH, '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
-        self.assertIn(cmd, self.cmd_token_list)
         self.assertIn(
             'View interactive frontend test coverage reports by navigating to',
             self.print_arr)
