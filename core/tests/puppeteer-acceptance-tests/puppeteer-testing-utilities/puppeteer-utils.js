@@ -21,7 +21,7 @@ const testConstants = require('./test-constants.js');
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
-module.exports = class puppeteerUtilities {
+module.exports = class baseUser {
   constructor() {
     this.page;
     this.browserObject;

@@ -16,7 +16,7 @@
  * @fileoverview Super Admin users utility file.
  */
 
-const puppeteerUtilities = require(
+const baseUser = require(
   '../puppeteer-testing-utilities/puppeteer-utils.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
@@ -29,7 +29,7 @@ const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
 const addRoleButton = 'button.oppia-add-role-button';
 
-module.exports = class superAdmin extends puppeteerUtilities {
+module.exports = class e2eSuperAdmin extends baseUser {
   /**
    * The function to assign a role to a user.
    * @param {string} username - The username to which role would be assigned.
