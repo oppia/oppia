@@ -245,7 +245,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         with self.swap_failed_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
-                    with self.swap_chrome_disconnected, self.swap_sys_exit:
+                    with self.swap_chrome_disconnected:
                         run_frontend_tests.main()
 
         cmd = [
