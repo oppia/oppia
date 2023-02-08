@@ -79,7 +79,7 @@ NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
         'description': 'questions',
         'rights_message': 'review question suggestions made by contributors'
     },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTIONS: {
+    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: {
         'review_category': 'submit_question',
         'description': 'submit questions',
         'right_message': 'contributors submit questions'
