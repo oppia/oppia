@@ -3620,7 +3620,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.next_content_id_index
         )
         content_id = content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT)
         change_list = [
             # Add state.
             exp_domain.ExplorationChange({

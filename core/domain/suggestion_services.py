@@ -1260,14 +1260,11 @@ def get_translation_suggestions_in_review_by_exp_ids(
     ]
 
 
-def get_suggestions_with_translatable_explorations(
+def get_suggestions_with_editable_explorations(
     suggestions: Sequence[suggestion_registry.SuggestionTranslateContent]
 ) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
-    translatable exploration content. That is, the following are true:
-    - The suggestion's change content corresponds to an existing exploration
-    content card.
-    - The suggestion's corresponding exploration allows edits.
+    explorations that allow edits.
 
     Args:
         suggestions: list(Suggestion). List of translation suggestions to
@@ -1276,44 +1273,13 @@ def get_suggestions_with_translatable_explorations(
     Returns:
         list(Suggestion). List of filtered translation suggestions.
     """
-
-    def _has_translatable_exploration(
-        suggestion: suggestion_registry.SuggestionTranslateContent,
-        suggestion_exp_id_to_exp: Dict[str, exp_domain.Exploration]
-    ) -> bool:
-        """Returns whether the supplied suggestion corresponds to a translatable
-        exploration content card.
-
-        Args:
-            suggestion: Suggestion. Translation suggestion domain object to
-                check.
-            suggestion_exp_id_to_exp: dict(str, Exploration). Dictionary mapping
-                suggestion target exploration IDs to their corresponding
-                Exploration domain objects.
-
-        Returns:
-            bool. Whether the supplied suggestion corresponds to a translatable
-            exploration content card.
-        """
-        exploration = suggestion_exp_id_to_exp[suggestion.target_id]
-        content_id_exists = False
-
-        # Checks whether the suggestion's change content still exists in the
-        # corresponding exploration.
-        # For more details, see https://github.com/oppia/oppia/issues/14339.
-        if suggestion.change.state_name in exploration.states:
-            content_id_exists = exploration.states[
-                suggestion.change.state_name].has_content_id(
-                    suggestion.change.content_id)
-        return content_id_exists and exploration.edits_allowed
-
     suggestion_exp_ids = {
         suggestion.target_id for suggestion in suggestions}
     suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
         list(suggestion_exp_ids))
     return list(filter(
-        lambda suggestion: _has_translatable_exploration(
-            suggestion, suggestion_exp_id_to_exp),
+        lambda suggestion: suggestion_exp_id_to_exp[
+            suggestion.target_id].edits_allowed,
         suggestions))
 
 
