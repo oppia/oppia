@@ -107,7 +107,7 @@ describe('Blog Post Object Factory', () => {
     ]);
 
     // Title contains invalid special characters. Only hyphens(-), ampersand(&)
-    // and colon(:) are allowed.
+    // and colon (:) are allowed.
     sampleBlogPostData.title = 'invalid chars#';
 
     expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
@@ -135,8 +135,9 @@ describe('Blog Post Object Factory', () => {
   it('should raise correct validation issues for' +
     ' exceeding property limits', () => {
     sampleBlogPostData.addTag('Learner');
-    sampleBlogPostData.title = 'Title exceeding character limit of 65' +
-      ' characters should raise error';
+    sampleBlogPostData.title = (
+      'Title exceeding character limit of 65 characters should raise error'
+    );
     let maxTags = 1;
 
     expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([

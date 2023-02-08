@@ -227,8 +227,8 @@ class BlogPostHandler(
                         'max_value': constants.BLOG_POST_ID_LENGTH
                     },
                     {
-                    'id': 'has_length_at_least',
-                    'min_value': constants.BLOG_POST_ID_LENGTH
+                        'id': 'has_length_at_least',
+                        'min_value': constants.BLOG_POST_ID_LENGTH
                     }
                 ]
             },
@@ -375,8 +375,8 @@ class BlogPostTitleHandlerNormalizedDict(TypedDict):
 
 class BlogPostTitleHandler(
     base.BaseHandler[
-    BlogPostTitleHandlerNormalizedDict,
-    BlogPostTitleHandlerNormalizedDict
+        BlogPostTitleHandlerNormalizedDict,
+        BlogPostTitleHandlerNormalizedDict
     ]
 ):
     """A data handler for checking if a blog post with given title exists."""
@@ -392,8 +392,8 @@ class BlogPostTitleHandler(
                         'max_value': constants.BLOG_POST_ID_LENGTH
                     },
                     {
-                    'id': 'has_length_at_least',
-                    'min_value': constants.BLOG_POST_ID_LENGTH,
+                        'id': 'has_length_at_least',
+                        'min_value': constants.BLOG_POST_ID_LENGTH,
                     }
                 ]
             }

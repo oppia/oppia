@@ -195,8 +195,8 @@ export class BlogPostEditorComponent implements OnInit {
         } else {
           this.blogPostData.titleIsDuplicate = true;
           this.alertsService.addWarning(
-            'Blog Post with the given title exists already. Please use a' +
-            ' different title.'
+            'Blog Post with the given title exists already. Please use a ' +
+            'different title.'
           );
         }
       }, error => {
