@@ -192,14 +192,20 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             build_js_files(dev_mode, source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
+        print("shivkant testing testing 1")
         stack.enter_context(servers.managed_redis_server()) # check
+        print("shivkant testing testing 2")
         stack.enter_context(servers.managed_elasticsearch_dev_server()) # check
+        print("shivkant testing testing 3")
         if constants.EMULATOR_MODE:
+            print("shivkant testing testing 4")
             stack.enter_context(servers.managed_firebase_auth_emulator()) # check
+            print("shivkant testing testing 5")
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True)) # check
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
+        print("shivkant testing testing 6")
         stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
             port=GOOGLE_APP_ENGINE_PORT,
