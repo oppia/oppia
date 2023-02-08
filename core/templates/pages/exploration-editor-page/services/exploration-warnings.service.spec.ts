@@ -329,23 +329,7 @@ describe('Exploration Warnings Service', () => {
           confirmed_unclassified_answers: [],
           solution: null,
           id: null,
-          answer_groups: [{
-            tagged_skill_misconception_id: null,
-            outcome: {
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
-              dest: '',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-            },
-            rule_specs: [],
-            training_data: []
-          }],
+          answer_groups: [],
           default_outcome: {
             labelled_as_correct: true,
             param_changes: [],
@@ -376,12 +360,8 @@ describe('Exploration Warnings Service', () => {
     }, {
       type: 'error',
       message: 'The following card has errors: Hola.'
-    }, {
-      type: 'error',
-      message: 'In \'Hola\', the following answer group has a classifier' +
-         ' with no training data: 0'
     }]);
-    expect(explorationWarningsService.countWarnings()).toBe(4);
+    expect(explorationWarningsService.countWarnings()).toBe(3);
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
