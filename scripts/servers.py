@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import contextlib
+import json
 import logging
 import os
 import re
@@ -149,6 +150,7 @@ def managed_dev_appserver(
     port: int = 8080,
     admin_host: str = '0.0.0.0',
     admin_port: int = 8000,
+    secrets: Optional[Dict[str, str]] = None,
     enable_host_checking: bool = True,
     automatic_restart: bool = False,
     skip_sdk_update_check: bool = False
@@ -193,6 +195,8 @@ def managed_dev_appserver(
         '--dev_appserver_log_level', log_level,
         app_yaml_path
     ]
+    env = {} if env is None else env
+    env['SECRETS'] = json.dumps(secrets)
     with contextlib.ExitStack() as stack:
         # OK to use shell=True here because we are not passing anything that
         # came from an untrusted user, only other callers of the script,
