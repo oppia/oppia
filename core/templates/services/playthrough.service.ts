@@ -125,9 +125,7 @@ class EarlyQuitTracker {
   foundAnIssue(): boolean {
     // TODO(#15212): Remove the below non-null check (!==) after codebase
     // is strictly typed.
-    return (
-      this.expDurationInSecs !== undefined &&
-      this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
+    return this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS;
   }
 
   recordExplorationQuit(stateName: string, expDurationInSecs: number): void {
@@ -216,7 +214,6 @@ export class PlaythroughService {
         state_name: {value: initStateName},
       })
     ];
-
     this.eqTracker = new EarlyQuitTracker();
     this.misTracker = new MultipleIncorrectAnswersTracker(initStateName);
     this.cstTracker = new CyclicStateTransitionsTracker(initStateName);
@@ -236,24 +233,18 @@ export class PlaythroughService {
     // TODO(#15212): Remove the below check once codebase is strictly typed.
     // And if check is needed, means we are actually passes null then add
     // proper comment to explain why we are doing this check.
-    if (
-      this.recordedLearnerActions &&
-      this.misTracker &&
-      this.cstTracker
-    ) {
-      this.recordedLearnerActions.push(
-        this.learnerActionObjectFactory.createNewAnswerSubmitAction({
-          state_name: {value: stateName},
-          dest_state_name: {value: destStateName},
-          interaction_id: {value: interactionId},
-          submitted_answer: {value: answer},
-          feedback: {value: feedback},
-          time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-        }));
+    this.recordedLearnerActions.push(
+      this.learnerActionObjectFactory.createNewAnswerSubmitAction({
+        state_name: {value: stateName},
+        dest_state_name: {value: destStateName},
+        interaction_id: {value: interactionId},
+        submitted_answer: {value: answer},
+        feedback: {value: feedback},
+        time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+      }));
 
-      this.misTracker.recordStateTransition(destStateName);
-      this.cstTracker.recordStateTransition(destStateName);
-    }
+    this.misTracker.recordStateTransition(destStateName);
+    this.cstTracker.recordStateTransition(destStateName);
   }
 
   recordExplorationQuitAction(
@@ -265,22 +256,15 @@ export class PlaythroughService {
     // TODO(#15212): Remove the below check once codebase is strictly typed.
     // And if check is needed, means we are actually passes null then add
     // proper comment to explain why we are doing this check.
-    if (
-      this.recordedLearnerActions &&
-      this.playthroughStopwatch &&
-      this.eqTracker
-    ) {
-      this.recordedLearnerActions.push(
-        this.learnerActionObjectFactory.createNewExplorationQuitAction({
-          state_name: {value: stateName},
-          time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-        }));
-
-      this.playthroughDurationInSecs = (
-        this.playthroughStopwatch.getTimeInSecs());
-      this.eqTracker.recordExplorationQuit(
-        stateName, this.playthroughDurationInSecs);
-    }
+    this.recordedLearnerActions.push(
+      this.learnerActionObjectFactory.createNewExplorationQuitAction({
+        state_name: {value: stateName},
+        time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+      }));
+    this.playthroughDurationInSecs = (
+      this.playthroughStopwatch.getTimeInSecs());
+    this.eqTracker.recordExplorationQuit(
+      stateName, this.playthroughDurationInSecs);
   }
 
   storePlaythrough(): void {
@@ -305,30 +289,24 @@ export class PlaythroughService {
     // TODO(#15212): Remove the below check once codebase is strictly typed.
     // And if check is needed, means we are actually passes null then add
     // proper comment to explain why we are doing this check.
-    if (
-      this.explorationId &&
-      this.explorationVersion &&
-      this.recordedLearnerActions
-    ) {
-      if (this.misTracker && this.misTracker.foundAnIssue()) {
-        return this.playthroughObjectFactory
-          .createNewMultipleIncorrectSubmissionsPlaythrough(
-            this.explorationId, this.explorationVersion,
-            this.misTracker.generateIssueCustomizationArgs(),
-            this.recordedLearnerActions);
-      } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-        return this.playthroughObjectFactory
-          .createNewCyclicStateTransitionsPlaythrough(
-            this.explorationId, this.explorationVersion,
-            this.cstTracker.generateIssueCustomizationArgs(),
-            this.recordedLearnerActions);
-      } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-        return this.playthroughObjectFactory
-          .createNewEarlyQuitPlaythrough(
-            this.explorationId, this.explorationVersion,
-            this.eqTracker.generateIssueCustomizationArgs(),
-            this.recordedLearnerActions);
-      }
+    if (this.misTracker && this.misTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory
+        .createNewMultipleIncorrectSubmissionsPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.misTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
+    } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory
+        .createNewCyclicStateTransitionsPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.cstTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
+    } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
+      return this.playthroughObjectFactory
+        .createNewEarlyQuitPlaythrough(
+          this.explorationId, this.explorationVersion,
+          this.eqTracker.generateIssueCustomizationArgs(),
+          this.recordedLearnerActions);
     }
     return null;
   }
@@ -356,7 +334,6 @@ export class PlaythroughService {
       // codebase is strictly typed. And if check is needed, means we are
       // actually passes null then add proper comment to explain why we are
       // doing this check.
-      this.recordedLearnerActions &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
@@ -369,7 +346,6 @@ export class PlaythroughService {
       // codebase is strictly typed. And if check is needed, means we are
       // actually passes null then add proper comment to explain why we are
       // doing this check.
-      this.recordedLearnerActions &&
       // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
