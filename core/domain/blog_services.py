@@ -821,6 +821,10 @@ def get_published_blog_post_summaries(
         max_limit = size
     else:
         max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+    # We use '!= None' instead of 'is not None' because the it is inside the
+    # query() as GAE does not support 'is not None' inside the query().
+    # Using the latter results in the following error:
+    # 'Cannot filter a non-Node argument'.
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
