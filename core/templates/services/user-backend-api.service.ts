@@ -162,21 +162,21 @@ export class UserBackendApiService {
   }
 
   async updatePreferencesProfilePictureDataUrlAsync(
-      data: string
+      profilePictureData: string
   ): Promise<ProfilePictureDataBackendDict> {
     return this.http.put<ProfilePictureDataBackendDict>(
       this.PREFERENCES_PROFILE_PICTURE_DATA_URL, {
-        data: data
+        profile_picture_data: profilePictureData
       }
     ).toPromise();
   }
 
   async updateEmailPreferencesAsync(
-      data: EmailPreferencesBackendDict
+      emailPreferencesData: EmailPreferencesBackendDict
   ): Promise<UpdatePreferencesResponse> {
     return this.http.put<UpdatePreferencesResponse>(
       this.EMAIL_PREFFERENCES, {
-        data: data
+        email_preferences_data: emailPreferencesData
       }
     ).toPromise();
   }

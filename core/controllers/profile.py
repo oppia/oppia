@@ -272,7 +272,7 @@ class EmailPreferencesHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    data: EmailPreferencesDict
+    email_preferences_data: EmailPreferencesDict
 
 
 class EmailPreferencesHandler(
@@ -286,7 +286,7 @@ class EmailPreferencesHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
-            'data': {
+            'email_preferences_data': {
                 'schema': {
                     'type': 'dict',
                     'properties': [{
@@ -340,13 +340,15 @@ class EmailPreferencesHandler(
         """Handles PUT requests."""
         assert self.normalized_payload is not None
         assert self.user_id is not None
-        data = self.normalized_payload['data']
+        email_preferences_data = (
+            self.normalized_payload['email_preferences_data'])
         bulk_email_signup_message_should_be_shown = (
             user_services.update_email_preferences(
-                self.user_id, data['can_receive_email_updates'],
-                data['can_receive_editor_role_email'],
-                data['can_receive_feedback_message_email'],
-                data['can_receive_subscription_email']
+                self.user_id,
+                email_preferences_data['can_receive_email_updates'],
+                email_preferences_data['can_receive_editor_role_email'],
+                email_preferences_data['can_receive_feedback_message_email'],
+                email_preferences_data['can_receive_subscription_email']
             )
         )
 
@@ -365,7 +367,7 @@ class ProfilePictureDataUrlHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
-            'data': {
+            'profile_picture_data': {
                 'schema': {
                     'type': 'basestring'
                 }
@@ -391,10 +393,11 @@ class ProfilePictureDataUrlHandler(
         """Handles PUT requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        data = self.normalized_payload['data']
-        user_services.update_profile_picture_data_url(self.user_id, data)
+        profile_picture_data = self.normalized_payload['profile_picture_data']
+        user_services.update_profile_picture_data_url(
+            self.user_id, profile_picture_data)
 
-        self.render_json({'data': data})
+        self.render_json({'profile_picture_data': profile_picture_data})
 
 
 class SubscriptionListDict(TypedDict):

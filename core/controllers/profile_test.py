@@ -469,7 +469,7 @@ class ProfilePictureDataUrlHandlerTests(test_utils.GenericTestBase):
         self.put_json(
             feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL,
             {
-                'data': 'new_profile_picture_data_url'},
+                'profile_picture_data': 'new_profile_picture_data_url'},
             csrf_token=csrf_token)
         profile_picture_data_url = self.get_json(
             feconf.PREFERENCES_PROFILE_PICTURE_DATA_URL
@@ -718,7 +718,7 @@ class EmailPreferencesHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         payload = {
-            'data': {
+            'email_preferences_data': {
                 'can_receive_email_updates': False,
                 'can_receive_editor_role_email': True,
                 'can_receive_feedback_message_email': True,
@@ -729,13 +729,13 @@ class EmailPreferencesHandlerTests(test_utils.GenericTestBase):
         # Check default email preferences.
         email_preferences = self.get_json(feconf.EMAIL_PREFFERENCES)
         self.assertDictContainsSubset(
-            payload['data'],
+            payload['email_preferences_data'],
             email_preferences,
             msg='Wrong email preferences'
         )
 
         payload = {
-            'data': {
+            'email_preferences_data': {
                 'can_receive_email_updates': True,
                 'can_receive_editor_role_email': True,
                 'can_receive_feedback_message_email': True,
@@ -757,7 +757,7 @@ class EmailPreferencesHandlerTests(test_utils.GenericTestBase):
         self.assertTrue(email_preferences.can_receive_subscription_email)
 
         payload = {
-            'data': {
+            'email_preferences_data': {
                 'can_receive_email_updates': False,
                 'can_receive_editor_role_email': False,
                 'can_receive_feedback_message_email': False,

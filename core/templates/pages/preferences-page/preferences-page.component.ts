@@ -164,11 +164,11 @@ export class PreferencesPageComponent {
 
 
   private _saveEmailPreferences(
-      data: EmailPreferencesBackendDict
+      emailPreferencesData: EmailPreferencesBackendDict
   ): void {
     this.preventPageUnloadEventService.addListener();
     this.userBackendApiService.updateEmailPreferencesAsync(
-      data
+      emailPreferencesData
     ).then((returnData) => {
       this.preventPageUnloadEventService.removeListener();
       if (returnData.bulk_email_signup_message_should_be_shown) {
@@ -184,14 +184,14 @@ export class PreferencesPageComponent {
       canReceiveEmailUpdates: boolean, canReceiveEditorRoleEmail: boolean,
       canReceiveFeedbackMessageEmail: boolean,
       canReceiveSubscriptionEmail: boolean): void {
-    let data: EmailPreferencesBackendDict = {
+    let emailPreferencesData: EmailPreferencesBackendDict = {
       can_receive_email_updates: canReceiveEmailUpdates,
       can_receive_editor_role_email: canReceiveEditorRoleEmail,
       can_receive_feedback_message_email: (
         canReceiveFeedbackMessageEmail),
       can_receive_subscription_email: canReceiveSubscriptionEmail
     };
-    this._saveEmailPreferences(data);
+    this._saveEmailPreferences(emailPreferencesData);
   }
 
 
@@ -252,22 +252,23 @@ export class PreferencesPageComponent {
 
     let preferencesProfilePictureDataUrlPromise = (
       this.userBackendApiService.getPreferencesProfilePictureDataUrlAsync());
-    preferencesProfilePictureDataUrlPromise.then((data) => {
+    preferencesProfilePictureDataUrlPromise.then((profilePictureData) => {
       this.profilePictureDataUrl = decodeURIComponent(
-        data.profile_picture_data_url);
+        profilePictureData.profile_picture_data_url);
     });
 
 
     let emailPreferencesPromise = (
       this.userBackendApiService.getEmailPreferencesAsync());
-    emailPreferencesPromise.then((data) => {
-      this.canReceiveEmailUpdates = data.can_receive_email_updates;
+    emailPreferencesPromise.then((emailPreferencesData) => {
+      this.canReceiveEmailUpdates = (
+        emailPreferencesData.can_receive_email_updates);
       this.canReceiveEditorRoleEmail = (
-        data.can_receive_editor_role_email);
+        emailPreferencesData.can_receive_editor_role_email);
       this.canReceiveFeedbackMessageEmail = (
-        data.can_receive_feedback_message_email);
+        emailPreferencesData.can_receive_feedback_message_email);
       this.canReceiveSubscriptionEmail = (
-        data.can_receive_subscription_email);
+        emailPreferencesData.can_receive_subscription_email);
       this.hasPageLoaded = true;
     });
 
