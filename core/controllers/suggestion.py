@@ -1167,8 +1167,8 @@ def _construct_exploration_suggestions(
 ) -> List[FrontendBaseSuggestionDict]:
     """Returns exploration suggestions with current exploration content. If the
     exploration content is no longer available, e.g. the exploration state or
-    content was deleted, a placeholder message is returned for the exploration
-    content instead.
+    content was deleted, the suggestion's change content is used for the
+    exploration content instead.
 
     Args:
         suggestions: list(BaseSuggestion). A list of suggestions.
@@ -1188,6 +1188,8 @@ def _construct_exploration_suggestions(
             content_html = exploration.get_content_html(
                 suggestion.change.state_name, suggestion.change.content_id)
         except ValueError:
+            # If the exploration content is no longer available, return the
+            # suggestion's content.
             content_html = suggestion.change.content_html
         suggestion_dict = suggestion.to_dict()
         updated_suggestion_dict: FrontendBaseSuggestionDict = {
