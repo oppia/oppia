@@ -104,7 +104,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
         self.swap_chrome_disconnected = self.swap(
-            run_frontend_tests, 'main', mock_chrome_disconnected)
+            builtins, 'print', mock_chrome_disconnected)
 
     def test_run_dtslint_type_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
