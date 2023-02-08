@@ -125,7 +125,9 @@ class EarlyQuitTracker {
   foundAnIssue(): boolean {
     // TODO(#15212): Remove the below non-null check (!==) after codebase
     // is strictly typed.
-    return this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS;
+    return (
+      this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS
+    );
   }
 
   recordExplorationQuit(stateName: string, expDurationInSecs: number): void {
