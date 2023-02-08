@@ -26,6 +26,9 @@ import { StateWrittenTranslationsService } from 'components/state-editor/state-e
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
+import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 
 
 class MockNgbModal {
@@ -38,11 +41,13 @@ class MockNgbModal {
 
 describe('Translation status service', () => {
   let tss: TranslationStatusService;
+  let entityTranslationsService: EntityTranslationsService;
+  let generateContentIdService: GenerateContentIdService;
   let ess: ExplorationStatesService;
   let srvs: StateRecordedVoiceoversService;
-  let swts: StateWrittenTranslationsService;
   let ttams: TranslationTabActiveModeService;
   let tls: TranslationLanguageService;
+
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
   let NO_ASSETS_AVAILABLE_COLOR = '#D14836';
@@ -59,6 +64,7 @@ describe('Translation status service', () => {
         StateWrittenTranslationsService,
         TranslationTabActiveModeService,
         ExplorationStatesService,
+        GenerateContentIdService,
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -75,13 +81,15 @@ describe('Translation status service', () => {
       ]
     });
 
-    tss = TestBed.inject(
-      TranslationStatusService);
+    tss = TestBed.inject(TranslationStatusService);
     ess = TestBed.inject(ExplorationStatesService);
     ttams = TestBed.inject(TranslationTabActiveModeService);
     tls = TestBed.inject(TranslationLanguageService);
     srvs = TestBed.inject(StateRecordedVoiceoversService);
-    swts = TestBed.inject(StateWrittenTranslationsService);
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    let currentIndex = 9;
+    generateContentIdService.init(() => currentIndex++, () => { });
   });
 
   beforeEach(() => {
@@ -89,34 +97,13 @@ describe('Translation status service', () => {
       First: {
         content: {
           html: '<p>This is first card.</p>',
-          content_id: 'content'
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_2: {
-              hi: {
-                data_format: 'html',
-                translation: '<p>This is feedback 1.</p>',
-                needs_update: false
-              }
-            },
-            feedback_1: {
-              hi: {
-                data_format: 'html',
-                translation: '<p>This is first card.</p>',
-                needs_update: false
-              }
-            },
-            rule_input_4: {}
-          }
+          content_id: 'content_0'
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_2: {
+            content_0: {},
+            default_outcome_1: {},
+            feedback_3: {
               en: {
                 needs_update: false,
                 filename: 'filename1.mp3',
@@ -124,8 +111,7 @@ describe('Translation status service', () => {
                 duration_secs: 4.3
               }
             },
-            feedback_1: {},
-            rule_input_4: {}
+            feedback_2: {},
           }
         },
         interaction: {
@@ -137,7 +123,7 @@ describe('Translation status service', () => {
               labelled_as_correct: false,
               feedback: {
                 html: '<p>This is feedback1</p>',
-                content_id: 'feedback_1'
+                content_id: 'feedback_2'
               },
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
@@ -157,7 +143,7 @@ describe('Translation status service', () => {
               labelled_as_correct: false,
               feedback: {
                 html: '<p>This is feedback2</p>',
-                content_id: 'feedback_2'
+                content_id: 'feedback_3'
               },
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
@@ -184,7 +170,7 @@ describe('Translation status service', () => {
             labelled_as_correct: false,
             feedback: {
               html: '',
-              content_id: 'default_outcome'
+              content_id: 'default_outcome_1'
             },
             missing_prerequisite_skill_id: null,
             dest_if_really_stuck: null,
@@ -196,26 +182,18 @@ describe('Translation status service', () => {
         solicit_answer_details: false,
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 0,
         card_is_checkpoint: false,
       },
       Second: {
         content: {
           html: '<p>This is second card</p>',
-          content_id: 'content'
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
+          content_id: 'content_5'
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+            content_5: {},
+            default_outcome_6: {},
+            feedback_7: {}
           }
         },
         interaction: {
@@ -227,7 +205,7 @@ describe('Translation status service', () => {
               labelled_as_correct: false,
               feedback: {
                 html: '',
-                content_id: 'feedback_1'
+                content_id: 'feedback_7'
               },
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
@@ -254,7 +232,7 @@ describe('Translation status service', () => {
             labelled_as_correct: false,
             feedback: {
               html: '',
-              content_id: 'default_outcome'
+              content_id: 'default_outcome_6'
             },
             missing_prerequisite_skill_id: null,
             dest_if_really_stuck: null,
@@ -266,22 +244,16 @@ describe('Translation status service', () => {
         solicit_answer_details: false,
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 0,
         card_is_checkpoint: false,
       },
       Third: {
         content: {
           html: 'Congratulations, you have finished!',
-          content_id: 'content'
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {}
-          }
+          content_id: 'content_8'
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {
+            content_8: {
               en: {
                 needs_update: false,
                 filename: 'content-en-s86jb5zajs.mp3',
@@ -308,13 +280,27 @@ describe('Translation status service', () => {
         solicit_answer_details: false,
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 0,
         card_is_checkpoint: false,
       }
     };
-    ess.init(statesWithAudioDict);
+    ess.init(statesWithAudioDict, false);
     ttams.activateVoiceoverMode();
     tls.setActiveLanguageCode('en');
+    entityTranslationsService.languageCodeToEntityTranslations.hi = (
+      EntityTranslation.createFromBackendDict({
+        entity_id: 'exp_id',
+        entity_type: 'exploration',
+        entity_version: 5,
+        language_code: 'hi',
+        translations: {
+          feedback_3: {
+            content_format: 'html',
+            content_value: '<p>This is feedback 1.</p>',
+            needs_update: false
+          }
+        }
+      })
+    );
     tss.refresh();
   });
 
@@ -335,7 +321,7 @@ describe('Translation status service', () => {
     expect(Object.keys(statesNeedingAudioUpdate).length).toBe(0);
     srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
     var value = srvs.displayed;
-    value.toggleNeedsUpdateAttribute('feedback_2', 'en');
+    value.toggleNeedsUpdateAttribute('feedback_3', 'en');
     srvs.saveDisplayedValue();
     ess.saveRecordedVoiceovers('First', value);
     tss.refresh();
@@ -354,13 +340,28 @@ describe('Translation status service', () => {
     var statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
     expect(Object.keys(statesNeedingTranslationUpdate).length).toBe(0);
 
-    swts.init('First', ess.getWrittenTranslationsMemento('First'));
-    swts.displayed.toggleNeedsUpdateAttribute('feedback_1', 'hi');
-    swts.displayed.toggleNeedsUpdateAttribute('feedback_2', 'hi');
-    ess.markWrittenTranslationsAsNeedingUpdate('feedback_1', 'First');
-    ess.markWrittenTranslationsAsNeedingUpdate('feedback_2', 'First');
-    tss.refresh();
+    entityTranslationsService.languageCodeToEntityTranslations.hi = (
+      EntityTranslation.createFromBackendDict({
+        entity_id: 'exp_id',
+        entity_type: 'exploration',
+        entity_version: 5,
+        language_code: 'hi',
+        translations: {
+          feedback_3: {
+            content_format: 'html',
+            content_value: '<p>This is feedback 1.</p>',
+            needs_update: true
+          },
+          feedback_2: {
+            content_format: 'html',
+            content_value: '<p>This is first card.</p>',
+            needs_update: true
+          }
+        }
+      })
+    );
 
+    tss.refresh();
     statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
     expect(Object.keys(statesNeedingTranslationUpdate).length).toBe(1);
     expect(Object.keys(statesNeedingTranslationUpdate)[0]).toBe('First');
@@ -377,14 +378,14 @@ describe('Translation status service', () => {
     tls.setActiveLanguageCode('hi');
     var explorationTranslationsRequiredCount = (
       tss.getExplorationContentRequiredCount());
-    expect(explorationTranslationsRequiredCount).toBe(9);
+    expect(explorationTranslationsRequiredCount).toBe(8);
 
     // To test changes after adding a new state.
     ess.addState('Fourth', () => {});
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
     ess.saveInteractionId('Fourth', 'EndExploration');
-    tss.refresh();
 
+    tss.refresh();
     ttams.activateVoiceoverMode();
     tls.setActiveLanguageCode('en');
     var explorationAudioRequiredCount = (
@@ -393,9 +394,10 @@ describe('Translation status service', () => {
 
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
+
     var explorationTranslationsRequiredCount = (
       tss.getExplorationContentRequiredCount());
-    expect(explorationTranslationsRequiredCount).toBe(10);
+    expect(explorationTranslationsRequiredCount).toBe(9);
   });
 
   it('should return a correct count of audio not available in an exploration',
@@ -426,8 +428,9 @@ describe('Translation status service', () => {
     ess.addState('Fourth', () => {});
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
     ess.saveInteractionId('Fourth', 'EndExploration');
-    tss.refresh();
 
+    ttams.activateTranslationMode();
+    tss.refresh();
     explorationTranslationNotAvailableCount = (
       tss.getExplorationContentNotAvailableCount());
     expect(explorationTranslationNotAvailableCount).toBe(8);
@@ -445,7 +448,7 @@ describe('Translation status service', () => {
     expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
     // To test changes after adding an audio translation to "content"
     // in the first state.
-    srvs.displayed.addVoiceover('content', 'en', 'file.mp3', 1000, 1000);
+    srvs.displayed.addVoiceover('content_0', 'en', 'file.mp3', 1000, 1000);
     srvs.saveDisplayedValue();
     var value = srvs.displayed;
     ess.saveRecordedVoiceovers('First', value);
@@ -469,8 +472,9 @@ describe('Translation status service', () => {
       'the active state components', () => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
+    srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
+    tss.refresh();
 
-    swts.init('First', ess.getWrittenTranslationsMemento('First'));
     var activeStateComponentStatus = (
       tss.getActiveStateComponentStatusColor('content'));
     expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
@@ -478,7 +482,24 @@ describe('Translation status service', () => {
       tss.getActiveStateComponentStatusColor('feedback'));
     expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
 
-    swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'Content');
+    tss.entityTranslation = EntityTranslation.createFromBackendDict({
+      entity_id: 'exp_id',
+      entity_type: 'exploration',
+      entity_version: 5,
+      language_code: 'hi',
+      translations: {
+        content_0: {
+          content_format: 'html',
+          content_value: '<p>This is content.</p>',
+          needs_update: false
+        },
+        feedback_2: {
+          content_format: 'html',
+          content_value: '<p>This is first card.</p>',
+          needs_update: false
+        }
+      }
+    });
 
     activeStateComponentStatus = (
       tss.getActiveStateComponentStatusColor('content'));
@@ -499,7 +520,7 @@ describe('Translation status service', () => {
     expect(activeStateComponentNeedsUpdateStatus).toBe(false);
     var value = srvs.displayed;
     // To test changes after changing "needs update" status of an audio.
-    value.toggleNeedsUpdateAttribute('feedback_2', 'en');
+    value.toggleNeedsUpdateAttribute('feedback_3', 'en');
     srvs.saveDisplayedValue();
     ess.saveRecordedVoiceovers('First', value);
     activeStateComponentNeedsUpdateStatus = tss
@@ -510,54 +531,54 @@ describe('Translation status service', () => {
   });
 
   it('should correctly return whether active state component translation ' +
-      'needs update', () => {
+      'needs update', (() => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
+    srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
 
-    swts.init('First', ess.getWrittenTranslationsMemento('First'));
     var activeStateComponentNeedsUpdateStatus = (
       tss.getActiveStateComponentNeedsUpdateStatus('feedback'));
     expect(activeStateComponentNeedsUpdateStatus).toBe(false);
 
-    swts.displayed.toggleNeedsUpdateAttribute('feedback_2', 'hi');
-
+    tss.refresh();
+    tss.entityTranslation.markTranslationAsNeedingUpdate('feedback_3');
     activeStateComponentNeedsUpdateStatus = (
       tss.getActiveStateComponentNeedsUpdateStatus('feedback'));
     expect(activeStateComponentNeedsUpdateStatus).toBe(true);
-  });
+  }));
 
   it('should return correct audio availability status color of a contentId ' +
       'of active state', () => {
     ttams.activateVoiceoverMode();
     srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
     var activeStateContentIdStatusColor = tss
-      .getActiveStateContentIdStatusColor('content');
-    expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
-    activeStateContentIdStatusColor = tss
-      .getActiveStateContentIdStatusColor('feedback_1');
+      .getActiveStateContentIdStatusColor('content_0');
     expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
     activeStateContentIdStatusColor = tss
       .getActiveStateContentIdStatusColor('feedback_2');
+    expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
+    activeStateContentIdStatusColor = tss
+      .getActiveStateContentIdStatusColor('feedback_3');
     expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
     var value = srvs.displayed;
     // To test changes after adding an audio translation to "content"
     // in the first state.
-    value.addVoiceover('content', 'en', 'file.mp3', 1000, 1000);
+    value.addVoiceover('content_0', 'en', 'file.mp3', 1000, 1000);
     srvs.saveDisplayedValue();
     ess.saveRecordedVoiceovers('First', value);
     activeStateContentIdStatusColor = tss
-      .getActiveStateContentIdStatusColor('content');
+      .getActiveStateContentIdStatusColor('content_0');
     expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
     srvs.init('Second', ess.getRecordedVoiceoversMemento('Second'));
     activeStateContentIdStatusColor = tss
-      .getActiveStateContentIdStatusColor('content');
+      .getActiveStateContentIdStatusColor('content_5');
     expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
     activeStateContentIdStatusColor = tss
-      .getActiveStateContentIdStatusColor('feedback_1');
+      .getActiveStateContentIdStatusColor('feedback_7');
     expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
     srvs.init('Third', ess.getRecordedVoiceoversMemento('Third'));
     activeStateContentIdStatusColor = tss
-      .getActiveStateContentIdStatusColor('content');
+      .getActiveStateContentIdStatusColor('content_8');
     expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
   });
 
@@ -565,33 +586,17 @@ describe('Translation status service', () => {
       'contentId of active state', () => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
+    tss.refresh();
 
-    swts.init('First', ess.getWrittenTranslationsMemento('First'));
     var activeStateContentIdStatusColor = (
-      tss.getActiveStateContentIdStatusColor('content'));
+      tss.getActiveStateContentIdStatusColor('content_0'));
     expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
     activeStateContentIdStatusColor = (
-      tss.getActiveStateContentIdStatusColor('feedback_1'));
-    expect(activeStateContentIdStatusColor).toBe(
-      ALL_ASSETS_AVAILABLE_COLOR);
-    activeStateContentIdStatusColor = (
       tss.getActiveStateContentIdStatusColor('feedback_2'));
     expect(activeStateContentIdStatusColor).toBe(
-      ALL_ASSETS_AVAILABLE_COLOR);
-
-    swts.displayed.addWrittenTranslation(
-      'content', 'hi', 'html', '<p>Content</p>');
-
+      NO_ASSETS_AVAILABLE_COLOR);
     activeStateContentIdStatusColor = (
-      tss.getActiveStateContentIdStatusColor('content'));
-    expect(activeStateContentIdStatusColor).toBe(
-      ALL_ASSETS_AVAILABLE_COLOR);
-    activeStateContentIdStatusColor = (
-      tss.getActiveStateContentIdStatusColor('feedback_1'));
-    expect(activeStateContentIdStatusColor).toBe(
-      ALL_ASSETS_AVAILABLE_COLOR);
-    activeStateContentIdStatusColor = (
-      tss.getActiveStateContentIdStatusColor('feedback_2'));
+      tss.getActiveStateContentIdStatusColor('feedback_3'));
     expect(activeStateContentIdStatusColor).toBe(
       ALL_ASSETS_AVAILABLE_COLOR);
   });
@@ -601,16 +606,16 @@ describe('Translation status service', () => {
     ttams.activateVoiceoverMode();
     srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
     var activeStateContentIdNeedsUpdateStatus = tss
-      .getActiveStateContentIdNeedsUpdateStatus('feedback_2');
+      .getActiveStateContentIdNeedsUpdateStatus('feedback_3');
       // To check that initially the state content id "feedback" does not
       // contain audio that needs update.
     expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
 
     var value = srvs.displayed;
-    value.toggleNeedsUpdateAttribute('feedback_2', 'en');
+    value.toggleNeedsUpdateAttribute('feedback_3', 'en');
     srvs.saveDisplayedValue();
     activeStateContentIdNeedsUpdateStatus = (
-      tss.getActiveStateContentIdNeedsUpdateStatus('feedback_2'));
+      tss.getActiveStateContentIdNeedsUpdateStatus('feedback_3'));
     // To check that the state content id "feedback" contains audio that
     // needs update.
     expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
@@ -620,15 +625,15 @@ describe('Translation status service', () => {
       'state contentId', () => {
     ttams.activateTranslationMode();
     tls.setActiveLanguageCode('hi');
-    swts.init('First', ess.getWrittenTranslationsMemento('First'));
     var activeStateContentIdNeedsUpdateStatus = (
-      tss.getActiveStateContentIdNeedsUpdateStatus('feedback_2'));
+      tss.getActiveStateContentIdNeedsUpdateStatus('feedback_3'));
     expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
 
-    swts.displayed.toggleNeedsUpdateAttribute('feedback_2', 'hi');
+    tss.refresh();
 
+    tss.entityTranslation.markTranslationAsNeedingUpdate('feedback_3');
     activeStateContentIdNeedsUpdateStatus = (
-      tss.getActiveStateContentIdNeedsUpdateStatus('feedback_2'));
+      tss.getActiveStateContentIdNeedsUpdateStatus('feedback_3'));
     expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
   });
 });
