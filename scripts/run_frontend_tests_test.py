@@ -88,7 +88,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.cmd_token_list.append(cmd_tokens)
             return MockFailedTask()
         def mock_chrome_disconnected_call(
-            cmd_tokens: list[str], **unused_kwargs: str) -> MockChromeDisconnectedTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockChromeDisconnectedTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockChromeDisconnectedTask()
 
