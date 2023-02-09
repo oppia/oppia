@@ -78,12 +78,6 @@ NEW_REVIEWER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
         'to_check': 'question suggestions',
         'description': 'questions',
         'rights_message': 'review question suggestions made by contributors'
-    },
-    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION: {
-        'review_category': 'submit_question',
-        'description': 'submit questions',
-        'right_message': 'contributors submit questions'
-
     }
 }
 
@@ -2151,28 +2145,21 @@ def send_email_to_new_contribution_reviewer(
 
 def send_email_to_new_contribution_submit_questions(
     recipient_id: str,
-    review_category: str,
 ) -> None:
     """Sends an email to user who is assigned to submit questions.
 
     Args:
         recipient_id: str. The ID of the user.
-        review_category: str. Submit questions.
 
     Raises:
-        Exception. The review category is not valid.
     """
-    if review_category not in NEW_REVIEWER_EMAIL_DATA:
-        raise Exception('Invalid review_category: %s' % review_category)
 
-    review_category_data = NEW_REVIEWER_EMAIL_DATA[review_category]
-    email_subject = 'You have been invited at Oppia to %s' % (
-        review_category_data['description'])
+    email_subject = 'You have been invited at Oppia to submit questions'
 
     email_body_template = (
         'Hi %s,<br><br>'
         'This is to let you know that the Oppia team has granted you '
-        'the rights to  %s.<br><br>'
+        'the rights to submit questions.<br><br>'
         'Link to the '
         '<a href="https://www.oppia.org/contributor-dashboard">'
         'Contributor Dashboard</a>.<br><br>'
@@ -2191,12 +2178,11 @@ def send_email_to_new_contribution_submit_questions(
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
         email_body = email_body_template % (
-            recipient_username, review_category_data['description'])
+            recipient_username)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
-
 
 def send_email_to_removed_contribution_reviewer(
     user_id: str,
