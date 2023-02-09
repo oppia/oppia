@@ -47,19 +47,19 @@ describe('HintsAndSolutionManager service', () => {
     hasms = TestBed.inject(HintsAndSolutionManagerService);
     sof = TestBed.inject(SolutionObjectFactory);
 
-    firstHint = hof.createFromBackendDict({
+    firstHint = Hint.createFromBackendDict({
       hint_content: {
         content_id: 'one',
         html: 'one',
       }
     });
-    secondHint = hof.createFromBackendDict({
+    secondHint = Hint.createFromBackendDict({
       hint_content: {
         content_id: 'two',
         html: 'two',
       }
     });
-    thirdHint = hof.createFromBackendDict({
+    thirdHint = Hint.createFromBackendDict({
       hint_content: {
         content_id: 'three',
         html: 'three',

@@ -606,10 +606,10 @@ describe('Interaction object factory', () => {
         content_id: 'content_id_new'
       }
     };
-    const newHint = hof.createFromBackendDict(newHintDict);
+    const newHint = Hint.createFromBackendDict(newHintDict);
     expect(testInteraction.hints).toEqual(hintsDict.map(
       (hintDict: HintBackendDict) => {
-        return hof.createFromBackendDict(hintDict);
+        return Hint.createFromBackendDict(hintDict);
       }
     ));
     testInteraction.setHints([newHint]);
