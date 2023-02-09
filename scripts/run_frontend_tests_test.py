@@ -71,7 +71,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return b'Disconnected , because no message'
 
         class MockChromeDisconnectedTask:
-            returncode = 1
             stdout = MockChromeDisconnectedFile()
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
@@ -87,6 +86,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             cmd_tokens: list[str], **unused_kwargs: str) -> MockFailedTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockFailedTask()
+
         def mock_chrome_disconnected_call(
             cmd_tokens: list[str], **unused_kwargs: str
         ) -> MockChromeDisconnectedTask:  # pylint: disable=unused-argument
