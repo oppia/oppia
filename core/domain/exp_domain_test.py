@@ -6667,7 +6667,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -6939,7 +6939,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7187,7 +7187,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7406,7 +7406,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7601,7 +7601,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7858,7 +7858,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8105,7 +8105,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8291,7 +8291,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8685,7 +8685,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9103,7 +9103,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9399,7 +9399,7 @@ next_content_id_index: 5
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9689,7 +9689,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9994,7 +9994,7 @@ next_content_id_index: 10
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10344,7 +10344,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10604,7 +10604,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10832,7 +10832,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11170,7 +11170,7 @@ next_content_id_index: 9
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11453,7 +11453,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11738,7 +11738,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12139,7 +12139,7 @@ next_content_id_index: 15
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12451,7 +12451,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 60
 states:
   Introduction:
     card_is_checkpoint: true
