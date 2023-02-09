@@ -118,7 +118,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'main', lambda: None)
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
-        self.swap_chrome_disconnected_Popen = self.swap(
+        self.swap_chrome_disconnected = self.swap(
             subprocess, 'Popen', mock_chrome_disconnected_call)
         self.subprocess_counter = test_utils.CallCounter(
             subprocess.Popen)
@@ -259,7 +259,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'in ../karma_coverage_reports', self.print_arr)
 
     def test_frontend_tests_are_rerun_when_chrome_disconnected(self) -> None:
-        with self.swap_chrome_disconnected_Popen, self.print_swap, self.swap_build:
+        with self.swap_chrome_disconnected, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main()
