@@ -497,7 +497,7 @@ export class InteractionObjectFactory {
   createHintsFromBackendDict(
       hintBackendDicts: readonly HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
-      return this.hintFactory.createFromBackendDict(hintBackendDict);
+      return Hint.createFromBackendDict(hintBackendDict);
     });
   }
 
