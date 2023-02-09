@@ -65,6 +65,18 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return 1
             def wait(self) -> None: # pylint: disable=missing-docstring
                 return None
+        
+        class MockChromeDisconnectedFile:
+            def readline(self) -> bytes:
+                return b'Disconnected , because no message'
+
+        class MockChromeDisconnectedTask:
+            returncode = 1
+            stdout = MockChromeDisconnectedFile()
+            def poll(self) -> int: # pylint: disable=missing-docstring
+                return 1
+            def wait(self) -> None: # pylint: disable=missing-docstring
+                return None
 
         self.cmd_token_list: list[list[str]] = []
         def mock_success_check_call(
@@ -75,6 +87,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             cmd_tokens: list[str], **unused_kwargs: str) -> MockFailedTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockFailedTask()
+        def mock_chrome_disconnected_call(
+            cmd_tokens: list[str], **unused_kwargs: str) -> MockFailedTask:  # pylint: disable=unused-argument
+            self.cmd_token_list.append(cmd_tokens)
+            return MockChromeDisconnectedTask()
 
         self.sys_exit_message: list[str] = []
         def mock_sys_exit(error_message: str) -> None:
@@ -87,9 +103,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.frontend_coverage_checks_called = False
         def mock_check_frontend_coverage() -> None:
             self.frontend_coverage_checks_called = True
-
-        def mock_chrome_disconnected() -> None:
-            mock_print('Disconnected , because no message')
 
         self.swap_success_Popen = self.swap(
             subprocess, 'Popen', mock_success_check_call)
@@ -104,7 +117,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
         self.swap_chrome_disconnected = self.swap(
-            builtins, 'print', mock_chrome_disconnected)
+            subprocess, 'Popen', mock_chrome_disconnected_call)
 
     def test_run_dtslint_type_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
@@ -248,6 +261,4 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     with self.swap_chrome_disconnected:
                         run_frontend_tests.main()
 
-        self.assertIn(
-            'View interactive frontend test coverage reports by navigating to',
-            self.print_arr)
+        self.assertEqual(subprocess.Popen.times_called, 2)
