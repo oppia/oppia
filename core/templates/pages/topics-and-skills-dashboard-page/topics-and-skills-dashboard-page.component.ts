@@ -312,11 +312,11 @@ export class TopicsAndSkillsDashboardPageComponent {
   }
 
   getTotalCountValueForSkills(): number | string {
-    if (this.skillSummaries.length > this.itemsPerPage) {
-      return 'many';
-    }
+    // if (this.skillSummaries.length > this.itemsPerPage) {
+    //   return 'many';
+    // }
 
-    return this.skillSummaries.length;
+    return this.totalSkillCount;
   }
 
   refreshPagination(): void {
