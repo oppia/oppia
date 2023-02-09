@@ -48,6 +48,7 @@ module.exports = class baseUser {
         // initialized, so there is no way to handle them in between the tests
         // (where our action is popping up an alert). and it wouldn't be good
         // to have explicit if-else conditions for handling such situations.
+        // see (https://github.com/puppeteer/puppeteer/blob/v0.12.0/docs/api.md#class-dialog)
         this.page.on('dialog', async(dialog) => {
           await dialog.accept();
         });
