@@ -2,25 +2,25 @@ body:
 - type: input
   attributes:
     label: Operating System
-    description: "What OS are you using?"
+    description: "What operating system (OS) are you using?"
   validations:
     required: true
 - type: input
   attributes:
     label: RAM size
-    description: "What is the RAM size?"
+    description: "How much RAM does your computer have"
   validations:
     required: true
 - type: textarea
   id: steps
   attributes:
-    label: Which step are you stuck in?
+    label: Which step are you stuck on?
     description: |
         If you encountered this error while following a wiki page, provide a link to the page and specify which step failed.
         Otherwise, list what steps caused the error.
         These should be detailed enough for someone else to follow them.
   validations:
-    required: false
+    required: true
 - type: textarea
   id: error
   attributes:
