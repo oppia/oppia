@@ -22,7 +22,7 @@ import { AnswerGroupObjectFactory, AnswerGroupBackendDict } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { HintBackendDict } from 'domain/exploration/hint-object.model';
+import { Hint, HintBackendDict } from 'domain/exploration/hint-object.model';
 import { InteractionObjectFactory, Interaction, InteractionBackendDict } from
   'domain/exploration/InteractionObjectFactory';
 import { OutcomeBackendDict, OutcomeObjectFactory } from
