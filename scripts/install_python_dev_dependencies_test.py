@@ -157,6 +157,23 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         with run_swap:
             install_python_dev_dependencies.install_dev_dependencies()
 
+    def test_uninstall_dev_dependencies(self) -> None:
+
+        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
+            pass
+
+        run_swap = self.swap_with_checks(
+            subprocess, 'run', mock_run, expected_args=[
+                (['pip', 'uninstall', '-r', 'requirements_dev.txt', '-y'],),
+            ],
+            expected_kwargs=[
+                {'check': True, 'encoding': 'utf-8'},
+            ]
+        )
+
+        with run_swap:
+            install_python_dev_dependencies.uninstall_dev_dependencies()
+
     def test_compile_pip_requirements_no_change(self) -> None:
 
         def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
@@ -255,6 +272,27 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
                 install_python_dev_dependencies.main([])
+
+    def test_main_passes_with_uninstall(self) -> None:
+        def mock_compile(*_args: str) -> bool:
+            return False
+
+        assert_swap = self.swap_with_checks(
+            install_python_dev_dependencies, 'check_python_env_is_suitable',
+            lambda: None)
+        install_tools_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'install_installation_tools', lambda: None)
+        compile_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'compile_pip_requirements', mock_compile)
+        uninstall_dependencies_swap = self.swap_with_checks(
+            install_python_dev_dependencies,
+            'uninstall_dev_dependencies', lambda: None)
+
+        with assert_swap, install_tools_swap, compile_swap:
+            with uninstall_dependencies_swap:
+                install_python_dev_dependencies.main(['--uninstall'])
 
     def test_main_passes_with_assert_and_no_change(self) -> None:
         def mock_func() -> None:

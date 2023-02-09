@@ -26,7 +26,6 @@ import { ExplorationEngineService } from './exploration-engine.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from './audio-translation-language.service';
 
 describe('ConceptCardManager service', () => {
@@ -37,7 +36,6 @@ describe('ConceptCardManager service', () => {
   let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
   let mockNewCardAvailableEmitter = new EventEmitter();
   let interactionObjectFactory: InteractionObjectFactory;
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 160000;
@@ -57,8 +55,6 @@ describe('ConceptCardManager service', () => {
       mockNewCardOpenedEmitter);
     ccms = TestBed.inject(ConceptCardManagerService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    writtenTranslationsObjectFactory = TestBed.inject(
-      WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
   }));
@@ -131,11 +127,6 @@ describe('ConceptCardManager service', () => {
         }
       },
       solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {}
-        }
-      },
       interaction: {
         solution: null,
         confirmed_unclassified_answers: [],
@@ -233,7 +224,6 @@ describe('ConceptCardManager service', () => {
         }
       }),
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
 
     pps.onNewCardOpened.emit(newCard);
