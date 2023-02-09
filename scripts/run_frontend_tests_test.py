@@ -65,9 +65,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return 1
             def wait(self) -> None: # pylint: disable=missing-docstring
                 return None
-        
+
         class MockChromeDisconnectedFile:
-            def readline(self) -> bytes:
+            def readline(self) -> bytes: # pylint: disable=missing-docstring
                 return b'Disconnected , because no message'
 
         class MockChromeDisconnectedTask:
