@@ -88,7 +88,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.cmd_token_list.append(cmd_tokens)
             return MockFailedTask()
         def mock_chrome_disconnected_call(
-            cmd_tokens: list[str], **unused_kwargs: str) -> MockFailedTask:  # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unused_kwargs: str) -> MockChromeDisconnectedTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockChromeDisconnectedTask()
 
@@ -118,6 +118,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
         self.swap_chrome_disconnected = self.swap(
             subprocess, 'Popen', mock_chrome_disconnected_call)
+        self.subprocess_counter = test_utils.CallCounter(
+            subprocess.Popen)
 
     def test_run_dtslint_type_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
@@ -261,4 +263,4 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     with self.swap_chrome_disconnected:
                         run_frontend_tests.main()
 
-        self.assertEqual(subprocess.Popen.times_called, 2)
+        self.assertEqual(self.subprocess_counter.times_called, 2)
