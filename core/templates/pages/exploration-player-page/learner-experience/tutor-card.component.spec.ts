@@ -48,6 +48,7 @@ import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { UserInfo } from 'domain/user/user-info.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -190,6 +191,20 @@ describe('Tutor card component', () => {
   });
 
   it('should initialize', fakeAsync(() => {
+    const sampleUserInfoBackendObject = {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+    const sampleUserInfo = UserInfo.createFromBackendDict(
+      sampleUserInfoBackendObject);
     let mockOnActiveCardChangedEventEmitter = new EventEmitter<void>();
     let mockOnOppiaFeedbackAvailableEventEmitter = new EventEmitter<void>();
     let isIframed = false;
@@ -208,6 +223,8 @@ describe('Tutor card component', () => {
       .and.returnValue(mockOnOppiaFeedbackAvailableEventEmitter);
     spyOn(componentInstance, 'getInputResponsePairId').and.returnValue('hash');
     componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(sampleUserInfo));
 
     componentInstance.ngOnInit();
     componentInstance.isAudioBarExpandedOnMobileDevice();
@@ -217,6 +234,7 @@ describe('Tutor card component', () => {
     tick();
 
     componentInstance.ngOnInit();
+    tick();
     tick();
     expect(componentInstance.profilePicturePngDataUrl).toEqual(
       'default-image-url-png');

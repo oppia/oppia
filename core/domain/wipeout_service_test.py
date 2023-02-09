@@ -5780,10 +5780,10 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
         self.assertEqual(
             logs,
             [
-                '[WIPEOUT] Profile picture of username username2 in .png format '
-                'does not exists.',
-                '[WIPEOUT] Profile picture of username username2 in .webp format '
-                'does not exists.'
+                '[WIPEOUT] Profile picture of username username2 in .png '
+                'format does not exists.',
+                '[WIPEOUT] Profile picture of username username2 in .webp '
+                'format does not exists.'
             ]
         )
 

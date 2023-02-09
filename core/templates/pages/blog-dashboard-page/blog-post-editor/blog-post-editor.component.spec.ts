@@ -168,7 +168,7 @@ describe('Blog Post Editor Component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should initialize', () => {
+  it('should initialize', fakeAsync (() => {
     const sampleUserInfoBackendObject = {
       roles: ['USER_ROLE'],
       is_moderator: false,
@@ -191,6 +191,7 @@ describe('Blog Post Editor Component', () => {
       Promise.resolve(sampleUserInfo));
 
     component.ngOnInit();
+    tick();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(component.blogPostId).toEqual('');
@@ -198,11 +199,12 @@ describe('Blog Post Editor Component', () => {
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
     expect(component.initEditor).toHaveBeenCalled;
     expect(component.authorProfilePicPngUrl).toEqual('default-image-url-png');
-    expect(component.authorProfilePicWebpUrl).toEqual('default-image-url-webp');
+    expect(component.authorProfilePicWebpUrl).toEqual(
+      'default-image-url-webp');
     expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
     expect(component.windowIsNarrow).toBe(true);
     expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should set image uploader window size', () => {
     component.uploadedImageDataUrl = 'image.png';

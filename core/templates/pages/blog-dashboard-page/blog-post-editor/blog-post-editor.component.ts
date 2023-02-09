@@ -97,12 +97,8 @@ export class BlogPostEditorComponent implements OnInit {
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
-    console.log('username ' + this.username);
-    console.log('user info ' + userInfo);
     [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
       this.userService.getProfileImageDataUrl(this.username));
-    console.log('author png ' + this.authorProfilePicPngUrl);
-    console.log('author webp ' + this.authorProfilePicWebpUrl);
   }
 
   ngOnInit(): void {

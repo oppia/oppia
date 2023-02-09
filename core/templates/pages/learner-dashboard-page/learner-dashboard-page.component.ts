@@ -288,13 +288,13 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  getauthorPicturePngDataUrl(username: string) {
-    let [pngImageUrl, ] = this.userService.getProfileImageDataUrl(
+  getauthorPicturePngDataUrl(username: string): string {
+    let [pngImageUrl,] = this.userService.getProfileImageDataUrl(
       username);
     return pngImageUrl;
   }
 
-  getauthorPictureWebpDataUrl(username: string) {
+  getauthorPictureWebpDataUrl(username: string): string {
     let [, webpImageUrl] = this.userService.getProfileImageDataUrl(
       username);
     return webpImageUrl;

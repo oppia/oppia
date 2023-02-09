@@ -610,7 +610,7 @@ describe('Learner dashboard page', () => {
       expect(component.getauthorPicturePngDataUrl('username')).toBe(
         'default-image-url-png');
     });
-  
+
     it('should get user profile image webp data url correctly', () => {
       expect(component.getauthorPictureWebpDataUrl('username')).toBe(
         'default-image-url-webp');

@@ -68,10 +68,10 @@ export class UserService {
         AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
       let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
-      if (localStoredImage == null) {
+      if (localStoredImage === null) {
         return [defaultUrlPng, defaultUrlWebp];
       }
-      // Normally, we return a tuple of PNG image URL and WebP image URL. 
+      // Normally, we return a tuple of PNG image URL and WebP image URL.
       // In emulator mode we use local storage and we only store the PNG image.
       // To handle this we return a tuple of the same PNG images in
       // emulator mode.

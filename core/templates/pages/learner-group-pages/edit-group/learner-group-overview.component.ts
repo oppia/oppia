@@ -113,7 +113,7 @@ export class LearnerGroupOverviewComponent implements OnInit {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl, ] = this.userService.getProfileImageDataUrl(
+    let [pngImageUrl,] = this.userService.getProfileImageDataUrl(
       username);
     return pngImageUrl;
   }
