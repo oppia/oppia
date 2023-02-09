@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Hint.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { Hint } from 'domain/exploration/hint-object.model';
 
 describe('Hint model', () => {
