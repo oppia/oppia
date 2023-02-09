@@ -2144,14 +2144,12 @@ def send_email_to_new_contribution_reviewer(
 
 
 def send_email_to_new_contribution_submit_questions(
-    recipient_id: str,
+    recipient_id: str
 ) -> None:
     """Sends an email to user who is assigned to submit questions.
 
     Args:
         recipient_id: str. The ID of the user.
-
-    Raises:
     """
 
     email_subject = 'You have been invited at Oppia to submit questions'
@@ -2183,6 +2181,7 @@ def send_email_to_new_contribution_submit_questions(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
+
 
 def send_email_to_removed_contribution_reviewer(
     user_id: str,
