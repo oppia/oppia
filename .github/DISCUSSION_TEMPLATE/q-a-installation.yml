@@ -8,7 +8,7 @@ body:
 - type: input
   attributes:
     label: RAM size
-    description: "How much RAM does your computer have"
+    description: "How much RAM does your computer have?"
   validations:
     required: true
 - type: textarea
@@ -25,7 +25,7 @@ body:
   id: error
   attributes:
     label: Error Log
-    description: "Please copy and paste the error log"
+    description: "Please copy and paste the error log."
     render: bash
   validations:
     required: true
