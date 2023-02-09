@@ -34,7 +34,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
     def test_incorrect_exp_domain_object_raises_exception(self) -> None:
         incorrect_change_dict = {
             'state_name': 'State 3',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>In Hindi</p>',
@@ -49,7 +49,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         incorrect_change_dict = {
             'cmd': 'add_subtopic',
             'state_name': 'State 3',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>In Hindi</p>',
@@ -65,7 +65,7 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         correct_change_dict = {
             'cmd': 'add_written_translation',
             'state_name': 'State 3',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
             'translation_html': '<p>In हिन्दी (Hindi)</p>',
@@ -175,7 +175,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
 
     def test_valid_object_raises_no_exception(self) -> None:
         state_dict: state_domain.StateDict = {
-            'content': {'content_id': 'content', 'html': ''},
+            'content': {'content_id': 'content_0', 'html': ''},
             'param_changes': [],
             'interaction': {
                 'solution': None,
@@ -183,7 +183,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                 'default_outcome': {
                     'param_changes': [],
                     'feedback': {
-                        'content_id': 'default_outcome',
+                        'content_id': 'default_outcome_1',
                         'html': ''
                     },
                     'dest': 'State A',
@@ -199,7 +199,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                     'placeholder': {
                         'value': {
                             'unicode_str': '',
-                            'content_id': 'ca_placeholder_0'
+                            'content_id': 'ca_placeholder_2'
                         }
                     },
                     'catchMisspellings': {
@@ -213,20 +213,12 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
             'linked_skill_id': None,
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'ca_placeholder_0': {}
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
                 }
             },
             'classifier_model_id': None,
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {},
-                    'default_outcome': {},
-                    'ca_placeholder_0': {}
-                }
-            },
-            'next_content_id_index': 1,
             'card_is_checkpoint': False,
             'solicit_answer_details': False
         }
