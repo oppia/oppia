@@ -71,6 +71,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return b'Disconnected , because no message'
 
         class MockChromeDisconnectedTask:
+            returncode = 1
             stdout = MockChromeDisconnectedFile()
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
@@ -117,7 +118,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'main', lambda: None)
         self.swap_check_frontend_coverage = self.swap(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
-        self.swap_chrome_disconnected = self.swap(
+        self.swap_chrome_disconnected_Popen = self.swap(
             subprocess, 'Popen', mock_chrome_disconnected_call)
         self.subprocess_counter = test_utils.CallCounter(
             subprocess.Popen)
@@ -258,10 +259,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'in ../karma_coverage_reports', self.print_arr)
 
     def test_frontend_tests_are_rerun_when_chrome_disconnected(self) -> None:
-        with self.swap_failed_Popen, self.print_swap, self.swap_build:
+        with self.swap_chrome_disconnected_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
-                    with self.swap_chrome_disconnected:
-                        run_frontend_tests.main()
+                    run_frontend_tests.main()
 
         self.assertEqual(self.subprocess_counter.times_called, 2)
