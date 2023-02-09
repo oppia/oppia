@@ -73,25 +73,15 @@ export class AddHintModalComponent
   }
 
   isHintLengthExceeded(tmpHint: string): boolean {
-    // The variable chars stores the remaining characters by
+    // The variable charCount stores the number of remaining characters after
     // removing the html tags from tmpHint.
-    let charRgx = /(?<=>)([^(\n)]*?)(?=<)/g;
-    let chars: string = '';
-    if (tmpHint !== null) {
-      let charArray = tmpHint.match(charRgx);
-      if (charArray !== null) {
-        chars = charArray.join('');
-      }
-    }
-    let charCount: number = chars.length;
-    // Regex for html entities like &nbsp; &lt; etc.
-    const entityRegex = /\&(.*?);/g;
-    if (entityRegex.test(chars)) {
-      let htmlEntityArray = chars.match(entityRegex);
-      if (htmlEntityArray !== null) {
-        let htmlEntityCount: number = htmlEntityArray.length;
-        let nonEntityCount: number = chars.replace(entityRegex, '').length;
-        charCount = htmlEntityCount + nonEntityCount;
+    let doc = new DOMParser;
+    let charCount = 0;
+    if (tmpHint.length) {
+      let dom = doc.parseFromString(tmpHint, 'text/html');
+      let newLineRegex = /(\n)(\s\n)*/g;
+      if (dom.body.textContent) {
+        charCount = dom.body.textContent.replace(newLineRegex, '').length;
       }
     }
     // Note: charCount does not include the characters from Rich Text ELements.

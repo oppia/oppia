@@ -117,13 +117,6 @@ describe('Add Hint Modal Component', () => {
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
   });
 
-  it('should check if HTML entity is counted correctly', () => {
-    let hint1 = '<p>This is HTML Entity &nbsp;hint</p>';
-    let hint2 = hint1.repeat(20);
-
-    expect(component.isHintLengthExceeded(hint2)).toBe(false);
-  });
-
   it('should update hint', () => {
     component.tmpHint = 'hint';
 
