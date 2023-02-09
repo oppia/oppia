@@ -39,6 +39,9 @@ _PARSER = argparse.ArgumentParser(
 _PARSER.add_argument(
     '--assert_compiled', action='store_true',
     help='Assert that the dev requirements file is already compiled.')
+_PARSER.add_argument(
+    '--uninstall', action='store_true',
+    help='Uninstall all dev requirements.')
 
 
 def check_python_env_is_suitable() -> None:
@@ -82,11 +85,18 @@ def install_installation_tools() -> None:
 
 
 def install_dev_dependencies() -> None:
-    """Install dev dependencies from
-    COMPILED_REQUIREMENTS_DEV_FILE_PATH.
-    """
+    """Install dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
         ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH],
+        check=True,
+        encoding='utf-8',
+    )
+
+
+def uninstall_dev_dependencies() -> None:
+    """Uninstall dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
+    subprocess.run(
+        ['pip', 'uninstall', '-r', COMPILED_REQUIREMENTS_DEV_FILE_PATH, '-y'],
         check=True,
         encoding='utf-8',
     )
@@ -127,14 +137,17 @@ def main(cli_args: Optional[List[str]] = None) -> None:
     install_installation_tools()
     not_compiled = compile_pip_requirements(
         REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH)
-    install_dev_dependencies()
-    if args.assert_compiled and not_compiled:
-        raise RuntimeError(
-            'The Python development requirements file '
-            f'{COMPILED_REQUIREMENTS_DEV_FILE_PATH} was changed by the '
-            'installation script. Please commit the changes. '
-            'You can get the changes again by running this command: '
-            'python -m scripts.install_python_dev_dependencies')
+    if args.uninstall:
+        uninstall_dev_dependencies()
+    else:
+        install_dev_dependencies()
+        if args.assert_compiled and not_compiled:
+            raise RuntimeError(
+                'The Python development requirements file '
+                f'{COMPILED_REQUIREMENTS_DEV_FILE_PATH} was changed by the '
+                'installation script. Please commit the changes. '
+                'You can get the changes again by running this command: '
+                'python -m scripts.install_python_dev_dependencies')
 
 
 # This code cannot be covered by tests since it only runs when this file
