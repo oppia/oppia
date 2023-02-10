@@ -1,4 +1,6 @@
-This file contains a summary of changes to the Oppia code base.
+This file contains a summary of changes to the Oppia codebase up
+to release 3.2.9. All the changes after that can be found in the commit
+log of the develop branch: https://github.com/oppia/oppia/commits/develop
 
 v3.2.9 (31 Dec 2022)
 ------------------------
