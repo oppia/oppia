@@ -49,7 +49,8 @@
         "core.controllers.admin_test",
         "core.controllers.android_test",
         "core.jobs.batch_jobs.translation_migration_jobs_test",
-        "core.controllers.release_coordinator_test"
+        "core.controllers.release_coordinator_test",
+        "core.platform.secrets.dev_mode_secrets_services_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
