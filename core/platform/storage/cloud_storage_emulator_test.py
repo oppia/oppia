@@ -53,6 +53,13 @@ class BlobUnitTests(test_utils.TestBase):
         self.assertEqual(blob.download_as_bytes(), b'string')
         self.assertEqual(blob.content_type, 'audio/mp3')
 
+    def test_init_blob_with_content_type_images_webp_creates_blob(self) -> None:
+        blob = cloud_storage_emulator.EmulatorBlob(
+            'name', 'string', 'image/webp')
+        self.assertEqual(blob.name, 'name')
+        self.assertEqual(blob.download_as_bytes(), b'string')
+        self.assertEqual(blob.content_type, 'image/webp')
+
     def test_init_blob_with_wrong_mimetype_raise_exception(self) -> None:
         with self.assertRaisesRegex(
                 Exception, 'Content type contains unknown MIME type.'):

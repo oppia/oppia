@@ -32,7 +32,7 @@ from core.constants import constants
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
 
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 
 class UtilsTests(test_utils.GenericTestBase):
@@ -605,7 +605,7 @@ class UtilsTests(test_utils.GenericTestBase):
             self.get_static_asset_filepath(), 'assets', 'favicon.ico')
 
         with self.assertRaisesRegex(
-            Exception, 'The given string does not represent a PNG image.'):
+            Exception, 'The given string does not represent a png image.'):
             utils.convert_png_to_data_url(favicon_filepath)
 
     def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
@@ -948,11 +948,31 @@ class UtilsTests(test_utils.GenericTestBase):
                 ['-1', '-2', '-3', '-4', '-5']),
                 [])
 
-    def test_convert_png_binary_to_data_url(self) -> None:
+    def _get_png_and_webp_image(self) -> Tuple[bytes, bytes]:
+        """Returns png image."""
         filepath_png = os.path.join('core', 'tests', 'data', 'test_png_img.png')
+        filepath_webp = os.path.join(
+            'core', 'tests', 'data', 'test_png_img.webp')
         file_contents_png = utils.get_file_contents(
             filepath_png, raw_bytes=True, mode='rb')
-        self.assertEqual(utils.convert_png_binary_to_data_url(file_contents_png), 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D')  # pylint: disable=line-too-long
+        file_contents_webp = utils.get_file_contents(
+            filepath_webp, raw_bytes=True, mode='rb')
+        return (file_contents_png, file_contents_webp)
+
+    def test_convert_png_or_webp_binary_to_data_url(self) -> None:
+        file_contents_png, file_contents_webp = self._get_png_and_webp_image()
+        self.assertEqual(utils.convert_png_or_webp_binary_to_data_url(file_contents_png, 'png'), 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D')  # pylint: disable=line-too-long
+        self.assertEqual(utils.convert_png_or_webp_binary_to_data_url(file_contents_webp, 'webp'), 'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA') # pylint: disable=line-too-long
+
+    def test_raise_error_invalid_convert_webp_binary_to_data_url(
+        self
+    ) -> None:
+        file_contents_png, _ = self._get_png_and_webp_image()
+        with self.assertRaisesRegex(
+            Exception, 'The given string does not represent a webp image.'
+        ):
+            utils.convert_png_or_webp_binary_to_data_url(
+                file_contents_png, 'webp')
 
     def test_get_exploration_components_from_dir_with_yaml_content(self) -> None: # pylint: disable=line-too-long
         img1_path = 'images/sample_Img.svg'

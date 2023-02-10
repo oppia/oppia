@@ -74,6 +74,11 @@ class EmulatorBlob:
         # this set. Only then can this exception be removed.
         elif content_type == 'audio/mp3':
             self._content_type = content_type
+        # Currently 'image/webp' is not recognized as a valid MIME type.
+        # To verify it is a valid type you can visit
+        # https://datatracker.ietf.org/doc/html/draft-zern-webp#section-6.1.
+        elif content_type == 'image/webp':
+            self._content_type = content_type
         else:
             if mimetypes.guess_extension(content_type) is None:
                 raise Exception('Content type contains unknown MIME type.')

@@ -168,7 +168,8 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             raw_image_png = constants.get_package_file_contents(
                 'assets', default_image_path, binary_mode=True)
             user_model.profile_picture_data_url = (
-                utils.convert_png_binary_to_data_url(raw_image_png))
+                utils.convert_png_or_webp_binary_to_data_url(
+                    raw_image_png, 'png'))
 
         # Here we need to check for the default image again because there is a
         # possibility that in the above check we are not able to generate the
