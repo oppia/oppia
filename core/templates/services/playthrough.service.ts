@@ -358,7 +358,7 @@ export class PlaythroughService {
       // TODO(#15212): Remove the below check "this.recordedLearnerActions" once
       // codebase is strictly typed. And if check is needed, means we are
       // actually passes null then add proper comment to explain why we are
-      // doing this check. 
+      // doing this check.
       this.recordedLearnerActions &&
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
