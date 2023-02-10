@@ -364,7 +364,7 @@ def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
 ) -> Tuple[int, int, int, int]:
-    """Run tests"""
+    """Run tests."""
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
