@@ -449,6 +449,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
             test_target, self.print_arr)
+
     def test_cancelled_tests_coverage_is_displayed_correctly(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
