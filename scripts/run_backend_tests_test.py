@@ -481,7 +481,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.print_swap, swap_load_excluded_files:
             run_backend_tests.print_coverage_report(
                 tasks, task_to_taskspec)
-                
+
         self.assertNotIn(
             'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
             test_target, self.print_arr)
