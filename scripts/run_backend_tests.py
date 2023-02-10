@@ -362,8 +362,7 @@ def load_coverage_exclusion_list(path: str) -> List[str]:
 
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
-    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
-    generate_coverage_report: bool
+    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
 ) -> Tuple[int, int, int, int]:
     """Run tests and parse coverage reports."""
     coverage_exclusions = load_coverage_exclusion_list(
@@ -373,7 +372,6 @@ def check_test_results(
     total_count = 0
     total_errors = 0
     total_failures = 0
-    incomplete_coverage = 0
     for task in tasks:
         test_count = 0
         spec = task_to_taskspec[task]
@@ -438,20 +436,31 @@ def check_test_results(
                 print(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
-            if generate_coverage_report:
-                coverage = task.task_results[0].get_report()[-2]
-                if (
-                        spec.test_target not in coverage_exclusions
-                        and float(coverage) != 100.0):
-                    print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
-                        coverage, spec.test_target))
-                    incomplete_coverage += 1
-                    print(task.task_results[0].get_report()[-3])
 
         total_count += test_count
 
-    return total_count, total_errors, total_failures, incomplete_coverage
+    return total_count, total_errors, total_failures
 
+
+def print_coverage_report(
+    tasks: List[concurrent_task_utils.TaskThread],
+    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
+    ) -> int:
+    incomplete_coverage = 0
+    coverage_exclusions = load_coverage_exclusion_list(
+    COVERAGE_EXCLUSION_LIST_PATH)
+    for task in tasks:
+        if task.finished and not task.exception:
+            coverage = task.task_results[0].get_report()[-2]
+            spec = task_to_taskspec[task]
+            if (
+                    spec.test_target not in coverage_exclusions
+                    and float(coverage) != 100.0):
+                print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
+                    coverage, spec.test_target))
+                incomplete_coverage += 1
+                print(task.task_results[0].get_report()[-3])
+    return incomplete_coverage
 
 def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
@@ -545,9 +554,9 @@ def main(args: Optional[List[str]] = None) -> None:
     print('')
 
     (
-        total_count, total_errors, total_failures, incomplete_coverage
+        total_count, total_errors, total_failures
     ) = check_test_results(
-        tasks, task_to_taskspec, parsed_args.generate_coverage_report)
+        tasks, task_to_taskspec)
 
     print('')
     if total_count == 0:
@@ -561,6 +570,7 @@ def main(args: Optional[List[str]] = None) -> None:
         print('(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
     else:
         print('All tests passed.')
+        print('')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
@@ -569,16 +579,15 @@ def main(args: Optional[List[str]] = None) -> None:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
 
-    if incomplete_coverage:
-        raise Exception(
-            '%s tests incompletely cover associated code files.' %
-            incomplete_coverage)
-
     if parsed_args.generate_coverage_report:
+        incomplete_coverage = print_coverage_report(tasks, task_to_taskspec)
+        if incomplete_coverage:
+            raise Exception(
+                '%s tests incompletely cover associated code files.' %
+                incomplete_coverage)
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = check_coverage(True)
         print(report_stdout)
-
         if (coverage != 100
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
