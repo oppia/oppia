@@ -95,16 +95,15 @@ export class RuleObjectFactory {
   }
 
   createFromBackendDict(
-      ruleDict: RuleBackendDict, interactionId: string | null
+      ruleDict: RuleBackendDict, interactionId: string
   ): Rule {
     let ruleType = ruleDict.rule_type;
     let ruleInputTypes: RuleInputTypes = {};
     let ruleDescription = null;
 
-    if (interactionId !== null) {
-      ruleDescription = INTERACTION_SPECS[
-        interactionId].rule_descriptions[ruleType];
-    }
+    ruleDescription = (
+      INTERACTION_SPECS[interactionId].rule_descriptions[ruleType]
+    );
 
     const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (ruleDescription.match(PATTERN)) {
