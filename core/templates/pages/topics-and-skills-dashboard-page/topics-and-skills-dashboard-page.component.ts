@@ -311,7 +311,7 @@ export class TopicsAndSkillsDashboardPageComponent {
           this.itemsPerPage), this.currentCount));
   }
 
-  getTotalCountValueForSkills(): number | string {
+  getTotalCountValueForSkills(): number {
     return this.totalSkillCount;
   }
 
