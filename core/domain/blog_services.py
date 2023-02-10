@@ -413,6 +413,11 @@ def get_published_blog_post_summaries_by_user_id(
         list(BlogPostSummary). The summary objects associated with the
         blog posts assigned to given user.
     """
+    # All the blog posts which are not published and are saved as 'draft' will
+    # have 'published_on' field as 'None'. We use '!= None' to fetch the
+    # published blog posts instead of 'is not None' because it is inside
+    # query() and Google App Engine does not support 'is not None' inside
+    # query().
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.author_id == user_id
@@ -764,16 +769,14 @@ def does_blog_post_with_title_exist(title: str, blog_post_id: str) -> bool:
         bool. Whether a blog post with given title already exists.
     """
     blog_post_models: Sequence[blog_models.BlogPostModel] = (
-        blog_models.BlogPostModel.query().filter(
+        blog_models.BlogPostModel.get_all().filter(
             blog_models.BlogPostModel.title == title
-        ).filter(
-            blog_models.BlogPostModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch()
     )
     if len(blog_post_models) > 0:
         if (
-                len(blog_post_models) > 1 or
-                blog_post_models[0].id != blog_post_id
+            len(blog_post_models) > 1 or
+            blog_post_models[0].id != blog_post_id
         ):
             return True
     return False
@@ -821,10 +824,9 @@ def get_published_blog_post_summaries(
         max_limit = size
     else:
         max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-    # We use '!= None' instead of 'is not None' because the it is inside the
-    # query() as GAE does not support 'is not None' inside the query().
-    # Using the latter results in the following error:
-    # 'Cannot filter a non-Node argument'.
+    # We use '!= None' instead of 'is not None' because the it is inside
+    # query() and Google App Engine does not support 'is not None' inside
+    # query().
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=singleton-comparison, inequality-with-none, line-too-long

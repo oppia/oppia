@@ -23,15 +23,11 @@ from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
-
-MAX_CHARS_IN_BLOG_POST_URL: Final = feconf.MAX_CHARS_IN_BLOG_POST_URL
 
 
 class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
@@ -354,7 +350,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             '%s/%s' % (
                 feconf.BLOG_HOMEPAGE_DATA_URL,
-                'aa' * MAX_CHARS_IN_BLOG_POST_URL
+                'aa' * feconf.MAX_CHARS_IN_BLOG_POST_URL
             ),
             expected_status_int=400
         )
