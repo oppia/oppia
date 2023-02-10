@@ -25,6 +25,7 @@ import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleBackendDict, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
+import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface AnswerGroupBackendDict {
   'rule_specs': RuleBackendDict[];
@@ -37,7 +38,7 @@ export interface AnswerGroupBackendDict {
   'tagged_skill_misconception_id': string | null;
 }
 
-export class AnswerGroup {
+export class AnswerGroup extends BaseTranslatableObject {
   rules: Rule[];
   outcome: Outcome;
   trainingData: readonly InteractionAnswer[];
@@ -46,10 +47,15 @@ export class AnswerGroup {
       rules: Rule[], outcome: Outcome,
       trainingData: readonly InteractionAnswer[],
       taggedSkillMisconceptionId: string | null) {
+    super();
     this.rules = rules;
     this.outcome = outcome;
     this.trainingData = trainingData;
     this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
+  }
+
+  getTranslatableObjects(): BaseTranslatableObject[] {
+    return [this.outcome, ...this.rules];
   }
 
   toBackendDict(): AnswerGroupBackendDict {
@@ -72,7 +78,7 @@ export class AnswerGroupObjectFactory {
 
   generateRulesFromBackendDict(
       ruleBackendDicts: RuleBackendDict[],
-      interactionId: string | null
+      interactionId: string
   ): Rule[] {
     return ruleBackendDicts.map(
       ruleBackendDict => this.ruleObjectFactory.createFromBackendDict(
@@ -90,7 +96,7 @@ export class AnswerGroupObjectFactory {
 
   createFromBackendDict(
       answerGroupBackendDict: AnswerGroupBackendDict,
-      interactionId: string | null
+      interactionId: string
   ): AnswerGroup {
     return new AnswerGroup(
       this.generateRulesFromBackendDict(

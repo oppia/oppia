@@ -18,10 +18,15 @@
 
 from __future__ import annotations
 
+from core import feconf
+from core.domain import exp_domain
+from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.domain import translation_services
 from core.platform import models
 from core.tests import test_utils
+
+from typing import Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -104,3 +109,298 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert translation is not None
         self.assertEqual(translation.translated_text, 'Bonjour le monde')
+
+
+class EntityTranslationServicesTest(test_utils.GenericTestBase):
+    """Test class for the entity translation services."""
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.EXP_ID = 'exp_id_123'
+        self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+
+    def test_add_new_translation_creats_new_model_if_needed(self) -> None:
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        self.assertEqual(len(entity_translation_models), 0)
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID,
+            5,
+            'hi',
+            'content_5',
+            translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        self.assertEqual(len(entity_translation_models), 1)
+        self.assertEqual(entity_translation_models[0].entity_id, self.EXP_ID)
+        self.assertEqual(entity_translation_models[0].language_code, 'hi')
+
+    def test_add_new_translation_adds_translations_to_existing_model(
+        self
+    ) -> None:
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID,
+            5,
+            'hi',
+            'content_5',
+            translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        self.assertEqual(len(entity_translation_models), 1)
+        entity_translation_model = entity_translation_models[0]
+        self.assertEqual(entity_translation_model.entity_id, self.EXP_ID)
+        self.assertEqual(entity_translation_model.language_code, 'hi')
+        self.assertEqual(
+            list(entity_translation_model.translations), ['content_5'])
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID,
+            5,
+            'hi',
+            'default_outcome_2',
+            translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch())
+        self.assertEqual(len(entity_translation_models), 1)
+        entity_translation_model = entity_translation_models[0]
+        self.assertEqual(entity_translation_model.entity_id, self.EXP_ID)
+        self.assertEqual(entity_translation_model.language_code, 'hi')
+        self.assertEqual(
+            list(entity_translation_model.translations.keys()),
+            ['content_5', 'default_outcome_2']
+        )
+
+    def test_compute_translation_related_change_removes_translations(
+        self
+    ) -> None:
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_5', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_6', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        self.assertEqual(len(entity_translation_models), 1)
+        entity_translation_model = entity_translation_models[0]
+        self.assertEqual(entity_translation_model.entity_version, 5)
+        self.assertEqual(
+            list(entity_translation_model.translations.keys()),
+            ['content_5', 'content_6']
+        )
+        self.exp.version = 6
+
+        entity_translations, _ = (
+            translation_services.compute_translation_related_change(
+                self.exp, ['content_5'], []
+            )
+        )
+
+        self.assertEqual(len(entity_translations), 1)
+        entity_translation = entity_translations[0]
+        self.assertEqual(
+            list(entity_translation.translations.keys()),
+            ['content_6']
+        )
+
+    def test_compute_translation_related_change_mark_translation_needs_update(
+        self
+    ) -> None:
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_5', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'hi',
+            'content_6', translation_domain.TranslatedContent(
+                'Translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
+        self.assertEqual(len(entity_translation_models), 1)
+        entity_translation_model = entity_translation_models[0]
+        self.assertEqual(entity_translation_model.entity_version, 5)
+        self.assertEqual([
+            t['needs_update']
+            for t in entity_translation_model.translations.values()
+        ], [False, False])
+
+        self.exp.version = 6
+
+        entity_translation_models, _ = (
+            translation_services.compute_translation_related_change(
+                self.exp, [], ['content_6']
+            )
+        )
+        self.assertEqual(len(entity_translation_models), 1)
+        entity_translation = entity_translation_models[0]
+        self.assertItemsEqual(
+            [
+                t['needs_update']
+                for t in entity_translation.translations.values()
+            ], [False, True]
+        )
+
+    def test_get_displayable_translation_languages_returns_correct_items(
+        self
+    ) -> None:
+        expected_language_list = ['ak', 'bn', 'hi']
+        for lang_code in expected_language_list:
+            translation_services.add_new_translation(
+                feconf.TranslatableEntityType.EXPLORATION,
+                self.EXP_ID, 5, lang_code,
+                'content_0', translation_domain.TranslatedContent(
+                    'Translations in %s!' % lang_code,
+                    translation_domain.TranslatableContentFormat.HTML,
+                    False
+                )
+            )
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'exp title')
+        exp.version = 5
+
+        are_translations_displayable_swap = self.swap_to_always_return(
+            exp, 'are_translations_displayable', True)
+        with are_translations_displayable_swap:
+            observed_language_list = (
+                translation_services.get_displayable_translation_languages(
+                    feconf.TranslatableEntityType.EXPLORATION,
+                    exp
+                )
+            )
+        self.assertItemsEqual(observed_language_list, expected_language_list)
+
+        are_translations_displayable_swap = self.swap_to_always_return(
+            exp, 'are_translations_displayable', False)
+        with are_translations_displayable_swap:
+            observed_language_list = (
+                translation_services.get_displayable_translation_languages(
+                    feconf.TranslatableEntityType.EXPLORATION,
+                    exp
+                )
+            )
+        self.assertItemsEqual(observed_language_list, [])
+
+    def test_get_languages_with_complete_translation_returns_correct_lang(
+        self
+    ) -> None:
+        expected_language_list = ['ak', 'bn']
+        for lang_code in expected_language_list:
+            translation_services.add_new_translation(
+                feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID,
+                5, lang_code, 'content_0',
+                translation_domain.TranslatedContent(
+                    'Translations in %s!' % lang_code,
+                    translation_domain.TranslatableContentFormat.HTML,
+                    False
+                )
+            )
+            translation_services.add_new_translation(
+                feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5,
+                lang_code, 'default_outcome_1',
+                translation_domain.TranslatedContent(
+                    'Translations in %s!' % lang_code,
+                    translation_domain.TranslatableContentFormat.HTML,
+                    False
+                )
+            )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'sq',
+            'content_0', translation_domain.TranslatedContent(
+                'Translations in sq!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'exp title')
+        init_state = exp.states[exp.init_state_name]
+        init_state.content.html = 'Content for translation'
+        assert init_state.interaction.default_outcome is not None
+        init_state.interaction.default_outcome.feedback.html = 'Content'
+        exp.version = 5
+
+        observed_language_list = (
+            translation_services.get_languages_with_complete_translation(
+                exp
+            )
+        )
+        self.assertItemsEqual(observed_language_list, expected_language_list)
+
+    def test_get_translatable_text_returns_correct_dict(self) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'exp title')
+        init_state = exp.states[exp.init_state_name]
+        init_state.content.html = 'Content for translation'
+        assert init_state.interaction.default_outcome is not None
+        init_state.interaction.default_outcome.feedback.html = 'Content'
+        exp.version = 5
+
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION, self.EXP_ID, 5, 'sq',
+            'content_0', translation_domain.TranslatedContent(
+                'Translations in sq!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            )
+        )
+
+        observed_translatable_text = translation_services.get_translatable_text(
+            exp, 'sq')
+        self.assertEqual(
+            list(observed_translatable_text.keys()),
+            ['Introduction']
+        )
+        self.assertEqual(
+            list(observed_translatable_text['Introduction'].keys()),
+            ['default_outcome_1']
+        )
