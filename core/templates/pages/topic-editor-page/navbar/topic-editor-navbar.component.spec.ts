@@ -40,6 +40,7 @@ class MockWindowRef {
     location: {
       hash: '123',
       href: '',
+      reload: () => {},
       replace: (val: string) => {}
     },
     open: (url: string) => {},
@@ -346,6 +347,7 @@ describe('Topic Editor Navbar', () => {
   it('should discard changes when user clicks \'Discard Changes\'' +
   ' button', () => {
     spyOn(topicEditorStateService, 'loadTopic');
+    spyOn(windowRef.nativeWindow.location, 'reload');
     spyOn(undoRedoService, 'clearChanges');
     componentInstance.discardChangesButtonIsShown = true;
     componentInstance.topicId = 'topicId';
@@ -354,6 +356,7 @@ describe('Topic Editor Navbar', () => {
 
     expect(undoRedoService.clearChanges).toHaveBeenCalled();
     expect(componentInstance.discardChangesButtonIsShown).toBe(false);
+    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
     expect(topicEditorStateService.loadTopic).toHaveBeenCalledWith('topicId');
   });
 

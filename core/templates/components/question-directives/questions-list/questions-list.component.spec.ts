@@ -893,20 +893,28 @@ describe('Questions List Component', () => {
 
   it('should remove skill linked to a question', () => {
     component.associatedSkillSummaries = [
-      SkillDifficulty.create('skillId1', '', 0.9),
-      SkillDifficulty.create('skillId2', '', 0.6)
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: '1',
+        skill_description: 'Skill Description'
+      }),
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: '2',
+        skill_description: 'Skill Description'
+      })
     ];
     component.skillLinkageModificationsArray = [];
-    component.removeSkill('skillId1');
+    component.removeSkill('1');
 
     expect(component.associatedSkillSummaries).toEqual([
-      SkillDifficulty.create('skillId2', '', 0.6)
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: '2',
+        skill_description: 'Skill Description'
+      })
     ]);
     expect(component.skillLinkageModificationsArray).toEqual([
       {
-        id: 'skillId1',
-        task: 'remove',
-        difficulty: 0.9
+        id: '1',
+        task: 'remove'
       } as SkillLinkageModificationsArray
     ]);
   });

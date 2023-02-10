@@ -132,8 +132,8 @@ export class TopicEditorNavbarComponent {
   discardChanges(): void {
     this.undoRedoService.clearChanges();
     this.discardChangesButtonIsShown = false;
-    this.topicEditorStateService.loadTopic(this.topicId);
     this.windowRef.nativeWindow.location.reload();
+    this.topicEditorStateService.loadTopic(this.topicId);
   }
 
   getChangeListLength(): number {
