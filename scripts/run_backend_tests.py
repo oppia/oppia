@@ -565,7 +565,7 @@ def main(args: Optional[List[str]] = None) -> None:
         total_count, total_errors, total_failures, incomplete_coverage
     ) = check_test_results(
         tasks, task_to_taskspec, parsed_args.generate_coverage_report)
-        
+
     print('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
@@ -587,13 +587,13 @@ def main(args: Optional[List[str]] = None) -> None:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
 
-    if (parsed_args.generate_coverage_report):
+    if parsed_args.generate_coverage_report:
         print_coverage_report(tasks, task_to_taskspec)
 
     if incomplete_coverage:
-            raise Exception(
-                '%s tests incompletely cover associated code files.' %
-                incomplete_coverage)
+        raise Exception(
+            '%s tests incompletely cover associated code files.' %
+            incomplete_coverage)
 
     if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
