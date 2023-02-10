@@ -90,7 +90,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         ) for i in range(3)]
 
         for exp in explorations:
@@ -427,9 +428,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
@@ -454,9 +455,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion in Hindi.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
@@ -468,9 +469,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion in Spanish.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'es',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content 2.</p>'
         }
@@ -550,7 +551,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -644,7 +646,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -731,9 +734,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create a translation suggestion for exploration 0.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
@@ -768,7 +771,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 10',
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_10.id)
         exp_20 = self.save_new_valid_exploration(
@@ -776,7 +780,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 20',
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_20.id)
         exp_30 = self.save_new_valid_exploration(
@@ -784,7 +789,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 30',
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_30.id)
 
@@ -813,9 +819,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # Create translation suggestions for the explorations.
         change_dict = {
             'cmd': 'add_translation',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'state_name': 'Introduction',
             'translation_html': '<p>Translation for content.</p>'
         }
@@ -955,7 +961,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
-            correctness_feedback_enabled=True
+            correctness_feedback_enabled=True,
+            content_html='Content'
         ) for i in range(2)]
 
         for exp in explorations:
@@ -1041,7 +1048,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'Introduction',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': '<p>A content to translate.</p>'
                 }
             })], 'Changes content.')
@@ -1055,19 +1062,21 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'version': 2,
             'state_names_to_content_id_mapping': {
                 'Introduction': {
-                    'content': {
-                        'content': (
+                    'content_0': {
+                        'content_value': (
                             '<p>A content to translate.</p>'),
-                        'data_format': 'html',
+                        'content_id': 'content_0',
+                        'content_format': 'html',
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None
                     }
                 },
                 'End State': {
-                    'content': {
-                        'content': '',
-                        'data_format': 'html',
+                    'content_3': {
+                        'content_value': 'Content',
+                        'content_id': 'content_3',
+                        'content_format': 'html',
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None
@@ -1082,9 +1091,9 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         change_dict = {
             'cmd': 'add_written_translation',
             'state_name': 'Introduction',
-            'content_id': 'content',
+            'content_id': 'content_0',
             'language_code': 'hi',
-            'content_html': '',
+            'content_html': 'Content',
             'translation_html': '<p>Translation for content.</p>',
             'data_format': 'html'
         }
@@ -1102,9 +1111,10 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'version': 1,
             'state_names_to_content_id_mapping': {
                 'End State': {
-                    'content': {
-                        'content': '',
-                        'data_format': 'html',
+                    'content_3': {
+                        'content_value': 'Content',
+                        'content_id': 'content_3',
+                        'content_format': 'html',
                         'content_type': 'content',
                         'interaction_id': None,
                         'rule_type': None
@@ -1220,7 +1230,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'End State',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'Please continue.'
                 }
             })], 'Changes content.')
@@ -1229,14 +1239,14 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
                 'state_name': 'End State',
-                'content_ids': '["invalid_content_id", "content"]',
+                'content_ids': '["invalid_content_id", "content_0"]',
                 'target_language_code': 'es'
             }, expected_status_int=200
         )
 
         expected_output = {
             'translated_texts': {
-                'content': 'Por favor continua.',
+                'content_0': 'Por favor continua.',
                 'invalid_content_id': None
             }
         }
@@ -1294,7 +1304,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'Introduction',
                 'new_value': {
-                    'content_id': 'content',
+                    'content_id': 'content_0',
                     'html': 'Please continue.'
                 }
             })], 'Changes content.')
@@ -1304,14 +1314,14 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             params={
                 'exp_id': self.exp_id,
                 'state_name': 'Introduction',
-                'content_ids': '["content"]',
+                'content_ids': '["content_0"]',
                 'target_language_code': 'es'
             },
             expected_status_int=200
         )
 
         expected_output = {
-            'translated_texts': {'content': 'Por favor continua.'}
+            'translated_texts': {'content_0': 'Por favor continua.'}
         }
         self.assertEqual(output, expected_output)
 
