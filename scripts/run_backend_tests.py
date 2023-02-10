@@ -364,7 +364,7 @@ def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
     generate_coverage_report: bool
-) -> Tuple[int, int, int]:
+) -> Tuple[int, int, int, int]:
     """Run tests and parse coverage reports."""
     coverage_exclusions = load_coverage_exclusion_list(
         COVERAGE_EXCLUSION_LIST_PATH)
