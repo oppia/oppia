@@ -364,10 +364,7 @@ def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
 ) -> Tuple[int, int, int, int]:
-    """Run tests and parse coverage reports."""
-    coverage_exclusions = load_coverage_exclusion_list(
-        COVERAGE_EXCLUSION_LIST_PATH)
-
+    """Run tests"""
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
@@ -446,6 +443,7 @@ def print_coverage_report(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
     ) -> int:
+    """Run tests and parse coverage reports."""
     incomplete_coverage = 0
     coverage_exclusions = load_coverage_exclusion_list(
     COVERAGE_EXCLUSION_LIST_PATH)
@@ -461,6 +459,7 @@ def print_coverage_report(
                 incomplete_coverage += 1
                 print(task.task_results[0].get_report()[-3])
     return incomplete_coverage
+
 
 def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
