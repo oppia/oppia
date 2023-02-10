@@ -276,7 +276,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def test_get_with_dummy_feature_enabled_in_test_returns_ok(self) -> None:
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
-        server_ctx = self.swap(feconf, 'OPPIA_PROJECT_ID', 'testserver')
+        server_ctx = self.swap(
+            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
             param_domain.FeatureStages.TEST)
 
@@ -292,7 +293,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def test_get_with_dummy_feature_disabled_in_test_raises_404(self) -> None:
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
-        server_ctx = self.swap(feconf, 'OPPIA_PROJECT_ID', 'testserver')
+        server_ctx = self.swap(
+            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
             param_domain.FeatureStages.TEST)
 
@@ -307,7 +309,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def test_get_with_dummy_feature_enabled_in_prod_returns_ok(self) -> None:
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
-        server_ctx = self.swap(feconf, 'OPPIA_PROJECT_ID', 'oppiaserver')
+        server_ctx = self.swap(
+            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
             param_domain.FeatureStages.PROD)
 
@@ -323,7 +326,8 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def test_get_with_dummy_feature_disabled_in_prod_raises_404(self) -> None:
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
-        server_ctx = self.swap(feconf, 'OPPIA_PROJECT_ID', 'oppiaserver')
+        server_ctx = self.swap(
+            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
             param_domain.FeatureStages.PROD)
 

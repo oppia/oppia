@@ -192,8 +192,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self
     ) -> None:
         constants_swap = self.swap(constants, 'DEV_MODE', False)
-        project_id_swap = self.swap(feconf, 'OPPIA_PROJECT_ID', 'testserver')
-        with constants_swap, project_id_swap:
+        env_swap = self.swap(
+            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
+        with constants_swap, env_swap:
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
                 'browser_type': None,
@@ -212,8 +213,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self
     ) -> None:
         constants_swap = self.swap(constants, 'DEV_MODE', False)
-        project_id_swap = self.swap(feconf, 'OPPIA_PROJECT_ID', 'oppiaserver')
-        with constants_swap, project_id_swap:
+        env_swap = self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
+        with constants_swap, env_swap:
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
                 'browser_type': None,
@@ -245,37 +246,37 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_evaluate_dev_feature_for_test_server_returns_false(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'testserver'):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 self.assertFalse(
                     feature_services.is_feature_enabled(self.dev_feature.name))
 
     def test_evaluate_test_feature_for_test_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'testserver'):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.test_feature.name))
 
     def test_evaluate_prod_feature_for_test_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'testserver'):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_evaluate_dev_feature_for_prod_server_returns_false(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'oppiaserver'):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 self.assertFalse(
                     feature_services.is_feature_enabled(self.dev_feature.name))
 
     def test_evaluate_test_feature_for_prod_server_returns_false(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'oppiaserver'):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 self.assertFalse(
                     feature_services.is_feature_enabled(self.test_feature.name))
 
     def test_evaluate_prod_feature_for_prod_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'oppiaserver'):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.prod_feature.name))
 
@@ -305,7 +306,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             ]
         )
         with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'oppiaserver'):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
                 self.assertTrue(
                     feature_services.is_feature_enabled(self.prod_feature.name))
 
