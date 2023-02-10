@@ -295,7 +295,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
                 subprocess.CalledProcessError, expected_error_msg):
             run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, False)
+                tasks, task_to_taskspec)
 
     def test_empty_test_files_show_no_tests_were_run(self) -> None:
         with self.swap_install_third_party_libs:
@@ -315,7 +315,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap:
             run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, False)
+                tasks, task_to_taskspec)
 
         self.assertIn(
             'ERROR     %s: No tests found.' % test_target, self.print_arr)
@@ -340,7 +340,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap:
             run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, False)
+                tasks, task_to_taskspec)
 
         self.assertIn(
             'FAILED    %s: %s errors, %s failures' % (test_target, 0, 2),
@@ -366,7 +366,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             Exception, 'Some internal error.'
         ):
             run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, False)
+                tasks, task_to_taskspec)
 
         self.assertIn(
             '    WARNING: FAILED TO RUN %s' % test_target, self.print_arr)
@@ -394,7 +394,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap:
             run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, True)
+                tasks, task_to_taskspec)
 
         self.assertIn('CANCELED  %s' % test_target, self.print_arr)
 
@@ -418,8 +418,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, True)
 
         with self.print_swap:
-            run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, True)
+            run_backend_tests.print_coverage_report(
+                tasks, task_to_taskspec)
 
         self.assertIn(
             'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
@@ -446,7 +446,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap:
             run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, False)
+                tasks, task_to_taskspec)
 
         self.assertIn(
             'SUCCESS   %s: 9 tests (1.2 secs)' % test_target,
@@ -477,8 +477,11 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap, swap_load_excluded_files:
             run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, True)
-
+                tasks, task_to_taskspec)
+        with self.print_swap, swap_load_excluded_files:
+            run_backend_tests.print_coverage_report(
+                tasks, task_to_taskspec)
+                
         self.assertNotIn(
             'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
             test_target, self.print_arr)
@@ -507,7 +510,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap:
             run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, True)
+                tasks, task_to_taskspec)
 
         self.assertIn(
             'An unexpected error occurred. '

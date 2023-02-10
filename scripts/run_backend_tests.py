@@ -363,7 +363,7 @@ def load_coverage_exclusion_list(path: str) -> List[str]:
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
-) -> Tuple[int, int, int, int]:
+) -> Tuple[int, int, int]:
     """Run tests."""
     # Check we ran all tests as expected.
     total_count = 0
