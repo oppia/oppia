@@ -461,7 +461,6 @@ def print_coverage_report(
             coverage = task.task_results[0].get_report()[-2]
             spec = task_to_taskspec[task]
             if (
-                
                     spec.test_target not in coverage_exclusions
                     and float(coverage) != 100.0):
                 print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
