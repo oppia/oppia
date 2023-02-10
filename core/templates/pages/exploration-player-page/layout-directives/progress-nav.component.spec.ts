@@ -36,7 +36,6 @@ import { SchemaFormSubmittedService } from 'services/schema-form-submitted.servi
 import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
 describe('Progress nav component', () => {
@@ -55,12 +54,10 @@ describe('Progress nav component', () => {
   let contentTranslationManagerService: ContentTranslationManagerService;
   let mockDisplayedCard = new StateCard(
     '', '', '', {} as Interaction, [],
-    {} as RecordedVoiceovers, {} as WrittenTranslations, '',
-    {} as AudioTranslationLanguageService);
+    {} as RecordedVoiceovers, '', {} as AudioTranslationLanguageService);
   let mockDisplayedCard2 = new StateCard(
     'state', 'name', 'html', {} as Interaction, [],
-    {} as RecordedVoiceovers, {} as WrittenTranslations, '',
-    {} as AudioTranslationLanguageService);
+    {} as RecordedVoiceovers, '', {} as AudioTranslationLanguageService);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
