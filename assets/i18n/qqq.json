@@ -1122,7 +1122,6 @@
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1": "Text displayed on the save progress menu of exploration lesson info modal telling users that their progress will be automatically saved if they sign in.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "Text displayed on the save progress menu of exploration lesson info modal asking the users whether they already have an account.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3": "Text displayed on the save progress menu of exploration lesson info modal telling the users to use the generated progress URL to save their exploration progress.",
-	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4": "Text displayed on the save progress menu of exploration lesson info modal telling the users that the progress URL generated will save their progress for the next 72 hours only.",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5": "Text displayed on the save progress menu of exploration lesson info modal prompting the users to write or copy the genrated URL.",
 	"I18N_SAVE_PROGRESS": "Text displayed at the end of a chapter to prompt the user to login or signup to save chapter progress.",
 	"I18N_SAVE_PROGRESS_BUTTON_TEXT": "Text displayed on the button in the Save progress card for copying the unique URL of the progress.",

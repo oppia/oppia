@@ -18,7 +18,7 @@
 
 import { Subscription } from 'rxjs';
 import { Subject } from 'rxjs';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -256,7 +256,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   searchDropdownCategories(): SearchDropDownCategories[] {
-    return constants.SEARCH_DROPDOWN_CATEGORIES.map((categoryName) => {
+    return AppConstants.SEARCH_DROPDOWN_CATEGORIES.map((categoryName) => {
       return {
         id: categoryName,
         text: this.constructTranslationIdsService.getLibraryId(
