@@ -362,13 +362,17 @@ def load_coverage_exclusion_list(path: str) -> List[str]:
 
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
-    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
+    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
+    generate_coverage_report: bool
 ) -> Tuple[int, int, int]:
-    """Run tests."""
+    """Run tests and parse coverage reports."""
+    coverage_exclusions = load_coverage_exclusion_list(
+        COVERAGE_EXCLUSION_LIST_PATH)
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
     total_failures = 0
+    incomplete_coverage = 0
     for task in tasks:
         test_count = 0
         spec = task_to_taskspec[task]
@@ -433,10 +437,15 @@ def check_test_results(
                 print(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
-
+            if generate_coverage_report:
+                coverage = task.task_results[0].get_report()[-2]
+                if (
+                        spec.test_target not in coverage_exclusions
+                        and float(coverage) != 100.0):
+                    incomplete_coverage += 1
         total_count += test_count
 
-    return total_count, total_errors, total_failures
+    return total_count, total_errors, total_failures, incomplete_coverage
 
 
 def print_coverage_report(
@@ -452,6 +461,7 @@ def print_coverage_report(
             coverage = task.task_results[0].get_report()[-2]
             spec = task_to_taskspec[task]
             if (
+                
                     spec.test_target not in coverage_exclusions
                     and float(coverage) != 100.0):
                 print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
@@ -553,9 +563,9 @@ def main(args: Optional[List[str]] = None) -> None:
     print('')
 
     (
-        total_count, total_errors, total_failures
+        total_count, total_errors, total_failures, incomplete_coverage
     ) = check_test_results(
-        tasks, task_to_taskspec)
+        tasks, task_to_taskspec, parsed_args.generate_coverage_report)
         
     print('')
     if total_count == 0:
@@ -578,13 +588,15 @@ def main(args: Optional[List[str]] = None) -> None:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
 
-    if parsed_args.generate_coverage_report:
-        incomplete_coverage = print_coverage_report(tasks, task_to_taskspec)
-        if incomplete_coverage:
+    if (parsed_args.generate_coverage_report):
+        print_coverage_report(tasks, task_to_taskspec)
+
+    if incomplete_coverage:
             raise Exception(
                 '%s tests incompletely cover associated code files.' %
                 incomplete_coverage)
 
+    if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = check_coverage(True)
         print(report_stdout)
