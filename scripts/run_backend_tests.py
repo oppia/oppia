@@ -556,7 +556,7 @@ def main(args: Optional[List[str]] = None) -> None:
         total_count, total_errors, total_failures
     ) = check_test_results(
         tasks, task_to_taskspec)
-
+        
     print('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
@@ -584,6 +584,7 @@ def main(args: Optional[List[str]] = None) -> None:
             raise Exception(
                 '%s tests incompletely cover associated code files.' %
                 incomplete_coverage)
+
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = check_coverage(True)
         print(report_stdout)
