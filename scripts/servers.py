@@ -169,6 +169,8 @@ def managed_dev_appserver(
         port: int. The lowest port to which application modules should bind.
         admin_host: str. The host name to which the admin server should bind.
         admin_port: int. The port to which the admin server should bind.
+        secrets: dict(). The dictionary of secrets to be available in the dev
+            server.
         enable_host_checking: bool. Whether to enforce HTTP Host checking for
             application modules, API server, and admin server. Host checking
             protects against DNS rebinding attacks, so only disable after
