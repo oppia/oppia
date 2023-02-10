@@ -95,7 +95,7 @@ describe('Checkpoints functionality', function() {
     await adminPage.getFeaturesTab();
     var checkpointCelebrationFlag = (
       await adminPage.getCheckpointCelebrationFeatureElement());
-    await adminPage.enableFeatureForProd(checkpointCelebrationFlag);
+    await adminPage.enableFeatureForTest(checkpointCelebrationFlag);
 
     await createDummyExploration();
     var handle = await browser.getWindowHandle();
