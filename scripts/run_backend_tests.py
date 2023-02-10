@@ -587,7 +587,7 @@ def main(args: Optional[List[str]] = None) -> None:
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = check_coverage(True)
         print(report_stdout)
-        
+
         if (coverage != 100
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
