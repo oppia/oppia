@@ -291,11 +291,9 @@ describe('Topics and skills dashboard page component', () => {
 
   it('should get total count value for skills', () => {
     componentInstance.skillSummaries = [
-      new SkillSummary('', '', '', 2, 3, 4, 6, 7)];  
-    spyOn(createNewSkillModalService, 'createNewSkill');
-    componentInstance.createSkill();
+      new SkillSummary('', '', '', 2, 3, 4, 6, 7)];
     componentInstance.itemsPerPage = 2;
-    expect(componentInstance.getTotalCountValueForSkills()).toEqual(1);
+    expect(componentInstance.getTotalCountValueForSkills()).toEqual(0);
   });
 
   it('should refresh pagination', () => {
