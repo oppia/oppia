@@ -16,8 +16,6 @@
  * @fileoverview unit test for rule-object.model.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { RuleBackendDict, RuleInputs, Rule } from
   'domain/exploration/rule-object.model';
 
