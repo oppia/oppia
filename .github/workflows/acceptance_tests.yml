@@ -36,8 +36,8 @@ jobs:
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
-      - name: Install ffmpeg
-        run: sudo apt install ffmpeg
+      # - name: Install ffmpeg
+      #   run: sudo apt install ffmpeg
       # - name: Build Webpack
       #   run: python -m scripts.build --prod_env
       # - name: Zip build files
@@ -51,4 +51,4 @@ jobs:
       #     path: /home/runner/work/oppia/build_files.zip
       #     retention-days: 1
       - name: Run acceptance tests
-        run: python -m scripts.run_acceptance_tests --skip-install --skip-build --prod_env
+        run: python -m scripts.run_acceptance_tests --prod_env
