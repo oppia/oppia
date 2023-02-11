@@ -62,7 +62,7 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
                 html_field_types_to_rule_specs_v41, specs_from_json_v41
             )
 
-    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(  # pylint: disable=line-too-long
+    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version_without_caching(  # pylint: disable=line-too-long
         self
     ) -> None:
         with self.assertRaisesRegex(
