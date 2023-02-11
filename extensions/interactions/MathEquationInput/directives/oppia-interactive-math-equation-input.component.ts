@@ -30,7 +30,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { MathEquationInputRulesService } from './math-equation-input-rules.service';
 import { TranslateService } from '@ngx-translate/core';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 interface FocusObj {
   focused: boolean;
@@ -100,7 +100,7 @@ export class InteractiveMathEquationInput implements OnInit {
     this.guppyConfigurationService.changeDivSymbol(
       JSON.parse(this.useFractionForDivisionWithValue || 'false'));
     let translatedPlaceholder = this.translateService.instant(
-      constants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
     this.guppyInitializationService.init(
       'guppy-div-learner',
       translatedPlaceholder,
