@@ -51,4 +51,4 @@ jobs:
       #     path: /home/runner/work/oppia/build_files.zip
       #     retention-days: 1
       - name: Run acceptance tests
-        run: python -m scripts.run_acceptance_tests --prod_env
+        run: python -m scripts.run_acceptance_tests --skip-install --skip-build --prod_env
