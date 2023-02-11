@@ -35,7 +35,7 @@ import {
 } from 'domain/opportunity/featured-translation-language.model';
 import { UserService } from 'services/user.service';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 interface SkillContributionOpportunitiesBackendDict {
   'opportunities': SkillOpportunityBackendDict[];
@@ -119,7 +119,7 @@ export class ContributionOpportunitiesBackendApiService {
     return this.http.get<SkillContributionOpportunitiesBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         this.urlTemplate, {
-          opportunityType: constants.OPPORTUNITY_TYPE_SKILL
+          opportunityType: AppConstants.OPPORTUNITY_TYPE_SKILL
         }
       ), { params }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
@@ -139,7 +139,7 @@ export class ContributionOpportunitiesBackendApiService {
       languageCode: string, topicName: string, cursor: string):
     Promise<TranslationContributionOpportunities> {
     topicName = (
-      topicName === constants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName);
+      topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName);
 
     const params = {
       language_code: languageCode,
@@ -150,7 +150,7 @@ export class ContributionOpportunitiesBackendApiService {
     return this.http.get<TranslationContributionOpportunitiesBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         this.urlTemplate, {
-          opportunityType: constants.OPPORTUNITY_TYPE_TRANSLATION
+          opportunityType: AppConstants.OPPORTUNITY_TYPE_TRANSLATION
         }
       ), { params }).toPromise().then(data => {
       const opportunities = data.opportunities.map(
@@ -174,7 +174,10 @@ export class ContributionOpportunitiesBackendApiService {
       topic_name?: string;
       language_code?: string;
     } = {};
-    if (topicName !== '' && topicName !== constants.TOPIC_SENTINEL_NAME_ALL) {
+    if (
+      topicName !== '' &&
+      topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL
+    ) {
       params.topic_name = topicName;
     }
     if (languageCode && languageCode !== '') {
