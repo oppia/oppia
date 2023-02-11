@@ -127,7 +127,8 @@
                                       [aspect-ratio]="'4:3'"
                                       [preview-title]="editableName"
                                       preview-description-bg-color="#2F6687"
-                                      [preview-footer]="topic.getCanonicalStoryIds().length + ' Lessons'">
+                                      [preview-footer]="topic.getCanonicalStoryIds().length + ' Lessons'"
+                                      ng-if="topicDataHasLoaded">
             </oppia-thumbnail-uploader>
           </div>
         </div>
