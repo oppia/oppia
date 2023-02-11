@@ -253,6 +253,12 @@ describe('Error reporting', function() {
     await users.createUser('lorem@preferences.com', 'loremPreferences');
     await users.login('lorem@preferences.com');
     await preferencesPage.get();
+    // This delay is needed so that the page gets a chance to fully load before
+    // cookies are deleted. The page makes a backend request for feature flags
+    // and the additional pause avoids that being recorded as an error due to
+    // the user no longer being logged in.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
     // Deleting the cookies simulates an expired session error.
     await browser.deleteCookies();
     await browser.setupInterceptor();
