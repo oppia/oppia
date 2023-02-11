@@ -17,7 +17,7 @@
 */
 
 import { TestBed } from '@angular/core/testing';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule-object.model';
 import { TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
 
 import { PopulateRuleContentIdsService } from
