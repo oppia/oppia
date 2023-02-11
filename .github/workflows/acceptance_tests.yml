@@ -1,13 +1,5 @@
 name: End-to-End tests
 on: push
-  # push:
-  #   branches:
-  #     - develop
-  #     - release-*
-  # pull_request:
-  #   branches:
-  #     - develop
-  #     - release-*
 
 jobs:
   build:
@@ -59,4 +51,4 @@ jobs:
       #     path: /home/runner/work/oppia/build_files.zip
       #     retention-days: 1
       - name: Run acceptance tests
-        run: python -m scripts.run_acceptance_tests
+        run: python -m scripts.run_acceptance_tests --skip-install --skip-build --prod_env
