@@ -262,6 +262,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         with self.swap_chrome_disconnected, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
-                    run_frontend_tests.main()
+                    run_frontend_tests.main([])
 
         self.assertEqual(self.subprocess_counter.times_called, 2)
