@@ -240,4 +240,44 @@ describe('Blog Post Editor backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith(
         'Error updating blog post thumbnail.');
     }));
+
+  it('should use the rejection handler when checking for blog post title' +
+  ' uniqueness fails.', fakeAsync(() => {
+    bpebas.doesPostWithGivenTitleAlreadyExistAsync(
+      'sampleBlogId', 'sampleTitle').then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/blogtitlehandler/data/sampleBlogId?title=sampleTitle');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Error checking for blog posts with same title.'
+    }, {
+      status: 500,
+      statusText: 'Error checking for blog posts with same title.'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error checking for blog posts with same title.');
+  }));
+
+  it('should check for blog post title uniqueness successfully',
+    fakeAsync(() => {
+      bpebas.doesPostWithGivenTitleAlreadyExistAsync(
+        'sampleBlogId', 'sampleTitle').then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/blogtitlehandler/data/sampleBlogId?title=sampleTitle');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        blog_post_exists: true
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

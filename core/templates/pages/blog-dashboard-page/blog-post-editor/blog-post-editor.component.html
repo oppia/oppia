@@ -79,6 +79,7 @@
                minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
                aria-label="Title"
                (focusout)="updateLocalTitleValue()"
+               [pattern]="BLOG_POST_TITLE_PATTERN"
                autofocus>
         <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
           <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE }">
@@ -86,6 +87,16 @@
         </span>
         <span class="oppia-input-box-subtitle" *ngIf="title.length < MIN_CHARS_IN_BLOG_POST_TITLE">
           <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MIN_LENGTH_ERROR' | translate: { minChars: MIN_CHARS_IN_BLOG_POST_TITLE }">
+          </em>
+        </span>
+        <span class="oppia-input-box-subtitle" *ngIf="!isTitlePatternValid()">
+          <em>
+            {{ 'I18N_BLOG_POST_EDITOR_TITLE_INVALID_CHARACTERS_ERROR' | translate }}
+          </em>
+        </span>
+        <span class="oppia-input-box-subtitle" *ngIf="blogPostData.titleIsDuplicate">
+          <em>
+            {{ 'I18N_BLOG_POST_EDITOR_TITLE_IS_DUPLICATE_ERROR' | translate }}
           </em>
         </span>
       </div>
@@ -187,7 +198,7 @@
               aria-label="List that shows issues preventing to save blog post as draft"
               class="w-100">
           <button mat-button class="w-100 mx-auto my-2 e2e-test-save-as-draft-button"
-                  [disabled]="(blogPostData.validate().length > 0) || !newChangesAreMade"
+                  [disabled]="(blogPostData.validate().length > 0) || !newChangesAreMade || blogPostData.titleIsDuplicate"
                   (click)="saveDraft()"
                   aria-label="Save blog post as draft."
                   [ngClass]="{'small-screen-button': windowIsNarrow}">

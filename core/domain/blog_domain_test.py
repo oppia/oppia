@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core import utils
-from core.constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.platform import models
@@ -174,9 +173,10 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', '')
         self._assert_strict_valid_title_for_blog_post(
-            'Title field contains invalid characters. Only words'
-            r'\(a-zA-Z0-9\) separated by spaces, hyphens\(-\) and colon\(:\)'
-            ' are allowed. Received %s' % 'ABC12& heloo', 'ABC12& heloo'
+            'Title field contains invalid characters. Only words '
+            r'\(a-zA-Z0-9\(\'!\)\) separated by spaces\, hyphens \(-\)\, comma '
+            r'\(\,\)\, ampersand \(&\) and colon \(:\) are allowed.'
+            'Received %s' % r'ABC12@heloo', r'ABC12@heloo'
         )
 
     def _assert_strict_valid_tags_for_blog_post(
@@ -197,7 +197,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not be empty.', '')
         url_fragment = 'very-very-long' * 30
-        url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+        url_fragment_char_limit = (
+            blog_domain.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+        )
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not exceed %d characters.'
             % (url_fragment_char_limit), url_fragment)
@@ -504,7 +506,9 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not be empty.', '')
         url_fragment = 'very-very-long' * 30
-        url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+        url_fragment_char_limit = (
+            blog_domain.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+        )
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not exceed %d characters.'
             % (url_fragment_char_limit), url_fragment)

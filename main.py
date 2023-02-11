@@ -993,6 +993,9 @@ URLS = [
         r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
         blog_dashboard.BlogPostHandler),
     get_redirect_route(
+        r'%s/<blog_post_id>' % feconf.BLOG_TITLE_HANDLER,
+        blog_dashboard.BlogPostTitleHandler),
+    get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
     get_redirect_route(

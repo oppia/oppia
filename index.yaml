@@ -434,3 +434,9 @@ indexes:
   - name: blog_post_is_published
   - name: last_updated
     direction: desc
+
+- kind: BlogPostSummaryModel
+  properties:
+  - name: author_id
+  - name: published_on
+    direction: desc
