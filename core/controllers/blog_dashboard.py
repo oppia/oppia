@@ -103,19 +103,23 @@ class BlogDashboardDataHandler(
                 'schema': {
                     'type': 'basestring',
                 },
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_AUTHOR_NAME_LENGTH
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_AUTHOR_NAME_LENGTH
+                    }
+                ]
             },
             'author_bio': {
                 'schema': {
                     'type': 'basestring',
                 },
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO
+                    }
+                ]
             },
         },
     }
@@ -216,8 +220,18 @@ class BlogPostHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_id': {
             'schema': {
-                'type': 'basestring'
-            }
+                'type': 'basestring',
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.BLOG_POST_ID_LENGTH
+                    },
+                    {
+                        'id': 'has_length_at_least',
+                        'min_value': constants.BLOG_POST_ID_LENGTH
+                    }
+                ]
+            },
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -232,7 +246,8 @@ class BlogPostHandler(
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        validation_method.validate_change_dict_for_blog_post),
+                        validation_method.validate_change_dict_for_blog_post
+                    ),
                 }
             },
         },
@@ -254,7 +269,6 @@ class BlogPostHandler(
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id: str) -> None:
         """Populates the data on the blog dashboard editor page."""
-        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
@@ -301,12 +315,10 @@ class BlogPostHandler(
     def put(self, blog_post_id: str) -> None:
         """Updates properties of the given blog post."""
         assert self.normalized_payload is not None
-        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=True))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
         change_dict = self.normalized_payload['change_dict']
-
         blog_services.update_blog_post(blog_post_id, change_dict)
         new_publish_status = self.normalized_payload['new_publish_status']
         if new_publish_status:
@@ -327,7 +339,6 @@ class BlogPostHandler(
         """Stores thumbnail of the blog post in the datastore."""
         assert self.normalized_request is not None
         assert self.normalized_payload is not None
-        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         raw_image = self.normalized_request['image']
         thumbnail_filename = self.normalized_payload['thumbnail_filename']
         try:
@@ -350,6 +361,71 @@ class BlogPostHandler(
     @acl_decorators.can_delete_blog_post
     def delete(self, blog_post_id: str) -> None:
         """Handles Delete requests."""
-        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_services.delete_blog_post(blog_post_id)
         self.render_json(self.values)
+
+
+class BlogPostTitleHandlerNormalizedDict(TypedDict):
+    """Dict representation of BlogPostTitleHandler's normalized_request
+    and payload dictionary.
+    """
+
+    title: str
+
+
+class BlogPostTitleHandler(
+    base.BaseHandler[
+        BlogPostTitleHandlerNormalizedDict,
+        BlogPostTitleHandlerNormalizedDict
+    ]
+):
+    """A data handler for checking if a blog post with given title exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'blog_post_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.BLOG_POST_ID_LENGTH
+                    },
+                    {
+                        'id': 'has_length_at_least',
+                        'min_value': constants.BLOG_POST_ID_LENGTH,
+                    }
+                ]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'title': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_CHARS_IN_BLOG_POST_TITLE
+                        }
+                    ]
+                }
+            }
+        },
+    }
+
+    @acl_decorators.can_edit_blog_post
+    def get(self, blog_post_id: str) -> None:
+        """Handler that receives a blog post title and checks whether
+        a blog post with the same title exists.
+        """
+        assert self.normalized_request is not None
+        title = self.normalized_request['title']
+        self.render_json({
+            'blog_post_exists': (
+                blog_services.does_blog_post_with_title_exist(
+                    title, blog_post_id
+                )
+            )
+        })
