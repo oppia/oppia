@@ -190,8 +190,17 @@ export class ContributorDashboardPageComponent
       if (userInfo.isLoggedIn()) {
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
-        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-          this.userService.getProfileImageDataUrl(this.username));
+        if (this.username !== null) {
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+            this.userService.getProfileImageDataUrl(this.username));
+        } else {
+          this.profilePictureWebpDataUrl = (
+            this.urlInterpolationService.getStaticImageUrl(
+              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+          this.profilePicturePngDataUrl = (
+            this.urlInterpolationService.getStaticImageUrl(
+              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+        }
       } else {
         this.userIsLoggedIn = false;
         this.username = '';

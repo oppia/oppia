@@ -58,7 +58,6 @@ describe('Preferences Page Component', () => {
     can_receive_feedback_message_email: false,
     can_receive_subscription_email: true,
     subscription_list: [{
-      creator_picture_data_url: 'picture_url',
       creator_username: 'creator',
       creator_impact: 0
     }]
@@ -139,6 +138,9 @@ describe('Preferences Page Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     mockWindowRef = TestBed.inject(WindowRef);
     mockUserBackendApiService = TestBed.inject(UserBackendApiService);
+
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   it('should be defined', () => {
@@ -159,8 +161,6 @@ describe('Preferences Page Component', () => {
         id: 'en',
         text: 'English'
       }]);
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
     componentInstance.ngOnInit();
     tick();
     tick();
@@ -194,6 +194,16 @@ describe('Preferences Page Component', () => {
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
+
+  it('should get user profile image png data url correctly', () => {
+    expect(componentInstance.getProfileImagePngDataUrl('username')).toBe(
+      'default-image-url-png');
+  });
+
+  it('should get user profile image webp data url correctly', () => {
+    expect(componentInstance.getProfileImageWebpDataUrl('username')).toBe(
+      'default-image-url-webp');
+  });
 
   it('should get static image url', () => {
     let staticImageUrl = 'static_image_url';

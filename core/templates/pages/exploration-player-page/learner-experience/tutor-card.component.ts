@@ -169,8 +169,17 @@ export class TutorCardComponent {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
     if (!this._editorPreviewMode) {
-      [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-        this.userService.getProfileImageDataUrl(this.username));
+      if (this.username !== null) {
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+            this.userService.getProfileImageDataUrl(this.username));
+        } else {
+          this.profilePictureWebpDataUrl = (
+            this.urlInterpolationService.getStaticImageUrl(
+              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+          this.profilePicturePngDataUrl = (
+            this.urlInterpolationService.getStaticImageUrl(
+              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+        }
     } else {
       this.profilePictureWebpDataUrl = (
         this.urlInterpolationService.getStaticImageUrl(

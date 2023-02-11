@@ -226,22 +226,18 @@ describe('Learner dashboard page', () => {
 
   let subscriptionsList = [{
     creator_impact: 0,
-    creator_picture_data_url: 'creatorA-url',
     creator_username: 'Bucky',
   },
   {
     creator_impact: 1,
-    creator_picture_data_url: 'creatorB-url',
     creator_username: 'Arrow',
   },
   {
     creator_impact: 3,
-    creator_picture_data_url: 'creatorD-url',
     creator_username: 'Deadpool',
   },
   {
     creator_impact: 2,
-    creator_picture_data_url: 'creatorC-url',
     creator_username: 'Captain America',
   }];
 

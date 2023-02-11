@@ -144,6 +144,29 @@ describe('Contributor dashboard page', () => {
     expect(component.defaultHeaderVisible).toBeTrue();
   });
 
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(Promise.resolve(userContributionRights));
+      let userInfo = {
+        isLoggedIn: () => true,
+        getUsername: () => null
+      };
+
+      getUserInfoAsyncSpy.and.returnValue(
+        Promise.resolve(userInfo as UserInfo));
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.profilePicturePngDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      expect(component.profilePictureWebpDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+  }));
+
   it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
     spyOn(userService, 'getUserContributionRightsDataAsync')
       .and.returnValue(Promise.resolve(userContributionRights));

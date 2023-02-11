@@ -194,6 +194,9 @@ export class PreferencesPageComponent {
   private _saveProfileImageToLocalStorage(image: string): void {
     const newImageFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(image));
+    if (newImageFile === null) {
+      throw new Error('Image uploaded is not valid.');
+    }
     const reader = new FileReader();
     reader.onload = () => {
       const imageData = reader.result as string;
@@ -228,14 +231,35 @@ export class PreferencesPageComponent {
     });
   }
 
+  getProfileImagePngDataUrl(username: string): string {
+    let [pngImageUrl,] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    let [, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
+  }
+
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then((userInfo) => {
       this.username = userInfo.getUsername();
       this.email = userInfo.getEmail();
-      [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-        this.userService.getProfileImageDataUrl(this.username));
+      if (this.username !== null) {
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(this.username));
+      } else {
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      }
     });
 
     this.AUDIO_LANGUAGE_CHOICES = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
@@ -267,10 +291,6 @@ export class PreferencesPageComponent {
       this.preferredAudioLanguageCode =
         data.preferred_audio_language_code;
       this.subscriptionList = data.subscription_list;
-      this.subscriptionList.forEach((subscription) => {
-        subscription.creator_picture_data_url = (
-          decodeURIComponent(subscription.creator_picture_data_url));
-      });
       this.hasPageLoaded = true;
     });
 

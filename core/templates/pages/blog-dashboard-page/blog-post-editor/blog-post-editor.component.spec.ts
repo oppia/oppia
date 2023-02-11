@@ -206,6 +206,28 @@ describe('Blog Post Editor Component', () => {
     expect(loaderService.hideLoadingScreen).not.toHaveBeenCalled();
   }));
 
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      let userInfo = {
+        getUsername: () => null,
+        isSuperAdmin: () => true
+      };
+      spyOn(component, 'initEditor');
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough();
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.authorProfilePicPngUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.png');
+      expect(component.authorProfilePicWebpUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.webp');
+    }));
+
   it('should set image uploader window size', () => {
     component.uploadedImageDataUrl = 'image.png';
 

@@ -48,6 +48,14 @@ describe('Blog Dashboard Page Component', () => {
   let resizeEvent = new Event('resize');
   let ngbModal: NgbModal;
   let userService: UserService;
+  let blogDashboardData = {
+    displayedAuthorName: 'test_user',
+    authorBio: '',
+    numOfPublishedBlogPosts: 0,
+    numOfDraftBlogPosts: 0,
+    publishedBlogPostSummaryDicts: [],
+    draftBlogPostSummaryDicts: [],
+  };
 
   class MockWindowRef {
     nativeWindow = {
@@ -189,14 +197,6 @@ describe('Blog Dashboard Page Component', () => {
       email: 'test@test.com',
       user_is_logged_in: true
     };
-    let blogDashboardData = {
-      displayedAuthorName: 'test_user',
-      authorBio: '',
-      numOfPublishedBlogPosts: 0,
-      numOfDraftBlogPosts: 0,
-      publishedBlogPostSummaryDicts: [],
-      draftBlogPostSummaryDicts: [],
-    };
     const sampleUserInfo = UserInfo.createFromBackendDict(
       sampleUserInfoBackendObject);
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
@@ -220,12 +220,36 @@ describe('Blog Dashboard Page Component', () => {
     expect(blogDashboardBackendApiService.fetchBlogDashboardDataAsync)
       .toHaveBeenCalled();
     expect(component.authorProfilePicPngUrl).toEqual('default-image-url-png');
-    expect(component.authorProfilePicWebpUrl).toEqual('default-image-url-webp');
+    expect(component.authorProfilePicWebpUrl).toEqual(
+      'default-image-url-webp');
     expect(component.showAuthorDetailsEditor).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.windowIsNarrow).toBe(true);
   }));
+
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      let userInfo = {
+        getUsername: () => null,
+        isSuperAdmin: () => true
+      };
+      spyOn(component, 'showAuthorDetailsEditor');
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
+        .and.returnValue(Promise.resolve(blogDashboardData));
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+
+      component.initMainTab();
+      tick();
+
+      expect(component.authorProfilePicPngUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.png');
+      expect(component.authorProfilePicWebpUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.webp');
+    }));
 
   it('should display alert when unable to fetch blog dashboard data',
     fakeAsync(() => {

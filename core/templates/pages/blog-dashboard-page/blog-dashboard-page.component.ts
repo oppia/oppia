@@ -29,6 +29,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserService } from 'services/user.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 @Component({
   selector: 'oppia-blog-dashboard-page',
   templateUrl: './blog-dashboard-page.component.html'
@@ -55,6 +56,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private ngbModal: NgbModal,
     private windowDimensionService: WindowDimensionsService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
@@ -87,8 +89,17 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
-    [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
-      this.userService.getProfileImageDataUrl(this.username));
+    if (this.username !== null) {
+      [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+        this.userService.getProfileImageDataUrl(this.username));
+    } else {
+      this.authorProfilePicWebpUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.authorProfilePicPngUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+    }
   }
 
   initMainTab(): void {

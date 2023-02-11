@@ -250,6 +250,28 @@ describe('Tutor card component', () => {
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
 
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      let userInfo = {
+        isLoggedIn: () => true,
+        getUsername: () => null
+      };
+
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.profilePicturePngDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      expect(componentInstance.profilePictureWebpDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+  }));
+
   it('should refresh displayed card on changes', fakeAsync(() => {
     let updateDisplayedCardSpy = spyOn(
       componentInstance, 'updateDisplayedCard');
