@@ -75,7 +75,10 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     // The cropper always returns a jpeg file, thus the extension should be
     // changed to jpeg for the final image type to match the extension.
     this.croppedFilename = (
-      originalFilename.replace(/\.([^.]*?)(?=\?|#|$)/, '.jpeg'));
+      originalFilename
+        .replace(/\.([^.]*?)(?=\?|#|$)/, '.jpeg')
+        .replace(/ /g, '_')
+    );
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
