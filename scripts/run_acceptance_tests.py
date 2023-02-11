@@ -192,32 +192,32 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             build_js_files(dev_mode, source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
-        print("shivkant testing testing 1")
+        print("shivkant testing testing 1") # ignore these for now!
         stack.enter_context(servers.managed_redis_server()) # check
-        print("shivkant testing testing 2")
+        print("shivkant testing testing 2") # ignore these for now!
         stack.enter_context(servers.managed_elasticsearch_dev_server()) # check
-        print("shivkant testing testing 3")
+        print("shivkant testing testing 3") # ignore these for now!
         if constants.EMULATOR_MODE:
-            print("shivkant testing testing 4")
+            print("shivkant testing testing 4") # ignore these for now!
             stack.enter_context(servers.managed_firebase_auth_emulator()) # check
-            print("shivkant testing testing 5")
+            print("shivkant testing testing 5") # ignore these for now!
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True)) # check
 
-        app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
-        print("shivkant testing testing 6")
-        stack.enter_context(servers.managed_dev_appserver(
-            app_yaml_path,
-            port=GOOGLE_APP_ENGINE_PORT,
-            log_level=args.server_log_level,
-            # Automatic restart can be disabled since we don't expect code
-            # changes to happen while the e2e tests are running.
-            automatic_restart=False,
-            skip_sdk_update_check=True,
-            env={
-                **os.environ,
-                'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
-            }))
+        # app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
+        # print("shivkant testing testing 6") # ignore these for now!
+        # stack.enter_context(servers.managed_dev_appserver(
+        #     app_yaml_path,
+        #     port=GOOGLE_APP_ENGINE_PORT,
+        #     log_level=args.server_log_level,
+        #     # Automatic restart can be disabled since we don't expect code
+        #     # changes to happen while the e2e tests are running.
+        #     automatic_restart=False,
+        #     skip_sdk_update_check=True,
+        #     env={
+        #         **os.environ,
+        #         'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
+        #     }))
 
         # if (args.mobile) and (args.suite not in MOBILE_SUITES):
         #     print(
