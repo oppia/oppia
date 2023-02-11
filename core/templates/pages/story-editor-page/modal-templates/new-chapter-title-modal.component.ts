@@ -16,7 +16,7 @@
  * @fileoverview Component for new chapter title modal.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -36,8 +36,8 @@ export class NewChapterTitleModalComponent implements OnInit {
   title: string;
   explorationId: string;
   invalidExpId: boolean;
-  nodeTitles: string | string[];
-  errorMsg: string;
+  @Input() nodeTitles: string | string[];
+  errorMsg: string | null;
   invalidExpErrorStrings: string[];
   correctnessFeedbackDisabledString: string;
   MAX_CHARS_IN_EXPLORATION_TITLE = AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE;

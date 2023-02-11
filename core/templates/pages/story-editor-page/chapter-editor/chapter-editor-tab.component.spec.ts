@@ -16,45 +16,62 @@
  * @fileoverview Unit tests for chapter editor tab component.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
-import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { StoryEditorStateService } from '../services/story-editor-state.service';
+import { StoryBackendDict, StoryObjectFactory } from '../../../domain/story/StoryObjectFactory';
+import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
+import { EditableStoryBackendApiService } from '../../../domain/story/editable-story-backend-api.service';
+import { ChapterEditorTabComponent } from './chapter-editor-tab.component';
 
-describe('Chapter Editor tab', () => {
-  let MockStoryEditorNavigationService;
+describe('Chapter Editor Tab Component', () => {
+  let component: ChapterEditorTabComponent;
+  let fixture: ComponentFixture<ChapterEditorTabComponent>;
+  let mockStoryEditorNavigationService: StoryEditorNavigationService;
   let storyInitializedEventEmitter;
   let storyReinitializedEventEmitter;
+  let storyObjectFactory: StoryObjectFactory;
+  let storyEditorStateService: StoryEditorStateService;
+
+  class MockStoryEditorNavigationService {
+    activeTab: string = 'chapter';
+    getActiveTab(): string {
+      return this.activeTab;
+    }
+
+    getChapterId = () => 'node_1';
+    getChapterIndex = () => null;
+    navigateToStoryEditor = () => {
+      this.activeTab = 'story';
+    };
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [StoryObjectFactory, StoryEditorNavigationService,
-        EditableStoryBackendApiService]
-    });
+      declarations: [ChapterEditorTabComponent],
+      providers: [
+        StoryObjectFactory,
+        StoryEditorNavigationService,
+        EditableStoryBackendApiService,
+        {
+          provide: StoryEditorNavigationService,
+          useClass: MockStoryEditorNavigationService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
   beforeEach(() => {
-    editableStoryBackendApiService = TestBed.inject(EditableStoryBackendApiService);
     storyObjectFactory = TestBed.inject(StoryObjectFactory);
-    storyEditorNavigationService = TestBed.inject(StoryEditorNavigationService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
-
   });
 
   beforeEach(() => {
-    MockStoryEditorNavigationService = {
-      activeTab: 'chapter',
-      getActiveTab: () => this.activeTab,
-      getChapterId: () => 'node_1',
-      getChapterIndex: () => null,
-      navigateToStoryEditor: () => {
-        this.activeTab = 'story';
-      }
-    };
-
+    fixture = TestBed.createComponent(ChapterEditorTabComponent);
+    component = fixture.componentInstance;
     let newStory = storyObjectFactory.createFromBackendDict({
       id: 'storyId_0',
       title: 'Story title',
@@ -74,54 +91,49 @@ describe('Chapter Editor tab', () => {
         }],
       },
       language_code: 'en',
-      story_contents_schema_version: '1',
-      version: '1',
+      story_contents_schema_version: 1,
+      version: 1,
       corresponding_topic_id: 'topic_id'
-    });
+    } as unknown as StoryBackendDict);
 
     storyInitializedEventEmitter = new EventEmitter();
     storyReinitializedEventEmitter = new EventEmitter();
 
-    spyOnProperty(StoryEditorStateService, 'onStoryInitialized').and.callFake(
-      () {
+    spyOnProperty(storyEditorStateService, 'onStoryInitialized').and.callFake(
+      () => {
         return storyInitializedEventEmitter;
       });
-    spyOnProperty(StoryEditorStateService, 'onStoryReinitialized').and.callFake(
-      () {
+    spyOnProperty(storyEditorStateService, 'onStoryReinitialized').and.callFake(
+      () => {
         return storyReinitializedEventEmitter;
       });
 
-    StoryEditorStateService.setStory(newStory);
-    ctrl = $componentController('chapterEditorTab', {
-      $scope: $scope,
-      StoryEditorStateService: StoryEditorStateService,
-      StoryEditorNavigationService: MockStoryEditorNavigationService,
-    });
-  }));
-
-  afterEach(() => {
-    ctrl.$onDestroy();
+    storyEditorStateService.setStory(newStory);
   });
 
-  it('should set initialize chapter index from the story', () {
-    ctrl.$onInit();
-    expect(ctrl.chapterId).toEqual('node_1');
-    expect(ctrl.chapterIndex).toEqual(0);
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
+  it('should set initialize chapter index from the story', () => {
+    component.ngOnInit();
+    expect(component.chapterId).toEqual('node_1');
+    expect(component.chapterIndex).toEqual(0);
   });
 
   it('should call StoryEditorNavigationService to navigate to story editor',
-    () {
-      ctrl.$onInit();
-      ctrl.navigateToStoryEditor();
-      expect(MockStoryEditorNavigationService.getActiveTab()).toEqual('story');
+    () => {
+      component.ngOnInit();
+      component.navigateToStoryEditor();
+      expect(mockStoryEditorNavigationService.activeTab).toEqual('story');
     });
 
   it('should called initEditor on calls from story being initialized',
-    () {
-      spyOn(ctrl, 'initEditor').and.callThrough();
-      ctrl.$onInit();
+    () => {
+      spyOn(component, 'initEditor').and.callThrough();
+      component.ngOnInit();
       storyInitializedEventEmitter.emit();
       storyReinitializedEventEmitter.emit();
-      expect(ctrl.initEditor).toHaveBeenCalledTimes(3);
+      expect(component.initEditor).toHaveBeenCalledTimes(3);
     });
 });

@@ -228,7 +228,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.storyUpdateService.finalizeStoryNodeOutline(this.story, this.nodeId);
   }
 
-  updateExplorationid(explorationId: string): void {
+  updateExplorationId(explorationId: string): void {
     this.toggleExplorationInputButtons();
 
     if (this.storyEditorStateService.isStoryPublished()) {
@@ -409,6 +409,12 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   toggleChapterCard(): void {
     if (this.windowDimensionsService.isWindowNarrow()) {
       this.mainChapterCardIsShown = !this.mainChapterCardIsShown;
+    }
+  }
+
+  toggleChapterTodoCard(): void {
+    if (this.windowDimensionsService.isWindowNarrow()) {
+      this.chapterTodoCardIsShown = !this.chapterTodoCardIsShown;
     }
   }
 
