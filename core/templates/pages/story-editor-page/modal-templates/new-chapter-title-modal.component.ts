@@ -33,22 +33,22 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
   templateUrl: './new-chapter-title-modal.component.html'
 })
 export class NewChapterTitleModalComponent implements OnInit {
-  @Input() nodeTitles: string | string[];
-  title: string;
-  explorationId: string;
-  invalidExpId: boolean;
-  errorMsg: string | null;
-  invalidExpErrorStrings: string[];
-  correctnessFeedbackDisabledString: string;
+  @Input() nodeTitles!: string | string[];
+  title!: string;
+  explorationId!: string;
+  invalidExpId!: boolean;
+  errorMsg!: string | null;
+  invalidExpErrorStrings!: string[];
+  correctnessFeedbackDisabledString!: string;
   MAX_CHARS_IN_EXPLORATION_TITLE = AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE;
-  story: Story;
-  nodeId: string;
-  editableThumbnailBgColor: string;
-  editableThumbnailFilename: string;
-  correctnessFeedbackDisabled: boolean;
-  categoryIsDefault: boolean;
-  statesWithRestrictedInteractions: string | string[];
-  statesWithTooFewMultipleChoiceOptions: string | string[];
+  story!: Story;
+  nodeId!: string;
+  editableThumbnailBgColor!: string;
+  editableThumbnailFilename!: string;
+  correctnessFeedbackDisabled!: boolean;
+  categoryIsDefault!: boolean;
+  statesWithRestrictedInteractions!: string | string[];
+  statesWithTooFewMultipleChoiceOptions!: string | string[];
   allowedBgColors = (
     newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
 

@@ -22,9 +22,9 @@ import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
 import { NewChapterTitleModalComponent } from './new-chapter-title-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditableStoryBackendApiService } from "../../../domain/story/editable-story-backend-api.service";
-import { StoryEditorStateService } from "../services/story-editor-state.service";
-import { StoryUpdateService } from "../../../domain/story/story-update.service";
+import { EditableStoryBackendApiService } from '../../../domain/story/editable-story-backend-api.service';
+import { StoryEditorStateService } from '../services/story-editor-state.service';
+import { StoryUpdateService } from '../../../domain/story/story-update.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockActiveModal {
