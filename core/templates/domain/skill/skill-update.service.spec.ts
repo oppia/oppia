@@ -49,8 +49,7 @@ describe('Skill update service', () => {
         SkillUpdateService,
         UndoRedoService,
         MisconceptionObjectFactory,
-        SkillObjectFactory,
-        WorkedExample,
+        SkillObjectFactory
       ],
     });
 
