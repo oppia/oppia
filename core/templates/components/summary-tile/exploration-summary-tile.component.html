@@ -86,7 +86,8 @@
                 [activityId]="explorationId"
                 [activityTitle]="explorationTitle"
                 [isContainerNarrow]="isContainerNarrow"
-                [activityActive]="explorationIsCurrentlyHoveredOver">
+                [activityActive]="explorationIsCurrentlyHoveredOver"
+                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
   </oppia-learner-dashboard-icons>
   <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration" [ngStyle]="{'margin': '5px'}">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">

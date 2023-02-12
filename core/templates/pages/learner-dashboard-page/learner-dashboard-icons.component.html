@@ -7,7 +7,7 @@
    container="body"
    placement="left">
 </i>
-<div *ngIf="canActivityBeAddedToLearnerPlaylist(activityId) && isContainerNarrow">
+<div *ngIf="canActivityBeAddedToLearnerPlaylist(activityId) && isContainerNarrow && isAddToPlaylistIconShown">
   <div class="dropdown oppia-learner-dashboard-icon" ngbDropdown>
     <ul class=" dropdown-menu dropdown-menu-right" ngbDropdownMenu>
       <li ngbDropdownItem (click)="addToLearnerPlaylist(activityId, activityType)">
