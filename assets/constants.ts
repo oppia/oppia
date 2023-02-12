@@ -6213,9 +6213,6 @@ export default {
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
-  // Link to open when the Oppia avatar is clicked on any page.
-  "OPPIA_AVATAR_LINK_URL": null,
-
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 

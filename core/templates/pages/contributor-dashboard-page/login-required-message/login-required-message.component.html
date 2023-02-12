@@ -1,12 +1,8 @@
 <div class="oppia-login-required-message-container">
   <div class="oppia-mascot-avatar-container">
-    <a [ngClass]="{'oppia-disabled-image-link': OPPIA_AVATAR_LINK_URL === null}"
-       [href]="OPPIA_AVATAR_LINK_URL"
-       rel="noopener"
-       target="_blank">
-      <img class="oppia-mascot-avatar"
-           [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
-    </a>
+    <img class="oppia-mascot-avatar"
+         [src]="OPPIA_AVATAR_IMAGE_URL"
+         alt="">
   </div>
   <div class="oppia-login-required-message">
     Oops! You haven't logged in yet.

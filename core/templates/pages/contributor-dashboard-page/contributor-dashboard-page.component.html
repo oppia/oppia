@@ -111,14 +111,9 @@
           <div class="oppia-outer-container">
             <div class="oppia-mascot-container">
               <div class="oppia-mascot-avatar-container">
-                <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-                   [href]="OPPIA_AVATAR_LINK_URL"
-                   rel="noopener"
-                   target="_blank">
-                  <img class="oppia-mascot-avatar"
-                       [src]="OPPIA_AVATAR_IMAGE_URL"
-                       alt="Oppia Mascot Avatar">
-                </a>
+                <img class="oppia-mascot-avatar"
+                     [src]="OPPIA_AVATAR_IMAGE_URL"
+                     alt="">
               </div>
               <div class="oppia-explanation-container">
                 <div class="oppia-opportunities-tabs-explanation">
@@ -207,14 +202,9 @@
              *ngIf="activeTabName !== 'myContributionTab'">
           <div class="tab-info">
             <div class="oppia-collapsed-mascot-avatar-container">
-              <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-                 [href]="OPPIA_AVATAR_LINK_URL"
-                 rel="noopener"
-                 target="_blank">
-                <img class="oppia-mascot-avatar collapsed-oppia-contributor-img"
-                     [src]="OPPIA_AVATAR_IMAGE_URL"
-                     alt="Oppia Mascot Avatar">
-              </a>
+              <img class="oppia-mascot-avatar collapsed-oppia-contributor-img"
+                   [src]="OPPIA_AVATAR_IMAGE_URL"
+                   alt="">
             </div>
             <div class="oppia-collapsed-opportunities-tabs-explanation"
                  *ngIf="activeTabName === 'submitQuestionTab'">

@@ -21,7 +21,6 @@ import { SafeUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { AppConstants } from 'app.constants';
 import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
@@ -38,7 +37,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class ContributorDashboardPageComponent
   implements OnInit {
-  OPPIA_AVATAR_LINK_URL: string | null = AppConstants.OPPIA_AVATAR_LINK_URL;
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1

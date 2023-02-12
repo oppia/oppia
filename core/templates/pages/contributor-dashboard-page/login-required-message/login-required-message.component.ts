@@ -22,7 +22,6 @@ import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'login-required-message',
@@ -34,8 +33,6 @@ export class LoginRequiredMessageComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   OPPIA_AVATAR_IMAGE_URL!: string;
-  // This constant is defined as null at AppConstants.
-  OPPIA_AVATAR_LINK_URL!: string | null;
 
   constructor(
     private readonly siteAnalyticsService: SiteAnalyticsService,
@@ -44,7 +41,6 @@ export class LoginRequiredMessageComponent {
     private readonly windowRef: WindowRef) {}
 
   ngOnInit(): void {
-    this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));

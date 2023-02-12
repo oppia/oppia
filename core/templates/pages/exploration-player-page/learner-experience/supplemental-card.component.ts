@@ -58,7 +58,6 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
   lastAnswer: string | null = null;
   maxHelpCardHeightSeen: number = 0;
   helpCardHasContinueButton: boolean = false;
-  OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
   CONTINUE_BUTTON_FOCUS_LABEL: string = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
 
