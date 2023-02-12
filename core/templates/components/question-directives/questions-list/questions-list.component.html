@@ -69,7 +69,9 @@
               </oppia-rte-output-display>
               <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())"
                     matTooltip="Unaddressed skill misconceptions"
-                    matTooltipClass="oppia-mat-tooltip-list">⚠️</span>
+                    matTooltipClass="oppia-mat-tooltip-list">
+                    ⚠️
+              </span>
               <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId());$event.stopPropagation();"
                     class="link-off-icon">
                 <i class="fas fa-trash"></i>
