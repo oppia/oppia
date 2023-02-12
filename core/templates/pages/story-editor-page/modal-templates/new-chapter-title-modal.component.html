@@ -61,8 +61,7 @@
       <div class="chapter-input-header">
         <span>Thumbnail Image*</span>
       </div>
-      <oppia-thumbnail-uploader [filename]="editableThumbnailFilename"
-                                [useLocalStorage]="false"
+      <oppia-thumbnail-uploader [useLocalStorage]="false"
                                 (updateFilename)="updateThumbnailFilename($event)"
                                 [bgColor]="editableThumbnailBgColor"
                                 (updateBgColor)="updateThumbnailBgColor($event)"

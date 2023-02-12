@@ -36,6 +36,7 @@ import { NewChapterTitleModalComponent } from '../modal-templates/new-chapter-ti
 import { DeleteChapterModalComponent } from '../modal-templates/delete-chapter-modal.component';
 import { Story } from 'domain/story/StoryObjectFactory';
 import { StoryContents } from 'domain/story/story-contents-object.model';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'oppia-story-editor',
@@ -114,6 +115,25 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this._initEditor();
   }
 
+  drop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(
+      this.linearNodesList,
+      event.previousIndex, event.currentIndex);
+    if (event.previousIndex === 0) {
+      this.storyUpdateService.setInitialNodeId(
+        this.story, this.story.getStoryContents().getNodes()[
+          event.currentIndex].getId());
+    }
+    if (event.currentIndex === 0) {
+      this.storyUpdateService.setInitialNodeId(
+        this.story, this.story.getStoryContents().getNodes()[
+          event.previousIndex].getId());
+    }
+    this.storyUpdateService.rearrangeNodeInStory(
+      this.story, event.previousIndex, event.currentIndex);
+    this._initEditor();
+  }
+
   _initEditor(): void {
     this.story = this.storyEditorStateService.getStory();
     if (this.story) {
@@ -158,30 +178,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   isInitialNode(nodeId: string): boolean {
     return (
       this.story.getStoryContents().getInitialNodeId() === nodeId);
-  }
-
-  onMoveChapterStart(index: number, node: StoryNode): void {
-    this.dragStartIndex = index;
-    this.nodeBeingDragged = node;
-  }
-
-  rearrangeNodeInStory(toIndex: number): void {
-    if (this.dragStartIndex === toIndex) {
-      return;
-    }
-    if (this.dragStartIndex === 0) {
-      this.storyUpdateService.setInitialNodeId(
-        this.story, this.story.getStoryContents().getNodes()[
-          toIndex].getId());
-    }
-    if (toIndex === 0) {
-      this.storyUpdateService.setInitialNodeId(
-        this.story, this.story.getStoryContents().getNodes()[
-          this.dragStartIndex].getId());
-    }
-    this.storyUpdateService.rearrangeNodeInStory(
-      this.story, this.dragStartIndex, toIndex);
-    this._initEditor();
   }
 
   deleteNode(nodeId: string): void {

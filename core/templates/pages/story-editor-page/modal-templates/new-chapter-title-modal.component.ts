@@ -33,10 +33,10 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
   templateUrl: './new-chapter-title-modal.component.html'
 })
 export class NewChapterTitleModalComponent implements OnInit {
+  @Input() nodeTitles: string | string[];
   title: string;
   explorationId: string;
   invalidExpId: boolean;
-  @Input() nodeTitles: string | string[];
   errorMsg: string | null;
   invalidExpErrorStrings: string[];
   correctnessFeedbackDisabledString: string;
@@ -69,6 +69,7 @@ export class NewChapterTitleModalComponent implements OnInit {
   init(): void {
     this.title = '';
     this.explorationId = '';
+    this.editableThumbnailFilename = '';
     this.invalidExpId = false;
     this.errorMsg = null;
     this.invalidExpErrorStrings = ['Please enter a valid exploration id.'];
@@ -77,7 +78,6 @@ export class NewChapterTitleModalComponent implements OnInit {
       'correctness feedback enabled before they can be added to a story.';
     this.story = this.storyEditorStateService.getStory();
     this.nodeId = this.story.getStoryContents().getNextNodeId();
-    this.editableThumbnailFilename = '';
     this.editableThumbnailBgColor = '';
     this.storyUpdateService.addStoryNode(this.story, this.title);
     this.correctnessFeedbackDisabled = false;

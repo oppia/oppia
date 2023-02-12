@@ -201,18 +201,12 @@
               <div class="chapter-list-card-heading">
                 <span>Name</span>
               </div>
-              <div class="story-nodes-container">
-
-
-                <div *ngFor="let node of linearNodesList;index as idx">
+              <div class="story-nodes-container" cdkDropList (cdkDropListDropped)="drop($event)">
+                <div *ngFor="let node of linearNodesList;index as idx"
+                     cdkDrag>
                   <div class="story-editor-node"
                        [ngClass]="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                       (click)="navigateToChapterWithId(node.getId(), idx)"
-                       dnd-draggable="node"
-                       dnd-list="linearNodesList"
-                       dnd-effect-allowed="move"
-                       dnd-dragstart="onMoveChapterStart(idx, node.getId())"
-                       dnd-drop="rearrangeNodeInStory(idx)">
+                       (click)="navigateToChapterWithId(node.getId(), idx)">
                     <div class="story-editor-node-title">
                       <span> {{ idx+1 }}. </span>
                       <span class="e2e-test-chapter-title">{{ node.getTitle() }}</span>
@@ -235,9 +229,6 @@
                     </div>
                   </div>
                 </div>
-
-
-                
               </div>
             </div>
           </div>
@@ -442,6 +433,9 @@
   }
   .story-editor-notes-edit-icon {
     padding-top: 4px;
+  }
+  .cdk-drag-placeholder {
+    opacity: 0;
   }
   @media screen and (max-width: 1150px) {
     .content-container {
