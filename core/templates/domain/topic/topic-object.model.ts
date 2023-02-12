@@ -584,40 +584,47 @@ export class Topic {
   // Reassigns all values within this topic to match the existing
   // topic. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic.
-  copyFromTopic(otherTopic: Topic): void {
-    this._id = otherTopic.getId();
-    this.setName(otherTopic.getName());
-    this.setAbbreviatedName(otherTopic.getAbbreviatedName());
-    this.setUrlFragment(otherTopic.getUrlFragment());
-    this.setThumbnailFilename(otherTopic.getThumbnailFilename());
-    this.setThumbnailBgColor(otherTopic.getThumbnailBgColor());
-    this.setDescription(otherTopic.getDescription());
-    this.setLanguageCode(otherTopic.getLanguageCode());
-    this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
-    this.setMetaTagContent(otherTopic.getMetaTagContent());
-    this.setPageTitleFragmentForWeb(otherTopic.getPageTitleFragmentForWeb());
-    this.setSkillSummariesForDiagnosticTest(
-      otherTopic.getSkillSummariesForDiagnosticTest());
-    this._version = otherTopic.getVersion();
-    this._nextSubtopicId = otherTopic.getNextSubtopicId();
-    this.clearAdditionalStoryReferences();
-    this.clearCanonicalStoryReferences();
-    this.clearUncategorizedSkills();
-    this.clearSubtopics();
+  copyFromTopic(otherTopic: Topic): Topic {
+    let id = otherTopic.getId();
+    let name = otherTopic.getName();
+    let abbreviatedName = otherTopic.getAbbreviatedName();
+    let urlFragment = otherTopic.getUrlFragment();
+    let thumbnailFilename = otherTopic.getThumbnailFilename();
+    let thumbnailBgColor = otherTopic.getThumbnailBgColor();
+    let description = otherTopic.getDescription();
+    let languageCode = otherTopic.getLanguageCode();
+    let practiceTabIsDisplayed = otherTopic.getPracticeTabIsDisplayed();
+    let metaTagContent = otherTopic.getMetaTagContent();
+    let pageTitleFragmentForWeb = otherTopic.getPageTitleFragmentForWeb();
+    let skillSummariesForDiagnosticTest =
+      otherTopic.getSkillSummariesForDiagnosticTest();
+    let version = otherTopic.getVersion();
+    let nextSubtopicId = otherTopic.getNextSubtopicId();
+    let topic = new Topic(
+      id, name, abbreviatedName, urlFragment, description,
+      languageCode, [], [], [], nextSubtopicId, version, [],
+      thumbnailFilename, thumbnailBgColor, {}, practiceTabIsDisplayed,
+      metaTagContent, pageTitleFragmentForWeb, []);
+    topic._skillSummariesForDiagnosticTest = skillSummariesForDiagnosticTest;
+    topic.clearAdditionalStoryReferences();
+    topic.clearCanonicalStoryReferences();
+    topic.clearUncategorizedSkills();
+    topic.clearSubtopics();
 
-    this._canonicalStoryReferences = otherTopic.getCanonicalStoryReferences();
-    this._additionalStoryReferences =
+    topic._canonicalStoryReferences = otherTopic.getCanonicalStoryReferences();
+    topic._additionalStoryReferences =
         otherTopic.getAdditionalStoryReferences();
 
     let uncategorizedSkillSummaries =
         otherTopic.getUncategorizedSkillSummaries();
     for (let i = 0; i < uncategorizedSkillSummaries.length; i++) {
-      this.addUncategorizedSkill(
+      topic.addUncategorizedSkill(
         uncategorizedSkillSummaries[i].getId(),
         uncategorizedSkillSummaries[i].getDescription());
     }
 
-    this._subtopics = cloneDeep(otherTopic.getSubtopics());
+    topic._subtopics = cloneDeep(otherTopic.getSubtopics());
+    return topic;
   }
 
 

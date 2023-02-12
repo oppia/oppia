@@ -72,23 +72,25 @@ export class TopicEditorNavbarComponent {
   }
 
   _validateTopic(): void {
-    this.validationIssues = this.topic.validate();
-    if (this.topicEditorStateService.getTopicWithNameExists()) {
-      this.validationIssues.push(
-        'A topic with this name already exists.');
+    if (this.topic) {
+      this.validationIssues = this.topic.validate();
+      if (this.topicEditorStateService.getTopicWithNameExists()) {
+        this.validationIssues.push(
+          'A topic with this name already exists.');
+      }
+      if (this.topicEditorStateService.getTopicWithUrlFragmentExists()) {
+        this.validationIssues.push(
+          'Topic URL fragment already exists.');
+      }
+      let prepublishTopicValidationIssues = (
+        this.topic.prepublishValidate());
+      let subtopicPrepublishValidationIssues = (
+        [].concat.apply([], this.topic.getSubtopics().map(
+          (subtopic) => subtopic.prepublishValidate())));
+      this.prepublishValidationIssues = (
+        prepublishTopicValidationIssues.concat(
+          subtopicPrepublishValidationIssues));
     }
-    if (this.topicEditorStateService.getTopicWithUrlFragmentExists()) {
-      this.validationIssues.push(
-        'Topic URL fragment already exists.');
-    }
-    let prepublishTopicValidationIssues = (
-      this.topic.prepublishValidate());
-    let subtopicPrepublishValidationIssues = (
-      [].concat.apply([], this.topic.getSubtopics().map(
-        (subtopic) => subtopic.prepublishValidate())));
-    this.prepublishValidationIssues = (
-      prepublishTopicValidationIssues.concat(
-        subtopicPrepublishValidationIssues));
   }
 
   publishTopic(): void {
@@ -267,7 +269,9 @@ export class TopicEditorNavbarComponent {
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicSkillIds = this.topic.getSkillIds();
+    if (this.topic) {
+      this.topicSkillIds = this.topic.getSkillIds();
+    }
     this.discardChangesButtonIsShown = false;
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
