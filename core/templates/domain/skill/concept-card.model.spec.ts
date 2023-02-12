@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for concept-card.model.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { ConceptCardBackendDict, ConceptCard } from 'domain/skill/concept-card.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { WorkedExampleBackendDict, WorkedExample } from 'domain/skill/worked-example.model';
