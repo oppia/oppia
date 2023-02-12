@@ -380,6 +380,7 @@
         "core.platform.bulk_email.mailchimp_bulk_email_services_test",
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
         "core.jobs.io.job_io_test",
-        "core.jobs.io.gcs_io_test"
+        "core.jobs.io.gcs_io_test",
+        "core.jobs.batch_jobs.store_profile_images_to_gcs_jobs_test"
     ]
 }
