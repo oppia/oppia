@@ -57,7 +57,7 @@
   </section>
   <div [hidden]="!(!reviewable && suggestionIsRejected)"
        class="oppia-suggestion-review-message">
-    <strong>Review message: </strong>
+    <strong>Review message:{{authorName}} </strong>
     <div class="oppia-review-message">
       {{reviewMessage}}
     </div>
