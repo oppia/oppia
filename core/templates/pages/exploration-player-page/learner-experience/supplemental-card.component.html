@@ -3,13 +3,9 @@
        class="conversation-skin-help-card help-card-standard e2e-test-conversation-skin-help-card"
        [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
        #helpCard>
-    <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-       [href]="OPPIA_AVATAR_LINK_URL"
-       target="_blank"
-       rel="noopener">
-      <img class="conversation-skin-oppia-avatar"
-           [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
-    </a>
+    <img class="conversation-skin-oppia-avatar"
+         [src]="OPPIA_AVATAR_IMAGE_URL"
+         alt="">
     <button type="button" class="conversation-skin-close-help-card-button e2e-test-close-help-card-button"
             (click)="clearHelpCard()" *ngIf="!helpCardHasContinueButton">
       <i class="fas fa-times"></i>
