@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { Story } from 'domain/story/story-object.model';
+import { Story } from 'domain/story/story.model';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';

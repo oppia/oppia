@@ -23,7 +23,7 @@ import { AlertsService } from 'services/alerts.service';
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { Story } from 'domain/story/story-object.model';
+import { Story } from 'domain/story/story.model';
 import { CuratedExplorationValidationService } from
   'domain/exploration/curated-exploration-validation.service';
 import { ExplorationSummaryBackendApiService } from

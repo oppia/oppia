@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Story } from 'domain/story/story-object.model';
+import { Story } from 'domain/story/story.model';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorNavbarBreadcrumbComponent } from './story-editor-navbar-breadcrumb.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';

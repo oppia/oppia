@@ -19,8 +19,8 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
-import { Story } from 'domain/story/story-object.model';
-import { StoryBackendDict } from 'domain/story/story-object.model';
+import { Story } from 'domain/story/story.model';
+import { StoryBackendDict } from 'domain/story/story.model';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';

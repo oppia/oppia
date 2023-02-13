@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the story editor navbar component.
  */
 
-import { Story, StoryBackendDict } from 'domain/story/story-object.model';
+import { Story, StoryBackendDict } from 'domain/story/story.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';

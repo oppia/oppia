@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { Story } from 'domain/story/story-object.model';
+import { Story } from 'domain/story/story.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { FaviconService } from 'services/favicon.service';
 import { LocalStorageService } from 'services/local-storage.service';

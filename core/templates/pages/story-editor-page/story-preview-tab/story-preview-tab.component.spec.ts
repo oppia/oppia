@@ -21,7 +21,7 @@ import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-import { Story } from 'domain/story/story-object.model';
+import { Story } from 'domain/story/story.model';
 import { StoryPreviewTabComponent } from './story-preview-tab.component';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';

@@ -16,7 +16,7 @@
  * @fileoverview Tests for Story model class.
  */
 
-import { Story } from 'domain/story/story-object.model';
+import { Story } from 'domain/story/story.model';
 
 describe('Story object factory', () => {
   let _sampleStory: Story;

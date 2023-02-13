@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { Story, StoryBackendDict } from 'domain/story/story-object.model';
+import { Story, StoryBackendDict } from 'domain/story/story.model';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
