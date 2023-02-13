@@ -15,14 +15,31 @@
   </oppia-skill-selector>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-success e2e-test-confirm-skill-selection-button"
-          (click)="confirm()">
-    Done
-  </button>
-  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <div>
+    <span [matTooltip]="errorMessage"
+          matTooltipClass="oppia-mat-tooltip-list"
+          [matTooltipDisabled]="isSaveButtonEnabled()"
+          class="w-100">
+      <button class="btn btn-success e2e-test-confirm-skill-selection-button"
+              (click)="confirm()"
+              [disabled]="!isSaveButtonEnabled()">
+        Done
+        <i class="fas fa-exclamation-triangle story-save-draft-warning"
+           *ngIf="!isSaveButtonEnabled()">
+        </i>
+      </button>
+    </span>
+    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  </div>
 </div>
 
 <style>
+  .btn-success {
+    margin: 2px;
+  }
+  .btn-secondary {
+    margin: 2px;
+  }
   @media screen and (max-width: 768px) {
     .skill-select-modal .modal-dialog {
       border: 0;

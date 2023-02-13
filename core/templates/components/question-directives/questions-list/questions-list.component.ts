@@ -93,6 +93,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   showDifficultyChoices: boolean;
   skillLinkageModificationsArray: SkillLinkageModificationsArray[];
   directiveSubscriptions = new Subscription();
+  MAX_SKILLS_PER_QUESTION: number = AppConstants.MAX_SKILLS_PER_QUESTION;
 
   constructor(
     private alertsService: AlertsService,
@@ -312,7 +313,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     this.skillLinkageModificationsArray.push({
       id: skillId,
-      task: 'remove'
+      task: 'remove',
+      difficulty: this.difficulty
     } as SkillLinkageModificationsArray);
 
     this.associatedSkillSummaries =
@@ -376,6 +378,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       allowSkillsFromOtherTopics);
     modalRef.componentInstance.untriagedSkillSummaries = (
       this.untriagedSkillSummaries);
+    modalRef.componentInstance.associatedSkillSummaries = (
+      this.associatedSkillSummaries);
 
     modalRef.result.then((summary) => {
       for (let idx in this.associatedSkillSummaries) {

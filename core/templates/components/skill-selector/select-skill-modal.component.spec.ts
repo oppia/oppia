@@ -26,6 +26,8 @@ import { CategorizedSkills, SelectSkillModalComponent } from './select-skill-mod
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { MaterialModule } from 'modules/material.module';
 
 
 describe('Select Skill Modal', () => {
@@ -54,6 +56,8 @@ describe('Select Skill Modal', () => {
     skillSummaryBackendDict
   ];
   let skillSummaries: SkillSummaryBackendDict[] = [skillSummaryBackendDict];
+  let associatedSkillSummaries: ShortSkillSummary[];
+
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -61,6 +65,7 @@ describe('Select Skill Modal', () => {
         MatCardModule,
         MatRadioModule,
         MatCheckboxModule,
+        MaterialModule,
         FormsModule,
         HttpClientTestingModule
       ],
@@ -82,6 +87,7 @@ describe('Select Skill Modal', () => {
     componentInstance.skillsInSameTopicCount = skillsInSameTopicCount;
     componentInstance.skillSummaries = skillSummaries;
     componentInstance.untriagedSkillSummaries = untriagedSkillSummaries;
+    componentInstance.associatedSkillSummaries = associatedSkillSummaries;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
@@ -111,5 +117,25 @@ describe('Select Skill Modal', () => {
   it('should set selected skill id', () => {
     componentInstance.setSelectedSkillId('skill_id');
     expect(componentInstance.selectedSkillId).toEqual('skill_id');
+  });
+
+  it('should disable Save button if skill is already linked', () => {
+    componentInstance.associatedSkillSummaries = [
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: 'skillId1',
+        skill_description: 'Skill Description'
+      }),
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: 'skillId2',
+        skill_description: 'Skill Description'
+      })
+    ];
+
+    componentInstance.setSelectedSkillId('skillId1');
+    expect(componentInstance.isSaveButtonEnabled()).toBe(false);
+
+    // Selecting a skill which is not already linked.
+    componentInstance.setSelectedSkillId('skillId3');
+    expect(componentInstance.isSaveButtonEnabled()).toBe(true);
   });
 });

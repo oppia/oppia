@@ -914,7 +914,8 @@ describe('Questions List Component', () => {
     expect(component.skillLinkageModificationsArray).toEqual([
       {
         id: '1',
-        task: 'remove'
+        task: 'remove',
+        difficulty: component.difficulty
       } as SkillLinkageModificationsArray
     ]);
   });
