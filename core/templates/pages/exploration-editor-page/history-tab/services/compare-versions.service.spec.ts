@@ -117,12 +117,6 @@ describe('Compare versions service', () => {
         next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
         card_is_checkpoint: true
       };
       // This throws "Argument of type 'null' is not assignable to parameter of
@@ -224,7 +218,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'B'
+      state_name: 'B',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }],
     version_number: 5,
     committer_id: 'admin',
@@ -264,7 +260,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'B'
+      state_name: 'B',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }],
     version_number: 8,
     committer_id: 'admin',
@@ -284,7 +282,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'B'
+      state_name: 'B',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }],
     version_number: 10,
     committer_id: 'admin',
@@ -740,7 +740,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'B'
+      state_name: 'B',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }],
     version_number: 2,
     committer_id: 'admin',
@@ -791,7 +793,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'D'
+      state_name: 'D',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1'
     }],
     version_number: 7,
     committer_id: 'admin',
@@ -1040,7 +1044,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'B'
+      state_name: 'B',
+      content_id_for_state_content: 'content_5',
+      content_id_for_default_outcome: 'default_outcome_6'
     }],
     version_number: 2,
     committer_id: 'admin',
@@ -1050,7 +1056,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'C'
+      state_name: 'C',
+      content_id_for_state_content: 'content_7',
+      content_id_for_default_outcome: 'default_outcome_8'
     }],
     version_number: 3,
     committer_id: 'admin',
@@ -1119,7 +1127,9 @@ describe('Compare versions service', () => {
     commit_type: 'edit',
     commit_cmds: [{
       cmd: 'add_state',
-      state_name: 'D'
+      state_name: 'D',
+      content_id_for_state_content: 'content_3',
+      content_id_for_default_outcome: 'default_outcome_9'
     }],
     version_number: 8,
     committer_id: 'admin',
