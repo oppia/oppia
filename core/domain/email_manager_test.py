@@ -6112,6 +6112,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL: Final = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
+    SUBMIT_QUESTION_EMAIL: Final = 'submitquestion@example.com'
 
     def setUp(self) -> None:
         super().setUp()
@@ -6119,6 +6120,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
+        self.signup(self.SUBMIT_QUESTION_EMAIL , 'questioner')
 
         self.translation_reviewer_id = self.get_user_id_from_email(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -6132,6 +6134,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.QUESTION_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.question_reviewer_id, True, False, False, False)
+        self.submit_question_id = self.get_user_id_from_email(
+            self.SUBMIT_QUESTION_EMAIL)
+        user_services.update_email_preferences(
+            self.submit_question_id, True, False, False, False)
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -6146,6 +6152,17 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 self.translation_reviewer_id,
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
                 language_code='hi')
+
+        messages = self._get_sent_email_messages(
+            self.TRANSLATION_REVIEWER_EMAIL)
+        self.assertEqual(len(messages), 0)
+
+    def test_assign_submit_question_email_for_can_send_emails_is_false(
+        self
+    ) -> None:
+        with self.can_not_send_emails_ctx:
+            email_manager.send_email_to_new_contribution_submit_questions(
+                self.submit_question_id)
 
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -6333,6 +6350,49 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 sent_email_model.recipient_id, self.question_reviewer_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.QUESTION_REVIEWER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+    
+    def test_send_assigned_submit_questioner_email(self) -> None:
+        expected_email_subject = ('You have been invited at Oppia to submit questions')
+
+        expected_email_html_body = (
+            'Hi questioner,<br><br>'
+            'This is to let you know that the Oppia team has granted you '
+            'the rights to submit questions.<br><br>'
+            'Link to the '
+            '<a href="https://www.oppia.org/contributor-dashboard">'
+            'Contributor Dashboard</a>.<br><br>'
+            'Thanks, and happy contributing!<br><br>'
+            'Best wishes,<br>'
+            'The Oppia Community')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_email_to_new_contribution_submit_questions(
+                self.submit_question_id)
+
+            # Make sure correct email is sent.
+            messages = self._get_sent_email_messages(
+                self.SUBMIT_QUESTION_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models: Sequence[
+                email_models.SentEmailModel
+            ] = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.submit_question_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.SUBMIT_QUESTION_EMAIL)
             self.assertEqual(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
