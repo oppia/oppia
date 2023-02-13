@@ -16,8 +16,9 @@
  * @fileoverview Utility File for declaring and initializing users.
  */
 
-let e2eSuperAdmin = e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser =
-  require('../user-utilities/blog-post-admin-utils.js');
+let e2eSuperAdmin = require('../user-utilities/super-admin-utils.js');
+let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
+  '../user-utilities/blog-post-admin-utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
@@ -38,7 +39,7 @@ let createNewSuperAdmin = async function(username) {
     return superAdminInstance;
   }
 
-  const superAdmin = await new e2eSuperAdmin();
+  const superAdmin = new e2eSuperAdmin();
   await superAdmin.openBrowser();
   await superAdmin.signUpNewUser(username, 'testadmin@example.com');
 
@@ -58,7 +59,7 @@ let createNewBlogAdmin = async function(username) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
 
-  const blogAdmin = await new e2eBlogAdmin();
+  const blogAdmin = new e2eBlogAdmin();
   await blogAdmin.openBrowser();
   await blogAdmin.signUpNewUser(username, 'blog_admin@example.com');
 
@@ -78,7 +79,7 @@ let createNewBlogAdmin = async function(username) {
 let createNewBlogPostEditor = async function(username) {
   const blogAdmin = await createNewBlogAdmin('blogAdm');
 
-  const blogPostEditor = await new e2eBlogPostEditor();
+  const blogPostEditor = new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
   await blogPostEditor.signUpNewUser(
     username, 'blog_post_editor@example.com');
@@ -99,7 +100,7 @@ let createNewBlogPostEditor = async function(username) {
  * @returns The guest user instance created.
  */
 let createNewGuestUser = async function(username, email) {
-  const guestUser = await new e2eGuestUser();
+  const guestUser = new e2eGuestUser();
   await guestUser.openBrowser();
   await guestUser.signUpNewUser(username, email);
 

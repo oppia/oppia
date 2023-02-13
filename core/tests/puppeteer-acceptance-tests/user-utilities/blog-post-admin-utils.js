@@ -16,7 +16,7 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-const puppeteerUtilities = require(
+const baseUser = require(
   '../puppeteer-testing-utilities/puppeteer-utils.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
@@ -44,7 +44,7 @@ const LABEL_FOR_CONFIRM_BUTTON = ' Confirm ';
 const LABEL_FOR_ADD_THUMBNAIL_BUTTON = ' Add Thumbnail Image ';
 const LABEL_FOR_ADD_ELEMENT_BUTTON = ' Add element ';
 
-module.exports = class e2eBlogPostAdmin extends puppeteerUtilities {
+module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
    * Function for adding blog post author bio in blog dashboard.
    */
