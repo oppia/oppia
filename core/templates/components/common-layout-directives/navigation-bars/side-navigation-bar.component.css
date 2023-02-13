@@ -40,6 +40,8 @@
   width: 22px;
 }
 .oppia-sidebar-menu ul {
+  overflow: scroll;
+  height: 90vh;
   font-size: 16px;
   list-style: none;
   margin-bottom: 0;
