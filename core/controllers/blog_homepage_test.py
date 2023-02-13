@@ -342,6 +342,24 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             expected_status_int=404
         )
 
+    def test_raise_exception_if_blog_post_url_is_invalid(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        # Blog post URL fragment is exceeding max character limit.
+        self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_HOMEPAGE_DATA_URL,
+                'aa' * feconf.MAX_CHARS_IN_BLOG_POST_URL
+            ),
+            expected_status_int=400
+        )
+        # Blog post URL fragment fails minimum character validation.
+        self.get_json(
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, 'aa'),
+            expected_status_int=400
+        )
+
 
 class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     """Checks that the author data and related blog summary cards are
