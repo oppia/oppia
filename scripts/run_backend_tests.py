@@ -368,6 +368,7 @@ def check_test_results(
     """Run tests and parse coverage reports."""
     coverage_exclusions = load_coverage_exclusion_list(
         COVERAGE_EXCLUSION_LIST_PATH)
+
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0

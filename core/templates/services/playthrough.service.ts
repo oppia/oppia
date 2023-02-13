@@ -254,7 +254,6 @@ export class PlaythroughService {
       this.misTracker.recordStateTransition(destStateName);
       this.cstTracker.recordStateTransition(destStateName);
     }
-
     this.misTracker.recordStateTransition(destStateName);
     this.cstTracker.recordStateTransition(destStateName);
   }
@@ -372,8 +371,8 @@ export class PlaythroughService {
       // codebase is strictly typed. And if check is needed, means we are
       // actually passes null then add proper comment to explain why we are
       // doing this check.
-      // Playthroughs are only helpful in their entirety.
       this.recordedLearnerActions &&
+      // Playthroughs are only helpful in their entirety.
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
       this.recordedLearnerActions.some(
