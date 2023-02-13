@@ -26,7 +26,7 @@ import { MathEquationInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
-  'domain/exploration/rule-object.model';
+  'domain/exploration/rule.model';
 import { MathEquationInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 

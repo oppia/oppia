@@ -20,7 +20,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/Answer
 import { AppConstants } from 'app.constants';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PencilCodeEditorValidationService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
-import { Rule, RuleInputs } from 'domain/exploration/rule-object.model';
+import { Rule, RuleInputs } from 'domain/exploration/rule.model';
 import { TestBed } from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {

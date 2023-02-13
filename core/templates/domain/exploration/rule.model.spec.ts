@@ -17,7 +17,7 @@
  */
 
 import { RuleBackendDict, RuleInputs, Rule } from
-  'domain/exploration/rule-object.model';
+  'domain/exploration/rule.model';
 
 describe('Rule', () => {
   let ruleBackendDict: RuleBackendDict;

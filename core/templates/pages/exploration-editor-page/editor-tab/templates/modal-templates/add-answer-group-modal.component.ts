@@ -29,7 +29,7 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';

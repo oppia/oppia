@@ -24,7 +24,7 @@ import { DragAndDropSortInputValidationService } from 'interactions/DragAndDropS
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
-  'domain/exploration/rule-object.model';
+  'domain/exploration/rule.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 

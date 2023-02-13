@@ -24,7 +24,7 @@ import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import { TestBed } from '@angular/core/testing';
 import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { FractionDict } from 'domain/objects/fraction.model';

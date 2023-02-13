@@ -20,7 +20,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import isEqual from 'lodash/isEqual';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';

@@ -22,7 +22,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/Answer
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { TextInputValidationService, Validator } from 'interactions/TextInput/directives/text-input-validation.service';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';

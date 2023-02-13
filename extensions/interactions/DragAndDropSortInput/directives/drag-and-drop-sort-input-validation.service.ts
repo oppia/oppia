@@ -29,7 +29,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 
 @Injectable({
   providedIn: 'root'

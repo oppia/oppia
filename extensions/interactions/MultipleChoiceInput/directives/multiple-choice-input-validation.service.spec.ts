@@ -25,7 +25,7 @@ import { MultipleChoiceInputCustomizationArgs } from
 import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 

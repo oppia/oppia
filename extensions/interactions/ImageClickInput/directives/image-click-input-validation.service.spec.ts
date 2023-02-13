@@ -25,7 +25,7 @@ import { ImageClickInputCustomizationArgs } from
 import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 
 import { AppConstants } from 'app.constants';
 

@@ -25,7 +25,7 @@ import { AnswerStats } from
 import { AnswerStatsBackendDict } from
   'domain/exploration/visualization-info.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
 import { StateTopAnswersStatsService } from

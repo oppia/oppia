@@ -23,7 +23,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { AppConstants } from 'app.constants';
 import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import { Unit } from 'interactions/answer-defs';
 import { Fraction, FractionDict } from 'domain/objects/fraction.model';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';

@@ -23,7 +23,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import { AppConstants } from 'app.constants';

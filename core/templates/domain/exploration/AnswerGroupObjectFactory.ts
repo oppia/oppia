@@ -24,7 +24,7 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleBackendDict } from
-  'domain/exploration/rule-object.model';
+  'domain/exploration/rule.model';
 import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface AnswerGroupBackendDict {

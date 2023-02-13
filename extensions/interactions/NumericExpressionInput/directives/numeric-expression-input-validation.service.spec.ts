@@ -26,7 +26,7 @@ import { NumericExpressionInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
-  'domain/exploration/rule-object.model';
+  'domain/exploration/rule.model';
 import { NumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { SubtitledUnicode } from

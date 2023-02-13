@@ -26,7 +26,7 @@ import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule-object.model';
+import { Rule } from 'domain/exploration/rule.model';
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
