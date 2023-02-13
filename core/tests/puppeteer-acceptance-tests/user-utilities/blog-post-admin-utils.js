@@ -34,6 +34,9 @@ const maximumTagLimitInput = 'input#mat-input-0';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
+const toastWarningMessageForDuplicateBlogPostTitle = ' Blog Post with the' +
+  ' given title exists already. Please use a different title. ';
+const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = ' CREATE NEW BLOG POST ';
 const LABEL_FOR_SAVE_BUTTON = ' Save ';
@@ -125,7 +128,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks if the Publish button is disabled.
    */
   async expectPublishButtonToBeDisabled() {
-    await this.page.waitForSelector('button.e2e-test-publish-blog-post-button');
+    await this.page.waitForSelector(publishBlogPostButton);
     await this.page.evaluate(() => {
       const publishedButtonIsDisabled = document.getElementsByClassName(
         'e2e-test-publish-blog-post-button')[0].disabled;
@@ -170,11 +173,29 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
     await this.page.waitForSelector(
-      'button.e2e-test-publish-blog-post-button:not([disabled])');
+      `${publishBlogPostButton}:not([disabled])`);
     await this.clickOn('PUBLISH');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
     showMessage('Successfully published a blog post!');
+  }
+
+  /**
+   * This function creates a new blog post with given title.
+   * @param {string} newBlogPostTitle - The title of the blog post.
+   */
+  async createNewBlogPostWithTitle(newBlogPostTitle) {
+    await this.clickOn('NEW POST');
+    await this.clickOn('button.mat-button-toggle-button');
+    await this.clickOn(thumbnailPhotoBox);
+    await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
+    await this.page.waitForSelector('body.modal-open', {hidden: true});
+
+    await this.type(blogTitleInput, newBlogPostTitle);
+    await this.page.keyboard.press('Tab');
+    await this.type(blogBodyInput, 'test blog post body content - duplicate');
+    await this.clickOn(LABEL_FOR_DONE_BUTTON);
   }
 
   /**
@@ -210,6 +231,27 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
         }
       }
     }, blogPostTitle);
+  }
+
+  /**
+   * This function checks that the publish button is disabled if blog post
+   * with same title already exists.
+   */
+  async expectUserUnableToPublishBlogPost() {
+    const toastMessageBox = await this.page.$(
+      'div.e2e-test-toast-warning-message');
+    const toastMessageWarning = await this.page.evaluate(
+      el => el.textContent, toastMessageBox);
+    const isPublishButtonDisabled = await this.page.$eval(
+      publishBlogPostButton, (button) => {
+        return button.disabled;
+      });
+    if (!isPublishButtonDisabled ||
+        toastWarningMessageForDuplicateBlogPostTitle !== toastMessageWarning) {
+      throw new Error('User is able to publish duplicate blog post');
+    }
+
+    showMessage('User is not able to publish blog post if title duplicates');
   }
 
   /**
