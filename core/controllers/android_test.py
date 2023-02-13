@@ -273,6 +273,30 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 classroom.to_dict()
             )
 
+
+    def test_get_classroom_with_version_returns_error(self) -> None:
+        classroom_id = classroom_config_services.get_new_classroom_id()
+
+        classroom_dict: classroom_config_domain.ClassroomDict = {
+            'classroom_id': classroom_id,
+            'name': 'Math',
+            'url_fragment': 'math',
+            'course_details': '',
+            'topic_list_intro': '',
+            'topic_id_to_prerequisite_topic_ids': {}
+        }
+
+        classroom = classroom_config_domain.Classroom.from_dict(
+            classroom_dict)
+
+        classroom_config_services.update_or_create_classroom_model(classroom)
+        with self.secrets_swap:
+            self.get_json(
+                '/android_data/secret?activity_type=classroom&'
+                'activity_id=math&version=2',
+                expected_status_int=400
+            )
+
     def test_get_topic_returns_correct_json(self) -> None:
         topic = self.save_new_topic('topic_id', 'user_id')
         with self.secrets_swap:
