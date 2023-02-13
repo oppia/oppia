@@ -422,7 +422,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 run_backend_tests.check_test_results(
                     tasks, task_to_taskspec, True)
             )[2]
-        self.assertEqual(incomplete_coverage, 1)
+        self.assertEqual(incomplete_coverage, 0)
 
     def test_incomplete_coverage_is_displayed_correctly(self) -> None:
         with self.swap_install_third_party_libs:
