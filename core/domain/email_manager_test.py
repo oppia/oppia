@@ -6120,7 +6120,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
-        self.signup(self.SUBMIT_QUESTION_EMAIL , 'questioner')
+        self.signup(self.SUBMIT_QUESTION_EMAIL, 'questioner')
 
         self.translation_reviewer_id = self.get_user_id_from_email(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -6357,9 +6357,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
-    
+
     def test_send_assigned_submit_questioner_email(self) -> None:
-        expected_email_subject = ('You have been invited at Oppia to submit questions')
+        expected_email_subject = (
+            'You have been invited at Oppia to submit questions')
 
         expected_email_html_body = (
             'Hi questioner,<br><br>'
