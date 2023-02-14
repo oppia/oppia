@@ -55,7 +55,9 @@ export class ContributorDashboardPageComponent
   languageCode!: string;
   topicName!: string;
   activeTabName!: string;
-  username!: string;
+  // The following property is set to null when the
+  // user is not logged in.
+  username: string | null = null;
 
   constructor(
     private contributionAndReviewService: ContributionAndReviewService,
@@ -187,29 +189,22 @@ export class ContributorDashboardPageComponent
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userInfoIsLoading = false;
+      this.profilePictureWebpDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.profilePicturePngDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       if (userInfo.isLoggedIn()) {
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
         if (this.username !== null) {
           [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
             this.userService.getProfileImageDataUrl(this.username));
-        } else {
-          this.profilePictureWebpDataUrl = (
-            this.urlInterpolationService.getStaticImageUrl(
-              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-          this.profilePicturePngDataUrl = (
-            this.urlInterpolationService.getStaticImageUrl(
-              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
         }
       } else {
         this.userIsLoggedIn = false;
         this.username = '';
-        this.profilePictureWebpDataUrl = (
-          this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-        this.profilePicturePngDataUrl = (
-          this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       }
     });
 
