@@ -129,7 +129,6 @@ export class TutorCardComponent {
   isIframed!: boolean;
   getCanAskLearnerForAnswerInfo!: () => boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
-  OPPIA_AVATAR_LINK_URL!: string | null;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
   directiveSubscriptions = new Subscription();
@@ -199,7 +198,6 @@ export class TutorCardComponent {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService
         .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
-    this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
 
     this.directiveSubscriptions.add(
       this.explorationPlayerStateService.onOppiaFeedbackAvailable.subscribe(
