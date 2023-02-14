@@ -16,6 +16,7 @@
  * @fileoverview Component for the contributor dashboard page.
  */
 
+import { AppConstants } from 'app.constants';
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
