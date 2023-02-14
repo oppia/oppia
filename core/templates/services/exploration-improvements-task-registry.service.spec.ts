@@ -139,16 +139,9 @@ describe('Exploration improvements task registrar service', () => {
         id: 'TextInput'
       },
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
-      card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
+      card_is_checkpoint: false
     };
 
     stateStatsBackendDict = {
@@ -226,7 +219,6 @@ describe('Exploration improvements task registrar service', () => {
       issue_description: '20% of learners dropped at this state',
       status: 'open',
       resolver_username: null,
-      resolver_profile_picture_data_url: null,
       resolved_on_msecs: null,
     };
 

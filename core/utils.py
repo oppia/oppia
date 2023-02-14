@@ -59,10 +59,6 @@ T = TypeVar('T')
 TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
-# TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
-# These will be removed after python3 migration and adding stubs for new python3
-# libraries.
-
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""
@@ -409,10 +405,10 @@ def convert_png_binary_to_webp_binary(png_binary: bytes) -> bytes:
     Returns:
         bytes. The binary content of webp.
     """
-    output = io.BytesIO()
-    image = Image.open(io.BytesIO(png_binary)).convert('RGB')
-    image.save(output, 'webp')
-    return output.getvalue()
+    with io.BytesIO() as output:
+        image = Image.open(io.BytesIO(png_binary)).convert('RGB')
+        image.save(output, 'webp')
+        return output.getvalue()
 
 
 def convert_data_url_to_binary(

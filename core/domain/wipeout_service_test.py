@@ -40,6 +40,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_domain
@@ -2653,11 +2654,13 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_1_ID,
             self.user_1_id,
-            self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
@@ -2779,11 +2782,13 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, question_mappings[self.QUESTION_1_ID])
 
     def test_multiple_questions_are_pseudonymized(self) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_2_ID,
             self.user_1_id,
-            self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
 
         wipeout_service.delete_user(
@@ -2826,11 +2831,13 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
     def test_multiple_questions_with_multiple_users_are_pseudonymized(
         self
     ) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_2_ID,
             self.user_2_id,
-            self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
 
         wipeout_service.delete_user(
@@ -2999,17 +3006,21 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_1_ID,
             self.user_1_id,
-            self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
+        content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.QUESTION_2_ID,
             self.user_2_id,
-            self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            self._create_valid_question_data('ABC', content_id_generator),
+            [self.SKILL_1_ID],
+            content_id_generator.next_content_id_index
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
@@ -5729,46 +5740,77 @@ class WipeoutServiceVerifyProfilePictureIsDeletedTests(
         self.webp_binary = utils.convert_png_binary_to_webp_binary(
             self.png_binary)
 
-        self.fs_1 = fs_services.GcsFileSystem(
+        self.file_system_for_user_1 = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, self.USER_1_USERNAME)
-        self.fs_1.commit(self.filename_png, self.png_binary)
-        self.fs_1.commit(self.filename_webp, self.webp_binary)
+        self.file_system_for_user_1.commit(self.filename_png, self.png_binary)
+        self.file_system_for_user_1.commit(self.filename_webp, self.webp_binary)
 
-        self.fs_2 = fs_services.GcsFileSystem(
+        self.file_system_for_user_2 = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_USER, self.USER_2_USERNAME)
-        self.fs_2.commit(self.filename_png, self.png_binary)
-        self.fs_2.commit(self.filename_webp, self.webp_binary)
+        self.file_system_for_user_2.commit(self.filename_png, self.png_binary)
+        self.file_system_for_user_2.commit(self.filename_webp, self.webp_binary)
 
     def test_profile_picture_is_removed(self) -> None:
-        self.assertTrue(self.fs_1.isfile(self.filename_png))
-        self.assertTrue(self.fs_1.isfile(self.filename_webp))
+        self.assertTrue(self.file_system_for_user_1.isfile(self.filename_png))
+        self.assertTrue(self.file_system_for_user_1.isfile(self.filename_webp))
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-        self.assertFalse(self.fs_1.isfile(self.filename_png))
-        self.assertFalse(self.fs_1.isfile(self.filename_webp))
+        self.assertFalse(self.file_system_for_user_1.isfile(self.filename_png))
+        self.assertFalse(self.file_system_for_user_1.isfile(self.filename_webp))
 
-    def test_log_error_when_profile_pictures_are_missing(self) -> None:
+    def test_log_error_when_profile_pictures_are_missing_while_deletion(
+        self
+    ) -> None:
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            wipeout_service.pre_delete_user(self.user_2_id)
+            self.process_and_flush_pending_tasks()
+            self.file_system_for_user_2.delete(self.filename_png)
+            wipeout_service.delete_user(
+                wipeout_service.get_pending_deletion_request(self.user_2_id))
+            self.file_system_for_user_2.commit(
+                self.filename_png, self.png_binary)
+            wipeout_service.delete_user(
+                wipeout_service.get_pending_deletion_request(self.user_2_id))
+            self.file_system_for_user_2.commit(
+                self.filename_webp, self.webp_binary)
+
+        self.assertEqual(
+            logs,
+            [
+                '[WIPEOUT] Profile picture of username username2 in .png '
+                'format does not exists.',
+                '[WIPEOUT] Profile picture of username username2 in .webp '
+                'format does not exists.'
+            ]
+        )
+
+    def test_log_error_when_profile_pictures_are_missing_while_verification(
+        self
+    ) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             wipeout_service.pre_delete_user(self.user_2_id)
             self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_2_id))
-            self.fs_2.commit(self.filename_png, self.png_binary)
+            self.file_system_for_user_2.commit(
+                self.filename_png, self.png_binary)
             self.assertFalse(wipeout_service.verify_user_deleted(
                 self.user_2_id))
-            self.assertEqual(
-                logs[0], (
-                    '[WIPEOUT] Profile picture in .png format is not deleted '
-                    'for user having username username2.'))
-            self.fs_2.delete(self.filename_png)
+            self.file_system_for_user_2.delete(self.filename_png)
+            self.file_system_for_user_2.commit(
+                self.filename_webp, self.webp_binary)
+            self.assertFalse(wipeout_service.verify_user_deleted(
+                self.user_2_id))
 
-            self.fs_2.commit(self.filename_webp, self.webp_binary)
-            self.assertFalse(wipeout_service.verify_user_deleted(
-                self.user_2_id))
-            self.assertEqual(
-                logs[1], (
-                    '[WIPEOUT] Profile picture in .webp format is not deleted '
-                    'for user having username username2.'))
+        self.assertEqual(
+            logs,
+            [
+                '[WIPEOUT] Profile picture in .png format is not deleted '
+                'for user having username username2.',
+                '[WIPEOUT] Profile picture in .webp format is not deleted '
+                'for user having username username2.'
+            ]
+        )

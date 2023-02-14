@@ -8,8 +8,13 @@
 </ng-template>
 
 <div class="conversation-skin-learner-answer-container">
-  <img class="conversation-skin-user-avatar rounded-circle"
-       [src]="decodedProfilePicture ? decodedProfilePicture : ''" alt="">
+  <picture>
+    <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+    <source type="image/png" [srcset]="profilePicturePngDataUrl">
+    <img [src]="profilePicturePngDataUrl"
+         class="conversation-skin-user-avatar rounded-circle"
+         alt="User profile picture">
+  </picture>
   <div *ngIf="!data.isHint">
     <div dir="auto" *ngIf="getShortAnswerHtml()"
          [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
@@ -32,13 +37,9 @@
 </div>
 
 <div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== '' && feedbackIsEnabled">
-  <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-     [href]="OPPIA_AVATAR_LINK_URL"
-     target="_blank"
-     rel="noopener">
-    <img class="conversation-skin-oppia-avatar rounded-circle"
-         [src]="oppiaAvatarImageUrl" alt="">
-  </a>
+  <img class="conversation-skin-oppia-avatar rounded-circle"
+       [src]="oppiaAvatarImageUrl"
+       alt="">
   <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
        class="e2e-test-input-response-loading-dots">
     <div class="conversation-skin-feedback-dot-one"></div>

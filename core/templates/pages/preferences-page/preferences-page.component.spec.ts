@@ -50,7 +50,6 @@ describe('Preferences Page Component', () => {
     preferred_language_codes: ['en'],
     preferred_site_language_code: 'en',
     preferred_audio_language_code: 'en',
-    profile_picture_data_url: '',
     default_dashboard: 'creator',
     user_bio: 'test user bio',
     subject_interests: '',
@@ -59,7 +58,6 @@ describe('Preferences Page Component', () => {
     can_receive_feedback_message_email: false,
     can_receive_subscription_email: true,
     subscription_list: [{
-      creator_picture_data_url: 'picture_url',
       creator_username: 'creator',
       creator_impact: 0
     }]
@@ -140,6 +138,9 @@ describe('Preferences Page Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     mockWindowRef = TestBed.inject(WindowRef);
     mockUserBackendApiService = TestBed.inject(UserBackendApiService);
+
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   it('should be defined', () => {
@@ -172,8 +173,10 @@ describe('Preferences Page Component', () => {
       preferencesData.subject_interests);
     expect(componentInstance.preferredLanguageCodes).toEqual(
       preferencesData.preferred_language_codes);
-    expect(componentInstance.profilePictureDataUrl).toEqual(
-      preferencesData.profile_picture_data_url);
+    expect(componentInstance.profilePicturePngDataUrl).toEqual(
+      'default-image-url-png');
+    expect(componentInstance.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
     expect(componentInstance.defaultDashboard).toEqual(
       preferencesData.default_dashboard);
     expect(componentInstance.canReceiveEmailUpdates).toEqual(
@@ -191,6 +194,16 @@ describe('Preferences Page Component', () => {
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
+
+  it('should get user profile image png data url correctly', () => {
+    expect(componentInstance.getProfileImagePngDataUrl('username')).toBe(
+      'default-image-url-png');
+  });
+
+  it('should get user profile image webp data url correctly', () => {
+    expect(componentInstance.getProfileImageWebpDataUrl('username')).toBe(
+      'default-image-url-webp');
+  });
 
   it('should get static image url', () => {
     let staticImageUrl = 'static_image_url';

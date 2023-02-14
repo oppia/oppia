@@ -22,6 +22,7 @@ import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupUserInfo } from
   'domain/learner_group/learner-group-user-info.model';
+import { UserService } from 'services/user.service';
 
 import './invite-learners.component.css';
 
@@ -43,9 +44,11 @@ export class InviteLearnersComponent {
 
   searchedUsername: string = '';
   errorMessage!: string;
+  profilePictureUrl!: string;
 
   constructor(
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
+    private userService: UserService
   ) {}
 
   updateInvitedLearners(): void {
@@ -89,8 +92,16 @@ export class InviteLearnersComponent {
     this.updateInvitedLearners();
   }
 
-  getProfileImageDataUrl(dataUrl: string): string {
-    return decodeURIComponent(dataUrl);
+  getProfileImagePngDataUrl(username: string): string {
+    let [pngImageUrl,] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    let [, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
   }
 }
 

@@ -392,9 +392,19 @@ def _delete_profile_picture(username: str) -> None:
     filename_webp = 'profile_picture.webp'
     if fs.isfile(filename_png):
         fs.delete(filename_png)
+    else:
+        logging.error(
+            '%s Profile picture of username %s in .png format does not exists.'
+            % (WIPEOUT_LOGS_PREFIX, username)
+        )
 
     if fs.isfile(filename_webp):
         fs.delete(filename_webp)
+    else:
+        logging.error(
+            '%s Profile picture of username %s in .webp format does not '
+            'exists.' % (WIPEOUT_LOGS_PREFIX, username)
+        )
 
 
 def delete_user(
@@ -513,19 +523,21 @@ def _verify_profile_picture_is_deleted(username: str) -> bool:
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'
+    all_profile_images_deleted = True
     if fs.isfile(filename_png):
         logging.error(
             '%s Profile picture in .png format is not deleted for user having '
             'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
         )
-        return False
+        all_profile_images_deleted = False
     elif fs.isfile(filename_webp):
         logging.error(
             '%s Profile picture in .webp format is not deleted for user having '
             'username %s.' % (WIPEOUT_LOGS_PREFIX, username)
         )
-        return False
-    return True
+        all_profile_images_deleted = False
+
+    return all_profile_images_deleted
 
 
 def verify_user_deleted(

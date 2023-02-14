@@ -173,7 +173,6 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GraphDetailService } from
   'interactions/GraphInput/directives/graph-detail.service';
 import { GraphInputRulesService } from
@@ -325,8 +324,6 @@ import { PredictionAlgorithmRegistryService } from
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
-import { ProfileLinkImageBackendApiService } from
-  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
@@ -405,9 +402,6 @@ import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 import { StateNameService } from
   'components/state-editor/state-editor-properties-services/state-name.service';
-import { StateNextContentIdIndexService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateParamChangesService } from
   // eslint-disable-next-line max-len
@@ -863,9 +857,6 @@ export class UpgradedServices {
     upgradedServices['StateInteractionIdService'] =
       new StateInteractionIdService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
-    upgradedServices['StateNextContentIdIndexService'] =
-      new StateNextContentIdIndexService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StatePropertyService'] = new StatePropertyService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateRecordedVoiceoversService'] =
@@ -993,9 +984,6 @@ export class UpgradedServices {
       new ExplorationStatsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['GenerateContentIdService'] =
-     new GenerateContentIdService(
-       upgradedServices['StateNextContentIdIndexService']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],
@@ -1031,7 +1019,8 @@ export class UpgradedServices {
       new ProfilePageBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient'],
-        upgradedServices['UrlService']);
+        upgradedServices['UrlService'],
+        upgradedServices['UserService']);
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
@@ -1119,6 +1108,8 @@ export class UpgradedServices {
       new UserBackendApiService(
         upgradedServices['HttpClient']);
     upgradedServices['UserService'] = new UserService(
+      upgradedServices['AssetsBackendApiService'],
+      upgradedServices['ImageLocalStorageService'],
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
       upgradedServices['WindowRef'],
@@ -1162,9 +1153,6 @@ export class UpgradedServices {
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['TextInputPredictionService']);
-    upgradedServices['ProfileLinkImageBackendApiService'] =
-      new ProfileLinkImageBackendApiService(
-        upgradedServices['HttpClient']);
     upgradedServices['UserExplorationPermissionsService'] = (
       new UserExplorationPermissionsService(
         upgradedServices['ExplorationPermissionsBackendApiService']));
@@ -1225,8 +1213,7 @@ export class UpgradedServices {
         upgradedServices['InteractionObjectFactory']);
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
-      upgradedServices['ParamChangesObjectFactory'],
-      upgradedServices['WrittenTranslationsObjectFactory']);
+      upgradedServices['ParamChangesObjectFactory']);
 
     // Topological level: 9.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
