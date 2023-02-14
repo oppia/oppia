@@ -82,7 +82,7 @@
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.0.3",
     "htmllint": "^0.8.0",
-    "htmllint-cli": "github:oppia/htmllint-cli#01a8b74",
+    "htmllint-cli": "git+https://github.com/oppia/htmllint-cli#01a8b74",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "^3.5.0",
     "jasmine-spec-reporter": "^7.0.0",
