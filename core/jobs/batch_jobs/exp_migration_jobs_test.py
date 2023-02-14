@@ -194,6 +194,8 @@ class MigrateExplorationJobTests(
     JOB_CLASS = exp_migration_jobs.MigrateExplorationJob
 
     NEW_EXP_ID = 'exp_1'
+    EXP_ID_ONE = 'exp_one'
+    EXP_ID_TWO = 'exp_two'
     EXP_TITLE = 'title'
 
     def test_empty_storage(self) -> None:
@@ -221,9 +223,10 @@ class MigrateExplorationJobTests(
 
     def test_broken_exp_is_not_migrated(self) -> None:
         exploration_rights = rights_domain.ActivityRights(
-            self.NEW_EXP_ID, [feconf.SYSTEM_COMMITTER_ID],
+            self.EXP_ID_ONE, [feconf.SYSTEM_COMMITTER_ID],
             [], [], [])
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
+
         exp_models.ExplorationRightsModel(
             id=exploration_rights.id,
             owner_ids=exploration_rights.owner_ids,
@@ -236,10 +239,9 @@ class MigrateExplorationJobTests(
             first_published_msec=exploration_rights.first_published_msec,
         ).commit(
             feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
-
         exp_model = self.create_model(
             exp_models.ExplorationModel,
-            id=self.NEW_EXP_ID,
+            id=self.EXP_ID_ONE,
             title='title',
             category=' category',
             init_state_name='Introduction',
@@ -249,17 +251,45 @@ class MigrateExplorationJobTests(
             feconf.SYSTEM_COMMITTER_ID, 'Create exploration', [{
                 'cmd': exp_domain.CMD_CREATE_NEW
         }])
+        # Save a valid unmigrated exploration.
+        exp_model = exp_models.ExplorationModel(
+            id=self.EXP_ID_TWO,
+            category=EXP_V46_DICT['category'],
+            title=EXP_V46_DICT['title'],
+            objective=EXP_V46_DICT['objective'],
+            language_code=EXP_V46_DICT['language_code'],
+            tags=EXP_V46_DICT['tags'],
+            blurb=EXP_V46_DICT['blurb'],
+            author_notes=EXP_V46_DICT['author_notes'],
+            states_schema_version=EXP_V46_DICT['states_schema_version'],
+            init_state_name=EXP_V46_DICT['init_state_name'],
+            states=EXP_V46_DICT['states'],
+            auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
+            correctness_feedback_enabled=EXP_V46_DICT[
+                'correctness_feedback_enabled']
+        )
+        rights_manager.create_new_exploration_rights(
+            self.EXP_ID_TWO, feconf.SYSTEM_COMMITTER_ID)
+        exp_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Created new exploration',
+            commit_cmds
+        )
 
+        self.assertEqual(exp_model.states_schema_version, 41)
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'EXP PROCESSED ERROR: "(\'exp_1\', ''ValidationError('
+                    'EXP PROCESSED ERROR: "(\'exp_one\', ''ValidationError('
                     '\'Names should not start or end with whitespace.\'))": 1'
                 )
-            )
+            ),
+            job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1')
         ])
 
-        migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
+        migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_ID_ONE)
+        self.assertEqual(migrated_exp_model.version, 1)
+        migrated_exp_model = exp_models.ExplorationModel.get(self.EXP_ID_TWO)
         self.assertEqual(migrated_exp_model.version, 1)
 
     def create_story_linked_to_exploration(self) -> None:
