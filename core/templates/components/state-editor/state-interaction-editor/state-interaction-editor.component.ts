@@ -33,7 +33,6 @@ import { EditabilityService } from 'services/editability.service';
 import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
 import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
-import { StateNextContentIdIndexService } from '../state-editor-properties-services/state-next-content-id-index.service';
 import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
 import { StateContentService } from '../state-editor-properties-services/state-content.service';
 import { ContextService } from 'services/context.service';
@@ -46,6 +45,7 @@ import { State } from 'domain/state/StateObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 export interface InitializeAnswerGroups {
   interactionId: string;
@@ -94,7 +94,7 @@ export class StateInteractionEditorComponent
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private generateContentIdService: GenerateContentIdService,
     private stateSolutionService: StateSolutionService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
@@ -157,15 +157,6 @@ export class StateInteractionEditorComponent
   }
 
   onCustomizationModalSavePostHook(): void {
-    let nextContentIdIndexHasChanged = (
-      this.stateNextContentIdIndexService.displayed !==
-      this.stateNextContentIdIndexService.savedMemento);
-    if (nextContentIdIndexHasChanged) {
-      this.stateNextContentIdIndexService.saveDisplayedValue();
-      this.onSaveNextContentIdIndex.emit(
-        this.stateNextContentIdIndexService.displayed);
-    }
-
     let hasInteractionIdChanged = (
       this.stateInteractionIdService.displayed !==
       this.stateInteractionIdService.savedMemento);
@@ -183,6 +174,7 @@ export class StateInteractionEditorComponent
       this.stateCustomizationArgsService.displayed
     );
 
+    this.onSaveNextContentIdIndex.emit();
     this.interactionDetailsCacheService.set(
       this.stateInteractionIdService.savedMemento,
       this.stateCustomizationArgsService.savedMemento);
@@ -218,13 +210,6 @@ export class StateInteractionEditorComponent
           windowClass: 'customize-interaction-modal'
         });
 
-      modalRef.componentInstance
-        .showMarkAllAudioAsNeedingUpdateModalIfRequired.subscribe(
-          (value: string[]) => {
-            this.markAllAudioAsNeedingUpdateModalIfRequired.emit(
-              value);
-          });
-
       modalRef.result.then(
         () => {
           this.onCustomizationModalSavePostHook();
@@ -232,7 +217,7 @@ export class StateInteractionEditorComponent
         () => {
           this.stateInteractionIdService.restoreFromMemento();
           this.stateCustomizationArgsService.restoreFromMemento();
-          this.stateNextContentIdIndexService.restoreFromMemento();
+          this.generateContentIdService.revertUnusedContentIdIndex();
         });
     }
   }

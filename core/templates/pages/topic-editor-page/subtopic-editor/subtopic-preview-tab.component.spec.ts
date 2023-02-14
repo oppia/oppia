@@ -19,7 +19,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SubtopicPreviewTab } from './subtopic-preview-tab.component';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';

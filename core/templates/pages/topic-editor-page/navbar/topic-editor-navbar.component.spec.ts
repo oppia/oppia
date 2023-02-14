@@ -25,7 +25,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicRightsBackendApiService, TopicRightsBackendResponse } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';

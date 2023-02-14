@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 

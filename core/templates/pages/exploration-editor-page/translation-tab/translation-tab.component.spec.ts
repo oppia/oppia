@@ -238,7 +238,6 @@ describe('Translation tab component', () => {
           hints: []
         },
         linked_skill_id: null,
-        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         recorded_voiceovers: {
@@ -254,17 +253,9 @@ describe('Translation tab component', () => {
               }
             }
           }
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {
-            }
-          }
         }
       }
-    });
+    }, false);
     fixture.detectChanges();
   });
 

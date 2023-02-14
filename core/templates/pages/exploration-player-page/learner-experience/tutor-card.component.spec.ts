@@ -112,7 +112,7 @@ describe('Tutor card component', () => {
       // the need to test validations. This throws an error only in the
       // frontend tests and not in the frontend.
       // @ts-ignore
-      null), [], null, null, '', null);
+      null), [], null, '', null);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
