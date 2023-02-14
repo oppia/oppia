@@ -120,3 +120,7 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs,  # pylint: disable=protected-access
             expected_state_schema_version_to_html_field_types_to_rule_specs
         )
+
+        rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs[41] = (  # pylint: disable=protected-access
+            specs_from_json_v41
+        )
