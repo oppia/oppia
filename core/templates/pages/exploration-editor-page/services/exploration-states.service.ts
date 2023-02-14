@@ -56,6 +56,7 @@ import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-p
 import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;

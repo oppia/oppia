@@ -256,7 +256,7 @@ export class ContributionAndReviewBackendApiService {
       params.language = language;
     }
     return this.http.get<ContributorCertificateResponse>(
-      url, { params }
+      url, { params } as Object
     ).toPromise();
   }
 }

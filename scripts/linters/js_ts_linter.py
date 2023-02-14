@@ -55,13 +55,6 @@ INJECTABLES_TO_IGNORE: Final = [
     'CanAccessSplashPageGuard',
 ]
 
-FILES_CONTAINING_UNKNOWN_TYPE: List[str] = [
-    # Do this file after removing jQuery from this file.
-    'extensions/objects/templates/svg-editor.component.ts',
-    # Do this file after completing the migration of whole AngularJS to Angular.
-    'extensions/rich_text_components/rte-output-display.component.ts',
-]
-
 
 def _parse_js_or_ts_file(
     filepath: str, file_content: str, comment: bool = False
@@ -436,82 +429,6 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_unknown_type(self) -> concurrent_task_utils.TaskResult:
-        """Prints a list of lint errors if an unknown type is used. Add proper
-        comment before the line with the unknown type if the type is needed.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the
-            lint check.
-        """
-        name = 'Unknown type'
-        error_messages: List[str] = []
-        failed = False
-        ts_files_to_check = self.ts_filepaths
-        for file_path in ts_files_to_check:
-            comment_before_unknown_type = False
-            multiple_line_comment = False
-            # Not showing lint errors for files present in
-            # FILES_CONTAINING_UNKNOWN_TYPE.
-            if file_path in FILES_CONTAINING_UNKNOWN_TYPE:
-                continue
-
-            file_content = self.file_cache.read(file_path)
-            for line_num, line in enumerate(file_content.split('\n')):
-                unknown_type_indexes: List[int] = []
-                # Check if the line has a comment. Skip the line if it has
-                # a comment.
-                if not (line.strip().startswith('//') or multiple_line_comment):
-                    # Allow the use of 'as unknown' type conversion in spec
-                    # files.
-                    if '.spec.ts' in file_path:
-                        unknown_types = [': unknown', '<unknown']
-                        for unknown_type in unknown_types:
-                            unknown_type_object = re.finditer(
-                                pattern=unknown_type, string=line)
-                            unknown_type_indexes.extend([
-                                index.start() for index in unknown_type_object])
-                    else:
-                        unknown_types = [': unknown', 'as unknown', '<unknown']
-                        for unknown_type in unknown_types:
-                            unknown_type_object = re.finditer(
-                                pattern=unknown_type, string=line)
-                            unknown_type_indexes.extend([
-                                index.start() for index in unknown_type_object])
-
-                # Check whether previous line contains a proper comment. If it
-                # does, then skip throwing an error.
-                if not comment_before_unknown_type:
-                    # Throw error if unknown type is present.
-                    if unknown_type_indexes:
-                        failed = True
-                        for unknown_type_index in unknown_type_indexes:
-                            error_message = (
-                                '%s:%s:%s: `unknown` type used. Add proper '
-                                'comment explaining why `unknown` type is '
-                                'used before the line if the type is needed '
-                                'otherwise remove the `unknown` type and use '
-                                'the appropriate type.' % (
-                                file_path, line_num + 1, unknown_type_index))
-                            error_messages.append(error_message)
-
-                # Check whether previous line contains a proper comment.
-                # If it does, then skip throwing an error.
-                comment_before_unknown_type = (
-                    line.strip().startswith('//') or
-                    line.strip().endswith('*/')
-                )
-
-                # Check if the line is a multi-line comment.
-                if not multiple_line_comment:
-                    multiple_line_comment = line.strip().startswith('/*')
-
-                if line.strip().endswith('*/'):
-                    multiple_line_comment = False
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, sorted(error_messages), sorted(error_messages))
-
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -540,7 +457,6 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
         linter_stdout.append(self._check_constants_declaration())
         linter_stdout.append(self._check_angular_services_index())
-        linter_stdout.append(self._check_unknown_type())
 
         # Clear temp compiled typescipt files.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
