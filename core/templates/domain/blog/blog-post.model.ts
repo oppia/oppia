@@ -39,6 +39,7 @@ export class BlogPostData {
   _urlFragment: string;
   _lastUpdated?: string;
   _publishedOn?: string;
+  _titleIsDuplicate: boolean;
   constructor(
       id: string,
       displayedAuthorName: string,
@@ -58,6 +59,7 @@ export class BlogPostData {
     this._urlFragment = urlFragment;
     this._lastUpdated = lastUpdated;
     this._publishedOn = publishedOn;
+    this._titleIsDuplicate = false;
   }
 
   get id(): string {
@@ -92,6 +94,14 @@ export class BlogPostData {
     this._tags = tags;
   }
 
+  set titleIsDuplicate(titleIsDuplicate: boolean) {
+    this._titleIsDuplicate = titleIsDuplicate;
+  }
+
+  get titleIsDuplicate(): boolean {
+    return this._titleIsDuplicate;
+  }
+
   addTag(tag: string): void {
     this._tags.push(tag);
   }
@@ -123,13 +133,28 @@ export class BlogPostData {
 
   validate(): string[] {
     let issues = [];
-    if (this._title === '') {
+    let validTitleRegex: RegExp = new RegExp(
+      AppConstants.VALID_BLOG_POST_TITLE_REGEX
+    );
+    if (this._titleIsDuplicate) {
+      issues.push(
+        'Blog Post with the given title already exists.');
+    } else if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
+    } else if (!validTitleRegex.test(this._title)) {
+      issues.push(
+        'Blog Post title contains invalid characters.'
+      );
     } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not be less than ' +
         `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
+      );
+    } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
+      issues.push(
+        'Blog Post title should not be more than ' +
+        `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (this._content === '') {
@@ -141,9 +166,19 @@ export class BlogPostData {
 
   prepublishValidate(maxTags: number): string[] {
     let issues = [];
-    if (this._title === '') {
+    let validTitleRegex: RegExp = new RegExp(
+      AppConstants.VALID_BLOG_POST_TITLE_REGEX
+    );
+    if (this._titleIsDuplicate) {
+      issues.push(
+        'Blog Post with the given title already exists.');
+    } else if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
+    } else if (!validTitleRegex.test(this._title)) {
+      issues.push(
+        'Blog Post title contains invalid characters.'
+      );
     } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not exceed ' +
