@@ -18,16 +18,10 @@
 
 const puppeteer = require('puppeteer');
 const testConstants = require('./test-constants.js');
-const { showMessage } = require('./show-message-utils.js');
 
-const rolesEditorTab = testConstants.URLs.RolesEditorTab;
-const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
-const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
-const rolesSelectDropdown = 'div.mat-select-trigger';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
-const addRoleButton = 'button.oppia-add-role-button';
 
-module.exports = class puppeteerUtilities {
+module.exports = class baseUser {
   constructor() {
     this.page;
     this.browserObject;
@@ -48,8 +42,12 @@ module.exports = class puppeteerUtilities {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await this.page.setViewport({ width: 0, height: 0 });
-        // Accepting the alerts that appear in between the tests.
-        await this.page.on('dialog', async dialog => {
+        // We are doing this generically because the on-alert behaviour needs
+        // to be defined through an event listener, and Puppeteer does not
+        // support handling these alerts on a case-by-case basis.
+        // See (https://github.com/puppeteer/puppeteer/blob/v0.12.0/docs/api.md#class-dialog)
+        // for more information.
+        this.page.on('dialog', async(dialog) => {
           await dialog.accept();
         });
       });
@@ -109,78 +107,6 @@ module.exports = class puppeteerUtilities {
       await this.page.waitForSelector(selector);
       await this.page.click(selector);
     }
-  }
-
-  /**
-   * The function to assign a role to a user.
-   * @param {string} username - The username to which role would be assigned.
-   * @param {string} role - The role that would be assigned to the user.
-   */
-  async assignRoleToUser(username, role) {
-    await this.goto(rolesEditorTab);
-    await this.type(roleEditorInputField, username);
-    await this.clickOn(roleEditorButtonSelector);
-    await this.clickOn(addRoleButton);
-    await this.clickOn(rolesSelectDropdown);
-    await this.page.evaluate(async(role) => {
-      const allRoles = document.getElementsByClassName('mat-option-text');
-      for (let i = 0; i < allRoles.length; i++) {
-        if (allRoles[i].innerText.toLowerCase() === role) {
-          allRoles[i].click({waitUntil: 'networkidle0'});
-          return;
-        }
-      }
-      throw new Error(`Role ${role} does not exists.`);
-    }, role);
-  }
-
-  /**
-   * The function excepts the user to have the given role.
-   * @param {string} username - The username to which role must be assigned.
-   * @param {string} role - The role which must be assigned to the user.
-   */
-  async expectUserToHaveRole(username, role) {
-    const currentPageUrl = this.page.url();
-    await this.goto(rolesEditorTab);
-    await this.type(roleEditorInputField, username);
-    await this.clickOn(roleEditorButtonSelector);
-    await this.page.waitForSelector('div.justify-content-between');
-    await this.page.evaluate((role) => {
-      const userRoles = document.getElementsByClassName(
-        'oppia-user-role-description');
-      for (let i = 0; i < userRoles.length; i++) {
-        if (userRoles[i].innerText.toLowerCase() === role) {
-          return;
-        }
-      }
-      throw new Error(`User does not have the ${role} role!`);
-    }, role);
-    showMessage(`User ${username} has the ${role} role!`);
-    await this.goto(currentPageUrl);
-  }
-
-  /**
-   * The function excepts the user to not have the given role.
-   * @param {string} username - The user to which the role must not be assigned.
-   * @param {string} role - The role which must not be assigned to the user.
-   */
-  async expectUserNotToHaveRole(username, role) {
-    const currentPageUrl = this.page.url();
-    await this.goto(rolesEditorTab);
-    await this.type(roleEditorInputField, username);
-    await this.clickOn(roleEditorButtonSelector);
-    await this.page.waitForSelector('div.justify-content-between');
-    await this.page.evaluate((role) => {
-      const userRoles = document.getElementsByClassName(
-        'oppia-user-role-description');
-      for (let i = 0; i < userRoles.length; i++) {
-        if (userRoles[i].innerText.toLowerCase() === role) {
-          throw new Error(`User has the ${role} role!`);
-        }
-      }
-    }, role);
-    showMessage(`User ${username} does not have the ${role} role!`);
-    await this.goto(currentPageUrl);
   }
 
   /**
