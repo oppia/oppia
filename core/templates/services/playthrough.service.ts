@@ -254,8 +254,6 @@ export class PlaythroughService {
       this.misTracker.recordStateTransition(destStateName);
       this.cstTracker.recordStateTransition(destStateName);
     }
-    this.misTracker.recordStateTransition(destStateName);
-    this.cstTracker.recordStateTransition(destStateName);
   }
 
   recordExplorationQuitAction(

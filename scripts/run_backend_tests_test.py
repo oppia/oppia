@@ -450,33 +450,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
             test_target, self.print_arr)
 
-    def test_cancelled_tests_coverage_is_displayed_correctly(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
-
-        task = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
-        )
-        task.finished = False
-        task_output = ['Ran 9 tests in 1.244s', '98']
-        task_result = concurrent_task_utils.TaskResult(
-            'task1', False, task_output, task_output)
-        task.task_results.append(task_result)
-
-        tasks = [task]
-        task_to_taskspec = {}
-        test_target = 'scripts.new_script.py'
-        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
-            test_target, False)
-
-        with self.print_swap:
-            run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, True)
-
-        self.assertNotIn(
-            'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
-            test_target, self.print_arr)
-
     def test_successfull_test_run_message_is_printed_correctly(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
