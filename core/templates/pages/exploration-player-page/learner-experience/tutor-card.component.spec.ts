@@ -270,7 +270,7 @@ describe('Tutor card component', () => {
       expect(componentInstance.profilePictureWebpDataUrl).toBe(
         urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-  }));
+    }));
 
   it('should refresh displayed card on changes', fakeAsync(() => {
     let updateDisplayedCardSpy = spyOn(

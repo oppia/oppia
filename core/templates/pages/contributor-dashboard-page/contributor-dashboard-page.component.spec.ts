@@ -165,7 +165,7 @@ describe('Contributor dashboard page', () => {
       expect(component.profilePictureWebpDataUrl).toBe(
         urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-  }));
+    }));
 
   it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
     spyOn(userService, 'getUserContributionRightsDataAsync')

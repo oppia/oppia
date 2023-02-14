@@ -185,30 +185,31 @@ describe('User Api Service', () => {
       flushMicrotasks();
     }));
 
-    it('should return new userInfo data if user is not logged', fakeAsync(() => {
-      const sampleUserInfoBackendObject = {
-        role: 'USER_ROLE',
-        is_moderator: false,
-        is_curriculum_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: true,
-        preferred_site_language_code: null,
-        username: 'tester',
-        email: 'test@test.com',
-        user_is_logged_in: false
-      };
-      const sampleUserInfo = UserInfo.createDefault();
+    it('should return new userInfo data if user is not logged',
+      fakeAsync(() => {
+        const sampleUserInfoBackendObject = {
+          role: 'USER_ROLE',
+          is_moderator: false,
+          is_curriculum_admin: false,
+          is_super_admin: false,
+          is_topic_manager: false,
+          can_create_collections: true,
+          preferred_site_language_code: null,
+          username: 'tester',
+          email: 'test@test.com',
+          user_is_logged_in: false
+        };
+        const sampleUserInfo = UserInfo.createDefault();
 
-      userService.getUserInfoAsync().then((userInfo) => {
-        expect(userInfo).toEqual(sampleUserInfo);
-      });
-      const req = httpTestingController.expectOne('/userinfohandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleUserInfoBackendObject);
+        userService.getUserInfoAsync().then((userInfo) => {
+          expect(userInfo).toEqual(sampleUserInfo);
+        });
+        const req = httpTestingController.expectOne('/userinfohandler');
+        expect(req.request.method).toEqual('GET');
+        req.flush(sampleUserInfoBackendObject);
 
-      flushMicrotasks();
-    }));
+        flushMicrotasks();
+      }));
 
     it('should return image stored in session storage while in emulator mode',
       fakeAsync(() => {
@@ -222,7 +223,7 @@ describe('User Api Service', () => {
         imageLocalStorageService.deleteImage(filename);
 
         flushMicrotasks();
-    }));
+      }));
 
     it('should return the default profile image path when in emulator mode',
       fakeAsync(() => {
@@ -283,7 +284,8 @@ describe('User Api Service', () => {
     it('should handle when set profile image data url is reject',
       fakeAsync(() => {
         const newProfileImageDataurl = '/avatar/x.png';
-        const errorMessage = 'It\'s not possible to set a new profile image data';
+        const errorMessage = (
+          'It\'s not possible to set a new profile image data');
         userService.setProfileImageDataUrlAsync(newProfileImageDataurl);
         const req = httpTestingController.expectOne('/preferenceshandler/data');
         expect(req.request.method).toEqual('PUT');
@@ -397,10 +399,9 @@ describe('User Api Service', () => {
           expect(val).toBeTrue();
         });
       }));
-    });
+  });
 
   describe('on emulator mode', () => {
-    let assetsBackendApiService: AssetsBackendApiService;
     let httpTestingController: HttpTestingController;
     let userService: UserService;
 
@@ -413,24 +414,23 @@ describe('User Api Service', () => {
       });
       userService = TestBed.inject(UserService);
       httpTestingController = TestBed.inject(HttpTestingController);
-      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     });
 
     it('should return image path when in production mode',
-    fakeAsync(() => {
-      let expectedPngImage = (
-        'https://storage.googleapis.com/app_default_bucket/user/' +
-        'tester/assets/profile_picture.png');
-      let expectedWebpImage = (
-        'https://storage.googleapis.com/app_default_bucket/user/' +
-        'tester/assets/profile_picture.webp');
-      let [profileImagePng, profileImageWebp] = (
-        userService.getProfileImageDataUrl('tester'));
-      expect(profileImagePng).toEqual(expectedPngImage);
-      expect(profileImageWebp).toEqual(expectedWebpImage);
+      fakeAsync(() => {
+        let expectedPngImage = (
+          'https://storage.googleapis.com/app_default_bucket/user/' +
+          'tester/assets/profile_picture.png');
+        let expectedWebpImage = (
+          'https://storage.googleapis.com/app_default_bucket/user/' +
+          'tester/assets/profile_picture.webp');
+        let [profileImagePng, profileImageWebp] = (
+          userService.getProfileImageDataUrl('tester'));
+        expect(profileImagePng).toEqual(expectedPngImage);
+        expect(profileImageWebp).toEqual(expectedWebpImage);
 
-      flushMicrotasks();
-    }));
+        flushMicrotasks();
+      }));
 
     afterEach(() => {
       httpTestingController.verify();

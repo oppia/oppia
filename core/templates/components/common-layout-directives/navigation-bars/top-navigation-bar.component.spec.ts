@@ -86,7 +86,7 @@ class MockWindowRef {
   };
 }
 
-fdescribe('TopNavigationBarComponent', () => {
+describe('TopNavigationBarComponent', () => {
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
@@ -104,7 +104,7 @@ fdescribe('TopNavigationBarComponent', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-  let urlInterpolationService: UrlInterpolationService
+  let urlInterpolationService: UrlInterpolationService;
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -552,7 +552,7 @@ fdescribe('TopNavigationBarComponent', () => {
       expect(component.profilePictureWebpDataUrl).toBe(
         urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-  }));
+    }));
 
   it('should return proper offset for dropdown', ()=>{
     var dummyElement = document.createElement('div');
