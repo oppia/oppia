@@ -14,18 +14,22 @@
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
   </div>
   <div class="oppia-opportunity-pagination-container" *ngIf="visibleOpportunities.length > 0">
-    <button type="button"
-            class="oppia-pagination-button"
-            (click)="gotoPage(activePageNumber - 1)"
-            [disabled]="activePageNumber == 1">
-      <span class="material-icons">navigate_before</span>Previous
-    </button>
-    <button type="button"
-            class="oppia-pagination-button"
-            (click)="gotoPage(activePageNumber + 1)"
-            [disabled]="loadingOpportunityData || userIsOnLastPage">
-      Next<span class="material-icons">navigate_next</span>
-    </button>
+    <div class="oppia-pagination-button-wrapper">
+      <button *ngIf="activePageNumber > 1" type="button"
+              class="oppia-pagination-button"
+              (click)="gotoPage(activePageNumber - 1)"
+              [disabled]="activePageNumber == 1">
+        <span class="material-icons">navigate_before</span>Previous
+      </button>
+    </div>
+    <div class="oppia-pagination-button-wrapper">
+      <button *ngIf="!userIsOnLastPage" type="button"
+              class="oppia-pagination-button"
+              (click)="gotoPage(activePageNumber + 1)"
+              [disabled]="loadingOpportunityData || userIsOnLastPage">
+        Next<span class="material-icons">navigate_next</span>
+      </button>
+    </div>
   </div>
   <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
     <div class="oppia-end-availability-line"></div>
@@ -60,7 +64,6 @@
   }
   .oppia-opportunity-pagination-container {
     display: flex;
-    justify-content: space-around;
     margin: 20px 0;
     width: 100%;
   }
@@ -74,6 +77,12 @@
     min-height: 40px;
     min-width: 100px;
     text-align: center;
+  }
+  .oppia-pagination-button-wrapper {
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+    max-width: 50%;
   }
   .oppia-pagination-button:hover {
     border: 2px solid #009688;
