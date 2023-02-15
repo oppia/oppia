@@ -107,7 +107,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         wipeout_service.save_pending_deletion_requests(
             [
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_1_id, self.USER_1_EMAIL)
+                    self.user_1_id, self.USER_1_USERNAME, self.USER_1_EMAIL)
             ]
         )
 
@@ -129,9 +129,9 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         wipeout_service.save_pending_deletion_requests(
             [
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_1_id, self.USER_1_EMAIL),
+                    self.user_1_id, self.USER_1_USERNAME, self.USER_1_EMAIL),
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_2_id, self.USER_2_EMAIL)
+                    self.user_2_id, self.USER_2_USERNAME, self.USER_2_EMAIL)
             ]
         )
         number_of_pending_deletion_requests = (
@@ -141,7 +141,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     def test_saves_pending_deletion_request_when_new(self) -> None:
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL))
+                self.user_1_id, self.USER_1_USERNAME, self.USER_1_EMAIL))
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
@@ -169,7 +169,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
 
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL)
+                self.user_1_id, self.USER_1_USERNAME, self.USER_1_EMAIL)
         )
         pending_deletion_request.deletion_complete = True
         pending_deletion_request.pseudonymizable_entity_mappings = {

@@ -2860,6 +2860,8 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
+    # The username of the user.
+    username = datastore_services.StringProperty(indexed=True)
     # The email of the user.
     email = datastore_services.StringProperty(required=True, indexed=True)
     # Normalized username of the deleted user. May be None in the cases when
