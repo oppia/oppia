@@ -723,6 +723,7 @@ def managed_webdriverio_server(
     finally:
         del os.environ['MOBILE']
 
+
 @contextlib.contextmanager
 def managed_acceptance_tests_server(
     suite_name: str = 'full',
@@ -731,7 +732,7 @@ def managed_acceptance_tests_server(
     mobile: bool = False,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
-    """Returns context manager to start/stop the Acceptance tests server gracefully.
+    """Returns context manager to start/stop the Acceptance server gracefully.
 
     Args:
         suite_name: str. The suite name whose tests should be run. If the value
