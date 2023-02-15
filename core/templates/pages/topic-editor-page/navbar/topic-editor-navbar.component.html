@@ -70,13 +70,13 @@
       <div class="oppia-topic-nav-topic-nav-dropdown-options"
            *ngIf="showNavigationOptions">
         <div class="oppia-topic-nav-dropdown-option" (click)="selectMainTab()">
-          <i class="oppia-material-icons">&#xE254;</i><span>Editor</span>
+          <i class="fas fa-pen"></i><span>Editor</span>
         </div>
         <div class="oppia-topic-nav-dropdown-option" (click)="selectQuestionsTab()">
-          <i class="oppia-material-icons">&#xE254;</i><span>Questions</span>
+          <i class="fas fa-pen"></i><span>Questions</span>
         </div>
         <div class="oppia-topic-nav-dropdown-option" (click)="openTopicViewer()">
-          <i class="oppia-material-icons">&#xE037;</i><span>Preview</span>
+          <i class="fas fa-play"></i><span>Preview</span>
         </div>
       </div>
       <div>
@@ -94,7 +94,7 @@
       </div>
       <div class="oppia-topic-nav-dropdown-content">
         <div class="oppia-topic-nav-dropdown-text" (click)="toggleWarningText()">
-          <i *ngIf="!getTotalWarningsCount()" class="oppia-material-icons">&#xE254;</i>
+          <i *ngIf="!getTotalWarningsCount()" class="fas fa-pen">&#xE254;</i>
           <span>{{ activeTab }}</span>
           <span *ngIf="getTotalWarningsCount()">
             ({{ getTotalWarningsCount() }} <i class="fa fa-exclamation-triangle oppia-error-icon"></i>)
@@ -109,20 +109,20 @@
     <div class="oppia-topic-nav-dropdown-container oppia-save-options-dropdown">
       <div class="oppia-topic-nav-topic-nav-dropdown-options" *ngIf="showTopicEditOptions">
         <div class="oppia-topic-nav-dropdown-option" (click)="discardChanges()">
-          <i class="oppia-material-icons">&#xE254;</i>
+          <i class="fas fa-pen"></i>
           <span>Discard Changes</span>
         </div>
         <div class="oppia-topic-nav-dropdown-option">
           <div *ngIf="!topicRights.isPublished()"
                (click)="publishTopic()"
                [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
-            <i class="oppia-material-icons">&#xE254;</i>
+            <i class="fas fa-pen"></i>
             <span>Publish Topic</span>
           </div>
           <div (click)="unpublishTopic()"
                *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
                [attr.disabled]="isTopicSaveable()">
-            <i class="oppia-material-icons">&#xE254;</i>
+            <i class="fas fa-pen"></i>
             <span>Unpublish Topic</span>
           </div>
         </div>
@@ -292,6 +292,10 @@
     }
     .oppia-error-icon {
       background-color: #f5f55a;
+    }
+    .fas {
+      font-size: 0.8em;
+      padding: 5px;
     }
   }
 </style>

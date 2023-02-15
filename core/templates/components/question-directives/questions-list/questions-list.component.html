@@ -37,7 +37,7 @@
           </a>
         </div>
       </mat-card>
-      <button class="btn btn-success btn-sm" (click)="addSkill()">Link Another Skill</button>
+      <button class="btn btn-success btn-sm" (click)="addSkill()" *ngIf="associatedSkillSummaries.length < MAX_SKILLS_PER_QUESTION">Link Another Skill</button>
     </div>
     <oppia-question-editor [questionId]="questionId"
                            [misconceptionsBySkill]="misconceptionsBySkill"
