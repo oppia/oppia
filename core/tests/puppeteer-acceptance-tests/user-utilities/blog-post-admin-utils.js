@@ -34,9 +34,8 @@ const maximumTagLimitInput = 'input#mat-input-0';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
-const toastWarningMessageForDuplicateBlogPostTitle = ' Blog Post with the' +
-  ' given title exists already. Please use a different title. ';
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
+const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = ' CREATE NEW BLOG POST ';
 const LABEL_FOR_SAVE_BUTTON = ' Save ';
@@ -163,6 +162,8 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn(thumbnailPhotoBox);
     await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.page.waitForSelector(
+      `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
@@ -189,6 +190,8 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(thumbnailPhotoBox);
     await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.page.waitForSelector(
+      `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
 
@@ -234,10 +237,11 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   }
 
   /**
-   * This function checks that the publish button is disabled if blog post
-   * with same title already exists.
+   * This function checks that the publish button is disabled.
+   * @param {string} expectedWarningMessage - The warning message to be
+   * displayed when the user tries to publish a duplicate blog post.
    */
-  async expectUserUnableToPublishBlogPost() {
+  async expectUserUnableToPublishBlogPost(expectedWarningMessage) {
     const toastMessageBox = await this.page.$(
       'div.e2e-test-toast-warning-message');
     const toastMessageWarning = await this.page.evaluate(
@@ -247,7 +251,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
         return button.disabled;
       });
     if (!isPublishButtonDisabled ||
-        toastWarningMessageForDuplicateBlogPostTitle !== toastMessageWarning) {
+        expectedWarningMessage !== toastMessageWarning) {
       throw new Error('User is able to publish duplicate blog post');
     }
 

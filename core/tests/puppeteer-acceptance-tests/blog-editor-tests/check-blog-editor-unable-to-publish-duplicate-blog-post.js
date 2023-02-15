@@ -20,6 +20,9 @@
 const userFactory = require(
   '../puppeteer-testing-utilities/user-factory.js');
 
+const warningMessage = ' Blog Post with the' +
+  ' given title exists already. Please use a different title. ';
+
 let checkBlogEditorUnableToPublishDuplicateBlogPost = async function() {
   const blogPostEditor = await userFactory.createNewBlogPostEditor(
     'blogPostEditor');
@@ -34,7 +37,7 @@ let checkBlogEditorUnableToPublishDuplicateBlogPost = async function() {
   await blogPostEditor.navigateToBlogDashboardPage();
   await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
 
-  await blogPostEditor.expectUserUnableToPublishBlogPost();
+  await blogPostEditor.expectUserUnableToPublishBlogPost(warningMessage);
 
   await userFactory.closeAllBrowsers();
 };
