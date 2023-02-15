@@ -49,6 +49,7 @@ def managed_process(
     **popen_kwargs: Any
 ) -> Iterator[psutil.Process]:
     """Context manager for starting and stopping a process gracefully.
+
     Args:
         command_args: list(int|str). A sequence of program arguments, where the
             program to execute is the first item. Ints are allowed in order to
@@ -69,8 +70,10 @@ def managed_process(
             managed process has a nonzero exit code. If False, no Exception is
             raised, and it is the caller's responsibility to handle the error.
         **popen_kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
+
     Yields:
         psutil.Process. The process managed by the context manager.
+
     Raises:
         Exception. The process exited unexpectedly (only raised if
             raise_on_nonzero_exit is True).
@@ -151,6 +154,7 @@ def managed_dev_appserver(
     skip_sdk_update_check: bool = False
 ) -> Iterator[psutil.Process]:
     """Returns a context manager to start up and shut down a GAE dev appserver.
+
     Args:
         app_yaml_path: str. Path to the app.yaml file which defines the
             structure of the server.
@@ -171,6 +175,7 @@ def managed_dev_appserver(
             files relevant to their module are changed.
         skip_sdk_update_check: bool. Whether to skip checking for SDK updates.
             If false, uses .appcfg_nag to decide.
+
     Yields:
         psutil.Process. The dev_appserver process.
     """
@@ -207,9 +212,11 @@ def managed_firebase_auth_emulator(
     recover_users: bool = False
 ) -> Iterator[psutil.Process]:
     """Returns a context manager to manage the Firebase auth emulator.
+
     Args:
         recover_users: bool. Whether to recover users created by the previous
             instance of the Firebase auth emulator.
+
     Yields:
         psutil.Process. The Firebase emulator process.
     """
@@ -238,6 +245,7 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
     """Returns a context manager for ElasticSearch server for running tests
     in development mode and running a local dev server. This is only required
     in a development environment.
+
     Yields:
         psutil.Process. The ElasticSearch server process.
     """
@@ -271,9 +279,11 @@ def managed_cloud_datastore_emulator(
     clear_datastore: bool = False
 ) -> Iterator[psutil.Process]:
     """Returns a context manager for the Cloud Datastore emulator.
+
     Args:
         clear_datastore: bool. Whether to delete the datastore's config and data
             before starting the emulator.
+
     Yields:
         psutil.Process. The emulator process.
     """
@@ -363,12 +373,15 @@ def create_managed_web_browser(
     """Returns a ContextManager for a web browser targeting the given port on
     localhost. If a web browser cannot be opened on the current system by Oppia,
     then raises an exception.
+
     Args:
         port: int. The port number to open in the web browser.
+
     Returns:
         ContextManager. The ContextManager to a web browser window if the
         current operating system can be identified and a web browser can be
         launched automatically.
+
     Raises:
         Exception. Unable to launch the web browser (this happens when the
             Operating System cannot be identified).
@@ -392,12 +405,15 @@ def managed_ng_build(
     *, use_prod_env: bool = False, watch_mode: bool = False
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the ng compiler gracefully.
+
     Args:
         use_prod_env: bool. Whether to compile for use in production.
         watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
             change.
+
     Yields:
         psutil.Process. The ng compiler process.
+
     Raises:
         OSError. First build never completed.
     """
@@ -454,6 +470,7 @@ def managed_webpack_compiler(
     max_old_space_size: Optional[int] = None
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the webpack compiler gracefully.
+
     Args:
         config_path: str|None. Path to an explicit webpack config, or None to
             determine it from the other args.
@@ -467,8 +484,10 @@ def managed_webpack_compiler(
             "old memory" section. As memory consumption approaches the limit,
             the compiler will spend more time on garbage collection in an effort
             to free unused memory.
+
     Yields:
         psutil.Process. The Webpack compiler process.
+
     Raises:
         OSError. First build never completed.
     """
@@ -572,15 +591,18 @@ def get_chrome_version() -> str:
 @contextlib.contextmanager
 def managed_portserver() -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the portserver gracefully.
+
     The portserver listens at PORTSERVER_SOCKET_FILEPATH and allocates free
     ports to clients. This prevents race conditions when two clients request
     ports in quick succession. The local Google App Engine server that we use to
     serve the development version of Oppia uses python_portpicker, which is
     compatible with the portserver this function starts, to request ports.
+
     By "compatible" we mean that python_portpicker requests a port by sending a
     request consisting of the PID of the requesting process and expects a
     response consisting of the allocated port number. This is the interface
     provided by this portserver.
+
     Yields:
         psutil.Popen. The Popen subprocess object.
     """
@@ -634,6 +656,7 @@ def managed_webdriverio_server(
     stdout: int = subprocess.PIPE
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the WebdriverIO server gracefully.
+
     Args:
         suite_name: str. The suite name whose tests should be run. If the value
             is `full`, all tests will run.
@@ -649,8 +672,10 @@ def managed_webdriverio_server(
         stdout: int. This parameter specifies the executed program's standard
             output file handle.
         mobile: bool. Whether to run the webdriverio tests in mobile mode.
+
     Yields:
         psutil.Process. The webdriverio process.
+
     Raises:
         ValueError. Number of sharding instances are less than 0.
     """
@@ -697,7 +722,6 @@ def managed_webdriverio_server(
             yield proc
     finally:
         del os.environ['MOBILE']
-
 
 @contextlib.contextmanager
 def managed_acceptance_tests_server(
