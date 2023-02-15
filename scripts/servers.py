@@ -702,8 +702,6 @@ def managed_webdriverio_server(
 @contextlib.contextmanager
 def managed_acceptance_tests_server(
     suite_name: str = 'full',
-    dev_mode: bool = True,
-    debug_mode: bool = False,
     sharding_instances: int = 1,
     chrome_version: Optional[str] = None,
     mobile: bool = False,
@@ -714,11 +712,6 @@ def managed_acceptance_tests_server(
     Args:
         suite_name: str. The suite name whose tests should be run. If the value
             is `full`, all tests will run.
-        dev_mode: bool. Whether the test is running on dev_mode.
-        debug_mode: bool. Whether to run the webdriverio tests in debugging
-            mode. Read the following instructions to learn how to run e2e
-            tests in debugging mode:
-            https://webdriver.io/docs/debugging/#the-debug-command.
         sharding_instances: int. How many sharding instances to be running.
         chrome_version: str|None. The version of Google Chrome to run the tests
             on. If None, then the currently-installed version of Google Chrome
@@ -754,9 +747,6 @@ def managed_acceptance_tests_server(
     #     webdriverio_args.extend([
     #        '--capabilities[0].maxInstances=%d' % sharding_instances,
     #    ])
-
-    # if debug_mode:
-    #     webdriverio_args.insert(0, 'DEBUG=true')
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
