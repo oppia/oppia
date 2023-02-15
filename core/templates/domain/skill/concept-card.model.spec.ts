@@ -120,7 +120,7 @@ describe('Concept card object factory', () => {
 
     conceptCardDict.recorded_voiceovers = voiceover;
     let conceptCard =
-          ConceptCard.createFromBackendDict(conceptCardDict);
+      ConceptCard.createFromBackendDict(conceptCardDict);
 
     expect(conceptCard.getRecordedVoiceovers())
       .toEqual(RecordedVoiceovers.createFromBackendDict(voiceover));
