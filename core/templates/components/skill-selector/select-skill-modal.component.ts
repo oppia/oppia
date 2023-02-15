@@ -19,6 +19,7 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 export interface CategorizedSkills {
   [topic: string]: {
@@ -40,6 +41,9 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   untriagedSkillSummaries!: SkillSummaryBackendDict[];
   selectedSkillId!: string;
   allowSkillsFromOtherTopics: boolean = false;
+  associatedSkillSummaries!: ShortSkillSummary[];
+  errorMessage: string =
+    'This skill is already linked to the current question.';
 
   constructor(
     private ngbActiveModal: NgbActiveModal
@@ -69,5 +73,16 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
 
   setSelectedSkillId(skillId: string): void {
     this.selectedSkillId = skillId;
+  }
+
+  isSaveButtonEnabled(): boolean {
+    for (let idx in this.associatedSkillSummaries) {
+      if (
+        this.associatedSkillSummaries[idx].getId() ===
+          this.selectedSkillId) {
+        return false;
+      }
+    }
+    return true;
   }
 }

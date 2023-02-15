@@ -25,7 +25,7 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('domain/exploration/curated-exploration-validation.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 
-import newChapterConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 angular.module('oppia').controller('CreateNewChapterModalController', [
   '$controller', '$scope', '$uibModalInstance',
@@ -60,7 +60,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.editableThumbnailFilename = '';
       $scope.editableThumbnailBgColor = '';
       $scope.allowedBgColors = (
-        newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
+        AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
       StoryUpdateService.addStoryNode($scope.story, $scope.title);
       $scope.correctnessFeedbackDisabled = false;
       $scope.categoryIsDefault = true;
