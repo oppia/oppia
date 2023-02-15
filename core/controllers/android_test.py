@@ -273,7 +273,6 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 classroom.to_dict()
             )
 
-
     def test_get_classroom_with_version_returns_error(self) -> None:
         classroom_id = classroom_config_services.get_new_classroom_id()
 
