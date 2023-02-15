@@ -97,12 +97,10 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
       } else {
         if (this.isContainerNarrow) {
           return true;
-        } else {
-          return this.activityIsCurrentlyHoveredOver;
         }
       }
     }
-    return false;
+    return true;
   }
 
   belongsToLearnerPlaylist(): boolean {
