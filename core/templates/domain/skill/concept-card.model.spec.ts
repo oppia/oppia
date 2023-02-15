@@ -74,7 +74,7 @@ describe('Concept card object factory', () => {
 
   it('should create a new concept card from a backend dictionary', () => {
     let conceptCard =
-          ConceptCard.createFromBackendDict(conceptCardDict);
+      ConceptCard.createFromBackendDict(conceptCardDict);
     expect(conceptCard.getExplanation()).toEqual(
       SubtitledHtml.createDefault(
         'test explanation', 'explanation'));
