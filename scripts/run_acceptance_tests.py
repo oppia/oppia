@@ -195,6 +195,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     install_third_party_libraries(args.skip_install)
 
     with contextlib.ExitStack() as stack:
+        dev_mode = not args.prod_env
 
         if args.skip_build:
             build.modify_constants(prod_env=args.prod_env)
