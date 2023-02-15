@@ -94,7 +94,7 @@ describe('Concept card object factory', () => {
 
   it('should convert to a backend dictionary', () => {
     let conceptCard =
-        ConceptCard.createFromBackendDict(conceptCardDict);
+      ConceptCard.createFromBackendDict(conceptCardDict);
     expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);
   });
 
