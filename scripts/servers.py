@@ -722,3 +722,79 @@ def managed_webdriverio_server(
             yield proc
     finally:
         del os.environ['MOBILE']
+
+
+@contextlib.contextmanager
+def managed_acceptance_tests_server(
+    suite_name: str = "full",
+    dev_mode: bool = True,
+    debug_mode: bool = False,
+    sharding_instances: int = 1,
+    chrome_version: Optional[str] = None,
+    mobile: bool = False,
+    stdout: int = subprocess.PIPE,
+) -> Iterator[psutil.Process]:
+    """Returns context manager to start/stop the Acceptance tests server gracefully.
+
+    Args:
+        suite_name: str. The suite name whose tests should be run. If the value
+            is `full`, all tests will run.
+        dev_mode: bool. Whether the test is running on dev_mode.
+        debug_mode: bool. Whether to run the webdriverio tests in debugging
+            mode. Read the following instructions to learn how to run e2e
+            tests in debugging mode:
+            https://webdriver.io/docs/debugging/#the-debug-command.
+        sharding_instances: int. How many sharding instances to be running.
+        chrome_version: str|None. The version of Google Chrome to run the tests
+            on. If None, then the currently-installed version of Google Chrome
+            is used instead.
+        stdout: int. This parameter specifies the executed program's standard
+            output file handle.
+        mobile: bool. Whether to run the webdriverio tests in mobile mode.
+
+    Yields:
+        psutil.Process. The webdriverio process.
+
+    Raises:
+        ValueError. Number of sharding instances are less than 0.
+    """
+    if sharding_instances <= 0:
+        raise ValueError("Sharding instance should be larger than 0")
+
+    if chrome_version is None:
+        chrome_version = get_chrome_version()
+
+    if mobile:
+        os.environ["MOBILE"] = "true"
+    else:
+        os.environ["MOBILE"] = "false"
+
+    acceptance_tests_args = [common.NODE_BIN_PATH, suite_name]
+
+    # Capabilities in wdio.conf.js are added as an array of object,
+    # so in order to set the value of maximum instances of chrome
+    # in wdio.conf.js, we need to provide the index of the capability
+    # at which chrome is present, i.e. 0.
+    # if sharding_instances > 1:
+    #     webdriverio_args.extend([
+    #        '--capabilities[0].maxInstances=%d' % sharding_instances,
+    #    ])
+
+    # if debug_mode:
+    #     webdriverio_args.insert(0, 'DEBUG=true')
+
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
+    managed_acceptance_tests_proc = managed_process(
+        acceptance_tests_args,
+        human_readable_name="Acceptance Tests Server",
+        shell=True,
+        raise_on_nonzero_exit=False,
+        stdout=stdout,
+    )
+
+    try:
+        with managed_acceptance_tests_proc as proc:
+            yield proc
+    finally:
+        del os.environ["MOBILE"]
