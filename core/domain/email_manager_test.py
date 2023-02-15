@@ -6364,7 +6364,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
         expected_email_html_body = (
         'Hi questioncontributor,<br><br>'
-        'This is to let you know that the Oppia team has added you as a contributor '
+        'This is to let you know that the Oppia team has added '
+        'you as a contributor '
         'to submit practice question suggestions for use in lessons.<br><br>'
         'You can check the available opportunities in the'
         '<a href="https://www.oppia.org/contributor-dashboard">'
@@ -6391,9 +6392,11 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
             self.assertEqual(
-                sent_email_model.recipient_id, self.question_contributor_user_id)
+                sent_email_model.recipient_id,
+                self.question_contributor_user_id)
             self.assertEqual(
-                sent_email_model.recipient_email, self.QUESTION_CONTRIBUTOR_EMAIL)
+                sent_email_model.recipient_email,
+                self.QUESTION_CONTRIBUTOR_EMAIL)
             self.assertEqual(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(

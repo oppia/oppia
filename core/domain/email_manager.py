@@ -2153,14 +2153,15 @@ def send_email_to_new_question_contributor(
     """
     if not feconf.CAN_SEND_EMAILS:
         logging.error('This app cannot send emails to users.')
-        return    
+        return
     recipient_username = user_services.get_username(recipient_id)
     can_user_receive_email = user_services.get_email_preferences(
         recipient_id).can_receive_email_updates
     if not can_user_receive_email:
         return
-    
-    email_subject = 'You have been invited to submit practice questions for Oppia'
+
+    email_subject = (
+        'You have been invited to submit practice questions for Oppia')
     email_body_template = (
         'Hi %s,<br><br>'
         'This is to let you know that the Oppia team has added '
