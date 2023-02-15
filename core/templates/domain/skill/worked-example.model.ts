@@ -61,7 +61,8 @@ export class WorkedExample {
   }
 
   static create(
-      question: SubtitledHtml, explanation: SubtitledHtml): WorkedExample {
+      question: SubtitledHtml, explanation: SubtitledHtml
+  ): WorkedExample {
     return new WorkedExample(question, explanation);
   }
 }
