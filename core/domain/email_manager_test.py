@@ -6112,7 +6112,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     TRANSLATION_REVIEWER_EMAIL: Final = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL: Final = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
-    SUBMIT_QUESTION_EMAIL: Final = 'submitquestion@example.com'
+    QUESTION_CONTRIBUTOR_EMAIL: Final = 'submitquestion@example.com'
 
     def setUp(self) -> None:
         super().setUp()
@@ -6120,7 +6120,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
-        self.signup(self.SUBMIT_QUESTION_EMAIL, 'questioner')
+        self.signup(self.QUESTION_CONTRIBUTOR_EMAIL, 'questioncontributor')
 
         self.translation_reviewer_id = self.get_user_id_from_email(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -6134,10 +6134,10 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.QUESTION_REVIEWER_EMAIL)
         user_services.update_email_preferences(
             self.question_reviewer_id, True, False, False, False)
-        self.submit_question_id = self.get_user_id_from_email(
-            self.SUBMIT_QUESTION_EMAIL)
+        self.question_contributor_user_id = self.get_user_id_from_email(
+            self.QUESTION_CONTRIBUTOR_EMAIL)
         user_services.update_email_preferences(
-            self.submit_question_id, True, False, False, False)
+            self.question_contributor_user_id, True, False, False, False)
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -6157,15 +6157,15 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
-    def test_assign_submit_question_email_for_can_send_emails_is_false(
+    def test_new_question_contributor_email_for_can_send_emails_is_false(
         self
     ) -> None:
         with self.can_not_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_submit_questions(
-                self.submit_question_id)
+            email_manager.send_email_to_new_question_contributor(
+                self.question_contributor_user_id)
 
         messages = self._get_sent_email_messages(
-            self.TRANSLATION_REVIEWER_EMAIL)
+            self.QUESTION_CONTRIBUTOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_without_language_code_email_not_sent_to_new_translation_reviewer(
@@ -6358,28 +6358,28 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.intent, feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
-    def test_send_assigned_submit_questioner_email(self) -> None:
+    def test_send_new_question_contributor_email(self) -> None:
         expected_email_subject = (
-            'You have been invited at Oppia to submit questions')
+            'You have been invited to submit practice questions for Oppia')
 
         expected_email_html_body = (
-            'Hi questioner,<br><br>'
-            'This is to let you know that the Oppia team has granted you '
-            'the rights to submit questions.<br><br>'
-            'Link to the '
-            '<a href="https://www.oppia.org/contributor-dashboard">'
-            'Contributor Dashboard</a>.<br><br>'
-            'Thanks, and happy contributing!<br><br>'
-            'Best wishes,<br>'
-            'The Oppia Community')
+        'Hi questioncontributor,<br><br>'
+        'This is to let you know that the Oppia team has added you as a contributor '
+        'to submit practice question suggestions for use in lessons.<br><br>'
+        'You can check the available opportunities in the'
+        '<a href="https://www.oppia.org/contributor-dashboard">'
+        'Contributor Dashboard</a>.<br><br>'
+        'Thanks, and happy contributing!<br><br>'
+        'Best wishes,<br>'
+        'The Oppia Contributor Dashboard Team')
 
         with self.can_send_emails_ctx:
-            email_manager.send_email_to_new_contribution_submit_questions(
-                self.submit_question_id)
+            email_manager.send_email_to_new_question_contributor(
+                self.question_contributor_user_id)
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
-                self.SUBMIT_QUESTION_EMAIL)
+                self.QUESTION_CONTRIBUTOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].html, expected_email_html_body)
 
@@ -6391,9 +6391,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
             self.assertEqual(
-                sent_email_model.recipient_id, self.submit_question_id)
+                sent_email_model.recipient_id, self.question_contributor_user_id)
             self.assertEqual(
-                sent_email_model.recipient_email, self.SUBMIT_QUESTION_EMAIL)
+                sent_email_model.recipient_email, self.QUESTION_CONTRIBUTOR_EMAIL)
             self.assertEqual(
                 sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(

@@ -173,7 +173,7 @@ class ContributionRightsHandler(
                     'User %s already has rights to submit question.' % (
                         username))
             user_services.allow_user_to_submit_question(user_id)
-            email_manager.send_email_to_new_contribution_submit_questions(
+            email_manager.send_email_to_new_question_contributor(
                 user_id)
 
         if category in [

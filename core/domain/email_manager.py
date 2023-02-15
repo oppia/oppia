@@ -2143,7 +2143,7 @@ def send_email_to_new_contribution_reviewer(
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_email_to_new_contribution_submit_questions(
+def send_email_to_new_question_contributor(
     recipient_id: str
 ) -> None:
     """Sends an email to user who is assigned to submit questions.
@@ -2151,36 +2151,35 @@ def send_email_to_new_contribution_submit_questions(
     Args:
         recipient_id: str. The ID of the user.
     """
-
-    email_subject = 'You have been invited at Oppia to submit questions'
-
+    if not feconf.CAN_SEND_EMAILS:
+        logging.error('This app cannot send emails to users.')
+        return
+    
+    recipient_username = user_services.get_username(recipient_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        recipient_id).can_receive_email_updates
+    
+    if not can_user_receive_email:
+        return
+    
+    email_subject = 'You have been invited to submit practice questions for Oppia'
     email_body_template = (
         'Hi %s,<br><br>'
-        'This is to let you know that the Oppia team has granted you '
-        'the rights to submit questions.<br><br>'
-        'Link to the '
+        'This is to let you know that the Oppia team has added you as a contributor '
+        'to submit practice question suggestions for use in lessons.<br><br>'
+        'You can check the available opportunities in the'
         '<a href="https://www.oppia.org/contributor-dashboard">'
         'Contributor Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
         'Best wishes,<br>'
-        'The Oppia Community')
+        'The Oppia Contributor Dashboard Team')
 
-    if not feconf.CAN_SEND_EMAILS:
-        logging.error('This app cannot send emails to users.')
-        return
-
-    recipient_username = user_services.get_username(recipient_id)
-    can_user_receive_email = user_services.get_email_preferences(
-        recipient_id).can_receive_email_updates
-
-    # Send email only if recipient wants to receive.
-    if can_user_receive_email:
-        email_body = email_body_template % (
-            recipient_username)
-        _send_email(
-            recipient_id, feconf.SYSTEM_COMMITTER_ID,
-            feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
-            feconf.NOREPLY_EMAIL_ADDRESS)
+    email_body = email_body_template % (
+        recipient_username)
+    _send_email(
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
+        feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_email_to_removed_contribution_reviewer(
