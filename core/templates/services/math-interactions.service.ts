@@ -170,7 +170,8 @@ export class MathInteractionsService {
       this.warningText = 'Your answer contains an invalid character: "_".';
       return false;
     }
-    if (expressionString.match(/\(\d\+\)/g)) {
+
+    if (expressionString.match(/^(\d+)\+$|^\(\d+\+\)$/g)) {
       this.warningText = (
         'Your answer seems to be missing a number after' +
         ' the + operator.');
@@ -184,35 +185,35 @@ export class MathInteractionsService {
       return false;
     }
 
-    if (expressionString.match(/\(\d\*\)/g)) {
+    if (expressionString.match(/^(\d+)\*$|^\(\d+\*\)$/g)) {
       this.warningText = (
         'Your answer seems to be missing a number after' +
         ' the × operator.');
       return false;
     }
 
-    if (expressionString.match(/(\*$)|(\(\*\))|(\(\*\d\))|(\*\d)/g)) {
+    if (expressionString.match(/(\*$)|(\(\*\))|^(\(\*\d+\))|^(\*\d+)/g)) {
       this.warningText = (
         'Your answer seems to be missing a number before' +
         ' the × operator.');
       return false;
     }
 
-    if (expressionString.match(/\(\d\/\)/g)) {
+    if (expressionString.match(/^(\d+)\/$|^\(\d+\/\)$/g)) {
       this.warningText = (
         'Your answer seems to be missing a number after' +
         ' the ÷ operator.');
       return false;
     }
 
-    if (expressionString.match(/(\/$)|(\(\/\))|(\(\/\d\))|(\/\d)/g)) {
+    if (expressionString.match(/^\/$|^\(\/\)$|^(\(\/\d+\))|^(\/\d+)/g)) {
       this.warningText = (
         'Your answer seems to be missing a number before' +
         ' the ÷ operator.');
       return false;
     }
 
-    if (expressionString.match(/\(\d\-\)/g)) {
+    if (expressionString.match(/^(\d+)\-$|^\(\d+\-\)$/g)) {
       this.warningText = (
         'Your answer seems to be missing a number after' +
         ' the - operator.');
@@ -225,37 +226,6 @@ export class MathInteractionsService {
         ' the - operator.');
       return false;
     }
-
-// Improved code
-
-    // const operatorRegex = /(\d[+\-*/]|[+\-*/]\d|\(\d[+\-*/]\)|\([+\-*/]\)|[+\-*/])/g;
-    // const match = expressionString.match(operatorRegex);
-
-    // if (!match) {
-    //   return true;
-    // }
-
-    // for (const operator of match) {
-    //   if (/^\d[+\-*/]\d+$/.test(operator) || !/^\d+(\s*[+\-*/]\s*\d+)+$/.test(operator)) {
-    //     this.warningText = `Your answer seems to be missing a number after the ${operator[operator.length - 1] === "*" ? "×" : operator[operator.length - 1] === "/"  ? "÷" : operator[operator.length - 1]} operator.`;
-    //     return false;
-    //   } else if (/^[*/]\d$/.test(operator)) {
-    //     this.warningText = `Your answer seems to be missing a number before the ${operator[0] === "*" ? "×" : operator[0] === "/" ? "÷" : operator[0]} operator.`;
-    //     return false;
-    //   } else if (/^\([+\-*/]\)$/.test(operator)) {
-    //     if (operator === '(+)') {
-    //       this.warningText = `Your answer seems to be missing a number before the + operator.`;
-    //     } else if (operator === '(-)') {
-    //       this.warningText = `Your answer seems to be missing a number before the - operator.`;
-    //     } else if (operator === '(×)') {
-    //       this.warningText = `Your answer seems to be missing a number before the × operator.`;
-    //     } else if (operator === '(÷)') {
-    //       this.warningText = `Your answer seems to be missing a number before the ÷ operator.`;
-    //     }
-    //     return false;
-    //   }
-    // }
-
     let invalidIntegers = expressionString.match(
       /(\d*\.\d*\.\d*)|(\d+\.\D)|(\D\.\d+)|(\d+\.$)/g);
     if (invalidIntegers !== null) {
