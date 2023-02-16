@@ -35,6 +35,7 @@ from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -1166,11 +1167,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_delete_topic(self) -> None:
         # Add suggestion for the topic to test if it is deleted too.
+        content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(
             'question_id',
             self.user_id_admin,
-            self._create_valid_question_data('dest'),
-            [self.skill_id_1])
+            self._create_valid_question_data('dest', content_id_generator),
+            [self.skill_id_1],
+            content_id_generator.next_content_id_index)
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_TOPIC,

@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, TestBed } from
   '@angular/core/testing';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -214,7 +214,7 @@ describe('Home tab Component', () => {
 
   it('should show empty learn something new tab' +
     '\'when goal selection limit is reached\'', () => {
-    component.currentGoalsLength = constants.MAX_CURRENT_GOALS_COUNT;
+    component.currentGoalsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
 
     expect(component.isGoalLimitReached()).toBeTrue();
 

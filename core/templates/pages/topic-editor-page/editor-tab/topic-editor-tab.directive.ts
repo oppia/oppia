@@ -20,10 +20,10 @@ import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/chang
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { Subscription } from 'rxjs';
+import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AppConstants } from 'app.constants';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
