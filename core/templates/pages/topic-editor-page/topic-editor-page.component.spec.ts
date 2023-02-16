@@ -20,7 +20,7 @@ import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { StoryReference } from 'domain/topic/story-reference-object.model';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { TopicEditorRoutingService } from './services/topic-editor-routing.service';

@@ -23,7 +23,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { StoryReference } from 'domain/topic/story-reference-object.model';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';

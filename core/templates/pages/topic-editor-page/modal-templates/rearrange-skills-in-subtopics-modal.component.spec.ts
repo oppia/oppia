@@ -25,7 +25,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { Topic, TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { RearrangeSkillsInSubtopicsModalComponent } from './rearrange-skills-in-subtopics-modal.component';
 
@@ -91,7 +91,6 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   let fixture: ComponentFixture<RearrangeSkillsInSubtopicsModalComponent>;
   let topicEditorStateService: TopicEditorStateService;
   let topicUpdateService: TopicUpdateService;
-  let topicObjectFactory: TopicObjectFactory;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
   let topic: Topic;
@@ -105,7 +104,6 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       providers: [
         TopicEditorStateService,
         TopicUpdateService,
-        TopicObjectFactory,
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
@@ -157,10 +155,9 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     );
     component = fixture.componentInstance;
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     topicUpdateService = TestBed.inject(TopicUpdateService);
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    topic = topicObjectFactory.create(
+    topic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict);
     topic._subtopics = [subtopic];

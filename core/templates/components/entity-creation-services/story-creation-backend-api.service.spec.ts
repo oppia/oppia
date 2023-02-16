@@ -19,7 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { async, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Topic, TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
@@ -34,7 +34,6 @@ describe('Story Creation Backend Api Service', () => {
   let imageBlob: Blob;
   let ngbModal: NgbModal;
   let httpTestingController: HttpTestingController;
-  let topicObjectFactory: TopicObjectFactory;
   let topic: Topic;
   let windowRef: WindowRef;
   let mockWindow = {
@@ -92,7 +91,6 @@ describe('Story Creation Backend Api Service', () => {
     };
 
     windowRef = TestBed.inject(WindowRef);
-    topicObjectFactory = TestBed.inject(TopicObjectFactory);
     scbas = TestBed.inject(StoryCreationBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -101,7 +99,7 @@ describe('Story Creation Backend Api Service', () => {
     csrfTokenService = TestBed.inject(CsrfTokenService);
 
     imageBlob = new Blob(['image data'], {type: 'imagetype'});
-    topic = topicObjectFactory.create(
+    topic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict);
     topic.getId = () => {
