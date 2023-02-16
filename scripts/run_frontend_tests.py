@@ -26,12 +26,13 @@ import sys
 # we migrate to Python 3.8.
 from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from typing import Optional, Sequence  # isort:skip
+from typing import Final, List, Optional, Tuple, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
 from . import install_third_party_libs  # isort:skip
 
+MAX_RETRY_COUNT: Final = 1
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
 # the given path is absolute.
@@ -106,11 +107,8 @@ def run_dtslint_type_tests() -> None:
     if task.returncode:
         sys.exit('The dtslint (type tests) failed.')
 
-
-def main(args: Optional[Sequence[str]] = None) -> None:
-    """Runs the frontend tests."""
-    parsed_args = _PARSER.parse_args(args=args)
-
+def run_frontend_tests(
+        parsed_args: argparse.Namespace) -> Tuple[List[bytes], int]:
     run_dtslint_type_tests()
     if parsed_args.dtslint_only:
         return
@@ -200,20 +198,30 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             ' please see https://github.com/oppia/oppia/wiki/'
             'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.')
+    
+    return_value = concatenated_output, task.returncode
+    return return_value
+
+def main(args: Optional[Sequence[str]] = None) -> None:
+    """Runs the frontend tests, rerunning once if chrome disconnects."""
+    parsed_args = _PARSER.parse_args(args=args)
+
+    concatenated_output, returncode = main(parsed_args)
 
     if 'Disconnected , because no message' in concatenated_output:
-        main()
+        for attempt_num in range(2, MAX_RETRY_COUNT + 2):
+            print('***Attempt %d.***' % attempt_num)
+            main(parsed_args)
 
     if parsed_args.check_coverage:
-        if task.returncode:
+        if returncode:
             sys.exit(
                 'The frontend tests failed. Please fix it before running the'
                 ' test coverage check.')
         else:
             check_frontend_test_coverage.main()
-    elif task.returncode:
-        sys.exit(task.returncode)
-
+    elif returncode:
+        sys.exit(returncode)
 
 if __name__ == '__main__':  # pragma: no cover
     main()
