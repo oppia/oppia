@@ -109,7 +109,7 @@ def run_dtslint_type_tests() -> None:
 
 
 def run_frontend_tests(
-    parsed_args: argparse.Namespace) -> Tuple[List[bytes], int]:
+    parsed_args: argparse.Namespace) -> Tuple[str, int]:
     """Runs the frontend tests."""
     if not parsed_args.skip_install:
         install_third_party_libs.main()
