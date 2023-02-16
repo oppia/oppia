@@ -13,27 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ConceptCardObjectFactory.
+ * @fileoverview Unit tests for concept-card.model.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { ConceptCardBackendDict, ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCardBackendDict, ConceptCard } from 'domain/skill/concept-card.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { WorkedExampleBackendDict, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExampleBackendDict, WorkedExample } from 'domain/skill/worked-example.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Concept card object factory', () => {
-  let conceptCardObjectFactory: ConceptCardObjectFactory;
   let conceptCardDict: ConceptCardBackendDict;
   let example1: WorkedExampleBackendDict;
   let example2: WorkedExampleBackendDict;
-  let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
-    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
-
     example1 = {
       question: {
         html: 'worked example question 1',
@@ -81,17 +74,17 @@ describe('Concept card object factory', () => {
 
   it('should create a new concept card from a backend dictionary', () => {
     let conceptCard =
-          conceptCardObjectFactory.createFromBackendDict(conceptCardDict);
+      ConceptCard.createFromBackendDict(conceptCardDict);
     expect(conceptCard.getExplanation()).toEqual(
       SubtitledHtml.createDefault(
         'test explanation', 'explanation'));
     expect(conceptCard.getWorkedExamples()).toEqual([
-      workedExampleObjectFactory.create(
+      WorkedExample.create(
         SubtitledHtml.createDefault(
           'worked example question 1', 'worked_example_q_1'),
         SubtitledHtml.createDefault(
           'worked example explanation 1', 'worked_example_e_1')),
-      workedExampleObjectFactory.create(
+      WorkedExample.create(
         SubtitledHtml.createDefault(
           'worked example question 2', 'worked_example_q_2'),
         SubtitledHtml.createDefault(
@@ -101,7 +94,7 @@ describe('Concept card object factory', () => {
 
   it('should convert to a backend dictionary', () => {
     let conceptCard =
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict);
+      ConceptCard.createFromBackendDict(conceptCardDict);
     expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);
   });
 
@@ -127,7 +120,7 @@ describe('Concept card object factory', () => {
 
     conceptCardDict.recorded_voiceovers = voiceover;
     let conceptCard =
-          conceptCardObjectFactory.createFromBackendDict(conceptCardDict);
+      ConceptCard.createFromBackendDict(conceptCardDict);
 
     expect(conceptCard.getRecordedVoiceovers())
       .toEqual(RecordedVoiceovers.createFromBackendDict(voiceover));

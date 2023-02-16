@@ -27,7 +27,7 @@ import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { Skill, SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { UrlService } from 'services/contextual/url.service';

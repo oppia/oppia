@@ -20,7 +20,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';

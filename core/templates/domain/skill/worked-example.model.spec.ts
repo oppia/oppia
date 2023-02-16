@@ -13,21 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for WorkedExampleObjectFactory.
+ * @fileoverview Unit tests for worked-example.model.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { WorkedExampleBackendDict, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExampleBackendDict, WorkedExample } from 'domain/skill/worked-example.model';
 
 describe('Worked example object factory', () => {
   let workedExampleBackendDict: WorkedExampleBackendDict;
-  let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
-
     workedExampleBackendDict = {
       question: {
         html: 'worked example question 1',
@@ -42,7 +37,7 @@ describe('Worked example object factory', () => {
 
   it('should create a new worked example from a backend dictionary', () => {
     let workedExample = (
-      workedExampleObjectFactory.createFromBackendDict(
+      WorkedExample.createFromBackendDict(
         workedExampleBackendDict));
     expect(workedExample.getQuestion()).toEqual(
       SubtitledHtml.createDefault(
@@ -54,7 +49,7 @@ describe('Worked example object factory', () => {
 
   it('should convert to a backend dictionary', () => {
     let workedExample = (
-      workedExampleObjectFactory.createFromBackendDict(
+      WorkedExample.createFromBackendDict(
         workedExampleBackendDict));
     expect(workedExample.toBackendDict()).toEqual(workedExampleBackendDict);
   });

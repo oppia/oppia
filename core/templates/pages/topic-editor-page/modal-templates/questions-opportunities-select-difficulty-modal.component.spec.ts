@@ -21,7 +21,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConceptCardBackendDict } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCardBackendDict } from 'domain/skill/concept-card.model';
 import { MisconceptionBackendDict } from 'domain/skill/MisconceptionObjectFactory';
 import { RubricBackendDict } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';

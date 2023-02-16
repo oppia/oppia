@@ -94,8 +94,6 @@ import { CollectionValidationService } from
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
-import { ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
 import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
@@ -480,8 +478,6 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
-import { WorkedExampleObjectFactory } from
-  'domain/skill/WorkedExampleObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -783,8 +779,6 @@ export class UpgradedServices {
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']);
-    upgradedServices['WorkedExampleObjectFactory'] =
-      new WorkedExampleObjectFactory();
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
@@ -809,8 +803,6 @@ export class UpgradedServices {
     upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']);
-    upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
-      upgradedServices['WorkedExampleObjectFactory']);
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['BlogPostPageService']);
@@ -935,7 +927,6 @@ export class UpgradedServices {
         upgradedServices['LanguageUtilService']);
     upgradedServices['ConceptCardBackendApiService'] =
       new ConceptCardBackendApiService(
-        upgradedServices['ConceptCardObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ClassifierDataBackendApiService'] =
@@ -1056,7 +1047,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
-        upgradedServices['ConceptCardObjectFactory'],
         upgradedServices['MisconceptionObjectFactory'],
         upgradedServices['ValidatorsService']);
     upgradedServices['SkillRightsBackendApiService'] =

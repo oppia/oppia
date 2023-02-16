@@ -23,7 +23,7 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { UrlService } from 'services/contextual/url.service';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';

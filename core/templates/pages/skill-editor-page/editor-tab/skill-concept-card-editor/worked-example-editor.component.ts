@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExample } from 'domain/skill/worked-example.model';
 
 interface HtmlFormSchema {
   type: 'html';

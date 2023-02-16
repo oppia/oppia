@@ -17,8 +17,6 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import {
   RecordedVoiceovers,
   RecordedVoiceOverBackendDict
@@ -29,9 +27,8 @@ import {
 } from 'domain/exploration/subtitled-html.model';
 import {
   WorkedExample,
-  WorkedExampleBackendDict,
-  WorkedExampleObjectFactory
-} from 'domain/skill/WorkedExampleObjectFactory';
+  WorkedExampleBackendDict
+} from 'domain/skill/worked-example.model';
 
 export interface ConceptCardBackendDict {
   'explanation': SubtitledHtmlBackendDict;
@@ -125,24 +122,16 @@ export class ConceptCard {
   getRecordedVoiceovers(): RecordedVoiceovers {
     return this._recordedVoiceovers;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ConceptCardObjectFactory {
-  constructor(
-      private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
-
-  _generateWorkedExamplesFromBackendDict(
+  static _generateWorkedExamplesFromBackendDict(
       workedExampleDicts: WorkedExampleBackendDict[]): WorkedExample[] {
     return workedExampleDicts.map(workedExampleDict=> {
-      return this.workedExampleObjectFactory.createFromBackendDict(
+      return WorkedExample.createFromBackendDict(
         workedExampleDict);
     });
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       conceptCardBackendDict: ConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
       SubtitledHtml.createFromBackendDict(
@@ -153,7 +142,3 @@ export class ConceptCardObjectFactory {
         conceptCardBackendDict.recorded_voiceovers));
   }
 }
-
-angular.module('oppia').factory(
-  'ConceptCardObjectFactory',
-  downgradeInjectable(ConceptCardObjectFactory));

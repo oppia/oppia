@@ -23,7 +23,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { WorkedExample, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExample } from 'domain/skill/worked-example.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AddWorkedExampleModalComponent } from 'pages/skill-editor-page/modal-templates/add-worked-example.component';
 import { DeleteWorkedExampleComponent } from 'pages/skill-editor-page/modal-templates/delete-worked-example-modal.component';
@@ -69,8 +69,7 @@ export class SkillConceptCardEditorComponent implements OnInit {
     private skillEditorStateService: SkillEditorStateService,
     private skillUpdateService: SkillUpdateService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionsService: WindowDimensionsService,
-    private workedExampleObjectFactory: WorkedExampleObjectFactory,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   drop(event: CdkDragSortEvent<WorkedExample[]>): void {
@@ -140,7 +139,7 @@ export class SkillConceptCardEditorComponent implements OnInit {
     this.ngbModal.open(AddWorkedExampleModalComponent, {
       backdrop: 'static'
     }).result.then((result) => {
-      let newExample = this.workedExampleObjectFactory.create(
+      let newExample = WorkedExample.create(
         SubtitledHtml.createDefault(
           result.workedExampleQuestionHtml,
           this.generateContentIdService.getNextId(

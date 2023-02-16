@@ -17,8 +17,6 @@
  * worked examples.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import {
   SubtitledHtml, SubtitledHtmlBackendDict
 } from 'domain/exploration/subtitled-html.model';
@@ -51,16 +49,8 @@ export class WorkedExample {
   getExplanation(): SubtitledHtml {
     return this._explanation;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class WorkedExampleObjectFactory {
-  constructor() {}
-
-
-  createFromBackendDict(
+  static createFromBackendDict(
       workedExampleDict: WorkedExampleBackendDict): WorkedExample {
     return new WorkedExample(
       SubtitledHtml.createFromBackendDict(
@@ -70,11 +60,9 @@ export class WorkedExampleObjectFactory {
     );
   }
 
-  create(question: SubtitledHtml, explanation: SubtitledHtml): WorkedExample {
+  static create(
+      question: SubtitledHtml, explanation: SubtitledHtml
+  ): WorkedExample {
     return new WorkedExample(question, explanation);
   }
 }
-
-angular.module('oppia').factory(
-  'WorkedExampleObjectFactory',
-  downgradeInjectable(WorkedExampleObjectFactory));

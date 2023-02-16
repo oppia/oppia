@@ -19,14 +19,14 @@
 import { TestBed } from '@angular/core/testing';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ConceptCardBackendDict } from './ConceptCardObjectFactory';
+import { ConceptCardBackendDict } from './concept-card.model';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillContentsWorkedExamplesChange } from 'domain/editor/undo_redo/change.model';
 import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { WorkedExampleObjectFactory, WorkedExampleBackendDict } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExample, WorkedExampleBackendDict } from 'domain/skill/worked-example.model';
 import { LocalStorageService } from 'services/local-storage.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { EventEmitter } from '@angular/core';
@@ -35,7 +35,6 @@ describe('Skill update service', () => {
   let skillUpdateService: SkillUpdateService;
   let skillObjectFactory: SkillObjectFactory;
   let misconceptionObjectFactory: MisconceptionObjectFactory;
-  let workedExampleObjectFactory: WorkedExampleObjectFactory;
   let undoRedoService: UndoRedoService;
   let localStorageService: LocalStorageService;
 
@@ -50,8 +49,7 @@ describe('Skill update service', () => {
         SkillUpdateService,
         UndoRedoService,
         MisconceptionObjectFactory,
-        SkillObjectFactory,
-        WorkedExampleObjectFactory,
+        SkillObjectFactory
       ],
     });
 
@@ -61,7 +59,6 @@ describe('Skill update service', () => {
 
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
     const misconceptionDict1 = {
       id: 2,
@@ -425,7 +422,7 @@ describe('Skill update service', () => {
 
     skillUpdateService.addWorkedExample(
       skill,
-      workedExampleObjectFactory.createFromBackendDict(newExample)
+      WorkedExample.createFromBackendDict(newExample)
     );
 
     const workedExamplesObject: SkillContentsWorkedExamplesChange = {
@@ -439,15 +436,15 @@ describe('Skill update service', () => {
       workedExamplesObject,
     ]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      workedExampleObjectFactory.createFromBackendDict(example1),
-      workedExampleObjectFactory.createFromBackendDict(example2),
-      workedExampleObjectFactory.createFromBackendDict(newExample),
+      WorkedExample.createFromBackendDict(example1),
+      WorkedExample.createFromBackendDict(example2),
+      WorkedExample.createFromBackendDict(newExample),
     ]);
 
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      workedExampleObjectFactory.createFromBackendDict(example1),
-      workedExampleObjectFactory.createFromBackendDict(example2),
+      WorkedExample.createFromBackendDict(example1),
+      WorkedExample.createFromBackendDict(example2),
     ]);
   });
 
@@ -467,13 +464,13 @@ describe('Skill update service', () => {
       [workedExamplesObject]
     );
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      workedExampleObjectFactory.createFromBackendDict(example2),
+      WorkedExample.createFromBackendDict(example2),
     ]);
 
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      workedExampleObjectFactory.createFromBackendDict(example1),
-      workedExampleObjectFactory.createFromBackendDict(example2),
+      WorkedExample.createFromBackendDict(example1),
+      WorkedExample.createFromBackendDict(example2),
     ]);
   });
 
@@ -509,14 +506,14 @@ describe('Skill update service', () => {
       [workedExamplesObject]
     );
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      workedExampleObjectFactory.createFromBackendDict(modifiedExample1),
-      workedExampleObjectFactory.createFromBackendDict(example2),
+      WorkedExample.createFromBackendDict(modifiedExample1),
+      WorkedExample.createFromBackendDict(example2),
     ]);
 
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      workedExampleObjectFactory.createFromBackendDict(example1),
-      workedExampleObjectFactory.createFromBackendDict(example2),
+      WorkedExample.createFromBackendDict(example1),
+      WorkedExample.createFromBackendDict(example2),
     ]);
   });
 
@@ -555,7 +552,7 @@ describe('Skill update service', () => {
     );
     expect(skill.getConceptCard().getWorkedExamples()).toEqual(
       newWorkedExamples.map((workedExample) => {
-        return workedExampleObjectFactory.createFromBackendDict(
+        return WorkedExample.createFromBackendDict(
           workedExample.toBackendDict()
         );
       })
@@ -564,8 +561,8 @@ describe('Skill update service', () => {
     undoRedoService.undoChange(skill);
 
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      workedExampleObjectFactory.createFromBackendDict(example1),
-      workedExampleObjectFactory.createFromBackendDict(example2),
+      WorkedExample.createFromBackendDict(example1),
+      WorkedExample.createFromBackendDict(example2),
     ]);
   });
 

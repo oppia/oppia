@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ConceptCardBackendDict, ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCardBackendDict, ConceptCard } from
+  'domain/skill/concept-card.model';
 import { MisconceptionBackendDict, MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { NormalizeWhitespacePipe } from
@@ -33,7 +33,6 @@ import { AppConstants } from 'app.constants';
 
 describe('Skill object factory', () => {
   let skillObjectFactory: SkillObjectFactory;
-  let conceptCardObjectFactory: ConceptCardObjectFactory;
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let example1 = null;
   let example2 = null;
@@ -50,7 +49,6 @@ describe('Skill object factory', () => {
         NormalizeWhitespacePipe,
       ]
     });
-    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     skillDifficulties = AppConstants.SKILL_DIFFICULTIES;
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
@@ -138,7 +136,7 @@ describe('Skill object factory', () => {
     expect(skill.getRubrics()).toEqual([
       Rubric.createFromBackendDict(rubricDict)]);
     expect(skill.getConceptCard()).toEqual(
-      conceptCardObjectFactory.createFromBackendDict(skillContentsDict));
+      ConceptCard.createFromBackendDict(skillContentsDict));
     expect(skill.getLanguageCode()).toEqual('en');
     expect(skill.getVersion()).toEqual(3);
     expect(skill.getSupersedingSkillId()).toEqual('2');
