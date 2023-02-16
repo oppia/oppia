@@ -243,7 +243,7 @@ describe('Topic editor functionality', function() {
       // await topicEditorPage.expectUncategorizedSkillsToBe(
       //   ['Skill 2']);
       // await topicEditorPage.saveRearrangedSkills();
-      await topicEditorPage.replacement(0);
+      await topicEditorPage.replacementDragSkillToSubtopic(0);
       await topicEditorPage.saveTopic('Rearranged skills');
     });
 

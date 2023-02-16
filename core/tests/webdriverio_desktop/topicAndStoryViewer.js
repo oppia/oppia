@@ -173,7 +173,7 @@ describe('Topic and Story viewer functionality', function() {
     // Await topicEditorPage.navigateToReassignModal();
     // await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
     // await topicEditorPage.saveRearrangedSkills();
-    await topicEditorPage.replacement(0);
+    await topicEditorPage.replacementDragSkillToSubtopic(0);
     await topicEditorPage.saveTopic('Added skill to subtopic.');
     await topicEditorPage.publishTopic();
     await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');

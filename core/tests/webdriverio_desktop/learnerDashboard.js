@@ -300,7 +300,7 @@ describe('Learner dashboard functionality', function() {
     // Await topicEditorPage.
     // dragSkillToSubtopic('Learner Dashboard Skill 1', 0);
     // await topicEditorPage.saveRearrangedSkills();
-    await topicEditorPage.replacement(0);
+    await topicEditorPage.replacementDragSkillToSubtopic(0);
     await topicEditorPage.saveTopic('Added skill to subtopic.');
 
     await topicEditorPage.updateMetaTagContent('meta tag content');
@@ -416,7 +416,7 @@ describe('Learner dashboard functionality', function() {
     // await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, [
     //   'Learner Dashboard Skill 2']);
     // await topicEditorPage.saveRearrangedSkills();
-    await topicEditorPage.replacement(0);
+    await topicEditorPage.replacementDragSkillToSubtopic(0);
     await topicEditorPage.saveTopic('Added skill to subtopic.');
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');

@@ -153,7 +153,7 @@ describe('Checkpoints functionality', function() {
     // await topicEditorPage.
     // dragSkillToSubtopic('Checkpoint features skill', 0);
     // await topicEditorPage.saveRearrangedSkills();
-    await topicEditorPage.replacement(0);
+    await topicEditorPage.replacementDragSkillToSubtopic(0);
     await topicEditorPage.saveTopic('Added skill to subtopic.');
     await topicEditorPage.publishTopic();
     await topicsAndSkillsDashboardPage.editTopic('Checkpoint features topic');
