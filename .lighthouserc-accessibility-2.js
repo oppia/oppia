@@ -81,12 +81,6 @@ module.exports = {
             'categories:accessibility': ['error', {'minScore': 0.91}]
           }
         },
-        // {
-        //   'matchingUrlPattern': '^http://127.0.0.1:8181/collection_editor/create/.*$',
-        //   'assertions': {
-        //     'categories:accessibility': ['error', {'minScore': 0.86}]
-        //   }
-        // },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/topic_editor/.*$',
           'assertions': {
