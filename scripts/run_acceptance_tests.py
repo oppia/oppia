@@ -36,7 +36,7 @@ from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
 
 MAX_RETRY_COUNT: Final = 3
-GOOGLE_APP_ENGINE_PORT: Final = 9001
+GOOGLE_APP_ENGINE_PORT: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
 PORTS_USED_BY_OPPIA_PROCESSES: Final = [
     GOOGLE_APP_ENGINE_PORT,
