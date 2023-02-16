@@ -26,7 +26,7 @@ import sys
 # we migrate to Python 3.8.
 from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 
-from typing import Final, Optional, Tuple, Sequence  # isort:skip
+from typing import Optional, Tuple, Sequence  # isort:skip
 
 from . import build  # isort:skip
 from . import check_frontend_test_coverage  # isort:skip
