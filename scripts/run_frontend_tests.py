@@ -210,9 +210,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     output, returncode = run_frontend_tests(parsed_args)
 
-    if output and 'Disconnected , because no message' in output:
+    if 'Disconnected , because no message' in output:
         for _ in range(1):
-            run_frontend_tests(parsed_args)
+            output, returncode = run_frontend_tests(parsed_args)
 
     if parsed_args.check_coverage:
         if returncode:
