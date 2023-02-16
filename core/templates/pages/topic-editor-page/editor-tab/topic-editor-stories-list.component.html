@@ -15,7 +15,7 @@
   <tbody cdkDropList
          (cdkDropListDropped)="drop($event)">
     <tr *ngFor="let summary of storySummaries; index as idx"
-        class="list-item e2e-test-list-view-item-item"
+        class="list-item e2e-test-list-view-item-item e2e-test-story-list-item"
         cdkDrag>
       <td>
         <a (click)="openStoryEditor(summary.getId())" class="list-summary text-left">
