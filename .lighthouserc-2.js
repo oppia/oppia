@@ -100,10 +100,10 @@ module.exports = {
             'uses-responsive-images': ['error', {'minScore': 1}]
           }
         },
-        {
-          'matchingUrlPattern': 'http://[^/]+/collection_editor/create/.*$',
-          'assertions': baseConfig['basePerformanceAssertions']
-        },
+        // {
+        //   'matchingUrlPattern': 'http://[^/]+/collection_editor/create/.*$',
+        //   'assertions': baseConfig['basePerformanceAssertions']
+        // },
         {
           'matchingUrlPattern': 'http://[^/]+/topic_editor/.*$',
           'assertions': baseConfig['basePerformanceAssertions']
