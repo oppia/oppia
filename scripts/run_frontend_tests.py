@@ -107,8 +107,10 @@ def run_dtslint_type_tests() -> None:
     if task.returncode:
         sys.exit('The dtslint (type tests) failed.')
 
+
 def run_frontend_tests(
         parsed_args: argparse.Namespace) -> Tuple[List[bytes], int]:
+    """Runs the frontend tests."""
     run_dtslint_type_tests()
     if parsed_args.dtslint_only:
         return
@@ -198,15 +200,16 @@ def run_frontend_tests(
             ' please see https://github.com/oppia/oppia/wiki/'
             'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.')
-    
+
     return_value = concatenated_output, task.returncode
     return return_value
+
 
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests, rerunning once if chrome disconnects."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    concatenated_output, returncode = main(parsed_args)
+    concatenated_output, returncode = run_frontend_tests(parsed_args)
 
     if 'Disconnected , because no message' in concatenated_output:
         for attempt_num in range(2, MAX_RETRY_COUNT + 2):
@@ -222,6 +225,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             check_frontend_test_coverage.main()
     elif returncode:
         sys.exit(returncode)
+
 
 if __name__ == '__main__':  # pragma: no cover
     main()

@@ -154,7 +154,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Running dtslint type tests.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
         self.assertEqual(len(self.cmd_token_list), 1)
-    
+
     def test_frontend_tests_are_rerun_when_chrome_disconnected(self) -> None:
         with self.swap_chrome_disconnected, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
@@ -265,4 +265,3 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Downloaded the combined-tests.spec.js file and stored'
             'in ../karma_coverage_reports', self.print_arr)
-
