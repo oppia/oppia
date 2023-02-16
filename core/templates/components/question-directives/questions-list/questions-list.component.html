@@ -67,7 +67,11 @@
               <oppia-rte-output-display classStr="question-text"
                                          [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
               </oppia-rte-output-display>
-              <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
+              <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())"
+                    matTooltip="Unaddressed skill misconceptions"
+                    matTooltipClass="oppia-mat-tooltip-list">
+                    ⚠️
+              </span>
               <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId());$event.stopPropagation();"
                     class="link-off-icon">
                 <i class="fas fa-trash"></i>
@@ -127,12 +131,19 @@
     </div>
     <div class="save-question-button-container">
       <button class="btn question-edit-cancel-button" (click)="cancel()">CANCEL</button>
-      <button title="To Save please add: interaction, hint, solution and address all misconceptions"
-              class="btn add-question-btn question-edit-save-button e2e-test-save-question-button"
-              (click)="saveQuestion()"
-              [disabled]="!isQuestionSavable()">
-        SAVE
-      </button>
+      <span matTooltip="To Save please add: interaction, hint, solution and address all misconceptions"
+            matTooltipClass="oppia-mat-tooltip-list"
+            [matTooltipDisabled]="isQuestionSavable()"
+            class="w-100">
+        <button class="btn add-question-btn question-edit-save-button e2e-test-save-question-button"
+                (click)="saveQuestion()"
+                [disabled]="!isQuestionSavable()">
+          <i class="fas fa-exclamation-triangle story-save-draft-warning"
+            *ngIf="!isQuestionSavable()">
+          </i>
+          SAVE
+        </button>
+      </span>
     </div>
   </mat-card>
   <div class="create-question-container" *ngIf="!editorIsOpen">
