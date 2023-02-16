@@ -581,25 +581,26 @@ export class Topic {
     });
   }
 
-  // Reassigns all values within this topic to match the existing
+  // Reassigns all values within a copy topic variable to match this
   // topic. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic.
-  copyFromTopic(otherTopic: Topic): Topic {
-    let id = otherTopic.getId();
-    let name = otherTopic.getName();
-    let abbreviatedName = otherTopic.getAbbreviatedName();
-    let urlFragment = otherTopic.getUrlFragment();
-    let thumbnailFilename = otherTopic.getThumbnailFilename();
-    let thumbnailBgColor = otherTopic.getThumbnailBgColor();
-    let description = otherTopic.getDescription();
-    let languageCode = otherTopic.getLanguageCode();
-    let practiceTabIsDisplayed = otherTopic.getPracticeTabIsDisplayed();
-    let metaTagContent = otherTopic.getMetaTagContent();
-    let pageTitleFragmentForWeb = otherTopic.getPageTitleFragmentForWeb();
+  createCopyFromTopic(): Topic {
+    let id = this.getId();
+    let name = this.getName();
+    let abbreviatedName = this.getAbbreviatedName();
+    let urlFragment = this.getUrlFragment();
+    let thumbnailFilename = this.getThumbnailFilename();
+    let thumbnailBgColor = this.getThumbnailBgColor();
+    let description = this.getDescription();
+    let languageCode = this.getLanguageCode();
+    let practiceTabIsDisplayed = this.getPracticeTabIsDisplayed();
+    let metaTagContent = this.getMetaTagContent();
+    let pageTitleFragmentForWeb = this.getPageTitleFragmentForWeb();
     let skillSummariesForDiagnosticTest =
-      otherTopic.getSkillSummariesForDiagnosticTest();
-    let version = otherTopic.getVersion();
-    let nextSubtopicId = otherTopic.getNextSubtopicId();
+      this.getSkillSummariesForDiagnosticTest();
+    let version = this.getVersion();
+    let nextSubtopicId = this.getNextSubtopicId();
+
     let topic = new Topic(
       id, name, abbreviatedName, urlFragment, description,
       languageCode, [], [], [], nextSubtopicId, version, [],
@@ -611,19 +612,19 @@ export class Topic {
     topic.clearUncategorizedSkills();
     topic.clearSubtopics();
 
-    topic._canonicalStoryReferences = otherTopic.getCanonicalStoryReferences();
+    topic._canonicalStoryReferences = this.getCanonicalStoryReferences();
     topic._additionalStoryReferences =
-        otherTopic.getAdditionalStoryReferences();
+        this.getAdditionalStoryReferences();
 
     let uncategorizedSkillSummaries =
-        otherTopic.getUncategorizedSkillSummaries();
+        this.getUncategorizedSkillSummaries();
     for (let i = 0; i < uncategorizedSkillSummaries.length; i++) {
       topic.addUncategorizedSkill(
         uncategorizedSkillSummaries[i].getId(),
         uncategorizedSkillSummaries[i].getDescription());
     }
 
-    topic._subtopics = cloneDeep(otherTopic.getSubtopics());
+    topic._subtopics = cloneDeep(this.getSubtopics());
     return topic;
   }
 

@@ -136,7 +136,7 @@ export class TopicEditorStateService {
   }
 
   private _setTopic(topic: Topic): void {
-    this._topic = topic.copyFromTopic(topic);
+    this._topic = topic.createCopyFromTopic();
     // Reset the subtopic pages list after setting new topic.
     this._cachedSubtopicPages.length = 0;
     if (this._topicIsInitialized) {
@@ -251,24 +251,22 @@ export class TopicEditorStateService {
         newBackendTopicObject.topicDict,
         newBackendTopicObject.skillIdToDescriptionDict
       );
-      if (this._topic) {
-        this._skillCreationIsAllowed = (
-          newBackendTopicObject.skillCreationIsAllowed);
-        this._skillQuestionCountDict = (
-          newBackendTopicObject.skillQuestionCountDict);
-        this._updateGroupedSkillSummaries(
-          newBackendTopicObject.groupedSkillSummaries);
-        this._updateGroupedSkillSummaries(
-          newBackendTopicObject.groupedSkillSummaries);
-        this._updateSkillIdToRubricsObject(
-          newBackendTopicObject.skillIdToRubricsDict);
-        this._updateClassroomUrlFragment(
-          newBackendTopicObject.classroomUrlFragment);
-        this._updateTopicRights(newBackendTopicRightsObject);
-        this._setCanonicalStorySummaries(canonicalStorySummaries);
-        this._topicIsLoading = false;
-        this.loaderService.hideLoadingScreen();
-      }
+      this._skillCreationIsAllowed = (
+        newBackendTopicObject.skillCreationIsAllowed);
+      this._skillQuestionCountDict = (
+        newBackendTopicObject.skillQuestionCountDict);
+      this._updateGroupedSkillSummaries(
+        newBackendTopicObject.groupedSkillSummaries);
+      this._updateGroupedSkillSummaries(
+        newBackendTopicObject.groupedSkillSummaries);
+      this._updateSkillIdToRubricsObject(
+        newBackendTopicObject.skillIdToRubricsDict);
+      this._updateClassroomUrlFragment(
+        newBackendTopicObject.classroomUrlFragment);
+      this._updateTopicRights(newBackendTopicRightsObject);
+      this._setCanonicalStorySummaries(canonicalStorySummaries);
+      this._topicIsLoading = false;
+      this.loaderService.hideLoadingScreen();
     }, (error) => {
       this.alertsService.addWarning(
         error || 'There was an error when loading the topic editor.');

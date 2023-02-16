@@ -72,25 +72,23 @@ export class TopicEditorNavbarComponent {
   }
 
   _validateTopic(): void {
-    if (this.topic) {
-      this.validationIssues = this.topic.validate();
-      if (this.topicEditorStateService.getTopicWithNameExists()) {
-        this.validationIssues.push(
-          'A topic with this name already exists.');
-      }
-      if (this.topicEditorStateService.getTopicWithUrlFragmentExists()) {
-        this.validationIssues.push(
-          'Topic URL fragment already exists.');
-      }
-      let prepublishTopicValidationIssues = (
-        this.topic.prepublishValidate());
-      let subtopicPrepublishValidationIssues = (
-        [].concat.apply([], this.topic.getSubtopics().map(
-          (subtopic) => subtopic.prepublishValidate())));
-      this.prepublishValidationIssues = (
-        prepublishTopicValidationIssues.concat(
-          subtopicPrepublishValidationIssues));
+    this.validationIssues = this.topic.validate();
+    if (this.topicEditorStateService.getTopicWithNameExists()) {
+      this.validationIssues.push(
+        'A topic with this name already exists.');
     }
+    if (this.topicEditorStateService.getTopicWithUrlFragmentExists()) {
+      this.validationIssues.push(
+        'Topic URL fragment already exists.');
+    }
+    let prepublishTopicValidationIssues = (
+      this.topic.prepublishValidate());
+    let subtopicPrepublishValidationIssues = (
+      [].concat.apply([], this.topic.getSubtopics().map(
+        (subtopic) => subtopic.prepublishValidate())));
+    this.prepublishValidationIssues = (
+      prepublishTopicValidationIssues.concat(
+        subtopicPrepublishValidationIssues));
   }
 
   publishTopic(): void {
@@ -256,11 +254,19 @@ export class TopicEditorNavbarComponent {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this.topicSkillIds = this.topic.getSkillIds();
+          this._validateTopic();
+        }
       ));
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this.topicSkillIds = this.topic.getSkillIds();
+          this._validateTopic();
+        }
       ));
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
@@ -278,7 +284,11 @@ export class TopicEditorNavbarComponent {
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this.topicSkillIds = this.topic.getSkillIds();
+          this._validateTopic();
+        }
       )
     );
   }
