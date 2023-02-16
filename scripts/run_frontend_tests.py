@@ -109,11 +109,11 @@ def run_dtslint_type_tests() -> None:
 
 
 def run_frontend_tests(
-        parsed_args: argparse.Namespace) -> Tuple[List[bytes], int]:
+    parsed_args: argparse.Namespace) -> Optional[Tuple[List[bytes], int]]:
     """Runs the frontend tests."""
     run_dtslint_type_tests()
     if parsed_args.dtslint_only:
-        return
+        return None
 
     if not parsed_args.skip_install:
         install_third_party_libs.main()
@@ -209,12 +209,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests, rerunning once if chrome disconnects."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    concatenated_output, returncode = run_frontend_tests(parsed_args)
+    output, returncode = run_frontend_tests(parsed_args)
 
-    if 'Disconnected , because no message' in concatenated_output:
+    if output and 'Disconnected , because no message' in output:
         for attempt_num in range(2, MAX_RETRY_COUNT + 2):
             print('***Attempt %d.***' % attempt_num)
-            main(parsed_args)
+            run_frontend_tests(parsed_args)
 
     if parsed_args.check_coverage:
         if returncode:
