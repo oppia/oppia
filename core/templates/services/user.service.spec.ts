@@ -33,7 +33,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 class MockWindowRef {
-  imageData = {};
+  imageData: Record<string, string> = {};
   _window = {
     location: {
       pathname: 'home'

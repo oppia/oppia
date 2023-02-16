@@ -45,7 +45,6 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   activeTab!: string;
   newLearnerGroupTitle!: string;
   newLearnerGroupDescription!: string;
-  profilePictureUrl!: string;
   readOnlyMode = true;
   invitedLearnersInfo!: LearnerGroupUserInfo[];
   currentLearnersInfo!: LearnerGroupUserInfo[];

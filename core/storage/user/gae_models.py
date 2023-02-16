@@ -2918,6 +2918,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         data export.
         """
         return dict(super(cls, cls).get_export_policy(), **{
+            'username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'normalized_long_term_username': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),

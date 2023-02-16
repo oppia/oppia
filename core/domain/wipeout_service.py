@@ -394,6 +394,8 @@ def _delete_profile_picture(
         username: str. The username of the user.
     """
     username = pending_deletion_request.username
+    # Ruling out the possibility of different types for mypy type checking.
+    assert isinstance(username, str)
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'

@@ -44,7 +44,6 @@ export class InviteLearnersComponent {
 
   searchedUsername: string = '';
   errorMessage!: string;
-  profilePictureUrl!: string;
 
   constructor(
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,

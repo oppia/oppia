@@ -31,6 +31,7 @@ import { EmailPreferencesBackendDict, PreferencesBackendDict, UpdatePreferencesR
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferencesPageComponent } from './preferences-page.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Preferences Page Component', () => {
   let componentInstance: PreferencesPageComponent;
@@ -96,7 +97,8 @@ describe('Preferences Page Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        NgbModalModule
+        NgbModalModule,
+        HttpClientTestingModule
       ],
       declarations: [
         MockTranslatePipe,
@@ -204,6 +206,27 @@ describe('Preferences Page Component', () => {
     expect(componentInstance.getProfileImageWebpDataUrl('username')).toBe(
       'default-image-url-webp');
   });
+
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      let userInfo = {
+        getUsername: () => null,
+        isSuperAdmin: () => true,
+        getEmail: () => 'test_email@example.com'
+      };
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+
+        componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.profilePicturePngDataUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.png');
+      expect(componentInstance.profilePictureWebpDataUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.webp');
+    }));
 
   it('should get static image url', () => {
     let staticImageUrl = 'static_image_url';
