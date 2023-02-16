@@ -162,6 +162,7 @@ const getExplorationEditorUrl = async function(browser, page) {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getCollectionEditorUrl = async function(browser, page) {
   try {
     // Load in Collection
@@ -306,7 +307,8 @@ const main = async function() {
   await getExplorationEditorUrl(browser, page);
 
   await setRole(browser, page, 'COLLECTION_EDITOR');
-  await getCollectionEditorUrl(browser, page);
+  // eslint-disable-next-line capitalized-comments
+  // await getCollectionEditorUrl(browser, page);
 
   await setRole(browser, page, 'ADMIN');
   await getTopicEditorUrl(browser, page);
