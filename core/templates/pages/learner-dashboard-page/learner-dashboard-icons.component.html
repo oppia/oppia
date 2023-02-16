@@ -1,6 +1,6 @@
 <i class="oppia-learner-dashboard-icon far fa-clock e2e-test-add-to-playlist-btn"
    *ngIf="isAddToPlaylistIconShown"
-   [hidden]="!(canActivityBeAddedToLearnerPlaylist(activityId) && !isContainerNarrow)" 
+   [hidden]="!(canActivityBeAddedToLearnerPlaylist(activityId) && !isContainerNarrow)"
    (click)="addToLearnerPlaylist(activityId, activityType)"
    tabindex="0"
    ngbTooltip="{{ 'I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate }}"
