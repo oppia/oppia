@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
