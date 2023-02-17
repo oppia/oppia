@@ -50,7 +50,6 @@ angular.module('oppia').directive('oppiaRoot', [
               'BrowserCheckerService',
               'ClassroomBackendApiService', 'CodeReplRulesService',
               'CollectionCreationBackendService', 'ComputeGraphService',
-              'ConceptCardObjectFactory',
               'CreatorDashboardBackendApiService',
               'CurrentInteractionService', 'DateTimeFormatService',
               'DebouncerService',
