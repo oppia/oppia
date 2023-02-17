@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
@@ -31,7 +31,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { CdkDragSortEvent } from '@angular/cdk/drag-drop';
-import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExample } from 'domain/skill/worked-example.model';
 import { of } from 'rxjs';
 
 class MockNgbModalRef {
