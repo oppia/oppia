@@ -150,6 +150,15 @@ export class TopicEditorNavbarComponent {
     );
   }
 
+  isWarningTooltipDisabled(): boolean {
+    return this.isTopicSaveable() || this.getTotalWarningsCount() === 0;
+  }
+
+  getAllTopicWarnings(): string {
+    return this.validationIssues.concat(
+    ).concat(this.prepublishValidationIssues).join('\n');
+  }
+
   toggleDiscardChangeButton(): void {
     this.showTopicEditOptions = false;
     this.discardChangesButtonIsShown = (
