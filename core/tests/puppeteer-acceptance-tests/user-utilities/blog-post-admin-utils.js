@@ -45,6 +45,8 @@ const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = ' Confirm ';
 const LABEL_FOR_ADD_THUMBNAIL_BUTTON = ' Add Thumbnail Image ';
 const LABEL_FOR_ADD_ELEMENT_BUTTON = ' Add element ';
+const duplicateBlogPostWarningMessage = ' Blog Post with the' +
+  ' given title exists already. Please use a different title. ';
 
 module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
@@ -182,7 +184,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   }
 
   /**
-   * This function creates a new blog post with given title.
+   * This function creates a new blog post with the given title.
    * @param {string} newBlogPostTitle - The title of the blog post.
    */
   async createNewBlogPostWithTitle(newBlogPostTitle) {
@@ -237,11 +239,9 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   }
 
   /**
-   * This function checks that the publish button is disabled.
-   * @param {string} expectedWarningMessage - The warning message to be
-   * displayed when the user tries to publish a duplicate blog post.
+   * This function checks that the user is unable to publish a blog post.
    */
-  async expectUserUnableToPublishBlogPost(expectedWarningMessage) {
+  async expectUserUnableToPublishBlogPost() {
     const toastMessageBox = await this.page.$(
       'div.e2e-test-toast-warning-message');
     const toastMessageWarning = await this.page.evaluate(
@@ -250,12 +250,14 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       publishBlogPostButton, (button) => {
         return button.disabled;
       });
-    if (!isPublishButtonDisabled ||
-        expectedWarningMessage !== toastMessageWarning) {
+    if (!isPublishButtonDisabled) {
       throw new Error('User is able to publish duplicate blog post');
     }
+    if (toastMessageWarning === duplicateBlogPostWarningMessage) {
+      showMessage('Blog post with same title already exists');
+    }
 
-    showMessage('User is not able to publish blog post if title duplicates');
+    showMessage('User is unable to publish the blog post');
   }
 
   /**
