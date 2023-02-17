@@ -8,7 +8,7 @@
   <div class="modal-footer">
     <button type="button"
           (click)="cancel()"
-          class="btn practise-session-btn-cancel"
+          class="btn practice-session-btn-cancel"
           [textContent]="'I18N_MODAL_CANCEL_BUTTON' | translate">
     </button>
     <button type="button"
@@ -27,10 +27,19 @@
     background-color: #00645c;
     border-color: #00645c;
     color: #fff;
+    font-weight: bold;
   }
   .practice-session-btn-cancel{
     background-color: #fff;
     border-color: #00645c;
     color: #00645c;
+    font-weight: bold;
+  }
+ 
+  .modal-header{
+    border: none;
+  }
+  .modal-footer{
+    border: none;
   }
 </style>
