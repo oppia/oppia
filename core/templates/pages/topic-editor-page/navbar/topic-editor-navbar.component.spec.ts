@@ -652,4 +652,23 @@ describe('Topic Editor Navbar', () => {
     expect(alertsService.addSuccessMessage)
       .toHaveBeenCalledWith('Mail Sent.', 1000);
   }));
+
+  it('should return all the warnings when called', () => {
+    componentInstance.topic = topic;
+    componentInstance._validateTopic();
+    expect(componentInstance.getAllTopicWarnings()).toEqual([
+      'Topic url fragment is not valid.',
+      'Topic should have a thumbnail.',
+      'Subtopic with title subtopic1 does not have any skill IDs linked.',
+      'Topic should have page title fragment.',
+      'Topic should have meta tag content.',
+      'Subtopic subtopic1 should have a thumbnail.'
+    ].join('\n'));
+  });
+
+  it('should return true or false when called', () => {
+    componentInstance.topic = topic;
+    componentInstance._validateTopic();
+    expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
+  });
 });
