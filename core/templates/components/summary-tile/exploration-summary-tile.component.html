@@ -81,6 +81,14 @@
   </button>
 </div>
 <div *ngIf="mobileCardToBeShown">
+  <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
+                [activityType]="activityType"
+                [activityId]="explorationId"
+                [activityTitle]="explorationTitle"
+                [isContainerNarrow]="isContainerNarrow"
+                [activityActive]="explorationIsCurrentlyHoveredOver"
+                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+  </oppia-learner-dashboard-icons>
   <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration" [ngStyle]="{'margin': '5px'}">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="mobile-exploration-card-image-container" [ngStyle]="{'background-color': thumbnailBgColor}">
