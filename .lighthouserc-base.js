@@ -50,7 +50,6 @@ module.exports = {
       'http://127.0.0.1:8181/thanks',
       'http://127.0.0.1:8181/volunteer',
       `http://127.0.0.1:8181/create/${process.env.exploration_id}`,
-      `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_id}`,
       `http://127.0.0.1:8181/topic_editor/${process.env.topic_id}`,
       `http://127.0.0.1:8181/skill_editor/${process.env.skill_id}`,
       `http://127.0.0.1:8181/story_editor/${process.env.story_id}`
