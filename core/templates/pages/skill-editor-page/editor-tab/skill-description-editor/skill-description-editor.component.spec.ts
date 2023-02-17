@@ -15,7 +15,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { SkillRights, SkillRightsBackendDict } from 'domain/skill/skill-rights.model';
 
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
