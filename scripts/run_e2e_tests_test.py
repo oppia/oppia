@@ -321,8 +321,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_rerun_when_tests_fail_with_rerun_yes(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
-        def mock_check_test_flakiness(*_: str) -> bool:
-            return True
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
@@ -336,8 +334,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_no_rerun_when_tests_flake_with_rerun_no(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
-        def mock_check_test_flakiness(*_: str) -> bool:
-            return False
 
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
@@ -351,8 +347,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_no_rerun_when_tests_flake_with_rerun_unknown(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
-        def mock_check_test_flakiness(*_: str) -> bool:
-            return False
 
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
@@ -367,11 +361,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        def mock_check_test_flakiness(
-            unused_output: str, unused_suite_name: str
-        ) -> None:
-            raise AssertionError('Tried to Check Flakiness.')
-
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
@@ -384,9 +373,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_no_reruns_off_ci_pass(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 0
-
-        def mock_report_pass(unused_suite_name: str) -> None:
-            raise AssertionError('Tried to Report Pass')
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
