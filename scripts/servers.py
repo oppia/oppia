@@ -729,7 +729,6 @@ def managed_acceptance_tests_server(
     suite_name: str = 'full',
     sharding_instances: int = 1,
     chrome_version: Optional[str] = None,
-    mobile: bool = False,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the Acceptance server gracefully.
@@ -743,7 +742,6 @@ def managed_acceptance_tests_server(
             is used instead.
         stdout: int. This parameter specifies the executed program's standard
             output file handle.
-        mobile: bool. Whether to run the webdriverio tests in mobile mode.
 
     Yields:
         psutil.Process. The webdriverio process.
@@ -757,21 +755,7 @@ def managed_acceptance_tests_server(
     if chrome_version is None:
         chrome_version = get_chrome_version()
 
-    if mobile:
-        os.environ['MOBILE'] = 'true'
-    else:
-        os.environ['MOBILE'] = 'false'
-
     acceptance_tests_args = [common.NODE_BIN_PATH, suite_name]
-
-    # Capabilities in wdio.conf.js are added as an array of object,
-    # so in order to set the value of maximum instances of chrome
-    # in wdio.conf.js, we need to provide the index of the capability
-    # at which chrome is present, i.e. 0.
-    # if sharding_instances > 1:
-    #     webdriverio_args.extend([
-    #        '--capabilities[0].maxInstances=%d' % sharding_instances,
-    #    ])
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
@@ -783,8 +767,5 @@ def managed_acceptance_tests_server(
         stdout=stdout,
     )
 
-    try:
-        with managed_acceptance_tests_proc as proc:
-            yield proc
-    finally:
-        del os.environ['MOBILE']
+    with managed_acceptance_tests_proc as proc:
+        yield proc

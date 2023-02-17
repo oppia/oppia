@@ -123,7 +123,7 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
-      - name: Run E2E Test ${{ matrix.suite }}
+      - name: Run Acceptance Test ${{ matrix.suite }}
         run: python -m scripts.run_acceptance_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
       - name: Uploading webpack bundles as an artifact
         if: ${{ failure() }}
@@ -135,5 +135,5 @@ jobs:
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "An E2E test failed on the upstream develop branch."
+          message: "An acceptance test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

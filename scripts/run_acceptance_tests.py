@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python execution for running e2e tests."""
+"""Python execution for running acceptance tests."""
 
 from __future__ import annotations
 
@@ -24,9 +24,6 @@ import sys
 
 from typing import Final, List, Optional, Tuple
 
-# TODO(#15567): This can be removed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
 from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
 
 from core.constants import constants  # isort:skip
@@ -46,12 +43,9 @@ PORTS_USED_BY_OPPIA_PROCESSES: Final = [
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
-   python -m scripts.run_e2e_tests
+   python -m scripts.run_acceptance_tests
 
 The root folder MUST be named 'oppia'.
-
-NOTE: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
-single test or test suite.
 """)
 
 _PARSER.add_argument(
@@ -75,20 +69,11 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--suite', default='full',
-    help='Performs test for different suites, here suites are the '
-         'name of the test files present in core/tests/webdriverio_desktop/ '
-         'and core/test/webdriverio/ dirs. e.g. for the file '
-         'core/tests/webdriverio/accessibility.js use --suite=accessibility. '
+    help='Performs test for different suites'
          'For performing a full test, no argument is required.')
 _PARSER.add_argument(
     '--chrome_driver_version',
     help='Uses the specified version of the chrome driver')
-_PARSER.add_argument(
-    '--debug_mode',
-    help='Runs the webdriverio test in debugging mode. Follow the instruction '
-         'provided in following URL to run e2e tests in debugging mode: '
-         'https://webdriver.io/docs/debugging/',
-    action='store_true')
 _PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
@@ -103,11 +88,6 @@ _PARSER.add_argument(
     '--mobile',
     help='Run e2e test in mobile viewport.',
     action='store_true')
-
-
-MOBILE_SUITES = [
-    'contributorDashboard'
-]
 
 
 def is_oppia_server_already_running() -> bool:
@@ -224,24 +204,13 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        if (args.mobile) and (args.suite not in MOBILE_SUITES):
-            print(
-                f'The {args.suite} suite should not be run ' +
-                'in the mobile viewport'
-                )
-            sys.exit(1)
-
         proc = stack.enter_context(servers.managed_acceptance_tests_server(
                 suite_name=args.suite,
                 chrome_version=args.chrome_driver_version,
                 sharding_instances=args.sharding_instances,
-                mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
-        print(
-            'Servers have come up.\n'
-            'Note: You can view screenshots of failed tests '
-            'in ../webdriverio-screenshots/')
+        print('Servers have come up.\n')
 
         output_lines = []
         while True:
