@@ -35,7 +35,17 @@
     color: #00645c;
     font-weight: bold;
   }
- 
+  .modal-body p{
+    text-indent: 2em;
+    padding-left: 2em;
+  }
+  .modal-body p::first-line {
+  text-indent: 0;
+  padding-left: 0;
+  }
+  .modal-body p:not(::first-line) {
+  text-indent: 4em;
+  }
   .modal-header{
     border: none;
   }
