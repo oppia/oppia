@@ -19,7 +19,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 
 @Component({
   selector: 'oppia-concept-card',
