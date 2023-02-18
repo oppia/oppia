@@ -107,9 +107,12 @@
 
 .beta-label {
   position: absolute;
+  top: 50px;
   right: 0;
   background-color: #046336;
   color: white;
+  font-size: 12px;
+  padding: 5px 10px;
   margin: 0;
 }
 
