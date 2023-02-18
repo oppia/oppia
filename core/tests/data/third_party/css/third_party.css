@@ -21140,10 +21140,10 @@ readers do not read off random characters that represent icons */
   content: "\f107"; }
 
 .fa-angle-left:before {
-  content: "\f104"; }
+  content: "\f105"; }
 
 .fa-angle-right:before {
-  content: "\f105"; }
+  content: "\f104"; }
 
 .fa-angle-up:before {
   content: "\f106"; }
