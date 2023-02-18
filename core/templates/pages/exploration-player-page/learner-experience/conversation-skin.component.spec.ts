@@ -28,7 +28,7 @@ import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
 import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';

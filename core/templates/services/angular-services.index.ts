@@ -114,10 +114,8 @@ import { QuestionBackendApiService } from 'domain/question/question-backend-api.
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
 import { PracticeSessionsBackendApiService } from 'pages/practice-session-page/practice-session-backend-api.service';
-import { ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
@@ -504,7 +502,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ConceptCardManagerService', ConceptCardManagerService],
   ['InternetConnectivityService', InternetConnectivityService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
-  ['ConceptCardObjectFactory', ConceptCardObjectFactory],
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
   ['ContentTranslationLanguageService', ContentTranslationLanguageService],
   ['ContentTranslationManagerService', ContentTranslationManagerService],
@@ -896,7 +893,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],
   ['WinnowingPreprocessingService', WinnowingPreprocessingService],
-  ['WorkedExampleObjectFactory', WorkedExampleObjectFactory],
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['YamlService', YamlService],
