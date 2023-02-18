@@ -7,6 +7,7 @@
     </div>
 
     <div class="oppia-question-player-card">
+      <span class="beta-label">Beta</span>
       <div [hidden]="!(totalQuestions > 0)">
         <h3 class="oppia-question-player-header">Question {{currentQuestion}}/{{totalQuestions}}</h3>
         <div class="oppia-question-player-progress">
@@ -289,6 +290,7 @@
   }
 
   .oppia-question-player-container .oppia-question-player-card {
+    position: relative;
     background: #fff;
     border-radius: 4px;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
@@ -428,6 +430,17 @@
 
   .oppia-question-player-container .oppia-col-width {
     width: 50%;
+  }
+
+  .beta-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #00645c;
+  color: white;
+  font-size: 14px;
+  padding: 5px 10px;
+  margin: 0;
   }
 
   @media screen and (max-width: 575px) {
