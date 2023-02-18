@@ -32,7 +32,7 @@ import { StateBackendDict } from
 import { SubtitledHtmlBackendDict } from
   'domain/exploration/subtitled-html.model';
 import { WorkedExampleBackendDict } from
-  'domain/skill/WorkedExampleObjectFactory';
+  'domain/skill/worked-example.model';
 import { Collection } from 'domain/collection/collection.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
