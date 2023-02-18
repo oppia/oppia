@@ -107,13 +107,10 @@
 
 .beta-label {
   position: absolute;
-  top: 0;
   right: 0;
-  background-color: #FFC107; /* set the background color */
-  color: white; /* set the text color */
-  font-size: 14px; /* set the font size */
-  padding: 5px 10px; /* add some padding */
-  margin: 0; /* reset margins */
+  background-color: #046336;
+  color: white;
+  margin: 0;
 }
 
 @media (max-width: 1024px) {
@@ -187,8 +184,4 @@
 
 .practice-tab .oppia-topic-viewer-container .background-banner-position {
   position: inherit;
-}
-
-.beta-label {
-  
 }
