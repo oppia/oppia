@@ -101,10 +101,6 @@ module.exports = {
           }
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/collection_editor/create/.*$',
-          'assertions': baseConfig['basePerformanceAssertions']
-        },
-        {
           'matchingUrlPattern': 'http://[^/]+/topic_editor/.*$',
           'assertions': baseConfig['basePerformanceAssertions']
         },
