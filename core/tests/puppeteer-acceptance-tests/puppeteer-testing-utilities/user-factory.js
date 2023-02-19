@@ -23,7 +23,7 @@ let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance = null;
+let superAdminInstance = blogAdminInstance = null;
 let activeUsers = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
@@ -67,6 +67,7 @@ let createNewBlogAdmin = async function(username) {
   await superAdminInstance.expectUserToHaveRole(username, ROLE_BLOG_ADMIN);
 
   activeUsers.push(blogAdmin);
+  blogAdminInstance = blogAdmin;
   return blogAdmin;
 };
 
@@ -77,14 +78,16 @@ let createNewBlogAdmin = async function(username) {
  * @returns The blog post editor instance created.
  */
 let createNewBlogPostEditor = async function(username) {
-  const blogAdmin = await createNewBlogAdmin('blogAdm');
+  if (blogAdminInstance === null) {
+    blogAdminInstance = await createNewBlogAdmin('blogAdm');
+  }
 
   const blogPostEditor = new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
   await blogPostEditor.signUpNewUser(
     username, 'blog_post_editor@example.com');
 
-  await blogAdmin.assignUserToRoleFromBlogAdminPage(
+  await blogAdminInstance.assignUserToRoleFromBlogAdminPage(
     'blogPostEditor', 'BLOG_POST_EDITOR');
   await superAdminInstance.expectUserToHaveRole(
     'blogPostEditor', ROLE_BLOG_POST_EDITOR);

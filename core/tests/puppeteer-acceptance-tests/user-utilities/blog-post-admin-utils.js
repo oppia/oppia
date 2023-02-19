@@ -34,6 +34,8 @@ const maximumTagLimitInput = 'input#mat-input-0';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
+const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
+const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = ' CREATE NEW BLOG POST ';
 const LABEL_FOR_SAVE_BUTTON = ' Save ';
@@ -125,7 +127,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks if the Publish button is disabled.
    */
   async expectPublishButtonToBeDisabled() {
-    await this.page.waitForSelector('button.e2e-test-publish-blog-post-button');
+    await this.page.waitForSelector(publishBlogPostButton);
     await this.page.evaluate(() => {
       const publishedButtonIsDisabled = document.getElementsByClassName(
         'e2e-test-publish-blog-post-button')[0].disabled;
@@ -160,6 +162,8 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn(thumbnailPhotoBox);
     await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.page.waitForSelector(
+      `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
@@ -170,7 +174,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
     await this.page.waitForSelector(
-      'button.e2e-test-publish-blog-post-button:not([disabled])');
+      `${publishBlogPostButton}:not([disabled])`);
     await this.clickOn('PUBLISH');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
