@@ -107,13 +107,16 @@
 
 .beta-label {
   position: absolute;
-  top: 50px;
   right: 0;
   background-color: #00645c;
   color: white;
-  font-size: 12px;
-  padding: 5px 10px;
+  font-size: 13px;
+  padding: 5px 12px;
   margin: 0;
+}
+
+.beta-label:hover {
+  background-color: #003d38;
 }
 
 @media (max-width: 1024px) {
