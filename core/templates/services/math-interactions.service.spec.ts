@@ -307,7 +307,7 @@ describe('MathInteractionsService', () => {
       'Please enter numbers only.');
   });
 
-    it('should validate equations correctly', function() {
+  it('should validate equations correctly', function() {
     // Success cases.
     expect(mathInteractionsService.validateEquation(
       'x=y', ['x', 'y'])).toBeTrue();
