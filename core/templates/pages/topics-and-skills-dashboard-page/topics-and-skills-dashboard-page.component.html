@@ -79,8 +79,7 @@
               <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
             </div>
             <div *ngIf="activeTab === TAB_NAME_SKILLS">
-              <div style="align-content: center;">
-                <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
+              <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
                 <span class="dashboard-list-pagination-value"
                       *ngFor=" let n of getPages(pageNumber + 1, getTotalCountValueForSkills()/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
                   <span *ngIf="pageNumber === n-1" class="dashboard-list-pagination-active">
@@ -89,8 +88,7 @@
                   <span *ngIf="pageNumber !== n-1 && n !== -1">{{ n }}</span>
                   <span *ngIf="pageNumber !== n-1 && n === -1">...</span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
-              </div>
+              <i class="fa fa-angle-right topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
             </div>
           </div>
 

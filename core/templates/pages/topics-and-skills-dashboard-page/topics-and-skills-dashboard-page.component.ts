@@ -143,7 +143,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   }
 
   getPages(current: number, total: number): number[] {
-    total = Math.ceil(total)
+    total = Math.ceil(total);
     if (total <= 6) {
       return [...Array(total).keys()].map((x) => ++x);
     }
