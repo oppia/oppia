@@ -7,7 +7,11 @@
     </div>
 
     <div class="oppia-question-player-card">
-      <span class="beta-label">Beta</span>
+      <span class="beta-label"
+            matTooltip="This feature is only available in English for now"
+            matTooltipClass="oppia-mat-tooltip-list">
+        Beta
+      </span>
       <div [hidden]="!(totalQuestions > 0)">
         <h3 class="oppia-question-player-header">Question {{currentQuestion}}/{{totalQuestions}}</h3>
         <div class="oppia-question-player-progress">
