@@ -65,7 +65,7 @@
                         aria-label="Items Per Page">
                   <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
                 </select>
-              </div>        
+              </div>
             </div>
             <div *ngIf="activeTab === TAB_NAME_TOPICS">
               <i class="fa fa-angle-left topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_PREV_PAGE)"></i>
@@ -443,8 +443,8 @@
     cursor: pointer;
     font-size: 16px;
     outline: none;
-    padding: 0 4px;
     display: inline-flex;
+    padding: 0 4px;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active {
     background-color: #00645c;
