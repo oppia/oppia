@@ -4,7 +4,7 @@
     <div class="exp-nav-dropdown-container">
       <div class="exp-nav-dropdown-content e2e-test-mobile-options-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <a>
-          <i class="material-icons">&#xE254;</i>
+          <i class="fa fa-pen"></i>
           Options
         </a>
         <div class="exp-nav-dropdown-icon">
@@ -14,7 +14,7 @@
           <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'uib-dropdown': countWarnings()}">
             <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE254;</i>
+              <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Editor</span>
             </a>
             <div [hidden]="!countWarnings()" class="oppia-editor-warnings-indicator" (click)="selectMainTab()" [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
@@ -26,35 +26,35 @@
           <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'translation'}">
             <a href="#" ngbTooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" placement="bottom" (click)="selectTranslationTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE029;</i>
+              <i class="fa fa-microphone oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
             </a>
           </li>
           <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
             <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE037;</i>
+              <i class="fa fa-play oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
             </a>
           </li>
           <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-settings-button" [ngClass]="{'active': getActiveTabName() === 'settings'}">
             <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE8B8;</i>
+              <i class="fa fa-cog oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Settings</span>
             </a>
           </li>
           <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'stats'}">
             <a href="#" ngbTooltip="Statistics" placement="bottom" (click)="selectStatsTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE24B;</i>
+              <i class="fa fa-poll oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
             </a>
           </li>
           <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'improvements'}" *ngIf="isImprovementsTabEnabled()">
             <a href="#" ngbTooltip="Improvements" placement="bottom" (click)="selectImprovementsTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
+              <i class="fa fa-arrow-trend-up oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
             </a>
           </li>
@@ -62,14 +62,14 @@
             <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab()"
                disabled="ExplorationRightsService.isCloned()"
                class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE192;</i>
+              <i class="fa fa-clock oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
             </a>
           </li>
           <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'feedback'}">
             <a href="#" ngbTooltip="Feedback" placement="bottom" (click)="selectFeedbackTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
-              <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE87F;</i>
+              <i class="fa fa-comment-alt oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Feedback</span>
             </a>
             <div [hidden]="!getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
@@ -92,10 +92,7 @@
                     [disabled]="!connectedToInternet || !isExplorationSaveable()">
               <span *ngIf="!saveIsInProcess">
                 <span *ngIf="isPrivate()">
-                  <i class="material-icons md-18 oppia-save-publish-button-icon"
-                     alt="Save Draft">
-                      &#xE161;
-                  </i>
+                  <i class="fa fa-floppy-disk md-18 oppia-save-publish-button-icon"></i>
                   <span>Save Draft</span>
                   <span class="d-none d-md-block" *ngIf="getChangeListLength()">({{getChangeListLength()}})</span>
                 </span>
@@ -123,7 +120,7 @@
 
         <ul class="dropdown-menu" aria-labelledby="discardButtonPopup">
           <div (click)="discardChanges()">
-            <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE254;</i>
+            <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
             Discard
           </div>
           <div *ngIf="showPublishButton()" [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
@@ -132,10 +129,7 @@
                     (click)="showPublishExplorationModal()"
                     [disabled]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
               <span *ngIf="!publishIsInProcess">
-                <i class="material-icons"
-                   alt="Publish to Oppia Library">
-                  &#xE2C3;
-                </i>
+                <i class="fa fa-cloud-upload-alt"></i>
                 <span>Publish</span>
               </span>
               <span *ngIf="publishIsInProcess">
