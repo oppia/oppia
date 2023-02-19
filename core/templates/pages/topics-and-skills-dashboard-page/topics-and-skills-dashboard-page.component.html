@@ -65,22 +65,29 @@
                         aria-label="Items Per Page">
                   <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
                 </select>
-              </div>
-              <div *ngIf="activeTab === TAB_NAME_TOPICS">
-                <i class="fa fa-angle-left topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value"
-                      *ngFor=" let n of generateNumbersTillRange(currentCount/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
-                  <span *ngIf="pageNumber === idx" class="dashboard-list-pagination-active">
-                    <span>{{ idx + 1 }}</span>
-                  </span>
-                  <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
+              </div>              
+            </div>
+            <div *ngIf="activeTab === TAB_NAME_TOPICS">
+              <i class="fa fa-angle-left topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_PREV_PAGE)"></i>
+              <span class="dashboard-list-pagination-value"
+                    *ngFor=" let n of generateNumbersTillRange(currentCount/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                <span *ngIf="pageNumber === idx" class="dashboard-list-pagination-active">
+                  <span>{{ idx + 1 }}</span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
-              </div>
-              <div *ngIf="activeTab === TAB_NAME_SKILLS">
+                <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
+              </span>
+              <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
+            </div>
+            <div *ngIf="activeTab === TAB_NAME_SKILLS">
+              <div style="align-content: center;">
                 <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-value">
-                  <span class="dashboard-list-pagination-active">{{ skillPageNumber + 1 }}</span>
+                <span class="dashboard-list-pagination-value"
+                      *ngFor=" let n of getPages(pageNumber + 1, getTotalCountValueForSkills()/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                  <span *ngIf="pageNumber === n-1" class="dashboard-list-pagination-active">
+                    <span>{{ n }}</span>
+                  </span>
+                  <span *ngIf="pageNumber !== n-1 && n !== -1">{{ n }}</span>
+                  <span *ngIf="pageNumber !== n-1 && n === -1">...</span>
                 </span>
                 <i class="fa fa-angle-right topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_NEXT_PAGE)"></i>
               </div>
@@ -439,6 +446,7 @@
     font-size: 16px;
     outline: none;
     padding: 0 4px;
+    display: inline-flex;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active {
     background-color: #00645c;

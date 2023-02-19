@@ -142,6 +142,23 @@ export class TopicsAndSkillsDashboardPageComponent {
     return arr;
   }
 
+  getPages(current: number, total: number): number[] {
+    total = Math.ceil(total)
+    if (total <= 6) {
+      return [...Array(total).keys()].map((x) => ++x);
+    }
+
+    if (current >= 4) {
+      if (current >= total - 4) {
+        return [1, -1, total - 2, total - 1, total];
+      } else {
+        return [1, -1, current - 1, current, current + 1, -1, total];
+      }
+    }
+
+    return [1, 2, 3, 4, -1, total];
+  }
+
   /**
    * Tells whether the next skill page is present in memory or not.
    * This case occurs when the next page is fetched from the backend
