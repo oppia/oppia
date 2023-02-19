@@ -903,7 +903,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 'ABC', self.content_id_generator_3),
             [self.skill_id],
             self.content_id_generator_3.next_content_id_index)
-        
+
         change_list = [{
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
