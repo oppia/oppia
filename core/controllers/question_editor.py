@@ -353,7 +353,9 @@ class EditableQuestionDataHandler(
             if (
                     change.cmd ==
                     question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
-                raise self.InvalidInputException
+                raise self.InvalidInputException(
+                    'Cannot create a new fully specified question'
+                )
 
         question_services.update_question(
             self.user_id, question_id, change_list,
