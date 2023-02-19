@@ -745,7 +745,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload = {
             'change_list': change_list,
-            'commit_message': ('a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+            'commit_message': ('a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)),
+            'version': 2
         }
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -779,7 +780,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload = {
             'change_list': change_list,
-            'commit_message': 'update question data'
+            'commit_message': 'update question data',
+            'version': 1
         }
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -826,7 +828,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload = {
             'change_list': change_list,
-            'commit_message': 'update question data'
+            'commit_message': 'update question data',
+            'version': 1
         }
 
         self.login(self.TOPIC_MANAGER_EMAIL)
@@ -871,7 +874,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload = {
             'change_list': change_list,
-            'commit_message': 'update question data'
+            'commit_message': 'update question data',
+            'version': 2
         }
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
