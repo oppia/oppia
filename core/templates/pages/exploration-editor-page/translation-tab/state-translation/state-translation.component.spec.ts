@@ -32,7 +32,7 @@ import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFa
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';

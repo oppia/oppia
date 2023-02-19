@@ -21,7 +21,6 @@ import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/serv
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { Subscription } from 'rxjs';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
@@ -59,7 +58,6 @@ describe('Add Answer Group Modal Component', () => {
         EditorFirstTimeEventsService,
         GenerateContentIdService,
         OutcomeObjectFactory,
-        RuleObjectFactory,
         StateEditorService,
         {
           provide: NgbActiveModal,

@@ -18,26 +18,23 @@
 
 import { ParameterizeRuleDescriptionPipe } from './parameterize-rule-description.pipe';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
 
 describe('ParameterizeRuleDescriptionPipe', () => {
   let parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe;
-  let ruleObjectFactory: RuleObjectFactory;
   let rule: Rule;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        ParameterizeRuleDescriptionPipe,
-        RuleObjectFactory,
+        ParameterizeRuleDescriptionPipe
       ]
     });
     parameterizeRuleDescriptionPipe = (
       TestBed.inject(ParameterizeRuleDescriptionPipe));
-    ruleObjectFactory = TestBed.inject(RuleObjectFactory);
 
-    rule = ruleObjectFactory.createNew('Equals', {
+    rule = Rule.createNew('Equals', {
       Equals: {
         x: '2'
       }
@@ -61,7 +58,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should send black string when rule is null', () => {
-    let testRule = ruleObjectFactory.createNew('none', {
+    let testRule = Rule.createNew('none', {
       rule: {
         x: '2'
       }
@@ -86,7 +83,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should correctly parameterize for TextInput', fakeAsync(() => {
-    var rules = ruleObjectFactory.createNew('Equals', {
+    var rules = Rule.createNew('Equals', {
       x: ({
         normalizedStrSet: ['first', 'secound'],
         contentId: null
@@ -109,7 +106,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   }));
 
   it('should correctly parameterize for Graph', () => {
-    var rules = ruleObjectFactory.createNew('IsIsomorphicTo', {
+    var rules = Rule.createNew('IsIsomorphicTo', {
       inputs: {
         x: 0
       }
@@ -127,7 +124,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should correctly parameterize for Fraction', () => {
-    var rules = ruleObjectFactory.createNew(
+    var rules = Rule.createNew(
       'IsEquivalentToAndInSimplestForm', {
         f: {
           isNegative: false,
@@ -149,7 +146,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should correctly parameterize for NumberWithUnits', () => {
-    var rules = ruleObjectFactory.createNew('IsEqualTo', {
+    var rules = Rule.createNew('IsEqualTo', {
       f: {
         type: 'string',
         real: 5,
@@ -176,7 +173,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should correctly parameterize for MusicPhrase', () => {
-    var rules = ruleObjectFactory.createNew('IsEqualToExceptFor', {
+    var rules = Rule.createNew('IsEqualToExceptFor', {
       x: {
         0: {
           readableNoteName: '0'
@@ -207,7 +204,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should correctly parameterize for InteractiveMap', () => {
-    var rules = ruleObjectFactory.createNew('Within', {
+    var rules = Rule.createNew('Within', {
       d: 10,
       p: 9
     }, {
@@ -225,7 +222,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should correctly parameterize for SetInput', () => {
-    var rules = ruleObjectFactory.createNew('Equals', {
+    var rules = Rule.createNew('Equals', {
       x: {
         unicodeStrSet: ['first', 'secound'],
         contentId: null
@@ -244,7 +241,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should correctly parameterize for MathEquationInput', () => {
-    var rules = ruleObjectFactory.createNew('MatchesExactlyWith', {
+    var rules = Rule.createNew('MatchesExactlyWith', {
       x: '2 + 3',
       y: 'rhs'
     }, {
@@ -262,7 +259,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
   });
 
   it('should correctly parameterize for RatioExpressionInput', () => {
-    var rules = ruleObjectFactory.createNew('Equals', {
+    var rules = Rule.createNew('Equals', {
       x: [2, 3]
     }, {
       x: '[2 , 3]'
@@ -279,7 +276,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
 
   it('should correctly parameterize for SetOfTranslatableHtmlContentIds' +
    ' with INVALID', () => {
-    var rules = ruleObjectFactory.createNew('Equals', {
+    var rules = Rule.createNew('Equals', {
       x: ['1', '2', '3', '4']
     }, {
       x: 'data'
@@ -300,7 +297,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
 
   it('should correctly parameterize for SetOfTranslatableHtmlContentIds',
     () => {
-      var rules = ruleObjectFactory.createNew('Equals', {
+      var rules = Rule.createNew('Equals', {
         x: ['1', '2']
       }, {
         x: 'data'
@@ -321,7 +318,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
 
   it('should correctly parameterize for ListOfSetsOfTranslatableHtmlContentIds',
     () => {
-      var rules = ruleObjectFactory.createNew('IsEqualToOrdering', {
+      var rules = Rule.createNew('IsEqualToOrdering', {
         x: [
           ['1'],
           ['2'],
@@ -345,7 +342,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
 
   it('should correctly parameterize for' +
    'ListOfSetsOfTranslatableHtmlContentIds with INVALID', () => {
-    var rules = ruleObjectFactory.createNew('IsEqualToOrdering', {
+    var rules = Rule.createNew('IsEqualToOrdering', {
       x: [
         ['1'],
         ['5'],
@@ -370,7 +367,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
 
   it('should correctly parameterize for' +
    'DragAndDropPositiveInt with INVALID', () => {
-    var rules = ruleObjectFactory.createNew('HasElementXAtPositionY', {
+    var rules = Rule.createNew('HasElementXAtPositionY', {
       x: 'TranslatableHtmlContentId',
       y: '2'
     }, {

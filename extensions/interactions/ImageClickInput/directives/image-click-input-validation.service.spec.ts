@@ -25,7 +25,7 @@ import { ImageClickInputCustomizationArgs } from
 import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 import { AppConstants } from 'app.constants';
 
@@ -38,7 +38,6 @@ describe('ImageClickInputValidationService', () => {
   let goodDefaultOutcome: Outcome;
   var customizationArguments: ImageClickInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,7 +47,6 @@ describe('ImageClickInputValidationService', () => {
     validatorService = TestBed.inject(ImageClickInputValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -101,7 +99,7 @@ describe('ImageClickInputValidationService', () => {
     };
 
     goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'IsInRegion',
         inputs: {
           x: 'SecondLabel'

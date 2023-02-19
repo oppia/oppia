@@ -23,7 +23,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import { AppConstants } from 'app.constants';
@@ -41,8 +41,7 @@ describe('ItemSelectionInputValidationService', () => {
     badCustomizationArguments: ItemSelectionInputCustomizationArgs;
   let IsProperSubsetValidOption: AnswerGroup[];
   let oof: OutcomeObjectFactory,
-    agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+    agof: AnswerGroupObjectFactory;
   let ThreeInputsAnswerGroups: AnswerGroup[],
     OneInputAnswerGroups: AnswerGroup[],
     NoInputAnswerGroups: AnswerGroup[];
@@ -57,7 +56,6 @@ describe('ItemSelectionInputValidationService', () => {
 
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
 
     currentState = 'First State';
 
@@ -104,7 +102,7 @@ describe('ItemSelectionInputValidationService', () => {
       }
     };
     goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['ca_0', 'ca_1']
@@ -115,7 +113,7 @@ describe('ItemSelectionInputValidationService', () => {
       null)
     ];
     ThreeInputsAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['ca_0', 'ca_1', 'ca_2']
@@ -126,7 +124,7 @@ describe('ItemSelectionInputValidationService', () => {
       null)
     ];
     OneInputAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['ca_0']
@@ -137,7 +135,7 @@ describe('ItemSelectionInputValidationService', () => {
       null)
     ];
     NoInputAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'ContainsAtLeastOneOf',
         inputs: {
           x: []
@@ -148,7 +146,7 @@ describe('ItemSelectionInputValidationService', () => {
       null)
     ];
     IsProperSubsetValidOption = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {
           x: ['ca_0']
@@ -353,7 +351,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.minAllowableSelectionCount.value = 0;
     let answerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['ca_0', 'ca_1']
@@ -403,7 +401,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.minAllowableSelectionCount.value = 0;
     let answerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['ca_0']
@@ -427,7 +425,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     goodDefaultOutcome.feedback.html = '';
     let answerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {
           x: ['ca_0', 'ca_1']
@@ -459,7 +457,7 @@ describe('ItemSelectionInputValidationService', () => {
   'rule', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     let answerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {
           x: ['ca_0', 'ca_1', 'ca_2']
@@ -485,7 +483,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.choices.value =
     [new SubtitledHtml('Selection 3', 'ca_2')];
     let answerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'ContainsAtLeastOneOf',
         inputs: {
           x: ['ca_0', 'ca_1']
@@ -527,7 +525,7 @@ describe('ItemSelectionInputValidationService', () => {
   ' rule', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     let answerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'DoesNotContainAtLeastOneOf',
         inputs: {
           x: ['ca_0', 'ca_1', 'ca_2']
@@ -551,7 +549,7 @@ describe('ItemSelectionInputValidationService', () => {
     goodDefaultOutcome.feedback.html = '';
     customizationArguments.maxAllowableSelectionCount.value = 1;
     let answerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'DoesNotContainAtLeastOneOf',
         inputs: {
           x: ['ca_0']

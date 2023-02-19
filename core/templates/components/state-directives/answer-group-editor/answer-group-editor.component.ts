@@ -20,7 +20,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import isEqual from 'lodash/isEqual';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
@@ -69,7 +69,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     private stateEditorService: StateEditorService,
     private responsesService: ResponsesService,
     private stateInteractionIdService: StateInteractionIdService,
-    private ruleObjectFactory: RuleObjectFactory,
     private alertsService: AlertsService,
     private trainingDataEditorPanelService: TrainingDataEditorPanelService,
     private externalSaveService: ExternalSaveService,
@@ -244,7 +243,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     // TODO(bhenning): Should use functionality in ruleEditor.js, but
     // move it to ResponsesService in StateResponses.js to properly
     // form a new rule.
-    const rule = this.ruleObjectFactory.createNew(
+    const rule = Rule.createNew(
       ruleType, inputs, inputTypes);
     this.rules.push(rule);
     this.changeActiveRuleIndex(this.rules.length - 1);

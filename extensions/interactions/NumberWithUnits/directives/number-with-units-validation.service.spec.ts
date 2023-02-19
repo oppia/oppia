@@ -23,7 +23,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { AppConstants } from 'app.constants';
 import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { Unit } from 'interactions/answer-defs';
 import { Fraction, FractionDict } from 'domain/objects/fraction.model';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
@@ -42,7 +42,6 @@ describe('NumberWithUnitsValidationService', () => {
   let equivalentToTwoRule: Rule;
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
   let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
 
   beforeEach(() => {
@@ -50,7 +49,6 @@ describe('NumberWithUnitsValidationService', () => {
     validatorService = TestBed.inject(NumberWithUnitsValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     var createFractionDict = (
@@ -89,7 +87,7 @@ describe('NumberWithUnitsValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    equalsTwoRule = rof.createFromBackendDict({
+    equalsTwoRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict(
@@ -99,7 +97,7 @@ describe('NumberWithUnitsValidationService', () => {
       }
     }, 'NumberWithUnits');
 
-    equivalentToTwoThousandRule = rof.createFromBackendDict({
+    equivalentToTwoThousandRule = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict(
@@ -109,7 +107,7 @@ describe('NumberWithUnitsValidationService', () => {
       }
     }, 'NumberWithUnits');
 
-    equivalentToTwoRule = rof.createFromBackendDict({
+    equivalentToTwoRule = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict(
@@ -119,7 +117,7 @@ describe('NumberWithUnitsValidationService', () => {
       }
     }, 'NumberWithUnits');
 
-    equalsTwoByThreeRule = rof.createFromBackendDict({
+    equalsTwoByThreeRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
@@ -128,7 +126,7 @@ describe('NumberWithUnitsValidationService', () => {
       }
     }, 'NumberWithUnits');
 
-    equivalentToTwoByThreeRule = rof.createFromBackendDict({
+    equivalentToTwoByThreeRule = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(

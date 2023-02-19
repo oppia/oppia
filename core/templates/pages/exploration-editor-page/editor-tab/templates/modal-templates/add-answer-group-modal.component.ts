@@ -29,7 +29,7 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
@@ -85,7 +85,6 @@ export class AddAnswerGroupModalComponent
      private populateRuleContentIdsService: PopulateRuleContentIdsService,
      private stateEditorService: StateEditorService,
      private editorFirstTimeEventsService: EditorFirstTimeEventsService,
-     private ruleObjectFactory: RuleObjectFactory,
      private generateContentIdService: GenerateContentIdService,
      private outcomeObjectFactory: OutcomeObjectFactory,
      private editabilityService: EditabilityService,
@@ -181,7 +180,7 @@ export class AddAnswerGroupModalComponent
      this.questionModeEnabled = (
        this.stateEditorService.isInQuestionMode());
 
-     this.tmpRule = this.ruleObjectFactory.createNew(null, {}, {});
+     this.tmpRule = Rule.createNew(null, {}, {});
      var feedbackContentId = this.generateContentIdService.getNextStateId(
        AppConstants.COMPONENT_NAME_FEEDBACK);
      this.tmpOutcome = this.outcomeObjectFactory.createNew(

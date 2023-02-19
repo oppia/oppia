@@ -23,8 +23,8 @@ import { Injectable } from '@angular/core';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleBackendDict, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Rule, RuleBackendDict } from
+  'domain/exploration/rule.model';
 import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
 
 export interface AnswerGroupBackendDict {
@@ -73,15 +73,14 @@ export class AnswerGroup extends BaseTranslatableObject {
 })
 export class AnswerGroupObjectFactory {
   constructor(
-    private outcomeObjectFactory: OutcomeObjectFactory,
-    private ruleObjectFactory: RuleObjectFactory) {}
+    private outcomeObjectFactory: OutcomeObjectFactory) {}
 
   generateRulesFromBackendDict(
       ruleBackendDicts: RuleBackendDict[],
       interactionId: string
   ): Rule[] {
     return ruleBackendDicts.map(
-      ruleBackendDict => this.ruleObjectFactory.createFromBackendDict(
+      ruleBackendDict => Rule.createFromBackendDict(
         ruleBackendDict, interactionId)
     );
   }

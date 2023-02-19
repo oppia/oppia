@@ -26,7 +26,7 @@ import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
@@ -40,7 +40,6 @@ describe('GraphInputValidationService', () => {
   let customizationArguments: GraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -51,7 +50,6 @@ describe('GraphInputValidationService', () => {
     validatorService = TestBed.get(GraphInputValidationService);
     oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
@@ -100,14 +98,14 @@ describe('GraphInputValidationService', () => {
     };
 
     var answerGroup = agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         inputs: {
           g: {
             vertices: new Array(10)
           }
         },
         rule_type: 'IsIsomorphicTo'
-      }, 'GraphInput'), rof.createFromBackendDict({
+      }, 'GraphInput'), Rule.createFromBackendDict({
         inputs: {
           g: {
             vertices: new Array(10)
@@ -206,7 +204,7 @@ describe('GraphInputValidationService', () => {
   it('should not verify vertex graph that has \'HasGraphProperty\'' +
   ' rule type', () => {
     var answerGroup = agof.createNew(
-      [rof.createNew('HasGraphProperty', {
+      [Rule.createNew('HasGraphProperty', {
         g: {
           vertices: new Array(10)
         }
@@ -223,7 +221,7 @@ describe('GraphInputValidationService', () => {
 
   it('should validate the maximum number of vertices in the graph', () => {
     var answerGroup = agof.createNew(
-      [rof.createNew('rule', {
+      [Rule.createNew('rule', {
         g: {
           vertices: new Array(52)
         }

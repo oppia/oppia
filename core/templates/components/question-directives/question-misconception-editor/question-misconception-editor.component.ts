@@ -25,7 +25,7 @@ import { Misconception, MisconceptionSkillMap, TaggedMisconception } from 'domai
 import { ExternalSaveService } from 'services/external-save.service';
 import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 export interface MisconceptionUpdatedValues {
   misconception: Misconception;

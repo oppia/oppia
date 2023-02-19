@@ -25,7 +25,7 @@ import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/servi
 import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 @Pipe({ name: 'truncate' })
 class MockTruncatePipe {

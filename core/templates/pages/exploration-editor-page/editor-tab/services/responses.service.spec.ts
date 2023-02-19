@@ -36,7 +36,7 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import {
   SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 describe('Responses Service', () => {

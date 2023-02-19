@@ -21,7 +21,7 @@ import { Fraction } from 'domain/objects/fraction.model';
 import { Ratio } from 'domain/objects/ratio.model';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { FractionAnswer, MusicNotesAnswer, NumberWithUnitsAnswer, RatioInputAnswer } from 'interactions/answer-defs';
 import { TranslatableSetOfNormalizedString, TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
 import { AnswerChoice } from 'components/state-editor/state-editor-properties-services/state-editor.service';

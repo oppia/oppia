@@ -20,20 +20,18 @@ import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/Answer
 import { AppConstants } from 'app.constants';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PencilCodeEditorValidationService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
-import { RuleObjectFactory, RuleInputs } from 'domain/exploration/RuleObjectFactory';
+import { Rule, RuleInputs } from 'domain/exploration/rule.model';
 import { TestBed } from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService;
   let oof: OutcomeObjectFactory;
-  let rof: RuleObjectFactory;
   let inputBackend: RuleInputs;
   let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     oof = TestBed.inject(OutcomeObjectFactory);
     pcevs = TestBed.inject(PencilCodeEditorValidationService);
-    rof = TestBed.inject(RuleObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
   });
 
@@ -78,7 +76,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome2 = oof.createNew(
         'Introduction', 'feedback_0', '<p>YES</p>', []);
-      let rulesDict = rof.createNew('CodeEquals', inputBackend, {
+      let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
       let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
@@ -102,7 +100,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome = oof.createNew(
         'Introduction', 'feedback_0', '<p>YES</p>', []);
-      let rulesDict = rof.createNew('CodeEquals', inputBackend, {
+      let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
       let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
@@ -150,7 +148,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome = oof.createNew(
         'Introduction', 'feedback_0', '<p>YES</p>', []);
-      let rulesDict = rof.createNew('CodeEquals', inputBackend, {
+      let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
       let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);

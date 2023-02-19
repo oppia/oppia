@@ -27,7 +27,7 @@ import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/ser
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import DEFAULT_OBJECT_VALUES from 'objects/object_defaults.json';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 interface SelectItem {

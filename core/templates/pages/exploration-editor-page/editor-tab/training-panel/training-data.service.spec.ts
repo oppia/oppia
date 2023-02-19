@@ -24,7 +24,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { TrainingDataService } from './training-data.service';
 import { ResponsesService } from '../services/responses.service';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';

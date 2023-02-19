@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { BaseTranslatableObject } from 'interactions/rule-input-defs';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 @Injectable({
   providedIn: 'root'

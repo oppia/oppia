@@ -23,8 +23,8 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { DragAndDropSortInputValidationService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Rule } from
+  'domain/exploration/rule.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 
@@ -45,8 +45,7 @@ describe('DragAndDropSortInputValidationService', () => {
     hasElementXAtPositionYRule: Rule;
   let customizationArgs: DragAndDropSortInputCustomizationArgs,
     badCustomizationArgs: DragAndDropSortInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -56,7 +55,6 @@ describe('DragAndDropSortInputValidationService', () => {
     validatorService = TestBed.get(DragAndDropSortInputValidationService);
     oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -114,7 +112,7 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     };
 
-    goodRule1 = rof.createFromBackendDict({
+    goodRule1 = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [
@@ -123,7 +121,7 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput');
 
-    goodRule2 = rof.createFromBackendDict({
+    goodRule2 = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [
@@ -132,7 +130,7 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput');
 
-    equalsListWithAllowedValuesRule = rof.createFromBackendDict({
+    equalsListWithAllowedValuesRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [
@@ -141,7 +139,7 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput');
 
-    equalsListWithValuesRule = rof.createFromBackendDict({
+    equalsListWithValuesRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
         x: [
@@ -150,14 +148,14 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput');
 
-    equalsListWithEmptyListRule = rof.createFromBackendDict({
+    equalsListWithEmptyListRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['ca_0'], [], ['ca_2', 'ca_1', 'ca_3']]
       }
     }, 'DragAndDropSortInput');
 
-    equalsListWithDuplicatesRule = rof.createFromBackendDict({
+    equalsListWithDuplicatesRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
         x: [
@@ -167,7 +165,7 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput');
 
-    hasXBeforeYRule = rof.createFromBackendDict({
+    hasXBeforeYRule = Rule.createFromBackendDict({
       rule_type: 'HasElementXBeforeElementY',
       inputs: {
         x: 'ca_1',
@@ -175,7 +173,7 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput');
 
-    hasElementXAtPositionYRule = rof.createFromBackendDict({
+    hasElementXAtPositionYRule = Rule.createFromBackendDict({
       rule_type: 'HasElementXAtPositionY',
       inputs: {
         x: 'ca_5',
@@ -206,7 +204,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should not allow multiple items in same position', () => {
     customizationArgs.allowMultipleItemsInSamePosition.value = false;
-    var rules = [rof.createFromBackendDict({
+    var rules = [Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['ca_0', 'ca_1'], ['ca_2', 'ca_3']]
