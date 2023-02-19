@@ -134,20 +134,11 @@ export class TopicsAndSkillsDashboardPageComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  generateNumbersTillRange(range: number): number[] {
-    let arr: number[] = [];
-    for (let i = 0; i < range; i++) {
-      arr.push(i);
-    }
-    return arr;
-  }
-
   getPages(current: number, total: number): number[] {
     total = Math.ceil(total);
     if (total <= 6) {
       return [...Array(total).keys()].map((x) => ++x);
     }
-
     if (current >= 4) {
       if (current >= total - 4) {
         return [1, -1, total - 2, total - 1, total];
@@ -155,7 +146,6 @@ export class TopicsAndSkillsDashboardPageComponent {
         return [1, -1, current - 1, current, current + 1, -1, total];
       }
     }
-
     return [1, 2, 3, 4, -1, total];
   }
 

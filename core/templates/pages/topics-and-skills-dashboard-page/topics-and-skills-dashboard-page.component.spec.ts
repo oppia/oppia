@@ -102,8 +102,11 @@ describe('Topics and skills dashboard page component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should generate numbers till range', () => {
-    expect(componentInstance.generateNumbersTillRange(4)).toEqual([0, 1, 2, 3]);
+  it('should generate page numbers for pagination', () => {
+    expect(componentInstance.getPages(1,5)).toEqual([1, 2, 3, 4, 5]);
+    expect(componentInstance.getPages(7,10)).toEqual([1, -1, 8, 9, 10]);
+    expect(componentInstance.getPages(5,10)).toEqual([1, -1, 4, 5, 6, -1, 10]);
+    expect(componentInstance.getPages(1,7)).toEqual([1, 2, 3, 4, -1, 7]);
   });
 
   it('should check whether next skill page is present', () => {
