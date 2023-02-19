@@ -19,6 +19,10 @@
  * /blog-admin page. But this is not the case now, only super admin can do this.
  */
 
+/**
+ * @fileoverview Accpetance Test for a Blog Admin and Blog editor
+ */
+
 const userFactory = require(
   '../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
@@ -26,7 +30,7 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Blog Admin Tests', function() {
+describe('Blog Admin and Blog Editor Tests', function() {
   const ROLE_BLOG_ADMIN = 'blog admin';
   const ROLE_BLOG_POST_EDITOR = 'blog post editor';
   let superAdmin = null;
