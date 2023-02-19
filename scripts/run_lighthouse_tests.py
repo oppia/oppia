@@ -129,9 +129,7 @@ def export_url(line: str) -> None:
     """
     url_parts = line.split('/')
     print('Parsing and exporting entity ID in line: %s' % line)
-    if 'collection_editor' in line:
-        os.environ['collection_id'] = url_parts[5]
-    elif 'create' in line:
+    if 'create' in line:
         os.environ['exploration_id'] = url_parts[4]
     elif 'topic_editor' in line:
         os.environ['topic_id'] = url_parts[4]
