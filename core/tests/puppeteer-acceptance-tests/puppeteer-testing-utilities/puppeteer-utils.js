@@ -101,7 +101,7 @@ module.exports = class baseUser {
   async clickOn(selector) {
     try {
       const [button] = await this.page.$x(
-        `\/\/*[contains(text(), '${selector}')]`);
+        `\/\/*[contains(text(), normalize-space('${selector}'))]`);
       await button.click();
     } catch (error) {
       await this.page.waitForSelector(selector);
