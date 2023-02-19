@@ -391,7 +391,8 @@ def _delete_profile_picture(
     """Verify that the profile picture is deleted.
 
     Args:
-        username: str. The username of the user.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object for which to delete or pseudonymize all the models.
     """
     username = pending_deletion_request.username
     # Ruling out the possibility of different types for mypy type checking.

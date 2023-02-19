@@ -30,7 +30,7 @@ import { UserService } from 'services/user.service';
 import { UrlService } from './contextual/url.service';
 import { PreferencesBackendDict, UserBackendApiService } from './user-backend-api.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
 class MockWindowRef {
   imageData: Record<string, string> = {};
@@ -401,7 +401,7 @@ describe('User Api Service', () => {
       }));
   });
 
-  describe('on emulator mode', () => {
+  describe('on production mode', () => {
     let httpTestingController: HttpTestingController;
     let userService: UserService;
 
