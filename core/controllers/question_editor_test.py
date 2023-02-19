@@ -895,14 +895,14 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator)
-        self.question_id_3 = question_services.get_new_question_id()
-        self.content_id_generator_3 = translation_domain.ContentIdGenerator()
+        question_id_3 = question_services.get_new_question_id()
+        content_id_generator_3 = translation_domain.ContentIdGenerator()
         self.save_new_question(
-            self.question_id_3, self.editor_id,
+            question_id_3, self.editor_id,
             self._create_valid_question_data(
-                'ABC', self.content_id_generator_3),
+                'ABC', content_id_generator_3),
             [self.skill_id],
-            self.content_id_generator_3.next_content_id_index)
+            content_id_generator_3.next_content_id_index)
 
         change_list = [{
             'cmd': 'update_question_property',
@@ -918,7 +918,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
 
         response_json = self.put_json(
             '%s/%s' % (
-                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id_3),
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, question_id_3),
             payload,
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
