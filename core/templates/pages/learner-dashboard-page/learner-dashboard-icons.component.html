@@ -7,9 +7,9 @@
    container="body"
    placement="left">
 </i>
-<div *ngIf="canActivityBeAddedToLearnerPlaylist(activityId) && isContainerNarrow">
+<div *ngIf="canActivityBeAddedToLearnerPlaylist(activityId) && isContainerNarrow && isAddToPlaylistIconShown">
   <div class="dropdown oppia-learner-dashboard-icon" ngbDropdown>
-    <ul class=" dropdown-menu dropdown-menu-right">
+    <ul class=" dropdown-menu dropdown-menu-right" ngbDropdownMenu>
       <li ngbDropdownItem (click)="addToLearnerPlaylist(activityId, activityType)">
         <a [innerHTML]="'I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate"></a>
       </li>
@@ -45,5 +45,11 @@
   .library-incomplete-activity-tooltip .tooltip-inner {
     max-width: none;
     white-space: nowrap;
+  }
+  .dropdown-toggle:after {
+    display: none;
+  }
+  .oppia-learner-dashboard-icon.dropdown {
+    color: black
   }
 </style>

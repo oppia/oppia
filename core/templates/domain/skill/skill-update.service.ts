@@ -29,7 +29,7 @@ import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { WorkedExample, WorkedExampleBackendDict } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExample, WorkedExampleBackendDict } from 'domain/skill/worked-example.model';
 import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
 import { LocalStorageService } from 'services/local-storage.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
