@@ -25,8 +25,8 @@ import { AlgebraicExpressionInputValidationService } from
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Rule } from
+  'domain/exploration/rule.model';
 import { AlgebraicExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 
@@ -40,8 +40,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: AlgebraicExpressionInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -52,7 +51,6 @@ describe('AlgebraicExpressionInputValidationService', () => {
     validatorService = TestBed.get(AlgebraicExpressionInputValidationService);
     oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -76,14 +74,14 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }
     };
 
-    isEquivalentTo = rof.createFromBackendDict({
+    isEquivalentTo = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'x^2'
       }
     }, 'AlgebraicExpressionInput');
 
-    matchesExactlyWith = rof.createFromBackendDict({
+    matchesExactlyWith = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'x^2'
@@ -112,13 +110,13 @@ describe('AlgebraicExpressionInputValidationService', () => {
     }]);
 
 
-    let isEquivalentTo1 = rof.createFromBackendDict({
+    let isEquivalentTo1 = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '(a+b)^2'
       }
     }, 'AlgebraicExpressionInput');
-    let isEquivalentTo2 = rof.createFromBackendDict({
+    let isEquivalentTo2 = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'a^2 + 2*a*b + b^2'
@@ -137,13 +135,13 @@ describe('AlgebraicExpressionInputValidationService', () => {
     }]);
 
 
-    let matchesExactlyWith1 = rof.createFromBackendDict({
+    let matchesExactlyWith1 = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'x ^ 2 - 1'
       }
     }, 'AlgebraicExpressionInput');
-    let matchesExactlyWith2 = rof.createFromBackendDict({
+    let matchesExactlyWith2 = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'x^2 - 1'
@@ -169,13 +167,13 @@ describe('AlgebraicExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
 
-    matchesExactlyWith = rof.createFromBackendDict({
+    matchesExactlyWith = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'x * y'
       }
     }, 'AlgebraicExpressionInput');
-    isEquivalentTo = rof.createFromBackendDict({
+    isEquivalentTo = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'x + y'
@@ -191,7 +189,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
   it('should warn if there are missing custom variables', function() {
     answerGroups[0].rules = [
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x^2 + alpha - y/b'
@@ -217,7 +215,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
   it('should warn if there are too many custom variables', function() {
     answerGroups[0].rules = [
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x+y'
@@ -241,7 +239,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
   it('should warn if there are inputs with unsupported functions', function() {
     answerGroups[0].rules = [
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x+log(y)'
