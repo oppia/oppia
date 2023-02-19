@@ -262,7 +262,7 @@ class EditableQuestionDataHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of EditableQuestionDataHandler's
     normalized_payload dictionary.
     """
-    
+
     version: int
     commit_message: str
     change_list: List[question_domain.QuestionChange]
