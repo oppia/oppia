@@ -2,7 +2,7 @@
   <mat-label class="text-capitalize">
     {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
   </mat-label>
-  <mat-chip-list #chipList aria-label="Subject Interests">
+  <mat-chip-list #chipList aria-label="Preferred Exploration Languages">
     <mat-chip *ngFor="let language of preferredLanguages"
               [selectable]="selectable"
               [removable]="removable"
