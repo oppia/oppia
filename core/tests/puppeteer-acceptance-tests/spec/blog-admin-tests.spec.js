@@ -20,7 +20,7 @@
  */
 
 /**
- * @fileoverview Accpetance Test for a Blog Admin and Blog editor
+ * @fileoverview Acceptance Test for Blog Admin
  */
 
 const userFactory = require(
@@ -30,18 +30,15 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Blog Admin and Blog Editor Tests', function() {
+describe('Blog Admin', function() {
   const ROLE_BLOG_ADMIN = 'blog admin';
   const ROLE_BLOG_POST_EDITOR = 'blog post editor';
   let superAdmin = null;
   let blogAdmin = null;
-  let blogPostEditor = null;
 
   beforeAll(async function() {
     superAdmin = await userFactory.createNewSuperAdmin('superAdm');
     blogAdmin = await userFactory.createNewBlogAdmin('blogAdm');
-    blogPostEditor = await userFactory.createNewBlogPostEditor(
-      'blogPostEditor');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should assign roles to users and change tag properties',
@@ -87,35 +84,6 @@ describe('Blog Admin and Blog Editor Tests', function() {
       await guestUser.expectBlogDashboardAccessToBeUnauthorized();
       await blogAdmin.expectBlogDashboardAccessToBeAuthorized();
       await guestUser.closeBrowser();
-    }, DEFAULT_SPEC_TIMEOUT);
-
-  it('should create draft and delete draft blog post',
-    async function() {
-      await blogPostEditor.navigateToBlogDashboardPage();
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-      await blogPostEditor.createDraftBlogPostWithTitle('Test-Blog');
-
-      await blogPostEditor.expectNumberOfBlogPostsToBe(1);
-      await blogPostEditor.expectDraftBlogPostWithTitleToBePresent('Test-Blog');
-
-      await blogPostEditor.deleteDraftBlogPostWithTitle('Test-Blog');
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-    }, DEFAULT_SPEC_TIMEOUT);
-
-  it('should publish blog post and delete published blog post',
-    async function() {
-      pending('This test is giving errors. So excluding it right now.');
-      await blogPostEditor.navigateToBlogDashboardPage();
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-      await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
-
-      await blogPostEditor.navigateToPublishTab();
-      await blogPostEditor.expectNumberOfBlogPostsToBe(1);
-      await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
-        'Test-Blog');
-
-      await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
