@@ -283,6 +283,16 @@ class EditableQuestionDataHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1
+                    }]
+                }
+            },
             'commit_message': {
                 'schema': {
                     'type': 'basestring',
@@ -329,6 +339,14 @@ class EditableQuestionDataHandler(
         assert self.normalized_payload is not None
         commit_message = self.normalized_payload['commit_message']
         change_list = self.normalized_payload['change_list']
+        version = self.normalized_payload['version']
+        question = question_services.get_question_by_id(question_id)
+
+        if version > question.version:
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update version %s of question from version %s, '
+                'which is not possible. Please reload the page and try again.'
+                % (question.version, version))
 
         for change in change_list:
             if (
