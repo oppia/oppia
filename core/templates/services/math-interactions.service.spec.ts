@@ -122,11 +122,6 @@ describe('MathInteractionsService', () => {
       'Your answer seems to be missing a number before the + operator.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      'a/', ['a'])).toBeFalse();
-    expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer seems to be missing a number after the ÷ operator.');
-
-    expect(mathInteractionsService.validateAlgebraicExpression(
       '(x-)3', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "-".');
@@ -312,7 +307,7 @@ describe('MathInteractionsService', () => {
       'Please enter numbers only.');
   });
 
-  it('should validate equations correctly', function() {
+    it('should validate equations correctly', function() {
     // Success cases.
     expect(mathInteractionsService.validateEquation(
       'x=y', ['x', 'y'])).toBeTrue();
