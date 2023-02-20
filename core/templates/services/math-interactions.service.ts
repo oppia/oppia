@@ -135,14 +135,14 @@ export class MathInteractionsService {
   }
 
   /**
-   * This function checks if an expression contains redundant params. It assumes
-   * that the expression will be syntactically valid.
-   * @param expressionString The math expression to be validated.
-   *
-   * @returns [boolean, string]. The boolean represents if the given expression
-   * contains any redundant params, and the string is the substring of the
-   * expression that contains redundant params.
-   */
+  * This function checks if an expression contains redundant params. It assumes
+  * that the expression will be syntactically valid.
+  * @param expressionString The math expression to be validated.
+  *
+  * @returns [boolean, string]. The boolean represents if the given expression
+  * contains any redundant params, and the string is the substring of the
+  * expression that contains redundant params.
+  */
   containsRedundantParens(expressionString: string): [boolean, string] {
     let stack: number[] = [];
 
