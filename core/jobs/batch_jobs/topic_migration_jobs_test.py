@@ -293,6 +293,7 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
         self.assertEqual(migrated_topic_model.version, 1)
 
+
 class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
