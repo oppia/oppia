@@ -321,8 +321,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
 
-
-    def test_run_lighthouse_tests_skipping_webpack_build_in_performance_mode(self) -> None:
+    def test_run_lighthouse_tests_skipping_webpack_build_in_performance_mode(
+        self) -> None:
         class MockTask:
             returncode = 0
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
@@ -332,7 +332,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests, 'run_lighthouse_checks',
-            lambda *unused_args: None, expected_args=(('performance_skip_build', '1'),))
+            lambda *unused_args: None,
+            expected_args=(('performance_skip_build', '1'),))
         def mock_popen(*unused_args: str, **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
         swap_popen = self.swap(
@@ -342,7 +343,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_build = self.swap_with_checks(
                     build, 'main', lambda args: None,
                     expected_kwargs=[{'args': []}])
-    
+
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:

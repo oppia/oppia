@@ -64,7 +64,8 @@ Note that the root folder MUST be named 'oppia'.
 
 _PARSER.add_argument(
     '--mode', help='Sets the mode for the lighthouse tests',
-    required=True, choices=['accessibility', 'performance', 'performance_skip_build'])
+    required=True,
+    choices=['accessibility', 'performance', 'performance_skip_build'])
 
 _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
