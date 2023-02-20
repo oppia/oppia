@@ -350,7 +350,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, swap_build:
                         with swap_popen, swap_run_lighthouse_tests:
                             run_lighthouse_tests.main(
-                                args=['--mode', 'performance_skip_build', '--shard', '1'])
+                                args=['--mode', 'performance_skip_build',
+                                '--shard', '1'])
 
         self.assertNotIn('Building files in production mode.', self.print_arr)
         self.assertIn(
