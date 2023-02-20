@@ -579,7 +579,7 @@ def main(args: Optional[List[str]] = None) -> None:
         print('(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
     else:
         print('All tests passed.')
-        # add one line for aesthetics.
+        # Add one line for aesthetics.
         print('')
 
     if task_execution_failed:
