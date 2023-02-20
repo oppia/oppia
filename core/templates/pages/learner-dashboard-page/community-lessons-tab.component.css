@@ -145,6 +145,8 @@
 .community-lessons-section .empty-section,
 .playlist-section .empty-section,
 .subscriptions-section .empty-section {
+  font-size: 16px;
+  font-weight: inherit;
   padding: 0 113px 0 40px;
 }
 .community-lessons-section .remove-icon,
@@ -259,8 +261,8 @@
   }
   .community-lessons-section .remove-icon,
   .playlist-section .remove-icon {
-    left: -40px;
-    top: 2px;
+    left: -70px;
+    top: 1px;
   }
   .community-lessons-section .oppia-learner-dashboard-icon {
     right: 44px;

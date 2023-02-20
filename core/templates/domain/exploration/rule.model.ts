@@ -17,11 +17,10 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import isEqual from 'lodash/isEqual';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -38,15 +37,33 @@ export interface RuleInputTypes {
   [propName: string]: string;
 }
 
-export class Rule {
+export class Rule extends BaseTranslatableObject {
   type: string;
   inputs: RuleInputs;
   inputTypes: RuleInputTypes;
 
   constructor(type: string, inputs: RuleInputs, inputTypes: RuleInputTypes) {
+    super();
+
     this.type = type;
     this.inputs = inputs;
     this.inputTypes = inputTypes;
+  }
+
+  getTranslatableFields(): TranslatableField[] {
+    let translatableFields: TranslatableField[] = [];
+    Object.keys(this.inputs).forEach(inputName => {
+      const ruleInput = this.inputs[inputName];
+      if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+        // This throws Type error for ruleInput". We need to suppress this error
+        // because the type for RuleInputs is incorrect and bypass flag can be
+        // removed once we have correct type for RuleInputs.
+        // @ts-ignore
+        translatableFields.push(ruleInput);
+      }
+    });
+
+    return translatableFields;
   }
 
   toBackendDict(): RuleBackendDict {
@@ -55,15 +72,8 @@ export class Rule {
       inputs: this.inputs
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RuleObjectFactory {
-  constructor() {}
-
-  createNew(
+  static createNew(
       type: string, inputs: RuleInputs, inputTypes: RuleInputTypes
   ): Rule {
     if (!isEqual(
@@ -75,17 +85,16 @@ export class RuleObjectFactory {
     return new Rule(type, inputs, inputTypes);
   }
 
-  createFromBackendDict(
-      ruleDict: RuleBackendDict, interactionId: string | null
+  static createFromBackendDict(
+      ruleDict: RuleBackendDict, interactionId: string
   ): Rule {
     let ruleType = ruleDict.rule_type;
     let ruleInputTypes: RuleInputTypes = {};
     let ruleDescription = null;
 
-    if (interactionId !== null) {
-      ruleDescription = INTERACTION_SPECS[
-        interactionId].rule_descriptions[ruleType];
-    }
+    ruleDescription = (
+      INTERACTION_SPECS[interactionId].rule_descriptions[ruleType]
+    );
 
     const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (ruleDescription.match(PATTERN)) {
@@ -101,6 +110,3 @@ export class RuleObjectFactory {
     return new Rule(ruleType, ruleDict.inputs, ruleInputTypes);
   }
 }
-
-angular.module('oppia').factory('RuleObjectFactory',
-  downgradeInjectable(RuleObjectFactory));

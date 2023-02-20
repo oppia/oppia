@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { EditabilityService } from 'services/editability.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ExplorationSavePromptModalComponent } from '../modal-templates/exploration-save-prompt-modal.component';
 import { ChangeListService } from '../services/change-list.service';
@@ -47,6 +48,7 @@ export class ExplorationSaveAndPublishButtonsComponent
   constructor(
      private explorationRightsService: ExplorationRightsService,
      private editabilityService: EditabilityService,
+     private entityTranslationsService: EntityTranslationsService,
      private changeListService: ChangeListService,
      private explorationWarningsService: ExplorationWarningsService,
      private explorationSaveService: ExplorationSaveService,
@@ -153,6 +155,7 @@ export class ExplorationSaveAndPublishButtonsComponent
       .then(() => {
         this.publishIsInProcess = false;
         this.loadingDotsAreShown = false;
+        this.entityTranslationsService.reset();
       });
   }
 
@@ -166,6 +169,7 @@ export class ExplorationSaveAndPublishButtonsComponent
       .then(() => {
         this.saveIsInProcess = false;
         this.loadingDotsAreShown = false;
+        this.entityTranslationsService.reset();
       }, () => {});
   }
 
