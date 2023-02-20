@@ -60,10 +60,23 @@ export class MathInteractionsService {
       errorMessage = 'Your answer includes a division by zero, which is ' +
         'not valid.';
     }
-    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
+    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1 &&
+      errorMessage[0] !== '/' && errorMessage[0] !== '*') {
       errorMessage = (
         'Your answer seems to be missing a number after the ' +
         errorMessage[0] + ' operator.');
+      console.log("Hello", errorMessage.indexOf('is not a valid postfix operator.'))
+    }
+    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1 &&
+      errorMessage[0] === '/') {
+      errorMessage = (
+        'Your answer seems to be missing a number after the ÷ operator.');
+    }
+    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1 &&
+      errorMessage[0] === '*') {
+      errorMessage = (
+        'Your answer seems to be missing a number after the × operator.');
+    console.log("check", errorMessage.indexOf('is not a valid postfix operator.'))
     }
     if (errorMessage === 'A prefix operator was expected.') {
       let symbol1, symbol2;
@@ -171,28 +184,14 @@ export class MathInteractionsService {
       return false;
     }
 
-    if (expressionString.match(/^(\d+)\+$|^\(\d+\+\)$/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number after' +
-        ' the + operator.');
-      return false;
-    }
-
-    if (expressionString.match(/(\+$)|(\(\+\))/g)) {
+    if (expressionString.match(/^(\+$)|^(\(\+\))/g)) {
       this.warningText = (
         'Your answer seems to be missing a number before' +
         ' the + operator.');
       return false;
     }
 
-    if (expressionString.match(/^(\d+)\*$|^\(\d+\*\)$/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number after' +
-        ' the × operator.');
-      return false;
-    }
-
-    if (expressionString.match(/(\*$)|(\(\*\))|^(\(\*\d+\))|^(\*\d+)/g)) {
+    if (expressionString.match(/^(\*$)|^(\(\*\))|^(\(\*\d+\))|^(\*\d+)/g)) {
       this.warningText = (
         'Your answer seems to be missing a number before' +
         ' the × operator.');
@@ -213,14 +212,7 @@ export class MathInteractionsService {
       return false;
     }
 
-    if (expressionString.match(/^(\d+)\-$|^\(\d+\-\)$/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number after' +
-        ' the - operator.');
-      return false;
-    }
-
-    if (expressionString.match(/(\-$)|(\(\-\))/g)) {
+    if (expressionString.match(/^(\-$)|^(\(\-\))/g)) {
       this.warningText = (
         'Your answer seems to be missing a number before' +
         ' the - operator.');
