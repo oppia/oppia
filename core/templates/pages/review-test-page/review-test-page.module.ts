@@ -34,7 +34,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-import { APP_BASE_HREF } from '@angular/common';
 
 @NgModule({
   imports: [
@@ -64,10 +63,6 @@ import { APP_BASE_HREF } from '@angular/common';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
-    },
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/my/app'
     },
     AppErrorHandlerProvider,
   ]

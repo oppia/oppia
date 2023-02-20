@@ -112,8 +112,6 @@ export class StoryViewerBackendApiService {
             expSummary)),
         nextNodeId: data.next_node_id,
         readyForReviewTest: data.ready_for_review_test});
-      // eslint-disable-next-line no-console
-      console.log(successCallback);
     }, errorResponse => {
       errorCallback(errorResponse.error.error);
     });
