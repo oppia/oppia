@@ -32,7 +32,7 @@ oppia-supplemental-card .conversation-skin-help-card.ng-leave-active {
 oppia-supplemental-card .help-card-standard {
   /* Use margin-bottom to make sure the help card doesn't get hidden behind the footer. */
   margin-bottom: 80px;
-  position: absolute; 
+  position: absolute;
 }
 
 oppia-supplemental-card .conversation-skin-help-card .conversation-skin-oppia-avatar {
