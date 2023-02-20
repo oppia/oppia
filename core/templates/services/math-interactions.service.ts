@@ -65,7 +65,6 @@ export class MathInteractionsService {
       errorMessage = (
         'Your answer seems to be missing a number after the ' +
         errorMessage[0] + ' operator.');
-      console.log("Hello", errorMessage.indexOf('is not a valid postfix operator.'))
     }
     if (errorMessage.indexOf('is not a valid postfix operator.') !== -1 &&
       errorMessage[0] === '/') {
@@ -76,7 +75,6 @@ export class MathInteractionsService {
       errorMessage[0] === '*') {
       errorMessage = (
         'Your answer seems to be missing a number after the × operator.');
-    console.log("check", errorMessage.indexOf('is not a valid postfix operator.'))
     }
     if (errorMessage === 'A prefix operator was expected.') {
       let symbol1, symbol2;
