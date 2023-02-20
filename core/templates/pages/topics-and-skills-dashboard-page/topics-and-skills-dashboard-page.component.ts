@@ -135,17 +135,39 @@ export class TopicsAndSkillsDashboardPageComponent {
   }
 
   getPages(current: number, total: number): number[] {
+    /**
+     * This function returns an array of the total number of pages.
+     * "-1" is an indicator to print ellipses.
+     * "total" variable is being rounded off to avoid cases when the items per page 
+     * is not a divisor of the total number of pages.
+     */
     total = Math.ceil(total);
-    if (total <= 6) {
+    let initialPaginationThreshold: number = 6;
+    /**
+     * Case 0 when the total count of pages is less than or equal to 6.
+     * Ellipses arent required.
+     */
+    if (total <= initialPaginationThreshold) {
       return [...Array(total).keys()].map((x) => ++x);
     }
     if (current >= 4) {
+      /**
+       * Case 1 when the current page number is towards the end of total number of pages. 
+       * "total" denotes the total page count.
+       */
       if (current >= total - 4) {
-        return [1, -1, total - 2, total - 1, total];
-      } else {
+        return [1, -1, total - 2, total - 1, total]; 
+      } 
+      /**
+       * Case 2 when the current page number is in the middle.
+       */
+      else {
         return [1, -1, current - 1, current, current + 1, -1, total];
       }
     }
+    /**
+     * Case 3 when the current page number is at the start.
+     */
     return [1, 2, 3, 4, -1, total];
   }
 
