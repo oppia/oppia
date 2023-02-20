@@ -89,6 +89,14 @@ describe('ThumbnailUploaderComponent', () => {
     }).toThrowError('No image present for preview');
   });
 
+  it('should display placeholder image when filename is null', () => {
+    component.filename = '';
+
+    component.ngOnInit();
+
+    expect(component.hidePlaceholder).toBeTrue();
+  });
+
   it('should update the thumbnail image when thumbnail filename' +
     ' changes', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');

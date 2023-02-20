@@ -388,7 +388,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.chapterPreviewCardIsShown = !this.chapterPreviewCardIsShown;
   }
 
-  togglePreqrequisiteSkillsList(): void {
+  togglePrerequisiteSkillsList(): void {
     if (this.windowDimensionsService.isWindowNarrow()) {
       this.prerequisiteSkillIsShown = !this.prerequisiteSkillIsShown;
     }

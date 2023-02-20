@@ -257,7 +257,7 @@ describe('Story node editor component', () => {
 
   it('should toggle prereq skill list', () => {
     component.prerequisiteSkillIsShown = true;
-    component.togglePreqrequisiteSkillsList();
+    component.togglePrerequisiteSkillsList();
     component.prerequisiteSkillIsShown = false;
   });
 
