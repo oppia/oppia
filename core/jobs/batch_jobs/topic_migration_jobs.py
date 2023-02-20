@@ -119,23 +119,6 @@ class MigrateTopicModels(beam.PTransform):# type: ignore[misc]
             })
             yield (topic_id, topic_change)
 
-    @staticmethod
-    def _check_migration_errors(
-        unused_migrated_topic: topic_domain.Topic,
-        is_no_migration_error: beam.pvalue.AsSingleton
-    ) -> bool:
-        """Checks if any migration errors have occured.
-
-        Args:
-            unused_migrated_topic: Topic. Unused migrated topic domain object.
-            is_no_migration_error: beam.pvalue.AsSingleton. Side input data
-                specifying non-zero erros during migration.
-
-        Returns:
-            bool. Specifies whether any migration errors were found.
-        """
-        return bool(is_no_migration_error)
-
     def expand(
         self, pipeline: beam.Pipeline
     ) -> Tuple[
