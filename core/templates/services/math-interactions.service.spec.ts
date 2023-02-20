@@ -192,7 +192,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(x-)3', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer seems to be missing a variable/number after the "-".');
+      'Your answer seems to be missing a number after the - operator');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'xy+c/2', ['x', 'y', 'z'])).toBeFalse();
