@@ -398,7 +398,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         self.assertIn('CANCELED  %s' % test_target, self.print_arr)
 
-    def test_number_of_incomplete_coverage_tests_calculated_correctly(self) -> None:
+    def test_number_of_incomplete_coverage_tests_is_calculated_correctly(
+        self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
 
