@@ -63,7 +63,7 @@ export class MathInteractionsService {
     if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
       errorMessage = (
         'Your answer seems to be missing a number after the ' +
-        errorMessage[0] + 'operator.');
+        errorMessage[0] + ' operator.');
     }
     if (errorMessage === 'A prefix operator was expected.') {
       let symbol1, symbol2;
