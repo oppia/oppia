@@ -100,6 +100,7 @@ module.exports = class baseUser {
    */
   async clickOn(selector) {
     try {
+      // Normalize-space is used to remove the extra spaces in the text.
       const [button] = await this.page.$x(
         `\/\/*[contains(text(), normalize-space('${selector}'))]`);
       await button.click();
