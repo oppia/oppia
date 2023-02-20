@@ -12,13 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** TODO(#16552): Write a test to check that the user is unable to publish
- * blog post if its title duplicates that of an existing published blog post. */
-/** TODO(#17162): This test should be done without the need of super admin, as
- * blog admin must be able to revoke blog editor role of other users from the
- * /blog-admin page. But this is not the case now, only super admin can do this.
- */
-
 /**
  * @fileoverview Acceptance Test for Blog Admin
  */
@@ -41,6 +34,10 @@ describe('Blog Admin', function() {
     blogAdmin = await userFactory.createNewBlogAdmin('blogAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
+  /** TODO(#17162): This test should be done without the need of super admin, as
+  * blog admin must be able to revoke blog editor role of other users from the
+  * /blog-admin page. But this is not the case now, only super admin can do this
+  */
   it('should assign roles to users and change tag properties',
     async function() {
       const guestUsr1 = await userFactory.createNewGuestUser(

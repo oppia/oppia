@@ -46,7 +46,6 @@ describe('Blog Editor', function() {
 
   it('should publish blog post and delete published blog post',
     async function() {
-      pending('This test is giving errors. So excluding it right now.');
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
       await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
