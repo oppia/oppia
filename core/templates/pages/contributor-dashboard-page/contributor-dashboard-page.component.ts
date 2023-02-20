@@ -21,10 +21,6 @@ import { SafeUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-<<<<<<< HEAD
-// Import AppConstants from 'assets/constants';  
-=======
->>>>>>> fc4b7bc10725cc205c7860f5c7511aeed490795d
 import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
