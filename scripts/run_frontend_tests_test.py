@@ -42,25 +42,53 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
         class MockFile:
-            counter = 0
+            def __init__(self, flakes: int = 0) -> None:
+                self.counter = 0
+                self.run_counter = 0
+                self.flakes = flakes
+
             def readline(self) -> bytes: # pylint: disable=missing-docstring
                 self.counter += 1
-                if self.counter > 1:
-                    self.counter = 0
-                    return b''
-                return b'Executed tests. Trying to get the Angular injector..'
+                if self.counter == 1:
+                    return (
+                        b'Executed tests. Trying to get the Angular injector..')
+                if self.counter == 2 and self.run_counter < self.flakes:
+                    return b'Disconnected , because no message'
+                self.counter = 0
+                self.run_counter += 1
+                return b''
 
         class MockTask:
-            returncode = 0
-            stdout = MockFile()
+            def __init__(self) -> None:
+                self.returncode = 0
+                self.stdout = MockFile()
+            def poll(self) -> int: # pylint: disable=missing-docstring
+                return 1
+            def wait(self) -> None: # pylint: disable=missing-docstring
+                return None
+
+        class MockFlakyTask:
+            def __init__(self) -> None:
+                self.returncode = 0
+                self.stdout = MockFile(flakes=1)
+            def poll(self) -> int: # pylint: disable=missing-docstring
+                return 1
+            def wait(self) -> None: # pylint: disable=missing-docstring
+                return None
+
+        class MockVeryFlakyTask:
+            def __init__(self) -> None:
+                self.returncode = 0
+                self.stdout = MockFile(flakes=10)
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
             def wait(self) -> None: # pylint: disable=missing-docstring
                 return None
 
         class MockFailedTask:
-            returncode = 1
-            stdout = MockFile()
+            def __init__(self) -> None:
+                self.returncode = 1
+                self.stdout = MockFile()
             def poll(self) -> int: # pylint: disable=missing-docstring
                 return 1
             def wait(self) -> None: # pylint: disable=missing-docstring
@@ -71,6 +99,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             cmd_tokens: list[str], **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
+        def mock_flaky_check_call(
+            cmd_tokens: list[str], **unused_kwargs: str) -> MockFlakyTask:  # pylint: disable=unused-argument
+            self.cmd_token_list.append(cmd_tokens)
+            return MockFlakyTask()
+        def mock_very_flaky_check_call(
+            cmd_tokens: list[str], **unused_kwargs: str) -> MockVeryFlakyTask:  # pylint: disable=unused-argument
+            self.cmd_token_list.append(cmd_tokens)
+            return MockVeryFlakyTask()
         def mock_failed_check_call(
             cmd_tokens: list[str], **unused_kwargs: str) -> MockFailedTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
@@ -90,6 +126,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         self.swap_success_Popen = self.swap(
             subprocess, 'Popen', mock_success_check_call)
+        self.swap_flaky_Popen = self.swap(
+            subprocess, 'Popen', mock_flaky_check_call)
+        self.swap_very_flaky_Popen = self.swap(
+            subprocess, 'Popen', mock_very_flaky_check_call)
         self.swap_failed_Popen = self.swap(
             subprocess, 'Popen', mock_failed_check_call)
         self.swap_sys_exit = self.swap(sys, 'exit', mock_sys_exit)
@@ -149,6 +189,60 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             ' please see https://github.com/oppia/oppia/wiki/'
             'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.', self.print_arr)
+        self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(len(self.sys_exit_message), 0)
+
+    def test_frontend_tests_rerun(self) -> None:
+        with self.swap_flaky_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    run_frontend_tests.main(args=['--check_coverage'])
+
+        cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+        self.assertIn(cmd, self.cmd_token_list)
+        self.assertIn(
+            'If you run into the error "Trying to get the Angular injector",'
+            ' please see https://github.com/oppia/oppia/wiki/'
+            'Frontend-unit-tests-guide#how-to-handle-common-errors'
+            ' for details on how to fix it.', self.print_arr)
+        self.assertIn('Attempt 1 of 2', self.print_arr)
+        self.assertIn(
+            'Detected chrome disconnected flake (#16607), so rerunning '
+            'if attempts allow.',
+            self.print_arr
+        )
+        self.assertIn('Attempt 2 of 2', self.print_arr)
+        self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(len(self.sys_exit_message), 0)
+
+    def test_frontend_tests_rerun_twice(self) -> None:
+        with self.swap_flaky_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    run_frontend_tests.main(args=['--check_coverage'])
+
+        cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+        self.assertIn(cmd, self.cmd_token_list)
+        self.assertIn(
+            'If you run into the error "Trying to get the Angular injector",'
+            ' please see https://github.com/oppia/oppia/wiki/'
+            'Frontend-unit-tests-guide#how-to-handle-common-errors'
+            ' for details on how to fix it.', self.print_arr)
+        self.assertIn('Attempt 1 of 2', self.print_arr)
+        self.assertEqual(
+            self.print_arr.count(
+                'Detected chrome disconnected flake (#16607), so rerunning '
+                'if attempts allow.',
+            ),
+            2
+        )
+        self.assertIn('Attempt 2 of 2', self.print_arr)
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(len(self.sys_exit_message), 0)
 
