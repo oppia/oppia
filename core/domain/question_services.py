@@ -704,7 +704,9 @@ def _save_question(
     change_list: List[question_domain.QuestionChange],
     commit_message: str
 ) -> None:
-    """Validates a question and commits it to persistent storage.
+    """Validates a question and commits it to persistent storage. If
+    successful, increments the version number of the incoming question domain
+    object by 1.
 
     Args:
         committer_id: str. The id of the user who is performing the update
@@ -718,8 +720,6 @@ def _save_question(
 
     Raises:
         Exception. Received an invalid change list.
-        Exception. The versions of the given question and the currently
-            stored question model do not match.
     """
     if not change_list:
         raise Exception(
@@ -728,19 +728,6 @@ def _save_question(
 
     question.validate()
     question_model = question_models.QuestionModel.get(question.id)
-
-    if question.version > question_model.version:
-        raise Exception(
-            'Unexpected error: trying to update version %s of question '
-            'from version %s. Please reload the page and try again.'
-            % (question_model.version, question.version))
-
-    if question.version < question_model.version:
-        raise Exception(
-            'Trying to update version %s of question from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (question_model.version, question.version))
-
     question_model.question_state_data = question.question_state_data.to_dict()
     question_model.language_code = question.language_code
     question_model.question_state_data_schema_version = (
