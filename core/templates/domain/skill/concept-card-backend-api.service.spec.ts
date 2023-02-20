@@ -22,13 +22,12 @@ import { HttpClientTestingModule, HttpTestingController } from
 
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
-import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard, ConceptCardBackendDict} from
+  'domain/skill/concept-card.model';
 
 describe('Concept card backend API service', () => {
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let httpTestingController: HttpTestingController;
-  let conceptCardObjectFactory: ConceptCardObjectFactory;
   let sampleResponse1: Record<string, ConceptCardBackendDict[]>;
   let sampleResponse2: Record<string, ConceptCardBackendDict[]>;
   let sampleResponse3: Record<string, ConceptCardBackendDict[]>;
@@ -44,7 +43,6 @@ describe('Concept card backend API service', () => {
 
     conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
 
     var example1 = {
       question: {
@@ -135,19 +133,19 @@ describe('Concept card backend API service', () => {
     conceptCardSampleResponse1 = [];
     sampleResponse1.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse1.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
 
     conceptCardSampleResponse2 = [];
     sampleResponse2.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse2.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
 
     conceptCardSampleResponse3 = [];
     sampleResponse3.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse3.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
   });
 
