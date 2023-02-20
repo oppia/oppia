@@ -158,7 +158,7 @@ export class TopicsAndSkillsDashboardPageComponent {
        * the end of total number of pages.
        * "total" denotes the total page count.
        */
-        return [1, -1, total - 2, total - 1, total]; 
+        return [1, -1, total - 2, total - 1, total];
       } else {
         /**
        * Case 2 when the current page number is in the middle.
