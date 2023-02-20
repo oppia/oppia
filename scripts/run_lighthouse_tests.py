@@ -36,6 +36,7 @@ from scripts import servers  # isort:skip
 
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
+LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD: Final = 'performance_skip_build'
 SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
@@ -63,7 +64,7 @@ Note that the root folder MUST be named 'oppia'.
 
 _PARSER.add_argument(
     '--mode', help='Sets the mode for the lighthouse tests',
-    required=True, choices=['accessibility', 'performance'])
+    required=True, choices=['accessibility', 'performance', 'performance_skip_build'])
 
 _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
@@ -187,17 +188,22 @@ def main(args: Optional[List[str]] = None) -> None:
     if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
         server_mode = SERVER_MODE_DEV
-    else:
+    elif parsed_args.mode == LIGHTHOUSE_MODE_PERFORMANCE:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
+    else:
+        lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD
+        server_mode = SERVER_MODE_DEV
 
-    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
+    if lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
+        build.main(args=[])
+        common.run_ng_compilation()
+        run_webpack_compilation()
+    elif lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         print('Building files in production mode.')
         build.main(args=['--prod_env'])
     else:
         build.main(args=[])
-        common.run_ng_compilation()
-        run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
