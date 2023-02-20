@@ -66,7 +66,6 @@ export class StateInteractionEditorComponent
   DEFAULT_TERMINAL_STATE_CONTENT: string;
   directiveSubscriptions = new Subscription();
   hasLoaded: boolean;
-  interactionEditorIsShown: boolean;
   interactionId: string;
   interactionIsDisabled: boolean;
   interactionPreviewHtml: string;
@@ -244,10 +243,6 @@ export class StateInteractionEditorComponent
     });
   }
 
-  toggleInteractionEditor(): void {
-    this.interactionEditorIsShown = !this.interactionEditorIsShown;
-  }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
@@ -264,7 +259,6 @@ export class StateInteractionEditorComponent
     'Congratulations, you have finished!';
 
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-    this.interactionEditorIsShown = true;
     this.hasLoaded = false;
     this.customizationModalReopened = false;
     this.directiveSubscriptions.add(
