@@ -111,7 +111,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             returncode = 0
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
                 return (
-                    b'https://oppia.org/collection_editor/create/5\n' +
                     b'https://oppia.org/create/4\n' +
                     b'https://oppia.org/topic_editor/4\n' +
                     b'https://oppia.org/story_editor/4\n' +
@@ -135,7 +134,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             returncode = 1
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
                 return (
-                    b'https://oppia.org/collection_editor/create/5\n' +
                     b'https://oppia.org/create/4\n' +
                     b'https://oppia.org/topic_editor/4\n' +
                     b'https://oppia.org/story_editor/4\n' +
