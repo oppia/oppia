@@ -22,6 +22,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import nerdamer from 'nerdamer';
 
 import { AppConstants } from 'app.constants';
+import { expression } from 'mathjs';
+import { negate } from 'lodash';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +32,7 @@ export class MathInteractionsService {
   private warningText = '';
   private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
+
 
   private cleanErrorMessage(
       errorMessage: string, expressionString: string): string {
@@ -60,21 +63,25 @@ export class MathInteractionsService {
       errorMessage = 'Your answer includes a division by zero, which is ' +
         'not valid.';
     }
-    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1 &&
-      errorMessage[0] !== '/' && errorMessage[0] !== '*') {
+    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
+      let humanReadableOperator = (
+        errorMessage[0] === '*' ? '×' :
+        errorMessage[0] === '/' ? '÷' :
+        errorMessage[0]);
       errorMessage = (
         'Your answer seems to be missing a number after the ' +
-        errorMessage[0] + ' operator.');
+        humanReadableOperator + ' operator.');
     }
-    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1 &&
-      errorMessage[0] === '/') {
+    if (errorMessage === 'Not a prefix operator.') {
+      let humanReadableOperator = (
+        expressionString[0]  === '*' ? '×' :
+        expressionString[0] === '/' ? '÷' :
+        expressionString[1]  === '*' ? '×' :
+        expressionString[1] === '/' ? '÷' :
+        expressionString);
       errorMessage = (
-        'Your answer seems to be missing a number after the ÷ operator.');
-    }
-    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1 &&
-      errorMessage[0] === '*') {
-      errorMessage = (
-        'Your answer seems to be missing a number after the × operator.');
+        'Your answer seems to be missing a number before the ' +
+        humanReadableOperator + ' operator.');
     }
     if (errorMessage === 'A prefix operator was expected.') {
       let symbol1, symbol2;
@@ -181,38 +188,14 @@ export class MathInteractionsService {
       this.warningText = 'Your answer contains an invalid character: "_".';
       return false;
     }
-    if (expressionString.match(/^(\+$)|^(\(\+\))/g)) {
+    if (expressionString.match(/(\+$)|(\+\))/g)) {
       this.warningText = (
-        'Your answer seems to be missing a number before' +
-        ' the + operator.');
+        'Your answer seems to be missing a number after the + operator.');
       return false;
     }
-
-    if (expressionString.match(/^(\*$)|^(\(\*\))|^(\(\*\d+\))|^(\*\d+)/g)) {
+    if (expressionString.match(/(\-$)|(\-\))/g)) {
       this.warningText = (
-        'Your answer seems to be missing a number before' +
-        ' the × operator.');
-      return false;
-    }
-
-    if (expressionString.match(/^(\d+)\/$|^\(\d+\/\)$/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number after' +
-        ' the ÷ operator.');
-      return false;
-    }
-
-    if (expressionString.match(/^\/$|^\(\/\)$|^(\(\/\d+\))|^(\/\d+)/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number before' +
-        ' the ÷ operator.');
-      return false;
-    }
-
-    if (expressionString.match(/^(\-$)|^(\(\-\))/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a number before' +
-        ' the - operator.');
+        'Your answer seems to be missing a number after the - operator.');
       return false;
     }
     let invalidIntegers = expressionString.match(
@@ -286,6 +269,7 @@ export class MathInteractionsService {
 
     expressionString = this.insertMultiplicationSigns(expressionString);
     let variablesList = nerdamer(expressionString).variables();
+    console.log("check2", variablesList);
     // Explicitly checking for presence of constants (pi and e).
     if (expressionString.match(/(^|[^a-zA-Z])e($|[^a-zA-Z])/g)) {
       variablesList.push('e');
@@ -388,12 +372,12 @@ export class MathInteractionsService {
     }
     return false;
   }
-
   getWarningText(): string {
     return this.warningText;
   }
 
   insertMultiplicationSigns(expressionString: string): string {
+    console.log("check1", expressionString);
     let greekLetters = Object.keys(
       AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
