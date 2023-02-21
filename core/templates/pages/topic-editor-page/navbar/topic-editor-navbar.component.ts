@@ -265,7 +265,6 @@ export class TopicEditorNavbarComponent {
       this.topicEditorStateService.onTopicInitialized.subscribe(
         () => {
           this.topic = this.topicEditorStateService.getTopic();
-          this.topicSkillIds = this.topic.getSkillIds();
           this._validateTopic();
         }
       ));
@@ -273,7 +272,6 @@ export class TopicEditorNavbarComponent {
       this.topicEditorStateService.onTopicReinitialized.subscribe(
         () => {
           this.topic = this.topicEditorStateService.getTopic();
-          this.topicSkillIds = this.topic.getSkillIds();
           this._validateTopic();
         }
       ));
@@ -284,9 +282,6 @@ export class TopicEditorNavbarComponent {
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
     this.topic = this.topicEditorStateService.getTopic();
-    if (this.topic) {
-      this.topicSkillIds = this.topic.getSkillIds();
-    }
     this.discardChangesButtonIsShown = false;
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
@@ -295,7 +290,6 @@ export class TopicEditorNavbarComponent {
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
         () => {
           this.topic = this.topicEditorStateService.getTopic();
-          this.topicSkillIds = this.topic.getSkillIds();
           this._validateTopic();
         }
       )

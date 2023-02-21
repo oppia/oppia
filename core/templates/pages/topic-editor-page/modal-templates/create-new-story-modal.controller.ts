@@ -54,8 +54,8 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
     $scope.hostname = WindowRef.nativeWindow.location.hostname;
     $scope.classroomUrlFragment = (
       TopicEditorStateService.getClassroomUrlFragment());
-    $scope.topicUrlFragment = TopicEditorStateService.getTopic() ? (
-      TopicEditorStateService.getTopic().getUrlFragment()) : '';
+    $scope.topicUrlFragment = (
+      TopicEditorStateService.getTopic().getUrlFragment());
     $scope.onStoryUrlFragmentChange = function() {
       if (!$scope.story.urlFragment) {
         return;

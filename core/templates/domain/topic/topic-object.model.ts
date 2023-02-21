@@ -581,8 +581,8 @@ export class Topic {
     });
   }
 
-  // Reassigns all values within a copy topic variable to match this
-  // topic. This is performed as a deep copy such that none of the
+  // Creates a separate copy of this topic with the same values for the
+  // internal fields. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic.
   createCopyFromTopic(): Topic {
     let id = this.getId();
@@ -601,31 +601,31 @@ export class Topic {
     let version = this.getVersion();
     let nextSubtopicId = this.getNextSubtopicId();
 
-    let topic = new Topic(
+    let newTopic = new Topic(
       id, name, abbreviatedName, urlFragment, description,
       languageCode, [], [], [], nextSubtopicId, version, [],
       thumbnailFilename, thumbnailBgColor, {}, practiceTabIsDisplayed,
       metaTagContent, pageTitleFragmentForWeb, []);
-    topic._skillSummariesForDiagnosticTest = skillSummariesForDiagnosticTest;
-    topic.clearAdditionalStoryReferences();
-    topic.clearCanonicalStoryReferences();
-    topic.clearUncategorizedSkills();
-    topic.clearSubtopics();
+    newTopic._skillSummariesForDiagnosticTest = skillSummariesForDiagnosticTest;
+    newTopic.clearAdditionalStoryReferences();
+    newTopic.clearCanonicalStoryReferences();
+    newTopic.clearUncategorizedSkills();
+    newTopic.clearSubtopics();
 
-    topic._canonicalStoryReferences = this.getCanonicalStoryReferences();
-    topic._additionalStoryReferences =
+    newTopic._canonicalStoryReferences = this.getCanonicalStoryReferences();
+    newTopic._additionalStoryReferences =
         this.getAdditionalStoryReferences();
 
     let uncategorizedSkillSummaries =
         this.getUncategorizedSkillSummaries();
     for (let i = 0; i < uncategorizedSkillSummaries.length; i++) {
-      topic.addUncategorizedSkill(
+      newTopic.addUncategorizedSkill(
         uncategorizedSkillSummaries[i].getId(),
         uncategorizedSkillSummaries[i].getDescription());
     }
 
-    topic._subtopics = cloneDeep(this.getSubtopics());
-    return topic;
+    newTopic._subtopics = cloneDeep(this.getSubtopics());
+    return newTopic;
   }
 
 
