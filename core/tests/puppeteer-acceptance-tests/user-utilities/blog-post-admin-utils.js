@@ -45,8 +45,6 @@ const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = ' Confirm ';
 const LABEL_FOR_ADD_THUMBNAIL_BUTTON = ' Add Thumbnail Image ';
 const LABEL_FOR_ADD_ELEMENT_BUTTON = ' Add element ';
-const duplicateBlogPostWarningMessage = ' Blog Post with the' +
-  ' given title exists already. Please use a different title. ';
 
 module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
@@ -241,7 +239,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
    * This function checks that the user is unable to publish a blog post.
    */
-  async expectUserUnableToPublishBlogPost() {
+  async expectUserUnableToPublishBlogPost(expactedWarningMessage) {
     const toastMessageBox = await this.page.$(
       'div.e2e-test-toast-warning-message');
     const toastMessageWarning = await this.page.evaluate(
@@ -250,14 +248,17 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       publishBlogPostButton, (button) => {
         return button.disabled;
       });
+
     if (!isPublishButtonDisabled) {
-      throw new Error('User is able to publish duplicate blog post');
+      throw new Error('User is able to publish the blog post');
     }
-    if (toastMessageWarning === duplicateBlogPostWarningMessage) {
-      showMessage('Blog post with same title already exists');
+    if (expactedWarningMessage !== toastMessageWarning) {
+      throw new Error(
+        'Expected warning message is not same as the actual warning message');
     }
 
-    showMessage('User is unable to publish the blog post');
+    showMessage(
+      'User is unable to publish the blog post because ' + toastMessageWarning);
   }
 
   /**
