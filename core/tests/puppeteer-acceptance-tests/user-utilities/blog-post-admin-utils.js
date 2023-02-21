@@ -37,14 +37,14 @@ const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 
-const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = ' CREATE NEW BLOG POST ';
-const LABEL_FOR_SAVE_BUTTON = ' Save ';
-const LABEL_FOR_DONE_BUTTON = ' DONE ';
+const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
+const LABEL_FOR_SAVE_BUTTON = 'Save';
+const LABEL_FOR_DONE_BUTTON = 'DONE';
 const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
-const LABEL_FOR_CONFIRM_BUTTON = ' Confirm ';
-const LABEL_FOR_ADD_THUMBNAIL_BUTTON = ' Add Thumbnail Image ';
-const LABEL_FOR_ADD_ELEMENT_BUTTON = ' Add element ';
+const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
+const LABEL_FOR_ADD_THUMBNAIL_BUTTON = 'Add Thumbnail Image';
+const LABEL_FOR_ADD_ELEMENT_BUTTON = 'Add element';
 
 module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
@@ -428,7 +428,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       const tagList = document.getElementsByClassName('form-control');
       tagList[tagList.length - 1].value = tagName;
     }, tagName);
-    await this.clickOn('Save');
+    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
     showMessage(`Tag ${tagName} added in tag list successfully!`);
   }
 
@@ -460,7 +460,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.page.keyboard.press('Backspace');
 
     await this.type(maximumTagLimitInput, limit);
-    await this.clickOn('Save');
+    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
 
     showMessage(`Successfully updated the tag limit to ${limit}!`);
   }
