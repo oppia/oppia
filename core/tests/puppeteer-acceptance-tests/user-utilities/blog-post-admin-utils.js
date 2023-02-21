@@ -239,7 +239,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
    * This function checks that the user is unable to publish a blog post.
    */
-  async expectUserUnableToPublishBlogPost(expactedWarningMessage) {
+  async expectUserUnableToPublishBlogPost(expectedWarningMessage) {
     const toastMessageBox = await this.page.$(
       'div.e2e-test-toast-warning-message');
     const toastMessageWarning = await this.page.evaluate(
@@ -252,7 +252,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     if (!isPublishButtonDisabled) {
       throw new Error('User is able to publish the blog post');
     }
-    if (expactedWarningMessage !== toastMessageWarning) {
+    if (expectedWarningMessage !== toastMessageWarning) {
       throw new Error(
         'Expected warning message is not same as the actual warning message');
     }
