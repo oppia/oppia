@@ -179,7 +179,7 @@ export class AlgebraicExpressionInputValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
           'The following variables are present in some of the Oppia ' +
-          'Responses but are missing from the custom letters list: ' + 
+          'Responses but are missing from the custom letters list: ' +
           missingVariables)
       });
     }

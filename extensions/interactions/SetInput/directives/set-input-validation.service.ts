@@ -173,7 +173,7 @@ export class SetInputValidationService {
             if (isRuleCoveredByAnyPrevRule) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 
+                message:
                 `Learner answer ${ruleIndex + 1} from Oppia response ` +
                 `${answerGroupIndex + 1} will never be matched because it ` +
                 `it is made redundant by answer ${prevRule.ruleIndex + 1} ` +
