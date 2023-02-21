@@ -17,8 +17,6 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import isEqual from 'lodash/isEqual';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
@@ -74,15 +72,8 @@ export class Rule extends BaseTranslatableObject {
       inputs: this.inputs
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RuleObjectFactory {
-  constructor() {}
-
-  createNew(
+  static createNew(
       type: string, inputs: RuleInputs, inputTypes: RuleInputTypes
   ): Rule {
     if (!isEqual(
@@ -94,7 +85,7 @@ export class RuleObjectFactory {
     return new Rule(type, inputs, inputTypes);
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       ruleDict: RuleBackendDict, interactionId: string
   ): Rule {
     let ruleType = ruleDict.rule_type;
@@ -119,6 +110,3 @@ export class RuleObjectFactory {
     return new Rule(ruleType, ruleDict.inputs, ruleInputTypes);
   }
 }
-
-angular.module('oppia').factory('RuleObjectFactory',
-  downgradeInjectable(RuleObjectFactory));
