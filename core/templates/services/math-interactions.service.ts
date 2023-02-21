@@ -22,8 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import nerdamer from 'nerdamer';
 
 import { AppConstants } from 'app.constants';
-import { expression } from 'mathjs';
-import { negate } from 'lodash';
 
 @Injectable({
   providedIn: 'root'
@@ -74,9 +72,9 @@ export class MathInteractionsService {
     }
     if (errorMessage === 'Not a prefix operator.') {
       let humanReadableOperator = (
-        expressionString[0]  === '*' ? '×' :
+        expressionString[0] === '*' ? '×' :
         expressionString[0] === '/' ? '÷' :
-        expressionString[1]  === '*' ? '×' :
+        expressionString[1] === '*' ? '×' :
         expressionString[1] === '/' ? '÷' :
         expressionString);
       errorMessage = (
@@ -269,7 +267,6 @@ export class MathInteractionsService {
 
     expressionString = this.insertMultiplicationSigns(expressionString);
     let variablesList = nerdamer(expressionString).variables();
-    console.log("check2", variablesList);
     // Explicitly checking for presence of constants (pi and e).
     if (expressionString.match(/(^|[^a-zA-Z])e($|[^a-zA-Z])/g)) {
       variablesList.push('e');
@@ -372,12 +369,12 @@ export class MathInteractionsService {
     }
     return false;
   }
+
   getWarningText(): string {
     return this.warningText;
   }
 
   insertMultiplicationSigns(expressionString: string): string {
-    console.log("check1", expressionString);
     let greekLetters = Object.keys(
       AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
