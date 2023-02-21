@@ -24,7 +24,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { TRANSLATION_DATA_FORMAT_HTML, TRANSLATION_DATA_FORMAT_UNICODE, TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING, TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';

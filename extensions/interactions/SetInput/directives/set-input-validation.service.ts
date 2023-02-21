@@ -29,7 +29,7 @@ import { SetInputCustomizationArgs } from
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
-  'domain/exploration/RuleObjectFactory';
+  'domain/exploration/rule.model';
 import { TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
 
 interface PreviousRule {
