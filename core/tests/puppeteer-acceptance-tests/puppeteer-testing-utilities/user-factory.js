@@ -77,10 +77,7 @@ let createNewBlogAdmin = async function(username) {
  * @returns The blog post editor instance created.
  */
 let createNewBlogPostEditor = async function(username) {
-  let blogAdmin = activeUsers.find(user => user instanceof e2eBlogAdmin);
-  if (blogAdmin === undefined) {
-    blogAdmin = await createNewBlogAdmin('blogAdm');
-  }
+  const blogAdmin = await createNewBlogAdmin('blogAdm');
 
   const blogPostEditor = new e2eBlogPostEditor();
   await blogPostEditor.openBrowser();
