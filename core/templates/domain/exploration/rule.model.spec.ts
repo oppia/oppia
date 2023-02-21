@@ -13,21 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview unit test for RuleObjectFactory.
+ * @fileoverview unit test for rule-object.model.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { RuleBackendDict, RuleInputs, Rule } from
+  'domain/exploration/rule.model';
 
-import { RuleObjectFactory, RuleBackendDict, RuleInputs, Rule } from
-  'domain/exploration/RuleObjectFactory';
-
-describe('RuleObjectFactory', () => {
-  let ruleObjectFactory: RuleObjectFactory;
+describe('Rule', () => {
   let ruleBackendDict: RuleBackendDict;
   let inputBackend: RuleInputs;
 
   beforeEach(() => {
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
     inputBackend = {
       x: [['<p>list_of_sets_of_html_strings</p>']]
     };
@@ -38,13 +34,13 @@ describe('RuleObjectFactory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    const rule = ruleObjectFactory.createFromBackendDict(
+    const rule = Rule.createFromBackendDict(
       ruleBackendDict, 'ItemSelectionInput');
     expect(rule.toBackendDict()).toEqual(ruleBackendDict);
   });
 
   it('should create a new rule from createNew()', () => {
-    let rulesDict = ruleObjectFactory.createNew(
+    let rulesDict = Rule.createNew(
       'rule_type_1', inputBackend, {
         x: ''
       });
@@ -56,7 +52,7 @@ describe('RuleObjectFactory', () => {
   it('should throw an error on createNew() if the keys in inputs and ' +
     'inputTypes do not match', () => {
     expect(() => {
-      ruleObjectFactory.createNew('rule_type_1', inputBackend, {});
+      Rule.createNew('rule_type_1', inputBackend, {});
     }).toThrowError('The keys of inputs and inputTypes do not match.');
   });
 });
