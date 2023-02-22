@@ -253,7 +253,7 @@ export class RatioExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                `Learner answer ${j + 1} from Oppia resposne ${i + 1} will ` +
+                `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
                 'never be matched because the \'HasNumberOfTermsEqualTo\' ' +
                 'answer is preceded by an answer with a matching input.')
             });

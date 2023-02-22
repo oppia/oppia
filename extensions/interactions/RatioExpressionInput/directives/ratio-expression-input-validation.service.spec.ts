@@ -177,7 +177,7 @@ describe('RatioExpressionInputValidationService', () => {
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 3 from Oppia response 1 will never be matched' +
-      'because it has differing number of terms than required.'
+      ' because it has differing number of terms than required.'
     }]);
 
     // The second rule will never get matched.
@@ -213,11 +213,11 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 1 from Oppia response 1 will never be matched' +
-      'because it has differing number of terms than required.'
+      ' because it has differing number of terms than required.'
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 3 from Oppia response 1 will never be matched' +
-      'because it has differing number of terms than required.'
+      ' because it has differing number of terms than required.'
     }]);
 
     // The second rule will never get matched.
