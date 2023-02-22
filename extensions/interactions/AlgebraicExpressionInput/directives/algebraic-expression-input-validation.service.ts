@@ -135,7 +135,7 @@ export class AlgebraicExpressionInputValidationService {
               message: (
                 'Learner answer ' + (j + 1) + ' from Oppia ' +
                 'response ' + (i + 1) + ' will never be matched because it ' +
-                'is preceded by an \'IsEquivalentTo\' rule ' +
+                'is preceded by an \'IsEquivalentTo\' answer ' +
                 'with a matching input.')
             });
           } else if (currentRuleType === 'MatchesExactlyWith' && (
