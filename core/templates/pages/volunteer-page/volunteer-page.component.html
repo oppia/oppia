@@ -65,12 +65,36 @@
   </div>
 
   <div class="row oppia-volunteer-body">
-    <h3 class="oppia-volunteer-h3">Read about some of our current volunteers below!</h3>
+    <h2 class="oppia-volunteer-h2 mb-5">Meet Our Volunteers</h2>
 
     <div class="oppia-volunteer-tabs">
       <mat-tab-group mat-stretch-tabs mat-align-tabs="center">
         <mat-tab label="Art">
           <div class="row pt-3">
+            <div class="col oppia-volunteer-tab-description">
+              <h3 class="mb-5 carousel-header">Our Impact and Responsibilities</h3>
+              <p class="mb-5">
+                Illustrations help learners visualize concepts and are a key part of our platform. Our network of 
+                artists create visuals that help facilitate learning and retention of concepts.
+              </p>
+              <h4 class="carousel-sub-header pt-5">Produce Graphics</h4>
+              <p>
+                Create visuals to connect Oppia’s story-based lessons to real-life examples and 
+                to illustrate Oppia’s flyers, posters, and social media channels.
+              </p>
+              <h4 class="carousel-sub-header">Define Design Directions</h4>
+              <p>
+                Work within a community of illustrators from around the world 
+                to help define illustration styles that represent the organization.
+              </p>
+              <h4 class="carousel-sub-header">Support art-related needs</h4>
+              <p>
+                Collabrate with other teams in designing art for flyers, posters,
+                social media, etc.
+              </p>
+
+
+            </div>
             <div class="col">
 
               <ngb-carousel *ngIf="art.images.length > 0">
@@ -93,37 +117,6 @@
                   </div>
                 </ng-template>
               </ngb-carousel>
-
-            </div>
-            <div class="col oppia-volunteer-tab-description">
-              <p>
-                Creative artwork is a key part of our story-based lessons and
-                general non-profit activities. We are always working on a
-                variety of projects around the world, so we could use help
-                from artists and graphic designers from all backgrounds
-                and specialties!
-              </p>
-              <p>
-                Contributing to Oppia is a great opportunity to grow your
-                skills, work with an international team of creators and artists,
-                and positively impact the lives of millions of students.
-              </p>
-
-              <div class="oppia-volunteer-dotted-spaced-line mb-5"><br></div>
-
-              <p><b> What we do: </b></p>
-              <ul>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Create graphics for lessons, websites, and other
-                  foundation-related outreach materials.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Collaborate with team to define art-related needs.
-                </li>
-                <li class="oppia-volunteer-page-description-list-item">
-                  Help drive the design-related strategy and direction for Oppia.
-                </li>
-              </ul>
 
             </div>
           </div>
@@ -331,6 +324,7 @@
 </div>
 
 <style>
+  /*  Volunteer banner */
   .oppia-volunteer-h1 {
     color: #27635C;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -401,21 +395,6 @@
     color: #00645C;
     font-weight: normal;
   }
-  /*Why Volunteer Ends */
-
-  @media screen and (max-width: 440px) {
-    .oppia-volunteer-h1 {
-      font-size: 1.8em;
-    }
-
-    .oppia-volunteer-h3 {
-      padding: 0 1.3em;
-    }
-
-    .oppia-volunteer-content {
-      margin: 2em 2em 2em 3em;
-    }
-  }
 
   .volunteer-page button {
     background-color: #00645c;
@@ -437,12 +416,21 @@
     letter-spacing: 0.7px;
     text-decoration: none;
   }
-  
+   
+  /* Volunteer-Body */
   .oppia-volunteer-body {
-    background-color: #274653;
+    background-color: #E5E5E5;
     text-align: center;
   }
 
+  .oppia-volunteer-body h2{
+    margin: 1.2em auto ;
+    color: #000;
+    font-size: 2em;
+    letter-spacing: 1px;
+    font-weight: lighter;
+  }
+  
   .oppia-volunteer-tabs {
     background-color: #fff;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -451,6 +439,19 @@
     padding: 0 .7em 0 .7em;
     text-align: center;
     width: 90%;
+  }
+
+  .oppia-volunteer-body .carousel-header {
+    font-size: 1.3em;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    color: #00645C;
+    font-weight: lighter;
+  }
+
+  .oppia-volunteer-body .carousel-sub-header {
+    font-size: 1em;
+    font-family: "Roboto", Arial, sans-serif;
+    color: #03968A;
   }
 
   .oppia-volunteer-tabs p {
@@ -499,7 +500,7 @@
 
   .oppia-volunteer-tab-description {
     font-size: 0.9em;
-    margin: 3em 5em 1em 0;
+    margin: 3em 5em 3em 5em;
     text-align: left;
   }
 
@@ -515,6 +516,12 @@
     margin-bottom: 10px;
   }
 
+  .oppia-volunteer-footer {
+    font-size: 1.3em;
+    padding: 3em 15% 0 15%;
+    text-align: center;
+  }
+
   @media screen and (max-width: 440px) {
     .oppia-volunteer-tabs {
       width: 100%;
@@ -527,11 +534,17 @@
     .oppia-volunteer-tabs ngb-carousel {
       margin: 2em auto;
     }
-  }
+    
+    .oppia-volunteer-h1 {
+      font-size: 1.8em;
+    }
 
-  .oppia-volunteer-footer {
-    font-size: 1.3em;
-    padding: 3em 15% 0 15%;
-    text-align: center;
+    .oppia-volunteer-h3 {
+      padding: 0 1.3em;
+    }
+
+    .oppia-volunteer-content {
+      margin: 2em 2em 2em 3em;
+    }
   }
 </style>
