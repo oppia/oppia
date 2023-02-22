@@ -1617,6 +1617,10 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
 # The sort keys of submitted questions shown on the Contributor Dashboard.
 SUGGESTIONS_SORT_KEYS = [constants.SUGGESTIONS_SORT_KEY_DATE]
 
+# Auto-generated review message for an obsolete translation suggestion, i.e. a
+# suggestion corresponding to content that no longer exists.
+OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG = constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG
+
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
 # '/access_validation_handler/<handler_name>'

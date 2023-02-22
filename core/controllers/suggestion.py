@@ -1188,9 +1188,8 @@ def _construct_exploration_suggestions(
             content_html = exploration.get_content_html(
                 suggestion.change.state_name, suggestion.change.content_id)
         except ValueError:
-            # If the exploration content is no longer available, return the
-            # suggestion's content.
-            content_html = suggestion.change.content_html
+            # Exploration content is no longer available.
+            pass
         suggestion_dict = suggestion.to_dict()
         updated_suggestion_dict: FrontendBaseSuggestionDict = {
             'suggestion_id': suggestion_dict['suggestion_id'],

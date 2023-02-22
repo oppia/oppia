@@ -256,10 +256,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
             author_name
         );
       });
-    this.reviewMessage = '';
-    if (!this.reviewable) {
-      this._getThreadMessagesAsync(this.activeSuggestionId);
-    }
     this.isContentExpanded = false;
     this.isTranslationExpanded = false;
     this.errorMessage = '';
@@ -287,6 +283,18 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.change.data_format ===
         'set_of_unicode_string'
     );
+    this.reviewMessage = '';
+    if (!this.reviewable) {
+      this._getThreadMessagesAsync(this.activeSuggestionId).then(() => {
+        // No review message and no exploration content means the suggestion
+        // became obsolete and was auto-rejected in a batch job. See issue
+        // #16022.
+        if (!this.reviewMessage && !this.explorationContentHtml) {
+          this.reviewMessage = (
+            AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG);
+        }
+      });
+    }
     setTimeout(() => {
       this.computePanelOverflowState();
     }, 0);
