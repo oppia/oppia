@@ -36,7 +36,7 @@ import { WorkedExampleBackendDict } from
 import { Collection } from 'domain/collection/collection.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
-import { Story } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { Topic } from 'domain/topic/topic-object.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 

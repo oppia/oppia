@@ -13,24 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StoryObjectFactory.
+ * @fileoverview Tests for Story model class.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 
 describe('Story object factory', () => {
-  let storyObjectFactory: StoryObjectFactory;
   let _sampleStory: Story;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [StoryObjectFactory]
-    });
-
-    storyObjectFactory = TestBed.get(StoryObjectFactory);
-
     var sampleStoryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
@@ -59,7 +50,7 @@ describe('Story object factory', () => {
       url_fragment: 'story-title',
       meta_tag_content: 'story meta tag content'
     };
-    _sampleStory = storyObjectFactory.createFromBackendDict(
+    _sampleStory = Story.createFromBackendDict(
       // This throws "Argument of type '{ id: string; ... }'
       // is not assignable to parameter of type 'StoryBackendDict'.".
       // We need to suppress this error because 'sampleStoryBackendDict'
@@ -119,7 +110,7 @@ describe('Story object factory', () => {
   });
 
   it('should be able to copy from another story', () => {
-    var secondStory = storyObjectFactory.createFromBackendDict({
+    var secondStory = Story.createFromBackendDict({
       id: 'sample_story_id_2s',
       title: 'Story title 2',
       description: 'Story description 2',

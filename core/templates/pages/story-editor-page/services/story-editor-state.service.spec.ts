@@ -19,8 +19,8 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
-
-import { StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
+import { StoryBackendDict } from 'domain/story/story.model';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
@@ -94,7 +94,6 @@ class MockEditableStoryBackendApiService {
 describe('Story editor state service', () => {
   var alertsService: AlertsService;
   var storyEditorStateService: StoryEditorStateService;
-  var storyObjectFactory: StoryObjectFactory;
   var storyUpdateService: StoryUpdateService;
   var fakeEditableStoryBackendApiService: MockEditableStoryBackendApiService;
   var secondBackendStoryObject: StoryBackendDict;
@@ -162,7 +161,6 @@ describe('Story editor state service', () => {
 
     alertsService = TestBed.inject(AlertsService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
-    storyObjectFactory = TestBed.inject(StoryObjectFactory);
     storyUpdateService = TestBed.inject(StoryUpdateService);
   });
 
@@ -244,7 +242,7 @@ describe('Story editor state service', () => {
   it('should report that a story has loaded through setStory()', () => {
     expect(storyEditorStateService.hasLoadedStory()).toBe(false);
 
-    var newStory = storyObjectFactory.createFromBackendDict(
+    var newStory = Story.createFromBackendDict(
       secondBackendStoryObject);
     storyEditorStateService.setStory(newStory);
     expect(storyEditorStateService.hasLoadedStory()).toBe(true);
@@ -256,7 +254,7 @@ describe('Story editor state service', () => {
       tick(1000);
 
       var previousStory = storyEditorStateService.getStory();
-      var expectedStory = storyObjectFactory.createFromBackendDict(
+      var expectedStory = Story.createFromBackendDict(
         secondBackendStoryObject);
       expect(previousStory).not.toEqual(expectedStory);
 
@@ -470,7 +468,7 @@ describe('Story editor state service', () => {
 
   it('should update stories URL when user updates the storie\'s URL',
     fakeAsync(() => {
-      var newStory = storyObjectFactory.createFromBackendDict(
+      var newStory = Story.createFromBackendDict(
         secondBackendStoryObject);
       storyEditorStateService.setStory(newStory);
 
@@ -488,7 +486,7 @@ describe('Story editor state service', () => {
   it('should warn user when user updates the storie\'s URL to an URL' +
   ' that already exits', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
-    var newStory = storyObjectFactory.createFromBackendDict(
+    var newStory = Story.createFromBackendDict(
       secondBackendStoryObject);
     storyEditorStateService.setStory(newStory);
 

@@ -22,7 +22,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { StoryBackendDict } from 'domain/story/StoryObjectFactory';
+import { StoryBackendDict } from 'domain/story/story.model';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';

@@ -19,6 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Story } from 'domain/story/story.model';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -42,7 +43,6 @@ describe('Story editor Directive having two story nodes', function() {
   var StoryEditorNavigationService = null;
   var StoryUpdateService = null;
   var StoryEditorStateService = null;
-  var StoryObjectFactory = null;
   var WindowRef = null;
   let fetchSpy = null;
 
@@ -67,7 +67,6 @@ describe('Story editor Directive having two story nodes', function() {
     UndoRedoService = $injector.get('UndoRedoService');
     WindowRef = $injector.get('WindowRef');
     StoryUpdateService = $injector.get('StoryUpdateService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     $q = $injector.get('$q');
 
@@ -108,7 +107,7 @@ describe('Story editor Directive having two story nodes', function() {
       },
       language_code: 'en'
     };
-    story = StoryObjectFactory.createFromBackendDict(sampleStoryBackendObject);
+    story = Story.createFromBackendDict(sampleStoryBackendObject);
     directive = $injector.get('storyEditorDirective')[0];
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
@@ -435,7 +434,6 @@ describe('Story editor Directive having one story node', function() {
   var WindowDimensionsService = null;
 
   var StoryEditorStateService = null;
-  var StoryObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('NgbModal', {
@@ -453,7 +451,6 @@ describe('Story editor Directive having one story node', function() {
     $scope = $rootScope.$new();
     $injector.get('NgbModal');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     $q = $injector.get('$q');
 
@@ -484,7 +481,7 @@ describe('Story editor Directive having one story node', function() {
       },
       language_code: 'en'
     };
-    story = StoryObjectFactory.createFromBackendDict(sampleStoryBackendObject);
+    story = Story.createFromBackendDict(sampleStoryBackendObject);
     directive = $injector.get('storyEditorDirective')[0];
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);

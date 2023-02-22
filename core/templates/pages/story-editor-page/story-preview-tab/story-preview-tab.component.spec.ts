@@ -21,7 +21,7 @@ import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { StoryPreviewTabComponent } from './story-preview-tab.component';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -39,14 +39,12 @@ describe('Story Preview tab', () => {
   let story: Story;
   let storyInitializedEventEmitter: EventEmitter<void>;
   let storyReinitializedEventEmitter: EventEmitter<void>;
-  let storyObjectFactory: StoryObjectFactory;
   let storyEditorStateService: StoryEditorStateService;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [StoryPreviewTabComponent, MockTranslatePipe],
       providers: [{
-        StoryObjectFactory,
         StoryEditorNavigationService,
         provide: [
           {
@@ -60,9 +58,8 @@ describe('Story Preview tab', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(StoryPreviewTabComponent);
     component = fixture.componentInstance;
-    storyObjectFactory = TestBed.get(StoryObjectFactory);
     storyEditorStateService = TestBed.get(StoryEditorStateService);
-    story = storyObjectFactory.createFromBackendDict({
+    story = Story.createFromBackendDict({
       id: 'storyId_0',
       title: 'Story title',
       description: 'Story Description',

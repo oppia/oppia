@@ -24,7 +24,7 @@ import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Chapter Editor tab', function() {
@@ -38,7 +38,7 @@ describe('Chapter Editor tab', function() {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [StoryObjectFactory, StoryEditorNavigationService,
+      providers: [StoryEditorNavigationService,
         EditableStoryBackendApiService]
     });
   });
@@ -46,7 +46,6 @@ describe('Chapter Editor tab', function() {
     $provide.value(
       'EditableStoryBackendApiService',
       TestBed.get(EditableStoryBackendApiService));
-    $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));
     $provide.value(
       'StoryEditorNavigationService',
       TestBed.get(StoryEditorNavigationService));
@@ -54,7 +53,6 @@ describe('Chapter Editor tab', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
-    var storyObjectFactory = $injector.get('StoryObjectFactory');
     var StoryEditorStateService = $injector.get('StoryEditorStateService');
     $scope = $rootScope.$new();
     MockStoryEditorNavigationService = {
@@ -67,7 +65,7 @@ describe('Chapter Editor tab', function() {
       }
     };
 
-    var newStory = storyObjectFactory.createFromBackendDict({
+    var newStory = Story.createFromBackendDict({
       id: 'storyId_0',
       title: 'Story title',
       description: 'Story Description',

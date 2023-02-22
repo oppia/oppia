@@ -23,7 +23,7 @@ import { AlertsService } from 'services/alerts.service';
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { CuratedExplorationValidationService } from
   'domain/exploration/curated-exploration-validation.service';
 import { ExplorationSummaryBackendApiService } from
@@ -36,7 +36,6 @@ describe('Create New Chapter Modal Controller', function() {
   var $uibModalInstance = null;
   var StoryEditorStateService = null;
   var StoryUpdateService = null;
-  var storyObjectFactory = null;
   var curatedExplorationValidationService = null;
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
   var editableStoryBackendApiService = null;
@@ -63,15 +62,11 @@ describe('Create New Chapter Modal Controller', function() {
       'EditableStoryBackendApiService',
       TestBed.get(
         EditableStoryBackendApiService));
-    $provide.value(
-      'StoryObjectFactory',
-      new StoryObjectFactory());
     $provide.value('AlertsService', new AlertsService(new LoggerService()));
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $rootScope = $injector.get('$rootScope');
     StoryUpdateService = $injector.get('StoryUpdateService');
-    storyObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     editableStoryBackendApiService = $injector.get(
       'EditableStoryBackendApiService');
@@ -118,7 +113,7 @@ describe('Create New Chapter Modal Controller', function() {
       },
       language_code: 'en'
     };
-    var story = storyObjectFactory.createFromBackendDict(
+    var story = Story.createFromBackendDict(
       sampleStoryBackendObject);
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
 
