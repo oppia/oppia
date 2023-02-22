@@ -56,7 +56,7 @@ export class FractionInputValidationService {
     return {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + (j + 1) + ' from answer group ' +
+        'Learner answer ' + (j + 1) + ' from Oppia response ' +
         (i + 1) + ' is invalid: input should be an ' +
         'integer.')
     };
@@ -294,7 +294,7 @@ export class FractionInputValidationService {
                 message: (
                   'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                  'is made redundant by answer ' + (ranges[k].ruleIndex + 1) +
                   ' from Oppia response ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
