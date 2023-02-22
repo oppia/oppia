@@ -39,8 +39,29 @@
         <img alt="Volunteer page map image - Mobile view" [src]="this.getStaticImageUrl(mapImgPath)">
       </picture>
     </div>
+  </div>
 
-    
+  <div class="why-volunteer">
+    <div class="container text-center">
+      <h2 class="section-heading mb-5">Why Volunteer with Us?</h2>
+      <div class="row mt-4">
+        <div class="col-md-4">
+          <i class="fa fa-suitcase fa-2x mb-5"></i>
+          <h3 class="font-weight-light">Vibrant Community</h3>
+          <p class="mt-5">Join a lively, diverse network of volunteers from all around the world.</p>
+        </div>
+        <div class="col-md-4">
+          <i class="fa fa-users fa-2x mb-5"></i>
+          <h3 class="font-weight-light">Gain Skills</h3>
+          <p class="mt-5">Collaborate alongside peers to develop your skills through contributing to a meaningful, open-source project.</p>
+        </div>
+        <div class="col-md-4">
+          <i class="fa fa-award fa-2x mb-5"></i>
+          <h3 class="font-weight-light">Meaningful Projects</h3>
+          <p class="mt-5">Your work directly helps underserved students around the world gain access to free, high-quality education.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="row oppia-volunteer-body">
@@ -327,7 +348,7 @@
   .oppia-volunteer-h3 {
     color: #fff;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 1.5em;
+    font-size: 1.3em;
     margin: 3em auto;
   }
 
@@ -345,6 +366,42 @@
     margin-left: 6.5em !important;
     height: 50px !important;
   }
+  
+  /* Why Volunter */
+  .why-volunteer {
+    background: #fff;
+    padding: 2em;
+  }
+
+  .why-volunteer .container{
+    margin: 3em;
+    min-width: 90%;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.3em;
+  }
+
+  .why-volunteer i {
+    color: #00645C;
+  }
+
+  .why-volunteer .row{
+    margin-top: 4.5em;
+  }
+
+  .why-volunteer p {
+    color: #000;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 0.9em;
+    letter-spacing: 0.7px;
+    text-align: center;
+    padding: 0.7em;
+  }
+
+  .why-volunteer h3 {
+    color: #00645C;
+    font-weight: normal;
+  }
+  /*Why Volunteer Ends */
 
   @media screen and (max-width: 440px) {
     .oppia-volunteer-h1 {
