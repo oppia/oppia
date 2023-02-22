@@ -256,8 +256,8 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Learner answer 2 from Oppia response 1 will never be ' +
-        'matched because it is made redundant by answer 1 from Oppia response 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+        ' because it is made redundant by answer 1 from Oppia response 1.'
     }]);
   });
 
