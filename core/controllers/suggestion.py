@@ -1183,7 +1183,7 @@ def _construct_exploration_suggestions(
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
     for suggestion in suggestions:
         exploration = exp_id_to_exp[suggestion.target_id]
-        content_html = ''
+        content_html: Union[str, List[str]] = ''
         try:
             content_html = exploration.get_content_html(
                 suggestion.change.state_name, suggestion.change.content_id)

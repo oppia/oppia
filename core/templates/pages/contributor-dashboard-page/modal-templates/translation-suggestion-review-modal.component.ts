@@ -116,6 +116,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isFirstItem: boolean = true;
   reviewMessage!: string;
   status!: string;
+  heading: string = 'Your Translation Contributions';
   subheading!: string;
   suggestionIdToContribution!: Record<string, ActiveContributionDict>;
   translationHtml!: string;
@@ -189,6 +190,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     if (this.reviewable) {
       this.siteAnalyticsService
         .registerContributorDashboardViewSuggestionForReview('Translation');
+      this.heading = 'Review Translation Contributions';
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
     this.remainingContributionIds = Object.keys(

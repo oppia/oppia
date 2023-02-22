@@ -26,7 +26,6 @@ import re
 from core import feconf
 from core.constants import constants
 from core.domain import email_manager
-from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner

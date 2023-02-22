@@ -3935,7 +3935,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             button_text_subtitle_unicode.unicode_str,
             'Continue')
 
-    def test_update_interaction_customization_args_rejects_obsolete_translation_suggestions(
+    def test_update_interaction_customization_args_rejects_obsolete_translation_suggestions( # pylint: disable=line-too-long
         self
     ) -> None:
         # Add a Continue button interaction to the exploration.
