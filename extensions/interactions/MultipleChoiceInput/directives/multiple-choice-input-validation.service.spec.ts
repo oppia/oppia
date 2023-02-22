@@ -25,7 +25,7 @@ import { MultipleChoiceInputCustomizationArgs } from
 import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 
@@ -40,7 +40,6 @@ describe('MultipleChoiceInputValidationService', () => {
   let validatorService: MultipleChoiceInputValidationService,
     customizationArguments: MultipleChoiceInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -51,7 +50,6 @@ describe('MultipleChoiceInputValidationService', () => {
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
 
     goodDefaultOutcome = oof.createFromBackendDict({
@@ -116,7 +114,8 @@ describe('MultipleChoiceInputValidationService', () => {
           x: 3
         }
       }].map(
-        ruleDict => rof.createFromBackendDict(ruleDict, 'MultipleChoiceInput')),
+        ruleDict => Rule.createFromBackendDict(
+          ruleDict, 'MultipleChoiceInput')),
       goodDefaultOutcome,
       [],
       null)];
