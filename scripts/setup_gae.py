@@ -80,10 +80,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # specifically tells the gcloud program to autofill all prompts with default
     # values. In this case, that means accepting all installations of gcloud
     # packages.
-    subprocess.call([
-        common.GCLOUD_PATH,
-        'components', 'install', 'beta', 'cloud-datastore-emulator',
-        'app-engine-python', 'app-engine-python-extras', '--quiet'])
+    subprocess.run(
+        [
+            common.GCLOUD_PATH, 'components', 'install', 'beta',
+            'cloud-datastore-emulator', 'app-engine-python',
+            'app-engine-python-extras', '--quiet',
+        ],
+        check=True,
+    )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
