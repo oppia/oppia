@@ -164,18 +164,9 @@
 
     <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
       <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
-<<<<<<< HEAD
-        <a [ngClass]=""
-           target="_blank"
-           rel="noopener">
-          <img class="conversation-skin-oppia-avatar rounded-circle"
-               [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
-        </a>
-=======
         <img class="conversation-skin-oppia-avatar rounded-circle"
              [src]="OPPIA_AVATAR_IMAGE_URL"
              alt="">
->>>>>>> fc4b7bc10725cc205c7860f5c7511aeed490795d
         <div class="conversation-skin-oppia-feedback-content">
           {{ 'I18N_EXPLORATION_STATE_PREVIOUSLY_COMPLETED' | translate }}
         </div>

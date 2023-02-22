@@ -5832,7 +5832,7 @@ export default {
       "NumberWithUnits",
       "RatioExpressionInput"
     ]
-  }, {  
+  }, {
     "name": "Programming",
     "interaction_ids": [
       "CodeRepl",
