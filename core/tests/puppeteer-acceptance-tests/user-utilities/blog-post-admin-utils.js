@@ -254,7 +254,9 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     }
     if (expectedWarningMessage !== toastMessageWarning) {
       throw new Error(
-        'Expected warning message is not same as the actual warning message');
+        'Expected warning message is not same as the actual warning message\n' +
+        `Expected warning: ${expectedWarningMessage}\n` +
+        `Actual warning: ${toastMessageWarning}\n`);
     }
 
     showMessage(
