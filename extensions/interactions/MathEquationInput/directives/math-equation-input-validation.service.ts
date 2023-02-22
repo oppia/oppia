@@ -132,7 +132,7 @@ export class MathEquationInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
-              'Input for learner answer' + (j + 1) + ' from Oppia response ' +
+              'Input for learner answer ' + (j + 1) + ' from Oppia response ' +
               (i + 1) + ' uses these function(s) that aren\'t supported: ' +
               '[' + unsupportedFunctions + ']' +
               ' The supported functions are: ' +

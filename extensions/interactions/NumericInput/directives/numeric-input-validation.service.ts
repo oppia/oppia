@@ -199,7 +199,7 @@ export class NumericInputValidationService {
                 'Learner answer ' + (j + 1) + ' from Oppia response ' +
                 (i + 1) + ' will never be matched because it is made ' +
                 'redundant by answer ' + (ranges[k].ruleIndex + 1) + ' from ' +
-                'Oppia response ' + (ranges[k].answerGroupIndex + 1) + '.')
+                'response ' + (ranges[k].answerGroupIndex + 1) + '.')
             });
           }
         }

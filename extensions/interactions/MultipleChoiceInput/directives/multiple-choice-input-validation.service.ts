@@ -109,7 +109,7 @@ export class MultipleChoiceInputValidationService {
               type: AppConstants.WARNING_TYPES.CRITICAL,
               message: 'Please ensure learner answer ' + String(j + 1) +
               ' in Oppia response ' + String(i + 1) + ' is not equaling ' +
-              'same multiple choice option as another learner answer.'
+              'the same multiple choice option as another learner answer.'
             });
           }
           if (rules[j].inputs.x >= numChoices) {

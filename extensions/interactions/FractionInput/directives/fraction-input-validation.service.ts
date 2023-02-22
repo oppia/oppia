@@ -241,7 +241,7 @@ export class FractionInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Learner answer ' + (j + 1) + ' from Oppia resonse ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' is invalid: denominator ' +
                   'should be greater than zero.')
               });
@@ -312,7 +312,7 @@ export class FractionInputValidationService {
                 message: (
                   'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' +
+                  'is made redundant by answer ' +
                   (matchedDenominators[k].ruleIndex + 1) +
                   ' from Oppia response ' +
                   (matchedDenominators[k].answerGroupIndex + 1) + '.')

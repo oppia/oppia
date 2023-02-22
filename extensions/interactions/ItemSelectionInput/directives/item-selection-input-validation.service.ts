@@ -228,7 +228,7 @@ export class ItemSelectionInputValidationService {
                   'In Oppia response ' + (answerIndex + 1) + ', ' +
                   'Learner answer ' + (ruleIndex + 1) + ', the number of ' +
                   'correct options in the "Equals" learner answer should be ' +
-                  ' between ' + minAllowedCount + ' and ' + maxAllowedCount +
+                  'between ' + minAllowedCount + ' and ' + maxAllowedCount +
                   ' (the minimum and maximum allowed selection counts).')
               });
             }

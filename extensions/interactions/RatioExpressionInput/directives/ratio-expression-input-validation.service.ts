@@ -255,7 +255,7 @@ export class RatioExpressionInputValidationService {
               message: (
                 `Learner answer ${j + 1} from Oppia resposne ${i + 1} will ` +
                 'never be matched because the \'HasNumberOfTermsEqualTo\' ' +
-                'answer is preceded by a rule with a matching input.')
+                'answer is preceded by an answer with a matching input.')
             });
           } else if (
             currentRuleType === 'HasNumberOfTermsEqualTo' &&

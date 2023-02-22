@@ -104,7 +104,7 @@ export class AlgebraicExpressionInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
-              'Input for learner answer ' + (j + 1) + ' from Oppia resposne ' +
+              'Input for learner answer ' + (j + 1) + ' from Oppia response ' +
               (i + 1) + ' uses these function(s) that aren\'t supported: ' +
               '[' + unsupportedFunctions + ']' +
               ' The supported functions are: ' +
@@ -148,7 +148,7 @@ export class AlgebraicExpressionInputValidationService {
               message: (
                 'Learner answer ' + (j + 1) + ' from Oppia ' +
                 'response ' + (i + 1) + ' will never be matched because it ' +
-                'is preceded by an \'MatchesExactlyWith\' rule ' +
+                'is preceded by a \'MatchesExactlyWith\' answer ' +
                 'with a matching input.')
             });
           }
@@ -179,7 +179,7 @@ export class AlgebraicExpressionInputValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
           'The following variables are present in some of the Oppia ' +
-          'Responses but are missing from the custom letters list: ' +
+          'responses but are missing from the custom letters list: ' +
           missingVariables)
       });
     }

@@ -161,7 +161,7 @@ describe('MathEquationInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 2 from Oppia response 1 will never be ' +
-      'matched because it is preceded by an \'MatchesExactlyWith\' learner ' +
+      'matched because it is preceded by a \'MatchesExactlyWith\' learner ' +
       'answer with a matching input.'
     }]);
   });

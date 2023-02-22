@@ -135,7 +135,7 @@ describe('RatioExpressionInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 2 from Oppia response 1 will never be ' +
       'matched because it is preceded by a \'Equals\' ' +
-      'rule with a matching input.'
+      'answer with a matching input.'
     }]);
 
     let isEquivalentNonSimplified = Rule.createFromBackendDict({
@@ -154,7 +154,7 @@ describe('RatioExpressionInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 2 from Oppia response 1 will never be ' +
       'matched because it is preceded by a \'IsEquivalent\' ' +
-      'rule with a matching input.'
+      'answer with a matching input.'
     }]);
 
     let equalFourTerms = Rule.createFromBackendDict({
@@ -173,7 +173,7 @@ describe('RatioExpressionInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 2 from Oppia response 1 will never be ' +
       'matched because it is preceded by a \'HasNumberOfTermsEqualTo\' ' +
-      'rule with a matching input.'
+      'answer with a matching input.'
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 3 from Oppia response 1 will never be matched' +
@@ -189,7 +189,7 @@ describe('RatioExpressionInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 2 from Oppia response 1 will never be ' +
       'matched because it is preceded by a \'HasNumberOfTermsEqualTo\' ' +
-      'rule with a matching input.'
+      'answer with a matching input.'
     }]);
 
     let equalsTwoTerms = Rule.createFromBackendDict({
@@ -229,7 +229,7 @@ describe('RatioExpressionInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Learner answer 2 from Oppia response 1 will never be ' +
       'matched because it is preceded by a \'HasSpecificTermEqualTo\' ' +
-      'rule with a matching input.'
+      'answer with a matching input.'
     }]);
 
     let invalidHasSpecificTermEqualTo = Rule.createFromBackendDict({

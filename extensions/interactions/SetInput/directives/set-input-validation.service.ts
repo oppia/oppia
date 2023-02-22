@@ -176,7 +176,7 @@ export class SetInputValidationService {
                 message:
                 `Learner answer ${ruleIndex + 1} from Oppia response ` +
                 `${answerGroupIndex + 1} will never be matched because it ` +
-                `it is made redundant by answer ${prevRule.ruleIndex + 1} ` +
+                `is made redundant by answer ${prevRule.ruleIndex + 1} ` +
                 `from Oppia response ${prevRule.answerGroupIndex + 1}.`
               });
             }
