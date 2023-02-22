@@ -58,11 +58,11 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
         with utils.open_file(spec_file_v41, 'r') as f:
             specs_from_json_v41 = json.loads(f.read())
 
-        self.assertDictEqual(
-            html_field_types_to_rule_specs_v41,
-            specs_from_json_v41)
+            self.assertDictEqual(
+                html_field_types_to_rule_specs_v41, specs_from_json_v41
+            )
 
-    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(  # pylint: disable=line-too-long
+    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version_without_caching(  # pylint: disable=line-too-long
         self
     ) -> None:
         with self.assertRaisesRegex(
@@ -73,3 +73,54 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
                 rules_registry.Registry
                 .get_html_field_types_to_rule_specs(state_schema_version=10)
             )
+
+    def test_get_html_field_types_to_rule_specs_for_given_state_schema_version_with_caching(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        # Checking the html field types to rule specs for version 41,
+        # and simuntaneously populating the
+        # Registry._state_schema_version_to_html_field_types_to_rule_specs
+        # for caching purpose.
+
+        html_field_types_to_rule_specs_v41 = (
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        spec_file_v41 = os.path.join(
+            'extensions', 'interactions',
+            'legacy_html_field_types_to_rule_specs_by_state_version',
+            'html_field_types_to_rule_specs_state_v41.json')
+        with utils.open_file(spec_file_v41, 'r') as f:
+            specs_from_json_v41 = json.loads(f.read())
+
+        self.assertDictEqual(
+            html_field_types_to_rule_specs_v41,
+            specs_from_json_v41)
+
+        # Checking if a key(41) is already present in
+        # Registry._state_schema_version_to_html_field_types_to_rule_specs
+        # and then re-calling Registry.get_html_field_types_to_rule_specs
+        # to check if state_schema_version_to_html_field_types_to_rule_specs
+        # is repopulated or not.
+
+        expected_state_schema_version_to_html_field_types_to_rule_specs = {
+            None: {},
+            41: specs_from_json_v41
+        }
+        self.assertEqual(
+            rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs,  # pylint: disable=protected-access
+            expected_state_schema_version_to_html_field_types_to_rule_specs
+        )
+
+        rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs[41] = {}  # pylint: disable=protected-access
+        rules_registry.Registry.get_html_field_types_to_rule_specs(
+            state_schema_version=41)
+
+        self.assertNotEqual(
+            rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs,  # pylint: disable=protected-access
+            expected_state_schema_version_to_html_field_types_to_rule_specs
+        )
+
+        rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs[41] = (  # pylint: disable=protected-access
+            specs_from_json_v41
+        )
