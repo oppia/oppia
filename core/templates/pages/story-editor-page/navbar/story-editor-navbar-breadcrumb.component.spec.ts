@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorNavbarBreadcrumbComponent } from './story-editor-navbar-breadcrumb.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -39,7 +39,6 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
   let storyEditorStateService: StoryEditorStateService;
   let story: Story;
   let ngbModal: NgbModal;
-  let storyObjectFactory: StoryObjectFactory;
   let undoRedoService: UndoRedoService;
   let windowRef: WindowRef;
 
@@ -55,13 +54,12 @@ describe('StoryEditorNavbarBreadcrumbComponent', () => {
     fixture = TestBed.createComponent(StoryEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
     storyEditorStateService = TestBed.get(StoryEditorStateService);
-    storyObjectFactory = TestBed.inject(StoryObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
     undoRedoService = TestBed.get(UndoRedoService);
     windowRef = (TestBed.inject(WindowRef) as unknown) as
       jasmine.SpyObj<WindowRef>;
 
-    story = storyObjectFactory.createFromBackendDict({
+    story = Story.createFromBackendDict({
       id: 'storyId_0',
       title: 'Story title',
       description: 'Story Description',
