@@ -70,7 +70,7 @@
             <div *ngIf="activeTab === TAB_NAME_TOPICS">
               <i class="fa fa-angle-left topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-value"
-                    *ngFor=" let n of getPages(pageNumber + 1, currentCount/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                    *ngFor="let n of getPagesToDisplayInNavigation(pageNumber + 1, currentCount, itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
                 <span *ngIf="pageNumber === n-1" class="dashboard-list-pagination-active">
                   <span>{{ n }}</span>
                 </span>
@@ -82,7 +82,7 @@
             <div *ngIf="activeTab === TAB_NAME_SKILLS">
               <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-value"
-                      *ngFor=" let n of getPages(pageNumber + 1, getTotalCountValueForSkills()/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                      *ngFor="let n of getPagesToDisplayInNavigation(pageNumber + 1, getTotalCountValueForSkills(), itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
                 <span *ngIf="pageNumber === n-1" class="dashboard-list-pagination-active">
                   <span>{{ n }}</span>
                 </span>
@@ -124,7 +124,7 @@
             <div *ngIf="activeTab === TAB_NAME_TOPICS">
               <i class="fa fa-angle-left topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-value"
-                    *ngFor=" let n of getPages(pageNumber + 1, currentCount/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                    *ngFor="let n of getPagesToDisplayInNavigation(pageNumber + 1, currentCount, itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
                 <span *ngIf="pageNumber === n-1" class="dashboard-list-pagination-active">
                   <span>{{ n }}</span>
                 </span>
@@ -136,7 +136,7 @@
             <div *ngIf="activeTab === TAB_NAME_SKILLS">
               <i class="fa fa-angle-left topic-pagination-arrow" (click)="navigateSkillPage(MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-value"
-                      *ngFor=" let n of getPages(pageNumber + 1, getTotalCountValueForSkills()/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
+                      *ngFor="let n of getPagesToDisplayInNavigation(pageNumber + 1, getTotalCountValueForSkills(), itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
                 <span *ngIf="pageNumber === n-1" class="dashboard-list-pagination-active">
                   <span>{{ n }}</span>
                 </span>

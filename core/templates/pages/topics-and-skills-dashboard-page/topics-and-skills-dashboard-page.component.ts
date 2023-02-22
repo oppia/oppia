@@ -134,42 +134,56 @@ export class TopicsAndSkillsDashboardPageComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  getPages(current: number, total: number): number[] {
+  /**
+   * This handles the pagination display for Topics and Skills.
+   * @param {number} currentPageNumber - current page number
+   * of user.
+   * @param {number} totalNumberOfItems - total number of
+   * skills/topics.
+   * @param {number} NumberOfItemsPerPage - number of
+   * skills/topics to be displayed per page.
+   * "-1" is used as an indicator to print ellipses.
+   * @returns {number[]} - Array of page numbers with/without
+   * ellipses depending on the current page number.
+   */
+  getPagesToDisplayInNavigation(currentPageNumber: number, totalNumberOfItems: number, NumberOfItemsPerPage: number): number[] {
     /**
-     * This function returns an array of the total number of pages.
-     * "-1" is an indicator to print ellipses.
-     * The "total" variable is being rounded off to avoid cases
-     * when the items per page is not a divisor of the total
-     * number of pages.
+     * @var {number} totalNumberOfPages - total number of 
+     * pages
+     * Ceiling function handles cases where 
+     * @param {number} totalNumberOfItems is not a divisor of the
+     * @var {number} NumberOfItemsPerPage
      */
-    total = Math.ceil(total);
+    let totalNumberOfPages: number = Math.ceil(totalNumberOfItems/NumberOfItemsPerPage);
     let initialPaginationThreshold: number = 6;
-    /**
-     * Case 0 when the total count of pages is less than or equal
-     * to 6. Ellipses arent required.
-     * */
-    if (total <= initialPaginationThreshold) {
-      return [...Array(total).keys()].map((x) => ++x);
+    
+    if (totalNumberOfPages <= initialPaginationThreshold) {
+      /**
+      * This handles the case where @var {number} totalNumberOfPages
+      * is less than or equal to 6. Ellipses aren't required.
+      */
+      return [...Array(totalNumberOfPages).keys()].map((x) => ++x);
     }
-    if (current >= 4) {
-      if (current >= total - 4) {
-        /**
-       * Case 1 when the current page number is towards
-       * the end of total number of pages.
-       * "total" denotes the total page count.
-       */
-        return [1, -1, total - 2, total - 1, total];
+    if (currentPageNumber >= 4) {
+      if (currentPageNumber >= totalNumberOfPages - 4) {
+      /**
+      * This handles the case where @var {number} currentPageNumber
+      * is towards the end of total page count.
+      */
+        return [1, -1, totalNumberOfPages - 2, totalNumberOfPages - 1, totalNumberOfPages];
       } else {
-        /**
-       * Case 2 when the current page number is in the middle.
-       */
-        return [1, -1, current - 1, current, current + 1, -1, total];
+      /**
+      * This handles the case where @var {number} currentPageNumber
+      * is in the middle of 1 and total page count.
+      */
+        return [1, -1, currentPageNumber - 1, currentPageNumber, currentPageNumber + 1, -1, totalNumberOfPages];
       }
     }
     /**
-     * Case 3 when the current page number is at the start.
-     */
-    return [1, 2, 3, 4, -1, total];
+    * This handles the case where @var {number} currentPageNumber
+    * is at the start or less than 4.
+    */
+    return [1, 2, 3, 4, -1, totalNumberOfPages];
   }
 
   /**
