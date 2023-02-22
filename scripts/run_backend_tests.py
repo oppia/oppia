@@ -443,14 +443,32 @@ def check_test_results(
                 if (
                         spec.test_target not in coverage_exclusions
                         and float(coverage) != 100.0):
-                    print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
-                        coverage, spec.test_target))
                     incomplete_coverage += 1
-                    print(task.task_results[0].get_report()[-3])
-
         total_count += test_count
 
     return total_count, total_errors, total_failures, incomplete_coverage
+
+
+def print_coverage_report(
+    tasks: List[concurrent_task_utils.TaskThread],
+    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
+    ) -> int:
+    """Run tests and parse coverage reports."""
+    incomplete_coverage = 0
+    coverage_exclusions = load_coverage_exclusion_list(
+    COVERAGE_EXCLUSION_LIST_PATH)
+    for task in tasks:
+        if task.finished and not task.exception:
+            coverage = task.task_results[0].get_report()[-2]
+            spec = task_to_taskspec[task]
+            if (
+                    spec.test_target not in coverage_exclusions
+                    and float(coverage) != 100.0):
+                print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
+                    coverage, spec.test_target))
+                incomplete_coverage += 1
+                print(task.task_results[0].get_report()[-3])
+    return incomplete_coverage
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -561,6 +579,8 @@ def main(args: Optional[List[str]] = None) -> None:
         print('(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
     else:
         print('All tests passed.')
+        # Add one line for aesthetics.
+        print('')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
@@ -568,6 +588,9 @@ def main(args: Optional[List[str]] = None) -> None:
     if total_errors or total_failures:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
+
+    if parsed_args.generate_coverage_report:
+        print_coverage_report(tasks, task_to_taskspec)
 
     if incomplete_coverage:
         raise Exception(

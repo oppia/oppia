@@ -398,6 +398,33 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         self.assertIn('CANCELED  %s' % test_target, self.print_arr)
 
+    def test_number_of_incomplete_coverage_tests_is_calculated_correctly(
+        self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+
+        task = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
+        task.finished = True
+        task_output = ['Ran 9 tests in 1.244s', '98']
+        task_result = concurrent_task_utils.TaskResult(
+            'task1', False, task_output, task_output)
+        task.task_results.append(task_result)
+
+        tasks = [task]
+        task_to_taskspec = {}
+        test_target = 'scripts.new_script.py'
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
+            test_target, True)
+
+        with self.print_swap:
+            incomplete_coverage = (
+                run_backend_tests.check_test_results(
+                    tasks, task_to_taskspec, True)
+            )[2]
+        self.assertEqual(incomplete_coverage, 0)
+
     def test_incomplete_coverage_is_displayed_correctly(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
@@ -418,9 +445,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, True)
 
         with self.print_swap:
-            run_backend_tests.check_test_results(
-                tasks, task_to_taskspec, True)
-
+            run_backend_tests.print_coverage_report(
+                tasks, task_to_taskspec)
         self.assertIn(
             'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
             test_target, self.print_arr)
@@ -485,6 +511,37 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'SUCCESS   %s: 9 tests (1.2 secs)' % test_target,
             self.print_arr)
+
+    def test_coverage_in_excluded_files_printed_correctly(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import run_backend_tests
+
+        task = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test'
+        )
+        task.finished = True
+        task_output = ['Ran 9 tests in 1.234s', '98']
+        task_result = concurrent_task_utils.TaskResult(
+            'task1', False, task_output, task_output)
+        task.task_results.append(task_result)
+
+        tasks = [task]
+        task_to_taskspec = {}
+        test_target = 'scripts.new_script_test'
+        task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
+            test_target, True)
+        swap_load_excluded_files = self.swap_with_checks(
+            run_backend_tests, 'load_coverage_exclusion_list',
+            lambda _: ['scripts.new_script_test'],
+            expected_args=((COVERAGE_EXCLUSION_LIST_PATH,),))
+
+        with self.print_swap, swap_load_excluded_files:
+            run_backend_tests.print_coverage_report(
+                tasks, task_to_taskspec)
+
+        self.assertNotIn(
+            'INCOMPLETE PER-FILE COVERAGE (98%%): %s' %
+            test_target, self.print_arr)
 
     def test_test_failed_due_to_error_in_parsing_coverage_report(self) -> None:
         with self.swap_install_third_party_libs:
