@@ -51,10 +51,22 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
             wipeout_domain.PendingDeletionRequest.create_default(
                 self.user_id_a, 'a@example.com'))
         pending_deletion_request.pseudonymizable_entity_mappings = {
+            'story': {'story_id': 'user_id'},
             'wrong_key': {}
         }
         with self.assertRaisesRegex(
             utils.ValidationError,
             'pseudonymizable_entity_mappings contain wrong key'
+        ):
+            pending_deletion_request.validate()
+
+    def test_validate_fails_for_no_key_in_activity_mappings(self) -> None:
+        """Tests the create_default_topic() function."""
+        pending_deletion_request = (
+            wipeout_domain.PendingDeletionRequest.create_default(
+                self.user_id_a, 'a@example.com'))
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'pseudonymizable_entity_mappings contain no key'
         ):
             pending_deletion_request.validate()

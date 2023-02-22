@@ -94,3 +94,5 @@ class PendingDeletionRequest:
             if key not in [name.value for name in feconf.ValidModelNames]:
                 raise utils.ValidationError(
                     'pseudonymizable_entity_mappings contain wrong key')
+        raise utils.ValidationError(
+                    'pseudonymizable_entity_mappings contain no key')
