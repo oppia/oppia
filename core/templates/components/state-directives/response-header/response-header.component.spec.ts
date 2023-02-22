@@ -115,4 +115,11 @@ describe('Response Header Component', () => {
   it('should check if a new state is being created', () => {
     expect(component.isCreatingNewState()).toBe(true);
   });
+
+  it('should delete response when user clicks delete button', () => {
+    spyOn(component.delete, 'emit').and.callThrough();
+    component.deleteResponse(new Event(''));
+
+    expect(component.delete.emit).toHaveBeenCalled();
+  });
 });
