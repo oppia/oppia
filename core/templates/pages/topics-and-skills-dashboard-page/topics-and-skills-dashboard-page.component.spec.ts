@@ -104,13 +104,13 @@ describe('Topics and skills dashboard page component', () => {
 
   it('should generate page numbers for pagination', () => {
     expect(componentInstance.getPagesToDisplayInNavigation(1, 50, 10))
-    .toEqual([1, 2, 3, 4, 5]);
+      .toEqual([1, 2, 3, 4, 5]);
     expect(componentInstance.getPagesToDisplayInNavigation(7, 100, 10))
-    .toEqual([1, -1, 8, 9, 10]);
+      .toEqual([1, -1, 8, 9, 10]);
     expect(componentInstance.getPagesToDisplayInNavigation(5, 100, 10))
-    .toEqual([1, -1, 4, 5, 6, -1, 10]);
+      .toEqual([1, -1, 4, 5, 6, -1, 10]);
     expect(componentInstance.getPagesToDisplayInNavigation(1, 70, 10))
-    .toEqual([1, 2, 3, 4, -1, 7]);
+      .toEqual([1, 2, 3, 4, -1, 7]);
   });
 
   it('should check whether next skill page is present', () => {
