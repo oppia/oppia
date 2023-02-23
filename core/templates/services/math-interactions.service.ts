@@ -20,7 +20,6 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
-import toRPN from 'nerdamer';
 
 import { AppConstants } from 'app.constants';
 
