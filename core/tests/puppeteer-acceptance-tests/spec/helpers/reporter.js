@@ -1,16 +1,36 @@
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Custom jasmine reporter for acceptance tests
+ */
+
 const util = require('util');
 
-let specCount,
-  executableSpecCount,
+let suiteCount,
+  specCount,
+  executedSpecCount,
   failureCount,
   failedSpecs = [],
   pendingSpecs = [],
   failedSuites = [],
+  stackTrace = jasmine.getEnv(),
   ansi = {
-    green: '\x1B[32m',
-    red: '\x1B[31m',
-    yellow: '\x1B[33m',
-    cyan: '\x1b[36m',
+    green: '\x1B[32;40m',
+    red: '\x1B[31;40m',
+    yellow: '\x1B[33;40m',
+    cyan: '\x1B[36;40m',
     none: '\x1B[0m'
   };
 
@@ -18,99 +38,70 @@ function print() {
   process.stdout.write(util.format.apply(this, arguments));
 }
 
-function colored(color, str) {
-  return (ansi[color] + str + ansi.none);
-}
-
 function printNewline() {
   print('\n');
 }
 
-function indent(str, spaces) {
-  const lines = (str || '').split('\n');
-  const newArr = [];
-  for (let i = 0; i < lines.length; i++) {
-    newArr.push(repeat(' ', spaces).join('') + lines[i]);
-  }
-  return newArr.join('\n');
+function colored(color, str) {
+  return (ansi[color] + str + ansi.none);
 }
 
-function repeat(thing, times) {
-  const arr = [];
-  for (let i = 0; i < times; i++) {
-    arr.push(thing);
-  }
-  return arr;
-}
-
-function stackFilter(stack) {
-  if (!stack) {
-    return '';
-  }
-}
-
-function plural(str, count) {
-  return count == 1 ? str : str + 's';
-}
-
-function pendingSpecDetails(result, pendingSpecNumber) {
+function pendingSpecTrace(result, pendingSpecNumber) {
   printNewline();
-  print(pendingSpecNumber + ') ');
-  print(result.fullName);
+  print(pendingSpecNumber + '. ' + result.fullName);
   printNewline();
-  let pendingReason = 'No reason given';
+  let pendingReason = '-';
   if (result.pendingReason && result.pendingReason !== '') {
     pendingReason = result.pendingReason;
   }
-  print(indent('Message:', 2));
+  print('Message:');
   printNewline();
-  print(indent(colored('yellow', pendingReason), 4));
+  print(colored('yellow', pendingReason));
   printNewline();
 }
 
-function specFailureDetails(result, failedSpecNumber) {
+function specFailureTrace(result, failedSpecNumber) {
   printNewline();
-  print(failedSpecNumber + ') ');
-  print(result.fullName);
-  printFailedExpectations(result);
+  print(failedSpecNumber + '. ' + result.fullName);
+  printLog(result);
 
   if (result.trace) {
     printNewline();
-    print(indent('Trace:', 2));
+    print('Trace:');
     printNewline();
 
     for (const entry of result.trace) {
-      print(indent(`${entry.timestamp}ms: ${entry.message}`, 4));
+      print(`${entry.timestamp}ms: ${entry.message}`);
       printNewline();
     }
   }
 }
 
-function suiteFailureDetails(result) {
+function suiteFailureTrace(result) {
   printNewline();
   print('Suite error: ' + result.fullName);
-  printFailedExpectations(result);
+  printLog(result);
 }
 
-function printFailedExpectations(result) {
+function printLog(result) {
   for (let i = 0; i < result.failedExpectations.length; i++) {
     const failedExpectation = result.failedExpectations[i];
     printNewline();
-    print(indent('Message:', 2));
+    print('Message:');
     printNewline();
-    print(colored('red', indent(failedExpectation.message, 4)));
+    print(colored('red', failedExpectation.message));
     printNewline();
-    print(indent('Stack:', 2));
+    print('Stack:');
     printNewline();
-    print(indent(stackFilter(failedExpectation.stack), 4));
+    print(!failedExpectation.stack ? '' : failedExpectation.stack);
   }
 
   if (result.failedExpectations.length === 0 &&
     result.passedExpectations.length === 0) {
     printNewline();
-    print(indent('Message:', 2));
+    print('Message:');
     printNewline();
-    print(colored('red', indent('Spec has no expectations', 4)));
+    print(colored('red', 'Spec has no expectations'));
   }
 
   printNewline();
@@ -118,22 +109,26 @@ function printFailedExpectations(result) {
 
 const Reporter = {
   jasmineStarted: function(suiteInfo) {
+    suiteCount = 0;
     specCount = 0;
-    executableSpecCount = 0;
+    executedSpecCount = 0;
     failureCount = 0;
+    printNewline();
+    print(stackTrace);
     print('Running suite with ' + suiteInfo.totalSpecsDefined + ' specs.');
     printNewline();
   },
 
   suiteStarted: function(result) {
+    suiteCount++;
     printNewline();
-    print('Suite started: ' + result.description);
+    print(suiteCount + '. Suite started: ' + result.description);
     printNewline();
   },
 
   specStarted: function(result) {
     printNewline();
-    print(indent('Spec started : ' + result.fullName, 4));
+    print('Spec started : ' + result.fullName);
     printNewline();
   },
 
@@ -141,39 +136,34 @@ const Reporter = {
     specCount++;
     const seconds = result ? result.duration / 1000 : 0;
 
-    if (result.status === 'pending') {
-      pendingSpecs.push(result);
-      executableSpecCount++;
-      print(indent(colored(
-        'yellow', '-> Pending [ Took ' + seconds + ' ' + plural(
-          'second', seconds) + ']'), 4));
-      printNewline();
-      return;
+    switch (result.status) {
+      case 'pending':
+        pendingSpecs.push(result);
+        executedSpecCount++;
+        print(colored(
+          'yellow', '-> Pending [ Took ' + seconds + ' seconds ]'));
+        printNewline();
+        return;
+
+      case 'passed':
+        executedSpecCount++;
+        print(colored(
+          'green', '-> Passed [ Took ' + seconds + ' seconds ]'));
+        printNewline();
+        return;
+
+      case 'failed':
+        failureCount++;
+        failedSpecs.push(result);
+        executedSpecCount++;
+        print(colored(
+          'red', '-> Failed [ Took ' + seconds + ' seconds ]'));
+        printNewline();
+        return;
     }
 
-    if (result.status === 'passed') {
-      executableSpecCount++;
-      print(indent(colored(
-        'green', '-> Passed [ Took ' + seconds + ' ' + plural(
-          'second', seconds) + ']'), 4));
-      printNewline();
-      return;
-    }
-
-    if (result.status === 'failed') {
-      failureCount++;
-      failedSpecs.push(result);
-      executableSpecCount++;
-      print(indent(colored(
-        'red', '-> Failed [ Took ' + seconds + ' ' + plural(
-          'second', seconds) + ']'), 4));
-      printNewline();
-      return;
-    }
-
-    print(indent(colored(
-      'cyan', '-> Skipped [ Took ' + seconds + ' ' + plural(
-        'second', seconds) + ']'), 4));
+    print(colored(
+      'cyan', '-> Skipped [ Took ' + seconds + ' seconds ]'));
     printNewline();
   },
 
@@ -191,41 +181,38 @@ const Reporter = {
       print('Failures:');
     }
     for (let i = 0; i < failedSpecs.length; i++) {
-      specFailureDetails(failedSpecs[i], i + 1);
+      specFailureTrace(failedSpecs[i], i + 1);
     }
 
     for (let i = 0; i < failedSuites.length; i++) {
-      suiteFailureDetails(failedSuites[i]);
+      suiteFailureTrace(failedSuites[i]);
     }
 
     if (result && result.failedExpectations &&
       result.failedExpectations.length > 0) {
-      suiteFailureDetails({ fullName: 'top suite', ...result });
+      suiteFailureTrace({ fullName: 'top suite', ...result });
     }
 
     if (pendingSpecs.length > 0) {
       print('Pending:');
     }
     for (i = 0; i < pendingSpecs.length; i++) {
-      pendingSpecDetails(pendingSpecs[i], i + 1);
+      pendingSpecTrace(pendingSpecs[i], i + 1);
     }
 
     if (specCount > 0) {
       printNewline();
 
-      if (executableSpecCount !== specCount) {
-        print('Ran ' + executableSpecCount + ' of ' + specCount + plural(
-          ' spec', specCount));
+      if (executedSpecCount !== specCount) {
+        print('Ran ' + executedSpecCount + ' of ' + specCount + ' specs');
         printNewline();
       }
 
-      let specCounts = executableSpecCount + ' ' + plural(
-        'spec', executableSpecCount) + ', ' + failureCount +
-        ' ' + plural('failure', failureCount);
+      let specCounts = executedSpecCount + ' specs, ' + failureCount +
+        ' failures';
 
       if (pendingSpecs.length) {
-        specCounts += ', ' + pendingSpecs.length + ' pending ' + plural(
-          'spec', pendingSpecs.length);
+        specCounts += ', ' + pendingSpecs.length + ' pending specs';
       }
 
       print(specCounts);
@@ -235,7 +222,7 @@ const Reporter = {
 
     printNewline();
     const seconds = result ? result.totalTime / 1000 : 0;
-    print('Finished in ' + seconds + ' ' + plural('second', seconds));
+    print('Finished in ' + seconds + ' seconds');
     printNewline();
 
     if (result && result.overallStatus === 'incomplete') {
