@@ -31,6 +31,24 @@ describe('Blog Editor', function() {
       'blogPostEditor');
   }, DEFAULT_SPEC_TIMEOUT);
 
+  it('should check blog editor unable to publish duplicate blog post',
+    async function() {
+      await blogPostEditor.navigateToBlogDashboardPage();
+      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
+      await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
+
+      await blogPostEditor.navigateToPublishTab();
+      await blogPostEditor.expectNumberOfBlogPostsToBe(1);
+      await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
+        'Test-Blog');
+
+      await blogPostEditor.navigateToBlogDashboardPage();
+      await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
+
+      await blogPostEditor.expectUserUnableToPublishBlogPost(
+        duplicateBlogPostWarning);
+    }, DEFAULT_SPEC_TIMEOUT);
+
   it('should create draft and delete draft blog post',
     async function() {
       await blogPostEditor.navigateToBlogDashboardPage();

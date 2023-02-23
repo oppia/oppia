@@ -37,14 +37,14 @@ const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 
-const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = ' CREATE NEW BLOG POST ';
-const LABEL_FOR_SAVE_BUTTON = ' Save ';
-const LABEL_FOR_DONE_BUTTON = ' DONE ';
+const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
+const LABEL_FOR_SAVE_BUTTON = 'Save';
+const LABEL_FOR_DONE_BUTTON = 'DONE';
 const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
-const LABEL_FOR_CONFIRM_BUTTON = ' Confirm ';
-const LABEL_FOR_ADD_THUMBNAIL_BUTTON = ' Add Thumbnail Image ';
-const LABEL_FOR_ADD_ELEMENT_BUTTON = ' Add element ';
+const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
+const LABEL_FOR_ADD_THUMBNAIL_BUTTON = 'Add Thumbnail Image';
+const LABEL_FOR_ADD_ELEMENT_BUTTON = 'Add element';
 
 module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
@@ -182,6 +182,26 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   }
 
   /**
+   * This function creates a new blog post with the given title.
+   * @param {string} newBlogPostTitle - The title of the blog post.
+   */
+  async createNewBlogPostWithTitle(newBlogPostTitle) {
+    await this.clickOn('NEW POST');
+    await this.clickOn('button.mat-button-toggle-button');
+    await this.clickOn(thumbnailPhotoBox);
+    await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.page.waitForSelector(
+      `${addThumbnailImageButton}:not([disabled])`);
+    await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
+    await this.page.waitForSelector('body.modal-open', {hidden: true});
+
+    await this.type(blogTitleInput, newBlogPostTitle);
+    await this.page.keyboard.press('Tab');
+    await this.type(blogBodyInput, 'test blog post body content - duplicate');
+    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+  }
+
+  /**
    * This function deletes a published blog post with the given title.
    * @param {string} blogPostTitle - The title of the published blog post
    * to be deleted.
@@ -214,6 +234,33 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
         }
       }
     }, blogPostTitle);
+  }
+
+  /**
+   * This function checks that the user is unable to publish a blog post.
+   */
+  async expectUserUnableToPublishBlogPost(expectedWarningMessage) {
+    const toastMessageBox = await this.page.$(
+      'div.e2e-test-toast-warning-message');
+    const toastMessageWarning = await this.page.evaluate(
+      el => el.textContent, toastMessageBox);
+    const isPublishButtonDisabled = await this.page.$eval(
+      publishBlogPostButton, (button) => {
+        return button.disabled;
+      });
+
+    if (!isPublishButtonDisabled) {
+      throw new Error('User is able to publish the blog post');
+    }
+    if (expectedWarningMessage !== toastMessageWarning) {
+      throw new Error(
+        'Expected warning message is not same as the actual warning message\n' +
+        `Expected warning: ${expectedWarningMessage}\n` +
+        `Displayed warning: ${toastMessageWarning}\n`);
+    }
+
+    showMessage(
+      'User is unable to publish the blog post because ' + toastMessageWarning);
   }
 
   /**
@@ -383,7 +430,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       const tagList = document.getElementsByClassName('form-control');
       tagList[tagList.length - 1].value = tagName;
     }, tagName);
-    await this.clickOn('Save');
+    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
     showMessage(`Tag ${tagName} added in tag list successfully!`);
   }
 
@@ -415,7 +462,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.page.keyboard.press('Backspace');
 
     await this.type(maximumTagLimitInput, limit);
-    await this.clickOn('Save');
+    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
 
     showMessage(`Successfully updated the tag limit to ${limit}!`);
   }
