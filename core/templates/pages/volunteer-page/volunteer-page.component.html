@@ -275,6 +275,58 @@
             
           </div>
         </mat-tab>
+        <mat-tab label="Translation">
+          <div class="row pt-3">
+            <div class="col oppia-volunteer-tab-description">
+              <h3 class="mb-5 carousel-header">Our Impact and Responsibilities</h3>
+              <p class="mb-5">
+                Through the help of our translators, Oppia’s lessons are available in multiple languages. 
+                We need volunteers from around the world to continue expanding available languages 
+                so more learners can overcome the language barriers to education. 
+              </p>
+              <h4 class="carousel-sub-header pt-5">Adapt Lessons</h4>
+              <p>
+                Translate Oppia’s existing lessons into other languages to ensure that learners can connect 
+                with concepts and learn in a language they are most comfortable with.
+              </p>
+              <h4 class="carousel-sub-header">Create Localized Content</h4>
+              <p>
+                Make lessons more inclusive by making existing content culturally relevant 
+                for learners in different places around the world.
+              </p>
+              <h4 class="carousel-sub-header">Expand Accessibility Tools</h4>
+              <p>
+                Provide voice-overs to lessons in a variety of languages and dialects to make Oppia’s 
+                lessons more accessible and complement the existing material.
+              </p>
+            </div>
+            <div class="col">
+
+              <ngb-carousel *ngIf="lessonCreation.images.length > 0">
+                <ng-template *ngFor="let image of lessonCreation.images; index as index" ngbSlide>
+                  <div class="oppia-carousel-wrapper">
+                    <picture>
+                      <source type="image/webp"
+                              [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                      <source type="image/png"
+                              [srcset]="this.getStaticImageUrl(image)">
+                      <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
+                    </picture>
+                  </div>
+                  <div class="carousel-caption">
+                    <p> {{ lessonCreation.caption[index].content }} </p>
+                    <div class="oppia-volunteer-name">
+                      <p><b> {{ lessonCreation.caption[index].name }} </b></p>
+                      <p><i> {{ lessonCreation.caption[index].type }} </i></p>
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-carousel>
+
+            </div>
+            
+          </div>
+        </mat-tab>
       </mat-tab-group>
     </div>
   </div>
