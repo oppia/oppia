@@ -28,7 +28,7 @@ import { NumericInputValidationService } from
   'interactions/NumericInput/directives/numeric-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 import { AppConstants } from 'app.constants';
 import { Warning } from 'interactions/base-interaction-validation.service';
@@ -49,8 +49,7 @@ describe('NumericInputValidationService', () => {
     zeroWithinToleranceOfOneRule: Rule,
     zeroWithinToleranceOfOneRuleLessThanZero: Rule,
     nonPositiveToleranceRule: Rule;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -62,7 +61,6 @@ describe('NumericInputValidationService', () => {
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
 
     customizationArgs = {
       requireNonnegativeInput: {
@@ -82,58 +80,58 @@ describe('NumericInputValidationService', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    equalsZeroRule = rof.createFromBackendDict({
+    equalsZeroRule = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: 0
       }
     }, 'NumericInput');
-    betweenNegativeOneAndOneRule = rof.createFromBackendDict({
+    betweenNegativeOneAndOneRule = Rule.createFromBackendDict({
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: -1,
         b: 1
       }
     }, 'NumericInput');
-    betweenOneAndOneRule = rof.createFromBackendDict({
+    betweenOneAndOneRule = Rule.createFromBackendDict({
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: 1,
         b: 1
       }
     }, 'NumericInput');
-    betweenFourAndTwoRule = rof.createFromBackendDict({
+    betweenFourAndTwoRule = Rule.createFromBackendDict({
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: 4,
         b: 2
       }
     }, 'NumericInput');
-    lessThanOneRule = rof.createFromBackendDict({
+    lessThanOneRule = Rule.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         x: 1
       }
     }, 'NumericInput');
-    greaterThanNegativeOneRule = rof.createFromBackendDict({
+    greaterThanNegativeOneRule = Rule.createFromBackendDict({
       rule_type: 'IsGreaterThan',
       inputs: {
         x: -1
       }
     }, 'NumericInput');
-    lessThanOrEqualToOneRule = rof.createFromBackendDict({
+    lessThanOrEqualToOneRule = Rule.createFromBackendDict({
       rule_type: 'IsLessThanOrEqualTo',
       inputs: {
         x: 1
       }
     }, 'NumericInput');
-    greaterThanOrEqualToNegativeOneRule = rof.createFromBackendDict({
+    greaterThanOrEqualToNegativeOneRule = Rule.createFromBackendDict({
       rule_type: 'IsGreaterThanOrEqualTo',
       inputs: {
         x: -1
       }
     }, 'NumericInput');
-    zeroWithinToleranceOfOneRule = rof.createFromBackendDict({
+    zeroWithinToleranceOfOneRule = Rule.createFromBackendDict({
       rule_type: 'IsWithinTolerance',
       inputs: {
         x: 0,
@@ -141,7 +139,7 @@ describe('NumericInputValidationService', () => {
       },
     }, 'NumericInput');
     zeroWithinToleranceOfOneRuleLessThanZero =
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsWithinTolerance',
         inputs: {
           x: -2,
@@ -149,26 +147,26 @@ describe('NumericInputValidationService', () => {
         }
       }, 'NumericInput');
     nonPositiveToleranceRule =
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsWithinTolerance',
         inputs: {
           x: 2,
           tol: -1
         }
       }, 'NumericInput');
-    lessThanOneRuleLessThanZero = rof.createFromBackendDict({
+    lessThanOneRuleLessThanZero = Rule.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         x: -1
       }
     }, 'NumericInput');
-    equalsZeroRuleLessThanZero = rof.createFromBackendDict({
+    equalsZeroRuleLessThanZero = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: -1
       }
     }, 'NumericInput');
-    lessThanOrEqualToOneRuleLessThanZero = rof.createFromBackendDict({
+    lessThanOrEqualToOneRuleLessThanZero = Rule.createFromBackendDict({
       rule_type: 'IsLessThanOrEqualTo',
       inputs: {
         x: -1
