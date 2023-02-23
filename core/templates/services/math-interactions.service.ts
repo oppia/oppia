@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
+import toRPN from 'nerdamer';
 
 import { AppConstants } from 'app.constants';
 
@@ -67,19 +68,22 @@ export class MathInteractionsService {
         errorMessage[0] === '/' ? '÷' :
         errorMessage[0]);
       errorMessage = (
-        'Your answer seems to be missing a number after the ' +
+        'Your answer seems to be missing a variable/number after the ' +
         humanReadableOperator + ' operator.');
     }
     if (errorMessage === 'Not a prefix operator.') {
-      let humanReadableOperator = (
-        expressionString[0] === '*' ? '×' :
-        expressionString[0] === '/' ? '÷' :
-        expressionString[1] === '*' ? '×' :
-        expressionString[1] === '/' ? '÷' :
-        expressionString);
-      errorMessage = (
-        'Your answer seems to be missing a number before the ' +
-        humanReadableOperator + ' operator.');
+      let i : number
+      for (i = 0; i <expressionString.length; i++){
+        if(expressionString[i] === '*' || expressionString[i] === '/'){
+          let humanReadableOperator = (
+            expressionString[i] === '*' ? '×' :
+            expressionString[i] === '/' ? '÷' :
+            expressionString);
+            errorMessage = (
+            'Your answer seems to be missing a variable/number before the ' +
+            humanReadableOperator + ' operator.');
+        }
+      }
     }
     if (errorMessage === 'A prefix operator was expected.') {
       let symbol1, symbol2;
@@ -188,12 +192,12 @@ export class MathInteractionsService {
     }
     if (expressionString.match(/(\+$)|(\+\))/g)) {
       this.warningText = (
-        'Your answer seems to be missing a number after the + operator.');
+        'Your answer seems to be missing a variable/number after the + operator.');
       return false;
     }
     if (expressionString.match(/(\-$)|(\-\))/g)) {
       this.warningText = (
-        'Your answer seems to be missing a number after the - operator.');
+        'Your answer seems to be missing a variable/number after the - operator.');
       return false;
     }
     let invalidIntegers = expressionString.match(
