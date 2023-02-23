@@ -100,8 +100,11 @@ module.exports = class baseUser {
    */
   async clickOn(selector) {
     try {
+      /** Normalize-space is used to remove the extra spaces in the text.
+       * Check the documentation for the normalize-space function here :
+       * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
       const [button] = await this.page.$x(
-        `\/\/*[contains(text(), '${selector}')]`);
+        `\/\/*[contains(text(), normalize-space('${selector}'))]`);
       await button.click();
     } catch (error) {
       await this.page.waitForSelector(selector);
