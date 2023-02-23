@@ -138,7 +138,8 @@ describe('AlgebraicExpressionInputInteractive', () => {
     component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
     expect(component.warningText).toBe(
-      'Your answer seems to be missing a variable/number after the ÷ operator.');
+      'Your answer seems to be missing a variable/number after' +
+      ' the ÷ operator.');
   });
 
   it('should correctly validate current answer', () => {
