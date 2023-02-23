@@ -31,7 +31,6 @@ export class MathInteractionsService {
   private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
-
   private cleanErrorMessage(
       errorMessage: string, expressionString: string): string {
     // The error thrown by nerdamer includes the index of the violation which
@@ -77,7 +76,7 @@ export class MathInteractionsService {
           let humanReadableOperator = (
             expressionString[i] === '*' ? '×' :
             expressionString[i] === '/' ? '÷' :
-            expressionString);
+            null);
             errorMessage = (
             'Your answer seems to be missing a variable/number before the ' +
             humanReadableOperator + ' operator.');
@@ -123,6 +122,7 @@ export class MathInteractionsService {
   ): boolean {
     /*
     Assumes that expressionString is syntactically valid.
+
     Multiple consecutive parens are considered redundant. eg: for ((a - b))
     the outer pair of parens are considered as redundant.
     */
