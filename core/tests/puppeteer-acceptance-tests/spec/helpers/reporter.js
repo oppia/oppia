@@ -25,7 +25,6 @@ let suiteCount,
   failedSpecs = [],
   pendingSpecs = [],
   failedSuites = [],
-  stackTrace = jasmine.getEnv(),
   ansi = {
     green: '\x1B[32;40m',
     red: '\x1B[31;40m',
@@ -114,15 +113,25 @@ const Reporter = {
     executedSpecCount = 0;
     failureCount = 0;
     printNewline();
-    print(stackTrace);
     print('Running suite with ' + suiteInfo.totalSpecsDefined + ' specs.');
     printNewline();
   },
 
   suiteStarted: function(result) {
     suiteCount++;
+    const heading = '. Suite started: ';
+    const length = suiteCount.toString().length + heading.length +
+      result.description.length + 4;
+    let border = '';
+    for (let i = 0; i < length; i++) {
+      border += '-';
+    }
     printNewline();
-    print(suiteCount + '. Suite started: ' + result.description);
+    print(border);
+    printNewline();
+    print('| ' + suiteCount + heading + result.description + ' |');
+    printNewline();
+    print(border);
     printNewline();
   },
 
