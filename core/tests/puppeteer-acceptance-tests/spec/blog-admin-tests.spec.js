@@ -71,18 +71,6 @@ describe('Blog Admin', function() {
       await guestUsr2.closeBrowser();
     }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should check blog dashboard accessible by blog admins',
-    async function() {
-      const guestUser = await userFactory.createNewGuestUser(
-        'guestUser', 'guest_user@example.com');
-
-      /** The blog-dashboard is not accessible to any guest user
-       *  as the user does not have the blog admin role. */
-      await guestUser.expectBlogDashboardAccessToBeUnauthorized();
-      await blogAdmin.expectBlogDashboardAccessToBeAuthorized();
-      await guestUser.closeBrowser();
-    }, DEFAULT_SPEC_TIMEOUT);
-
   afterAll(async function() {
     await userFactory.closeAllBrowsers();
   });

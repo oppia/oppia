@@ -33,56 +33,19 @@ let suiteCount,
     none: '\x1B[0m'
   };
 
-function print() {
+let print = function() {
   process.stdout.write(util.format.apply(this, arguments));
-}
+};
 
-function printNewline() {
+let printNewline = function() {
   print('\n');
-}
+};
 
-function colored(color, str) {
+let colored = function(color, str) {
   return (ansi[color] + str + ansi.none);
-}
+};
 
-function pendingSpecTrace(result, pendingSpecNumber) {
-  printNewline();
-  print(pendingSpecNumber + '. ' + result.fullName);
-  printNewline();
-  let pendingReason = '-';
-  if (result.pendingReason && result.pendingReason !== '') {
-    pendingReason = result.pendingReason;
-  }
-  print('Message:');
-  printNewline();
-  print(colored('yellow', pendingReason));
-  printNewline();
-}
-
-function specFailureTrace(result, failedSpecNumber) {
-  printNewline();
-  print(failedSpecNumber + '. ' + result.fullName);
-  printLog(result);
-
-  if (result.trace) {
-    printNewline();
-    print('Trace:');
-    printNewline();
-
-    for (const entry of result.trace) {
-      print(`${entry.timestamp}ms: ${entry.message}`);
-      printNewline();
-    }
-  }
-}
-
-function suiteFailureTrace(result) {
-  printNewline();
-  print('Suite error: ' + result.fullName);
-  printLog(result);
-}
-
-function printLog(result) {
+let printLog = function(result) {
   for (let i = 0; i < result.failedExpectations.length; i++) {
     const failedExpectation = result.failedExpectations[i];
     printNewline();
@@ -104,7 +67,44 @@ function printLog(result) {
   }
 
   printNewline();
-}
+};
+
+let pendingSpecTrace = function(result, pendingSpecNumber) {
+  printNewline();
+  print(pendingSpecNumber + '. ' + result.fullName);
+  printNewline();
+  let pendingReason = '-';
+  if (result.pendingReason && result.pendingReason !== '') {
+    pendingReason = result.pendingReason;
+  }
+  print('Message:');
+  printNewline();
+  print(colored('yellow', pendingReason));
+  printNewline();
+};
+
+let specFailureTrace = function(result, failedSpecNumber) {
+  printNewline();
+  print(failedSpecNumber + '. ' + result.fullName);
+  printLog(result);
+
+  if (result.trace) {
+    printNewline();
+    print('Trace:');
+    printNewline();
+
+    for (const entry of result.trace) {
+      print(`${entry.timestamp}ms: ${entry.message}`);
+      printNewline();
+    }
+  }
+};
+
+let suiteFailureTrace = function(result) {
+  printNewline();
+  print('Suite error: ' + result.fullName);
+  printLog(result);
+};
 
 const Reporter = {
   jasmineStarted: function(suiteInfo) {
