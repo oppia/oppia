@@ -139,7 +139,7 @@ export class TutorCardComponent {
   checkMarkSkipped: boolean = false;
   confettiAnimationTimeout!: NodeJS.Timeout;
   skipClickListener: Function | null = null;
-  username!: string;
+  username!: string | null;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -169,16 +169,16 @@ export class TutorCardComponent {
     this.username = userInfo.getUsername();
     if (!this._editorPreviewMode) {
       if (this.username !== null) {
-          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-            this.userService.getProfileImageDataUrl(this.username));
-        } else {
-          this.profilePictureWebpDataUrl = (
-            this.urlInterpolationService.getStaticImageUrl(
-              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-          this.profilePicturePngDataUrl = (
-            this.urlInterpolationService.getStaticImageUrl(
-              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
-        }
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(this.username));
+      } else {
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      }
     } else {
       this.profilePictureWebpDataUrl = (
         this.urlInterpolationService.getStaticImageUrl(

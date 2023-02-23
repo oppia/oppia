@@ -102,6 +102,7 @@ def get_pending_deletion_request(
         user_models.PendingDeletionRequestModel.get_by_id(user_id))
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
+        pending_deletion_request_model.username,
         pending_deletion_request_model.email,
         pending_deletion_request_model.normalized_long_term_username,
         pending_deletion_request_model.deletion_complete,
@@ -138,6 +139,7 @@ def save_pending_deletion_requests(
             pending_deletion_request_models, pending_deletion_requests):
         deletion_request.validate()
         deletion_request_dict = {
+            'username': deletion_request.username,
             'email': deletion_request.email,
             'normalized_long_term_username': (
                 deletion_request.normalized_long_term_username),
@@ -192,6 +194,7 @@ def pre_delete_user(user_id: str) -> None:
         pending_deletion_requests.append(
             wipeout_domain.PendingDeletionRequest.create_default(
                 profile_id,
+                profile_user_settings.username,
                 profile_user_settings.email
             )
         )
@@ -225,6 +228,7 @@ def pre_delete_user(user_id: str) -> None:
     pending_deletion_requests.append(
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
+            user_settings.username,
             user_settings.email,
             normalized_long_term_username=normalized_long_term_username
         )
@@ -381,12 +385,18 @@ def _delete_models_with_delete_at_end_policy(user_id: str) -> None:
             model_class.apply_deletion_policy(user_id)
 
 
-def _delete_profile_picture(username: str) -> None:
+def _delete_profile_picture(
+    pending_deletion_request: wipeout_domain.PendingDeletionRequest
+) -> None:
     """Verify that the profile picture is deleted.
 
     Args:
-        username: str. The username of the user.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object for which to delete or pseudonymize all the models.
     """
+    username = pending_deletion_request.username
+    # Ruling out the possibility of different types for mypy type checking.
+    assert isinstance(username, str)
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
     filename_png = 'profile_picture.png'
     filename_webp = 'profile_picture.webp'
@@ -503,10 +513,7 @@ def delete_user(
             ['manager_ids'])
         _pseudonymize_blog_post_models(pending_deletion_request)
         _pseudonymize_version_history_models(pending_deletion_request)
-        # Remove profile picture.
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        username = user_settings_model.username
-        _delete_profile_picture(username)
+        _delete_profile_picture(pending_deletion_request)
     _delete_models(user_id, models.Names.EMAIL)
     _delete_models(user_id, models.Names.LEARNER_GROUP)
 

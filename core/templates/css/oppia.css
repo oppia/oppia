@@ -4106,6 +4106,7 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
   white-space: pre-wrap;
 }
 
-.story-save-draft-warning {
+.oppia-save-draft-warning {
   color: #fc0;
+  margin-left: 5px;
 }

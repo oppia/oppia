@@ -45,7 +45,6 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   activeTab!: string;
   newLearnerGroupTitle!: string;
   newLearnerGroupDescription!: string;
-  profilePictureUrl!: string;
   readOnlyMode = true;
   invitedLearnersInfo!: LearnerGroupUserInfo[];
   currentLearnersInfo!: LearnerGroupUserInfo[];
@@ -216,13 +215,13 @@ export class LearnerGroupPreferencesComponent implements OnInit {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl,] = this.userService.getProfileImageDataUrl(
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
       username);
     return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [, webpImageUrl] = this.userService.getProfileImageDataUrl(
+    let [_ , webpImageUrl] = this.userService.getProfileImageDataUrl(
       username);
     return webpImageUrl;
   }
