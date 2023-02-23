@@ -1,5 +1,7 @@
 name: End-to-End coverage and Typescript test
 on:
+  merge_group:
+    types: [checks_requested]
   push:
     branches:
       - develop

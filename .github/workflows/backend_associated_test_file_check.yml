@@ -1,5 +1,7 @@
 name: Backend associated test file check
 on:
+  merge_group:
+    types: [checks_requested]
   push:
     branches:
       - develop

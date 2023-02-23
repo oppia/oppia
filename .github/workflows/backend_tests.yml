@@ -1,5 +1,7 @@
 name: Backend tests
 on:
+  merge_group:
+    types: [checks_requested]
   push:
     branches:
       - develop
