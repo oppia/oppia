@@ -34,8 +34,9 @@ import { PreferencesPageComponent } from './preferences-page.component';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { ImageUploadHelperService } from '../../services/image-upload-helper.service';
 
-fdescribe('Preferences Page Component', () => {
+describe('Preferences Page Component', () => {
   @Pipe({name: 'truncate'})
   class MockTruncatePipe {
     transform(value: string, params: Object | undefined): string {
@@ -55,6 +56,7 @@ fdescribe('Preferences Page Component', () => {
     let ngbModal: NgbModal;
     let mockWindowRef: MockWindowRef;
     let mockUserBackendApiService: MockUserBackendApiService;
+    let imageUploadHelperService: ImageUploadHelperService;
 
     let preferencesData: PreferencesBackendDict = {
       preferred_language_codes: ['en'],
@@ -86,7 +88,7 @@ fdescribe('Preferences Page Component', () => {
           setItem: (filename: string, rawImage: string) => {
             this.imageData[filename] = rawImage;
           },
-          getItem: () => {
+          getItem: (filename: string) => {
             return 'data:image/png;base64,JUMzJTg3JTJD';
           }
         }
@@ -154,6 +156,7 @@ fdescribe('Preferences Page Component', () => {
       ngbModal = TestBed.inject(NgbModal);
       mockWindowRef = TestBed.inject(WindowRef);
       mockUserBackendApiService = TestBed.inject(UserBackendApiService);
+      imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
         ['default-image-url-png', 'default-image-url-webp']);
@@ -359,7 +362,7 @@ fdescribe('Preferences Page Component', () => {
       componentInstance.showEditProfilePictureModal();
       tick();
       tick();
-      expect(mockWindowRef.nativeWindow.sessionStorage.getItem()).toEqual(
+      expect(mockWindowRef.nativeWindow.sessionStorage.getItem('file')).toEqual(
         profilePictureDataUrl);
       expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     }));
@@ -370,12 +373,14 @@ fdescribe('Preferences Page Component', () => {
         spyOn(ngbModal, 'open').and.returnValue({
           result: Promise.resolve(profilePictureDataUrl)
         } as NgbModalRef);
-        spyOn(userService, 'setProfileImageDataUrlAsync').and.returnValue(
-          Promise.resolve(
-            { bulk_email_signup_message_should_be_shown: false }));
         spyOn(mockWindowRef.nativeWindow.location, 'reload');
-        expect(() => componentInstance.showEditProfilePictureModal())
-          .toThrowError('Image uploaded is not valid.');
+        spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
+          .and.returnValue(null);
+        expect(() => {
+          componentInstance.showEditProfilePictureModal();
+          tick();
+          tick();
+        }).toThrowError('Image uploaded is not valid.');
       }));
 
     it('should handle edit profile picture modal is canceled', fakeAsync(() => {

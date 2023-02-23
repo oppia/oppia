@@ -34,6 +34,7 @@ import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
 import './preferences-page.component.css';
@@ -184,7 +185,7 @@ export class PreferencesPageComponent {
   }
 
   private saveProfileImage(newProfilePictureDataUrl: string): void {
-    if (AppConstants.EMULATOR_MODE) {
+    if (AssetsBackendApiService.EMULATOR_MODE) {
       this._saveProfileImageToLocalStorage(newProfilePictureDataUrl);
     } else {
       this._postProfileImageToServer(newProfilePictureDataUrl);
@@ -232,13 +233,13 @@ export class PreferencesPageComponent {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl,] = this.userService.getProfileImageDataUrl(
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
       username);
     return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [, webpImageUrl] = this.userService.getProfileImageDataUrl(
+    let [_ , webpImageUrl] = this.userService.getProfileImageDataUrl(
       username);
     return webpImageUrl;
   }

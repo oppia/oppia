@@ -112,13 +112,13 @@ export class CreatorDashboardPageComponent {
     AppConstants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl,] = this.userService.getProfileImageDataUrl(
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
       username);
     return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [, webpImageUrl] = this.userService.getProfileImageDataUrl(
+    let [_ , webpImageUrl] = this.userService.getProfileImageDataUrl(
       username);
     return webpImageUrl;
   }
