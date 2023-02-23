@@ -16,7 +16,7 @@
         <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
            target="_blank"
            rel="noopener">
-          APPLY TO BE A VOLUNTEER
+          APPLY TO VOLUNTEER
         </a>
       </button>
     </div>
@@ -327,24 +327,73 @@
             
           </div>
         </mat-tab>
+        <mat-tab label="Growth">
+          <div class="row pt-3">
+            <div class="col oppia-volunteer-tab-description">
+              <h3 class="mb-5 carousel-header">Our Impact and Responsibilities</h3>
+              <p class="mb-5">
+                Oppia’s main focus as an educational organization is serving under-resourced students from
+                 around the world. Our volunteers aim to expand Oppia’s global reach, and partner with 
+                 organizations to further expand access to equitable education. 
+              </p>
+              <h4 class="carousel-sub-header pt-5">Build Partnerships</h4>
+              <p>
+                Establish trust with our partner schools and organizations to get Oppia's lessons in the hands of students. 
+                Oppia’s partnerships are an integral part of our mission to create an equitable learning ecosystem.
+              </p>
+              <h4 class="carousel-sub-header">Develop our Marketing Strategy</h4>
+              <p>
+                Curate content on our blog and Facebook, Instagram, and Twitter 
+                pages to reach more learners, and expand awareness of Oppia’s resources. 
+              </p>
+              <h4 class="carousel-sub-header">Be a Community Advocate</h4>
+              <p>
+                Work with local ambassadors, such as students and educators, 
+                to introduce Oppia’s educational tools to more communities.
+              </p>
+            </div>
+            <div class="col">
+
+              <ngb-carousel *ngIf="learnerFeedback.images.length > 0">
+                <ng-template *ngFor="let image of learnerFeedback.images; index as index" ngbSlide>
+                  <div class="oppia-carousel-wrapper">
+                    <picture>
+                      <source type="image/webp"
+                              [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                      <source type="image/png"
+                              [srcset]="this.getStaticImageUrl(image)">
+                      <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
+                    </picture>
+                  </div>
+                  <div class="carousel-caption">
+                    <p> {{ learnerFeedback.caption[index].content }} </p>
+                    <div class="oppia-volunteer-name">
+                      <p><b> {{ learnerFeedback.caption[index].name }} </b></p>
+                      <p><i> {{ learnerFeedback.caption[index].type }} </i></p>
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-carousel>
+
+            </div>
+            
+          </div>
+        </mat-tab>
       </mat-tab-group>
     </div>
   </div>
 
   <div class="oppia-volunteer-footer">
     <p>
-      If you're interested in helping out, simply let us know what you’re
-      interested in working on and a lead will reach out to you shortly!
-      You can fill out the form below (or go to
-      <a href="https://github.com/oppia/oppia/wiki">GitHub</a> if you're
-      interested in contributing to the codebase as a developer).
+      If you're interested in helping out, let us know your
+      skills and interests and a lead will reach out to you shortly!
     </p>
 
     <button class="btn">
       <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
          target="_blank"
          rel="noopener">
-        FILL OUT INTEREST FORM
+        APPLY TO VOLUNTEER
       </a>
     </button>
   </div>
@@ -382,6 +431,10 @@
     line-height: 1.5;
   }
 
+  .oppia-volunteer-banner {
+    background: #fff;
+  }
+
   .oppia-volunteer-banner-content button {
     width: 50%;
     margin-left: 6.5em !important;
@@ -390,7 +443,6 @@
   
   /* Why Volunter */
   .why-volunteer {
-    background: #fff;
     padding: 2em;
   }
 
@@ -446,7 +498,7 @@
    
   /* Volunteer-Body */
   .oppia-volunteer-body {
-    background-color: #E5E5E5;
+    background-color: #fff;
     text-align: center;
   }
 
@@ -483,6 +535,7 @@
 
   .oppia-volunteer-tabs p {
     line-height: 1.5;
+    font-size: 0.9em;
   }
 
   .oppia-volunteer-tabs .mat-tab-label-container {
@@ -544,10 +597,17 @@
   }
 
   .oppia-volunteer-footer {
+    background-color: #EDF6F6;
     font-size: 1.3em;
-    padding: 3em 15% 0 15%;
+    padding: 3em 25% 1em 25%;
     text-align: center;
   }
+
+  .oppia-volunteer-footer p,button {
+    text-align: center;
+    width: 100%;
+  }
+
 
   @media screen and (max-width: 440px) {
     .oppia-volunteer-tabs {
