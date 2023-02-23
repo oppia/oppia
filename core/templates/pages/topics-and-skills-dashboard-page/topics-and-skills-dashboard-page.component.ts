@@ -146,17 +146,19 @@ export class TopicsAndSkillsDashboardPageComponent {
    * @returns {number[]} - Array of page numbers with/without
    * ellipses depending on the current page number.
    */
-  getPagesToDisplayInNavigation(currentPageNumber: number, totalNumberOfItems: number, NumberOfItemsPerPage: number): number[] {
+  getPagesToDisplayInNavigation(currentPageNumber: number,
+    totalNumberOfItems: number,
+    NumberOfItemsPerPage: number): number[] {
     /**
-     * @var {number} totalNumberOfPages - total number of 
-     * pages
-     * Ceiling function handles cases where 
+     * @var {number} totalNumberOfPages - total number of
+     * * pages
+     * Ceiling function handles cases where
      * @param {number} totalNumberOfItems is not a divisor of the
      * @var {number} NumberOfItemsPerPage
      */
-    let totalNumberOfPages: number = Math.ceil(totalNumberOfItems/NumberOfItemsPerPage);
+    let totalNumberOfPages: number = 
+    Math.ceil(totalNumberOfItems / NumberOfItemsPerPage);
     let initialPaginationThreshold: number = 6;
-    
     if (totalNumberOfPages <= initialPaginationThreshold) {
       /**
       * This handles the case where @var {number} totalNumberOfPages
@@ -170,13 +172,16 @@ export class TopicsAndSkillsDashboardPageComponent {
       * This handles the case where @var {number} currentPageNumber
       * is towards the end of total page count.
       */
-        return [1, -1, totalNumberOfPages - 2, totalNumberOfPages - 1, totalNumberOfPages];
+        return [1, -1, totalNumberOfPages - 2,
+          totalNumberOfPages - 1, totalNumberOfPages];
       } else {
       /**
       * This handles the case where @var {number} currentPageNumber
       * is in the middle of 1 and total page count.
       */
-        return [1, -1, currentPageNumber - 1, currentPageNumber, currentPageNumber + 1, -1, totalNumberOfPages];
+        return [1, -1, currentPageNumber - 1,
+          currentPageNumber, currentPageNumber + 1, -1,
+          totalNumberOfPages];
       }
     }
     /**
