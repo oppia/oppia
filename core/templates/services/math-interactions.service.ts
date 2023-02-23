@@ -70,14 +70,14 @@ export class MathInteractionsService {
         humanReadableOperator + ' operator.');
     }
     if (errorMessage === 'Not a prefix operator.') {
-      let i : number
-      for (i = 0; i <expressionString.length; i++){
-        if(expressionString[i] === '*' || expressionString[i] === '/'){
+      let i: number;
+      for (i = 0; i < expressionString.length; i++) {
+        if (expressionString[i] === '*' || expressionString[i] === '/') {
           let humanReadableOperator = (
             expressionString[i] === '*' ? '×' :
             expressionString[i] === '/' ? '÷' :
             null);
-            errorMessage = (
+          errorMessage = (
             'Your answer seems to be missing a variable/number before the ' +
             humanReadableOperator + ' operator.');
         }
@@ -191,12 +191,14 @@ export class MathInteractionsService {
     }
     if (expressionString.match(/(\+$)|(\+\))/g)) {
       this.warningText = (
-        'Your answer seems to be missing a variable/number after the + operator.');
+        'Your answer seems to be missing a variable/number after' +
+        ' the + operator.');
       return false;
     }
     if (expressionString.match(/(\-$)|(\-\))/g)) {
       this.warningText = (
-        'Your answer seems to be missing a variable/number after the - operator.');
+        'Your answer seems to be missing a variable/number after' +
+        ' the - operator.');
       return false;
     }
     let invalidIntegers = expressionString.match(
