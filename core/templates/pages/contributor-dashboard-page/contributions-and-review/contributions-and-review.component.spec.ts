@@ -973,7 +973,8 @@ describe('Contributions and review component', () => {
         target_id: 'string;,',
         suggestion_id: 'string;',
         author_name: 'string;',
-        suggestion_type: 'question'
+        suggestion_type: 'question',
+        exploration_content_html: ''
       };
 
       let suggestionIdToContribution = {
