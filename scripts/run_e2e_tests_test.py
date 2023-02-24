@@ -26,7 +26,6 @@ import time
 from core.tests import test_utils
 from scripts import build
 from scripts import common
-from scripts import flake_checker
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 from scripts import scripts_test_utils
@@ -264,11 +263,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'report_pass', lambda _: None,
-            expected_args=[('full',)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
@@ -327,22 +321,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_rerun_when_tests_fail_with_rerun_yes(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
-        def mock_check_test_flakiness(*_: str) -> bool:
-            return True
 
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'check_test_flakiness',
-            mock_check_test_flakiness, expected_args=[
-                ('sample\noutput', 'navigation'),
-                ('sample\noutput', 'navigation'),
-                ('sample\noutput', 'navigation'),
-            ]))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
 
@@ -351,18 +334,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_no_rerun_when_tests_flake_with_rerun_no(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
-        def mock_check_test_flakiness(*_: str) -> bool:
-            return False
 
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'check_test_flakiness',
-            mock_check_test_flakiness, expected_args=[
-                ('sample\noutput', 'navigation'),
-            ]))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -373,18 +347,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_no_rerun_when_tests_flake_with_rerun_unknown(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
-        def mock_check_test_flakiness(*_: str) -> bool:
-            return False
 
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'check_test_flakiness',
-            mock_check_test_flakiness, expected_args=[
-                ('sample\noutput', 'navigation'),
-            ]))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -396,19 +361,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        def mock_check_test_flakiness(
-            unused_output: str, unused_suite_name: str
-        ) -> None:
-            raise AssertionError('Tried to Check Flakiness.')
-
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_test_flakiness', mock_check_test_flakiness))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
 
@@ -418,17 +374,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 0
 
-        def mock_report_pass(unused_suite_name: str) -> None:
-            raise AssertionError('Tried to Report Pass')
-
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'report_pass', mock_report_pass))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
@@ -473,11 +422,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'report_pass', lambda _: None,
-            expected_args=[('full',)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
@@ -517,11 +461,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'report_pass', lambda _: None,
-            expected_args=[('full',)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
@@ -561,11 +500,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'report_pass', lambda _: None,
-            expected_args=[('full',)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
@@ -606,11 +540,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            flake_checker, 'report_pass', lambda _: None,
-            expected_args=[('collections',)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
@@ -638,8 +567,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_cloud_datastore_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(
-            flake_checker, 'check_if_on_ci', lambda: True))
 
         with self.assertRaisesRegex(SystemExit, '^1$'):
             run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
