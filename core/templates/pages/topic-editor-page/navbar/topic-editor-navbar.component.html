@@ -1,5 +1,5 @@
 <ul class="oppia-navbar-desktop nav navbar-nav oppina-navbar-nav float-right"
-    *ngIf="topicRights.canEditTopic()">
+    *ngIf="topic && topicRights.canEditTopic()">
   <li class="oppia-navbar-dropdown-menu">
     <div ngbDropdown>
       <span [matTooltip]="getAllTopicWarnings()"
@@ -75,7 +75,7 @@
     </button>
   </li>
 </ul>
-<div class="oppia-topic-nav-mobile">
+<div class="oppia-topic-nav-mobile" *ngIf="topic">
   <div class="oppia-topic-navbar-mobile-tabs">
     <div class="oppia-topic-nav-dropdown-container">
       <div class="oppia-topic-nav-topic-nav-dropdown-options"
