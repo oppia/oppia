@@ -217,10 +217,7 @@
       "all"
     ],
     "dot-notation": [
-      "error",
-      {
-        "allowKeywords": true
-      }
+      "off"
     ],
     "eol-last":[
       "error",
@@ -449,6 +446,12 @@
       {
         "before": false,
         "after": true
+      }
+    ],
+    "@typescript-eslint/dot-notation": [
+      "error",
+      {
+        "allowKeywords": true
       }
     ],
     "@typescript-eslint/lines-between-class-members": [
