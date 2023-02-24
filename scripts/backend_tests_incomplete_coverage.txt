@@ -59,7 +59,6 @@ core.domain.recommendations_services_test
 core.domain.rights_domain_test
 core.domain.rights_manager_test
 core.domain.rte_component_registry_test
-core.domain.rules_registry_test
 core.domain.search_services_test
 core.domain.skill_domain_test
 core.domain.skill_services_test
