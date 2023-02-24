@@ -245,7 +245,7 @@ export class StateInteractionEditorComponent
     });
   }
 
-  toggleBtn() {
+  toggleBtn(): void {
     this.showMe = !this.showMe;
   }
 
