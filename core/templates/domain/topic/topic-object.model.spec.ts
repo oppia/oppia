@@ -309,7 +309,7 @@ describe('Topic object factory', () => {
     expect(_sampleTopic).not.toBe(secondTopic);
     expect(_sampleTopic).not.toEqual(secondTopic);
 
-    _sampleTopic.copyFromTopic(secondTopic);
+    _sampleTopic = secondTopic.createCopyFromTopic();
     expect(_sampleTopic).not.toBe(secondTopic);
     expect(_sampleTopic).toEqual(secondTopic);
   });
