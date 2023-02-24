@@ -27,15 +27,16 @@ oppia-conversation-skin .supplemental-card-parent-container {
   bottom: 0;
   display: flex;
   margin: 0 0 0 0;
-  position: absolute;
-  right: 0;
-  text-align: right;
   margin-bottom: -68px;
-  vertical-align: middle;
   padding-bottom: 10px;
   padding-left: 10px;
   padding-top: 10px;
   padding-right: 10px;
+  position: absolute;
+  right: 0;
+  text-align: right;
+  vertical-align: middle;
+  
 }
 
 .conversation-skin-next-lesson-text {
@@ -143,9 +144,9 @@ oppia-conversation-skin .oppia-button-icon {
 @media screen and (max-width: 959px) {
   .conversation-skin-cards-container {
     display: block;
+    min-height: 134vh;
     padding: 66px 0;
     position: relative;
-    min-height: 134vh;
     width: 100%;
   }
 
