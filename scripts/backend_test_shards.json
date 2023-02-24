@@ -93,7 +93,6 @@
         "scripts.servers_test",
         "scripts.concurrent_task_utils_test",
         "core.storage.storage_models_test",
-        "scripts.flake_checker_test",
         "core.platform.cache.redis_cache_services_test",
         "core.utils_test",
         "scripts.linters.linter_utils_test",
