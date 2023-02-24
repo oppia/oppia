@@ -73,7 +73,7 @@
   justify-content: space-evenly;
   margin-top: 40px;
   overflow-y: auto;
-  padding-bottom: 18vh;
+  padding-bottom: 30vh;
   row-gap: 24px;
 }
 
@@ -118,7 +118,7 @@ classroom-page .oppia-classroom-page-subheading-text {
 
 @media(max-width: 1150px) {
   .oppia-topic-summary-tiles {
-    margin-bottom: 55px;
+    margin-bottom: 20vw;
   }
 
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
@@ -127,7 +127,7 @@ classroom-page .oppia-classroom-page-subheading-text {
 
   .oppia-classroom-viewer-container,
   .oppia-classroom-search-section {
-    width: 75vw;
+    width: 60vw;
   }
 }
 
