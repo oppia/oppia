@@ -27,6 +27,7 @@ from core.domain import topic_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
+from core.jobs.transforms import results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -45,8 +46,15 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class MigrateTopicJob(base_jobs.JobBase):
-    """Job that migrates topic models."""
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
+class MigrateTopicModels(beam.PTransform):# type: ignore[misc]
+    """Transform that gets all Topic models, performs migration
+      and filters any error results.
+    """
 
     @staticmethod
     def _migrate_topic(
@@ -111,6 +119,131 @@ class MigrateTopicJob(base_jobs.JobBase):
             })
             yield (topic_id, topic_change)
 
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
+        beam.PCollection[base_models.BaseModel],
+        beam.PCollection[job_run_result.JobRunResult]
+    ]:
+        """Migrate topic objects and flush the input
+            in case of errors.
+
+        Args:
+            pipeline: Pipeline. Input beam pipeline.
+
+        Returns:
+            (PCollection, PCollection). Tuple containing
+            PCollection of models which should be put into the datastore and
+            a PCollection of results from the topic migration.
+        """
+
+        unmigrated_topic_models = (
+            pipeline
+            | 'Get all non-deleted topic models' >> (
+                ndb_io.GetModels(topic_models.TopicModel.get_all()))
+            # Pylint disable is needed becasue pylint is not able to correclty
+            # detect that the value is passed through the pipe.
+            | 'Add topic keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda topic_model: topic_model.id)
+        )
+        topic_summary_models = (
+            self.pipeline
+            | 'Get all non-deleted topic summary models' >> (
+                ndb_io.GetModels(topic_models.TopicSummaryModel.get_all()))
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add topic summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda topic_summary_model: topic_summary_model.id)
+        )
+
+        all_migrated_topic_results = (
+            unmigrated_topic_models
+            | 'Transform and migrate model' >> beam.MapTuple(
+                self._migrate_topic)
+        )
+
+        migrated_topic_job_run_results = (
+            all_migrated_topic_results
+            | 'Generates results for migration' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'TOPIC PROCESSED'))
+        )
+
+        filtered_migrated_exp = (
+            all_migrated_topic_results
+            | 'Filter migration results' >> (
+                results_transforms.DrainResultsOnError())
+        )
+
+        migrated_topics = (
+            filtered_migrated_exp
+            | 'Unwrap ok' >> beam.Map(
+                lambda result_item: result_item.unwrap())
+        )
+
+        topic_changes = (
+            unmigrated_topic_models
+            | 'Generates topic changes' >> beam.FlatMapTuple(
+                self._generate_topic_changes)
+        )
+
+        topic_objects_list = (
+            {
+                'topic_model': unmigrated_topic_models,
+                'topic_summary_model': topic_summary_models,
+                'topic': migrated_topics,
+                'topic_changes': topic_changes
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+        )
+
+        transformed_topic_objects_list = (
+            topic_objects_list
+            | 'Remove unmigrated topics' >> beam.Filter(
+                lambda x: len(x['topic_changes']) > 0 and len(x['topic']) > 0)
+            | 'Reorganize the topic objects' >> beam.Map(lambda objects: {
+                    'topic_model': objects['topic_model'][0],
+                    'topic_summary_model': objects['topic_summary_model'][0],
+                    'topic': objects['topic'][0],
+                    'topic_changes': objects['topic_changes']
+                })
+
+        )
+
+        already_migrated_job_run_results = (
+            topic_objects_list
+            | 'Remove migrated jobs' >> beam.Filter(
+                lambda x: (
+                    len(x['topic_changes']) == 0 and len(x['topic']) > 0
+                ))
+            | 'Transform previously migrated topics into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOPIC PREVIOUSLY MIGRATED'))
+        )
+
+        topic_objects_list_job_run_results = (
+            transformed_topic_objects_list
+            | 'Transform topic objects into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOPIC MIGRATED'))
+        )
+
+        job_run_results = (
+            migrated_topic_job_run_results,
+            already_migrated_job_run_results,
+            topic_objects_list_job_run_results
+        ) | 'Flatten job run results' >> beam.Flatten()
+
+        return (
+            transformed_topic_objects_list,
+            job_run_results
+        )
+
+
+class MigrateTopicJob(base_jobs.JobBase):
+    """Job that migrates Topic models."""
+
     @staticmethod
     def _update_topic(
         topic_model: topic_models.TopicModel,
@@ -167,6 +300,7 @@ class MigrateTopicJob(base_jobs.JobBase):
             TopicSummaryModel. The updated topic summary model to put into the
             datastore.
         """
+
         topic_summary = topic_services.compute_summary_of_topic(migrated_topic)
         topic_summary.version += 1
         updated_topic_summary_model = (
@@ -176,130 +310,18 @@ class MigrateTopicJob(base_jobs.JobBase):
         )
         return updated_topic_summary_model
 
-    @staticmethod
-    def _check_migration_errors(
-        unused_migrated_topic: topic_domain.Topic,
-        is_no_migration_error: beam.pvalue.AsSingleton
-    ) -> bool:
-        """Checks if any migration errors have occured.
-
-        Args:
-            unused_migrated_topic: Topic. Unused migrated topic domain object.
-            is_no_migration_error: beam.pvalue.AsSingleton. Side input data
-                specifying non-zero erros during migration.
-
-        Returns:
-            bool. Specifies whether any migration errors were found.
-        """
-        return bool(is_no_migration_error)
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the topic migration.
 
         Returns:
-            PCollection. A PCollection of results from the topic migration.
+            PCollection. A PCollection of results from the topic
+            migration.
         """
 
-        unmigrated_topic_models = (
+        transformed_topic_objects_list, job_run_results = (
             self.pipeline
-            | 'Get all non-deleted topic models' >> (
-                ndb_io.GetModels(topic_models.TopicModel.get_all()))
-            # Pylint disable is needed becasue pylint is not able to correclty
-            # detect that the value is passed through the pipe.
-            | 'Add topic keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda topic_model: topic_model.id)
-        )
-        topic_summary_models = (
-            self.pipeline
-            | 'Get all non-deleted topic summary models' >> (
-                ndb_io.GetModels(topic_models.TopicSummaryModel.get_all()))
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Add topic summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda topic_summary_model: topic_summary_model.id)
-        )
-
-        all_migrated_topic_results = (
-            unmigrated_topic_models
-            | 'Transform and migrate model' >> beam.MapTuple(
-                self._migrate_topic)
-        )
-
-        migrated_topic_job_run_results = (
-            all_migrated_topic_results
-            | 'Generates results for migration' >> (
-                job_result_transforms.ResultsToJobRunResults(
-                    'TOPIC PROCESSED'))
-        )
-
-        migration_error_check = (
-            all_migrated_topic_results
-            | 'Filter errors' >> beam.Filter(
-                lambda result_item: result_item.is_err())
-            | 'Count number of errors' >> beam.combiners.Count.Globally()
-            | 'Check if error count is zero' >> beam.Map(lambda x: x == 0)
-        )
-
-        migrated_topic_results = (
-            all_migrated_topic_results
-            | 'Remove all results in case of migration errors' >> beam.Filter(
-                self._check_migration_errors,
-                is_no_migration_error=beam.pvalue.AsSingleton(
-                    migration_error_check))
-        )
-
-        migrated_topics = (
-            migrated_topic_results
-            | 'Unwrap ok' >> beam.Map(
-                lambda result_item: result_item.unwrap())
-        )
-
-        topic_changes = (
-            unmigrated_topic_models
-            | 'Generates topic changes' >> beam.FlatMapTuple(
-                self._generate_topic_changes)
-        )
-
-        topic_objects_list = (
-            {
-                'topic_model': unmigrated_topic_models,
-                'topic_summary_model': topic_summary_models,
-                'topic': migrated_topics,
-                'topic_changes': topic_changes
-            }
-            | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
-        )
-
-        transformed_topic_objects_list = (
-            topic_objects_list
-            | 'Remove unmigrated topics' >> beam.Filter(
-                lambda x: len(x['topic_changes']) > 0 and len(x['topic']) > 0)
-            | 'Reorganize the topic objects' >> beam.Map(lambda objects: {
-                    'topic_model': objects['topic_model'][0],
-                    'topic_summary_model': objects['topic_summary_model'][0],
-                    'topic': objects['topic'][0],
-                    'topic_changes': objects['topic_changes']
-                })
-
-        )
-
-        already_migrated_job_run_results = (
-            topic_objects_list
-            | 'Remove migrated jobs' >> beam.Filter(
-                lambda x: (
-                    len(x['topic_changes']) == 0 and len(x['topic']) > 0
-                ))
-            | 'Transform previously migrated topics into job run results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'TOPIC PREVIOUSLY MIGRATED'))
-        )
-
-        topic_objects_list_job_run_results = (
-            transformed_topic_objects_list
-            | 'Transform topic objects into job run results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'TOPIC MIGRATED'))
+            | 'Perform migration and filter migration results' >> (
+                MigrateTopicModels())
         )
 
         topic_models_to_put = (
@@ -327,11 +349,25 @@ class MigrateTopicJob(base_jobs.JobBase):
             | 'Put models into datastore' >> ndb_io.PutModels()
         )
 
-        return (
-            (
-                migrated_topic_job_run_results,
-                already_migrated_job_run_results,
-                topic_objects_list_job_run_results
-            )
-            | beam.Flatten()
+        return job_run_results
+
+
+class AuditTopicMigrateJob(base_jobs.JobBase):
+    """Job that migrates Topic models."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the audit of topic
+        migration.
+
+        Returns:
+            PCollection. A PCollection of results from the topic
+            migration.
+        """
+
+        unused_transformed_topic_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results' >> (
+                MigrateTopicModels())
         )
+
+        return job_run_results
