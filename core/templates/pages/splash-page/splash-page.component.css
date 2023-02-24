@@ -549,6 +549,7 @@
 
   .splash-page .splash-arrows-container {
     position: relative;
+    direction: ltr;
   }
 
   .splash-page .oppia-splash-section-four-left .oppia-splash-button,
