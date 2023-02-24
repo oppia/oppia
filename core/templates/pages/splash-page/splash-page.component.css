@@ -141,6 +141,7 @@
   margin-top: 50px;
 }
 .splash-page .splash-arrows-container {
+  direction: ltr;
   position: absolute;
 }
 
@@ -549,7 +550,6 @@
 
   .splash-page .splash-arrows-container {
     position: relative;
-    direction: ltr;
   }
 
   .splash-page .oppia-splash-section-four-left .oppia-splash-button,
