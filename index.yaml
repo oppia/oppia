@@ -270,6 +270,23 @@ indexes:
   - name: target_id
   - name: author_id
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: created_on
+  - name: author_id
+  - name: suggestion_type
+  - name: language_code
+  - name: status
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: created_on
+  - name: author_id
+  - name: suggestion_type
+  - name: status
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer
@@ -416,4 +433,10 @@ indexes:
   properties:
   - name: blog_post_is_published
   - name: last_updated
+    direction: desc
+
+- kind: BlogPostSummaryModel
+  properties:
+  - name: author_id
+  - name: published_on
     direction: desc

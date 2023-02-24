@@ -106,7 +106,6 @@ describe('Exploration Warnings Service', () => {
         solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -161,14 +160,8 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       }
-    });
+    }, false);
     explorationWarningsService.updateWarnings();
 
     expect(explorationWarningsService.getWarnings()).toEqual([{
@@ -208,7 +201,6 @@ describe('Exploration Warnings Service', () => {
         solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -284,14 +276,8 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       }
-    });
+    }, false);
     explorationWarningsService.updateWarnings();
 
     expect(explorationWarningsService.getWarnings()).toEqual([{
@@ -331,7 +317,6 @@ describe('Exploration Warnings Service', () => {
         solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -344,23 +329,7 @@ describe('Exploration Warnings Service', () => {
           confirmed_unclassified_answers: [],
           solution: null,
           id: null,
-          answer_groups: [{
-            tagged_skill_misconception_id: null,
-            outcome: {
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
-              dest: '',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
-              },
-            },
-            rule_specs: [],
-            training_data: []
-          }],
+          answer_groups: [],
           default_outcome: {
             labelled_as_correct: true,
             param_changes: [],
@@ -376,14 +345,8 @@ describe('Exploration Warnings Service', () => {
           customization_args: {},
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       }
-    });
+    }, false);
     explorationWarningsService.updateWarnings();
 
     expect(explorationWarningsService.getWarnings()).toEqual([{
@@ -397,12 +360,8 @@ describe('Exploration Warnings Service', () => {
     }, {
       type: 'error',
       message: 'The following card has errors: Hola.'
-    }, {
-      type: 'error',
-      message: 'In \'Hola\', the following answer group has a classifier' +
-         ' with no training data: 0'
     }]);
-    expect(explorationWarningsService.countWarnings()).toBe(4);
+    expect(explorationWarningsService.countWarnings()).toBe(3);
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
@@ -421,7 +380,6 @@ describe('Exploration Warnings Service', () => {
           classifier_model_id: null,
           solicit_answer_details: false,
           linked_skill_id: null,
-          next_content_id_index: 0,
           card_is_checkpoint: true,
           content: {
             content_id: 'content',
@@ -484,14 +442,8 @@ describe('Exploration Warnings Service', () => {
             },
             hints: [],
           },
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
         }
-      });
+      }, false);
       explorationWarningsService.updateWarnings();
       tick();
 
@@ -536,7 +488,6 @@ describe('Exploration Warnings Service', () => {
           solicit_answer_details: false,
           card_is_checkpoint: true,
           linked_skill_id: null,
-          next_content_id_index: 0,
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}'
@@ -598,14 +549,8 @@ describe('Exploration Warnings Service', () => {
             },
             hints: [],
           },
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
         }
-      });
+      }, false);
       spyOn(stateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
         .and.returnValue(Promise.resolve(
           new StateTopAnswersStats(
@@ -659,7 +604,6 @@ describe('Exploration Warnings Service', () => {
         solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -724,14 +668,8 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       }
-    });
+    }, false);
     explorationWarningsService.updateWarnings();
 
     expect(explorationWarningsService.getWarnings()).toEqual([{
@@ -771,7 +709,6 @@ describe('Exploration Warnings Service', () => {
         solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -833,19 +770,12 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State: {
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: 'content'
@@ -906,15 +836,9 @@ describe('Exploration Warnings Service', () => {
             },
           },
           hints: []
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          }
         }
       }
-    });
+    }, false);
     explorationWarningsService.updateWarnings();
 
     expect(explorationWarningsService.getWarnings()).toEqual([{
@@ -961,7 +885,6 @@ describe('Exploration Warnings Service', () => {
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -1016,14 +939,8 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       }
-    });
+    }, false);
 
     explorationWarningsService.updateWarnings();
     expect(explorationWarningsService.countWarnings()).toBe(4);
@@ -1047,7 +964,6 @@ describe('Exploration Warnings Service', () => {
         solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -1105,19 +1021,12 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       End: {
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: true,
         linked_skill_id: null,
-        next_content_id_index: 0,
         content: {
           content_id: 'content',
           html: '{{HtmlValue}}'
@@ -1155,14 +1064,8 @@ describe('Exploration Warnings Service', () => {
           default_outcome: null,
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       }
-    });
+    }, false);
 
     explorationWarningsService.updateWarnings();
     expect(explorationWarningsService.countWarnings()).toBe(5);
@@ -1188,7 +1091,6 @@ describe('Exploration Warnings Service', () => {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1269,18 +1171,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State1: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1324,19 +1219,12 @@ describe('Exploration Warnings Service', () => {
             }
           },
           hints: [],
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
         },
       },
       State2: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1380,19 +1268,12 @@ describe('Exploration Warnings Service', () => {
             }
           },
           hints: [],
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
         },
       },
       State3: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1437,18 +1318,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State4: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1493,18 +1367,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State5: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1549,18 +1416,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State6: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1605,18 +1465,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State7: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1661,18 +1514,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       End: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1711,14 +1557,8 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       }
-    });
+    }, false);
 
     explorationWarningsService.updateWarnings();
     expect(explorationWarningsService.countWarnings()).toBe(13);
@@ -1777,7 +1617,6 @@ describe('Exploration Warnings Service', () => {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1841,18 +1680,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State1: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1897,18 +1729,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State2: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -1953,18 +1778,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State3: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -2009,18 +1827,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State4: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -2065,18 +1876,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State5: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -2121,18 +1925,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State6: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: true,
         content: {
           content_id: 'content',
@@ -2188,18 +1985,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       State7: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: false,
         content: {
           content_id: 'content',
@@ -2260,18 +2050,11 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       },
       End: {
         classifier_model_id: null,
         solicit_answer_details: false,
         linked_skill_id: null,
-        next_content_id_index: 0,
         card_is_checkpoint: false,
         content: {
           content_id: 'content',
@@ -2310,14 +2093,8 @@ describe('Exploration Warnings Service', () => {
           },
           hints: [],
         },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
       }
-    });
+    }, false);
 
     explorationWarningsService.updateWarnings();
     expect(explorationWarningsService.countWarnings()).toBe(12);
