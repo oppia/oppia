@@ -119,7 +119,7 @@
       </div>
     </div>
 
-    <oppia-exploration-editor-tab [hidden]="!(getActiveTabName() === 'main')" [explorationIsLinkedToStory]="explorationIsLinkedToStory">
+    <oppia-exploration-editor-tab *ngIf="getActiveTabName() === 'main'" [explorationIsLinkedToStory]="explorationIsLinkedToStory">
     </oppia-exploration-editor-tab>
 
     <oppia-translation-tab *ngIf="getActiveTabName() === 'translation'">
