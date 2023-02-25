@@ -26,10 +26,7 @@ from extensions.answer_summarizers import models
 class CalculationRegistryTests(test_utils.GenericTestBase):
     """Provides testing of the calculation registry."""
 
-    def test_get_calculation_by_id_when_calculations_dict_is_empty(
-        self) -> None:
-        # AnswerFrequencies is not present in calculations_dict,
-        # therefore AnswerFrequencies will be inserted into calculations_dict.
+    def test_get_calculation_by_id(self) -> None:
         self.assertTrue(
             isinstance(
                 calculation_registry.Registry.get_calculation_by_id(
@@ -39,13 +36,19 @@ class CalculationRegistryTests(test_utils.GenericTestBase):
             TypeError, '\'a\' is not a valid calculation id.'):
             calculation_registry.Registry.get_calculation_by_id('a')
 
-    def test_get_calculation_by_id_when_calculations_dict_is_not_empty(
+    def test_get_calculation_by_id_when_calculations_dict_have_calculation_id(
         self) -> None:
-        # AnswerFrequencies is present in calculations_dict,
-        # because AnswerFrequencies is inserted in calculations_dict in
-        # test_get_calculation_by_id_when_calculations_dict_is_empty test case.
+        # AnswerFrequencies is not present in calculations_dict,
+        # therefore AnswerFrequencies will be inserted into calculations_dict.
         self.assertTrue(
             isinstance(
                 calculation_registry.Registry.get_calculation_by_id(
-                    'AnswerFrequencies'),
-                models.AnswerFrequencies))
+                    'Top5AnswerFrequencies'),
+                models.Top5AnswerFrequencies))
+        # AnswerFrequencies is present in calculations_dict
+        # So AnswerFrequencies will not be inserted again.
+        self.assertTrue(
+            isinstance(
+                calculation_registry.Registry.get_calculation_by_id(
+                    'Top5AnswerFrequencies'),
+                models.Top5AnswerFrequencies))
