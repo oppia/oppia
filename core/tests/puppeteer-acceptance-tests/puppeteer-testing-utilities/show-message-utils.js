@@ -19,7 +19,7 @@
 let showMessage = function(message) {
   // We use console statements to log the progress or feedback of the tests.
   // eslint-disable-next-line no-console
-  console.log(message);
+  console.log('LOG: ' + message);
 };
 
 module.exports = { showMessage };
