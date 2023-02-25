@@ -62,7 +62,7 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
     this.topicEditorStateService.getClassroomUrlFragment());
 
   topicUrlFragment = (
-    this.topicEditorStateService.getTopic().getUrlFragment());
+    this.topicEditorStateService.getTopic()?.getUrlFragment());
 
   onStoryUrlFragmentChange(): void {
     if (!this.story.urlFragment) {
