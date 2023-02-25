@@ -30,13 +30,12 @@ oppia-conversation-skin .supplemental-card-parent-container {
   margin-bottom: -68px;
   padding-bottom: 10px;
   padding-left: 10px;
-  padding-top: 10px;
   padding-right: 10px;
+  padding-top: 10px;
   position: absolute;
   right: 0;
   text-align: right;
   vertical-align: middle;
-  
 }
 
 .conversation-skin-next-lesson-text {
