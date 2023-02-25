@@ -186,6 +186,10 @@ WEBDRIVERIO_CONFIG_FILE_PATH = (
     os.path.join('core', 'tests', 'wdio.conf.js'))
 NODEMODULES_WDIO_BIN_PATH = (
     os.path.join(NODE_MODULES_PATH, '.bin', 'wdio'))
+NODEMODULES_JASMINE_BIN_PATH = (
+    os.path.join(NODE_MODULES_PATH, '.bin', 'jasmine'))
+JASMINE_CONFIG_FILE_PATH = (
+    os.path.join('core', 'tests', 'puppeteer-acceptance-tests', 'jasmine.json'))
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
@@ -909,3 +913,25 @@ def run_ng_compilation() -> None:
     if not os.path.isdir(ng_bundles_dir_name):
         print('Failed to complete ng build compilation, exiting...')
         sys.exit(1)
+
+
+def is_oppia_server_already_running(
+        PORTS_USED_BY_OPPIA_PROCESSES: List[int]) -> bool:
+    """Check if the ports are taken by any other processes. If any one of
+    them is taken, it may indicate there is already one Oppia instance running.
+
+    Args:
+        PORTS_USED_BY_OPPIA_PROCESSES: List[int]. List of addresses to check if
+        being used by another processes.
+
+    Returns:
+        bool. Whether there is a running Oppia instance.
+    """
+    for port in PORTS_USED_BY_OPPIA_PROCESSES:
+        if is_port_in_use(port):
+            print(
+                'There is already a server running on localhost:%s. '
+                'Please terminate it before running the end-to-end tests. '
+                'Exiting.' % port)
+            return True
+    return False

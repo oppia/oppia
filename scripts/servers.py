@@ -727,8 +727,6 @@ def managed_webdriverio_server(
 @contextlib.contextmanager
 def managed_acceptance_tests_server(
     suite_name: str = 'full',
-    sharding_instances: int = 1,
-    chrome_version: Optional[str] = None,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the Acceptance server gracefully.
@@ -736,10 +734,6 @@ def managed_acceptance_tests_server(
     Args:
         suite_name: str. The suite name whose tests should be run. If the value
             is `full`, all tests will run.
-        sharding_instances: int. How many sharding instances to be running.
-        chrome_version: str|None. The version of Google Chrome to run the tests
-            on. If None, then the currently-installed version of Google Chrome
-            is used instead.
         stdout: int. This parameter specifies the executed program's standard
             output file handle.
 
@@ -749,13 +743,11 @@ def managed_acceptance_tests_server(
     Raises:
         ValueError. Number of sharding instances are less than 0.
     """
-    if sharding_instances <= 0:
-        raise ValueError('Sharding instance should be larger than 0')
-
-    if chrome_version is None:
-        chrome_version = get_chrome_version()
-
-    acceptance_tests_args = [common.NODE_BIN_PATH, suite_name]
+    acceptance_tests_args = [
+        common.NODEMODULES_JASMINE_BIN_PATH,
+        '--config="%s"' % common.JASMINE_CONFIG_FILE_PATH,
+        '--filter="%s"' % suite_name
+    ]
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.

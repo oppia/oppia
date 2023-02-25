@@ -68,10 +68,8 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite:
-          - core/tests/puppeteer-acceptance-tests/blog-admin-tests/assign-roles-to-users-and-change-tag-properties
-          - core/tests/puppeteer-acceptance-tests/blog-admin-tests/check-blog-dashboard-accessible-by-blog-admins
-          - core/tests/puppeteer-acceptance-tests/blog-admin-tests/create-and-delete-draft-blog-post
-          - core/tests/puppeteer-acceptance-tests/blog-admin-tests/publish-and-delete-published-blog-post
+          - Blog Admin
+          - Blog Editor
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3

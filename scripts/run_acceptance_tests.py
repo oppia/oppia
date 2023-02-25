@@ -1,4 +1,4 @@
-# Copyright 2019 The Oppia Authors. All Rights Reserved.
+# Copyright 2023 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ from scripts import common  # isort:skip pylint: disable=wrong-import-position, 
 
 from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
-from scripts import flake_checker  # isort:skip
 from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
 
@@ -57,12 +56,6 @@ _PARSER.add_argument(
     help='If true, skips building files. The default value is false.',
     action='store_true')
 _PARSER.add_argument(
-    '--sharding-instances', type=int, default=3,
-    help='Sets the number of parallel browsers to open while sharding. '
-         'Sharding must be disabled (either by passing in false to --sharding '
-         'or 1 to --sharding-instances) if running any tests in isolation '
-         '(fit or fdescribe).')
-_PARSER.add_argument(
     '--prod_env',
     help='Run the tests in prod mode. Static resources are served from '
          'build directory and use cache slugs.',
@@ -71,9 +64,6 @@ _PARSER.add_argument(
     '--suite', default='full',
     help='Performs test for different suites'
          'For performing a full test, no argument is required.')
-_PARSER.add_argument(
-    '--chrome_driver_version',
-    help='Uses the specified version of the chrome driver')
 _PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
@@ -84,27 +74,6 @@ _PARSER.add_argument(
     '--source_maps',
     help='Build webpack with source maps.',
     action='store_true')
-_PARSER.add_argument(
-    '--mobile',
-    help='Run e2e test in mobile viewport.',
-    action='store_true')
-
-
-def is_oppia_server_already_running() -> bool:
-    """Check if the ports are taken by any other processes. If any one of
-    them is taken, it may indicate there is already one Oppia instance running.
-
-    Returns:
-        bool. Whether there is a running Oppia instance.
-    """
-    for port in PORTS_USED_BY_OPPIA_PROCESSES:
-        if common.is_port_in_use(port):
-            print(
-                'There is already a server running on localhost:%s. '
-                'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port)
-            return True
-    return False
 
 
 def run_webpack_compilation(source_maps: bool = False) -> None:
@@ -169,7 +138,7 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start end-to-end tests."""
-    if is_oppia_server_already_running():
+    if common.is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
         sys.exit(1)
 
     install_third_party_libraries(args.skip_install)
@@ -239,29 +208,7 @@ def main(args: Optional[List[str]] = None) -> None:
     parsed_args = _PARSER.parse_args(args=args)
 
     with servers.managed_portserver():
-        for attempt_num in range(1, MAX_RETRY_COUNT + 1):
-            print('***Attempt %d.***' % attempt_num)
-            output, return_code = run_tests(parsed_args)
-
-            if not flake_checker.check_if_on_ci():
-                # Don't rerun off of CI.
-                print('No reruns because not running on CI.')
-                break
-
-            if return_code == 0:
-                # Don't rerun passing tests.
-                flake_checker.report_pass(parsed_args.suite)
-                break
-
-            # Check whether we should rerun based on the instructions from the
-            # flake checker server.
-            rerun = flake_checker.check_test_flakiness(
-                output, parsed_args.suite)
-            if rerun:
-                print('Rerunning.')
-            else:
-                print('Not rerunning.')
-                break
+        _, return_code = run_tests(parsed_args)
 
     sys.exit(return_code)
 
