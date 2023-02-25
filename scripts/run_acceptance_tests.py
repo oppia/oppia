@@ -31,7 +31,6 @@ from scripts import build  # isort:skip
 from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
 
-MAX_RETRY_COUNT: Final = 3
 GOOGLE_APP_ENGINE_PORT: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
 PORTS_USED_BY_OPPIA_PROCESSES: Final = [
@@ -175,8 +174,6 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
         proc = stack.enter_context(servers.managed_acceptance_tests_server(
                 suite_name=args.suite,
-                chrome_version=args.chrome_driver_version,
-                sharding_instances=args.sharding_instances,
                 stdout=subprocess.PIPE))
 
         print('Servers have come up.\n')
@@ -204,7 +201,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
 
 def main(args: Optional[List[str]] = None) -> None:
-    """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
+    """Run acceptance tests"""
     parsed_args = _PARSER.parse_args(args=args)
 
     with servers.managed_portserver():

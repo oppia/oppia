@@ -921,8 +921,8 @@ def is_oppia_server_already_running(
     them is taken, it may indicate there is already one Oppia instance running.
 
     Args:
-        PORTS_USED_BY_OPPIA_PROCESSES: List[int]. List of addresses to check if
-        being used by another processes.
+        PORTS_USED_BY_OPPIA_PROCESSES: list(int). List of addresses to check if
+            being used by another processes.
 
     Returns:
         bool. Whether there is a running Oppia instance.
