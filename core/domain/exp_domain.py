@@ -1234,6 +1234,7 @@ class ExplorationDict(TypedDict):
     correctness_feedback_enabled: bool
     edits_allowed: bool
     next_content_id_index: int
+    version: int
 
 
 class VersionedExplorationDict(ExplorationDict):
@@ -5699,7 +5700,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'next_content_id_index': self.next_content_id_index,
             'edits_allowed': self.edits_allowed,
             'states': {state_name: state.to_dict()
-                       for (state_name, state) in self.states.items()}
+                       for (state_name, state) in self.states.items()},
+            'version': self.version
         })
         exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
         return exploration_dict_deepcopy

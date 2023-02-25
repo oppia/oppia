@@ -23,6 +23,10 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_domain
+from core.domain import classroom_services
+from core.domain import config_domain
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -44,10 +48,17 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import translation_domain
+from core.domain import translation_fetchers
+from core.domain import translation_services
 from core.domain import user_services
+from core.platform import models
 
 from typing import Dict, List, TypedDict, Union
 
+platform_translate_services = models.Registry.import_translate_services()
+
+(translation_models,) = models.Registry.import_models([
+    models.Names.TRANSLATION])
 
 class InitializeAndroidTestDataHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
@@ -87,21 +98,43 @@ class InitializeAndroidTestDataHandler(
 
         if not constants.DEV_MODE:
             raise Exception('Cannot load new structures data in production.')
+
+        user_id = feconf.SYSTEM_COMMITTER_ID
+        exp_id = '26'
+        target_language_code = 'pt'
+        entity_type = feconf.TranslatableEntityType(
+            feconf.ENTITY_TYPE_EXPLORATION)
+
         if topic_services.does_topic_with_name_exist('Android test'):
             topic = topic_fetchers.get_topic_by_name(
                 'Android test', strict=True
             )
-            topic_rights = topic_fetchers.get_topic_rights(
-                topic.id, strict=True
-            )
-            if topic_rights.topic_is_published:
-                raise self.InvalidInputException(
-                    'The topic is already published.')
+            # If the topic already exists, delete it before proceeding.
+            topic_services.delete_topic(user_id, topic.id)
 
-            raise self.InvalidInputException(
-                'The topic exists but is not published.')
-        exp_id = '26'
-        user_id = feconf.SYSTEM_COMMITTER_ID
+            # Also delete the demo exploration's translations, if any.
+            test_exploration = exp_fetchers.get_exploration_by_id(
+                exp_id, strict=False)
+            if test_exploration:
+                entity_translation_model = (
+                    translation_models.EntityTranslationsModel.get_model(
+                        entity_type, exp_id, test_exploration.version,
+                        target_language_code))
+                if entity_translation_model:
+                    entity_translation_model.delete()
+
+            # Unconditionally reset possible machine translations.
+            translation_models.MachineTranslationModel.delete_multi(
+                translation_models.MachineTranslationModel.get_all())
+
+            # Remove the topic from classroom pages if it's present.
+            classrooms_property = config_domain.CLASSROOM_PAGES_DATA
+            classrooms = classrooms_property.value
+            for classroom in classrooms:
+                classroom['topic_ids'].remove(topic.id)
+            config_services.set_property(
+                user_id, classrooms_property.name, classrooms)
+
         # Generate new Structure id for topic, story, skill and question.
         topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
@@ -152,6 +185,11 @@ class InitializeAndroidTestDataHandler(
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, topic_id))
+        subtopic_page.page_contents.subtitled_html.html = (
+            'Example revision card. Click <oppia-noninteractive-skillreview '
+            'skill_id-with-value="&amp;quot;%s&amp;quot;" text-with-value="'
+            '&amp;quot;here&amp;quot;"></oppia-noninteractive-skillreview> to'
+            ' open a concept card.' % skill_id)
 
         # Upload local exploration to the datastore and enable feedback.
         exp_services.load_demo(exp_id)
@@ -232,7 +270,231 @@ class InitializeAndroidTestDataHandler(
         # Upload thumbnails to be accessible through AssetsDevHandler.
         self._upload_thumbnail(topic_id, feconf.ENTITY_TYPE_TOPIC)
         self._upload_thumbnail(story_id, feconf.ENTITY_TYPE_STORY)
-        self.render_json({})
+
+        # Arrange fake translations since the emulator translation service won't
+        # support the Android test exploration by default.
+        emulator_client = platform_translate_services.CLIENT
+        emulator_client.add_expected_response(
+            'en', target_language_code, (
+                '<p>Test exploration with all android specific interactions</p>'
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;'
+                'tests&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"'
+                ' filepath-with-value="&amp;quot;img_20210622_123005_'
+                'efcgi87dk2_height_130_width_289.png&amp;quot;">'
+                '</oppia-noninteractive-image>'), (
+                '<p>Exploração de teste com todas as interações específicas do '
+                'Android</p><oppia-noninteractive-image alt-with-value='
+                '"&amp;quot;tests&amp;quot;" caption-with-value="&amp;quot;'
+                '&amp;quot;" filepath-with-value="&amp;quot;img_20210622_'
+                '123005_efcgi87dk2_height_130_width_289.png&amp;quot;">'
+                '</oppia-noninteractive-image>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code, 'Continue', 'Continuar')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>What fraction represents half of something?</p>',
+            '<p>Que fração representa a metade de algo?</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>That answer isn\'t correct. Try again.</p>',
+            '<p>Essa resposta não está correta. Tente novamente.</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Correct!</p>', '<p>Correto!</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, (
+                '<p>Remember that two halves, when added together, make one'
+                ' whole.</p>'), (
+                '<p>Lembre-se que duas metades, quando somadas, formam um'
+                ' todo.</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code, (
+                '<p>One half is a fraction resulting from dividing one by'
+                ' two.</p>'), (
+                '<p>A metade é uma fração resultante da divisão de um por'
+                ' dois.</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code, (
+                '<p>Half in fraction is represented by 1 in the numerator and 2'
+                ' in the denominator.</p>'), (
+                '<p>A metade em fração é representada por 1 no numerador e 2 no'
+                ' denominador.</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code, (
+                '<p>Half of something has one part in the numerator for every'
+                ' two parts in the denominator.</p>'), (
+                '<p>Metade de algo tem uma parte no numerador para cada duas'
+                ' partes no denominador.</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>In which language does Oppia mean \'to learn\'?</p>',
+            '<p>Em que língua Oppia significa \'aprender\'?</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>Not quite. Try again (or maybe use a search engine).</p>', (
+                '<p>Não exatamente. Tente novamente (ou talvez use um mecanismo'
+                ' de pesquisa).</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>What are the primary colors of light?</p>',
+            '<p>Quais são as cores primárias da luz?</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>That\'s not quite right. Try again.</p>',
+            '<p>Isto não está completamente correto. Tente novamente.</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p><strong>Correct!</strong></p>',
+            '<p><strong>Correto!</strong></p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, (
+                '<p>\'Yellow\' is considered a primary color in the RYB'
+                ' spectrum, but that doesn\'t correspond to light. Try again!'
+                '</p>'), (
+                '<p>\'Amarelo\' é considerada uma cor primária no espectro'
+                ' RYB, mas não corresponde à luz. Tente novamente!</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Red</p>', '<p>Vermelho</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Yellow</p>', '<p>Amarelo</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Green</p>', '<p>Verde</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Blue</p>', '<p>Azul</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Orange</p>', '<p>Laranja</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Purple</p>', '<p>Roxo</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>Sort the following in descending order.</p>',
+            '<p>Classifique o seguinte em ordem decrescente.</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Not quite. Try again.</p>',
+            '<p>Não exatamente. Tente novamente.</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>That\'s correct</p>',
+            '<p>Está correto</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>0.35</p>', '<p>0.35</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>3/5</p>', '<p>3/5</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>0.5</p>', '<p>0.5</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>0.46</p>', '<p>0.46</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, (
+                '<p>Sort the following in descending order, putting equal'
+                ' items in the same position.</p>'), (
+                '<p>Classifique o seguinte em ordem decrescente, colocando'
+                ' itens iguais na mesma posição.</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>Seems like you did the ascending order</p>',
+            '<p>Parece que você fez a ordem crescente</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>6.0</p>', '<p>6.0</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, 'Congratulations, you have finished!',
+            'Parabéns, você terminou!')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>Click on the "O" letter in the below image.</p>',
+            '<p>Clique na letra "O" na imagem abaixo.</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Select the left most letter</p>',
+            '<p>Selecione a letra mais à esquerda</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Continue</p>', '<p>Continuar</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>What is 11 times 11?</p>',
+            '<p>Quanto é 11 vezes 11?</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Try again</p>',
+            '<p>Tente novamente</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>Not quite. It\'s actually larger than that. Try again.</p>', (
+                '<p>Não exatamente. Na verdade, é maior do que isso. Tente'
+                ' novamente.</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>Not quite. It\'s less than that.</p>',
+            '<p>Não exatamente. É menos que isso.</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>Which bird can sustain flight for long periods of time?</p>', (
+                '<p>Qual ave pode sustentar o vôo por longos períodos de'
+                ' tempo?</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Try again.</p>',
+            '<p>Tente novamente.</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code,
+            '<p>Correct! Eagles can sustain flight.</p>',
+            '<p>Correto! As águias podem sustentar o vôo.</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Penguin</p>', '<p>Pinguim</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Chicken</p>', '<p>Frango</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Eagle</p>', '<p>Águia</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Tiger</p>', '<p>Tigre</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, (
+                '<p>Two numbers are respectively 20% and 50% more than a third'
+                ' number. The ratio of the two numbers is:</p>'), (
+                '<p>Dois números são, respectivamente, 20% e 50% mais do que um'
+                ' terceiro número. A razão entre os dois números é:</p>'))
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Not correct</p>',
+            '<p>Incorreto</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, '<p>Correct</p>', '<p>Correto</p>')
+        emulator_client.add_expected_response(
+            'en', target_language_code, 'finnish', 'finlandês')
+
+        # Add translations for the test exploration.
+        test_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        translatable_text_dict = translation_services.get_translatable_text(
+            test_exploration, target_language_code)
+        for state_name, translations_dict in translatable_text_dict.items():
+            for content_id, translatable_content in translations_dict.items():
+                content_to_translate = translatable_content.content_value
+                if translatable_content.is_data_format_list():
+                    translated_content_value = [
+                        translation_services.get_and_cache_machine_translation(
+                            source_language_code='en',
+                            target_language_code=target_language_code,
+                            source_text=text_option)
+                        for text_option in content_to_translate
+                    ]
+                else:
+                    translated_content_value = (
+                        translation_services.get_and_cache_machine_translation(
+                            source_language_code='en',
+                            target_language_code=target_language_code,
+                            source_text=content_to_translate))
+                translated_content = translation_domain.TranslatedContent(
+                    translated_content_value,
+                    translatable_content.content_format,
+                    needs_update=False)
+                translation_services.add_new_translation(
+                    entity_type, exp_id, test_exploration.version,
+                    target_language_code, content_id, translated_content)
+
+        # Add the new topic to all available classrooms.
+        classrooms_property = config_domain.CLASSROOM_PAGES_DATA
+        classrooms = classrooms_property.value
+        for classroom in classrooms:
+            classroom['topic_ids'].append(topic_id)
+        config_services.set_property(
+            user_id, classrooms_property.name, classrooms)
+
+        self.render_json({
+            'generated_topic_id': topic_id
+        })
 
     def _upload_thumbnail(self, structure_id: str, structure_type: str) -> None:
         """Uploads images to the local datastore to be fetched using the
@@ -379,6 +641,8 @@ class AndroidActivityHandler(base.BaseHandler[
                 'schema': {
                     'type': 'basestring',
                     'choices': [
+                        'classroom',
+                        'exp_translations',
                         constants.ACTIVITY_TYPE_EXPLORATION,
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
@@ -395,7 +659,14 @@ class AndroidActivityHandler(base.BaseHandler[
             'activity_version': {
                 'schema': {
                     'type': 'int'
-                }
+                },
+                'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -414,13 +685,15 @@ class AndroidActivityHandler(base.BaseHandler[
     # 'is_from_oppia_android_build' decorator, and here we are getting 'secret'
     # because the decorator always passes every url_path_args to HTTP methods.
     @acl_decorators.is_from_oppia_android_build
-    def get(self, unused_secret: str) -> None:
+    def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
         activity_id = self.normalized_request['activity_id']
         activity_type = self.normalized_request['activity_type']
-        activity_version = self.normalized_request['activity_version']
+        activity_version = self.normalized_request.get('activity_version')
+        language_code = self.normalized_request.get('language_code')
         activity: Union[
+            classroom_domain.Classroom,
             exp_domain.Exploration,
             story_domain.Story,
             skill_domain.Skill,
@@ -428,7 +701,14 @@ class AndroidActivityHandler(base.BaseHandler[
             topic_domain.Topic
         ]
         try:
-            if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+            if activity_type == 'classroom':
+                matching_classroom_fragment = next(
+                    classroom['url_fragment']
+                    for classroom in config_domain.CLASSROOM_PAGES_DATA.value
+                    if classroom['name'] == activity_id)
+                activity = classroom_services.get_classroom_by_url_fragment(
+                    matching_classroom_fragment)
+            elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
                 activity = exp_fetchers.get_exploration_by_id(
                     activity_id, version=activity_version)
             elif activity_type == constants.ACTIVITY_TYPE_STORY:
@@ -444,6 +724,11 @@ class AndroidActivityHandler(base.BaseHandler[
                     int(subtopic_page_id),
                     version=activity_version
                 )
+            elif activity_type == 'exp_translations':
+                entity_type = feconf.TranslatableEntityType(
+                    feconf.ENTITY_TYPE_EXPLORATION)
+                activity = translation_fetchers.get_entity_translation(
+                    entity_type, activity_id, activity_version, language_code)
             else:
                 activity = topic_fetchers.get_topic_by_id(
                     activity_id, version=activity_version)
