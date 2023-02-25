@@ -7,6 +7,11 @@
     </div>
 
     <div class="oppia-question-player-card">
+      <span class="beta-label"
+            matTooltip="This feature is only available in English for now"
+            matTooltipClass="oppia-mat-tooltip-list">
+        Beta
+      </span>
       <div [hidden]="!(totalQuestions > 0)">
         <h3 class="oppia-question-player-header">Question {{currentQuestion}}/{{totalQuestions}}</h3>
         <div class="oppia-question-player-progress">
@@ -294,6 +299,7 @@
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     height: 100px;
     margin: 0 20px;
+    position: relative;
     text-align: center;
   }
 
@@ -428,6 +434,21 @@
 
   .oppia-question-player-container .oppia-col-width {
     width: 50%;
+  }
+
+  .beta-label {
+    background-color: #00645c;
+    color: white;
+    font-size: 14px;
+    margin: 0;
+    padding: 5px 10px;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .beta-label:hover {
+    background-color: #003d38;
   }
 
   @media screen and (max-width: 575px) {

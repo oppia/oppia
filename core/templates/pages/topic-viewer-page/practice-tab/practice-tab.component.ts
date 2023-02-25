@@ -182,6 +182,7 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       return;
     }
     this.ngbModal.open(PracticeSessionConfirmationModal, {
+      centered: true,
       backdrop: 'static'
     }).result.then(() => {
       this.openNewPracticeSession();
