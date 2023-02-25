@@ -41,28 +41,28 @@
                      *ngIf="userIsLoggedIn && username.length <= 8"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
-                  <span class="e2e-test-username"
-                        [hidden]="userInfoIsLoading">
-                    {{ username }}
-                  </span>
+                  <h1 class="e2e-test-username"
+                      [hidden]="userInfoIsLoading">
+                      {{ username }}
+                  </h1>
                 </div>
                 <div class="oppia-long-contributor-username-container"
                      *ngIf="userIsLoggedIn && username.length > 8"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
-                  <span class="e2e-test-username"
-                        [hidden]="userInfoIsLoading">
-                    {{ username }}
-                  </span>
+                  <h1 class="e2e-test-username"
+                      [hidden]="userInfoIsLoading">
+                      {{ username }}
+                  </h1>
                 </div>
                 <div class="oppia-short-contributor-username-container"
                      *ngIf="!userIsLoggedIn"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
-                  <span class="e2e-test-username"
-                        [hidden]="userInfoIsLoading">
-                    Guest
-                  </span>
+                  <h1 class="e2e-test-username"
+                      [hidden]="userInfoIsLoading">
+                      Guest
+                  </h1>
                 </div>
                 <div class="oppia-review-right-details-container e2e-test-review-rights"
                      *ngIf="userIsReviewer">
@@ -118,9 +118,9 @@
               <div class="oppia-explanation-container">
                 <div class="oppia-opportunities-tabs-explanation">
                   <div class="oppia-opportunities-tabs-explanation-before">
-                    {{tabsDetails[activeTabName].tabName}}
+                    <h1>{{tabsDetails[activeTabName].tabName}}</h1>
                   </div>
-                  {{tabsDetails[activeTabName].description}}
+                  <h2>{{tabsDetails[activeTabName].description}}</h2>
                 </div>
               </div>
             </div>
@@ -163,10 +163,10 @@
             </div>
             <div class="collapsed-oppia-contributor-username-container">
               <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
-              <span class="e2e-test-username"
-                    [hidden]="userInfoIsLoading">
-                {{userIsLoggedIn ? username : 'Guest'}}
-              </span>
+              <h1 class="e2e-test-username"
+                  [hidden]="userInfoIsLoading">
+                  {{userIsLoggedIn ? username : 'Guest'}}
+              </h1>
             </div>
           </div>
           <div class="oppia-collapsed-review-right-details-container e2e-test-review-rights"
@@ -340,6 +340,15 @@
   }
   .oppia-opportunities-tabs-explanation {
     position: relative;
+  }
+  .oppia-opportunities-tabs-explanation h1,
+  .oppia-contributor-username-and-review-rights-container h1 {
+    color: #009688;
+    font-size: 26px;
+  }
+  .oppia-opportunities-tabs-explanation h2 {
+    font-size: 16px;
+    font-weight: 300;
   }
   .oppia-opportunities-tabs-explanation-before {
     color: #009688;
@@ -569,6 +578,12 @@
   @keyframes translate-y {
       from { transform: translateY(-100%); }
       to { transform: translateY(0); }
+  }
+  @media (max-width:700px) {
+    .oppia-opportunities-tabs-explanation h1,
+    .oppia-contributor-username-and-review-rights-container h1 {
+      font-size: 20px;
+    }
   }
   @media only screen and (max-width: 800px) {
     .oppia-contributor-username-container {
