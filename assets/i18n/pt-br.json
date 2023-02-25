@@ -1116,7 +1116,7 @@
 	"I18N_TOPIC_VIEWER_MASTER_SKILLS": "Habilidades principais para <[topicName]>",
 	"I18N_TOPIC_VIEWER_NO_QUESTION_WARNING": "Ainda não há perguntas criadas para o(s) subtópico(s) selecionado(s).",
 	"I18N_TOPIC_VIEWER_PRACTICE": "Prática",
-	"I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG": "(Beta)",
+	"I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG": "Beta",
 	"I18N_TOPIC_VIEWER_QUESTIONS_UNAVAILABLE": "Volte mais tarde quando as perguntas para praticar estiverem disponíveis para este tópico.",
 	"I18N_TOPIC_VIEWER_REVISION": "Revisão",
 	"I18N_TOPIC_VIEWER_SELECT_SKILLS": "Selecione as habilidades das lições de <[topicName]> que você gostaria de praticar.",
