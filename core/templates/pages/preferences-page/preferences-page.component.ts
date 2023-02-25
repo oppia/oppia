@@ -22,6 +22,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { HttpClient } from '@angular/common/http';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -88,7 +89,8 @@ export class PreferencesPageComponent {
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private urlInterpolationService: UrlInterpolationService,
     private userBackendApiService: UserBackendApiService,
-    private userService: UserService
+    private userService: UserService,
+    private http:HttpClient
   ) { }
 
   getStaticImageUrl(imagePath: string): string {
@@ -173,6 +175,15 @@ export class PreferencesPageComponent {
   handleExportDataClick(): void {
     if (!this.exportingData) {
       this.exportingData = true;
+      this.http.get('/export-account-handler', { responseType: 'blob' })
+      .subscribe((data) => {
+        const blob = new Blob([data], { type: 'application/zip' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'oppia_takeout_data.zip';
+        a.click();
+      });
     }
   }
 
@@ -196,6 +207,9 @@ export class PreferencesPageComponent {
   }
 
   ngOnInit(): void {
+    document.addEventListener("keydown", (event) => {
+      console.log(document.activeElement)
+    });
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then((userInfo) => {

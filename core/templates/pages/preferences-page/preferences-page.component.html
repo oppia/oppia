@@ -17,7 +17,8 @@
           {{ 'I18N_PREFERENCES_USERNAME' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
-          <a *ngIf="username"
+          <a class="focus-class" *ngIf="username"
+             tabindex="0"
              href="/profile/{{ username }}"
              [smartRouterLink]="'/profile/' + username">
              {{ username }}
@@ -322,10 +323,8 @@
         {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
-          <button type="button" class="btn btn-danger e2e-test-delete-account-button">
+        <a href="/delete-account"  class="btn btn-danger delete-btn e2e-test-delete-account-button focus-class" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
-          </button>
         </a>
         <span class="form-text oppia-form-text">
           {{ 'I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO' | translate }}
@@ -340,14 +339,13 @@
         {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
-        <a href="/export-account-handler">
           <button type="button"
-                  class="btn btn-primary e2e-test-export-account-button"
+                  tabindex="0"
+                  class="btn btn-primary e2e-test-export-account-button focus-class"
                   title="Export account"
                   (click)="handleExportDataClick()">
                   {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
           </button>
-        </a>
         <span class="form-text oppia-form-text">
           {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate }}
         </span>

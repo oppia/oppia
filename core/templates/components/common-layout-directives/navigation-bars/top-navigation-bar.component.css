@@ -407,7 +407,7 @@
   color: #009688;
 }
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link:hover {
-  color: #888;
+  background-color: #d7d7d7;
 }
 
 .oppia-top-navigation-bar .oppia-signin-text {
@@ -489,6 +489,12 @@
   font-size: 15px;
   margin-right: 5px;
   padding-left: 5px;
+}
+.dropdown-item:focus {
+  background-color: #d7d7d7;
+}
+.oppia-navbar-dropdown-toggle:focus {
+  background-color: #ffffff;
 }
 @media screen and (max-width: 880px) {
   .oppia-top-navigation-bar .oppia-logo-wide {
