@@ -4694,6 +4694,6 @@ def is_from_oppia_android_build(
                 'The incoming request is not a valid '
                 'Oppia Android build request.'
             )
-        return handler(self, **kwargs)
+        return handler(self, secret, **kwargs)
 
     return test_is_from_oppia_android_build

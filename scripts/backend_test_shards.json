@@ -49,7 +49,8 @@
         "core.controllers.admin_test",
         "core.controllers.android_test",
         "core.jobs.batch_jobs.translation_migration_jobs_test",
-        "core.controllers.release_coordinator_test"
+        "core.controllers.release_coordinator_test",
+        "core.platform.secrets.dev_mode_secrets_services_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -284,7 +285,6 @@
         "scripts.install_third_party_test",
         "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
-        "scripts.release_scripts.update_changelog_and_credits_test",
         "scripts.setup_test",
         "core.storage.feedback.gae_models_test",
         "scripts.pre_commit_hook_test",
@@ -316,7 +316,7 @@
         "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
         "core.jobs.batch_jobs.user_settings_profile_picture_jobs_test",
         "core.jobs.io.cache_io_test",
-        "scripts.contributor_dashboard_debug_test",
+        "scripts.generate_sample_data_test",
         "core.platform.secrets.cloud_secrets_services_test",
         "extensions.interactions.ItemSelectionInput.ItemSelectionInput_test",
         "extensions.interactions.SetInput.SetInput_test",
@@ -382,6 +382,7 @@
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
         "core.jobs.io.job_io_test",
         "core.jobs.io.gcs_io_test",
-        "core.domain.android_services"
+        "core.domain.android_services_test",
+        "core.jobs.batch_jobs.store_profile_images_to_gcs_jobs_test"
     ]
 }

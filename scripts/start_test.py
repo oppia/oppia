@@ -20,12 +20,13 @@ from core.constants import constants
 from core.tests import test_utils
 from scripts import build
 from scripts import common
-from scripts import contributor_dashboard_debug
 from scripts import extend_index_yaml
+from scripts import generate_sample_data
 from scripts import install_third_party_libs
 from scripts import servers
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
+MANAGED_WEB_BROWSER_ERROR = 'Mock Exception while launching web browser.'
 
 
 class MockCompiler:
@@ -104,6 +105,9 @@ class StartTests(test_utils.GenericTestBase):
             servers, 'create_managed_web_browser',
             lambda _: MockCompilerContextManager(),
             expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
+        self.swap_create_managed_web_browser = self.swap_to_always_raise(
+            servers, 'create_managed_web_browser',
+            Exception(MANAGED_WEB_BROWSER_ERROR))
 
     def test_start_servers_successfully(self) -> None:
         with self.swap_install_third_party_libs:
@@ -249,7 +253,19 @@ class StartTests(test_utils.GenericTestBase):
             ],
             self.print_arr)
 
-    def test_start_servers_successfully_in_contributor_dashboard_debug_mode(
+    def test_start_servers_with_contributor_dashboard_debug_flag_fails(
+        self
+    ) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import start
+        with self.assertRaisesRegex(
+            Exception,
+            'The \'--contributor_dashboard_debug\' flag is deprecated'
+            'use \'--generate_sample_data\' instead.'
+        ):
+            start.main(args=['--contributor_dashboard_debug'])
+
+    def test_start_servers_successfully_with_generate_sample_data_flag(
         self
     ) -> None:
         with self.swap_install_third_party_libs:
@@ -258,8 +274,7 @@ class StartTests(test_utils.GenericTestBase):
             build, 'main', lambda **unused_kwargs: None,
             expected_kwargs=[{'args': []}])
         populate_data_swap = self.swap_with_call_counter(
-            contributor_dashboard_debug.ContributorDashboardDebugInitializer,
-            'populate_debug_data'
+            generate_sample_data.GenerateSampleData, 'generate_sample_data'
         )
         with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
@@ -267,7 +282,7 @@ class StartTests(test_utils.GenericTestBase):
                     with self.swap_extend_index_yaml, self.swap_dev_appserver:
                         with self.swap_firebase_auth_emulator, self.swap_print:
                             with populate_data_swap as populate_data_counter:
-                                start.main(args=['--contributor_dashboard'])
+                                start.main(args=['--generate_sample_data'])
 
         self.assertEqual(populate_data_counter.times_called, 1)
         self.assertIn(
@@ -277,6 +292,42 @@ class StartTests(test_utils.GenericTestBase):
                     'Local development server is ready! Opening a default web '
                     'browser window pointing to it: '
                     'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
+                )
+            ],
+            self.print_arr)
+
+    def test_could_not_auto_launch_web_browser(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import start
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}])
+
+        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
+            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
+                with self.swap_create_managed_web_browser:
+                    with self.swap_webpack_compiler, self.swap_dev_appserver:
+                        with self.swap_extend_index_yaml, self.swap_print:
+                            with self.swap_firebase_auth_emulator:
+                                start.main(args=[])
+
+        self.assertIn(
+            [
+                'ERROR',
+                (
+                    'Error occurred while attempting to automatically launch '
+                    'the web browser: %s' % MANAGED_WEB_BROWSER_ERROR
+                )
+            ],
+            self.print_arr)
+
+        self.assertIn(
+            [
+                'INFORMATION',
+                (
+                    'Local development server is ready! You can access it by '
+                    'navigating to http://localhost:%s/ in a web '
+                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER
                 )
             ],
             self.print_arr)

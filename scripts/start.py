@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import json
 import time
 from typing import Iterator, Optional, Sequence
 
@@ -37,7 +38,7 @@ from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-posit
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import generate_sample_data # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -80,9 +81,14 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--contributor_dashboard_debug',
+    help='DEPRECATED: use \'--generate_sample_data\' instead',
+    action='store_true')
+_PARSER.add_argument(
+    '--generate_sample_data',
     help='optional; if specified, populate sample data that can be used to help'
          'develop for the contributor dashboard.',
     action='store_true')
+_PARSER.add_argument('--secrets', help='optional; specify secrets to be set')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
@@ -136,6 +142,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    if parsed_args.contributor_dashboard_debug:
+        raise Exception(
+            'The \'--contributor_dashboard_debug\' flag is deprecated'
+            'use \'--generate_sample_data\' instead.'
+        )
+
     if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
             'WARNING',
@@ -178,29 +190,25 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             stack.enter_context(servers.managed_ng_build(watch_mode=True))
             stack.enter_context(servers.managed_webpack_compiler(
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
-                watch_mode=True))
+                watch_mode=False))
 
         app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
         dev_appserver = stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
+            secrets=json.loads(parsed_args.secrets),
             enable_host_checking=not parsed_args.disable_host_checking,
             automatic_restart=not parsed_args.no_auto_restart,
             skip_sdk_update_check=True,
             port=PORT_NUMBER_FOR_GAE_SERVER))
 
-        if parsed_args.contributor_dashboard_debug:
+        if parsed_args.generate_sample_data:
             initializer = (
-                contributor_dashboard_debug
-                .ContributorDashboardDebugInitializer(
+                generate_sample_data.GenerateSampleData(
                     base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER)
             )
-            initializer.populate_debug_data()
+            initializer.generate_sample_data()
 
-        managed_web_browser = (
-            None if parsed_args.no_browser else
-            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
-
-        if managed_web_browser is None:
+        if parsed_args.no_browser:
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Local development server is ready! You can access it by '
@@ -208,13 +216,27 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
             ])
         else:
-            common.print_each_string_after_two_new_lines([
-                'INFORMATION',
-                'Local development server is ready! Opening a default web '
-                'browser window pointing to it: '
-                'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
-            ])
-            stack.enter_context(managed_web_browser)
+            try:
+                stack.enter_context(servers.create_managed_web_browser(
+                    PORT_NUMBER_FOR_GAE_SERVER))
+                common.print_each_string_after_two_new_lines([
+                    'INFORMATION',
+                    'Local development server is ready! Opening a default web '
+                    'browser window pointing to it: '
+                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
+                ])
+            except Exception as error:
+                common.print_each_string_after_two_new_lines([
+                    'ERROR',
+                    'Error occurred while attempting to automatically launch '
+                    'the web browser: %s' % error,
+                ])
+                common.print_each_string_after_two_new_lines([
+                    'INFORMATION',
+                    'Local development server is ready! You can access it by '
+                    'navigating to http://localhost:%s/ in a web '
+                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
+                ])
 
         dev_appserver.wait()
 

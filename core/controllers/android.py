@@ -23,8 +23,8 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_domain
-from core.domain import classroom_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
@@ -53,7 +53,7 @@ from core.domain import translation_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, TypedDict, Union
+from typing import Dict, List, Optional, TypedDict, Union
 
 platform_translate_services = models.Registry.import_translate_services()
 
@@ -647,7 +647,8 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
-                        constants.ACTIVITY_TYPE_LEARN_TOPIC
+                        constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                        constants.ACTIVITY_TYPE_CLASSROOM
                     ]
                 },
             },
@@ -692,46 +693,49 @@ class AndroidActivityHandler(base.BaseHandler[
         activity_type = self.normalized_request['activity_type']
         activity_version = self.normalized_request.get('activity_version')
         language_code = self.normalized_request.get('language_code')
-        activity: Union[
-            classroom_domain.Classroom,
+        activity: Optional[Union[
             exp_domain.Exploration,
             story_domain.Story,
             skill_domain.Skill,
             subtopic_page_domain.SubtopicPage,
-            topic_domain.Topic
-        ]
-        try:
-            if activity_type == 'classroom':
-                matching_classroom_fragment = next(
-                    classroom['url_fragment']
-                    for classroom in config_domain.CLASSROOM_PAGES_DATA.value
-                    if classroom['name'] == activity_id)
-                activity = classroom_services.get_classroom_by_url_fragment(
-                    matching_classroom_fragment)
-            elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-                activity = exp_fetchers.get_exploration_by_id(
-                    activity_id, version=activity_version)
-            elif activity_type == constants.ACTIVITY_TYPE_STORY:
-                activity = story_fetchers.get_story_by_id(
-                    activity_id, version=activity_version)
-            elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-                activity = skill_fetchers.get_skill_by_id(
-                    activity_id, version=activity_version)
-            elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-                topic_id, subtopic_page_id = activity_id.split('-')
-                activity = subtopic_page_services.get_subtopic_page_by_id(
-                    topic_id,
-                    int(subtopic_page_id),
-                    version=activity_version
-                )
-            elif activity_type == 'exp_translations':
-                entity_type = feconf.TranslatableEntityType(
-                    feconf.ENTITY_TYPE_EXPLORATION)
-                activity = translation_fetchers.get_entity_translation(
-                    entity_type, activity_id, activity_version, language_code)
-            else:
-                activity = topic_fetchers.get_topic_by_id(
-                    activity_id, version=activity_version)
-        except Exception as e:
-            raise self.PageNotFoundException from e
+            classroom_config_domain.Classroom,
+            topic_domain.Topic,
+            translation_domain.EntityTranslation
+        ]] = None
+
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+            activity = exp_fetchers.get_exploration_by_id(
+                activity_id, strict=False, version=activity_version)
+        elif activity_type == constants.ACTIVITY_TYPE_STORY:
+            activity = story_fetchers.get_story_by_id(
+                activity_id, strict=False, version=activity_version)
+        elif activity_type == constants.ACTIVITY_TYPE_SKILL:
+            activity = skill_fetchers.get_skill_by_id(
+                activity_id, strict=False, version=activity_version)
+        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
+            topic_id, subtopic_page_id = activity_id.split('-')
+            activity = subtopic_page_services.get_subtopic_page_by_id(
+                topic_id,
+                int(subtopic_page_id),
+                strict=False,
+                version=activity_version
+            )
+        elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
+            if activity_version is not None:
+                raise self.InvalidInputException(
+                    'Version cannot be specified for classroom')
+            activity = classroom_config_services.get_classroom_by_url_fragment(
+                activity_id)
+        elif activity_type == 'exp_translations':
+            entity_type = feconf.TranslatableEntityType(
+                feconf.ENTITY_TYPE_EXPLORATION)
+            activity = translation_fetchers.get_entity_translation(
+                entity_type, activity_id, activity_version, language_code)
+        else:
+            activity = topic_fetchers.get_topic_by_id(
+                activity_id, strict=False, version=activity_version)
+
+        if activity is None:
+            raise self.PageNotFoundException('Activity does not exist')
+
         self.render_json(activity.to_dict())

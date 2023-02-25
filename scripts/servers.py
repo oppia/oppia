@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import contextlib
+import json
 import logging
 import os
 import re
@@ -149,6 +150,7 @@ def managed_dev_appserver(
     port: int = 8080,
     admin_host: str = '0.0.0.0',
     admin_port: int = 8000,
+    secrets: Optional[Dict[str, str]] = None,
     enable_host_checking: bool = True,
     automatic_restart: bool = False,
     skip_sdk_update_check: bool = False
@@ -167,6 +169,8 @@ def managed_dev_appserver(
         port: int. The lowest port to which application modules should bind.
         admin_host: str. The host name to which the admin server should bind.
         admin_port: int. The port to which the admin server should bind.
+        secrets: dict(). The dictionary of secrets to be available in the dev
+            server.
         enable_host_checking: bool. Whether to enforce HTTP Host checking for
             application modules, API server, and admin server. Host checking
             protects against DNS rebinding attacks, so only disable after
@@ -193,6 +197,8 @@ def managed_dev_appserver(
         '--dev_appserver_log_level', log_level,
         app_yaml_path
     ]
+    env = {} if env is None else env
+    env['SECRETS'] = json.dumps(secrets)
     with contextlib.ExitStack() as stack:
         # OK to use shell=True here because we are not passing anything that
         # came from an untrusted user, only other callers of the script,
@@ -369,31 +375,35 @@ def managed_redis_server() -> Iterator[psutil.Process]:
 
 def create_managed_web_browser(
     port: int
-) -> Optional[ContextManager[psutil.Process]]:
-    """Returns a context manager for a web browser targeting the given port on
+) -> ContextManager[psutil.Process]:
+    """Returns a ContextManager for a web browser targeting the given port on
     localhost. If a web browser cannot be opened on the current system by Oppia,
-    then returns None instead.
+    then raises an exception.
 
     Args:
         port: int. The port number to open in the web browser.
 
     Returns:
-        context manager|None. The context manager to a web browser window, or
-        None if the current operating system does not support web browsers.
+        ContextManager. The ContextManager to a web browser window if the
+        current operating system can be identified and a web browser can be
+        launched automatically.
+
+    Raises:
+        Exception. Unable to launch the web browser (this happens when the
+            Operating System cannot be identified).
     """
     url = 'http://localhost:%s/' % port
     human_readable_name = 'Web Browser'
     if common.is_linux_os():
-        if any(re.match('.*VBOX.*', d) for d in os.listdir('/dev/disk/by-id/')):
-            return None
-        else:
-            return managed_process(
-                ['xdg-open', url], human_readable_name=human_readable_name)
+        return managed_process(
+            ['xdg-open', url], human_readable_name=human_readable_name)
     elif common.is_mac_os():
         return managed_process(
             ['open', url], human_readable_name=human_readable_name)
     else:
-        return None
+        raise Exception(
+            'Unable to identify the Operating System and therefore, unable to '
+            'launch the web browser.')
 
 
 @contextlib.contextmanager

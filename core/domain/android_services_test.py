@@ -54,7 +54,7 @@ class AndroidBuildSecretTest(test_utils.GenericTestBase):
                 self.assertFalse(
                     android_services.verify_android_build_secret('secret'))
                 self.assertEqual(
-                    ['Mailchimp Webhook secret is not available.'], logs
+                    ['Android build secret is not available.'], logs
                 )
 
     def test_cloud_secrets_return_secret_passes(self) -> None:
