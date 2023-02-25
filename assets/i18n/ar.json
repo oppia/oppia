@@ -1052,7 +1052,7 @@
 	"I18N_TOPIC_VIEWER_MASTER_SKILLS": "تمرّس مهارات متعلقة بالموضوع <[topicName]>",
 	"I18N_TOPIC_VIEWER_NO_QUESTION_WARNING": "حاليا لا توجد أسئلة بعد ، حول هذه الوحدة.",
 	"I18N_TOPIC_VIEWER_PRACTICE": "الممارسة",
-	"I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG": "(بيتا)",
+	"I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG": "بيتا",
 	"I18N_TOPIC_VIEWER_QUESTIONS_UNAVAILABLE": "عد لاحقا عندما تصبح الأسئلة متواجدة حول هذا الموضوع.",
 	"I18N_TOPIC_VIEWER_REVISION": "مراجعة",
 	"I18N_TOPIC_VIEWER_SELECT_SKILLS": "حدد المهارة لتمرين<[topicName]> معرفتك عليها.",
