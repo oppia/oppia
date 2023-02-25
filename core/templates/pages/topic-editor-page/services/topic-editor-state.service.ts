@@ -94,11 +94,6 @@ export class TopicEditorStateService {
     private loaderService: LoaderService,
     private undoRedoService: UndoRedoService
   ) {
-    this._topic = new Topic(
-      'id', 'Topic name loading', 'Abbrev. name loading',
-      'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
-    );
     this._topicRights = new TopicRights(false, false, false);
     this._subtopicPage = new SubtopicPage(
       'id', 'topic_id', SubtopicPageContents.createDefault(), 'en');
@@ -141,7 +136,7 @@ export class TopicEditorStateService {
   }
 
   private _setTopic(topic: Topic): void {
-    this._topic.copyFromTopic(topic);
+    this._topic = topic.createCopyFromTopic();
     // Reset the subtopic pages list after setting new topic.
     this._cachedSubtopicPages.length = 0;
     if (this._topicIsInitialized) {
@@ -252,16 +247,16 @@ export class TopicEditorStateService {
       canonicalStorySummaries,
       newBackendTopicRightsObject
     ]) => {
+      this._updateTopic(
+        newBackendTopicObject.topicDict,
+        newBackendTopicObject.skillIdToDescriptionDict
+      );
       this._skillCreationIsAllowed = (
         newBackendTopicObject.skillCreationIsAllowed);
       this._skillQuestionCountDict = (
         newBackendTopicObject.skillQuestionCountDict);
       this._updateGroupedSkillSummaries(
         newBackendTopicObject.groupedSkillSummaries);
-      this._updateTopic(
-        newBackendTopicObject.topicDict,
-        newBackendTopicObject.skillIdToDescriptionDict
-      );
       this._updateGroupedSkillSummaries(
         newBackendTopicObject.groupedSkillSummaries);
       this._updateSkillIdToRubricsObject(
