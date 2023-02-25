@@ -1,4 +1,4 @@
-<div class="navbar-helper">
+<div class="navbar-helper" ng-if="$ctrl.topic">
   <div class="navbar-tabs">
     <div class="navbar-text">
       <[$ctrl.getNavbarText()]>
@@ -49,7 +49,7 @@
     </div>
   </div>
 </div>
-<div class="topic-editor-main">
+<div class="topic-editor-main" ng-if="$ctrl.topic">
   <div ng-if="$ctrl.getActiveTabName() === 'main' && $ctrl.getEntityType() === 'topic'">
     <topic-editor-tab></topic-editor-tab>
   </div>

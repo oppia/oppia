@@ -32,7 +32,8 @@ let testConstants = {
   },
   SignInDetails: {
     inputField: 'input.e2e-test-sign-in-email-input',
-  }
+  },
+  DEFAULT_SPEC_TIMEOUT: 300000
 };
 
 module.exports = testConstants;
