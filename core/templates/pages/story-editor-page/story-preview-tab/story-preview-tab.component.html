@@ -83,14 +83,13 @@
                 </image>
               </pattern>
             </defs>
-            <a xlink:href="getExplorationUrl(node)">
-              <rect width="192"
-                    height="108"
-                    x="0"
-                    y="0"
-                    attr.fill="url(#image2{{i}})">
-              </rect>
-            </a>
+            <rect [attr.href]="getExplorationUrl(node)"
+                  width="192"
+                  height="108"
+                  x="0"
+                  y="0"
+                  attr.fill="url(#image2{{i}})">
+            </rect>
           </svg>
         </div>
         <div class="story-text">

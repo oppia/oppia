@@ -87,13 +87,12 @@
                           <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
                         </filter>
                       </defs>
-                      <a xlink:href="getExplorationUrl(node)">
-                        <rect width="320"
-                              height="180"
-                              attr.fill="url(#image{{index}})"
-                              rx="4">
-                        </rect>
-                      </a>
+                      <rect [attr.href]="getExplorationUrl(node)"
+                            width="320"
+                            height="180"
+                            attr.fill="url(#image{{index}})"
+                            rx="4">
+                      </rect>
                     </svg>
 
                     <div class="oppia-story-viewer-card-description-box">
@@ -133,12 +132,11 @@
                           <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
                         </filter>
                       </defs>
-                      <a xlink:href="getExplorationUrl(node)">
-                        <rect width="192"
-                              height="108"
-                              attr.fill="url(#image2{{index}})"
-                        ></rect>
-                      </a>
+                      <rect [attr.href]="getExplorationUrl(node)"
+                            width="192"
+                            height="108"
+                            attr.fill="url(#image2{{index}})"
+                      ></rect>
                     </svg>
 
                     <div class="oppia-story-viewer-mobile-card-description-box">
