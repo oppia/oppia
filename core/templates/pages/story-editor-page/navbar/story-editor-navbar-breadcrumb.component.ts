@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { Story } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { WindowRef } from 'services/contextual/window-ref.service';

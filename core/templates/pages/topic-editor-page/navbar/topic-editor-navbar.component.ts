@@ -267,11 +267,17 @@ export class TopicEditorNavbarComponent implements OnInit,
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       ));
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       ));
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
@@ -280,14 +286,16 @@ export class TopicEditorNavbarComponent implements OnInit,
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicSkillIds = this.topic.getSkillIds();
     this.discardChangesButtonIsShown = false;
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       )
     );
   }

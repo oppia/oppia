@@ -82,7 +82,6 @@ import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObject
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from 'domain/exploration/ParamTypeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
@@ -129,7 +128,6 @@ import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFac
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
@@ -764,7 +762,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],
   ['ResponsesService', ResponsesService],
-  ['RuleObjectFactory', RuleObjectFactory],
   ['SVMPredictionService', SVMPredictionService],
   ['SchemaDefaultValueService', SchemaDefaultValueService],
   ['SchemaFormSubmittedService', SchemaFormSubmittedService],
@@ -833,7 +830,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryEditorStalenessDetectionService',
     StoryEditorStalenessDetectionService],
   ['StoryEditorStateService', StoryEditorStateService],
-  ['StoryObjectFactory', StoryObjectFactory],
   ['StoryUpdateService', StoryUpdateService],
   ['StoryValidationService', StoryValidationService],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
