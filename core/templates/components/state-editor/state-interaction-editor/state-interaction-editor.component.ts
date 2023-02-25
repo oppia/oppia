@@ -67,6 +67,7 @@ export class StateInteractionEditorComponent
   directiveSubscriptions = new Subscription();
   hasLoaded: boolean;
   interactionEditorIsShown: boolean;
+  showMe: boolean = true;
   interactionId: string;
   interactionIsDisabled: boolean;
   interactionPreviewHtml: string;
@@ -244,6 +245,10 @@ export class StateInteractionEditorComponent
     });
   }
 
+  toggleBtn(): void {
+    this.showMe = !this.showMe;
+  }
+
   toggleInteractionEditor(): void {
     this.interactionEditorIsShown = !this.interactionEditorIsShown;
   }
@@ -265,6 +270,7 @@ export class StateInteractionEditorComponent
 
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionEditorIsShown = true;
+    this.showMe = false;
     this.hasLoaded = false;
     this.customizationModalReopened = false;
     this.directiveSubscriptions.add(
