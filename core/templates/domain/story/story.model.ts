@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model class for creating and mutating instances of frontend
  * story domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
 
@@ -217,14 +214,8 @@ export class Story {
     this._urlFragment = otherStory.getUrlFragment();
     this.setMetaTagContent(otherStory.getMetaTagContent());
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StoryObjectFactory {
-  constructor() {}
-  createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
+  static createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,
       storyBackendDict.description, storyBackendDict.notes,
@@ -238,6 +229,3 @@ export class StoryObjectFactory {
     );
   }
 }
-
-angular.module('oppia').factory(
-  'StoryObjectFactory', downgradeInjectable(StoryObjectFactory));

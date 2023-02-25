@@ -104,6 +104,11 @@
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
                       <div class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-classroom-link nav-item-top-link">
+                        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+                           (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
+                           class="nav-item-left-head underline" tabindex="0">
+                           {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
+                        </a>
                         <div (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
                              class="nav-item-left-head">
                           <span class="underline">
@@ -144,12 +149,12 @@
                     </div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <span class="underline">
+                      <a class="underline nav-item-bottom-link" tabindex="0" href="/learn/math">
                         <span class="link">
                           {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
                         </span>
                         <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
-                      </span>
+                      </a>
                     </div>
                   </div>
                 </a>
