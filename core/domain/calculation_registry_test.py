@@ -39,7 +39,7 @@ class CalculationRegistryTests(test_utils.GenericTestBase):
     def test_get_calculation_by_id_when_calculations_dict_have_calculation_id(
         self) -> None:
         # Top5AnswerFrequencies is not present in calculations_dict,
-        # therefore Top5AnswerFrequencies will be inserted into calculations_dict.
+        # So Top5AnswerFrequencies will be inserted into calculations_dict.
         self.assertTrue(
             isinstance(
                 calculation_registry.Registry.get_calculation_by_id(
