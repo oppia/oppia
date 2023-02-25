@@ -75,7 +75,7 @@
   outline: 2px solid #0060df;
   text-decoration: underline;
 }
-a.delete-btn, a.delete-btn:hover, a.delete-btn:visited,a.delete-btn:active{
+a.delete-btn, a.delete-btn:hover, a.delete-btn:visited,a.delete-btn:active {
   color: #fff;
   text-decoration: none;
 }

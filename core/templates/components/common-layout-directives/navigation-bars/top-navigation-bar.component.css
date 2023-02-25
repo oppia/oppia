@@ -494,7 +494,7 @@
   background-color: #d7d7d7;
 }
 .oppia-navbar-dropdown-toggle:focus {
-  background-color: #ffffff;
+  background-color: #fff;
 }
 @media screen and (max-width: 880px) {
   .oppia-top-navigation-bar .oppia-logo-wide {

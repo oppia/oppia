@@ -339,13 +339,15 @@
         {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
+        <a href="/export-account-handler">
           <button type="button"
-                  tabindex="0"
+                  tabindex="-1"
                   class="btn btn-primary e2e-test-export-account-button focus-class"
                   title="Export account"
                   (click)="handleExportDataClick()">
                   {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
           </button>
+        </a>
         <span class="form-text oppia-form-text">
           {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate }}
         </span>
