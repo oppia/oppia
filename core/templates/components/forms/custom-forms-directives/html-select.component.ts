@@ -30,13 +30,18 @@ export class HtmlSelectComponent implements OnInit {
   @Input() selection!: string;
   @Output() onSelectionChange = new EventEmitter();
 
+  selectedOption: { id: string; val: string };
+
   ngOnInit(): void {
     if (!this.selection) {
-      this.selection = this.options[0].id;
+      this.selectedOption = this.options[0];
+    } else {
+      this.selectedOption = this.options.find(
+        option => option.id === this.selection);
     }
   }
 
   updatedSelection(): void {
-    this.onSelectionChange.emit(this.selection);
+    this.onSelectionChange.emit(this.selectedOption.id);
   }
 }

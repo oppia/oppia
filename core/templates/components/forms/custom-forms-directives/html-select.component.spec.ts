@@ -44,7 +44,7 @@ describe('HTML Select Component', () => {
   });
 
   it('should update Selection', () => {
-    component.selection = '1';
+    component.selectedOption = { id: '1', val: 'string' };
     spyOn(component.onSelectionChange, 'emit');
 
     component.updatedSelection();
