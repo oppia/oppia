@@ -118,7 +118,7 @@ classroom-page .oppia-classroom-page-subheading-text {
 
 @media(max-width: 1150px) {
   .oppia-topic-summary-tiles {
-    margin-bottom: -54px;
+    margin-bottom: 20vw;
   }
 
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
