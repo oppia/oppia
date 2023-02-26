@@ -1,11 +1,11 @@
 <mat-form-field class="oppia-html-select" appearance="fill">
   <mat-label>Parameter:</mat-label>
   <mat-select class="e2e-test-main-html-select-selector"
-              [(value)]="selectedOption"
+              [(value)]="selection"
               disableRipple>
     <mat-select-trigger>
       <oppia-rte-output-display class="oppia-html-select-option"
-                                [rteString]="selectedOption.val">
+                                [rteString]="selection.val">
       </oppia-rte-output-display>
     </mat-select-trigger>
     <mat-option class="e2e-test-html-select-selector"
