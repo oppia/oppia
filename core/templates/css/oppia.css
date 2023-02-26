@@ -994,6 +994,12 @@ textarea {
   border: none;
 }
 
+@media(max-width: 1050px) {
+  .oppia-navbar-breadcrumb {
+    display: none;
+  }
+}
+
 @media(max-width: 768px) {
   .oppia-navbar-breadcrumb > li, .oppia-navbar-breadcrumb {
     float: left;
