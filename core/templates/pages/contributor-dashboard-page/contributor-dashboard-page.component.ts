@@ -224,6 +224,10 @@ export class ContributorDashboardPageComponent
 
     // TODO(sll): Use constant values from
     // contributor-dashboard-page.constants.ts for below tabDetails.
+
+    // this.tabsDetails = {
+    //   ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
+    // } as unknown as ContributorDashboardTabsDetails;
     this.tabsDetails = {
       myContributionTab: {
         ariaLabel: 'Check your contributions.',

@@ -19,10 +19,6 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-// This throws "TS2307". We need to
-// suppress this error because uiValidate come from angular-ui-validate
-// dependency. We can't import it directly.
-// @ts-ignore
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [

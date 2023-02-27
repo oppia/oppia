@@ -41,6 +41,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { Rule } from 'domain/exploration/rule.model';
+import { InitializeAnswerGroups } from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;

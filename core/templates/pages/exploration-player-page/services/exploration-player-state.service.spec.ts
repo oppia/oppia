@@ -281,13 +281,13 @@ describe('Exploration Player State Service', () => {
     explorationPlayerStateService = TestBed
       .inject(ExplorationPlayerStateService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    playerTranscriptService = (playerTranscriptService) as
+    playerTranscriptService = playerTranscriptService as
       jasmine.SpyObj<PlayerTranscriptService>;
     statsReportingService = TestBed.inject(StatsReportingService);
-    statsReportingService = (statsReportingService) as
+    statsReportingService = statsReportingService as
       jasmine.SpyObj<StatsReportingService>;
     playthroughService = TestBed.inject(PlaythroughService);
-    playthroughService = (playthroughService) as
+    playthroughService = playthroughService as
       jasmine.SpyObj<PlaythroughService>;
     playerCorrectnessFeedbackEnabledService = TestBed.inject(
       PlayerCorrectnessFeedbackEnabledService);
@@ -295,10 +295,10 @@ describe('Exploration Player State Service', () => {
       playerCorrectnessFeedbackEnabledService) as
       jasmine.SpyObj<PlayerCorrectnessFeedbackEnabledService>;
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    explorationEngineService = (explorationEngineService) as
+    explorationEngineService = explorationEngineService as
       jasmine.SpyObj<ExplorationEngineService>;
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    questionPlayerEngineService = (questionPlayerEngineService) as
+    questionPlayerEngineService = questionPlayerEngineService as
       jasmine.SpyObj<QuestionPlayerEngineService>;
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService);
@@ -330,7 +330,7 @@ describe('Exploration Player State Service', () => {
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionObject = questionObjectFactory.createFromBackendDict(
       questionBackendDict);
-    urlService = (TestBed.inject(UrlService));
+    urlService = TestBed.inject(UrlService);
     diagnosticTestPlayerEngineService = TestBed.inject(
       DiagnosticTestPlayerEngineService);
   });

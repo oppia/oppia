@@ -60,7 +60,7 @@ implements ControlValueAccessor, Validator {
   @Input() disabled!: boolean;
   // Read-only property. The schema definition for each item in the list.
   @Input() itemSchema!: {
-    'ui_config': {'coding_mode': string | boolean; rows: number};
+    'ui_config': {'coding_mode': boolean; rows: number};
   } & Schema;
   // The length of the list. If not specified, the list is of arbitrary
   // length.
