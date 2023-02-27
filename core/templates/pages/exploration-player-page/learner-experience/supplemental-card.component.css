@@ -14,7 +14,7 @@ oppia-supplemental-card .conversation-skin-help-card {
   min-height: 50px;
   opacity: 1;
   padding: 12px;
-  right: 12px;
+  right: -42px;
   text-align: left;
   transition: all 350ms;
   /* The z-index value of leaflet map attribution is 1000, to make it go lower
@@ -36,7 +36,7 @@ oppia-supplemental-card .help-card-standard {
 }
 
 oppia-supplemental-card .conversation-skin-help-card .conversation-skin-oppia-avatar {
-  left: -15px;
+  right: -15px;
   top: 12px;
 }
 
