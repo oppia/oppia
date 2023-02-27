@@ -23,12 +23,17 @@ import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { AppConstants } from 'app.constants';
+import { Topic } from 'domain/topic/topic-object.model';
 
 describe('Create New Story Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
   var StoryEditorStateService = null;
+  var TopicEditorStateService = null;
+  var topic = new Topic(
+    '', '', '', '', '', '', [], [], [], 1, 1, [], 'str', '',
+    {}, false, '', '', []);
 
   importAllAngularServices();
 
@@ -55,9 +60,11 @@ describe('Create New Story Modal Controller', function() {
       '$uibModalInstance', ['close', 'dismiss']);
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
+    TopicEditorStateService = $injector.get('TopicEditorStateService');
 
     spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
       [{filename: 'a.png', image: 'faf'}]);
+    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
 
     $scope = $rootScope.$new();
     $controller('CreateNewStoryModalController', {
