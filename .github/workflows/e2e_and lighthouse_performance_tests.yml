@@ -237,7 +237,7 @@ jobs:
           ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
-      - uses: ./.github/actions/install-opp ia-dependencies
+      - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
