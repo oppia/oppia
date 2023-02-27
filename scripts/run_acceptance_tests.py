@@ -201,7 +201,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
 
 def main(args: Optional[List[str]] = None) -> None:
-    """Run acceptance tests"""
+    """Run acceptance tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
     with servers.managed_portserver():
