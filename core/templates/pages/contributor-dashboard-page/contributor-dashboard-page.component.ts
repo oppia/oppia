@@ -21,7 +21,7 @@ import { SafeUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { ContributorDashboardKey, ContributorDashboardTabsDetails, TabDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -48,10 +48,7 @@ export class ContributorDashboardPageComponent
   userCanReviewTranslationSuggestionsInLanguages!: string[];
   userCanReviewVoiceoverSuggestionsInLanguages!: string[];
   userCanReviewQuestions!: boolean;
-  tabsDetails!: {
-    [tabName in ContributorDashboardKey]: TabDetails;
-  };
-
+  tabsDetails!: ContributorDashboardTabsDetails;
   OPPIA_AVATAR_IMAGE_URL!: string;
   languageCode!: string;
   topicName!: string;
@@ -222,37 +219,10 @@ export class ContributorDashboardPageComponent
 
     this.activeTabName = 'myContributionTab';
 
-    // TODO(sll): Use constant values from
-    // contributor-dashboard-page.constants.ts for below tabDetails.
-
-    // this.tabsDetails = {
-    //   ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
-    // } as unknown as ContributorDashboardTabsDetails;
     this.tabsDetails = {
-      myContributionTab: {
-        ariaLabel: 'Check your contributions.',
-        tabName: 'My Contributions',
-        description: '',
-        customizationOptions: [],
-        enabled: true
-      },
-      submitQuestionTab: {
-        ariaLabel: 'See opportunities for adding new questions.',
-        tabName: 'Submit Question',
-        description: 'Submit a question for students to answer while ' +
-          'practicing that skill.',
-        customizationOptions: ['sort'],
-        enabled: false
-      },
-      translateTextTab: {
-        ariaLabel: 'See opportunities for translation.',
-        tabName: 'Translate Text',
-        description: 'Translate the lesson text to help non-English speakers ' +
-          'follow the lessons.',
-        customizationOptions: ['language', 'topic', 'sort'],
-        enabled: true
-      }
-    },
+      ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
+    // TODO(#13015): Remove use of unknown as a type.
+    } as unknown as ContributorDashboardTabsDetails;
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));
