@@ -624,6 +624,8 @@ def _update_suggestion(
 
     Args:
         suggestion: Suggestion. The suggestion to be updated.
+        validate_suggestion: bool. Whether to validate the suggestion before
+            saving it.
     """
     _update_suggestions([suggestion], validate_suggestion=validate_suggestion)
 
@@ -639,6 +641,8 @@ def _update_suggestions(
         suggestions: list(Suggestion). The suggestions to be updated.
         update_last_updated_time: bool. Whether to update the last_updated
             field of the suggestions.
+        validate_suggestion: bool. Whether to validate the suggestions before
+            saving them.
     """
     suggestion_ids = []
 
