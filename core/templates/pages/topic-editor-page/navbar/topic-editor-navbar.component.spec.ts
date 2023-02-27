@@ -103,7 +103,6 @@ describe('Topic Editor Navbar', () => {
       TestBed.inject(TopicRightsBackendApiService);
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');
     let skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
@@ -136,7 +135,6 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.warningsAreShown).toBeFalse();
     expect(componentInstance.showTopicEditOptions).toBeFalse();
     expect(componentInstance.topic).toEqual(topic);
-    expect(componentInstance.topicSkillIds).toEqual(['skill_1']);
     expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.topicRights).toEqual(
