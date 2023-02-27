@@ -4574,21 +4574,22 @@ class State(translation_domain.BaseTranslatableObject):
             ca_specs_dict = interaction_specs[interaction_id][
                 'customization_arg_specs']
             for spec in ca_specs_dict:
-                customisation_arg = customisation_args[spec['name']]
-                contents = (
-                    InteractionCustomizationArg.traverse_by_schema_and_get(
-                        spec['schema'], customisation_arg['value'], [
-                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
-                            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
-                        lambda x: x
+                if spec['name'] != 'catchMisspellings':
+                    customisation_arg = customisation_args[spec['name']]
+                    contents = (
+                        InteractionCustomizationArg.traverse_by_schema_and_get(
+                            spec['schema'], customisation_arg['value'], [
+                                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
+                                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+                            lambda x: x
+                        )
                     )
-                )
-                for content in contents:
-                    yield (
-                        content,
-                        translation_domain.ContentType.CUSTOMIZATION_ARG,
-                        spec['name']
-                    )
+                    for content in contents:
+                        yield (
+                            content,
+                            translation_domain.ContentType.CUSTOMIZATION_ARG,
+                            spec['name']
+                        )
 
     @classmethod
     def update_old_content_id_to_new_content_id_in_v54_states(
