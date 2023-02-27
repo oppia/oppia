@@ -101,11 +101,7 @@ export class LoginPageComponent implements OnInit {
     // specific type of error, we are unable to further optimise the
     // code by introducing more types of errors.
     } catch (error: unknown) {
-      if (error instanceof firebase.auth.Error) {
-        this.onSignInError(error as firebase.auth.Error);
-      } else {
-        throw error;
-      }
+      this.onSignInError(error as firebase.auth.Error);
       return;
     }
 
