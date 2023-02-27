@@ -48,6 +48,9 @@
   <section [hidden]="!reviewable"
            class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
+      Reviewer Name:
+      <input type="text" class="e2e-test-reviewer-name" [(ngModel)]="reviewerName">
+      <br>
       Review message (required if rejecting):
       <textarea class="e2e-test-suggestion-review-message w-100"
                 rows="3"
@@ -57,6 +60,9 @@
   </section>
   <div [hidden]="!(!reviewable && suggestionIsRejected)"
        class="oppia-suggestion-review-message">
+    <strong>Reviewer Name: </strong>
+      {{reviewerName}}
+      <br>
     <strong>Review message: </strong>
     <div class="oppia-review-message">
       {{reviewMessage}}

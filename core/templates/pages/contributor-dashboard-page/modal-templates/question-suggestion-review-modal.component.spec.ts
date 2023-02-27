@@ -540,6 +540,7 @@ describe('Question Suggestion Review Modal component', () => {
         expect(component.contentHtml).toBe(contentHtml);
         expect(component.reviewable).toBe(reviewable);
         expect(component.reviewMessage).toBe('');
+        expect(component.reviewerName).toBe('');
         expect(component.questionHeader).toBe(questionHeader);
         expect(component.canEditQuestion).toBe(false);
         expect(component.skillDifficultyLabel).toBe('Easy');
@@ -567,10 +568,10 @@ describe('Question Suggestion Review Modal component', () => {
         siteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
       component.reviewMessage = 'Review message example';
-
+      component.reviewerName = 'Reviewer Name example';
       component.accept();
       tick();
-
+``
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Question');
@@ -582,7 +583,7 @@ describe('Question Suggestion Review Modal component', () => {
         siteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
       component.reviewMessage = 'Review message example';
-
+      component.reviewerName = 'Reviewer Name example';
       component.reject();
       tick();
 
@@ -616,8 +617,8 @@ describe('Question Suggestion Review Modal component', () => {
     }];
 
     const messages = [
-      { text: 'Question submitted.' },
-      { text: 'This is a rejection.' }
+      { text: 'Question submitted.', authorUsername: 'user1' },
+      { text: 'This is a rejection.', authorUsername: 'user1' }
     ];
     component.reviewable = false;
     component.suggestionIsRejected = true;
@@ -635,6 +636,7 @@ describe('Question Suggestion Review Modal component', () => {
     expect(component._getThreadMessagesAsync).toHaveBeenCalled();
     expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('2');
     expect(component.reviewMessage).toBe('This is a rejection.');
+    expect(component.reviewerName).toBe('user1');
   }));
 
   it('should allow users to navigate between suggestions', fakeAsync(()=>{

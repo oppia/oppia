@@ -115,6 +115,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isLastItem!: boolean;
   isFirstItem: boolean = true;
   reviewMessage!: string;
+  reviewerName! : string;
   status!: string;
   subheading!: string;
   suggestionIdToContribution!: Record<string, ActiveContributionDict>;
@@ -257,6 +258,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         );
       });
     this.reviewMessage = '';
+    this.reviewerName = '';
     if (!this.reviewable) {
       this._getThreadMessagesAsync(this.activeSuggestionId);
     }
@@ -355,6 +357,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     // array contains the actual review message.
     if (threadMessages[1] !== undefined) {
       this.reviewMessage = threadMessages[1].text;
+      this.reviewerName = threadMessages[1].authorUsername;
     }
   }
 
@@ -429,7 +432,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       });
   }
 
-  rejectAndReviewNext(reviewMessage: string): void {
+  rejectAndReviewNext(reviewMessage: string, reviewerName: string): void {
     if (this.validatorsService.isValidReviewMessage(reviewMessage,
       /* ShowWarnings= */ true)) {
       this.resolvingSuggestion = true;
@@ -441,7 +444,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.contributionAndReviewService.reviewExplorationSuggestion(
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewMessage || this.reviewMessage, null,
+        reviewMessage || this.reviewMessage,reviewerName || this.reviewerName, null,
         this.resolveSuggestionAndUpdateModal.bind(this),
         (error) => {
           this.alertsService.clearWarnings();

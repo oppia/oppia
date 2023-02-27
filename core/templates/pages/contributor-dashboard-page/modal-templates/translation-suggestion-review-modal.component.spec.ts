@@ -228,6 +228,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.activeSuggestionId).toBe('suggestion_1');
         expect(component.activeSuggestion).toEqual(suggestion1);
         expect(component.reviewMessage).toBe('');
+        expect(component.reviewerName).toBe('');
       });
 
     it('should register Contributor Dashboard view suggestion for review ' +
@@ -258,6 +259,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
+      expect(component.reviewerName).toBe('');
       // Suggestion 1's exploration_content_html matches its content_html.
       expect(component.hasExplorationContentChanged()).toBe(false);
       expect(component.displayExplorationContent()).toEqual(
@@ -268,13 +270,14 @@ describe('Translation Suggestion Review Modal Component', function() {
         'registerContributorDashboardAcceptSuggestion');
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage, commitMessage,
+            targetId, suggestionId, action, reviewMessage, reviewerName, commitMessage,
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
       spyOn(activeModal, 'close');
 
       component.reviewMessage = 'Review message example';
+      component.reviewerName = 'Reviewer Name example';
       component.translationUpdated = true;
       component.acceptAndReviewNext();
 
@@ -282,6 +285,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.activeSuggestion).toEqual(suggestion2);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
+      expect(component.reviewerName).toBe('');
       // Suggestion 2's exploration_content_html does not match its
       // content_html.
       expect(component.hasExplorationContentChanged()).toBe(true);
@@ -298,6 +302,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           jasmine.any(Function), jasmine.any(Function));
 
       component.reviewMessage = 'Review message example 2';
+      component.reviewerName = 'Reviewer Name example 2';
       component.translationUpdated = false;
       component.acceptAndReviewNext();
 
@@ -320,10 +325,11 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
+      expect(component.reviewerName).toBe('');
 
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage, commitMessage,
+            targetId, suggestionId, action, reviewMessage,reviewerName, commitMessage,
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
@@ -333,13 +339,15 @@ describe('Translation Suggestion Review Modal Component', function() {
       spyOn(activeModal, 'close');
 
       component.reviewMessage = 'Review message example';
+      component.reviewerName = 'Reviewer Name example';
       component.translationUpdated = true;
-      component.rejectAndReviewNext(component.reviewMessage);
+      component.rejectAndReviewNext(component.reviewMessage, component.reviewerName);
 
       expect(component.activeSuggestionId).toBe('suggestion_2');
       expect(component.activeSuggestion).toEqual(suggestion2);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
+      expect(component.reviewerName).toBe('');
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -350,8 +358,9 @@ describe('Translation Suggestion Review Modal Component', function() {
           jasmine.any(Function));
 
       component.reviewMessage = 'Review message example 2';
+      component.reviewerName = 'Reviewer Name example 2';
       component.translationUpdated = false;
-      component.rejectAndReviewNext(component.reviewMessage);
+      component.rejectAndReviewNext(component.reviewMessage, component.reviewerName);
 
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
@@ -367,12 +376,13 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
+      expect(component.reviewerName).toBe('');
       spyOn(
         siteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage, commitMessage,
+            targetId, suggestionId, action, reviewMessage,reviewerName, commitMessage,
             successCallback, errorCallback) => {
           return Promise.reject(
             errorCallback('Pre accept validation failed.')
@@ -381,6 +391,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       spyOn(alertsService, 'addWarning');
 
       component.reviewMessage = 'Review message example';
+      component.reviewerName = 'Reviewer Name example';
       component.acceptAndReviewNext();
 
       expect(
@@ -637,6 +648,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.hasExplorationContentChanged()).toBe(true);
         expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect(component.reviewMessage).toBe('Review Message');
+        expect(component.reviewerName).toBe('Reviewer Name');
       }));
 
     it('should correctly determine whether the panel data is overflowing',
@@ -755,10 +767,11 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
+      expect(component.reviewerName).toBe('');
 
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage, commitMessage,
+            targetId, suggestionId, action, reviewMessage,reviewerName, commitMessage,
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
@@ -768,7 +781,8 @@ describe('Translation Suggestion Review Modal Component', function() {
       spyOn(activeModal, 'close');
 
       component.reviewMessage = 'Review message example';
-      component.rejectAndReviewNext(component.reviewMessage);
+      component.reviewerName = 'Reviewer Name example';
+      component.rejectAndReviewNext(component.reviewMessage, component.reviewerName);
 
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)

@@ -107,6 +107,7 @@ export class QuestionSuggestionReviewModalComponent
   @Input() suggestionId!: string;
   @Input() misconceptionsBySkill!: MisconceptionSkillMap;
   reviewMessage!: string;
+  reviewerName! : string;
   questionStateData!: State;
   canEditQuestion!: boolean;
   skillDifficultyLabel!: string;
@@ -210,7 +211,8 @@ export class QuestionSuggestionReviewModalComponent
     this.suggestionModalService.rejectSuggestion(
       this.ngbActiveModal, {
         action: AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewMessage: this.reviewMessage
+        reviewMessage: this.reviewMessage,
+        reviewerName: this.reviewerName
       } as ParamDict);
   }
 
@@ -223,6 +225,7 @@ export class QuestionSuggestionReviewModalComponent
       this.ngbActiveModal, {
         action: AppConstants.ACTION_ACCEPT_SUGGESTION,
         reviewMessage: this.reviewMessage,
+        reviewerName: this.reviewerName,
         skillDifficulty: this.skillDifficulty
       });
   }
@@ -317,6 +320,8 @@ export class QuestionSuggestionReviewModalComponent
       const threadMessageBackendDicts = response.messages;
       this.reviewMessage = threadMessageBackendDicts.map(
         m => ThreadMessage.createFromBackendDict(m))[1].text;
+      const reviewerName = threadMessageBackendDicts.map(
+        m => ThreadMessage.createFromBackendDict(m))[0].authorUsername;
     });
   }
 
@@ -369,6 +374,7 @@ export class QuestionSuggestionReviewModalComponent
     this.isLastItem = this.remainingContributionIdStack.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
     this.reviewMessage = '';
+    this.reviewerName = '';
 
     this.refreshContributionState();
   }

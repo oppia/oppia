@@ -25,6 +25,7 @@ export interface ParamDict {
   audioUpdateRequired?: boolean;
   commitMessage?: string;
   reviewMessage: string;
+  reviewerName: string;
   skillDifficulty?: number;
 }
 
