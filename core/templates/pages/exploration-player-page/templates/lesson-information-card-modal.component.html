@@ -34,7 +34,7 @@
           </div>
           <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
                [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
-            {{ idx + 1 }}
+              {{ ((idx + 1) / checkpointStatusArray.length) * 100 | percent: '1.2-2' }}%
           </div>
         </div>
         <p *ngIf="translatedCongratulatoryCheckpointMessage"
