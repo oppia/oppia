@@ -16,7 +16,7 @@
  * @fileoverview Constants for the creator dashboard page.
  */
 
- interface TabDetails {
+interface TabDetails {
   ariaLabel: string;
   tabName: string;
   description: string;
