@@ -30,7 +30,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Change, TopicChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-import { Topic } from 'core/templates/domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { ShortSkillSummary } from 'core/templates/domain/skill/short-skill-summary.model';
 import { SubtitledHtml } from 'core/templates/domain/exploration/subtitled-html.model';
 import { SubtopicPage } from 'core/templates/domain/topic/subtopic-page.model';

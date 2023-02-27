@@ -22,7 +22,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -297,8 +297,6 @@ describe('State Responses Component', () => {
         callback(null, null);
       });
     spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
-      .and.stub();
 
     const event = {
       previousIndex: 1,
@@ -306,13 +304,8 @@ describe('State Responses Component', () => {
     };
     component.drop(event as CdkDragSortEvent<AnswerGroup[]>);
     component.sendOnSaveNextContentIdIndex(0);
-    component.sendshowMarkAllAudioAsNeedingUpdateModalIfRequired([]);
-
     expect(responsesService.save).toHaveBeenCalled();
     expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalledWith(0);
-    expect(
-      component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalledWith([]);
   });
 
   it('should set component properties on initialization', () => {

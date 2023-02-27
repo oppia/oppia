@@ -30,7 +30,7 @@ import { SubtopicPage, SubtopicPageBackendDict } from 'domain/topic/subtopic-pag
 import { SkillIdToDescriptionMap } from 'domain/topic/subtopic.model';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicRights, TopicRightsBackendDict } from 'domain/topic/topic-rights.model';
-import { Topic, TopicBackendDict, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
 import cloneDeep from 'lodash/cloneDeep';
 import { AlertsService } from 'services/alerts.service';
 import { TopicDeleteCanonicalStoryChange, TopicDeleteAdditionalStoryChange }
@@ -90,16 +90,10 @@ export class TopicEditorStateService {
     private alertsService: AlertsService,
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private editableTopicBackendApiService: EditableTopicBackendApiService,
-    private topicObjectFactory: TopicObjectFactory,
     private topicRightsBackendApiService: TopicRightsBackendApiService,
     private loaderService: LoaderService,
     private undoRedoService: UndoRedoService
   ) {
-    this._topic = new Topic(
-      'id', 'Topic name loading', 'Abbrev. name loading',
-      'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
-    );
     this._topicRights = new TopicRights(false, false, false);
     this._subtopicPage = new SubtopicPage(
       'id', 'topic_id', SubtopicPageContents.createDefault(), 'en');
@@ -142,7 +136,7 @@ export class TopicEditorStateService {
   }
 
   private _setTopic(topic: Topic): void {
-    this._topic.copyFromTopic(topic);
+    this._topic = topic.createCopyFromTopic();
     // Reset the subtopic pages list after setting new topic.
     this._cachedSubtopicPages.length = 0;
     if (this._topicIsInitialized) {
@@ -171,7 +165,7 @@ export class TopicEditorStateService {
       newBackendTopicDict: TopicBackendDict,
       skillIdToDescriptionDict: SkillIdToDescriptionMap): void {
     this._setTopic(
-      this.topicObjectFactory.create(
+      Topic.create(
         newBackendTopicDict, skillIdToDescriptionDict));
   }
 
@@ -253,16 +247,16 @@ export class TopicEditorStateService {
       canonicalStorySummaries,
       newBackendTopicRightsObject
     ]) => {
+      this._updateTopic(
+        newBackendTopicObject.topicDict,
+        newBackendTopicObject.skillIdToDescriptionDict
+      );
       this._skillCreationIsAllowed = (
         newBackendTopicObject.skillCreationIsAllowed);
       this._skillQuestionCountDict = (
         newBackendTopicObject.skillQuestionCountDict);
       this._updateGroupedSkillSummaries(
         newBackendTopicObject.groupedSkillSummaries);
-      this._updateTopic(
-        newBackendTopicObject.topicDict,
-        newBackendTopicObject.skillIdToDescriptionDict
-      );
       this._updateGroupedSkillSummaries(
         newBackendTopicObject.groupedSkillSummaries);
       this._updateSkillIdToRubricsObject(

@@ -25,7 +25,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicRightsBackendApiService, TopicRightsBackendResponse } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -103,7 +103,6 @@ describe('Topic Editor Navbar', () => {
       TestBed.inject(TopicRightsBackendApiService);
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');
     let skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
@@ -136,7 +135,6 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.warningsAreShown).toBeFalse();
     expect(componentInstance.showTopicEditOptions).toBeFalse();
     expect(componentInstance.topic).toEqual(topic);
-    expect(componentInstance.topicSkillIds).toEqual(['skill_1']);
     expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.topicRights).toEqual(
@@ -652,4 +650,23 @@ describe('Topic Editor Navbar', () => {
     expect(alertsService.addSuccessMessage)
       .toHaveBeenCalledWith('Mail Sent.', 1000);
   }));
+
+  it('should return all the warnings when called', () => {
+    componentInstance.topic = topic;
+    componentInstance._validateTopic();
+    expect(componentInstance.getAllTopicWarnings()).toEqual([
+      'Topic url fragment is not valid.',
+      'Topic should have a thumbnail.',
+      'Subtopic with title subtopic1 does not have any skill IDs linked.',
+      'Topic should have page title fragment.',
+      'Topic should have meta tag content.',
+      'Subtopic subtopic1 should have a thumbnail.'
+    ].join('\n'));
+  });
+
+  it('should return true or false when called', () => {
+    componentInstance.topic = topic;
+    componentInstance._validateTopic();
+    expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
+  });
 });

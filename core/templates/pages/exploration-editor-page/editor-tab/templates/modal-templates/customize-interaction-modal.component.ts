@@ -16,7 +16,7 @@
  * @fileoverview Component for the Customize Interaction Modal Component.
  */
 
-import { AfterContentChecked, ChangeDetectorRef, EventEmitter, Component, Injector, OnInit, Output } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, Injector, OnInit } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { SchemaConstants } from 'components/forms/schema-based-editors/schema.constants';
@@ -28,7 +28,6 @@ import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/serv
 import { ContextService } from 'services/context.service';
 import { Schema } from 'services/schema-default-value.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 import { ConfirmLeaveModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
 import { InteractionDetailsCacheService } from '../../services/interaction-details-cache.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
@@ -58,6 +57,7 @@ import { RatioExpressionInputValidationService } from 'interactions/RatioExpress
 import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { ImageWithRegions } from 'interactions/customization-args-defs';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 interface DefaultValueHtml {
   content_id: string;
@@ -139,9 +139,6 @@ const INTERACTION_SERVICE_MAPPING = {
 })
 export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal implements OnInit, AfterContentChecked {
-  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
-    EventEmitter<string[]> = new EventEmitter();
-
   customizationArgSpecs: CustomizationArgSpecsInterface[];
   originalContentIdToContent: object;
   hasCustomizationArgs: boolean;
@@ -162,7 +159,7 @@ export class CustomizeInteractionModalComponent
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
     public stateInteractionIdService: StateInteractionIdService,
-    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private generateContentIdService: GenerateContentIdService,
     private urlInterpolationService: UrlInterpolationService,
   ) {
     super(ngbActiveModal);
@@ -319,10 +316,7 @@ export class CustomizeInteractionModalComponent
       if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
         if ((value as SubtitledHtml|SubtitledUnicode).contentId === null) {
           (value as SubtitledHtml|SubtitledUnicode).contentId = (
-            `${contentIdPrefix}_${
-              this.stateNextContentIdIndexService.displayed}`
-          );
-          this.stateNextContentIdIndexService.displayed += 1;
+            this.generateContentIdService.getNextStateId(contentIdPrefix));
         }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (
@@ -404,22 +398,6 @@ export class CustomizeInteractionModalComponent
   }
 
   save(): void {
-    const contentIdsWithModifiedContent = [];
-    const updatedContentIdToContent = this.getContentIdToContent();
-
-    Object.keys(this.originalContentIdToContent).forEach(contentId => {
-      if (
-        this.originalContentIdToContent.hasOwnProperty(contentId) &&
-        updatedContentIdToContent.hasOwnProperty(contentId) &&
-        (this.originalContentIdToContent[contentId] !==
-          updatedContentIdToContent[contentId])
-      ) {
-        contentIdsWithModifiedContent.push(contentId);
-      }
-    });
-    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
-      contentIdsWithModifiedContent);
-
     this.populateNullContentIds();
     this.editorFirstTimeEventsService.registerFirstSaveInteractionEvent();
     this.ngbActiveModal.close();

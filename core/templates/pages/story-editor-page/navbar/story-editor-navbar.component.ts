@@ -20,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
-import { Story } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
@@ -95,6 +95,16 @@ export class StoryEditorNavbarComponent implements OnInit {
     return (
       this.getChangeListLength() > 0 &&
       this.getWarningsCount() === 0);
+  }
+
+  isWarningTooltipDisabled(): boolean {
+    return this.isStorySaveable() || this.getTotalWarningsCount() === 0;
+  }
+
+  getAllStoryWarnings(): string {
+    return this.validationIssues.concat(
+      this.explorationValidationIssues
+    ).concat(this.prepublishValidationIssues).join('\n');
   }
 
   discardChanges(): void {

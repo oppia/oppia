@@ -19,7 +19,7 @@
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { TopicEditorStateService } from './topic-editor-state.service';
 import { TopicEditorRoutingService } from './topic-editor-routing.service';
 import { EntityCreationService } from './entity-creation.service';
@@ -58,7 +58,6 @@ describe('Entity creation service', () => {
         TopicEditorStateService,
         TopicEditorRoutingService,
         CreateNewSkillModalService,
-        TopicObjectFactory,
         {
           provide: NgbModal,
           useClass: MockNgbModal

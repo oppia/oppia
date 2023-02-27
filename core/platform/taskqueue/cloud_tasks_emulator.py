@@ -23,11 +23,13 @@ https://github.com/doitintl/Cloud-Tasks-In-Process-Emulator
 
 from __future__ import annotations
 
-import datetime  # pylint: disable=unused-import
 import threading
 import time
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
+
+if TYPE_CHECKING:  # pragma: no cover
+    import datetime
 
 
 class Task:

@@ -18,11 +18,9 @@
 
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { JoyrideService } from 'ngx-joyride';
 import cloneDeep from 'lodash/cloneDeep';
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
 import { StateTutorialFirstTimeService } from '../services/state-tutorial-first-time.service';
 import { EditabilityService } from 'services/editability.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -45,6 +43,8 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StateEditorRefreshService } from '../services/state-editor-refresh.service';
 import { LoaderService } from 'services/loader.service';
 import { GraphDataService } from '../services/graph-data.service';
+import { ExplorationNextContentIdIndexService } from '../services/exploration-next-content-id-index.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { VersionHistoryService } from '../services/version-history.service';
 import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -78,29 +78,31 @@ export class ExplorationEditorTabComponent
     ];
 
     constructor(
-     public editabilityService: EditabilityService,
-     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
-     private siteAnalyticsService: SiteAnalyticsService,
-     private explorationStatesService: ExplorationStatesService,
-     private userExplorationPermissionsService:
-       UserExplorationPermissionsService,
-     private stateEditorService: StateEditorService,
-     private explorationFeaturesService: ExplorationFeaturesService,
-     private routerService: RouterService,
-     private ngbModal: NgbModal,
-     public stateCardIsCheckpointService: StateCardIsCheckpointService,
-     private explorationInitStateNameService: ExplorationInitStateNameService,
-     private explorationWarningsService: ExplorationWarningsService,
-     private explorationCorrectnessFeedbackService:
-       ExplorationCorrectnessFeedbackService,
-     private focusManagerService: FocusManagerService,
-     private stateEditorRefreshService: StateEditorRefreshService,
-     private loaderService: LoaderService,
-     private graphDataService: GraphDataService,
-     private joyride: JoyrideService,
-     private versionHistoryService: VersionHistoryService,
-     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
-     private contextService: ContextService
+      private editabilityService: EditabilityService,
+      private explorationNextContentIdIndexService:
+        ExplorationNextContentIdIndexService,
+      private generateContentIdService: GenerateContentIdService,
+      private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
+      private siteAnalyticsService: SiteAnalyticsService,
+      private explorationStatesService: ExplorationStatesService,
+      private userExplorationPermissionsService:
+        UserExplorationPermissionsService,
+      private stateEditorService: StateEditorService,
+      private explorationFeaturesService: ExplorationFeaturesService,
+      private routerService: RouterService,
+      public stateCardIsCheckpointService: StateCardIsCheckpointService,
+      private explorationInitStateNameService: ExplorationInitStateNameService,
+      private explorationWarningsService: ExplorationWarningsService,
+      private explorationCorrectnessFeedbackService:
+        ExplorationCorrectnessFeedbackService,
+      private focusManagerService: FocusManagerService,
+      private stateEditorRefreshService: StateEditorRefreshService,
+      private loaderService: LoaderService,
+      private graphDataService: GraphDataService,
+      private joyride: JoyrideService,
+      private versionHistoryService: VersionHistoryService,
+      private versionHistoryBackendApiService: VersionHistoryBackendApiService,
+      private contextService: ContextService
     ) { }
 
     startTutorial(): void {
@@ -215,10 +217,8 @@ export class ExplorationEditorTabComponent
         cloneDeep(displayedValue));
     }
 
-    saveNextContentIdIndex(displayedValue: number): void {
-      this.explorationStatesService.saveNextContentIdIndex(
-        this.stateEditorService.getActiveStateName(),
-        cloneDeep(displayedValue));
+    saveNextContentIdIndex(): void {
+      this.explorationNextContentIdIndexService.saveDisplayedValue();
     }
 
     saveSolution(displayedValue: Solution | SubtitledHtml): void {
@@ -246,46 +246,6 @@ export class ExplorationEditorTabComponent
 
       this.stateEditorService.setSolicitAnswerDetails(
         cloneDeep(displayedValue));
-    }
-
-    showMarkAllAudioAsNeedingUpdateModalIfRequired(
-        contentIds: string[]): void {
-      let stateName = this.stateEditorService.getActiveStateName();
-      let state = this.explorationStatesService.getState(stateName);
-      let recordedVoiceovers = state.recordedVoiceovers;
-      let writtenTranslations = state.writtenTranslations;
-      const shouldPrompt = contentIds.some(contentId => {
-        return (
-          recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
-         writtenTranslations.hasUnflaggedWrittenTranslations(contentId));
-      });
-
-      if (shouldPrompt) {
-        this.ngbModal.open(
-          MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent, {
-            backdrop: 'static',
-          }).result.then(() => {
-          contentIds.forEach(contentId => {
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-              recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                contentId);
-              this.explorationStatesService.saveRecordedVoiceovers(
-                stateName, recordedVoiceovers);
-            }
-            if (writtenTranslations.hasUnflaggedWrittenTranslations(
-              contentId)) {
-              writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                contentId);
-              this.explorationStatesService
-                .markWrittenTranslationsAsNeedingUpdate(
-                  contentId, stateName);
-            }
-          });
-        }, () => {
-          // This callback is triggered when the Cancel button is
-          // clicked. No further action is needed.
-        });
-      }
     }
 
     navigateToState(stateName: string): void {
@@ -463,6 +423,13 @@ export class ExplorationEditorTabComponent
 
       this.interactionIsShown = false;
       this.removeTutorialSaveButtonIfNoPermissions();
+      this.generateContentIdService.init(() => {
+        let indexToUse = this.explorationNextContentIdIndexService.displayed;
+        this.explorationNextContentIdIndexService.displayed += 1;
+        return indexToUse;
+      }, () => {
+        this.explorationNextContentIdIndexService.restoreFromMemento();
+      });
     }
 
     ngOnDestroy(): void {

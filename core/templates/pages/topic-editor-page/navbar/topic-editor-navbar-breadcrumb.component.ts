@@ -17,8 +17,9 @@
  */
 
 import { Component } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 
@@ -37,6 +38,8 @@ export class TopicEditorNavbarBreadcrumbComponent {
     private topicEditorStateService: TopicEditorStateService
   ) {}
 
+  directiveSubscriptions = new Subscription();
+
   canNavigateToTopicEditorPage(): boolean {
     const activeTab = this.topicEditorRoutingService.getActiveTabName();
     return (
@@ -49,6 +52,18 @@ export class TopicEditorNavbarBreadcrumbComponent {
   }
 
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onTopicInitialized.subscribe(
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+        }
+      ));
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onTopicReinitialized.subscribe(
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+        }
+      ));
     this.topic = this.topicEditorStateService.getTopic();
   }
 }

@@ -29,7 +29,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UrlService } from 'services/contextual/url.service';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { Topic } from 'domain/topic/TopicObjectFactory';
+import { Topic } from 'domain/topic/topic-object.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -149,6 +149,15 @@ export class TopicEditorNavbarComponent {
     );
   }
 
+  isWarningTooltipDisabled(): boolean {
+    return this.isTopicSaveable() || this.getTotalWarningsCount() === 0;
+  }
+
+  getAllTopicWarnings(): string {
+    return this.validationIssues.concat(
+    ).concat(this.prepublishValidationIssues).join('\n');
+  }
+
   toggleDiscardChangeButton(): void {
     this.showTopicEditOptions = false;
     this.discardChangesButtonIsShown = (
@@ -254,11 +263,17 @@ export class TopicEditorNavbarComponent {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       ));
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       ));
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
@@ -267,14 +282,16 @@ export class TopicEditorNavbarComponent {
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicSkillIds = this.topic.getSkillIds();
     this.discardChangesButtonIsShown = false;
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       )
     );
   }

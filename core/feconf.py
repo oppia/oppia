@@ -27,11 +27,6 @@ from core.constants import constants
 
 from typing import Callable, Dict, Final, List, TypedDict, Union
 
-MYPY = False
-if MYPY:  # pragma: no cover
-    # Here, we are importing 'state_domain' only for type checking.
-    from core.domain import state_domain
-
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
@@ -224,6 +219,12 @@ ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 # The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
 
+MAX_CHARS_IN_BLOG_POST_URL = (
+    constants.MAX_CHARS_IN_BLOG_POST_TITLE
+    + len('-')
+    + constants.BLOG_POST_ID_LENGTH
+)
+
 ALLOWED_TRAINING_JOB_STATUS_CHANGES: Dict[str, List[str]] = {
     TRAINING_JOB_STATUS_COMPLETE: [],
     TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
@@ -337,7 +338,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 54
+CURRENT_STATE_SCHEMA_VERSION = 55
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -407,29 +408,11 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
-# Default content id for the state's content.
-DEFAULT_NEW_STATE_CONTENT_ID = 'content'
-# Default content id for the interaction's default outcome.
-DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # Content id assigned to rule inputs that do not match any interaction
 # customization argument choices.
 INVALID_CONTENT_ID = 'invalid_content_id'
-# Default recorded_voiceovers dict for a default state template.
-DEFAULT_RECORDED_VOICEOVERS: state_domain.RecordedVoiceoversDict = {
-    'voiceovers_mapping': {
-        'content': {},
-        'default_outcome': {}
-    }
-}
-# Default written_translations dict for a default state template.
-DEFAULT_WRITTEN_TRANSLATIONS: state_domain.WrittenTranslationsDict = {
-    'translations_mapping': {
-        'content': {},
-        'default_outcome': {}
-    }
-}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -439,6 +422,8 @@ DEFAULT_AUTO_TTS_ENABLED = False
 # Whether new explorations should have correctness-feedback enabled
 # by default.
 DEFAULT_CORRECTNESS_FEEDBACK_ENABLED = True
+# Default value for next_content_id_index in exploration/question.
+DEFUALT_NEXT_CONTENT_ID_INDEX = 0
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -533,20 +518,13 @@ EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
 EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
-# with the Mailgun API key.
-MAILGUN_API_KEY = None
-# If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
 # Audience ID of the mailing list for Oppia in Mailchimp.
 MAILCHIMP_AUDIENCE_ID = None
-# Mailchimp API Key.
-MAILCHIMP_API_KEY = None
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
-# Mailchimp secret, used to authenticate webhook requests.
-MAILCHIMP_WEBHOOK_SECRET = None
 # Valid Mailchimp merge keys.
 VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
@@ -921,6 +899,7 @@ BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
 BLOG_HOMEPAGE_URL = '/blog'
 BLOG_SEARCH_DATA_URL = '/blog/searchhandler/data'
+BLOG_TITLE_HANDLER = '/blogtitlehandler/data'
 BLOG_AUTHOR_PROFILE_PAGE_URL_PREFIX = '/blog/author'
 BLOG_AUTHOR_PROFILE_PAGE_DATA_URL_PREFIX = '/blog/author/data'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
@@ -936,6 +915,7 @@ CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
 CONTRIBUTOR_STATS_SUMMARIES_URL = '/contributorstatssummaries'
 CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = '/contributorallstatssummaries'
+CONTRIBUTOR_CERTIFICATE_URL = '/contributorcertificate'
 CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
@@ -1611,6 +1591,9 @@ CONTRIBUTION_SUBTYPE_REVIEW: Final = 'review'
 CONTRIBUTION_SUBTYPE_EDIT: Final = 'edit'
 CONTRIBUTION_SUBTYPE_SUBMISSION: Final = 'submission'
 
+TRANSLATION_TEAM_LEAD = 'Anubhuti Varshney'
+QUESTION_TEAM_LEAD = 'Jatin Kumar Jadoun'
+
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
     'suggestion_type', 'target_type', 'target_id', 'status', 'author_id',
@@ -1638,6 +1621,9 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# The sort keys of submitted questions shown on the Contributor Dashboard.
+SUGGESTIONS_SORT_KEYS = [constants.SUGGESTIONS_SORT_KEY_DATE]
+
 # Prefix for all access validation handlers.
 # The naming scheme for access validation handlers is
 # '/access_validation_handler/<handler_name>'
@@ -1664,6 +1650,8 @@ COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 # BaseTranslatableObject.
 ContentValueType = Union[str, List[str]]
 
+MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 10
+
 
 class TranslatableEntityType(enum.Enum):
     """Represents all possible entity types which support new translations
@@ -1679,3 +1667,4 @@ class TranslatedContentDict(TypedDict):
 
     content_value: ContentValueType
     needs_update: bool
+    content_format: str

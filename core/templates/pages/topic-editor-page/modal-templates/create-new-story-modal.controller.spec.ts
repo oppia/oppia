@@ -22,14 +22,18 @@ import { TestBed } from '@angular/core/testing';
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
-import CONSTANTS from 'assets/constants';
+import { AppConstants } from 'app.constants';
+import { Topic } from 'domain/topic/topic-object.model';
 
 describe('Create New Story Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
   var StoryEditorStateService = null;
+  var TopicEditorStateService = null;
+  var topic = new Topic(
+    '', '', '', '', '', '', [], [], [], 1, 1, [], 'str', '',
+    {}, false, '', '', []);
 
   importAllAngularServices();
 
@@ -56,9 +60,11 @@ describe('Create New Story Modal Controller', function() {
       '$uibModalInstance', ['close', 'dismiss']);
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
+    TopicEditorStateService = $injector.get('TopicEditorStateService');
 
     spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
       [{filename: 'a.png', image: 'faf'}]);
+    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
 
     $scope = $rootScope.$new();
     $controller('CreateNewStoryModalController', {
@@ -72,7 +78,7 @@ describe('Create New Story Modal Controller', function() {
     expect($scope.story.title).toBe('');
     expect($scope.story.description).toBe('');
     expect($scope.MAX_CHARS_IN_STORY_TITLE).toBe(
-      CONSTANTS.MAX_CHARS_IN_STORY_TITLE);
+      AppConstants.MAX_CHARS_IN_STORY_TITLE);
   });
 
   it('should check if url fragment already exists', function() {

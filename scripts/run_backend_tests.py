@@ -149,9 +149,10 @@ def run_shell_cmd(
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env)
     last_stdout_bytes, last_stderr_bytes = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
-    # compatible with rest of the code.
-    last_stdout_str = last_stdout_bytes.decode('utf-8')
-    last_stderr_str = last_stderr_bytes.decode('utf-8')
+    # compatible with rest of the code. Sometimes we get invalid bytes, in which
+    # case we replace them with U+FFFD.
+    last_stdout_str = last_stdout_bytes.decode('utf-8', 'replace')
+    last_stderr_str = last_stderr_bytes.decode('utf-8', 'replace')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
@@ -209,16 +210,6 @@ class TestingTaskSpec:
             # see that.
             if 'ev_epollex_linux.cc' in str(e):
                 result = run_shell_cmd(exc_list, env=env)
-            # We exempt this block from coverage since it's just added for
-            # debugging a backend flake.
-            elif 'invalid start byte' in str(e):  # pragma: no cover
-                # We sometimes get a UnicodeDecodeError with an "invalid start
-                # byte" message, and this can sometimes happen when trying to
-                # read a non-unicode file. To help debug this issue, print some
-                # more information before failing. See #16600 for details.
-                print('[Debug invalid start byte flake] Command:', exc_list)
-                print('[Debug invalid start byte flake] Environment:', env)
-                raise e
             else:
                 raise e
 
@@ -452,14 +443,32 @@ def check_test_results(
                 if (
                         spec.test_target not in coverage_exclusions
                         and float(coverage) != 100.0):
-                    print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
-                        coverage, spec.test_target))
                     incomplete_coverage += 1
-                    print(task.task_results[0].get_report()[-3])
-
         total_count += test_count
 
     return total_count, total_errors, total_failures, incomplete_coverage
+
+
+def print_coverage_report(
+    tasks: List[concurrent_task_utils.TaskThread],
+    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
+    ) -> int:
+    """Run tests and parse coverage reports."""
+    incomplete_coverage = 0
+    coverage_exclusions = load_coverage_exclusion_list(
+    COVERAGE_EXCLUSION_LIST_PATH)
+    for task in tasks:
+        if task.finished and not task.exception:
+            coverage = task.task_results[0].get_report()[-2]
+            spec = task_to_taskspec[task]
+            if (
+                    spec.test_target not in coverage_exclusions
+                    and float(coverage) != 100.0):
+                print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
+                    coverage, spec.test_target))
+                incomplete_coverage += 1
+                print(task.task_results[0].get_report()[-3])
+    return incomplete_coverage
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -570,6 +579,8 @@ def main(args: Optional[List[str]] = None) -> None:
         print('(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
     else:
         print('All tests passed.')
+        # Add one line for aesthetics.
+        print('')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
@@ -577,6 +588,9 @@ def main(args: Optional[List[str]] = None) -> None:
     if total_errors or total_failures:
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
+
+    if parsed_args.generate_coverage_report:
+        print_coverage_report(tasks, task_to_taskspec)
 
     if incomplete_coverage:
         raise Exception(

@@ -8,6 +8,18 @@
   margin-bottom: 15px;
 }
 
+.oppia-footer-social h3 {
+  color: #fff;
+  font-size: 1em;
+  font-weight: 700;
+  margin: 1.33em 0;
+  text-transform: uppercase;
+}
+
+.oppia-footer-social a {
+  color: #fff;
+}
+
 .oppia-footer-social a:hover,
 .oppia-footer-social a:focus {
   text-decoration: none;
@@ -52,11 +64,8 @@
   position: relative;
 }
 
-.oppia-footer-social .oppia-android-app-button {
-  border: 1px solid;
-  color: #fff;
+.oppia-footer-social a .oppia-android-app-button {
+  display: block;
   margin-top: 20px;
-  padding: 5px;
-  text-align: center;
-  width: 140px;
+  width: auto;
 }
