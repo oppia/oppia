@@ -218,8 +218,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             # changes to happen while the e2e tests are running.
             automatic_restart=False,
             skip_sdk_update_check=True,
-            env={
-                **os.environ,
+            additional_env={
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 

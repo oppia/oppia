@@ -25,6 +25,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import classroom_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
@@ -641,9 +642,8 @@ class AndroidActivityHandler(base.BaseHandler[
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        'classroom',
-                        'exp_translations',
                         constants.ACTIVITY_TYPE_EXPLORATION,
+                        constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS,
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
@@ -686,7 +686,7 @@ class AndroidActivityHandler(base.BaseHandler[
     # 'is_from_oppia_android_build' decorator, and here we are getting 'secret'
     # because the decorator always passes every url_path_args to HTTP methods.
     @acl_decorators.is_from_oppia_android_build
-    def get(self) -> None:
+    def get(self, unused_secret: str) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
         activity_id = self.normalized_request['activity_id']
@@ -724,9 +724,16 @@ class AndroidActivityHandler(base.BaseHandler[
             if activity_version is not None:
                 raise self.InvalidInputException(
                     'Version cannot be specified for classroom')
+            matching_classroom_fragment = next(
+                classroom['url_fragment']
+                for classroom in config_domain.CLASSROOM_PAGES_DATA.value
+                if classroom['name'] == activity_id)
+
             activity = classroom_config_services.get_classroom_by_url_fragment(
-                activity_id)
-        elif activity_type == 'exp_translations':
+                activity_id) or (
+                classroom_services.get_classroom_by_url_fragment(
+                    matching_classroom_fragment))
+        elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS:
             entity_type = feconf.TranslatableEntityType(
                 feconf.ENTITY_TYPE_EXPLORATION)
             activity = translation_fetchers.get_entity_translation(
