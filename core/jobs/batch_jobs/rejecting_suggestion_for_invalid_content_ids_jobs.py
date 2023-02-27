@@ -129,13 +129,14 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             list(dict). Audit report result.
         """
         obsolete_content = []
-        obsolete_translation_suggestion_error_report: (
-            List[Dict[str,
-                Union[
-                    # Exploration ID.
-                    str,
-                    # Obsolete content dict.
-                    List[Dict[str, str]]]]]) = []
+        obsolete_translation_suggestion_error_report: List[
+            Dict[str, Union[
+                # Exploration ID.
+                str,
+                # Obsolete content dict.
+                List[Dict[str, str]]
+            ]]
+        ] = []
 
         translatable_content_ids = exploration.get_translatable_content_ids()
         for suggestion in suggestions:
