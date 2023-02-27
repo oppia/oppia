@@ -1353,7 +1353,7 @@
 	"I18N_TOPIC_VIEWER_PRACTICE": "Mise en application",
 	"I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_NOTICE_MODAL_MESSAGE": "La fonctionnalité de mise en pratique est encore en version bêta et n’est disponible qu’en anglais. Voulez-vous continuer ?",
 	"I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_NOTICE_MODAL_TITLE": "Confirmer la langue de mise en pratique",
-	"I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG": "(bêta)",
+	"I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG": "bêta",
 	"I18N_TOPIC_VIEWER_QUESTIONS_UNAVAILABLE": "Revenez plus tard quand des questions pratiques seront disponibles pour ce sujet.",
 	"I18N_TOPIC_VIEWER_REVISION": "Révision",
 	"I18N_TOPIC_VIEWER_SELECT_SKILLS": "Sélectionnez les compétences des leçons de <[topicName]> que vous aimeriez mettre en pratique.",

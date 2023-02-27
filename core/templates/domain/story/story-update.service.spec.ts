@@ -20,14 +20,13 @@ import { HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { LocalStorageService } from 'services/local-storage.service';
 
 describe('Story update service', () => {
-  let storyObjectFactory: StoryObjectFactory;
   let storyUpdateService: StoryUpdateService;
   let undoRedoService: UndoRedoService;
   let localStorageService: LocalStorageService;
@@ -40,7 +39,6 @@ describe('Story update service', () => {
 
     storyUpdateService = TestBed.inject(StoryUpdateService);
     undoRedoService = TestBed.inject(UndoRedoService);
-    storyObjectFactory = TestBed.inject(StoryObjectFactory);
     localStorageService = TestBed.inject(LocalStorageService);
 
     let sampleStoryBackendObject = {
@@ -87,7 +85,7 @@ describe('Story update service', () => {
       meta_tag_content: 'meta'
     };
 
-    _sampleStory = storyObjectFactory.createFromBackendDict(
+    _sampleStory = Story.createFromBackendDict(
       sampleStoryBackendObject);
   });
 
