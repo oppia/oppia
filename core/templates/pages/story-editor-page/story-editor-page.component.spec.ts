@@ -25,6 +25,7 @@ import { EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import { Story } from 'domain/story/story.model';
 
 require('pages/story-editor-page/story-editor-page.component.ts');
 
@@ -42,7 +43,6 @@ describe('Story editor page', function() {
   var PageTitleService = null;
   var PreventPageUnloadEventService = null;
   var StoryEditorStateService = null;
-  var StoryObjectFactory = null;
   var UndoRedoService = null;
   var LocalStorageService = null;
   var StoryEditorStalenessDetectionService = null;
@@ -90,13 +90,12 @@ describe('Story editor page', function() {
     PreventPageUnloadEventService = $injector.get(
       'PreventPageUnloadEventService');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
     LocalStorageService = $injector.get('LocalStorageService');
     StoryEditorStalenessDetectionService = $injector.get(
       'StoryEditorStalenessDetectionService');
-    story = StoryObjectFactory.createFromBackendDict({
+    story = Story.createFromBackendDict({
       id: '2',
       title: 'Story title',
       description: 'Story description',

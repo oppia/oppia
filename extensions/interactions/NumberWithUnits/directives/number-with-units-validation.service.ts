@@ -32,7 +32,7 @@ import { NumberWithUnitsObjectFactory } from
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { NumberWithUnitsCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
 @Injectable({

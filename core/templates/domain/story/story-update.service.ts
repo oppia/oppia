@@ -29,7 +29,7 @@ import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
-import { Story } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { StoryContents } from 'domain/story/story-contents-object.model';
 import { StoryNode } from './story-node.model';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
