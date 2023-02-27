@@ -666,6 +666,48 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             observed_log_messages[0],
             'object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
+        
+    def test_cannot_update_question_with_mismatch_of_versions(
+        self
+    ) -> None:
+        
+        question_id_4 = question_services.get_new_question_id()
+        content_id_generator_4 = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id_4, self.editor_id,
+            self._create_valid_question_data(
+                'ABC', content_id_generator_4),
+            ['skill_2'],
+            content_id_generator_4.next_content_id_index)
+
+        question_model = question_models.QuestionModel.get(question_id_4)
+        question_model.version = 0
+        question_model.commit(question_id_4, 'changed version', [])  
+
+        changelist = [question_domain.QuestionChange({
+            'cmd': question_domain.CMD_UPDATE_QUESTION_PROPERTY,
+            'property_name': question_domain.QUESTION_PROPERTY_LANGUAGE_CODE,
+            'old_value': 'en',
+            'new_value': 'bn'
+        })]
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Unexpected error: trying to update version 1 of topic '
+            'from version 2. Please reload the page and try again.'):
+            question_services.update_question(
+                self.editor_id, self.question_id, changelist, 'change language_code')
+
+        question_model = question_models.QuestionModel.get(self.question_id)
+        question_model.version = 100
+        question_model.commit(self.user_id, 'changed version', [])
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Trying to update version 101 of topic from version 2, '
+            'which is too old. Please reload the page and try again.'):
+            question_services.update_question(
+                self.editor_id, self.question_id, changelist, 'change language_code')
 
     def test_replace_skill_id_for_all_questions(self) -> None:
         question_id_2 = question_services.get_new_question_id()

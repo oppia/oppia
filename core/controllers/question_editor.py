@@ -286,12 +286,7 @@ class EditableQuestionDataHandler(
         'PUT': {
             'version': {
                 'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        # Version must be greater than zero.
-                        'min_value': 1
-                    }]
+                    'type': 'int'
                 }
             },
             'commit_message': {
