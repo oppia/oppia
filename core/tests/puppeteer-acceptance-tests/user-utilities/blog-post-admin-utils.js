@@ -37,8 +37,7 @@ const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
-const blogPostThumbnailImagePath = path.resolve(
-  __dirname, '../images/blog-post-thumbnail.svg');
+const blogPostThumbnailImage = testConstants.images.blogPostThumbnailImage;
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
@@ -46,7 +45,6 @@ const LABEL_FOR_DONE_BUTTON = 'DONE';
 const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
-const LABEL_FOR_ADD_THUMBNAIL_BUTTON = 'Add Thumbnail Image';
 const LABEL_FOR_ADD_ELEMENT_BUTTON = 'Add element';
 
 module.exports = class e2eBlogPostAdmin extends baseUser {
@@ -164,10 +162,10 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('button.mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile(blogPostThumbnailImagePath);
+    await this.uploadFile(blogPostThumbnailImage);
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
-    await this.clickOn(blogPostThumbnailImagePath);
+    await this.clickOn(addThumbnailImageButton);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
 
@@ -192,10 +190,10 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('NEW POST');
     await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile(blogPostThumbnailImagePath);
+    await this.uploadFile(blogPostThumbnailImage);
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
-    await this.clickOn(blogPostThumbnailImagePath);
+    await this.clickOn(addThumbnailImageButton);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
 
     await this.type(blogTitleInput, newBlogPostTitle);
