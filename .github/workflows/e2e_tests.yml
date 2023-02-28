@@ -200,8 +200,8 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite:
-          - Blog Admin
-          - Blog Editor
+          - Blog-Admin
+          - Blog-Editor
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3

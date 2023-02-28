@@ -23,7 +23,7 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Blog Editor', function() {
+describe('Blog-Editor', function() {
   let blogPostEditor = null;
 
   beforeAll(async function() {
