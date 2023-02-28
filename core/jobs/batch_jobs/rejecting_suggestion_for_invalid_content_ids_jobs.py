@@ -246,7 +246,7 @@ def _get_suggestion_dicts(
         | 'Get all exploration models' >> ndb_io.GetModels(
             exp_models.ExplorationModel.get_all())
         | 'Map exploration model to domain class' >> beam.Map(
-            lambda model: exp_fetchers.get_exploration_from_model(model))
+            exp_fetchers.get_exploration_from_model)
         # PCollection<exp_id: exploration>.
         | 'Key explorations by ID' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
             lambda exploration: exploration.id)
