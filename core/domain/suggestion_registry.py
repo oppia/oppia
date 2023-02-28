@@ -1606,6 +1606,32 @@ class TranslationReviewStats:
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
 
+    @classmethod
+    def create_default(
+        cls,
+        language_code: Optional[str] = None,
+        reviewer_user_id: Optional[str] = None,
+        topic_id: Optional[str] = None
+    ) -> TranslationReviewStats:
+        """Create default translation review stats.
+
+        Args:
+            language_code: str. The language code for which are these stats
+                generated.
+            reviewer_user_id: str. User ID of the reviewer to which
+                these stats belong.
+            topic_id: str. ID of the topic for which were
+                the translations created.
+
+        Returns:
+            TranslationContributionStats. Default translation contribution
+            stats.
+        """
+        return cls(
+            language_code, reviewer_user_id, topic_id,
+            0, 0, 0, 0, 0, datetime.datetime.now(), datetime.datetime.now()
+        )
+
     def to_dict(self) -> TranslationReviewStatsDict:
         """Returns a dict representation of a TranslationReviewStats
         domain object.
@@ -1703,6 +1729,29 @@ class QuestionContributionStats:
         )
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
+
+    @classmethod
+    def create_default(
+        cls,
+        contributor_user_id: Optional[str] = None,
+        topic_id: Optional[str] = None
+    ) -> QuestionContributionStats:
+        """Create default question contribution stats.
+
+        Args:
+            contributor_user_id: str. User ID of the contributor to which
+                these stats belong.
+            topic_id: str. ID of the topic for which were
+                the translations created.
+
+        Returns:
+            QuestionContributionStats. Default question contribution
+            stats.
+        """
+        return cls(
+            contributor_user_id, topic_id,
+            0, 0, 0, datetime.datetime.now(), datetime.datetime.now()
+        )
 
     def to_dict(self) -> QuestionContributionStatsDict:
         """Returns a dict representation of a QuestionContributionStats
