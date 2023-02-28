@@ -38,7 +38,7 @@ const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 const blogPostThumbnailImagePath = path.resolve(
-  dirname, '../images/blog-post-thumbnail.svg');
+  __dirname, '../images/blog-post-thumbnail.svg');
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
