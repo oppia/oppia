@@ -194,7 +194,8 @@ def main(args: Optional[List[str]] = None) -> None:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD
         server_mode = SERVER_MODE_DEV
 
-    if lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
+    if (lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY or
+        lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD):
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
@@ -203,6 +204,8 @@ def main(args: Optional[List[str]] = None) -> None:
         build.main(args=['--prod_env'])
     else:
         build.main(args=[])
+        common.run_ng_compilation()
+        run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
