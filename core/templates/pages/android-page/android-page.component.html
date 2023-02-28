@@ -107,7 +107,7 @@
           </div>
         </div>
         <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7">
-          <div class="row">
+          <div class="row oppia-android-carousel-direction">
             <div class="col-md-2 align-self-center" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
               <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right"></i>
             </div>
@@ -121,7 +121,7 @@
               <i class="fas fa-chevron-right oppia-android-carousel-chevron"></i>
             </div>
           </div>
-          <div class="oppia-android-carousel-item-container row">
+          <div class="oppia-android-carousel-item-container row oppia-android-carousel-direction">
             <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 0}" (click)="changeFeaturesShown(0)"></button>
             <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 1}" (click)="changeFeaturesShown(1)"></button>
             <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 2}" (click)="changeFeaturesShown(2)"></button>
