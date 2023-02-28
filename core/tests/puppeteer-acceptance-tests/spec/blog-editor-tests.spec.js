@@ -22,6 +22,8 @@ const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const duplicateBlogPostWarning = ' Blog Post with the' +
+  ' given title exists already. Please use a different title. ';
 
 describe('Blog-Editor', function() {
   let blogPostEditor = null;

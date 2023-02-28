@@ -16,6 +16,7 @@
  * @fileoverview Blog Admin users utility file.
  */
 
+const path = require('path');
 const baseUser = require(
   '../puppeteer-testing-utilities/puppeteer-utils.js');
 const testConstants = require(
@@ -36,6 +37,8 @@ const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
+const blogPostThumbnailImagePath = path.resolve(
+  dirname, '../images/blog-post-thumbnail.svg');
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
@@ -161,10 +164,10 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('button.mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.uploadFile(blogPostThumbnailImagePath);
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
-    await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
+    await this.clickOn(blogPostThumbnailImagePath);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
 
@@ -189,10 +192,10 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('NEW POST');
     await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile('../images/blog-post-thumbnail.svg');
+    await this.uploadFile(blogPostThumbnailImagePath);
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
-    await this.clickOn(LABEL_FOR_ADD_THUMBNAIL_BUTTON);
+    await this.clickOn(blogPostThumbnailImagePath);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
 
     await this.type(blogTitleInput, newBlogPostTitle);
