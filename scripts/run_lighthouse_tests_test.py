@@ -341,15 +341,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_build = self.swap_with_checks(
                     build, 'main', lambda args: None,
                     expected_kwargs=[{'args': []}])
+        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
 
-        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+        with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
-                with self.swap_redis_server, self.swap_cloud_datastore_emulator:
-                    with self.swap_firebase_auth_emulator, swap_build:
-                        with swap_popen, swap_run_lighthouse_tests:
-                            run_lighthouse_tests.main(
-                                args=['--mode', 'performance_skip_build',
-                                '--shard', '1'])
+                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
+                    with self.swap_redis_server, swap_run_lighthouse_tests:
+                        run_lighthouse_tests.main(
+                            args=['--mode', 'performance_skip_build', '--shard', '1'])
 
         self.assertNotIn('Building files in production mode.', self.print_arr)
         self.assertIn(
