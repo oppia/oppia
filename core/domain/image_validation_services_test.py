@@ -129,3 +129,18 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'Expected a filename ending in .png'
         )
+        base64_encoded_string = 'SGVsbG8gV29ybGQh'
+        self._assert_image_validation_error(
+            base64_encoded_string,
+            'image.svg',
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'Image not recognized'
+        )
+        xmlns_attribute_svg = '<svg xmlns="http://www.w3.org/2000/svg" ></svg>'
+        base64_encoded_xmlns_attribute_svg = xmlns_attribute_svg.encode('utf-8')
+        validated_image = image_validation_services.validate_image_and_filename(
+            base64_encoded_xmlns_attribute_svg,
+            'image.svg',
+            feconf.ENTITY_TYPE_EXPLORATION
+        )
+        self.assertEqual('svg', validated_image)
