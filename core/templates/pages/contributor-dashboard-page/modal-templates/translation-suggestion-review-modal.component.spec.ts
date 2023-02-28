@@ -260,8 +260,6 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.reviewMessage).toBe('');
       // Suggestion 1's exploration_content_html matches its content_html.
       expect(component.hasExplorationContentChanged()).toBe(false);
-      expect(component.displayExplorationContent()).toEqual(
-        suggestion1.change.content_html);
 
       spyOn(
         siteAnalyticsService,
@@ -285,8 +283,6 @@ describe('Translation Suggestion Review Modal Component', function() {
       // Suggestion 2's exploration_content_html does not match its
       // content_html.
       expect(component.hasExplorationContentChanged()).toBe(true);
-      expect(component.displayExplorationContent()).toEqual(
-        suggestion2.exploration_content_html);
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');

@@ -470,7 +470,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   isHtmlContentEqual(
-      first: string | string[], second: string | string[]): boolean {
+      first: string | string[] | null,
+      second: string | string[] | null
+  ): boolean {
     if (Array.isArray(first) && Array.isArray(second)) {
       // Check equality of all array elements.
       return (
