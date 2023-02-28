@@ -62,7 +62,7 @@
   font-size: 18px;
   font-weight: 400;
   margin-top: -25px;
-  padding-left: 30px;
+  padding-left: 30px /*rtl:ignore*/;
 }
 
 .oppia-android-updates-input-padding {
@@ -225,7 +225,7 @@
 }
 
 .oppia-android-hero-image {
-  margin: 0;
+  margin: 0 /*rtl:0 0 0 -60px*/;
   transform: scale(1.5);
 }
 
@@ -292,6 +292,9 @@
   display: none;
 }
 
+.oppia-android-carousel-direction {
+  flex-direction: row /*rtl:row-reverse*/;
+}
 
 @media only screen and (max-width: 1024px) {
   .oppia-android-features-web {
@@ -455,6 +458,7 @@
 
 @media only screen and (max-width: 575px) {
   .oppia-android-hero-image {
+    margin: 0 /*rtl:0 0 0 -100px*/;
     transform: scale(4) translateY(50px);
   }
 
