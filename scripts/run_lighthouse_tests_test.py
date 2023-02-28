@@ -348,7 +348,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         run_lighthouse_tests.main(
-                            args=['--mode', 'performance_skip_build', '--shard', '1'])
+                            args=['--mode', 'performance_skip_build',
+                                '--shard', '1'])
 
         self.assertNotIn('Building files in production mode.', self.print_arr)
         self.assertIn(
