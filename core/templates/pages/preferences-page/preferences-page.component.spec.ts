@@ -77,7 +77,7 @@ describe('Preferences Page Component', () => {
 
     class MockWindowRef {
       imageData: Record<string, string> = {};
-      nativeWindow = {
+      _window = {
         location: {
           reload: () => {}
         },
@@ -93,6 +93,10 @@ describe('Preferences Page Component', () => {
           }
         }
       };
+    
+      get nativeWindow() {
+        return this._window;
+      }
     }
 
     class MockUserBackendApiService {
@@ -236,7 +240,7 @@ describe('Preferences Page Component', () => {
         spyOn(userService, 'getUserInfoAsync')
           .and.resolveTo(userInfo as UserInfo);
 
-          componentInstance.ngOnInit();
+        componentInstance.ngOnInit();
         tick();
 
         expect(componentInstance.profilePicturePngDataUrl).toEqual(
@@ -286,7 +290,7 @@ describe('Preferences Page Component', () => {
         tick();
         expect(
           i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
-            code);
+          code);
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
         expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
         expect(alertsService.addInfoMessage).toHaveBeenCalled();
