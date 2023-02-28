@@ -48,6 +48,10 @@ LIGHTHOUSE_CONFIG_FILENAMES: Final = {
     LIGHTHOUSE_MODE_ACCESSIBILITY: {
         '1': '.lighthouserc-accessibility-1.js',
         '2': '.lighthouserc-accessibility-2.js'
+    },
+    LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD: {
+        '1': '.lighthouserc-1.js',
+        '2': '.lighthouserc-2.js'
     }
 }
 APP_YAML_FILENAMES: Final = {
