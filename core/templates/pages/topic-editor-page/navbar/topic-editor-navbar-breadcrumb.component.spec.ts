@@ -17,6 +17,7 @@
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { Topic } from 'domain/topic/topic-object.model';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
@@ -29,6 +30,9 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
   let fixture: ComponentFixture<TopicEditorNavbarBreadcrumbComponent>;
   let topicEditorStateService: TopicEditorStateService;
   let topicEditorRoutingService: TopicEditorRoutingService;
+  let topic: Topic;
+  let topicInitializedEventEmitter = new EventEmitter();
+  let topicReinitializedEventEmitter = new EventEmitter();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -42,14 +46,14 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     fixture = TestBed.createComponent(TopicEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
-  });
-
-  it('should initialise component when user opens topic editor page', () => {
-    let topic = new Topic(
+    topic = new Topic(
       'id', 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
     );
+  });
+
+  it('should initialise component when user opens topic editor page', () => {
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.setUrlFragment('subtopic-one');
     let subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
@@ -62,6 +66,28 @@ describe('TopicEditorNavbarBreadcrumbComponent', () => {
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
 
     component.ngOnInit();
+
+    expect(component.topic).toEqual(topic);
+  });
+
+  it('should validate topic when topic is initialised', () => {
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOnProperty(topicEditorStateService, 'onTopicInitialized').and
+      .returnValue(topicInitializedEventEmitter);
+    component.ngOnInit();
+
+    topicInitializedEventEmitter.emit();
+
+    expect(component.topic).toEqual(topic);
+  });
+
+  it('should validate topic when topic is reinitialised', () => {
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOnProperty(topicEditorStateService, 'onTopicReinitialized').and
+      .returnValue(topicReinitializedEventEmitter);
+    component.ngOnInit();
+
+    topicReinitializedEventEmitter.emit();
 
     expect(component.topic).toEqual(topic);
   });
