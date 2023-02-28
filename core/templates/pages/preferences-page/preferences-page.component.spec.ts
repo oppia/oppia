@@ -93,7 +93,7 @@ describe('Preferences Page Component', () => {
           }
         }
       };
-    
+
       get nativeWindow() {
         return this._window;
       }
