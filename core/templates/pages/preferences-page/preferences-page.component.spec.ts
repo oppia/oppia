@@ -36,7 +36,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ImageUploadHelperService } from '../../services/image-upload-helper.service';
 
-fdescribe('Preferences Page Component', () => {
+describe('Preferences Page Component', () => {
   @Pipe({name: 'truncate'})
   class MockTruncatePipe {
     transform(value: string, params: Object | undefined): string {
