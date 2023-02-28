@@ -728,20 +728,6 @@ def _save_question(
 
     question.validate()
     question_model = question_models.QuestionModel.get(question.id)
-
-    if question.version > question_model.version:
-        raise Exception(
-            'Unexpected error: trying to update version %s of question '
-            'from version %s. Please reload the page and try again.'
-            % (question_model.version, question.version))
-
-    if question.version < question_model.version:
-        raise Exception(
-            'Trying to update version %s of question from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (question_model.version, question.version))
-
-
     question_model.question_state_data = question.question_state_data.to_dict()
     question_model.language_code = question.language_code
     question_model.question_state_data_schema_version = (
@@ -759,7 +745,8 @@ def update_question(
     committer_id: str,
     question_id: str,
     change_list: List[question_domain.QuestionChange],
-    commit_message: str
+    commit_message: str,
+    version: int = None
 ) -> None:
     """Updates a question. Commits changes.
 
@@ -780,6 +767,16 @@ def update_question(
         raise ValueError(
             'Expected a commit message, received none.')
     updated_question = apply_change_list(question_id, change_list)
+    if (version != None) and (version < updated_question.version):
+        raise Exception(
+            'Unexpected error: trying to update version %s of question '
+            'from version %s. Please reload the page and try again.'
+            % (version, updated_question.version))
+    if (version != None) and (version > updated_question.version):
+        raise Exception(
+            'Trying to update version %s of question from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (version, updated_question.version))
     _save_question(
         committer_id, updated_question, change_list, commit_message)
     create_question_summary(question_id)
