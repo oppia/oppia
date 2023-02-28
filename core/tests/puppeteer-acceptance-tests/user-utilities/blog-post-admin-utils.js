@@ -22,7 +22,6 @@ const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
-const path = require('path');
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
@@ -37,8 +36,7 @@ const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
-const blogPostThumnailImagePath = path.resolve(
-  __dirname, '../images/blog-post-thumbnail.svg');
+const blogPostThumbnailImage = testConstants.images.blogPostThumbnailImage;
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
@@ -163,7 +161,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('button.mat-button-toggle-button');
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile(blogPostThumnailImagePath);
+    await this.uploadFile(blogPostThumbnailImage);
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(addThumbnailImageButton);
@@ -191,7 +189,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.clickOn('NEW POST');
     await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(thumbnailPhotoBox);
-    await this.uploadFile(blogPostThumnailImagePath);
+    await this.uploadFile(blogPostThumbnailImage);
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(addThumbnailImageButton);
