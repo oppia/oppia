@@ -194,8 +194,8 @@ def main(args: Optional[List[str]] = None) -> None:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD
         server_mode = SERVER_MODE_DEV
 
-    if (lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY or
-        lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD):
+    if (lighthouse_mode in (LIGHTHOUSE_MODE_ACCESSIBILITY, 
+                            LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD)):
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
