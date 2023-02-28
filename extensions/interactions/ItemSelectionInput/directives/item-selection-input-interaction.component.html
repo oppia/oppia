@@ -38,7 +38,7 @@
       </div>
 
       <div *ngIf="!displayCheckboxes">
-        <button class="multiple-choice-option" (click)="submitMultipleChoiceAnswer($event, idx)">
+        <button class="multiple-choice-option" aria-label="multiple choice" (click)="submitMultipleChoiceAnswer($event, idx)">
           <div class="multiple-choice-radio-button-container">
             <span class="multiple-choice-outer-radio-button">
               <span class="multiple-choice-inner-radio-button"></span>
