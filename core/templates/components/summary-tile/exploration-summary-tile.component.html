@@ -4,7 +4,6 @@
                                 [activityId]="explorationId"
                                 [activityTitle]="explorationTitle"
                                 [isContainerNarrow]="isContainerNarrow"
-                                [activityActive]="explorationIsCurrentlyHoveredOver"
                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
   </oppia-learner-dashboard-icons>
 
@@ -86,7 +85,6 @@
                 [activityId]="explorationId"
                 [activityTitle]="explorationTitle"
                 [isContainerNarrow]="isContainerNarrow"
-                [activityActive]="explorationIsCurrentlyHoveredOver"
                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
   </oppia-learner-dashboard-icons>
   <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration" [ngStyle]="{'margin': '5px'}">

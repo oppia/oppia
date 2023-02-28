@@ -1,6 +1,9 @@
 <div class="oppia-feedback-popup-container">
   <div *ngIf="!feedbackSubmitted">
-    <button type="button" class="oppia-close-popover-button e2e-test-exploration-feedback-close-button" (click)="close()">
+    <button type="button"
+            class="oppia-close-popover-button e2e-test-exploration-feedback-close-button"
+            (click)="close()"
+            aria-label="Close">
       <i class="fas fa-times"></i>
     </button>
     <br>
