@@ -296,7 +296,6 @@
   flex-direction: row /*rtl:row-reverse*/;
 }
 
-
 @media only screen and (max-width: 1024px) {
   .oppia-android-features-web {
     display: none;
