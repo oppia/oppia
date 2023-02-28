@@ -742,6 +742,30 @@ describe('Contributions and review component', () => {
         component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
         expect(component.isReviewQuestionsTab()).toBeTrue();
         expect(component.isReviewTranslationsTab()).toBeFalse();
+
+        // TODO(#9749): Factor into separate test. Currently, the below test
+        // logic only exists to satisfy code coverage for
+        // onClickViewSuggestion().
+        spyOn(component, 'openQuestionSuggestionModal').and.callFake(() => {
+          return;
+        });
+        component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
+        component.contributions = {
+          SUGGESTION: {
+            details: null,
+            suggestion: {
+              suggestion_type: 'SUGGESTION',
+              suggestion_id: '',
+              target_id: 'target_id',
+              change: {
+                content_html: '',
+                translation_html: '',
+              },
+              status: '',
+            }
+          }
+        };
+        component.onClickViewSuggestion('SUGGESTION');
       });
 
       it('should return false on Translation Contributions tab', () => {
