@@ -62,8 +62,7 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
                 associated with the suggestions.
 
         Returns:
-            suggestions. List[GeneralSuggestionModel]. List of updated
-                suggestion models.
+            list(GeneralSuggestionModel). List of updated suggestion models.
         """
         translatable_content_ids = exploration.get_translatable_content_ids()
         updated_suggestions = []
@@ -247,7 +246,7 @@ def _get_suggestion_dicts(
         | 'Get all exploration models' >> ndb_io.GetModels(
             exp_models.ExplorationModel.get_all())
         | 'Map exploration model to domain class' >> beam.Map(
-            exp_fetchers.get_exploration_from_model(model))
+            lambda model: exp_fetchers.get_exploration_from_model(model))
         # PCollection<exp_id: exploration>.
         | 'Key explorations by ID' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
             lambda exploration: exploration.id)

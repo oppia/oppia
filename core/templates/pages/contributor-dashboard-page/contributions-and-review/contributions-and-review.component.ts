@@ -52,7 +52,7 @@ export interface Suggestion {
   target_id: string;
   suggestion_id: string;
   author_name: string;
-  exploration_content_html: string;
+  exploration_content_html: string | null;
 }
 
 export interface ContributionsSummary {
@@ -233,8 +233,8 @@ export class ContributionsAndReview
         labelText: (
           // Missing exploration content means the translation suggestion is
           // now obsolete. See issue #16022.
-          suggestion.exploration_content_html === '' ?
-          'OBSOLETE' :
+          suggestion.exploration_content_html === null ?
+          'Obsolete' :
           this.SUGGESTION_LABELS[suggestion.status].text),
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (

@@ -64,7 +64,7 @@ interface SuggestionChangeDict {
 interface ActiveSuggestionDict {
   'author_name': string;
   'change': SuggestionChangeDict;
-  'exploration_content_html': string | string[];
+  'exploration_content_html': string | string[] | null;
   'language_code': string;
   'last_updated_msecs': number;
   'status': string;
@@ -103,7 +103,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   contentHtml!: string | string[];
   editedContent!: EditedContentDict;
   errorMessage!: string;
-  explorationContentHtml!: string | string[];
+  explorationContentHtml!: string | string[] | null;
   finalCommitMessage!: string;
   initialSuggestionId!: string;
   languageCode!: string;
@@ -460,15 +460,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         }
       );
     }
-  }
-
-  // Returns the HTML content representing the most up-to-date exploration
-  // content for the active suggestion.
-  displayExplorationContent(): string | string[] {
-    return (
-      this.hasExplorationContentChanged() ?
-      this.explorationContentHtml :
-      this.contentHtml);
   }
 
   // Returns whether the active suggestion's exploration_content_html
