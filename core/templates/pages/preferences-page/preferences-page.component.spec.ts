@@ -36,7 +36,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ImageUploadHelperService } from '../../services/image-upload-helper.service';
 
-describe('Preferences Page Component', () => {
+fdescribe('Preferences Page Component', () => {
   @Pipe({name: 'truncate'})
   class MockTruncatePipe {
     transform(value: string, params: Object | undefined): string {
@@ -115,6 +115,7 @@ describe('Preferences Page Component', () => {
     }
 
     beforeEach(waitForAsync(() => {
+      mockWindowRef = new MockWindowRef();
       TestBed.configureTestingModule({
         imports: [
           NgbModalModule,
@@ -139,7 +140,7 @@ describe('Preferences Page Component', () => {
           UserService,
           {
             provide: WindowRef,
-            useClass: MockWindowRef
+            useValue: mockWindowRef
           }
         ],
         schemas: [NO_ERRORS_SCHEMA]
@@ -158,7 +159,6 @@ describe('Preferences Page Component', () => {
       alertsService = TestBed.inject(AlertsService);
       i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
       ngbModal = TestBed.inject(NgbModal);
-      mockWindowRef = TestBed.inject(WindowRef);
       mockUserBackendApiService = TestBed.inject(UserBackendApiService);
       imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
 
