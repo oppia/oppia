@@ -571,7 +571,6 @@ describe('Question Suggestion Review Modal component', () => {
       component.reviewerName = 'Reviewer Name example';
       component.accept();
       tick();
-``
       expect(
         siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Question');

@@ -107,7 +107,7 @@ export class QuestionSuggestionReviewModalComponent
   @Input() suggestionId!: string;
   @Input() misconceptionsBySkill!: MisconceptionSkillMap;
   reviewMessage!: string;
-  reviewerName! : string;
+  reviewerName!: string;
   questionStateData!: State;
   canEditQuestion!: boolean;
   skillDifficultyLabel!: string;
@@ -320,7 +320,7 @@ export class QuestionSuggestionReviewModalComponent
       const threadMessageBackendDicts = response.messages;
       this.reviewMessage = threadMessageBackendDicts.map(
         m => ThreadMessage.createFromBackendDict(m))[1].text;
-      const reviewerName = threadMessageBackendDicts.map(
+      this.reviewerName = threadMessageBackendDicts.map(
         m => ThreadMessage.createFromBackendDict(m))[0].authorUsername;
     });
   }

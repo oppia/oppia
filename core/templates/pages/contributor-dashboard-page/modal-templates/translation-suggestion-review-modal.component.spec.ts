@@ -270,7 +270,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         'registerContributorDashboardAcceptSuggestion');
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage, reviewerName, commitMessage,
+            targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
@@ -329,7 +329,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage,reviewerName, commitMessage,
+            targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
@@ -341,7 +341,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.reviewMessage = 'Review message example';
       component.reviewerName = 'Reviewer Name example';
       component.translationUpdated = true;
-      component.rejectAndReviewNext(component.reviewMessage, component.reviewerName);
+      component.rejectAndReviewNext(component.reviewMessage);
 
       expect(component.activeSuggestionId).toBe('suggestion_2');
       expect(component.activeSuggestion).toEqual(suggestion2);
@@ -360,7 +360,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.reviewMessage = 'Review message example 2';
       component.reviewerName = 'Reviewer Name example 2';
       component.translationUpdated = false;
-      component.rejectAndReviewNext(component.reviewMessage, component.reviewerName);
+      component.rejectAndReviewNext(component.reviewMessage);
 
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
@@ -382,7 +382,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         'registerContributorDashboardAcceptSuggestion');
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage,reviewerName, commitMessage,
+            targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           return Promise.reject(
             errorCallback('Pre accept validation failed.')
@@ -771,7 +771,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
-            targetId, suggestionId, action, reviewMessage,reviewerName, commitMessage,
+            targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
@@ -782,7 +782,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
       component.reviewMessage = 'Review message example';
       component.reviewerName = 'Reviewer Name example';
-      component.rejectAndReviewNext(component.reviewMessage, component.reviewerName);
+      component.rejectAndReviewNext(component.reviewMessage);
 
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)

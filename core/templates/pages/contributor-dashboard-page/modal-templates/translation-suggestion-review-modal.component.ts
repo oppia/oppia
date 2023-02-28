@@ -115,7 +115,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isLastItem!: boolean;
   isFirstItem: boolean = true;
   reviewMessage!: string;
-  reviewerName! : string;
+  reviewerName!: string;
   status!: string;
   subheading!: string;
   suggestionIdToContribution!: Record<string, ActiveContributionDict>;
@@ -432,7 +432,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       });
   }
 
-  rejectAndReviewNext(reviewMessage: string, reviewerName: string): void {
+  rejectAndReviewNext(reviewMessage: string): void {
     if (this.validatorsService.isValidReviewMessage(reviewMessage,
       /* ShowWarnings= */ true)) {
       this.resolvingSuggestion = true;
@@ -444,7 +444,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.contributionAndReviewService.reviewExplorationSuggestion(
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewMessage || this.reviewMessage,reviewerName || this.reviewerName, null,
+        reviewMessage || this.reviewMessage, null,
         this.resolveSuggestionAndUpdateModal.bind(this),
         (error) => {
           this.alertsService.clearWarnings();
