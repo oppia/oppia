@@ -764,7 +764,8 @@ def update_question(
 
     Raises:
         ValueError. No commit message was provided.
-        Exception. Version of the incoming question and current question differs.
+        Exception. Version of the incoming question and current question 
+            differs.
     """
     if not commit_message:
         raise ValueError(
