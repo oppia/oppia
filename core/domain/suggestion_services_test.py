@@ -3293,6 +3293,27 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
+    def test_auto_reject_translation_suggestions_for_content_ids(self) -> None:
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            self.create_translation_suggestion_associated_with_exp(
+                self.EXP_ID, self.author_id)
+        suggestion_id = self.THREAD_ID
+
+        suggestion_services.auto_reject_translation_suggestions_for_content_ids(
+            self.EXP_ID, {'content_0'})
+
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(
+            last_message.text,
+            feconf.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        self.assertEqual(
+            suggestion.final_reviewer_id, feconf.SUGGESTION_BOT_USER_ID)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
+
     def test_delete_skill_rejects_question_suggestion(self) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
