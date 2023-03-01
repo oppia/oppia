@@ -888,4 +888,3 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             response_json['error'],
             'Cannot create a new fully specified question')
         self.logout()
-

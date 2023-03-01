@@ -666,7 +666,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             observed_log_messages[0],
             'object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
-        
+
     def test_cannot_update_question_with_mismatch_of_versions(
         self
     ) -> None:
@@ -681,7 +681,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'Trying to update version 2 of question from version 1, '
             'which is too old. Please reload the page and try again.'):
             question_services.update_question(
-                self.editor_id, self.question_id_2, changelist, 'change language_code', 2)
+                self.editor_id, self.question_id_2, 
+                changelist, 'change language_code', 2)
             
         question_model = question_models.QuestionModel.get(self.question_id_2)
         question_model.version = 100
@@ -690,7 +691,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'Unexpected error: trying to update version 1 of question '
             'from version 100. Please reload the page and try again.'):
             question_services.update_question(
-                self.editor, self.question_id_2, changelist, 'change language_code', 1)
+                self.editor, self.question_id_2, 
+                changelist, 'change language_code', 1)
 
     def test_replace_skill_id_for_all_questions(self) -> None:
         question_id_2 = question_services.get_new_question_id()
