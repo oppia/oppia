@@ -746,7 +746,7 @@ def update_question(
     question_id: str,
     change_list: List[question_domain.QuestionChange],
     commit_message: str,
-    version: int = None
+    version: Optional[int] = None
 ) -> None:
     """Updates a question. Commits changes.
 

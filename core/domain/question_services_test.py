@@ -691,7 +691,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'Unexpected error: trying to update version 1 of question '
             'from version 100. Please reload the page and try again.'):
             question_services.update_question(
-                self.editor, self.question_id_2,
+                self.editor_id, self.question_id_2,
                 changelist, 'change language_code', 1)
 
     def test_replace_skill_id_for_all_questions(self) -> None:
