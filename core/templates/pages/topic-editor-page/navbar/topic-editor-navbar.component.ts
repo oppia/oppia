@@ -149,6 +149,15 @@ export class TopicEditorNavbarComponent {
     );
   }
 
+  isWarningTooltipDisabled(): boolean {
+    return this.isTopicSaveable() || this.getTotalWarningsCount() === 0;
+  }
+
+  getAllTopicWarnings(): string {
+    return this.validationIssues.concat(
+    ).concat(this.prepublishValidationIssues).join('\n');
+  }
+
   toggleDiscardChangeButton(): void {
     this.showTopicEditOptions = false;
     this.discardChangesButtonIsShown = (
@@ -254,11 +263,17 @@ export class TopicEditorNavbarComponent {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       ));
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       ));
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
@@ -267,14 +282,16 @@ export class TopicEditorNavbarComponent {
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicSkillIds = this.topic.getSkillIds();
     this.discardChangesButtonIsShown = false;
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       )
     );
   }
