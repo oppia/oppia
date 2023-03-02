@@ -648,7 +648,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.hasExplorationContentChanged()).toBe(true);
         expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect(component.reviewMessage).toBe('Review Message');
-        expect(component.reviewerName).toBe('Reviewer Name');
+        expect(component.reviewerName).toBe('');
       }));
 
     it('should correctly determine whether the panel data is overflowing',

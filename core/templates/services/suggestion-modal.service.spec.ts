@@ -42,7 +42,8 @@ describe('Suggestion Modal Service', () => {
       action: AppConstants.ACTION_ACCEPT_SUGGESTION,
       commitMessage: '',
       reviewMessage: '',
-      audioUpdateRequired: false
+      audioUpdateRequired: false,
+      reviewerName: ''
     };
     sms.acceptSuggestion(uibModalInstanceMock, paramDict);
 
@@ -55,7 +56,8 @@ describe('Suggestion Modal Service', () => {
       action: AppConstants.ACTION_REJECT_SUGGESTION,
       commitMessage: '',
       reviewMessage: '',
-      audioUpdateRequired: false
+      audioUpdateRequired: false,
+      reviewerName: ''
     };
     sms.rejectSuggestion(uibModalInstanceMock, paramDict);
 

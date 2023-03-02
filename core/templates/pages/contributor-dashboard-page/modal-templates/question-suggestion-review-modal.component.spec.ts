@@ -635,7 +635,7 @@ describe('Question Suggestion Review Modal component', () => {
     expect(component._getThreadMessagesAsync).toHaveBeenCalled();
     expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('2');
     expect(component.reviewMessage).toBe('This is a rejection.');
-    expect(component.reviewerName).toBe('user1');
+    expect(component.reviewerName).toBe('');
   }));
 
   it('should allow users to navigate between suggestions', fakeAsync(()=>{
