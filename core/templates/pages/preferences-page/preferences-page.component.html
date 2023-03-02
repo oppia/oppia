@@ -323,7 +323,7 @@
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <a href="/delete-account"
-        class="btn btn-danger delete-btn e2e-test-delete-account-button preferences-page-tab-focus" 
+        class="btn btn-danger delete-btn e2e-test-delete-account-button preferences-page-tab-focus"
         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
         </a>
@@ -341,12 +341,12 @@
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
         <a href="/export-account-handler"
-          type="button"
-          tabindex="0"
-          class="btn btn-primary export-btn e2e-test-export-account-button preferences-page-tab-focus"
-          title="Export account"
-          (click)="handleExportDataClick()">
-            {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
+        type="button"
+        tabindex="0"
+        class="btn btn-primary export-btn e2e-test-export-account-button preferences-page-tab-focus"
+        title="Export account"
+        (click)="handleExportDataClick()">
+          {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
         </a>
         <span class="form-text oppia-form-text">
           {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate }}
