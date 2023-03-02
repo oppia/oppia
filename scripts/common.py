@@ -19,6 +19,7 @@ from __future__ import annotations
 import contextlib
 import errno
 import getpass
+from http import client
 import io
 import os
 import platform
@@ -865,7 +866,9 @@ def url_retrieve(
             ) as response:
                 with open(output_path, 'wb') as output_file:
                     output_file.write(response.read())
-        except (urlerror.URLError, ssl.SSLError) as exception:
+        except (
+            urlerror.URLError, ssl.SSLError, client.IncompleteRead
+        ) as exception:
             failures += 1
             print('Attempt %d of %d failed when downloading %s.' % (
                 failures, max_attempts, url))
