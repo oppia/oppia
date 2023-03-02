@@ -140,11 +140,16 @@ export class QuestionSuggestionEditorModalComponent
         this.suggestionId,
         this.skillDifficulty,
         questionDict.question_state_data,
+        questionDict.next_content_id_index,
         imagesData,
         () => {
           this.alertsService.addSuccessMessage('Updated question.');
         },
         () => {});
+      this.ngbActiveModal.close({
+        questionDict: questionDict,
+        skillDifficulty: this.skillDifficulty
+      });
     } else {
       this.questionSuggestionBackendApiService.submitSuggestionAsync(
         this.question, this.skill, this.skillDifficulty,
@@ -153,8 +158,8 @@ export class QuestionSuggestionEditorModalComponent
           this.alertsService.addSuccessMessage(
             'Submitted question for review.');
         });
+      this.ngbActiveModal.close();
     }
-    this.ngbActiveModal.close();
   }
 
   setDifficultyString(skillDifficulty: number): void {

@@ -40,7 +40,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -64,7 +64,7 @@ interface UpdateRule {
   rules: Rule[];
 }
 
-type UpdateActiveAnswerGroup = (
+export type UpdateActiveAnswerGroup = (
   AnswerGroup |
   UpdateAnswerGroupFeedback |
   UpdateAnswerGroupCorrectnessLabel |
@@ -194,11 +194,6 @@ export class ResponsesService {
       if (updates.hasOwnProperty('dest')) {
         let destUpdates = updates as UpdateActiveAnswerGroupDest;
         answerGroup.outcome.dest = destUpdates.dest;
-      }
-      if (updates.hasOwnProperty('destIfReallyStuck')) {
-        let destIfReallyStuckUpdates = updates as Outcome;
-        answerGroup.outcome.destIfReallyStuck = (
-          destIfReallyStuckUpdates.destIfReallyStuck);
       }
       if (updates.hasOwnProperty('refresherExplorationId')) {
         let refresherExplorationIdUpdates = updates as {

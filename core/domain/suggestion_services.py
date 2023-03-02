@@ -617,19 +617,23 @@ def get_all_stale_suggestion_ids() -> List[str]:
 
 
 def _update_suggestion(
-    suggestion: suggestion_registry.BaseSuggestion
+    suggestion: suggestion_registry.BaseSuggestion,
+    validate_suggestion: bool = True
 ) -> None:
     """Updates the given suggestion.
 
     Args:
         suggestion: Suggestion. The suggestion to be updated.
+        validate_suggestion: bool. Whether to validate the suggestion before
+            saving it.
     """
-    _update_suggestions([suggestion])
+    _update_suggestions([suggestion], validate_suggestion=validate_suggestion)
 
 
 def _update_suggestions(
     suggestions: List[suggestion_registry.BaseSuggestion],
-    update_last_updated_time: bool = True
+    update_last_updated_time: bool = True,
+    validate_suggestion: bool = True
 ) -> None:
     """Updates the given suggestions.
 
@@ -637,12 +641,19 @@ def _update_suggestions(
         suggestions: list(Suggestion). The suggestions to be updated.
         update_last_updated_time: bool. Whether to update the last_updated
             field of the suggestions.
+        validate_suggestion: bool. Whether to validate the suggestions before
+            saving them.
     """
     suggestion_ids = []
 
-    for suggestion in suggestions:
-        suggestion.validate()
-        suggestion_ids.append(suggestion.suggestion_id)
+    if validate_suggestion:
+        for suggestion in suggestions:
+            suggestion.validate()
+            suggestion_ids.append(suggestion.suggestion_id)
+    else:
+        suggestion_ids = [
+            suggestion.suggestion_id for suggestion in suggestions
+        ]
 
     suggestion_models_to_update_with_none = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
@@ -843,7 +854,7 @@ def reject_suggestions(
         suggestion.set_suggestion_status_to_rejected()
         suggestion.set_final_reviewer_id(reviewer_id)
 
-    _update_suggestions(suggestions)
+    _update_suggestions(suggestions, validate_suggestion=False)
 
     # Update the community contribution stats so that the number of suggestions
     # that are in review decreases, since these suggestions are no longer in
@@ -2017,7 +2028,8 @@ def update_translation_suggestion(
 def update_question_suggestion(
     suggestion_id: str,
     skill_difficulty: float,
-    question_state_data: state_domain.StateDict
+    question_state_data: state_domain.StateDict,
+    next_content_id_index: int
 ) -> Optional[suggestion_registry.BaseSuggestion]:
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
@@ -2026,6 +2038,8 @@ def update_question_suggestion(
         suggestion_id: str. The id of the suggestion to be updated.
         skill_difficulty: double. The difficulty level of the question.
         question_state_data: obj. Details of the question.
+        next_content_id_index: int. The next content Id index for the question's
+            content.
 
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
@@ -2056,8 +2070,9 @@ def update_question_suggestion(
                             'question_state_data_schema_version']),
                     'linked_skill_ids': question_dict['linked_skill_ids'],
                     'inapplicable_skill_misconception_ids': (
-                        question_dict[
-                            'inapplicable_skill_misconception_ids'])
+                        suggestion.change.question_dict[
+                            'inapplicable_skill_misconception_ids']),
+                    'next_content_id_index': next_content_id_index
                 },
                 'skill_id': suggestion.change.skill_id,
                 'skill_difficulty': skill_difficulty

@@ -25,7 +25,7 @@ import { AnswerStats } from
 import { AnswerStatsBackendDict } from
   'domain/exploration/visualization-info.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
 import { StateTopAnswersStatsService } from
@@ -38,7 +38,6 @@ import { States, StatesObjectFactory } from
 const joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', () => {
-  let ruleObjectFactory: RuleObjectFactory;
   let stateTopAnswersStatsBackendApiService:
     StateTopAnswersStatsBackendApiService;
   let stateTopAnswersStatsService: StateTopAnswersStatsService;
@@ -47,7 +46,6 @@ describe('StateTopAnswersStatsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateTopAnswersStatsBackendApiService = (
       TestBed.get(StateTopAnswersStatsBackendApiService));
     stateTopAnswersStatsService = TestBed.get(StateTopAnswersStatsService);
@@ -59,7 +57,6 @@ describe('StateTopAnswersStatsService', () => {
   const stateBackendDict: StateBackendDict = {
     content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
     linked_skill_id: null,
-    next_content_id_index: 0,
     param_changes: [],
     interaction: {
       answer_groups: [{
@@ -118,13 +115,6 @@ describe('StateTopAnswersStatsService', () => {
     },
     solicit_answer_details: false,
     card_is_checkpoint: false,
-    written_translations: {
-      translations_mapping: {
-        content: {},
-        default_outcome: {},
-        feedback_1: {},
-      },
-    },
   };
 
   const makeStates = (statesBackendDict = {Hola: stateBackendDict}): States => {
@@ -318,7 +308,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createFromBackendDict(
+      Rule.createFromBackendDict(
         {
           rule_type: 'Contains',
           inputs: {
@@ -347,7 +337,7 @@ describe('StateTopAnswersStatsService', () => {
 
       const updatedState = states.getState('Hola');
       updatedState.interaction.answerGroups[0].rules.push(
-        ruleObjectFactory.createFromBackendDict(
+        Rule.createFromBackendDict(
           {
             rule_type: 'Equals',
             inputs: {
@@ -386,7 +376,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules = [
-      ruleObjectFactory.createFromBackendDict(
+      Rule.createFromBackendDict(
         {
           rule_type: 'Contains',
           inputs: {
@@ -410,7 +400,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createFromBackendDict(
+      Rule.createFromBackendDict(
         {
           rule_type: 'Contains',
           inputs: {
