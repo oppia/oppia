@@ -16,6 +16,8 @@
  * @fileoverview Constants that can be re-used in the accpetance tests.
  */
 
+const path = require('path');
+
 let testConstants = {
   URLs: {
     home: 'http://localhost:8181/',
@@ -32,6 +34,10 @@ let testConstants = {
   },
   SignInDetails: {
     inputField: 'input.e2e-test-sign-in-email-input',
+  },
+  images: {
+    blogPostThumbnailImage: path.resolve(
+      __dirname, '../images/blog-post-thumbnail.svg')
   },
   DEFAULT_SPEC_TIMEOUT: 300000
 };
