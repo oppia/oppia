@@ -323,7 +323,9 @@
         {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account"  class="btn btn-danger delete-btn e2e-test-delete-account-button focus-class" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
+        <a href="/delete-account"
+        class="btn btn-danger delete-btn e2e-test-delete-account-button focus-class" 
+        [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
         </a>
         <span class="form-text oppia-form-text">
