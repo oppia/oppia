@@ -90,12 +90,6 @@ STATE_DICT_IN_V52 = {
     'next_content_id_index': 2
 }
 
-ERRORED_TRANSLATION_VALUE = (
-    '<p><oppia-noninteractive-image filepath-with-value='
-    '"&amp;quot;img.svg&amp;quot;"></oppia-noninteractive-image>'
-    '</p>'
-)
-
 TRANSLATION_HTML = (
     '<p><oppia-noninteractive-image alt-with-value="&amp;quot;'
     '&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" '
@@ -105,20 +99,11 @@ TRANSLATION_HTML = (
 
 CHANGE_DICT = {
     'cmd': 'add_translation',
-    'content_id': 'invalid_content_id',
+    'content_id': 'content_0',
     'language_code': 'hi',
-    'content_html': 'Content',
+    'content_html': 'html',
     'state_name': 'Introduction',
-    'translation_html': ERRORED_TRANSLATION_VALUE
-}
-
-CHANGE_DICT_WITH_LIST_TRANSLATION = {
-    'cmd': 'add_translation',
-    'content_id': 'invalid_content_id',
-    'language_code': 'hi',
-    'content_html': 'Content',
-    'state_name': 'Introduction',
-    'translation_html': [ERRORED_TRANSLATION_VALUE, '']
+    'translation_html': TRANSLATION_HTML
 }
 
 
@@ -156,11 +141,29 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
         )
         self.put_multi([self.exp_1])
 
-    def test_no_obsolete_suggestions_returns_empty_report(self) -> None:
+    def test_no_suggestions_returns_empty_report(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_valid_suggestions_are_not_rejected(self) -> None:
+        CHANGE_DICT['content_id'] = 'content_0'
+        suggestion = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id='user1',
+            change_cmd=CHANGE_DICT,
+            score_category='irrelevant',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            target_type='exploration',
+            target_id=self.TARGET_ID,
+            target_version_at_submission=0,
+            language_code='bn'
+        )
+        suggestion.update_timestamps()
+        suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
+
         self.assert_job_output_is_empty()
 
     def test_obsolete_suggestion_is_rejected(self) -> None:
-        CHANGE_DICT['translation_html'] = TRANSLATION_HTML
         CHANGE_DICT['content_id'] = 'non_existent_content_id'
         suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
@@ -227,7 +230,6 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
 
     def test_obsolete_suggestions_are_reported(self) -> None:
         CHANGE_DICT['content_id'] = 'invalid_id'
-        CHANGE_DICT['translation_html'] = TRANSLATION_HTML
         suggestion_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
