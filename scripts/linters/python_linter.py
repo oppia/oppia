@@ -205,13 +205,17 @@ def check_jobs_imports(
     """This function is used to check that all `jobs.batch_jobs.*_jobs` are
     imported in `jobs.registry`.
 
+    Args:
+        batch_jobs_dir: str. The path to the batch_jobs directory.
+        jobs_registry: str. The path to the jobs registry file.
+
     Returns:
         TaskResult. A TaskResult object representing the result of the lint
         check.
     """
     jobs_files: List[str] = [
         filename.split('.')[0] for filename in os.listdir(batch_jobs_dir)
-            if filename.endswith('_jobs.py')
+        if filename.endswith('_jobs.py')
     ]
 
     with open(jobs_registry, 'r', encoding='utf-8') as file:
@@ -235,7 +239,7 @@ def check_jobs_imports(
     error_messages: List[str] = []
     if missing_imports:
         error_message = 'Following jobs should be imported in %s:\n%s' % (
-            os.path.relpath(jobs_registry), ('\n'.join(missing_imports))
+            os.path.relpath(jobs_registry), (', '.join(missing_imports))
         )
         error_messages.append(error_message)
     return concurrent_task_utils.TaskResult(
