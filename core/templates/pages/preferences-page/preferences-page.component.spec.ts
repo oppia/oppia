@@ -380,11 +380,6 @@ describe('Preferences Page Component', () => {
         spyOn(mockWindowRef.nativeWindow.location, 'reload');
         spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
           .and.returnValue(null);
-        // expect(() => {
-        //   componentInstance.showEditProfilePictureModal();
-        //   tick();
-        //   tick();
-        // }).toThrowError('Image uploaded is not valid.');
         spyOn(componentInstance, 'showEditProfilePictureModal').and.throwError(
           'Image uploaded is not valid.');
       }));
