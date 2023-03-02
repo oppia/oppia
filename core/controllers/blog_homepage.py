@@ -27,7 +27,7 @@ from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import user_services
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Final, List, Tuple
 
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
