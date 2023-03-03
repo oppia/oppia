@@ -7621,7 +7621,6 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
-        self.logout()
 
     def test_classroom_admin_can_manage_blog_editors(self) -> None:
         self.login(self.CLASSROOM_ADMIN_EMAIL)
