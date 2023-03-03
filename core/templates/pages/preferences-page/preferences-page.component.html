@@ -36,14 +36,13 @@
           <div class="oppia-editable-section oppia-editor-profile-picture-container"
                tabindex="0"
                title="{{ 'I18N_PREFERENCES_CHANGE_PICTURE' | translate }}">
-            <div tabindex="0" class="oppia-click-to-start-editing e2e-test-photo-clickable"
+            <div class="oppia-click-to-start-editing e2e-test-photo-clickable"
                  (click)="showEditProfilePictureModal()"
-                 (keydown.enter)="showEditProfilePictureModal()"
                  aria-label="Edit profile picture button">
             </div>
-            <i tabindex="0" aria-label="Edit-button" (keydown.enter)="showEditProfilePictureModal()" class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"></i>
             <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"
                tabindex="0"
+               aria-label="Edit-button"
                (keydown.enter)="showEditProfilePictureModal()">
             </i>
             <img *ngIf="profilePictureDataUrl"
