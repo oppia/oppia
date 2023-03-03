@@ -73,6 +73,7 @@ _PARSER.add_argument(
     '--skip_build', help='Sets whether do webpack build',
     required=False, choices=['true', 'false'])
 
+
 def run_lighthouse_puppeteer_script() -> None:
     """Runs puppeteer script to collect dynamic urls."""
     puppeteer_path = (
@@ -193,7 +194,7 @@ def main(args: Optional[List[str]] = None) -> None:
         server_mode = SERVER_MODE_PROD
 
     if (lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY or
-        "true" == parsed_args.skip_build):
+        parsed_args.skip_build == 'true'):
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
