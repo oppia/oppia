@@ -36,7 +36,6 @@ from scripts import servers  # isort:skip
 
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
-LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD: Final = 'performance_skip_build'
 SERVER_MODE_PROD: Final = 'dev'
 SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
@@ -48,7 +47,7 @@ LIGHTHOUSE_CONFIG_FILENAMES: Final = {
     LIGHTHOUSE_MODE_ACCESSIBILITY: {
         '1': '.lighthouserc-accessibility-1.js',
         '2': '.lighthouserc-accessibility-2.js'
-    }
+    },
 }
 APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
@@ -65,12 +64,14 @@ Note that the root folder MUST be named 'oppia'.
 _PARSER.add_argument(
     '--mode', help='Sets the mode for the lighthouse tests',
     required=True,
-    choices=['accessibility', 'performance', 'performance_skip_build'])
+    choices=['accessibility', 'performance'])
 
 _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
     required=True, choices=['1', '2'])
-
+_PARSER.add_argument(
+    '--skip_build', help='Sets whether do webpack build',
+    required=False, choices=['true', 'false'])
 
 def run_lighthouse_puppeteer_script() -> None:
     """Runs puppeteer script to collect dynamic urls."""
@@ -187,15 +188,12 @@ def main(args: Optional[List[str]] = None) -> None:
     if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
         server_mode = SERVER_MODE_DEV
-    elif parsed_args.mode == LIGHTHOUSE_MODE_PERFORMANCE:
+    else:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
-    else:
-        lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD
-        server_mode = SERVER_MODE_DEV
 
-    if lighthouse_mode in (LIGHTHOUSE_MODE_ACCESSIBILITY,
-        LIGHTHOUSE_MODE_PERFORMANCE_SKIP_BUILD):
+    if (lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY or
+        "true" == parsed_args.skip_build):
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
