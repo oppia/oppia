@@ -16,7 +16,7 @@
  * @fileoverview Component for create new story modal.
  */
 
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -64,10 +64,6 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
 
   topicUrlFragment = (
     this.topicEditorStateService.getTopic()?.getUrlFragment());
-
-  updateView(): void {
-    this.changeDetectorRef.detectChanges();
-  }
 
   onStoryUrlFragmentChange(): void {
     if (!this.story.urlFragment) {
