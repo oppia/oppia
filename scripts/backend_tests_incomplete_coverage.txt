@@ -26,7 +26,6 @@ core.domain.app_feedback_report_services_test
 core.domain.beam_job_services_test
 core.domain.blog_domain_test
 core.domain.blog_services_test
-core.domain.calculation_registry_test
 core.domain.classifier_services_test
 core.domain.collection_domain_test
 core.domain.change_domain_test
@@ -42,7 +41,6 @@ core.domain.feedback_services_test
 core.domain.fs_services_test
 core.domain.html_cleaner_test
 core.domain.html_validation_service_test
-core.domain.image_validation_services_test
 core.domain.interaction_registry_test
 core.domain.learner_goals_services_test
 core.domain.learner_group_fetchers_test
@@ -59,7 +57,6 @@ core.domain.recommendations_services_test
 core.domain.rights_domain_test
 core.domain.rights_manager_test
 core.domain.rte_component_registry_test
-core.domain.rules_registry_test
 core.domain.search_services_test
 core.domain.skill_domain_test
 core.domain.skill_services_test

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the story editor navbar component.
  */
 
-import { Story, StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story, StoryBackendDict } from 'domain/story/story.model';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
@@ -41,7 +41,6 @@ describe('Story editor navbar component', () => {
   let fixture: ComponentFixture<StoryEditorNavbarComponent>;
   let story: Story;
   let alertsService: AlertsService;
-  let storyObjectFactory: StoryObjectFactory;
   let storyEditorStateService: StoryEditorStateService;
   let undoRedoService: UndoRedoService;
   let editableStoryBackendApiService: EditableStoryBackendApiService;
@@ -56,7 +55,6 @@ describe('Story editor navbar component', () => {
         StoryEditorUnpublishModalComponent
       ],
       providers: [
-        StoryObjectFactory,
         StoryEditorStateService,
         StoryEditorNavigationService,
         UndoRedoService,
@@ -78,7 +76,6 @@ describe('Story editor navbar component', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
     undoRedoService = TestBed.inject(UndoRedoService);
-    storyObjectFactory = TestBed.inject(StoryObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
     editableStoryBackendApiService = TestBed.inject(
       EditableStoryBackendApiService);
@@ -157,7 +154,7 @@ describe('Story editor navbar component', () => {
       'title name is empty', () => {
       // Setting story title to be empty.
       storyBackendDict.title = '';
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
@@ -181,7 +178,7 @@ describe('Story editor navbar component', () => {
       'fragment is empty', () => {
       // Setting url fragment to be empty.
       storyBackendDict.url_fragment = '';
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -202,7 +199,7 @@ describe('Story editor navbar component', () => {
 
     it('should show validation error when we ' +
       'try to add url fragment if it already exists', () => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryReinitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -227,7 +224,7 @@ describe('Story editor navbar component', () => {
       'does not have any linked exploration', fakeAsync(() => {
       // Setting exploration ID to be empty.
       storyBackendDict.story_contents.nodes[0].exploration_id = null;
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryReinitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -251,7 +248,7 @@ describe('Story editor navbar component', () => {
 
     it('should validate story without any validation errors ' +
       'on initialization', () => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -271,7 +268,7 @@ describe('Story editor navbar component', () => {
 
     it('should validate story without any validation errors ' +
       'on reinitalization', () => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryReinitializedEventEmitter = new EventEmitter();
 
       spyOnProperty(storyEditorStateService, 'onStoryReinitialized')
@@ -291,7 +288,7 @@ describe('Story editor navbar component', () => {
 
     it('should validate story without any validation errors ' +
       'when undo operation is performed', () => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockUndoRedoChangeEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -311,7 +308,7 @@ describe('Story editor navbar component', () => {
   });
 
   it('should unpublish story', fakeAsync(() => {
-    story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+    story = Story.createFromBackendDict(storyBackendDict);
     let mockStoryInitializedEventEmitter = new EventEmitter();
 
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -392,7 +389,7 @@ describe('Story editor navbar component', () => {
   });
 
   it('should discard changes', () => {
-    story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+    story = Story.createFromBackendDict(storyBackendDict);
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
 
     component.story = story;
@@ -409,7 +406,7 @@ describe('Story editor navbar component', () => {
       'clicking save draft button', fakeAsync(() => {
       const commitMessage = 'commitMessage';
 
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -448,7 +445,7 @@ describe('Story editor navbar component', () => {
 
     it('should show error message if the story was not saved' +
       'on clicking save draft button', fakeAsync(() => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       const commitMessage = null;
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
@@ -494,7 +491,7 @@ describe('Story editor navbar component', () => {
     }));
 
     it('should not save story on clicking cancel button', fakeAsync(() => {
-      story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      story = Story.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
