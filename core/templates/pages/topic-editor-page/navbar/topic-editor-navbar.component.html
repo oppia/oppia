@@ -8,21 +8,17 @@
             aria-label="List that shows issues preventing to save changes to the topic"
             class="w-100">
         <button class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-left"
-                [ngClass]="{'btn-success': isTopicSaveable()}"
+                [ngClass]="{'btn-success': topicIsSaveable}"
                 (click)="saveChanges()"
-                [disabled]="!isTopicSaveable()">
+                [disabled]="!topicIsSaveable">
           <span *ngIf="!isSaveInProgress()">
-            <i *ngIf="isWarningTooltipDisabled()"
-               class="fas fa-save md-18 md-dark oppia-save-publish-button-icon oppia-topic-editor-save-icon"
+            <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon oppia-topic-editor-save-icon"
                alt="Save Topic">
             </i>
-            <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
-               *ngIf="!isWarningTooltipDisabled()">
-            </i>
             <span class="oppia-save-publish-button-label float-left">Save Changes</span>
-            <span class="d-none d-md-block float-left oppia-changes-count"
-                  *ngIf="getChangeListLength() > 0">
-              ({{ getChangeListLength() }})
+            <span class="d-none d-md-block float-left oppia-change-count"
+                  *ngIf="!changeListLength">
+              ({{ changeListLength }})
             </span>
           </span>
 
