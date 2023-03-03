@@ -123,7 +123,6 @@ export class DonatePageComponent implements OnInit, OnDestroy {
             size: 'xl'
           }
         );
-        this.emailAddress = '';
       } else {
         this.alertsService.addInfoMessage(
           'Sorry, an unexpected error occurred. Please email admin@oppia.org ' +
