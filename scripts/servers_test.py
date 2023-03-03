@@ -454,7 +454,7 @@ class ManagedProcessTests(test_utils.TestBase):
             common, 'wait_for_port_to_be_in_use'))
 
         self.exit_stack.enter_context(servers.managed_dev_appserver(
-            'app.yaml', env=None))
+            'app.yaml', additional_env=None))
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
