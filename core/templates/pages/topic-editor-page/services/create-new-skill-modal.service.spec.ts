@@ -122,16 +122,16 @@ describe('Create New Skill Modal Service', () => {
   beforeEach(() => {
     createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
     alertsService = TestBed.inject(AlertsService);
-    alertsService = (alertsService) as
-      jasmine.SpyObj<AlertsService>;
+    alertsService = alertsService as jasmine.SpyObj<AlertsService>;
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
-    imageLocalStorageService = (imageLocalStorageService) as
+    imageLocalStorageService = imageLocalStorageService as
       jasmine.SpyObj<ImageLocalStorageService>;
     topicsAndSkillsDashboardBackendApiService =
     TestBed.inject(TopicsAndSkillsDashboardBackendApiService);
-    topicsAndSkillsDashboardBackendApiService =
-    (topicsAndSkillsDashboardBackendApiService) as jasmine
-    .SpyObj<TopicsAndSkillsDashboardBackendApiService>;
+    topicsAndSkillsDashboardBackendApiService = (
+      topicsAndSkillsDashboardBackendApiService as
+      jasmine.SpyObj<TopicsAndSkillsDashboardBackendApiService>
+    );
     mockSkillCreationBackendApiService = (
       // This throws "Type 'MockSkillCreationBackendApiService' is not
       // assignable to type desire". We need to suppress this error because of
