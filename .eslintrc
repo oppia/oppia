@@ -416,7 +416,7 @@
       "error",
       {
         "args": "none",
-        "varsIgnorePattern": "_"
+        "varsIgnorePattern": "^_$"
       }
     ],
     "@typescript-eslint/explicit-module-boundary-types": ["error"],

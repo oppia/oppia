@@ -28,7 +28,7 @@ import { ReleaseCoordinatorNavbarComponent } from './release-coordinator-navbar.
 import { UserInfo } from 'domain/user/user-info.model';
 
 
-fdescribe('Release coordinator navbar component', () => {
+describe('Release coordinator navbar component', () => {
   let component: ReleaseCoordinatorNavbarComponent;
   let userService: UserService;
   let profileUrl = '/profile/username1';

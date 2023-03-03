@@ -566,7 +566,7 @@ describe('Learner dashboard page', () => {
           '/assets/images/avatar/user_blue_150px.png');
         expect(component.profilePictureWebpDataUrl).toEqual(
           '/assets/images/avatar/user_blue_150px.webp');
-    }));
+      }));
 
     it('should check whether window is narrow on resizing the screen', () => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
