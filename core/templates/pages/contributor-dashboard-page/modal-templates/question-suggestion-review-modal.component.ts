@@ -321,7 +321,7 @@ export class QuestionSuggestionReviewModalComponent
       this.reviewMessage = threadMessageBackendDicts.map(
         m => ThreadMessage.createFromBackendDict(m))[1].text;
       this.reviewerName = threadMessageBackendDicts.map(
-        m => ThreadMessage.createFromBackendDict(m))[0].authorUsername;
+        m => ThreadMessage.createFromBackendDict(m))[0].reviewerName;
     });
   }
 

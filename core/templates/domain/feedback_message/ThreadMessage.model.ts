@@ -21,6 +21,7 @@ import { ThreadMessageSummary } from 'domain/feedback_message/ThreadMessageSumma
 
 export interface ThreadMessageBackendDict {
   'author_username': string;
+  'reviewer_username': string;
   'created_on_msecs': number;
   'entity_type': string;
   'entity_id': string;
@@ -36,6 +37,7 @@ export interface ThreadMessageBackendDict {
 
 export class ThreadMessage {
   authorUsername: string;
+  reviewerName: string;
   createdOnMsecs: number;
   entityType: string;
   entityId: string;
@@ -46,11 +48,12 @@ export class ThreadMessage {
   summary: ThreadMessageSummary;
 
   constructor(
-      authorUsername: string, createdOnMsecs: number, entityType: string,
+      authorUsername: string, reviewerName: string, createdOnMsecs: number, entityType: string,
       entityId: string, messageId: number, text: string,
       updatedStatus: string | null, updatedSubject: string | null,
       summary: ThreadMessageSummary) {
     this.authorUsername = authorUsername;
+    this.reviewerName = reviewerName;
     this.createdOnMsecs = createdOnMsecs;
     this.entityType = entityType;
     this.entityId = entityId;
@@ -77,6 +80,7 @@ export class ThreadMessage {
       threadMessageBackendDict: ThreadMessageBackendDict): ThreadMessage {
     return new ThreadMessage(
       threadMessageBackendDict.author_username,
+      threadMessageBackendDict.reviewer_username,
       threadMessageBackendDict.created_on_msecs,
       threadMessageBackendDict.entity_type, threadMessageBackendDict.entity_id,
       threadMessageBackendDict.message_id, threadMessageBackendDict.text,
