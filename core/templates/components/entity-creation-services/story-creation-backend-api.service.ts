@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Modal and ality for the create story button.
+ * @fileoverview Modal and functionality for the create story button.
  */
 
 import { HttpClient } from '@angular/common/http';
