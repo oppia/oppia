@@ -32,7 +32,6 @@ import { TopicEditorStateService } from '../services/topic-editor-state.service'
 })
 export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
     private imageLocalStorageService: ImageLocalStorageService,
     private ngbActiveModal: NgbActiveModal,
     private storyEditorStateService: StoryEditorStateService,
