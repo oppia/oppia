@@ -140,7 +140,6 @@ oppia-conversation-skin .oppia-button-icon {
 @media screen and (max-width: 959px) {
   .conversation-skin-cards-container {
     display: block;
-    min-height: 134vh;
     padding: 66px 0;
     position: relative;
     width: 100%;
