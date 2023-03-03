@@ -95,6 +95,7 @@ describe('Create New Story Modal Component', () => {
       component.story.urlFragment = '';
       component.onStoryUrlFragmentChange();
       component.save();
+      component.updateView();
       component.cancel();
       expect(
         storyEditorStateService.updateExistenceOfStoryUrlFragment
