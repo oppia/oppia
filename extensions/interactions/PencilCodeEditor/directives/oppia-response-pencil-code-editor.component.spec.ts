@@ -47,9 +47,9 @@ describe('Response pencil code editor component ', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ResponePencilCodeEditor);
     component = fixture.componentInstance;
-    component.answer = {
+    component.answer = JSON.stringify({
       code: '# Add the initial code snippet here.'
-    };
+    });
   });
 
   it('should initialize the component when submits answer', () => {
