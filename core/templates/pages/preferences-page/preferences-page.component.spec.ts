@@ -163,7 +163,7 @@ describe('Preferences Page Component', () => {
       imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-        ['default-image-url-png', 'default-image-url-webp']);
+        ['profile-image-url-png', 'profile-image-url-webp']);
     });
 
     it('should be defined', () => {
@@ -197,9 +197,9 @@ describe('Preferences Page Component', () => {
       expect(componentInstance.preferredLanguageCodes).toEqual(
         preferencesData.preferred_language_codes);
       expect(componentInstance.profilePicturePngDataUrl).toEqual(
-        'default-image-url-png');
+        'profile-image-url-png');
       expect(componentInstance.profilePictureWebpDataUrl).toEqual(
-        'default-image-url-webp');
+        'profile-image-url-webp');
       expect(componentInstance.defaultDashboard).toEqual(
         preferencesData.default_dashboard);
       expect(componentInstance.canReceiveEmailUpdates).toEqual(
@@ -220,12 +220,12 @@ describe('Preferences Page Component', () => {
 
     it('should get user profile image png data url correctly', () => {
       expect(componentInstance.getProfileImagePngDataUrl('username')).toBe(
-        'default-image-url-png');
+        'profile-image-url-png');
     });
 
     it('should get user profile image webp data url correctly', () => {
       expect(componentInstance.getProfileImageWebpDataUrl('username')).toBe(
-        'default-image-url-webp');
+        'profile-image-url-webp');
     });
 
     it('should set default profile pictures when username is null',

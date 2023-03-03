@@ -56,6 +56,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -466,12 +467,7 @@ describe('Learner dashboard page', () => {
       }
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-        ['default-image-url-png', 'default-image-url-webp']);
-
-      spyOn(userService, 'getUserInfoAsync').and
-        .callFake(async() => {
-          return Promise.resolve(userInfo);
-        });
+        ['profile-image-url-png', 'profile-image-url-webp']);
 
       spyOn(
         learnerDashboardBackendApiService,
@@ -539,12 +535,37 @@ describe('Learner dashboard page', () => {
 
     it('should initialize correctly component properties after its' +
     ' initialization and get data from backend', fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync').and
+        .callFake(async() => {
+          return Promise.resolve(userInfo);
+        });
+      component.ngOnInit();
+      flush();
+
       expect(component.profilePicturePngDataUrl).toEqual(
-        'default-image-url-png');
+        'profile-image-url-png');
       expect(component.profilePictureWebpDataUrl).toEqual(
-        'default-image-url-webp');
+        'profile-image-url-webp');
       expect(component.username).toBe(userInfo.getUsername());
       expect(component.windowIsNarrow).toBeTrue();
+    }));
+
+    it('should get default profile pictures when username is null',
+      fakeAsync(() => {
+        let userInfo = {
+          getUsername: () => null,
+          isSuperAdmin: () => true,
+          getEmail: () => 'test_email@example.com'
+        };
+        spyOn(userService, 'getUserInfoAsync')
+          .and.resolveTo(userInfo as UserInfo);
+        component.ngOnInit();
+        flush();
+
+        expect(component.profilePicturePngDataUrl).toEqual(
+          '/assets/images/avatar/user_blue_150px.png');
+        expect(component.profilePictureWebpDataUrl).toEqual(
+          '/assets/images/avatar/user_blue_150px.webp');
     }));
 
     it('should check whether window is narrow on resizing the screen', () => {
@@ -559,6 +580,10 @@ describe('Learner dashboard page', () => {
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+      spyOn(userService, 'getUserInfoAsync').and
+        .callFake(async() => {
+          return Promise.resolve(userInfo);
+        });
 
       component.ngOnInit();
       flush();
@@ -604,12 +629,12 @@ describe('Learner dashboard page', () => {
 
     it('should get user profile image png data url correctly', () => {
       expect(component.getauthorPicturePngDataUrl('username')).toBe(
-        'default-image-url-png');
+        'profile-image-url-png');
     });
 
     it('should get user profile image webp data url correctly', () => {
       expect(component.getauthorPictureWebpDataUrl('username')).toBe(
-        'default-image-url-webp');
+        'profile-image-url-webp');
     });
 
     it('should toggle active subsection type when changing subsection type',
