@@ -67,7 +67,7 @@ export class StateInteractionEditorComponent
   directiveSubscriptions = new Subscription();
   hasLoaded: boolean;
   interactionEditorIsShown: boolean;
-  showMe: boolean = true;
+  showToggleBtn: boolean = true;
   interactionId: string;
   interactionIsDisabled: boolean;
   interactionPreviewHtml: string;
@@ -246,7 +246,7 @@ export class StateInteractionEditorComponent
   }
 
   toggleBtn(): void {
-    this.showMe = !this.showMe;
+    this.showToggleBtn = !this.showToggleBtn;
   }
 
   toggleInteractionEditor(): void {
@@ -270,7 +270,7 @@ export class StateInteractionEditorComponent
 
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionEditorIsShown = true;
-    this.showMe = false;
+    this.showToggleBtn = false;
     this.hasLoaded = false;
     this.customizationModalReopened = false;
     this.directiveSubscriptions.add(
