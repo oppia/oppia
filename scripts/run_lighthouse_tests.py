@@ -47,7 +47,7 @@ LIGHTHOUSE_CONFIG_FILENAMES: Final = {
     LIGHTHOUSE_MODE_ACCESSIBILITY: {
         '1': '.lighthouserc-accessibility-1.js',
         '2': '.lighthouserc-accessibility-2.js'
-    },
+    }
 }
 APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
