@@ -5172,7 +5172,7 @@ export default {
     "code": "prs",
     "description": "دری (Dari)",
     "direction": "rtl",
-    "decimal_separator": ","
+    "decimal_separator": "."
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
