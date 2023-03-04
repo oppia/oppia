@@ -203,8 +203,8 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     border-radius: 10px;
     color: #fff;
     height: 40px;
-    margin-left: 1px;
-    margin-top: 10px;
+    margin-left: 50px;
+    margin-top: -60px;
     max-width: none;
     padding: 8px 7px 0 6px;
     text-align: center;
@@ -215,7 +215,7 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     color: #fff;
   }
   .e2e-test-search-bar-dropdown-menu {
-    margin-top: -25px;
+    margin-top: 1px;
   }
   oppia-search-bar .oppia-same-row-container {
     display: inline-block;
