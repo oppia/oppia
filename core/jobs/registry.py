@@ -43,6 +43,7 @@ from typing import List, Type
 # We need this to happen for every job in this registry file, because the
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
+from core.jobs.batch_jobs import blog_post_search_indexing_jobs      # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import blog_validation_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import collection_info_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import email_deletion_jobs                 # pylint: disable=unused-import  # isort: skip
