@@ -22,7 +22,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/Answer
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { TextInputValidationService, Validator } from 'interactions/TextInput/directives/text-input-validation.service';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
@@ -41,7 +41,6 @@ describe('TextInputValidationService', () => {
   let goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
@@ -49,7 +48,6 @@ describe('TextInputValidationService', () => {
     validatorService = TestBed.inject(TextInputValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     let customizationArgSpecs =
      INTERACTION_SPECS.TextInput.customization_arg_specs;
@@ -158,7 +156,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -167,7 +165,7 @@ describe('TextInputValidationService', () => {
               }
             }
           }, 'TextInput'),
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -193,7 +191,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -206,7 +204,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -230,7 +228,7 @@ describe('TextInputValidationService', () => {
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -243,7 +241,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -267,7 +265,7 @@ describe('TextInputValidationService', () => {
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -280,7 +278,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -306,7 +304,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -319,7 +317,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -343,7 +341,7 @@ describe('TextInputValidationService', () => {
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -356,7 +354,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -380,7 +378,7 @@ describe('TextInputValidationService', () => {
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
               x: {
@@ -393,7 +391,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
               x: {
@@ -419,7 +417,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -432,7 +430,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -456,7 +454,7 @@ describe('TextInputValidationService', () => {
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -469,7 +467,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: {
@@ -495,7 +493,7 @@ describe('TextInputValidationService', () => {
     let answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -508,7 +506,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -532,7 +530,7 @@ describe('TextInputValidationService', () => {
     answerGroups = [
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
@@ -545,7 +543,7 @@ describe('TextInputValidationService', () => {
       ),
       createAnswerGroupByRules(
         [
-          rof.createFromBackendDict({
+          Rule.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
