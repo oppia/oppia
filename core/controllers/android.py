@@ -23,6 +23,7 @@ from core.controllers import base
 from core.domain import android_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import classroom_domain
 from core.domain import classroom_services
 from core.domain import config_domain
 from core.domain import exp_domain
@@ -91,7 +92,7 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
     activity_id: str
     activity_version: int
     api_key: str
-
+    language_code: Optional[str]
 
 class AndroidActivityHandler(base.BaseHandler[
     Dict[str, str], AndroidActivityHandlerHandlerNormalizedRequestDict
@@ -100,7 +101,7 @@ class AndroidActivityHandler(base.BaseHandler[
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'activity_type': {
@@ -170,7 +171,8 @@ class AndroidActivityHandler(base.BaseHandler[
             subtopic_page_domain.SubtopicPage,
             classroom_config_domain.Classroom,
             topic_domain.Topic,
-            translation_domain.EntityTranslation
+            translation_domain.EntityTranslation,
+            classroom_domain.Classroom
         ]] = None
 
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
@@ -206,6 +208,8 @@ class AndroidActivityHandler(base.BaseHandler[
         elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS:
             entity_type = feconf.TranslatableEntityType(
                 feconf.ENTITY_TYPE_EXPLORATION)
+            assert activity_version is not None
+            assert language_code is not None
             activity = translation_fetchers.get_entity_translation(
                 entity_type, activity_id, activity_version, language_code)
         else:

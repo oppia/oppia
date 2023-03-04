@@ -49,13 +49,15 @@ from core.domain import translation_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import List
+from typing import Optional, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import secrets_services
+    from mypy_imports import translation_models
+    from mypy_imports import translate_services
 
-platform_translate_services = models.Registry.import_translate_services()
+translate_services = models.Registry.import_translate_services()
 secrets_services = models.Registry.import_secrets_services()
 
 (translation_models,) = models.Registry.import_models([
@@ -112,7 +114,7 @@ def initialize_android_test_data() -> str:
 
         # Unconditionally reset possible machine translations.
         translation_models.MachineTranslationModel.delete_multi(
-            translation_models.MachineTranslationModel.get_all())
+            translation_models.MachineTranslationModel.get_all().fetch())
 
         # Remove the topic from classroom pages if it's present.
         classrooms_property = config_domain.CLASSROOM_PAGES_DATA
@@ -269,7 +271,7 @@ def initialize_android_test_data() -> str:
 
     # Arrange fake translations since the emulator translation service won't
     # support the Android test exploration by default.
-    emulator_client = platform_translate_services.CLIENT
+    emulator_client = translate_services.CLIENT
     emulator_client.add_expected_response(
         'en',
         target_language_code,
@@ -307,7 +309,7 @@ def initialize_android_test_data() -> str:
     emulator_client.add_expected_response(
         'en',
         target_language_code,
-        '<p>Remember that two halves, when added together, make one whole.</p>'
+        '<p>Remember that two halves, when added together, make one whole.</p>',
         '<p>Lembre-se que duas metades, quando somadas, formam um todo.</p>'
     )
     emulator_client.add_expected_response(
@@ -530,22 +532,36 @@ def initialize_android_test_data() -> str:
     for translations_dict in translatable_text_dict.values():
         for content_id, translatable_content in translations_dict.items():
             content_to_translate = translatable_content.content_value
+            translated_content_value: feconf.ContentValueType
             if translatable_content.is_data_format_list():
-                translated_content_value = [
+                translated_list = [
                     translation_services.get_and_cache_machine_translation(
                         source_language_code='en',
                         target_language_code=target_language_code,
                         source_text=text_option
                     ) for text_option in content_to_translate
                 ]
+                translated_content_value = []
+                for translated_str in translated_list:
+                    if translated_str is None:
+                        raise Exception()
+                    translated_content_value.append(translated_str)
             else:
-                translated_content_value = (
+                # In order to tighten the type we use isinstance. This will
+                # never fail as is_data_format_list is false so this will be
+                # a string.
+                assert isinstance(content_to_translate, str)
+                translated_str = (
                     translation_services.get_and_cache_machine_translation(
                         source_language_code='en',
                         target_language_code=target_language_code,
                         source_text=content_to_translate
                     )
                 )
+                if translated_str is None:
+                    raise Exception()
+                translated_content_value = translated_str
+
             translated_content = translation_domain.TranslatedContent(
                 translated_content_value,
                 translatable_content.content_format,

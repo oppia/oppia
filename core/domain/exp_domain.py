@@ -1267,7 +1267,6 @@ class VersionedExplorationStatesDict(TypedDict):
 class SerializableExplorationDict(ExplorationDict):
     """Dictionary representing the serializable Exploration object."""
 
-    version: int
     created_on: str
     last_updated: str
 
