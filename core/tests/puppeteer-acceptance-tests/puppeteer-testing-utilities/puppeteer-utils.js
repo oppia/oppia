@@ -42,11 +42,11 @@ module.exports = class baseUser {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await this.page.setViewport({ width: 0, height: 0 });
-        // We are doing this generically because the on-alert behaviour needs
-        // to be defined through an event listener, and Puppeteer does not
-        // support handling these alerts on a case-by-case basis.
-        // See (https://github.com/puppeteer/puppeteer/blob/v0.12.0/docs/api.md#class-dialog)
-        // for more information.
+        /** We accept all browser alerts due to empty messages we get from
+         *  `dialog.message()`. It's an issue with Chromium (see
+         *  https://github.com/puppeteer/puppeteer/issues/3725). Once fixed,
+         *  we'll only accept alerts that are present in a alert messages list.
+         *  Otherwise, an error will occur for unexpected alerts. */
         this.page.on('dialog', async(dialog) => {
           await dialog.accept();
         });
