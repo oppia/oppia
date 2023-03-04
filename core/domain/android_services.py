@@ -49,13 +49,13 @@ from core.domain import translation_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import Optional, List, Union
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import secrets_services
-    from mypy_imports import translation_models
     from mypy_imports import translate_services
+    from mypy_imports import translation_models
 
 translate_services = models.Registry.import_translate_services()
 secrets_services = models.Registry.import_secrets_services()
@@ -79,6 +79,9 @@ def initialize_android_test_data() -> str:
         Exploration: 'android_interactions' from the local assets.
         Subtopic: A dummy subtopic to validate the topic.
         Skill: A dummy skill to validate the subtopic.
+
+    Returns:
+        str. The topic ID of the created topic.
 
     Raises:
         Exception. When used in production mode.
@@ -585,6 +588,7 @@ def initialize_android_test_data() -> str:
 
     return topic_id
 
+
 def _upload_thumbnail(structure_id: str, structure_type: str) -> None:
     """Uploads images to the local datastore to be fetched using the
     AssetDevHandler.
@@ -603,6 +607,7 @@ def _upload_thumbnail(structure_id: str, structure_type: str) -> None:
             'thumbnail',
             False
         )
+
 
 def _create_dummy_question(
     question_id: str, question_content: str, linked_skill_ids: List[str]
@@ -698,6 +703,7 @@ def _create_dummy_question(
     )
     return question
 
+
 def _create_dummy_skill(
     skill_id: str, skill_description: str, explanation: str
 ) -> skill_domain.Skill:
@@ -720,6 +726,7 @@ def _create_dummy_skill(
         skill_id, skill_description, rubrics)
     skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
     return skill
+
 
 def verify_android_build_secret(secret: str) -> bool:
     """Verifies the secret key from Android build.

@@ -4678,7 +4678,6 @@ def is_from_oppia_android_build(
         """Checks whether the request was sent from Oppia Android build process.
 
         Args:
-            secret: str. The secret key sent by the Oppia Android build process.
             **kwargs: *. Keyword arguments.
 
         Returns:

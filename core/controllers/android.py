@@ -82,7 +82,6 @@ class InitializeAndroidTestDataHandler(
         })
 
 
-
 class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of AndroidActivityHandler's normalized_request
     dictionary.
@@ -93,6 +92,7 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
     activity_version: int
     api_key: str
     language_code: Optional[str]
+
 
 class AndroidActivityHandler(base.BaseHandler[
     Dict[str, str], AndroidActivityHandlerHandlerNormalizedRequestDict
