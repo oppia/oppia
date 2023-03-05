@@ -4689,7 +4689,7 @@ def is_from_oppia_android_build(
                 Oppia Android build request.
         """
         if not android_services.verify_android_build_secret(
-            self.request.get('secret')
+            self.normalized_request.get('api_key')
         ):
             raise self.UnauthorizedUserException(
                 'The incoming request is not a valid '

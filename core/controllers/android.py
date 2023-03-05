@@ -39,7 +39,7 @@ from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 
-from typing import Dict, Optional, TypedDict, Union
+from typing import Dict, List, Optional, TypedDict, Union
 
 
 class InitializeAndroidTestDataHandler(
@@ -82,16 +82,22 @@ class InitializeAndroidTestDataHandler(
         })
 
 
+class ActivityDataDict(TypedDict):
+    """Dict representation of items in activites_data."""
+
+    id: str
+    version: Optional[int]
+    language_code: Optional[str]
+
+
 class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of AndroidActivityHandler's normalized_request
     dictionary.
     """
 
     activity_type: str
-    activity_id: str
-    activity_version: int
+    activites_data: List[ActivityDataDict]
     api_key: str
-    language_code: Optional[str]
 
 
 class AndroidActivityHandler(base.BaseHandler[
@@ -118,24 +124,13 @@ class AndroidActivityHandler(base.BaseHandler[
                     ]
                 },
             },
-            'activity_id': {
+            'activities_data': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
                 }
             },
-            'activity_version': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
-            },
-            'language_code': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'secret': {
+            'api_key': {
                 'schema': {
                     'type': 'basestring'
                 }
@@ -160,11 +155,9 @@ class AndroidActivityHandler(base.BaseHandler[
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        activity_id = self.normalized_request['activity_id']
+        activities_data = self.normalized_request['activities_data']
         activity_type = self.normalized_request['activity_type']
-        activity_version = self.normalized_request.get('activity_version')
-        language_code = self.normalized_request.get('language_code')
-        activity: Optional[Union[
+        activities: List[Union[
             exp_domain.Exploration,
             story_domain.Story,
             skill_domain.Skill,
@@ -172,51 +165,89 @@ class AndroidActivityHandler(base.BaseHandler[
             classroom_config_domain.Classroom,
             topic_domain.Topic,
             translation_domain.EntityTranslation,
-            classroom_domain.Classroom
-        ]] = None
+            classroom_domain.Classroom,
+            None
+        ]] = []
 
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            activity = exp_fetchers.get_exploration_by_id(
-                activity_id, strict=False, version=activity_version)
+            activities = [
+                exp_fetchers.get_exploration_by_id(
+                    activity_data['id'],
+                    strict=False,
+                    version=activity_data.get('version')
+                ) for activity_data in activities_data
+            ]
         elif activity_type == constants.ACTIVITY_TYPE_STORY:
-            activity = story_fetchers.get_story_by_id(
-                activity_id, strict=False, version=activity_version)
+            activities = [
+                story_fetchers.get_story_by_id(
+                    activity_data['id'],
+                    strict=False,
+                    version=activity_data.get('version')
+                ) for activity_data in activities_data
+            ]
         elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-            activity = skill_fetchers.get_skill_by_id(
-                activity_id, strict=False, version=activity_version)
+            activities = [
+                skill_fetchers.get_skill_by_id(
+                    activity_data['id'],
+                    strict=False,
+                    version=activity_data.get('version')
+                ) for activity_data in activities_data
+            ]
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-            topic_id, subtopic_page_id = activity_id.split('-')
-            activity = subtopic_page_services.get_subtopic_page_by_id(
-                topic_id,
-                int(subtopic_page_id),
-                strict=False,
-                version=activity_version
-            )
+            for activity_data in activities_data:
+                topic_id, subtopic_page_id = activity_data['id'].split('-')
+                activities.append(
+                    subtopic_page_services.get_subtopic_page_by_id(
+                        topic_id,
+                        int(subtopic_page_id),
+                        strict=False,
+                        version=activity_data.get('version')
+                    )
+                )
         elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
-            if activity_version is not None:
-                raise self.InvalidInputException(
-                    'Version cannot be specified for classroom')
-            matching_classroom_fragment = next(
-                classroom['url_fragment']
-                for classroom in config_domain.CLASSROOM_PAGES_DATA.value
-                if classroom['name'] == activity_id)
+            for activity_data in activities_data:
+                if activity_data.get('version') is not None:
+                    raise self.InvalidInputException(
+                        'Version cannot be specified for classroom')
+                matching_classroom_fragment = next(
+                    classroom['url_fragment']
+                    for classroom in config_domain.CLASSROOM_PAGES_DATA.value
+                    if classroom['name'] == activity_data['id']
+                )
 
-            activity = classroom_config_services.get_classroom_by_url_fragment(
-                activity_id) or (
-                classroom_services.get_classroom_by_url_fragment(
-                    matching_classroom_fragment))
+                activities.append(
+                    classroom_config_services.get_classroom_by_url_fragment(
+                        activity_data['id']
+                    ) or classroom_services.get_classroom_by_url_fragment(
+                        matching_classroom_fragment
+                    )
+                )
         elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS:
             entity_type = feconf.TranslatableEntityType(
                 feconf.ENTITY_TYPE_EXPLORATION)
-            assert activity_version is not None
-            assert language_code is not None
-            activity = translation_fetchers.get_entity_translation(
-                entity_type, activity_id, activity_version, language_code)
+            for activity_data in activities_data:
+                if (
+                    activity_data.get('version') is None or
+                    activity_data.get('language_code') is None
+                ):
+                    raise self.InvalidInputException(
+                        'Version cannot be specified for classroom')
+                activities.append(translation_fetchers.get_entity_translation(
+                    entity_type,
+                    activity_data['id'],
+                    activity_data['version'],
+                    activity_data['language_code']
+                ))
         else:
-            activity = topic_fetchers.get_topic_by_id(
-                activity_id, strict=False, version=activity_version)
+            activities = [
+                topic_fetchers.get_topic_by_id(
+                    activity_data['id'],
+                    strict=False,
+                    version=activity_data.get('version')
+                ) for activity_data in activities_data
+            ]
 
-        if activity is None:
-            raise self.PageNotFoundException('Activity does not exist')
-
-        self.render_json(activity.to_dict())
+        self.render_json([
+            activity.to_dict() if activity is not None else None
+            for activity in activities
+        ])

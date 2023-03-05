@@ -1643,6 +1643,7 @@ MATH_INTERACTION_IDS = [
 # The task entry ID template used by the task entry model.
 TASK_ENTRY_ID_TEMPLATE = '%s.%s.%d.%s.%s.%s'
 
+
 # The composite entity ID template used by the task entry model.
 COMPOSITE_ENTITY_ID_TEMPLATE = '%s.%s.%d'
 
