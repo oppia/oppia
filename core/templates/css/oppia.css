@@ -2486,7 +2486,8 @@ div#ng-curtain {
 }
 
 .oppia-navbar-dropdown-toggle:focus {
-  color: #fff;
+  background-color: #fff;
+  color: #00645c;
 }
 .oppia-navbar-profile-picture {
   height: 32px;
