@@ -52,9 +52,9 @@ describe('Short response pencil code editor component ', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ShortResponePencilCodeEditor);
     component = fixture.componentInstance;
-    component.answer = JSON.stringify({
+    component.answer = {
       code: '# Add the initial code snippet here.'
-    });
+    } as unknown as string;
   });
 
   it('should initialize the component when submits answer', () => {

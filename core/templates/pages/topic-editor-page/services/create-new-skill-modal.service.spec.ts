@@ -139,7 +139,8 @@ describe('Create New Skill Modal Service', () => {
       // MockSkillCreationBackendApiService is a class and not an interface.
       // @ts-ignore
       TestBed.inject(SkillCreationBackendApiService) as
-    MockSkillCreationBackendApiService);
+      MockSkillCreationBackendApiService
+    );
   });
 
   it('should not create new skill when skill creation is in progress', () => {
