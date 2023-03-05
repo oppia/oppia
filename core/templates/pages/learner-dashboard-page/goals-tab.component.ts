@@ -62,6 +62,7 @@ export class GoalsTabComponent implements OnInit {
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];
+  showThreeDotsDropdown!: boolean[];
   pawImageUrl: string = '';
   bookImageUrl: string = '';
   starImageUrl: string = '';
@@ -82,13 +83,14 @@ export class GoalsTabComponent implements OnInit {
   editGoalsTopicClassification: number[] = [];
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
   windowIsNarrow: boolean = false;
-  showThreeDotsDropdown: boolean = false;
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
     this.MAX_CURRENT_GOALS_LENGTH = AppConstants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
+    this.showThreeDotsDropdown = [];
     this.currentGoalsStoryIsShown[0] = true;
+    this.showThreeDotsDropdown[0] = false;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/book_icon.png');
@@ -188,8 +190,8 @@ export class GoalsTabComponent implements OnInit {
     }
   }
 
-  toggleThreeDotsDropdown(): void {
-    this.showThreeDotsDropdown = !this.showThreeDotsDropdown;
+  toggleThreeDotsDropdown(index: number): void {
+    this.showThreeDotsDropdown[index] = !(this.showThreeDotsDropdown[index]);
   }
 
   /**
@@ -206,7 +208,7 @@ export class GoalsTabComponent implements OnInit {
       targetElement &&
       !this.dropdownRef.nativeElement.contains(targetElement)
     ) {
-      this.showThreeDotsDropdown = false;
+      this.showThreeDotsDropdown[0] = false;
     }
   }
 
