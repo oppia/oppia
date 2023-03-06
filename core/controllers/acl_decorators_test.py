@@ -7584,23 +7584,25 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-        URL_PATH_ARGS_SCHEMAS = {
-            'secret': {
-                'schema': {
-                    'type': 'basestring'
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+            'GET': {
+                'api_key': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 }
             }
         }
-        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.is_from_oppia_android_build
-        def get(self, secret: str) -> None:
-            self.render_json({'secret': secret})
+        def get(self) -> None:
+            self.render_json({'secret': self.normalized_request['api_key']})
 
     def setUp(self) -> None:
         super().setUp()
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_secret_page/<secret>', self.MockHandler)],
+            [webapp2.Route('/mock_secret_page', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
 
@@ -7618,7 +7620,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         with testapp_swap:
             with swap_api_key_secrets_return_none:
                 response = self.get_json(
-                    '/mock_secret_page/secret',
+                    '/mock_secret_page?api_key=secret',
                     expected_status_int=401
                 )
 
@@ -7634,7 +7636,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
-                '/mock_secret_page/nonsecret',
+                '/mock_secret_page?api_key=nonsecret',
                 expected_status_int=401
             )
 
@@ -7650,7 +7652,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
-                '/mock_secret_page/secret',
+                '/mock_secret_page?api_key=secret',
                 expected_status_int=200
             )
 

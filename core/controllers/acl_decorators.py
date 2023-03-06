@@ -49,6 +49,10 @@ from core.domain import user_services
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
+MYPY = False
+if MYPY:
+    from core.controllers import android
+
 # Note: '_SelfBaseHandlerType' is a private type variable because it is only
 # supposed to denote the 'self' argument of the handler function that the
 # decorator is decorating. So, do not make it public type variable in future.
@@ -4673,7 +4677,7 @@ def is_from_oppia_android_build(
     # arguments with different types.
     @functools.wraps(handler)
     def test_is_from_oppia_android_build(
-        self: _SelfBaseHandlerType, **kwargs: Any
+        self: Type[android.AndroidActivityHandler], **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the request was sent from Oppia Android build process.
 
@@ -4688,8 +4692,9 @@ def is_from_oppia_android_build(
             UnauthorizedUserException. If incoming request is not from a valid
                 Oppia Android build request.
         """
+        assert self.normalized_request is not None
         if not android_services.verify_android_build_secret(
-            self.normalized_request.get('api_key')
+            self.normalized_request['api_key']
         ):
             raise self.UnauthorizedUserException(
                 'The incoming request is not a valid '

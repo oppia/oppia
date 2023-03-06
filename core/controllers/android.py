@@ -96,7 +96,7 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
     """
 
     activity_type: str
-    activites_data: List[ActivityDataDict]
+    activities_data: List[ActivityDataDict]
     api_key: str
 
 
@@ -138,15 +138,6 @@ class AndroidActivityHandler(base.BaseHandler[
         }
     }
 
-    ACTIVITY_TYPE_TO_FETCHER = {
-        constants.ACTIVITY_TYPE_EXPLORATION: exp_fetchers.get_exploration_by_id,
-        constants.ACTIVITY_TYPE_STORY: story_fetchers.get_story_by_id,
-        constants.ACTIVITY_TYPE_SKILL: skill_fetchers.get_skill_by_id,
-        constants.ACTIVITY_TYPE_SUBTOPIC: (
-            subtopic_page_services.get_subtopic_page_by_id),
-        constants.ACTIVITY_TYPE_LEARN_TOPIC: topic_fetchers.get_topic_by_id
-    }
-
     # Here, the 'secret' url_path_argument is not used in the function body
     # because the actual usage of 'secret' lies within the
     # 'is_from_oppia_android_build' decorator, and here we are getting 'secret'
@@ -157,7 +148,7 @@ class AndroidActivityHandler(base.BaseHandler[
         assert self.normalized_request is not None
         activities_data = self.normalized_request['activities_data']
         activity_type = self.normalized_request['activity_type']
-        activities: List[Union[
+        activities: Dict[str, Union[
             exp_domain.Exploration,
             story_domain.Story,
             skill_domain.Skill,
@@ -167,36 +158,36 @@ class AndroidActivityHandler(base.BaseHandler[
             translation_domain.EntityTranslation,
             classroom_domain.Classroom,
             None
-        ]] = []
+        ]] = {}
 
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            activities = [
-                exp_fetchers.get_exploration_by_id(
+            activities = {
+                activity_data['id']: exp_fetchers.get_exploration_by_id(
                     activity_data['id'],
                     strict=False,
                     version=activity_data.get('version')
                 ) for activity_data in activities_data
-            ]
+            }
         elif activity_type == constants.ACTIVITY_TYPE_STORY:
-            activities = [
-                story_fetchers.get_story_by_id(
+            activities = {
+                activity_data['id']: story_fetchers.get_story_by_id(
                     activity_data['id'],
                     strict=False,
                     version=activity_data.get('version')
                 ) for activity_data in activities_data
-            ]
+            }
         elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-            activities = [
-                skill_fetchers.get_skill_by_id(
+            activities = {
+                activity_data['id']: skill_fetchers.get_skill_by_id(
                     activity_data['id'],
                     strict=False,
                     version=activity_data.get('version')
                 ) for activity_data in activities_data
-            ]
+            }
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
             for activity_data in activities_data:
                 topic_id, subtopic_page_id = activity_data['id'].split('-')
-                activities.append(
+                activities[activity_data['id']] = (
                     subtopic_page_services.get_subtopic_page_by_id(
                         topic_id,
                         int(subtopic_page_id),
@@ -215,7 +206,7 @@ class AndroidActivityHandler(base.BaseHandler[
                     if classroom['name'] == activity_data['id']
                 )
 
-                activities.append(
+                activities[activity_data['id']] = (
                     classroom_config_services.get_classroom_by_url_fragment(
                         activity_data['id']
                     ) or classroom_services.get_classroom_by_url_fragment(
@@ -226,28 +217,29 @@ class AndroidActivityHandler(base.BaseHandler[
             entity_type = feconf.TranslatableEntityType(
                 feconf.ENTITY_TYPE_EXPLORATION)
             for activity_data in activities_data:
-                if (
-                    activity_data.get('version') is None or
-                    activity_data.get('language_code') is None
-                ):
+                version = activity_data.get('version')
+                language_code = activity_data.get('language_code')
+                if version is None or language_code is None:
                     raise self.InvalidInputException(
                         'Version cannot be specified for classroom')
-                activities.append(translation_fetchers.get_entity_translation(
-                    entity_type,
-                    activity_data['id'],
-                    activity_data['version'],
-                    activity_data['language_code']
-                ))
+                activities[activity_data['id']] = (
+                    translation_fetchers.get_entity_translation(
+                        entity_type,
+                        activity_data['id'],
+                        version,
+                        language_code
+                    )
+                )
         else:
-            activities = [
-                topic_fetchers.get_topic_by_id(
+            activities = {
+                activity_data['id']: topic_fetchers.get_topic_by_id(
                     activity_data['id'],
                     strict=False,
                     version=activity_data.get('version')
                 ) for activity_data in activities_data
-            ]
+            }
 
-        self.render_json([
-            activity.to_dict() if activity is not None else None
-            for activity in activities
-        ])
+        self.render_json({
+            id: activity.to_dict() if activity is not None else None
+            for id, activity in activities.items()
+        })

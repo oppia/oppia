@@ -99,7 +99,8 @@ class StartTests(test_utils.GenericTestBase):
                 'enable_host_checking': True,
                 'automatic_restart': True,
                 'skip_sdk_update_check': True,
-                'port': PORT_NUMBER_FOR_GAE_SERVER
+                'port': PORT_NUMBER_FOR_GAE_SERVER,
+                'secrets': None,
             }])
         self.swap_create_server = self.swap_with_checks(
             servers, 'create_managed_web_browser',
