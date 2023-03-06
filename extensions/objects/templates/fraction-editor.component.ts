@@ -66,6 +66,10 @@ export class FractionEditorComponent implements OnInit {
       }
       this.errorMessageI18nKey = '';
       this.currentFractionValueIsValid = true;
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
         this.errorMessageI18nKey = parsingError.message;
