@@ -109,7 +109,7 @@ export class InteractiveMathEquationInput implements OnInit {
     );
     this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.allowedVariablesWithValue) as unknown as string[]);
+        this.allowedVariablesWithValue) as string[]);
 
     Guppy.event('change', (focusObj: FocusObj) => {
       let activeGuppyObject = (

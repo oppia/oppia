@@ -231,7 +231,13 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        ['1'], 'abc' as unknown as number, true
+        // This throws "Type string is not assignable to type
+        // 'number'." We need to suppress this error
+        // because of the need to test validations. This
+        // throws an error only in the frontend test and
+        // not in the backend test.
+        // @ts-ignore
+        ['1'], 'abc' as number, true
       ).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -273,7 +279,8 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionsAsync(
         // This throws "Type 'string' is not assignable to type 'string[]'."
         // We need to suppress this error because of the need to test
-        // validations.
+        // validations. This throws an error only in the frontend test and
+        // not in the backend test.
         // @ts-ignore
         'x', 1, true).then(successHandler, failHandler);
       flushMicrotasks();
@@ -290,7 +297,8 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionsAsync(
         // This throws "Type 'number[]' is not assignable to type 'string[]'."
         // We need to suppress this error because of the need to test
-        // validations.
+        // validations. This throws an error only in the frontend test and
+        // not in the backend test.
         // @ts-ignore
         [1, 2], 1, true
       ).then(successHandler, failHandler);
@@ -308,7 +316,8 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionsAsync(
         // This throws "Type 'null' is not assignable to type 'string[]'."
         // We need to suppress this error because of the need to test
-        // validations.
+        // validations. This throws an error only in the frontend test and
+        // not in the backend test.
         // @ts-ignore
         null, 1, true).then(successHandler, failHandler);
       flushMicrotasks();
