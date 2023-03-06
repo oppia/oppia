@@ -80,9 +80,10 @@ export class StoryUpdateService {
     try {
       this._undoRedoService.applyChange(changeObj, story);
       this._updateStoryEditorBrowserTabsUnsavedChangesStatus(story);
-    // The catch parameter type can only be any or unknown. The type 'unknown'
-    // is safer than type 'any' because it reminds us that we need to perform
-    // some sorts of type-checks before operating on our values.
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (err: unknown) {
       if (err instanceof Error) {
         this._alertsService.addWarning(err.message);
