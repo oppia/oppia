@@ -3,9 +3,14 @@
   <mat-select class="e2e-test-main-html-select-selector"
               [(value)]="selection"
               disableRipple>
+    <mat-select-trigger>
+      <oppia-rte-output-display class="oppia-html-select-option"
+                                [rteString]="selection.val">
+      </oppia-rte-output-display>
+    </mat-select-trigger>
     <mat-option class="e2e-test-html-select-selector"
                 *ngFor="let choice of options; index as index"
-                [value]="choice.id"
+                [value]="choice"
                 (click)="updatedSelection()">
       <oppia-rte-output-display class="oppia-html-select-option"
                                 [rteString]="choice.val">
