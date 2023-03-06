@@ -35,7 +35,7 @@ import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFac
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 
 export interface InputResponsePair {
-  learnerInput: string;
+  learnerInput: string | { answerDetails: string };
   // 'oppiaResponse' is null when the response for the input has
   // not been received yet.
   oppiaResponse: string | null;
@@ -215,7 +215,7 @@ export class StateCard {
   }
 
   // This will return null when there is no input response pair.
-  getLastAnswer(): string | null {
+  getLastAnswer(): string | null | { answerDetails: string } {
     const lastInputResponsePair = this.getLastInputResponsePair();
     if (lastInputResponsePair === null) {
       return null;

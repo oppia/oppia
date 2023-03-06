@@ -67,7 +67,8 @@ describe('Story node model', () => {
 
     // This throws "TS2345". We need to suppress this error because
     // we are testing that _checkValidNodeId return false when
-    // typeof nodeId is not a string.
+    // typeof nodeId is not a string. We cannot use a string as
+    // nodeId because it will throw an error in the constructor.
     // @ts-ignore
     const invalidStoryNode2 = StoryNode.createFromIdAndTitle({}, '');
 

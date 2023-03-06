@@ -56,6 +56,7 @@ import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-p
 import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -82,7 +83,7 @@ export class ExplorationStatesService {
 
   stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
   private _states: States | null = null;
-  private _refreshGraphEventEmitter: EventEmitter<unknown> = new EventEmitter();
+  private _refreshGraphEventEmitter: EventEmitter<string> = new EventEmitter();
 
   constructor(
     private angularNameService: AngularNameService,
@@ -612,10 +613,10 @@ export class ExplorationStatesService {
   }
 
   saveConfirmedUnclassifiedAnswers(
-      stateName: string, newAnswers: AnswerGroup[]
+      stateName: string, newAnswers: AnswerGroup[] | InteractionAnswer[]
   ): void {
     this.saveStateProperty(
-      stateName, 'confirmed_unclassified_answers', newAnswers);
+      stateName, 'confirmed_unclassified_answers', newAnswers as AnswerGroup[]);
     this.stateInteractionSavedCallbacks.forEach((callback) => {
       callback(this._states.getState(stateName));
     });
@@ -814,7 +815,7 @@ export class ExplorationStatesService {
     this.stateInteractionSavedCallbacks.push(callback);
   }
 
-  get onRefreshGraph(): EventEmitter<unknown> {
+  get onRefreshGraph(): EventEmitter<string> {
     return this._refreshGraphEventEmitter;
   }
 }
