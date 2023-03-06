@@ -205,7 +205,6 @@ describe('Exploration Improvements Service', () => {
     stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(Promise.resolve(
       new Map()));
 
-    explorationImprovementsService.ngOnInit();
     explorationStatesService.init(statesBackendDict, false);
   });
 
