@@ -41,6 +41,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { Rule } from 'domain/exploration/rule.model';
+import { InitializeAnswerGroups } from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -124,7 +125,12 @@ export class ResponsesService {
       stateSolutionSavedMemento.correctAnswer !== null);
 
     const activeStateName = this.stateEditorService.getActiveStateName();
-    if (interactionCanHaveSolution && solutionExists && activeStateName) {
+    if (
+      interactionCanHaveSolution &&
+      stateSolutionSavedMemento &&
+      solutionExists &&
+      activeStateName
+    ) {
       const interaction = this.stateEditorService.getInteraction();
       interaction.answerGroups = cloneDeep(this._answerGroups);
       interaction.defaultOutcome = cloneDeep(this._defaultOutcome);
@@ -267,11 +273,12 @@ export class ResponsesService {
 
   // The 'data' arg is a list of interaction handlers for the
   // currently-active state.
-  init(data: Interaction): void {
-    this._answerGroups = cloneDeep(data.answerGroups);
-    this._defaultOutcome = cloneDeep(data.defaultOutcome);
+  init(data: Interaction | string): void {
+    let interactionData = data as Interaction;
+    this._answerGroups = cloneDeep(interactionData.answerGroups);
+    this._defaultOutcome = cloneDeep(interactionData.defaultOutcome);
     this._confirmedUnclassifiedAnswers = cloneDeep(
-      data.confirmedUnclassifiedAnswers
+      interactionData.confirmedUnclassifiedAnswers
     );
 
     this._answerGroupsMemento = cloneDeep(this._answerGroups);
@@ -599,11 +606,13 @@ export class ResponsesService {
     callback(this._answerGroupsMemento, this._defaultOutcomeMemento);
   }
 
-  get onAnswerGroupsChanged(): EventEmitter<unknown> {
+  get onAnswerGroupsChanged(): EventEmitter<string> {
     return this._answerGroupsChangedEventEmitter;
   }
 
-  get onInitializeAnswerGroups(): EventEmitter<unknown> {
+  get onInitializeAnswerGroups(): (
+    EventEmitter<string | Interaction | InitializeAnswerGroups>
+  ) {
     return this._initializeAnswerGroupsEventEmitter;
   }
 }
