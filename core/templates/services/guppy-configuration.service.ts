@@ -109,7 +109,7 @@ export class GuppyConfigurationService {
     GuppyConfigurationService.serviceIsInitialized = true;
   }
 
-  changeDivSymbol(useFraction: boolean = false): void {
+  changeDivSymbol(useFraction: (boolean | { value: boolean }) = false): void {
     Guppy.add_global_symbol(
       '/', useFraction ? FRACTION_SYMBOL_DICT : DIVISION_SYMBOL_DICT
     );
