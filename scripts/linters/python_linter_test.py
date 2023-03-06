@@ -64,6 +64,35 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Import order', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 
+    def test_valid_job_imports(self) -> None:
+        batch_jobs_dir: str = (
+            os.path.join(os.getcwd(), 'core', 'jobs', 'batch_jobs')
+        )
+        lint_task_report = (
+            python_linter.check_jobs_imports(batch_jobs_dir, VALID_PY_FILEPATH)
+        )
+        self.assertEqual(
+            'SUCCESS  Check jobs imports in jobs registry check passed',
+            lint_task_report.get_report()[-1])
+        self.assertEqual(
+            'Check jobs imports in jobs registry', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
+    def test_invalid_job_imports(self) -> None:
+        batch_jobs_dir: str = (
+            os.path.join(os.getcwd(), 'core', 'jobs', 'batch_jobs')
+        )
+        lint_task_report = (
+            python_linter.check_jobs_imports(
+                batch_jobs_dir, INVALID_IMPORT_FILEPATH)
+        )
+        self.assertEqual(
+            'FAILED  Check jobs imports in jobs registry check failed',
+            lint_task_report.get_report()[-1])
+        self.assertEqual(
+            'Check jobs imports in jobs registry', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
     def test_valid_file_with_pylint(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [VALID_PY_FILEPATH]).lint_py_files()

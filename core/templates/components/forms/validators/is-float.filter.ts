@@ -17,7 +17,7 @@
  */
 
 angular.module('oppia').filter('isFloat', [function() {
-  return function(input) {
+  return function(input: { toString: () => string }) {
     var FLOAT_REGEXP = /(?=.*\d)^\-?\d*(\.|\,)?\d*\%?$/;
     // This regex accepts floats in the following formats:
     // 0.

@@ -44,7 +44,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 const debounce = (delay: number = 5): MethodDecorator => {
   return function(
-      target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+      target: string, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     const key = `__timeout__${propertyKey}`;
 

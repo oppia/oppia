@@ -27,7 +27,7 @@ angular.module('oppia').directive('angularHtmlBind', [
       link: function(scope, elm, attrs) {
         // Clean up old scopes if the html changes.
         // Reference: https://stackoverflow.com/a/42927814
-        var newScope;
+        var newScope: ng.IScope;
         scope.$watch(attrs.htmlData, function(newValue: string) {
           if (newScope) {
             newScope.$destroy();

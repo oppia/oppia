@@ -40,7 +40,7 @@ describe('Device Info Service', () => {
   it('should evaluate when a device is a mobile device', () => {
     spyOnProperty(wrs.nativeWindow, 'navigator').and.callFake(() => ({
       userAgent: mobileUserAgent
-    }));
+    } as Navigator));
 
     expect(dis.isMobileDevice()).toBe(true);
     expect(dis.isMobileUserAgent()).toBe(true);
@@ -49,7 +49,7 @@ describe('Device Info Service', () => {
   it('should evaluate when a device is not a mobile device', () => {
     spyOnProperty(wrs.nativeWindow, 'navigator').and.callFake(() => ({
       userAgent: desktopUserAgent
-    }));
+    } as Navigator));
 
     expect(dis.isMobileDevice()).toBe(false);
     expect(dis.isMobileUserAgent()).toBe(false);

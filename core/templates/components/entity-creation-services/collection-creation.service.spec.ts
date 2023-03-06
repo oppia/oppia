@@ -65,7 +65,7 @@ describe('Collection Creation service', () => {
           href: ''
         },
         gtag: () => {}
-      });
+      } as unknown as Window);
 
       collectionCreationService.createNewCollection();
 
@@ -120,7 +120,7 @@ describe('Collection Creation service', () => {
           href: ''
         },
         gtag: () => {}
-      });
+      } as unknown as Window);
 
       collectionCreationService.createNewCollection();
       collectionCreationService.createNewCollection();
