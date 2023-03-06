@@ -30,7 +30,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { ResponsesService } from '../../services/responses.service';
-import { TeachOppiaModalComponent } from './teach-oppia-modal.component';
+import { TeachOppiaModalComponent, UnresolvedAnswer } from './teach-oppia-modal.component';
 import { TruncateInputBasedOnInteractionAnswerTypePipe } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
@@ -311,13 +311,16 @@ describe('Teach Oppia Modal Component', () => {
         Object.defineProperty(component, 'unresolvedAnswers', {
           get: () => undefined
         });
-        spyOnProperty(component, 'unresolvedAnswers').and.returnValue([{}, {
-          answer: 'Correct answer',
-          classificationResult: {
-            classificationCategorization: 'explicit',
-            answerGroupIndex: 0
-          }
-        }]);
+        spyOnProperty(component, 'unresolvedAnswers').and.returnValue([
+          {} as UnresolvedAnswer,
+          {
+            answer: 'Correct answer',
+            classificationResult: {
+              classificationCategorization: 'explicit',
+              answerGroupIndex: 0
+            },
+          } as UnresolvedAnswer
+        ]);
         component.confirmAnswerAssignment(1);
 
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
