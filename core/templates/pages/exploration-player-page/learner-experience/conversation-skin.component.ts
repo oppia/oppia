@@ -67,7 +67,7 @@ import { ExplorationPlayerConstants } from '../exploration-player-page.constants
 import { AppConstants } from 'app.constants';
 import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
 import { StoryViewerDomainConstants } from 'domain/story_viewer/story-viewer-domain.constants';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
@@ -499,16 +499,16 @@ export class ConversationSkinComponent {
     });
   }
 
-  doesCollectionAllowsGuestProgress(collectionId: string): boolean {
+  doesCollectionAllowsGuestProgress(collectionId: string | never): boolean {
     let whiteListedCollectionIds = (
       AppConstants.
         WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
     );
     return (
       (
-        whiteListedCollectionIds as unknown as string[]
+        whiteListedCollectionIds as readonly[]
       ).
-        indexOf(collectionId) !== -1);
+        indexOf(collectionId as never) !== -1);
   }
 
   isSubmitButtonDisabled(): boolean {

@@ -22,6 +22,15 @@
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
+
+interface StringValidatorSchema {
+  type: string;
+  items: {
+    type: string;
+  };
+  validators: { id: string }[];
+}
 
 @Component({
   selector: 'set-of-unicode-string-editor',
@@ -33,13 +42,9 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
-  // TODO(#13015): Remove use of unknown as a type.
-  // The property 'value' is dependent on another property, 'localValue', from
-  // 'schema-based-editor'. Most components using 'localValue' are currently in
-  // AngularJS, so its type cannot be determined for now.
-  @Input() value: unknown;
+  @Input() value!: SchemaDefaultValue;
   @Output() valueChanged = new EventEmitter();
-  SCHEMA = {
+  SCHEMA: StringValidatorSchema = {
     type: 'list',
     items: {
       type: 'unicode'
@@ -58,11 +63,11 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
     }
   }
 
-  getSchema(): unknown {
+  getSchema(): StringValidatorSchema {
     return this.SCHEMA;
   }
 
-  updateValue(value: unknown): void {
+  updateValue(value: SchemaDefaultValue): void {
     if (this.value === value) {
       return;
     }

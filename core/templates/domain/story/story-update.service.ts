@@ -29,7 +29,7 @@ import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
-import { Story } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { StoryContents } from 'domain/story/story-contents-object.model';
 import { StoryNode } from './story-node.model';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
@@ -80,9 +80,10 @@ export class StoryUpdateService {
     try {
       this._undoRedoService.applyChange(changeObj, story);
       this._updateStoryEditorBrowserTabsUnsavedChangesStatus(story);
-    // The catch parameter type can only be any or unknown. The type 'unknown'
-    // is safer than type 'any' because it reminds us that we need to perform
-    // some sorts of type-checks before operating on our values.
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (err: unknown) {
       if (err instanceof Error) {
         this._alertsService.addWarning(err.message);
