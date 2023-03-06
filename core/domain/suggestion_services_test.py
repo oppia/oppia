@@ -3308,7 +3308,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(
             last_message.text,
-            feconf.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
+            constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(
             suggestion.final_reviewer_id, feconf.SUGGESTION_BOT_USER_ID)

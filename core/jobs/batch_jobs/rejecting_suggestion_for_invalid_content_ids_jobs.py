@@ -83,10 +83,9 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         suggestion_dicts = _get_suggestion_dicts(self.pipeline)
         total_processed_suggestions_count_job_run_results = (
             suggestion_dicts
-            | 'Get suggestions' >> beam.Map(
+            | 'Get suggestions' >> beam.FlatMap(
                 lambda suggestions_dict: suggestions_dict['suggestions']
-                )
-            | 'Flatten suggestions' >> beam.FlatMap(lambda x: x)
+            )
             | 'Total processed suggestion count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'TOTAL PROCESSED SUGGESTIONS'))
@@ -184,10 +183,9 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         suggestion_dicts = _get_suggestion_dicts(self.pipeline)
         total_processed_suggestions_count_job_run_results = (
             suggestion_dicts
-            | 'Get suggestions' >> beam.Map(
+            | 'Get suggestions' >> beam.FlatMap(
                 lambda suggestions_dict: suggestions_dict['suggestions']
-                )
-            | 'Flatten suggestions' >> beam.FlatMap(lambda x: x)
+            )
             | 'Total processed suggestion count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'TOTAL PROCESSED SUGGESTIONS'))

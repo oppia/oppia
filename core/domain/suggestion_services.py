@@ -932,7 +932,7 @@ def auto_reject_translation_suggestions_for_content_ids(
         if suggestion.change.content_id in content_ids]
     reject_suggestions(
         obsolete_suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
-        feconf.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
+        constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
 
 
 def resubmit_rejected_suggestion(
