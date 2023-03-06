@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import functools
 
-from google.cloud import datastore
+from third_party.python_libs.google.cloud import datastore
 
 from typing import Any, Callable
 
