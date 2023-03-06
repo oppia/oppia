@@ -34,7 +34,7 @@ angular.module('oppia').directive('oppiaRoot', [
           $scope.initialized = false;
           OppiaAngularRootComponent.rteHelperService = RteHelperService;
           $scope.onInit = function() {
-            const map: Record<string, unknown[]> = {};
+            const map: Record<string, Object[]> = {};
             for (let [serviceName, serviceType] of angularServices) {
               map[serviceName] = [serviceType];
             }
