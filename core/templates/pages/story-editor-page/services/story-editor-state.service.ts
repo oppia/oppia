@@ -282,19 +282,19 @@ export class StoryEditorStateService {
     return this._storyIsBeingSaved;
   }
 
-  get onStoryInitialized(): EventEmitter<unknown> {
+  get onStoryInitialized(): EventEmitter<string> {
     return this._storyInitializedEventEmitter;
   }
 
-  get onStoryReinitialized(): EventEmitter<unknown> {
+  get onStoryReinitialized(): EventEmitter<string> {
     return this._storyReinitializedEventEmitter;
   }
 
-  get onViewStoryNodeEditor(): EventEmitter<unknown> {
+  get onViewStoryNodeEditor(): EventEmitter<string> {
     return this._viewStoryNodeEditorEventEmitter;
   }
 
-  get onRecalculateAvailableNodes(): EventEmitter<unknown> {
+  get onRecalculateAvailableNodes(): EventEmitter<string> {
     return this._recalculateAvailableNodesEventEmitter;
   }
 

@@ -145,7 +145,7 @@ export class ExplorationPropertyService {
     }
 
     this.changeListService.editExplorationProperty(
-      this.propertyName, newBackendValue, oldBackendValue);
+      this.propertyName, newBackendValue as string, oldBackendValue as string);
     this.savedMemento = cloneDeep(this.displayed);
 
     this._explorationPropertyChangedEventEmitter.emit();

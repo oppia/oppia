@@ -307,10 +307,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.skillIdToSummaryMap[summary.id] = summary.description;
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
                   $scope.story, $scope.getId(), summary.id);
-                // The catch parameter type can only be any or unknown. The type
-                // 'unknown' is safer than type 'any' because it reminds us
-                // that we need to performsome sorts of type-checks before
-                // operating on our values.
+                // Unknown type is used because we don't know which type of
+                // error is thrown.
               } catch (err: unknown) {
                 if (err instanceof Error) {
                   AlertsService.addInfoMessage(

@@ -51,7 +51,7 @@ describe('Topic Editor Routing Service', () => {
 
   beforeEach(() => {
     ters = TestBed.inject(TopicEditorRoutingService);
-    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
   });
 
   it('should return the default active tab name', () => {

@@ -46,7 +46,7 @@ export class InteractiveSetInputComponent implements OnInit {
     type: string;
     items: {
       type: string;
-    };
+    } | Schema;
     'ui_config': {
       'add_element_text': string;
     };
@@ -83,7 +83,7 @@ export class InteractiveSetInputComponent implements OnInit {
   }
 
   getSchema(): Schema {
-    return this.schema as unknown as Schema;
+    return this.schema as Schema;
   }
 
   ngOnInit(): void {

@@ -618,7 +618,7 @@ describe('Library Page Component', () => {
     }
 
     spyOn(window, '$').and.returnValue({
-      animate: (options, arg2: {
+      animate: (options: string[], arg2: {
         duration: number;
         queue: boolean;
         start: () => void;
@@ -676,7 +676,7 @@ describe('Library Page Component', () => {
     }
 
     spyOn(window, '$').and.returnValue({
-      animate: (options, arg2: {
+      animate: (options: string[], arg2: {
         duration: number;
         queue: boolean;
         start: () => void;

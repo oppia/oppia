@@ -196,9 +196,8 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             contains: (text: string) => {
               return true;
             }
-          }
-
-        }
+          },
+        } as unknown as EventTarget
       );
       spyOn(currentInteractionService, 'onSubmit').and.callThrough();
       spyOn(component, 'submitAnswer').and.callThrough();
@@ -254,9 +253,8 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             contains: (text: string) => {
               return true;
             }
-          }
-
-        }
+          },
+        } as unknown as EventTarget
       );
       spyOn(currentInteractionService, 'onSubmit').and.callThrough();
       spyOn(component, 'submitAnswer').and.callThrough();

@@ -112,8 +112,12 @@ describe('Save Validation Fail Modal Component', () => {
 
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        reload: reloadSpy
-      }
+        _hash: '',
+        _hashChange: null,
+        hash: '',
+        reload: reloadSpy,
+      },
+      onhashchange: null,
     });
 
     component.closeAndRefresh();

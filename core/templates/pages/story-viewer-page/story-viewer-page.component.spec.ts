@@ -111,7 +111,7 @@ describe('Story Viewer Page component', () => {
         reload: ()=>{},
         href: '/home'
       }
-    });
+    } as Window);
   }));
 
   beforeEach(() => {

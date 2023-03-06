@@ -123,7 +123,8 @@ describe('Translation Modal Component', () => {
     component.contentPanel = new RteOutputDisplayComponent(
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'ViewContainerRef'." We need to suppress this error because of
-      // the need to test validations.
+      // the need to test validations. This is because the component is not
+      // strictly typed yet.
       // @ts-ignore
       null, null, new ElementRef({offsetHeight: 200}), null);
     getUserContributionRightsDataAsyncSpy = spyOn(

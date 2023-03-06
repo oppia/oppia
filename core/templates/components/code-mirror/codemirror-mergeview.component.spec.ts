@@ -42,7 +42,7 @@ describe('Oppia CodeMirror Component', () => {
   }));
 
   it('should throw error if codemirror is undefined', () => {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({});
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({} as Window);
     expect(() => {
       component.ngOnInit();
     }).toThrowError('CodeMirror not found.');
@@ -81,7 +81,7 @@ describe('Oppia CodeMirror Component', () => {
           };
         }
       }
-    });
+    } as unknown as Window);
     component.ngAfterViewInit();
     let changes: SimpleChanges = {
       leftValue: {
@@ -125,7 +125,7 @@ describe('Oppia CodeMirror Component', () => {
           };
         }
       }
-    });
+    } as unknown as Window);
     component.ngAfterViewInit();
     const changes: SimpleChanges = {
       leftValue: {

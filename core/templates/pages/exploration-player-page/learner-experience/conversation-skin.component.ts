@@ -499,16 +499,16 @@ export class ConversationSkinComponent {
     });
   }
 
-  doesCollectionAllowsGuestProgress(collectionId: string): boolean {
+  doesCollectionAllowsGuestProgress(collectionId: string | never): boolean {
     let whiteListedCollectionIds = (
       AppConstants.
         WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS
     );
     return (
       (
-        whiteListedCollectionIds as unknown as string[]
+        whiteListedCollectionIds as readonly[]
       ).
-        indexOf(collectionId) !== -1);
+        indexOf(collectionId as never) !== -1);
   }
 
   isSubmitButtonDisabled(): boolean {

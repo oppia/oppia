@@ -38,7 +38,7 @@ describe('Testing filters', function() {
     expect(truncatePipe.transform('HelloWorld', 8, 'contd'))
       .toBe('Helcontd');
     expect(truncatePipe.transform('', 10)).toBe('');
-    expect(truncatePipe.transform((12345678) as unknown as string, 7))
+    expect(truncatePipe.transform((12345678), 7))
       .toBe('1234...');
   });
 });

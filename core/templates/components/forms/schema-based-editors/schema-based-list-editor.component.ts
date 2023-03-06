@@ -60,13 +60,12 @@ implements ControlValueAccessor, Validator {
   @Input() disabled!: boolean;
   // Read-only property. The schema definition for each item in the list.
   @Input() itemSchema!: {
-    'ui_config': {'coding_mode': unknown; rows: number};
+    'ui_config': {'coding_mode': boolean; rows: number};
   } & Schema;
   // The length of the list. If not specified, the list is of arbitrary
   // length.
 
   @Input() len!: number;
-  // UI configuration. May be undefined.
   @Input() uiConfig!: {'add_element_text': string};
   @Input() validators!: OppiaValidator[];
   @Input() labelForFocusTarget!: string;
@@ -134,7 +133,7 @@ implements ControlValueAccessor, Validator {
   }
 
   hasDuplicates(): boolean {
-    let valuesSoFar: Record<string | number, unknown> = {};
+    let valuesSoFar: Record<string | number, SchemaDefaultValue> = {};
     for (let i = 0; i < this.localValue.length; i++) {
       const value = this.localValue[i];
       if (!valuesSoFar.hasOwnProperty(value as string)) {

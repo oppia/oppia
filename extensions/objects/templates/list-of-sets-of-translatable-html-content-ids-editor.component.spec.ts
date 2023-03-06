@@ -83,6 +83,7 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
     spyOn(component.valueChanged, 'emit');
     // This throws "Type 'undefined' is not assignable to type 'string[][]'."
     // We need to suppress this error because of the need to test validations.
+    // This throws an error because the value is undefined.
     // @ts-ignore
     component.value = undefined;
 
@@ -96,6 +97,7 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
     spyOn(component.valueChanged, 'emit');
     // This throws "Type 'undefined' is not assignable to type 'string[]'."
     // We need to suppress this error because of the need to test validations.
+    // This throws an error because the value is undefined.
     // @ts-ignore
     component.value = [undefined];
 
@@ -253,6 +255,7 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
     ];
     // This throws "Type 'undefined' is not assignable to type 'string[]'."
     // We need to suppress this error because of the need to test validations.
+    // This throws an error because the value is undefined.
     // @ts-ignore
     component.value[3] = undefined;
 

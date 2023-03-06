@@ -26,6 +26,7 @@ import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict }
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { CustomizationArgSpecsInterface } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -64,7 +65,8 @@ export class InteractionAttributesExtractorService {
     const caBackendDict: InteractionCustomizationArgsBackendDict = {};
     const caSpecs = (
       InteractionSpecsConstants.INTERACTION_SPECS[
-        interactionId].customization_arg_specs);
+        interactionId
+      ].customization_arg_specs) as CustomizationArgSpecsInterface[];
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
       const attributesKey: string = `${caName}WithValue`;

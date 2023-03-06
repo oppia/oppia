@@ -17,7 +17,7 @@
  */
 
 angular.module('oppia').filter('convertToPlainText', [function() {
-  return function(input) {
+  return function(input: string) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
     strippedText = strippedText.replace(/&nbsp;/ig, ' ');
     strippedText = strippedText.replace(/&quot;/ig, '');

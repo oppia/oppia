@@ -37,8 +37,8 @@ describe('Story Preview tab', () => {
   let component: StoryPreviewTabComponent;
   let fixture: ComponentFixture<StoryPreviewTabComponent>;
   let story: Story;
-  let storyInitializedEventEmitter: EventEmitter<void>;
-  let storyReinitializedEventEmitter: EventEmitter<void>;
+  let storyInitializedEventEmitter: EventEmitter<string>;
+  let storyReinitializedEventEmitter: EventEmitter<string>;
   let storyEditorStateService: StoryEditorStateService;
   beforeEach(() => {
     TestBed.configureTestingModule({

@@ -45,7 +45,7 @@ describe('Keyboard Shortcuts', () => {
     location: {
       href: ''
     }
-  };
+  } as Window;
 
   let windowRef: WindowRef;
   let appRef: ApplicationRef;

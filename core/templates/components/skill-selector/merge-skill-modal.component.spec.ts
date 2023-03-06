@@ -53,8 +53,7 @@ describe('Merge Skill Modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MergeSkillModalComponent);
     componentInstance = fixture.componentInstance;
-    ngbActiveModal = (TestBed.inject(NgbActiveModal) as unknown) as
-      jasmine.SpyObj<NgbActiveModal>;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
   it('should be defined', () => {

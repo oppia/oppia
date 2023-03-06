@@ -18,7 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { PositionOfTerm, PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
+import { PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
 
 describe('PositionOfTerms', () => {
   let fixture: ComponentFixture<PositionOfTermsEditorComponent>;
@@ -49,7 +49,13 @@ describe('PositionOfTerms', () => {
 
     // Changing localValue should change ctrl.value.
     component.localValue = (
-      component.positionOfTerms[0] as unknown as PositionOfTerm);
+      // This throws "Type object is not assignable to type
+      // 'PositionOfTerm'." We need to suppress this error
+      // because of the need to test validations. This error
+      // is thrown because the type of localValue is PositionOfTerm
+      // and we are assigning a string to it.
+      // @ts-ignore
+      component.positionOfTerms[0]);
     component.onChangePosition('lhs');
     expect(component.value).toBe('lhs');
   });

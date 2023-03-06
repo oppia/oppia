@@ -19,10 +19,11 @@
 import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { Schema } from 'services/schema-default-value.service';
 
 interface SubtitledHtmlEditorSchema {
   type: string;
-  'ui_config': unknown | {};
+  'ui_config': Schema | {};
 }
 
 @Component({
@@ -34,7 +35,7 @@ export class SubtitledHtmlEditorComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
-  @Input() schema!: { 'replacement_ui_config': unknown | {} };
+  @Input() schema!: { 'replacement_ui_config': Schema | {} };
   @Input() value!: SubtitledHtml;
   @Output() valueChanged = new EventEmitter();
   SCHEMA!: SubtitledHtmlEditorSchema;

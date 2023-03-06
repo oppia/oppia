@@ -22,11 +22,11 @@ import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia-noninteractive-skillreview-concept-card-modal.component';
 class MockNgbActiveModal {
-  dismiss(reason: unknown): Promise<unknown> {
+  dismiss(reason: string): Promise<string> {
     return Promise.reject(reason);
   }
 
-  close(reason: unknown): Promise<unknown> {
+  close(reason: string): Promise<string> {
     return Promise.resolve(reason);
   }
 }

@@ -77,7 +77,8 @@ const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
   topicSummaries: [],
   // This throws "Argument of type 'null' is not assignable to parameter of
   // type 'object'" We need to suppress this error because of the need to test
-  // validations.
+  // validations. This is because the value of categorizedSkillsDict is null
+  // when the topic is not yet initialized.
   // @ts-ignore
   categorizedSkillsDict: categorizedSkillsDictData,
 };

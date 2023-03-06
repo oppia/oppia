@@ -268,7 +268,7 @@ describe('ExplorationFooterComponent', () => {
           objective: 'Solve problem 1 on the Project Euler site',
           thumbnail_icon_url: '/subjects/Lightbulb.svg',
           id: 'exp1',
-        } as unknown as ExplorationSummaryDict
+        } as ExplorationSummaryDict
       ]
     });
     spyOn(userService, 'getUserInfoAsync').and.returnValue(

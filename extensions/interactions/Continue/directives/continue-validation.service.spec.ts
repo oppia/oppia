@@ -141,7 +141,8 @@ describe('ContinueValidationService', () => {
       var warnings = validatorService.getAllWarnings(
         // This throws "Type 'null' is not assignable to type 'Outcome'
         // ." We need to suppress this error because of the need to test
-        // validations if the outcome is not defined.
+        // validations if the outcome is not defined. We are purposely
+        // assigning the wrong type of outcome in order to test validations.
         // @ts-ignore
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{

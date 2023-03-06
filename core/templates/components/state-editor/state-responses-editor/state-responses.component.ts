@@ -427,7 +427,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   saveActiveAnswerGroupDestIfStuck(updatedOutcome: Outcome): void {
     this.responsesService.updateActiveAnswerGroup({
       destIfReallyStuck: updatedOutcome.destIfReallyStuck,
-    } as unknown as AnswerGroup, (newAnswerGroups) => {
+    } as typeof updatedOutcome, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });

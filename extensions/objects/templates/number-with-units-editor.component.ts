@@ -69,6 +69,10 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         modalId: this.modalId
       }));
       this.errorMessageI18nKey = '';
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (parsingError: unknown) {
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
         value: true,

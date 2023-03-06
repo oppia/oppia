@@ -133,9 +133,8 @@ export class ContributorDashboardAdminBackendApiService {
       params.language_code = languageCode;
     }
     return new Promise((resolve, reject) => {
-      this.http.delete<void>(url, {
-        params
-      }
+      this.http.delete<void>(
+        url, { params } as Object
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {

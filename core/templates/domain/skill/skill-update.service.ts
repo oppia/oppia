@@ -377,7 +377,7 @@ export class SkillUpdateService {
     this._prerequisiteSkillChanged.emit();
   }
 
-  get onPrerequisiteSkillChange(): EventEmitter<unknown> {
+  get onPrerequisiteSkillChange(): EventEmitter<string> {
     return this._prerequisiteSkillChanged;
   }
 

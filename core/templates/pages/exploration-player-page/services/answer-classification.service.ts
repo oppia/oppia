@@ -169,7 +169,7 @@ export class AnswerClassificationService {
             if (predictedAnswerGroupIndex === -1) {
               answerClassificationResult = (
                 new AnswerClassificationResult(
-                  defaultOutcome, answerGroups.length, 0,
+                  defaultOutcome as Outcome, answerGroups.length, 0,
                   ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
             } else {
               answerClassificationResult = (

@@ -22,6 +22,8 @@ import { OperatorFunction, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BaseEvent } from './app-events';
 
+// Type unknown is used here because we don't know the type of the data
+// that will be passed with the event.
 export type Newable<T> = new(message: unknown) => T;
 
 @Injectable({
@@ -58,6 +60,10 @@ export class EventBusService {
       (event: T): void => {
         try {
           action.call(callbackContext, event);
+        // We use unknown type because we are unsure of the type of error
+        // that was thrown. Since the catch block cannot identify the
+        // specific type of error, we are unable to further optimise the
+        // code by introducing more types of errors.
         } catch (error: unknown) {
           if (error instanceof Error) {
             this._errorHandler(error);

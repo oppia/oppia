@@ -30,7 +30,6 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UrlService } from 'services/contextual/url.service';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore

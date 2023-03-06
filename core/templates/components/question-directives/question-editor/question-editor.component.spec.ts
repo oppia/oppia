@@ -342,7 +342,8 @@ describe('Question Editor Component', () => {
 
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'ExplorationHtmlFormatterService'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This error is thrown because
+    // the value of 'htmlFormatter' is null.
     // @ts-ignore
     let solution = new Solution(null, null, null, null);
     component.saveSolution(solution);

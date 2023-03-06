@@ -62,6 +62,10 @@ export class LoginPageComponent implements OnInit {
       let authSucceeded = false;
       try {
         authSucceeded = await this.authService.handleRedirectResultAsync();
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
       } catch (error: unknown) {
         this.onSignInError(error as firebase.auth.Error);
         return;
@@ -74,6 +78,10 @@ export class LoginPageComponent implements OnInit {
 
       try {
         await this.authService.signInWithRedirectAsync();
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
       } catch (error: unknown) {
         this.onSignInError(error as firebase.auth.Error);
       }
@@ -88,6 +96,10 @@ export class LoginPageComponent implements OnInit {
 
     try {
       await this.authService.signInWithEmail(email);
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (error: unknown) {
       this.onSignInError(error as firebase.auth.Error);
       return;

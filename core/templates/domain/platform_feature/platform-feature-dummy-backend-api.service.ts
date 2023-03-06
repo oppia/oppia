@@ -47,6 +47,10 @@ export class PlatformFeatureDummyBackendApiService {
       await this.http.get(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
         .toPromise();
       return true;
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (err: unknown) {
       if (err instanceof HttpErrorResponse && err.status === 404) {
         return false;

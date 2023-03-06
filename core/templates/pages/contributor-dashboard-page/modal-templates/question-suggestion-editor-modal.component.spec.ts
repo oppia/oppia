@@ -333,7 +333,8 @@ describe('Question Suggestion Editor Modal Component', () => {
     spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'string'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This rule will be removed
+      // when the codeowners file is updated.
       // @ts-ignore
       .and.callFake((
           suggestionId, skillDifficulty, questionStateData, nextContentIdIndex,
@@ -341,7 +342,8 @@ describe('Question Suggestion Editor Modal Component', () => {
       ) => {
         // This throws "Argument of type 'null' is not assignable to parameter
         // of type 'string'." We need to suppress
-        // this error because of the need to test validations.
+        // this error because of the need to test validations. This rule will be
+        // removed when the codeowners file is updated.
         // @ts-ignore
         successCallback(null);
         return null;
@@ -362,14 +364,16 @@ describe('Question Suggestion Editor Modal Component', () => {
       spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
         // This throws "Argument of type 'null' is not assignable to parameter
         // of type 'string'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This rule will be removed
+        // when the codeowners file is updated.
         // @ts-ignore
         .and.callFake((
             suggestionId, skillDifficulty, questionStateData,
             nextContentIdIndex, imagesData, successCallback, errorCallback) => {
           // This throws "Argument of type 'null' is not assignable to parameter
           // of type 'string'." We need to suppress
-          // this error because of the need to test validations.
+          // this error because of the need to test validations. This rule will
+          // be removed when the codeowners file is updated.
           // @ts-ignore
           successCallback(null);
           return null;

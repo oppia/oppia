@@ -173,8 +173,13 @@ describe('Topic editor state service', () => {
   beforeEach(() => {
     undoRedoService = TestBed.inject(UndoRedoService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
+    // This throws "Type 'EditableTopicBackendApiService' is not
+    // assignable to type desire". We need to suppress this error because of
+    // the need to test validations. This is because the backend api service
+    // returns an unknown type.
+    // @ts-ignore
     mockEditableTopicBackendApiService = (TestBed.inject(
-      EditableTopicBackendApiService) as unknown) as
+      EditableTopicBackendApiService)) as
       jasmine.SpyObj<MockEditableTopicBackendApiService>;
     editableStoryBackendApiService =
       TestBed.inject(EditableStoryBackendApiService);
@@ -285,7 +290,8 @@ describe('Topic editor state service', () => {
     spyOn(alertsService, 'addWarning');
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'string'" We need to suppress this error because of the need to test
-    // validations.
+    // validations. This is because the backend api service returns an unknown
+    // type.
     // @ts-ignore
     topicEditorStateService.loadSubtopicPage(null, null);
     tick();

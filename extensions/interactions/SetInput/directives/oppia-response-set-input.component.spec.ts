@@ -61,6 +61,6 @@ describe('ResponseSetInputComponent', () => {
   it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
-    expect(component.escapedAnswer).toEqual(['answer1'] as unknown as string);
+    expect(component.escapedAnswer).toEqual(['answer1']);
   });
 });

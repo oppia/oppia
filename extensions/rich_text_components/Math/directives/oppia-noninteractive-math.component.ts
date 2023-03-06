@@ -64,7 +64,7 @@ export class NoninteractiveMath implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() mathContentWithValue!: string;
+  @Input() mathContentWithValue!: string | Object;
   imageContainerStyle!: ImageContainerStyle;
   // Null ff the SVG is not valid or not trusted.
   imageUrl!: string | ArrayBuffer | SafeResourceUrl | null;
@@ -83,8 +83,8 @@ export class NoninteractiveMath implements OnInit, OnChanges {
       return;
     }
     const mathExpressionContent = this.htmlEscaperService.escapedJsonToObj(
-      this.mathContentWithValue) as MathExpression;
-    if (mathExpressionContent as unknown as string === '') {
+      this.mathContentWithValue as string) as MathExpression;
+    if (typeof mathExpressionContent === 'string') {
       return;
     }
     if (mathExpressionContent.hasOwnProperty('raw_latex')) {

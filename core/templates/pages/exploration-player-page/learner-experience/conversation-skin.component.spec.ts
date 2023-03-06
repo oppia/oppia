@@ -25,7 +25,7 @@ import { GuestCollectionProgressService } from 'domain/collection/guest-collecti
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { ConceptCard } from 'domain/skill/concept-card.model';
@@ -2334,10 +2334,13 @@ describe('Conversation skin component', () => {
   it('should be able to skip the current question', fakeAsync(() => {
     let sampleCard = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '',
-      // Use unknown type conversion to test that the interaction is not
-      // required to be a string.
-      null as unknown as Interaction, null as unknown as RecordedVoiceovers,
-      'content', audioTranslationLanguageService);
+      // This throws "Type null is not assignable to type
+      // 'string'." We need to suppress this error
+      // because of the need to test validations. This
+      // throws an error only in the frontend test and
+      // not in the frontend.
+      // @ts-ignore
+      null, null, 'content', audioTranslationLanguageService);
 
     let callback = (successCallback: (nextCard: StateCard) => void) => {
       successCallback(sampleCard);

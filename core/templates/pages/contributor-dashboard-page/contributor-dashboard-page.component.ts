@@ -219,9 +219,9 @@ export class ContributorDashboardPageComponent
 
     this.activeTabName = 'myContributionTab';
 
-    // TODO(#13015): Remove use of unknown as a type.
     this.tabsDetails = {
       ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
+    // TODO(#13015): Remove use of unknown as a type.
     } as unknown as ContributorDashboardTabsDetails;
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(

@@ -39,6 +39,7 @@ import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.mode
 import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -182,7 +183,8 @@ describe('Ratings and recommendations component', () => {
 
     // This throws "Type 'null' is not assignable to parameter of type
     // 'QuestionPlayerConfig'." We need to suppress this error because
-    // of the need to test validations.
+    // of the need to test validations. This throws an error because
+    // the value is null.
     // @ts-ignore
     componentInstance.questionPlayerConfig = null;
 
@@ -332,7 +334,7 @@ describe('Ratings and recommendations component', () => {
         EndChapterCelebration: {
           isEnabled: false
         }
-      }
+      } as FeatureStatusChecker
     );
 
     expect(componentInstance.isEndChapterFeatureEnabled()).toBe(false);

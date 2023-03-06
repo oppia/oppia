@@ -54,7 +54,7 @@ describe('Short response pencil code editor component ', () => {
     component = fixture.componentInstance;
     component.answer = {
       code: '# Add the initial code snippet here.'
-    };
+    } as unknown as string;
   });
 
   it('should initialize the component when submits answer', () => {

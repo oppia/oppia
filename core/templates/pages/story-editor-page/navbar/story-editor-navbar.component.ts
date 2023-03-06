@@ -184,9 +184,6 @@ export class StoryEditorNavbarComponent implements OnInit {
     modalRef.result.then((commitMessage) => {
       this.storyEditorStateService.saveStory(
         commitMessage, () => {
-        // The type of errorMessage is unknown because error messages
-        // can be of type anything. For example, it can be a string
-        // or an object.
         }, (errorMessage: string) => {
           this.alertsService.addInfoMessage(errorMessage, 5000);
         }

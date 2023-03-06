@@ -48,13 +48,15 @@ describe('PlatformFeatureService', () => {
   const clearStaticProperties = () => {
     // This throws "Type 'null' is not assignable to type 'FeatureStatusSummary'
     // ." We need to suppress this error because of the need to manually clear
-    // the state of PlatformFeatureService after each test.
+    // the state of PlatformFeatureService after each test. This is because
+    // PlatformFeatureService is a singleton service.
     // @ts-ignore
     PlatformFeatureService.featureStatusSummary = null;
     PlatformFeatureService._isInitializedWithError = false;
     // This throws "Type 'null' is not assignable to type 'Promise<void>'."
     // We need to suppress this error because of the need to manually clear the
-    // state of PlatformFeatureService after each test.
+    // state of PlatformFeatureService after each test. This is because
+    // PlatformFeatureService is a singleton service.
     // @ts-ignore
     PlatformFeatureService.initializationPromise = null;
   };
@@ -89,7 +91,7 @@ describe('PlatformFeatureService', () => {
           return userAgent;
         }
       }
-    });
+    } as unknown as Window);
     mockSessionStore = (obj: object) => {
       Object.assign(store, obj);
     };
