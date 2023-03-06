@@ -161,7 +161,11 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
         suggestion.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
 
-        self.assert_job_output_is_empty()
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED SUGGESTIONS SUCCESS: 1'
+            )
+        ])
 
     def test_obsolete_suggestion_is_rejected(self) -> None:
         CHANGE_DICT['content_id'] = 'non_existent_content_id'
@@ -181,6 +185,9 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
         suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
 
         self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED SUGGESTIONS SUCCESS: 1'
+            ),
             job_run_result.JobRunResult(
                 stdout='REJECTED SUGGESTIONS SUCCESS: 1'
             )
@@ -254,6 +261,9 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED SUGGESTIONS SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult(
                 stdout='OBSOLETE SUGGESTIONS PER EXP ID SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
@@ -288,7 +298,11 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
         suggestion_models.GeneralSuggestionModel.put_multi([
             valid_suggestion_model])
 
-        self.assert_job_output_is_empty()
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='TOTAL PROCESSED SUGGESTIONS SUCCESS: 1'
+            )
+        ])
 
         suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get(

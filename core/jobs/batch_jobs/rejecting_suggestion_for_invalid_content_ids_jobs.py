@@ -80,8 +80,20 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of the job run results.
         """
+        suggestion_dicts = _get_suggestion_dicts(self.pipeline)
+        total_processed_suggestions_count_job_run_results = (
+            suggestion_dicts
+            | 'Get suggestions' >> beam.Map(
+                lambda suggestions_dict: suggestions_dict['suggestions']
+                )
+            | 'Flatten suggestions' >> beam.FlatMap(lambda x: x)
+            | 'Total processed suggestion count' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL PROCESSED SUGGESTIONS'))
+        )
+
         updated_suggestions = (
-            _get_suggestion_dicts(self.pipeline)
+            suggestion_dicts
             | 'Update suggestion models' >> beam.Map(
                 lambda suggestions_dict: self._reject_obsolete_suggestions(
                     suggestions_dict['suggestions'],
@@ -102,7 +114,13 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return updated_suggestions_count_job_run_results
+        return (
+            (
+                total_processed_suggestions_count_job_run_results,
+                updated_suggestions_count_job_run_results
+            )
+            | 'Combine results' >> beam.Flatten()
+        )
 
 
 class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
@@ -163,8 +181,20 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of results.
         """
+        suggestion_dicts = _get_suggestion_dicts(self.pipeline)
+        total_processed_suggestions_count_job_run_results = (
+            suggestion_dicts
+            | 'Get suggestions' >> beam.Map(
+                lambda suggestions_dict: suggestions_dict['suggestions']
+                )
+            | 'Flatten suggestions' >> beam.FlatMap(lambda x: x)
+            | 'Total processed suggestion count' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL PROCESSED SUGGESTIONS'))
+        )
+
         suggestion_results = (
-            _get_suggestion_dicts(self.pipeline)
+            suggestion_dicts
             | 'Report obsolete suggestions' >> beam.Map(
                 lambda suggestions_dict: (
                     self._report_suggestions_with_missing_content_ids(
@@ -180,7 +210,7 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
 
         job_run_results = (
             suggestion_results
-            | 'Report the rejected obsolete suggestions' >> beam.Map(
+            | 'Report the obsolete suggestions' >> beam.Map(
                 lambda result: (
                     job_run_result.JobRunResult.as_stdout(
                         f'Results are - {result}'
@@ -189,9 +219,9 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             )
         )
 
-        job_run_results_count = (
+        obsolete_suggestions_count_job_run_results = (
             suggestion_results
-            | 'Report the rejected obsolete suggestions count' >> (
+            | 'Report the obsolete suggestions count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'OBSOLETE SUGGESTIONS PER EXP ID')
             )
@@ -200,7 +230,8 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
         return (
             (
                 job_run_results,
-                job_run_results_count
+                total_processed_suggestions_count_job_run_results,
+                obsolete_suggestions_count_job_run_results
             )
             | 'Combine results' >> beam.Flatten()
         )
