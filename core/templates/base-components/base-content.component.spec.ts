@@ -62,6 +62,10 @@ describe('Base Content Component', () => {
     }
   }
 
+  class MockLoaderService {
+    onLoadingMessageChange: Observable<string> = of('Test Message');
+  }
+
   // We are mocking Router service to return the NavigationEnd object,
   // so that we can test the routing event in our base component.
   class MockRouteService {
@@ -86,10 +90,6 @@ describe('Base Content Component', () => {
         }
       }
     };
-  }
-
-  class MockLoaderService {
-    onLoadingMessageChange: Observable<string> = of('Test Message');
   }
 
   class MockPageTitleService {
@@ -146,20 +146,20 @@ describe('Base Content Component', () => {
     fixture = TestBed.createComponent(BaseContentComponent);
     componentInstance = fixture.componentInstance;
     loaderService = TestBed.inject(LoaderService);
-    loaderService = (loaderService as unknown) as jasmine.SpyObj<LoaderService>;
+    loaderService = loaderService as jasmine.SpyObj<LoaderService>;
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
-    keyboardShortcutService = (keyboardShortcutService as unknown) as
+    keyboardShortcutService = keyboardShortcutService as
      jasmine.SpyObj<KeyboardShortcutService>;
     windowRef = TestBed.inject(WindowRef);
-    windowRef = (windowRef as unknown) as jasmine.SpyObj<WindowRef>;
+    windowRef = windowRef as jasmine.SpyObj<WindowRef>;
     sidebarStatusService = TestBed.inject(SidebarStatusService);
-    sidebarStatusService = (sidebarStatusService as unknown) as
+    sidebarStatusService = sidebarStatusService as
      jasmine.SpyObj<SidebarStatusService>;
     bottomNavbarStatusService = TestBed.inject(BottomNavbarStatusService);
-    bottomNavbarStatusService = (bottomNavbarStatusService as unknown) as
+    bottomNavbarStatusService = bottomNavbarStatusService as
      jasmine.SpyObj<BottomNavbarStatusService>;
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
-    backgroundMaskService = (backgroundMaskService as unknown) as
+    backgroundMaskService = backgroundMaskService as
      jasmine.SpyObj<BackgroundMaskService>;
     cookieService = TestBed.inject(CookieService);
   });

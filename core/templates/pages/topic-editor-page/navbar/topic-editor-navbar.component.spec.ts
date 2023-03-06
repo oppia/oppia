@@ -452,7 +452,8 @@ describe('Topic Editor Navbar', () => {
     spyOn(topicEditorStateService, 'saveTopic').and.callFake(
       // This throws "Cannot set properties of undefined (setting
       // 'topicIsPublished')". We need to suppress this error because
-      // we can't return a true value here for spyOn.
+      // we can't return a true value here for spyOn. We need to
+      // return a promise here because the function is async.
       // @ts-ignore
       (commitMessage: string, successCallback: () => void) => {
         successCallback();
