@@ -786,7 +786,7 @@ export class MusicNotesInputComponent
     readableSequence = this._makeAllNotesHaveDurationOne(readableSequence);
     if (readableSequence) {
       this.currentInteractionService.onSubmit(
-        readableSequence as unknown as InteractionAnswer,
+        readableSequence as InteractionAnswer,
         this.musicNotesInputRulesService);
     }
   }

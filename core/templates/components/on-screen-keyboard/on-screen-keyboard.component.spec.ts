@@ -81,11 +81,7 @@ describe('On Screen Keyboard', () => {
     fixture = TestBed.createComponent(OnScreenKeyboardComponent);
     componentInstance = fixture.componentInstance;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
-    guppyInitializationService = (guppyInitializationService as unknown) as
-    jasmine.SpyObj<GuppyInitializationService>;
     deviceInfoService = TestBed.inject(DeviceInfoService);
-    deviceInfoService = (deviceInfoService as unknown) as
-    jasmine.SpyObj<DeviceInfoService>;
     guppyInitializationService.setShowOSK(true);
   });
 
