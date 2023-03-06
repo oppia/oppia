@@ -91,8 +91,6 @@ describe('Question deletion modal', () => {
     fixture = TestBed.createComponent(RemoveQuestionSkillLinkModalComponent);
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    ngbActiveModal = (ngbActiveModal as unknown) as
-      jasmine.SpyObj<NgbActiveModal>;
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
   });
 
