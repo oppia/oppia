@@ -184,7 +184,6 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
           }
 
           hasSubmittedAnswer = true;
-          // TODO(#13015): Remove use of unknown as a type.
           this.currentInteractionService.onSubmit({
             code: normalizedCode,
             output: output || '',
@@ -203,7 +202,6 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
       errorIsHappening = true;
       hasSubmittedAnswer = true;
 
-      // TODO(#13015): Remove use of unknown as a type.
       this.currentInteractionService.onSubmit({
         code: normalizedCode,
         output: '',

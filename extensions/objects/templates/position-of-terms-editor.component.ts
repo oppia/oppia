@@ -23,11 +23,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
-export interface PositionOfTerm {
-  name: 'string';
-  readonly humanReadableName: 'string';
-}
-
 @Component({
   selector: 'position-of-terms-editor',
   templateUrl: './position-of-terms-editor.component.html',
@@ -39,17 +34,17 @@ export class PositionOfTermsEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: string;
-  localValue!: PositionOfTerm;
   @Output() valueChanged = new EventEmitter();
   alwaysEditable = true;
   positionOfTerms = AppConstants.POSITION_OF_TERMS_MAPPING;
+  localValue!: {name: string; humanReadableName: string};
   constructor() { }
 
   ngOnInit(): void {
-    this.localValue = this.positionOfTerms[2] as unknown as PositionOfTerm;
+    this.localValue = this.positionOfTerms[2];
     for (let i = 0; i < this.positionOfTerms.length; i++) {
       if (this.positionOfTerms[i].name === this.value) {
-        this.localValue = this.positionOfTerms[i] as unknown as PositionOfTerm;
+        this.localValue = this.positionOfTerms[i];
       }
     }
     if (this.value === null || this.value === undefined) {
@@ -63,7 +58,7 @@ export class PositionOfTermsEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
     for (let i = 0; i < this.positionOfTerms.length; i++) {
       if (this.positionOfTerms[i].name === this.value) {
-        this.localValue = this.positionOfTerms[i] as unknown as PositionOfTerm;
+        this.localValue = this.positionOfTerms[i];
         break;
       }
     }

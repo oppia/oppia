@@ -222,8 +222,10 @@ export class AdminFeaturesTabComponent implements OnInit {
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
       this.setStatusMessage.emit('Saved successfully.');
-    // The type of error 'e' is unknown because anything can be throw
-    // in TypeScript. We need to make sure to check the type of 'e'.
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (e: unknown) {
       if (e instanceof HttpErrorResponse) {
         if (e.error && e.error.error) {
