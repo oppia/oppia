@@ -56,8 +56,6 @@ describe('Rubrics Editor Component', () => {
     componentInstance.rubrics = rubrics;
     componentInstance.newSkillBeingCreated = false;
     skillCreationService = TestBed.inject(SkillCreationService);
-    skillCreationService = (skillCreationService as unknown) as
-      jasmine.SpyObj<SkillCreationService>;
   });
 
   it('should create', () => {

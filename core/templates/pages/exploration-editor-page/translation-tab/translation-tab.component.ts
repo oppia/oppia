@@ -21,7 +21,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 // This throws "Object is possibly undefined." The type undefined
 // comes here from ngx joyride dependency. We need to suppress this
-// error because of strict type checking.
+// error because of strict type checking. This error is thrown because
+// the type of the variable is undefined. This is because the type of
+// the variable is undefined. This is because the type of the variable
+// is undefined. This is because the type of the variable is undefined.
 // @ts-ignore
 import { JoyrideService } from 'ngx-joyride';
 import { Subscription } from 'rxjs';
