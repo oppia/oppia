@@ -72,7 +72,7 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
       type: 'list',
       items: {
         type: 'unicode',
-        choices: choices as unknown as string[]
+        choices: choices as string[]
       },
       validators: [{
         id: 'is_uniquified'

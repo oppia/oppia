@@ -48,6 +48,7 @@ import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -108,7 +109,8 @@ describe('Tutor card component', () => {
       [], [], {} as InteractionCustomizationArgs, null, [], 'EndExploration',
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'RecordedVoiceovers'." We need to suppress this error because of
-      // the need to test validations.
+      // the need to test validations. This throws an error only in the
+      // frontend tests and not in the frontend.
       // @ts-ignore
       null), [], null, '', null);
 
@@ -278,7 +280,7 @@ describe('Tutor card component', () => {
           EndChapterCelebration: {
             isEnabled: false
           }
-        }
+        } as FeatureStatusChecker
       );
       spyOn(componentInstance, 'triggerCelebratoryAnimation');
       componentInstance.animationHasPlayedOnce = false;
@@ -648,7 +650,8 @@ describe('Tutor card component', () => {
     spyOn(mockDisplayedCard, 'getInteraction').and.returnValue(
       // This throws "Type 'null' is not assignable to type
       // 'InteractionCustomizationArgs'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This throws an error
+      // because the value of interaction is null.
       // @ts-ignore
       new Interaction([], [], null, null, [], '', null));
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
@@ -685,7 +688,8 @@ describe('Tutor card component', () => {
     spyOn(audioTranslationManagerService, 'getCurrentComponentName')
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'String'." We need to suppress this error because of
-      // the need to test validations.
+      // the need to test validations. This throws an error because the
+      // value of interaction is null.
       // @ts-ignore
       .and.returnValue(null);
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
