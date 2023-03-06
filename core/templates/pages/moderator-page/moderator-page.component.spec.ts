@@ -133,13 +133,13 @@ describe('Moderator Page Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ModeratorPageComponent);
     componentInstance = fixture.componentInstance;
-    loaderService = (TestBed.inject(LoaderService) as unknown) as
+    loaderService = (TestBed.inject(LoaderService)) as
       jasmine.SpyObj<LoaderService>;
     datetimeFormatService = (
-      TestBed.inject(DateTimeFormatService) as unknown) as
+      TestBed.inject(DateTimeFormatService)) as
       jasmine.SpyObj<DateTimeFormatService>;
     alertsService = (
-      TestBed.inject(AlertsService) as unknown) as
+      TestBed.inject(AlertsService)) as
       jasmine.SpyObj<AlertsService>;
   });
 

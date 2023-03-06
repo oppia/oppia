@@ -87,6 +87,7 @@ describe('create new subtopic modal', function() {
   };
 
   beforeEach(waitForAsync(() => {
+    topicEditorStateService = new MockTopicEditorStateService();
     TestBed.configureTestingModule({
       declarations: [
         CreateNewSubtopicModalComponent
@@ -102,7 +103,7 @@ describe('create new subtopic modal', function() {
         },
         {
           provide: TopicEditorStateService,
-          useClass: MockTopicEditorStateService
+          useValue: topicEditorStateService
         },
         TopicUpdateService,
         SubtopicValidationService
@@ -117,9 +118,6 @@ describe('create new subtopic modal', function() {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     TestBed.inject(WindowRef);
     topicUpdateService = TestBed.inject(TopicUpdateService);
-    topicEditorStateService =
-      (TestBed.inject(TopicEditorStateService) as unknown) as
-      jasmine.SpyObj<MockTopicEditorStateService>;
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
 
     topic = new Topic(
