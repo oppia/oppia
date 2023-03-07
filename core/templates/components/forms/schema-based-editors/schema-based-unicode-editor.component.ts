@@ -29,6 +29,7 @@ import 'components/code-mirror/codemirror.component';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { Subscription } from 'rxjs';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
@@ -62,9 +63,8 @@ implements ControlValueAccessor, OnInit, Validator {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
-  // UI configuration. May be undefined if the schema does not specify it.
   @Input() uiConfig!: {
-    rows: string[]; placeholder: string; 'coding_mode': unknown;
+    rows: string[]; placeholder: string; 'coding_mode': string;
   } | undefined;
 
   @Input() validators!: OppiaValidator[];
@@ -77,7 +77,8 @@ implements ControlValueAccessor, OnInit, Validator {
     extraKeys: { Tab: (cm: CodeMirror.Editor) => void };
     indentWithTabs: boolean;
     lineNumbers: boolean;
-    readOnly?: string; mode?: unknown;
+    readOnly?: string;
+    mode?: string;
   } = {
     // Convert tabs to spaces.
       extraKeys: {
@@ -120,7 +121,7 @@ implements ControlValueAccessor, OnInit, Validator {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: unknown): void {
+  registerOnTouched(fn: SchemaDefaultValue): void {
   }
 
   validate(control: AbstractControl): ValidationErrors {
@@ -196,7 +197,7 @@ implements ControlValueAccessor, OnInit, Validator {
     }
   }
 
-  getCodingMode(): unknown {
+  getCodingMode(): string | null {
     if (!this.uiConfig) {
       return null;
     } else {
