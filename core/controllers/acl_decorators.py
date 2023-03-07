@@ -49,10 +49,6 @@ from core.domain import user_services
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
-MYPY = False
-if MYPY:
-    from core.controllers import android
-
 # Note: '_SelfBaseHandlerType' is a private type variable because it is only
 # supposed to denote the 'self' argument of the handler function that the
 # decorator is decorating. So, do not make it public type variable in future.

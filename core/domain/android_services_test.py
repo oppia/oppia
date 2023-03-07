@@ -21,12 +21,12 @@ from __future__ import annotations
 import logging
 import os
 
+from core.domain import android_services
 from core.domain import exp_fetchers
 from core.domain import skill_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.domain import android_services
 from core.platform import models
 from core.tests import test_utils
 
