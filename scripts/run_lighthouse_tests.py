@@ -70,8 +70,8 @@ _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
     required=True, choices=['1', '2'])
 _PARSER.add_argument(
-    '--skip_build', help='Sets whether do webpack build',
-    required=False, choices=['true', 'false'])
+    '--skip_build', help='Sets whether to skip webpack build',
+    action='store_true')
 
 
 def run_lighthouse_puppeteer_script() -> None:
@@ -192,9 +192,8 @@ def main(args: Optional[List[str]] = None) -> None:
     else:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
-
     if (lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY or
-        parsed_args.skip_build == 'true'):
+        parsed_args.skip_build):
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()

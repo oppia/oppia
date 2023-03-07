@@ -349,7 +349,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         run_lighthouse_tests.main(
                             args=['--mode', 'performance',
-                                '--shard', '1', '--skip_build', 'true'])
+                                '--shard', '1', '--skip_build'])
 
         self.assertNotIn('Building files in production mode.', self.print_arr)
         self.assertIn(
