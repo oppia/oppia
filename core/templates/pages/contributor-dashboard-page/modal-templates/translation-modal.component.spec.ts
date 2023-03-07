@@ -332,7 +332,7 @@ describe('Translation Modal Component', () => {
     it('should compute editor overlfow after the view has changed', () => {
       spyOn(component, 'computeTranslationEditorOverflowState');
 
-      component.ngAfterViewChecked();
+      component.ngAfterContentChecked();
 
       expect(component.computeTranslationEditorOverflowState)
         .toHaveBeenCalled();
