@@ -49,7 +49,6 @@ describe('Post Publish Modal Controller', function() {
   let fixture: ComponentFixture<PostPublishModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let contextService: ContextService;
-  let windowRef: WindowRef;
   let urlInterpolationService: UrlInterpolationService;
 
   const explorationId = 'exp1';
@@ -90,8 +89,6 @@ describe('Post Publish Modal Controller', function() {
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     contextService = TestBed.inject(ContextService);
-    windowRef = TestBed.inject(WindowRef);
-    windowRef = (windowRef as unknown) as jasmine.SpyObj<WindowRef>;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(urlInterpolationService, 'getStaticImageUrl')

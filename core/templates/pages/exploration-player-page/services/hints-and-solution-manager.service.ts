@@ -282,11 +282,11 @@ export class HintsAndSolutionManagerService {
     return this._hintConsumedEventEmitter;
   }
 
-  get onHintsExhausted(): EventEmitter<unknown> {
+  get onHintsExhausted(): EventEmitter<string> {
     return this._hintsExhaustedEventEmitter;
   }
 
-  get onLearnerReallyStuck(): EventEmitter<unknown> {
+  get onLearnerReallyStuck(): EventEmitter<string> {
     return this._learnerReallyStuckEventEmitter;
   }
 }

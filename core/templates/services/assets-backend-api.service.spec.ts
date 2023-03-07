@@ -224,7 +224,9 @@ describe('Assets Backend API Service', () => {
         spyOn(
           // This throws "Argument of type 'getImageUploadUrl' is not assignable
           // to parameter of type 'keyof AssetsBackendApiService'. We need to
-          // suppress this error because of strict type checking.
+          // suppress this error because of strict type checking. This is
+          // because the type of getImageUploadUrl is string and not a
+          // function.
           // @ts-ignore
           assetsBackendApiService, 'getImageUploadUrl'
         ).and.throwError(Error('token'));
@@ -264,7 +266,9 @@ describe('Assets Backend API Service', () => {
         spyOn(
           // This throws "Argument of type 'getImageUploadUrl' is not assignable
           // to parameter of type 'keyof AssetsBackendApiService'. We need to
-          // suppress this error because of strict type checking.
+          // suppress this error because of strict type checking. This is
+          // because the type of getImageUploadUrl is string and not a
+          // function.
           // @ts-ignore
           assetsBackendApiService, 'getAudioUploadUrl'
         ).and.throwError(Error('token'));
