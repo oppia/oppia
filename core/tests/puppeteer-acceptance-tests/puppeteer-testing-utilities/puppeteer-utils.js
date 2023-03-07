@@ -20,6 +20,9 @@ const puppeteer = require('puppeteer');
 const testConstants = require('./test-constants.js');
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+/** We accept the empty alert message because this is what is sent on
+ * 'beforeunload' due to an issue with Chromium (see
+ * https://github.com/puppeteer/puppeteer/issues/3725). */
 const acceptedBrowserAlerts = ['', 'Changes that you made may not be saved.'];
 
 module.exports = class baseUser {
@@ -43,11 +46,6 @@ module.exports = class baseUser {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await this.page.setViewport({ width: 0, height: 0 });
-        /** We accept all browser alerts with empty messages we get from
-         *  `dialog.message()`. It's an issue with Chromium (see
-         *  https://github.com/puppeteer/puppeteer/issues/3725). Once fixed,
-         *  we'll only accept alerts that are present in a alert messages list.
-         *  Otherwise, an error will occur for unexpected alerts. */
         this.page.on('dialog', async(dialog) => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
