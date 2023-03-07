@@ -265,10 +265,10 @@ describe('Classroom Page Component', () => {
   });
 
   it('should return correct value for diagnostic test feature flag', () => {
-    expect(component.diagnosticTestFeatureFlag()).toBeFalse();
+    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeFalse();
 
     mockPlatformFeatureService.status.DiagnosticTest.isEnabled = true;
 
-    expect(component.diagnosticTestFeatureFlag()).toBeTrue();
+    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeTrue();
   });
 });

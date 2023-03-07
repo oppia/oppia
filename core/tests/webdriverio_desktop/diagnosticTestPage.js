@@ -16,6 +16,11 @@
  * @fileoverview End-to-end tests for the diagnostic test page.
  */
 
+// TODO(#130): The diagnostic test functionality is currently gated by a feature
+// flag, and currently, we are observing some issues related to enabling the
+// feature flag. The E2E test for the functionality will be added again as per
+// the workflow mentioned in issue #130, created in the oppia-wiki repo.
+
 var action = require('../webdriverio_utils/action.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');

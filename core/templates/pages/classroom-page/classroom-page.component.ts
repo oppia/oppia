@@ -80,7 +80,7 @@ export class ClassroomPageComponent implements OnDestroy {
       '/splash/books.svg');
 
     this.loaderService.showLoadingScreen('Loading');
-    this.diagnosticTestFeatureFlag();
+    this.isDiagnosticTestFeatureFlagEnabled();
 
     this.accessValidationBackendApiService.validateAccessToClassroomPage(
       this.classroomUrlFragment).then(() => {
@@ -163,7 +163,7 @@ export class ClassroomPageComponent implements OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  diagnosticTestFeatureFlag(): boolean {
+  isDiagnosticTestFeatureFlagEnabled(): boolean {
     return this.platformFeatureService.status.DiagnosticTest.isEnabled;
   }
 }
