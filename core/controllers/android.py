@@ -97,7 +97,6 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
 
     activity_type: str
     activities_data: List[ActivityDataDict]
-    api_key: str
 
 
 class AndroidActivityHandler(base.BaseHandler[
