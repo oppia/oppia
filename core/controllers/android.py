@@ -129,11 +129,6 @@ class AndroidActivityHandler(base.BaseHandler[
                     'type': 'custom',
                     'obj_type': 'JsonEncodedInString'
                 }
-            },
-            'api_key': {
-                'schema': {
-                    'type': 'basestring'
-                }
             }
         }
     }

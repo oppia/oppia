@@ -7584,20 +7584,14 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-        URL_PATH_ARGS_SCHEMAS = {}
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-            'GET': {
-                'api_key': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                }
-            }
+            'GET': {}
         }
 
         @acl_decorators.is_from_oppia_android_build
         def get(self) -> None:
-            self.render_json({'secret': self.normalized_request['api_key']})
+            self.render_json({'secret': self.request.headers.get('X-ApiKey')})
 
     def setUp(self) -> None:
         super().setUp()
@@ -7620,8 +7614,9 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         with testapp_swap:
             with swap_api_key_secrets_return_none:
                 response = self.get_json(
-                    '/mock_secret_page?api_key=secret',
-                    expected_status_int=401
+                    '/mock_secret_page',
+                    expected_status_int=401,
+                    headers={'X-ApiKey': 'secret'}
                 )
 
         self.assertEqual(
@@ -7636,8 +7631,9 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
-                '/mock_secret_page?api_key=nonsecret',
-                expected_status_int=401
+                '/mock_secret_page',
+                expected_status_int=401,
+                headers={'X-ApiKey': 'nonsecret'}
             )
 
         self.assertEqual(
@@ -7652,8 +7648,9 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
         with testapp_swap, mailchimp_swap:
             response = self.get_json(
-                '/mock_secret_page?api_key=secret',
-                expected_status_int=200
+                '/mock_secret_page',
+                expected_status_int=200,
+                headers={'X-ApiKey': 'secret'}
             )
 
         self.assertEqual(response['secret'], 'secret')

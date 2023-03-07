@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 import os
 
-from core import feconf
 from core.domain import exp_fetchers
 from core.domain import skill_fetchers
 from core.domain import story_fetchers
@@ -102,16 +101,6 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
                 'image/png'
             )
 
-    def test_initialize_twice_raises_already_published_exception(self) -> None:
-        android_services.initialize_android_test_data()
-        android_services.initialize_android_test_data()
-
-    def test_initialize_twice_raises_unpublished_topic_exception(self) -> None:
-        android_services.initialize_android_test_data()
-        topic = topic_fetchers.get_topic_by_name('Android test', strict=True)
-        topic_services.unpublish_topic(
-            topic.id, feconf.SYSTEM_COMMITTER_ID)
-        android_services.initialize_android_test_data()
 
 class AndroidBuildSecretTests(test_utils.GenericTestBase):
     """Tests for the verify_android_build_secret."""

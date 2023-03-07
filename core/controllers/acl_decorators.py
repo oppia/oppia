@@ -4677,7 +4677,7 @@ def is_from_oppia_android_build(
     # arguments with different types.
     @functools.wraps(handler)
     def test_is_from_oppia_android_build(
-        self: Type[android.AndroidActivityHandler], **kwargs: Any
+        self: _SelfBaseHandlerType, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the request was sent from Oppia Android build process.
 
@@ -4692,9 +4692,11 @@ def is_from_oppia_android_build(
             UnauthorizedUserException. If incoming request is not from a valid
                 Oppia Android build request.
         """
-        assert self.normalized_request is not None
-        if not android_services.verify_android_build_secret(
-            self.normalized_request['api_key']
+        if (
+            self.request.headers.get('X-ApiKey') is None or
+            not android_services.verify_android_build_secret(
+                self.request.headers['X-ApiKey']
+            )
         ):
             raise self.UnauthorizedUserException(
                 'The incoming request is not a valid '

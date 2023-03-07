@@ -157,7 +157,7 @@ def initialize_android_test_data() -> str:
         raw_image = f.read()
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
     fs.commit(
-        '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL),
+        '%s/test_svg.svg' % constants.ASSET_TYPE_THUMBNAIL,
         raw_image,
         mimetype='image/svg+xml'
     )
@@ -228,7 +228,7 @@ def initialize_android_test_data() -> str:
         raw_image = f.read()
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
     fs.commit(
-        '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL),
+        '%s/test_svg.svg' % constants.ASSET_TYPE_THUMBNAIL,
         raw_image,
         mimetype='image/svg+xml'
     )

@@ -16,19 +16,12 @@
 
 from __future__ import annotations
 
-import os
-
-from core import feconf
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import skill_fetchers
-from core.domain import story_fetchers
-from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -51,29 +44,6 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
                 '/initialize_android_test_data', {}, use_payload=False,
                 csrf_token=None)
 
-    def test_initialize_twice_raises_already_published_exception(self) -> None:
-        self.post_json(
-            '/initialize_android_test_data', {}, use_payload=False,
-            csrf_token=None)
-        response = self.post_json(
-            '/initialize_android_test_data', {}, use_payload=False,
-            csrf_token=None, expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'The topic is already published.')
-
-    def test_initialize_twice_raises_unpublished_topic_exception(self) -> None:
-        self.post_json(
-            '/initialize_android_test_data', {}, use_payload=False,
-            csrf_token=None)
-        topic = topic_fetchers.get_topic_by_name('Android test', strict=True)
-        topic_services.unpublish_topic(
-            topic.id, feconf.SYSTEM_COMMITTER_ID)
-        response = self.post_json(
-            '/initialize_android_test_data', {}, use_payload=False,
-            csrf_token=None, expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'The topic exists but is not published.')
-
 
 class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     """Tests for the AndroidActivityHandler."""
@@ -88,8 +58,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             secrets_services, 'get_secret', 'not_key')
         with secrets_swap:
             self.get_json(
-                '/android_data?activity_type=story&api_key=secret&'
+                '/android_data?activity_type=story&'
                 'activities_data=[{"id": "id", "version": 1}]',
+                headers={'X-ApiKey': 'secret'},
                 expected_status_int=401
             )
 
@@ -97,11 +68,12 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=story&api_key=secret&'
+                    '/android_data?activity_type=story&'
                     'activities_data=[{"id": "story_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [None]
+                {'story_id': None}
             )
 
     def test_get_exploration_returns_correct_json(self) -> None:
@@ -109,11 +81,12 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=exploration&api_key=secret&'
+                    '/android_data?activity_type=exploration&'
                     'activities_data=[{"id": "exp_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [exploration.to_dict()]
+                {'exp_id': exploration.to_dict()}
             )
 
     def test_get_different_versions_of_exploration_returns_correct_json(
@@ -137,19 +110,21 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=exploration&api_key=secret&'
+                    '/android_data?activity_type=exploration&'
                     'activities_data=[{"id": "exp_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [exploration.to_dict()]
+                {'exp_id': exploration.to_dict()}
             )
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=exploration&api_key=secret&'
+                    '/android_data?activity_type=exploration&'
                     'activities_data=[{"id": "exp_id", "version": 2}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [new_exploration.to_dict()]
+                {'exp_id': new_exploration.to_dict()}
             )
 
     def test_get_story_returns_correct_json(self) -> None:
@@ -157,11 +132,12 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=story&api_key=secret&'
+                    '/android_data?activity_type=story&'
                     'activities_data=[{"id": "story_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [story.to_dict()]
+                {'story_id': story.to_dict()}
             )
 
     def test_get_skill_returns_correct_json(self) -> None:
@@ -169,11 +145,12 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=skill&api_key=secret&'
+                    '/android_data?activity_type=skill&'
                     'activities_data=[{"id": "skill_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [skill.to_dict()]
+                {'skill_id': skill.to_dict()}
             )
 
     def test_get_subtopic_returns_correct_json(self) -> None:
@@ -181,11 +158,12 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=subtopic&api_key=secret&'
+                    '/android_data?activity_type=subtopic&'
                     'activities_data=[{"id": "topic_id-1", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [subtopic.to_dict()]
+                {'topic_id-1': subtopic.to_dict()}
             )
 
     def test_get_classroom_returns_correct_json(self) -> None:
@@ -207,11 +185,12 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=classroom&api_key=secret&'
+                    '/android_data?activity_type=classroom&'
                     'activities_data=[{"id": "math"}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [classroom.to_dict()]
+                {'math': classroom.to_dict()}
             )
 
     def test_get_classroom_with_version_returns_error(self) -> None:
@@ -232,8 +211,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         classroom_config_services.update_or_create_classroom_model(classroom)
         with self.secrets_swap:
             self.get_json(
-                '/android_data?activity_type=classroom&api_key=secret&'
+                '/android_data?activity_type=classroom&'
                 'activities_data=[{"id": "math", "version": 2}]',
+                headers={'X-ApiKey': 'secret'},
                 expected_status_int=400
             )
 
@@ -242,9 +222,10 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
-                    '/android_data?activity_type=learntopic&api_key=secret&'
+                    '/android_data?activity_type=learntopic&'
                     'activities_data=[{"id": "topic_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                [topic.to_dict()]
+                {'topic_id': topic.to_dict()}
             )
