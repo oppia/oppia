@@ -20,7 +20,7 @@ const puppeteer = require('puppeteer');
 const testConstants = require('./test-constants.js');
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
-const browserAlerts = ['', 'Changes that you made may not be saved.'];
+const acceptedBrowserAlerts = ['', 'Changes that you made may not be saved.'];
 
 module.exports = class baseUser {
   constructor() {
@@ -50,7 +50,7 @@ module.exports = class baseUser {
          *  Otherwise, an error will occur for unexpected alerts. */
         this.page.on('dialog', async(dialog) => {
           const alertText = dialog.message();
-          if (browserAlerts.includes(alertText)) {
+          if (acceptedBrowserAlerts.includes(alertText)) {
             await dialog.accept();
           } else {
             throw new Error(`Unexpected alert: ${alertText}`);
