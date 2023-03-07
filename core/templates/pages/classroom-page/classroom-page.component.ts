@@ -34,6 +34,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import './classroom-page.component.css';
 
 @Component({
@@ -68,7 +69,8 @@ export class ClassroomPageComponent implements OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -78,6 +80,7 @@ export class ClassroomPageComponent implements OnDestroy {
       '/splash/books.svg');
 
     this.loaderService.showLoadingScreen('Loading');
+    this.isDiagnosticTestFeatureFlagEnabled();
 
     this.accessValidationBackendApiService.validateAccessToClassroomPage(
       this.classroomUrlFragment).then(() => {
@@ -158,6 +161,10 @@ export class ClassroomPageComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isDiagnosticTestFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status.DiagnosticTest.isEnabled;
   }
 }
 

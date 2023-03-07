@@ -17,6 +17,10 @@
 from __future__ import annotations
 
 from core import feconf
+from core.constants import constants
+from core.domain import platform_feature_services as feature_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import question_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -28,11 +32,43 @@ from core.tests import test_utils
 class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
     """Test class for the diagnostic test player page."""
 
-    def test_diagnostic_test_page_access(self) -> None:
-        self.get_html_response(
-            feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-            expected_status_int=200
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        feature_services.update_feature_flag_rules(
+            platform_parameter_list.ParamNames.DIAGNOSTIC_TEST.value,
+            self.owner_id,
+            'test update',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [{
+                        'type': 'server_mode',
+                        'conditions': [[
+                            '=',
+                            platform_parameter_domain.FeatureStages.DEV.value]
+                            ]
+                    }],
+                    'value_when_matched': True
+                })
+            ]
         )
+
+    def test_should_access_diagnostic_test_page_in_dev_mode(self) -> None:
+        with self.swap(constants, 'DEV_MODE', True):
+            self.get_html_response(
+                feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+                expected_status_int=200
+            )
+
+    def test_should_not_access_diagnostic_test_page_when_not_in_dev_mode(
+        self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            self.get_html_response(
+                feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
+                expected_status_int=404
+            )
 
 
 class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):

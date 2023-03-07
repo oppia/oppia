@@ -38,6 +38,7 @@ class ParamNames(enum.Enum):
         'contributor_dashboard_accomplishments')
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
+    DIAGNOSTIC_TEST = 'diagnostic_test'
 
 
 # Platform parameters should all be defined below.
@@ -82,4 +83,10 @@ Registry.create_feature_flag(
     ParamNames.BLOG_PAGES,
     'This flag is for blog home page, blog author profile page and blog post' +
     ' page.',
+    platform_parameter_domain.FeatureStages.PROD)
+
+
+Registry.create_feature_flag(
+    ParamNames.DIAGNOSTIC_TEST,
+    'This flag is for the diagnostic test functionality.',
     platform_parameter_domain.FeatureStages.PROD)
