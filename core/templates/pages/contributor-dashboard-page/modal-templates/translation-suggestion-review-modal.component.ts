@@ -422,34 +422,32 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.reviewMessage, this.finalCommitMessage,
       this.resolveSuggestionAndUpdateModal.bind(this),
       (errorMessage) => {
-        this.rejectAndReviewNext(`Invalid Suggestion: ${errorMessage}`);
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(
           `Invalid Suggestion: ${errorMessage}`);
       });
   }
 
-  rejectAndReviewNext(reviewMessage: string): void {
-    if (this.validatorsService.isValidReviewMessage(reviewMessage,
-      /* ShowWarnings= */ true)) {
-      this.resolvingSuggestion = true;
-      this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
-        'Translation');
-
-      // In case of rejection, the suggestion is not applied, so there is no
-      // commit message. Because there is no commit to make.
-      this.contributionAndReviewService.reviewExplorationSuggestion(
-        this.activeSuggestion.target_id, this.activeSuggestionId,
-        AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewMessage || this.reviewMessage, null,
-        this.resolveSuggestionAndUpdateModal.bind(this),
-        (error) => {
-          this.alertsService.clearWarnings();
-          this.alertsService.addWarning(
-            'There was an error rejecting this suggestion');
-        }
-      );
+  rejectAndReviewNext(): void {
+    this.finalCommitMessage = this.generateCommitMessage();
+    if (this.translationUpdated) {
+      this.reviewMessage = this.reviewMessage + ': This suggestion' +
+        ' was rejected.';
     }
+    this.resolvingSuggestion = false;
+    this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
+      'Translation');
+
+    this.contributionAndReviewService.reviewExplorationSuggestion(
+      this.activeSuggestion.target_id, this.activeSuggestionId,
+      AppConstants.ACTION_REJECT_SUGGESTION,
+      this.reviewMessage, this.finalCommitMessage,
+      this.resolveSuggestionAndUpdateModal.bind(this),
+      (errorMessage) => {
+        this.alertsService.clearWarnings();
+        this.alertsService.addWarning(
+          `There was an error rejecting this translation`);
+      });
   }
 
   // Returns the HTML content representing the most up-to-date exploration
