@@ -34,6 +34,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ClassroomPageComponent } from './classroom-page.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockCapitalizePipe {
   transform(input: string): string {
@@ -46,6 +47,14 @@ class MockTranslateService {
   instant(key: string, interpolateParams?: Object): string {
     return key;
   }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    DiagnosticTest: {
+      isEnabled: false
+    }
+  };
 }
 
 describe('Classroom Page Component', () => {
@@ -61,6 +70,7 @@ describe('Classroom Page Component', () => {
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -80,6 +90,10 @@ describe('Classroom Page Component', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
         },
         ClassroomBackendApiService,
         LoaderService,
@@ -248,5 +262,13 @@ describe('Classroom Page Component', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.closed).toBe(true);
+  });
+
+  it('should return correct value for diagnostic test feature flag', () => {
+    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeFalse();
+
+    mockPlatformFeatureService.status.DiagnosticTest.isEnabled = true;
+
+    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeTrue();
   });
 });
