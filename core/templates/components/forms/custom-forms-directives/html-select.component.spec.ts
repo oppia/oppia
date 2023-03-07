@@ -39,12 +39,24 @@ describe('HTML Select Component', () => {
     component.options = [
       { id: '12', val: 'string' },
       { id: '21', val: 'string' }];
+  });
 
+  it('should initialize Selection with selectionId', () => {
+    component.selectionId = '21';
     component.ngOnInit();
+    expect(component.selection).toEqual({ id: '21', val: 'string' });
+  });
+
+  it('should initialize Selection with the first option when selectionId' +
+  ' not in options', () => {
+    component.selectionId = '13';
+    component.ngOnInit();
+    expect(component.selection).toEqual({ id: '12', val: 'string' });
   });
 
   it('should update Selection', () => {
-    component.selection = '1';
+    component.ngOnInit();
+    component.selection = { id: '1', val: 'string' };
     spyOn(component.onSelectionChange, 'emit');
 
     component.updatedSelection();

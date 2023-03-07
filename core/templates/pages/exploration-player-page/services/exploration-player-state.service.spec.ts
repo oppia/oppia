@@ -281,57 +281,56 @@ describe('Exploration Player State Service', () => {
     explorationPlayerStateService = TestBed
       .inject(ExplorationPlayerStateService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    playerTranscriptService = (playerTranscriptService as unknown) as
+    playerTranscriptService = playerTranscriptService as
       jasmine.SpyObj<PlayerTranscriptService>;
     statsReportingService = TestBed.inject(StatsReportingService);
-    statsReportingService = (statsReportingService as unknown) as
+    statsReportingService = statsReportingService as
       jasmine.SpyObj<StatsReportingService>;
     playthroughService = TestBed.inject(PlaythroughService);
-    playthroughService = (playthroughService as unknown) as
+    playthroughService = playthroughService as
       jasmine.SpyObj<PlaythroughService>;
     playerCorrectnessFeedbackEnabledService = TestBed.inject(
       PlayerCorrectnessFeedbackEnabledService);
     playerCorrectnessFeedbackEnabledService = (
-      playerCorrectnessFeedbackEnabledService as unknown) as
+      playerCorrectnessFeedbackEnabledService) as
       jasmine.SpyObj<PlayerCorrectnessFeedbackEnabledService>;
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    explorationEngineService = (explorationEngineService as unknown) as
+    explorationEngineService = explorationEngineService as
       jasmine.SpyObj<ExplorationEngineService>;
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    questionPlayerEngineService = (questionPlayerEngineService as unknown) as
+    questionPlayerEngineService = questionPlayerEngineService as
       jasmine.SpyObj<QuestionPlayerEngineService>;
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService);
     editableExplorationBackendApiService = (
-      editableExplorationBackendApiService as unknown) as
+      editableExplorationBackendApiService) as
       jasmine.SpyObj<EditableExplorationBackendApiService>;
     explorationFeaturesBackendApiService = TestBed.inject(
       ExplorationFeaturesBackendApiService);
     explorationFeaturesBackendApiService = (
-      explorationFeaturesBackendApiService as unknown) as
+      explorationFeaturesBackendApiService) as
       jasmine.SpyObj<ExplorationFeaturesBackendApiService>;
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     explorationFeaturesService = (
-      explorationFeaturesService as unknown) as
+      explorationFeaturesService) as
       jasmine.SpyObj<ExplorationFeaturesService>;
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
     numberAttemptsService = (
-      numberAttemptsService as unknown) as
+      numberAttemptsService) as
       jasmine.SpyObj<NumberAttemptsService>;
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionBackendApiService = (
-      questionBackendApiService as unknown) as
+      questionBackendApiService) as
       jasmine.SpyObj<QuestionBackendApiService>;
     pretestQuestionBackendApiService = TestBed.inject(
       PretestQuestionBackendApiService);
     pretestQuestionBackendApiService = (
-      pretestQuestionBackendApiService as unknown) as
+      pretestQuestionBackendApiService) as
       jasmine.SpyObj<PretestQuestionBackendApiService>;
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionObject = questionObjectFactory.createFromBackendDict(
       questionBackendDict);
-    urlService = (TestBed.inject(UrlService) as unknown) as
-      jasmine.SpyObj<UrlService>;
+    urlService = TestBed.inject(UrlService);
     diagnosticTestPlayerEngineService = TestBed.inject(
       DiagnosticTestPlayerEngineService);
   });

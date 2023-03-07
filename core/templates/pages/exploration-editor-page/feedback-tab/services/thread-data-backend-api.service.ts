@@ -111,7 +111,7 @@ export class ThreadDataBackendApiService {
     return this.threadsById.get(threadId) || null;
   }
 
-  get onFeedbackThreadsInitialized(): EventEmitter<unknown> {
+  get onFeedbackThreadsInitialized(): EventEmitter<string> {
     return this._feedbackThreadsInitializedEventEmitter;
   }
 
