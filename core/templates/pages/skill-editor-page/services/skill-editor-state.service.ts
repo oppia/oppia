@@ -280,7 +280,7 @@ export class SkillEditorStateService {
       });
   }
 
-  get onSkillChange(): EventEmitter<unknown> {
+  get onSkillChange(): EventEmitter<string> {
     return this._skillChangedEventEmitter;
   }
 
