@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { Story, StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story, StoryBackendDict } from 'domain/story/story.model';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
@@ -57,7 +57,6 @@ export class StoryEditorStateService {
     private alertsService: AlertsService,
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private loaderService: LoaderService,
-    private storyObjectFactory: StoryObjectFactory,
     private undoRedoService: UndoRedoService) {}
 
   private _setStory(story: Story): void {
@@ -92,7 +91,7 @@ export class StoryEditorStateService {
 
   private _updateStory(newBackendStoryObject: StoryBackendDict): void {
     this._setStory(
-      this.storyObjectFactory.createFromBackendDict(newBackendStoryObject));
+      Story.createFromBackendDict(newBackendStoryObject));
   }
 
   private _setStoryWithUrlFragmentExists(
@@ -283,19 +282,19 @@ export class StoryEditorStateService {
     return this._storyIsBeingSaved;
   }
 
-  get onStoryInitialized(): EventEmitter<unknown> {
+  get onStoryInitialized(): EventEmitter<string> {
     return this._storyInitializedEventEmitter;
   }
 
-  get onStoryReinitialized(): EventEmitter<unknown> {
+  get onStoryReinitialized(): EventEmitter<string> {
     return this._storyReinitializedEventEmitter;
   }
 
-  get onViewStoryNodeEditor(): EventEmitter<unknown> {
+  get onViewStoryNodeEditor(): EventEmitter<string> {
     return this._viewStoryNodeEditorEventEmitter;
   }
 
-  get onRecalculateAvailableNodes(): EventEmitter<unknown> {
+  get onRecalculateAvailableNodes(): EventEmitter<string> {
     return this._recalculateAvailableNodesEventEmitter;
   }
 

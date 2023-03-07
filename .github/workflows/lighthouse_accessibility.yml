@@ -1,5 +1,7 @@
 name: Lighthouse CI accessibility tests
 on:
+  merge_group:
+    types: [checks_requested]
   push:
     branches:
       - develop

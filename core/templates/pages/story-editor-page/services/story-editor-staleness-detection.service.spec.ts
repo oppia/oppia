@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { FaviconService } from 'services/favicon.service';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -39,7 +39,6 @@ class MockWindowRef {
 describe('Story editor staleness detection service', () => {
   let storyEditorStalenessDetectionService:
     StoryEditorStalenessDetectionService;
-  let storyObjectFactory: StoryObjectFactory;
   let storyEditorStateService: StoryEditorStateService;
   let localStorageService: LocalStorageService;
   let ngbModal: NgbModal;
@@ -68,7 +67,6 @@ describe('Story editor staleness detection service', () => {
 
     storyEditorStalenessDetectionService =
       TestBed.inject(StoryEditorStalenessDetectionService);
-    storyObjectFactory = TestBed.inject(StoryObjectFactory);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
     localStorageService = TestBed.inject(LocalStorageService);
     ngbModal = TestBed.inject(NgbModal);
@@ -120,7 +118,7 @@ describe('Story editor staleness detection service', () => {
       meta_tag_content: 'meta'
     };
 
-    sampleStory = storyObjectFactory.createFromBackendDict(
+    sampleStory = Story.createFromBackendDict(
       sampleStoryBackendObject);
   });
 

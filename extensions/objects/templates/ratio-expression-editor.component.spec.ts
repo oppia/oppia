@@ -38,7 +38,9 @@ describe('RatioExpression', () => {
   it('should initialize @Input() value with a default value', () => {
     // This throws "Type 'null' is not assignable to type
     // 'number[]'". We need to suppress this error
-    // because we are testing validations here.
+    // because we are testing validations here. This error
+    // is thrown because the type of value is number[] and
+    // we are assigning null to it.
     // @ts-ignore
     component.value = null;
 
