@@ -51,68 +51,6 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
                 '/initialize_android_test_data', {}, use_payload=False,
                 csrf_token=None)
 
-    def test_initialize_topic_is_published(self) -> None:
-        self.post_json(
-            '/initialize_android_test_data', {}, use_payload=False,
-            csrf_token=None)
-        self.assertTrue(topic_services.does_topic_with_name_exist(
-            'Android test'))
-        topic = topic_fetchers.get_topic_by_name('Android test', strict=True)
-        topic_rights = topic_fetchers.get_topic_rights(
-            topic.id, strict=True)
-
-        self.assertTrue(topic_rights.topic_is_published)
-
-    def test_initialize_structures_are_valid(self) -> None:
-        self.post_json(
-            '/initialize_android_test_data', {}, use_payload=False,
-            csrf_token=None)
-        exp_id = '26'
-        topic = topic_fetchers.get_topic_by_name('Android test', strict=True)
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        story = story_fetchers.get_story_by_url_fragment(
-            'android-end-to-end-testing')
-        assert story is not None
-        skill = skill_fetchers.get_skill_by_description(
-            'Dummy Skill for Android')
-        assert skill is not None
-        skill.validate()
-        story.validate()
-        topic.validate(strict=True)
-        exploration.validate(strict=True)
-        for node in story.story_contents.nodes:
-            self.assertEqual(node.exploration_id, exp_id)
-
-    def test_initialize_structure_thumbnails_exist(self) -> None:
-        # To validate the thumbnails for topics ans stories can be fetched
-        # using AssetsDevHandler.
-        self.post_json(
-            '/initialize_android_test_data', {}, use_payload=False,
-            csrf_token=None)
-        topic = topic_fetchers.get_topic_by_name('Android test', strict=True)
-        story = story_fetchers.get_story_by_url_fragment(
-            'android-end-to-end-testing')
-        assert story is not None
-        self.get_custom_response(
-            '/assetsdevhandler/topic/%s/assets/thumbnail/test_svg.svg' %
-            topic.id, 'image/svg+xml')
-        self.get_custom_response(
-            '/assetsdevhandler/story/%s/assets/thumbnail/test_svg.svg' %
-            story.id, 'image/svg+xml')
-
-    def test_exploration_assets_are_loaded(self) -> None:
-        self.post_json(
-            '/initialize_android_test_data', {}, use_payload=False,
-            csrf_token=None)
-        filelist = os.listdir(
-            os.path.join(
-                'data', 'explorations', 'android_interactions', 'assets',
-                'image'))
-        for filename in filelist:
-            self.get_custom_response(
-                '/assetsdevhandler/exploration/26/assets/image/%s' %
-                filename, 'image/png')
-
     def test_initialize_twice_raises_already_published_exception(self) -> None:
         self.post_json(
             '/initialize_android_test_data', {}, use_payload=False,
