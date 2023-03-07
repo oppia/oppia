@@ -16,7 +16,6 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-const path = require('path');
 const baseUser = require(
   '../puppeteer-testing-utilities/puppeteer-utils.js');
 const testConstants = require(
