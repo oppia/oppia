@@ -17,14 +17,14 @@
  */
 
 const userFactory = require(
-  '../puppeteer-testing-utilities/user-factory.js');
+  '../../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
+  '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Blog-Admin', function() {
-  const ROLE_BLOG_ADMIN = 'blog admin';
+describe('blog-admin', function() {
+  const ROLE_BLOG_ADMIN = 'blog-admin';
   const ROLE_BLOG_POST_EDITOR = 'blog post editor';
   let superAdmin = null;
   let blogAdmin = null;
@@ -38,7 +38,7 @@ describe('Blog-Admin', function() {
   * blog admin must be able to revoke blog editor role of other users from the
   * /blog-admin page. But this is not the case now, only super admin can do this
   */
-  it('should assign roles to users and change tag properties',
+  it('should-assign-roles-to-users-and-change-tag-properties',
     async function() {
       const guestUsr1 = await userFactory.createNewGuestUser(
         'guestUsr1', 'guest_user1@example.com');
