@@ -185,8 +185,8 @@ export class ContributionOpportunitiesBackendApiService {
     }
     return this.http.get<ReviewableTranslationOpportunitiesBackendDict>(
       '/getreviewableopportunitieshandler', {
-        params: params
-      }).toPromise().then(data => {
+        params
+      } as Object).toPromise().then(data => {
       const opportunities = data.opportunities.map(
         dict => this._getExplorationOpportunityFromDict(dict));
       return {

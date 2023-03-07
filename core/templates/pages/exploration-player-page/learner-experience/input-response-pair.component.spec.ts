@@ -212,8 +212,9 @@ describe('InputResponsePairComponent', () => {
     component.data = {
       // This throws "Type '{ answerDetails: string; }' is not assignable to
       // type 'string'.". We need to suppress this error because we need to
-      // store "answerDetails" to test the relevant code.
-      // @ts-expect-error
+      // store "answerDetails" to test the relevant code. This is done to
+      // avoid the lint error "This test should have at least one expectation.".
+      // @ts-ignore
       learnerInput: {
         answerDetails: 'Answer Details'
       },
