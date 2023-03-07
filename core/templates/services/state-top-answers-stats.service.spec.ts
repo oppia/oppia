@@ -446,7 +446,8 @@ describe('StateTopAnswersStatsService', () => {
 
     flushMicrotasks();
 
-    stateTopAnswersStatsService.getTopAnswersByStateNameAsync().then(
+    stateTopAnswersStatsService.getTopAnswersByStateNameAsync(
+      expId, states).then(
       (data) => {
         expect(data.get('Hola')).toEqual([
           new AnswerStats('hola', 'hola', 7, true),
