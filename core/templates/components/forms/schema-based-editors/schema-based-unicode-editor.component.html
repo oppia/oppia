@@ -9,7 +9,8 @@
             [oppiaFocusOn]="labelForFocusTarget"
             attr.placeholder="{{getPlaceholder()}}"
             applyValidation [validators]="validators"
-            (keydown)="onKeypress($event)"
+            (keyup)="onKeypress($event, inputText.valid)"
+            #inputText="ngModel"
             rows="{{getRows()}}">
   </textarea>
 
@@ -24,7 +25,8 @@
            [oppiaFocusOn]="labelForFocusTarget"
            attr.placeholder="{{getPlaceholder()}}"
            applyValidation [validators]="validators"
-           (keydown)="onKeypress($event)"
+           (keyup)="onKeypress($event,inputText.valid)"
+           #inputText="ngModel"
            aria-label="text input">
   </span>
 

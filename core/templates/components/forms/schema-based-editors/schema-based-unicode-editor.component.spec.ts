@@ -183,7 +183,7 @@ describe('Schema Based Unicode Editor', () => {
       keyCode: 13
     });
 
-    component.onKeypress(evt);
+    component.onKeypress(evt, true);
 
     expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
       .toHaveBeenCalled();

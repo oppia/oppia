@@ -44,7 +44,8 @@
                                [labelForFocusTarget]="labelForFocusTarget"
                                (inputBlur)="inputBlur.emit()"
                                (inputFocus)="inputFocus.emit()"
-                               name="unicodeEditor">
+                               name="unicodeEditor"
+                               (isInputValidChange)="isInputValid($event)">
   </schema-based-unicode-editor>
 
   <schema-based-html-editor *ngIf="schema.type === 'html' && !schema.choices"

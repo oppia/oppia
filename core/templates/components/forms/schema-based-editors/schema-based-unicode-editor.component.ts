@@ -70,6 +70,7 @@ implements ControlValueAccessor, OnInit, Validator {
   @Input() validators!: OppiaValidator[];
   @Input() labelForFocusTarget!: string;
   localValue!: string;
+  @Output() isInputValidChange = new EventEmitter<boolean>();
   onChange: (value: string) => void = () => {};
   directiveSubscriptions = new Subscription();
   codemirrorStatus: boolean = false;
@@ -170,7 +171,8 @@ implements ControlValueAccessor, OnInit, Validator {
     }, 5);
   }
 
-  onKeypress(evt: KeyboardEvent): void {
+  onKeypress(evt: KeyboardEvent, isInputValid: boolean): void {
+    this.isInputValidChange.emit(isInputValid);
     if (evt.keyCode === 13) {
       this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
     }
