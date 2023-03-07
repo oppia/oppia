@@ -25,7 +25,7 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const duplicateBlogPostWarning = ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 
-describe('blog-editor', function() {
+describe('Blog Editor', function() {
   let blogPostEditor = null;
 
   beforeAll(async function() {
@@ -33,7 +33,7 @@ describe('blog-editor', function() {
       'blogPostEditor');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should-check-blog-editor-unable-to-publish-duplicate-blog-post',
+  it('should check blog editor unable to publish duplicate blog post',
     async function() {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);

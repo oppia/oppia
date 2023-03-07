@@ -23,7 +23,7 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('blog-editor', function() {
+describe('Blog Editor', function() {
   let blogPostEditor = null;
 
   beforeAll(async function() {
@@ -31,7 +31,7 @@ describe('blog-editor', function() {
       'blogPostEditor');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should-create-draft-and-delete-draft-blog-post',
+  it('should create draft and delete draft blog post',
     async function() {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);

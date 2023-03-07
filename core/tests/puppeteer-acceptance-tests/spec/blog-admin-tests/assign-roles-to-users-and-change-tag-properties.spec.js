@@ -23,7 +23,7 @@ const testConstants = require(
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('blog-admin', function() {
+describe('Blog Admin', function() {
   const ROLE_BLOG_ADMIN = 'blog-admin';
   const ROLE_BLOG_POST_EDITOR = 'blog post editor';
   let superAdmin = null;
@@ -38,7 +38,7 @@ describe('blog-admin', function() {
   * blog admin must be able to revoke blog editor role of other users from the
   * /blog-admin page. But this is not the case now, only super admin can do this
   */
-  it('should-assign-roles-to-users-and-change-tag-properties',
+  it('should assign roles to users and change tag properties',
     async function() {
       const guestUsr1 = await userFactory.createNewGuestUser(
         'guestUsr1', 'guest_user1@example.com');
