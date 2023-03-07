@@ -83,7 +83,6 @@ jobs:
           - contributorDashboard
           - coreEditorAndPlayerFeatures
           - creatorDashboard
-          - diagnosticTestPage
           - embedding
           - explorationFeedbackTab
           - explorationImprovementsTab
