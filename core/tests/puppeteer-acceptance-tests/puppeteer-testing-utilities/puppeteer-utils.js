@@ -20,7 +20,7 @@ const puppeteer = require('puppeteer');
 const testConstants = require('./test-constants.js');
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
-/** We accept the empty alert message because this is what is sent on
+/** We accept the empty message because this is what is sent on
  * 'beforeunload' due to an issue with Chromium (see
  * https://github.com/puppeteer/puppeteer/issues/3725). */
 const acceptedBrowserAlerts = ['', 'Changes that you made may not be saved.'];
