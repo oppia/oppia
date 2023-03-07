@@ -446,7 +446,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       (errorMessage) => {
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(
-          `There was an error rejecting this translation`);
+          `Invalid Suggestion: ${errorMessage}`);
       });
   }
 
