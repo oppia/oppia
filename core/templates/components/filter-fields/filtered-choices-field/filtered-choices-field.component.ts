@@ -37,7 +37,7 @@ export class FilteredChoicesFieldComponent {
 
   filteredChoices!: string[];
 
-  constructor(private cd: ChangeDetectorRef) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.filteredChoices = this.choices;
@@ -46,7 +46,7 @@ export class FilteredChoicesFieldComponent {
   filterChoices(searchTerm: string): void {
     this.filteredChoices = this.choices.filter(
       choice => choice.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
-    this.cd.detectChanges();
+    this.changeDetectorRef.detectChanges();
   }
 
   updateSelection(selection: string): void {
