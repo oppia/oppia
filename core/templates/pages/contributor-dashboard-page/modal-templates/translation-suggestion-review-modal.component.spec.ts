@@ -375,7 +375,6 @@ describe('Translation Suggestion Review Modal Component', function() {
         'suggestion_1', 'suggestion_2']);
     });
 
-
     it('should reject a suggestion if the backend pre accept validation ' +
     'failed', function() {
       component.ngOnInit();
