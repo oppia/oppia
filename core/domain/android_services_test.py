@@ -143,8 +143,7 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
             self
     ) -> None:
         android_services.initialize_android_test_data()
-        test_exploration = exp_fetchers.get_exploration_by_id(
-            '26', strict=False)
+        test_exploration = exp_fetchers.get_exploration_by_id('26', strict=True)
         entity_translation_model = (
             translation_models.EntityTranslationsModel.get_model(
                 feconf.TranslatableEntityType(feconf.ENTITY_TYPE_EXPLORATION),
