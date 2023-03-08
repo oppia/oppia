@@ -435,7 +435,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         ' was rejected.';
     }
     this.resolvingSuggestion = false;
-    this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
+    this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
       'Translation');
 
     this.contributionAndReviewService.reviewExplorationSuggestion(
