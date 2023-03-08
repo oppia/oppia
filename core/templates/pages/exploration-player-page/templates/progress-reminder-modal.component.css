@@ -129,3 +129,8 @@
   padding: 5px;
   width: 240px;
 }
+
+oppia-progress-reminder-modal .restart-button:focus,
+oppia-progress-reminder-modal .resume-button:focus {
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
+}
