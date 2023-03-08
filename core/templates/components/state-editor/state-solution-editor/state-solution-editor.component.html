@@ -26,9 +26,11 @@
               </button>
             </div>
           </div>
-          <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
+          <ul class="nav oppia-option-list nav-stacked nav-pills"
+              role="tablist"
               *ngIf="savedMemento()">
-            <li class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
+            <li class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
+                role="tab">
               <div class="oppia-rule-header-warning-placement"
                    *ngIf="!isSolutionValid()"
                    (click)="toggleInlineSolutionEditorIsActive()"

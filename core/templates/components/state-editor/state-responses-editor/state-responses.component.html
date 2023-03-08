@@ -23,6 +23,7 @@
             <div [cdkDragDisabled]="activeAnswerGroupIndex === index ? true : false"
                  cdkDrag
                  *ngFor="let answerGroup of answerGroups; let index = index"
+                 role="tab"
                  [ngClass]="{'active': activeAnswerGroupIndex === index}"
                  class="oppia-sortable-rule-block oppia-prevent-selection">
 
@@ -82,7 +83,9 @@
         </div>
         <div *ngIf="!suppressDefaultAnswerGroup()">
           <div class="oppia-option-list nav-stacked nav-pills" role="tablist">
-            <div class="option-list-default" [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}">
+            <div class="option-list-default"
+                 [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}"
+                 role="tab">
               <div class="oppia-rule-header-warning-placement"
                    *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome))"
                    (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
