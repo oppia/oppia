@@ -28,8 +28,12 @@ from core.tests import test_utils
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import secrets_services
+    from mypy_imports import translation_models
 
 secrets_services = models.Registry.import_secrets_services()
+
+(translation_models,) = models.Registry.import_models([
+    models.Names.TRANSLATION])
 
 
 class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
@@ -43,6 +47,18 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
             self.post_json(
                 '/initialize_android_test_data', {}, use_payload=False,
                 csrf_token=None)
+
+    def test_initialize_in_develop_passes(self) -> None:
+        self.assertEqual(
+            list(self.post_json(
+                '/initialize_android_test_data',
+                {},
+                use_payload=False,
+                csrf_token=None
+            ).keys()),
+            ['generated_topic_id']
+        )
+
 
 
 class AndroidActivityHandlerTests(test_utils.GenericTestBase):
@@ -210,12 +226,87 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
         classroom_config_services.update_or_create_classroom_model(classroom)
         with self.secrets_swap:
-            self.get_json(
-                '/android_data?activity_type=classroom&'
-                'activities_data=[{"id": "math", "version": 2}]',
-                headers={'X-ApiKey': 'secret'},
-                expected_status_int=400
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=classroom&'
+                    'activities_data=[{"id": "math", "version": 2}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=400
+                )['error'],
+                'Version cannot be specified for classroom'
             )
+
+    def test_get_exploration_translation_without_lang_code_fails(self) -> None:
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exp_translations&'
+                    'activities_data=[{"id": "translation_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=400
+                )['error'],
+                'Version and language code must be specified '
+                'for translation'
+            )
+
+    def test_get_exploration_translation_without_version_fails(self) -> None:
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exp_translations&'
+                    'activities_data=['
+                    '  {"id": "translation_id", "language_code": "es"}'
+                    ']',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=400
+                )['error'],
+                'Version and language code must be specified '
+                'for translation'
+            )
+
+    def test_get_exploration_translation_returns_correct_json(self) -> None:
+        translation_model = (
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', 'translation_id', 1, 'es', {}))
+        translation_model.update_timestamps()
+        translation_model.put()
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exp_translations&'
+                    'activities_data=[{'
+                    '    "id": "translation_id", '
+                    '    "language_code": "es", '
+                    '    "version": 1'
+                    '}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                {
+                    'translation_id': {
+                        'entity_id': 'translation_id',
+                        'entity_type': 'exploration',
+                        'entity_version': 1,
+                        'language_code': 'es',
+                        'translations': {}
+                    }
+                }
+            )
+
+    def test_get_exploration_translation_with_zero_items_returns_correct_json(
+        self
+    ) -> None:
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exp_translations&'
+                    'activities_data=[]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                {}
+            )
+
 
     def test_get_topic_returns_correct_json(self) -> None:
         topic = self.save_new_topic('topic_id', 'user_id')

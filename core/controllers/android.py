@@ -194,12 +194,11 @@ class AndroidActivityHandler(base.BaseHandler[
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
                         'Version cannot be specified for classroom')
-                matching_classroom_fragment = next(
+                matching_classroom_fragment =                         [
                     classroom['url_fragment']
                     for classroom in config_domain.CLASSROOM_PAGES_DATA.value
                     if classroom['name'] == activity_data['id']
-                )
-
+                ][0]
                 activities[activity_data['id']] = (
                     classroom_config_services.get_classroom_by_url_fragment(
                         activity_data['id']
@@ -215,7 +214,9 @@ class AndroidActivityHandler(base.BaseHandler[
                 language_code = activity_data.get('language_code')
                 if version is None or language_code is None:
                     raise self.InvalidInputException(
-                        'Version cannot be specified for classroom')
+                        'Version and language code must be specified '
+                        'for translation'
+                    )
                 activities[activity_data['id']] = (
                     translation_fetchers.get_entity_translation(
                         entity_type,
