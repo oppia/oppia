@@ -101,6 +101,28 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
                 'image/png'
             )
 
+    def test_reinitialize_topic_is_published(self) -> None:
+        android_services.initialize_android_test_data()
+        self.assertTrue(
+            topic_services.does_topic_with_name_exist('Android test'))
+        old_topic = topic_fetchers.get_topic_by_name(
+            'Android test', strict=True)
+        old_topic_rights = topic_fetchers.get_topic_rights(
+            old_topic.id, strict=True)
+        old_topic_last_updated = old_topic.last_updated
+        self.assertTrue(old_topic_rights.topic_is_published)
+
+        android_services.initialize_android_test_data()
+        self.assertTrue(
+            topic_services.does_topic_with_name_exist('Android test'))
+        new_topic = topic_fetchers.get_topic_by_name(
+            'Android test', strict=True)
+        new_topic_rights = topic_fetchers.get_topic_rights(
+            new_topic.id, strict=True)
+        self.assertTrue(new_topic_rights.topic_is_published)
+
+        self.assertGreater(new_topic.last_updated, old_topic_last_updated)
+
 
 class AndroidBuildSecretTests(test_utils.GenericTestBase):
     """Tests for the verify_android_build_secret."""

@@ -546,8 +546,7 @@ def initialize_android_test_data() -> str:
                 ]
                 translated_content_value = []
                 for translated_str in translated_list:
-                    if translated_str is None:
-                        raise Exception()
+                    assert translated_str is not None
                     translated_content_value.append(translated_str)
             else:
                 # In order to tighten the type we use isinstance. This will
@@ -561,8 +560,7 @@ def initialize_android_test_data() -> str:
                         source_text=content_to_translate
                     )
                 )
-                if translated_str is None:
-                    raise Exception()
+                assert translated_str is not None
                 translated_content_value = translated_str
 
             translated_content = translation_domain.TranslatedContent(
