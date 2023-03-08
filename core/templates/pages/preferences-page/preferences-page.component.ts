@@ -196,7 +196,8 @@ export class PreferencesPageComponent {
     const newImageFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(image));
     if (newImageFile === null) {
-      throw new Error('Image uploaded is not valid.');
+      this.alertsService.addWarning('Image uploaded is not valid.');
+      return;
     }
     const reader = new FileReader();
     reader.onload = () => {

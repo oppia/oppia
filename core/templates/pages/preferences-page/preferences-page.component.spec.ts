@@ -373,15 +373,17 @@ describe('Preferences Page Component', () => {
 
     it('should edit profile picture modal raise error when image is invalid',
       fakeAsync(() => {
+        let error = 'Image uploaded is not valid.';
         let profilePictureDataUrl = 'data:text/plain;base64,JUMzJTg3JTJD';
         spyOn(ngbModal, 'open').and.returnValue({
           result: Promise.resolve(profilePictureDataUrl)
         } as NgbModalRef);
-        spyOn(mockWindowRef.nativeWindow.location, 'reload');
         spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
           .and.returnValue(null);
-        spyOn(componentInstance, 'showEditProfilePictureModal').and.throwError(
-          'Image uploaded is not valid.');
+        spyOn(alertsService, 'addWarning');
+        componentInstance.showEditProfilePictureModal();
+        tick();
+        expect(alertsService.addWarning).toHaveBeenCalledWith(error);
       }));
 
     it('should handle edit profile picture modal is canceled', fakeAsync(() => {
