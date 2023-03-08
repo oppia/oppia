@@ -103,7 +103,8 @@ export class InputResponsePairComponent {
       this.playerPositionService.getDisplayedCardIndex());
     let interaction = displayedCard.getInteraction();
     return this.explorationHtmlFormatterService.getAnswerHtml(
-      this.convertAnswerToLocalFormat(this.data.learnerInput), interaction.id,
+      this.convertAnswerToLocalFormat(this.data.learnerInput as string),
+      interaction.id,
       interaction.customizationArgs);
   }
 
@@ -116,8 +117,8 @@ export class InputResponsePairComponent {
     let shortAnswerHtml = '';
     if (this.data.learnerInput.hasOwnProperty('answerDetails')) {
       shortAnswerHtml = (
-           this.data.learnerInput as unknown as { answerDetails: string })
-        .answerDetails;
+        this.data.learnerInput as { answerDetails: string }
+      ).answerDetails;
     } else if (
       this.data && interaction.id &&
       InteractionSpecsConstants.INTERACTION_SPECS[
@@ -127,7 +128,7 @@ export class InputResponsePairComponent {
       shortAnswerHtml = (
         this.explorationHtmlFormatterService.getShortAnswerHtml(
           this.convertAnswerToLocalFormat(
-            this.data.learnerInput), interaction.id,
+            this.data.learnerInput as string), interaction.id,
           interaction.customizationArgs));
     }
     return shortAnswerHtml;

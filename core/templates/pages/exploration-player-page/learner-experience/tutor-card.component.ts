@@ -120,7 +120,7 @@ export class TutorCardComponent {
   @Input() inputOutputHistoryIsShown!: boolean;
   @Input() checkpointCelebrationModalIsEnabled!: boolean;
   private _editorPreviewMode!: boolean;
-  lastAnswer!: string | null;
+  lastAnswer!: { answerDetails: string } | string | null;
   conceptCardIsBeingShown!: boolean;
   interactionIsActive!: boolean;
   waitingForOppiaFeedback: boolean = false;
