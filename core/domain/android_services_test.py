@@ -21,8 +21,10 @@ from __future__ import annotations
 import logging
 import os
 
+from core import feconf
 from core.domain import android_services
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import skill_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
@@ -33,8 +35,12 @@ from core.tests import test_utils
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import secrets_services
+    from mypy_imports import translation_models
 
 secrets_services = models.Registry.import_secrets_services()
+
+(translation_models,) = models.Registry.import_models([
+    models.Names.TRANSLATION])
 
 
 class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
@@ -103,14 +109,9 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
 
     def test_reinitialize_topic_is_published(self) -> None:
         android_services.initialize_android_test_data()
-        self.assertTrue(
-            topic_services.does_topic_with_name_exist('Android test'))
         old_topic = topic_fetchers.get_topic_by_name(
             'Android test', strict=True)
-        old_topic_rights = topic_fetchers.get_topic_rights(
-            old_topic.id, strict=True)
         old_topic_last_updated = old_topic.last_updated
-        self.assertTrue(old_topic_rights.topic_is_published)
 
         android_services.initialize_android_test_data()
         self.assertTrue(
@@ -122,6 +123,46 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
         self.assertTrue(new_topic_rights.topic_is_published)
 
         self.assertGreater(new_topic.last_updated, old_topic_last_updated)
+
+    def test_reinitialize_topic_is_published_when_exploration_does_not_exist(
+        self
+    ) -> None:
+        android_services.initialize_android_test_data()
+
+        exp_services.delete_exploration('committer', '26')
+        android_services.initialize_android_test_data()
+        self.assertTrue(
+            topic_services.does_topic_with_name_exist('Android test'))
+        new_topic = topic_fetchers.get_topic_by_name(
+            'Android test', strict=True)
+        new_topic_rights = topic_fetchers.get_topic_rights(
+            new_topic.id, strict=True)
+        self.assertTrue(new_topic_rights.topic_is_published)
+
+    def test_reinitialize_topic_is_published_when_translation_does_not_exist(
+            self
+    ) -> None:
+        android_services.initialize_android_test_data()
+        test_exploration = exp_fetchers.get_exploration_by_id(
+            '26', strict=False)
+        entity_translation_model = (
+            translation_models.EntityTranslationsModel.get_model(
+                feconf.TranslatableEntityType(feconf.ENTITY_TYPE_EXPLORATION),
+                '26',
+                test_exploration.version,
+                'pt'
+            )
+        )
+        if entity_translation_model:
+            entity_translation_model.delete()
+        android_services.initialize_android_test_data()
+        self.assertTrue(
+            topic_services.does_topic_with_name_exist('Android test'))
+        new_topic = topic_fetchers.get_topic_by_name(
+            'Android test', strict=True)
+        new_topic_rights = topic_fetchers.get_topic_rights(
+            new_topic.id, strict=True)
+        self.assertTrue(new_topic_rights.topic_is_published)
 
 
 class AndroidBuildSecretTests(test_utils.GenericTestBase):
