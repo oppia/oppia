@@ -83,7 +83,9 @@
         </div>
         <div *ngIf="!suppressDefaultAnswerGroup()">
           <div class="oppia-option-list nav-stacked nav-pills" role="tablist">
-            <div class="option-list-default" [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}" role="tab">
+            <div class="option-list-default" 
+                 [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}"
+                 role="tab">
               <div class="oppia-rule-header-warning-placement"
                    *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome))"
                    (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
