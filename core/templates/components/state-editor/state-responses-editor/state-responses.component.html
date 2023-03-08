@@ -33,7 +33,7 @@
 
               <div class="oppia-rule-header-warning-placement" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
                    ngbTooltip="{{getOutcomeTooltip(answerGroup.outcome)}}"
-                   placement="bottom">
+                   placement="auto">
                 <div class="oppia-rule-header-warning-style" >
                   ⚠
                 </div>
@@ -90,7 +90,7 @@
                    *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome))"
                    (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
                    ngbTooltip="{{getOutcomeTooltip(defaultOutcome)}}"
-                   placement="bottom">
+                   placement="auto">
                 <div class="oppia-rule-header-warning-style" >
                   ⚠
                 </div>
