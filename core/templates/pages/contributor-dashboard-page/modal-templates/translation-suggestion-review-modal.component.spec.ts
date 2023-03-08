@@ -313,8 +313,8 @@ describe('Translation Suggestion Review Modal Component', function() {
         'suggestion_1', 'suggestion_2']);
     });
 
-    it('should reject suggestion in suggestion modal service when clicking' +
-      ' on reject and review next suggestion button', function() {
+    it('should reject suggestion in suggestion modal service when clicking ' +
+      'on reject and review next suggestion button', function() {
       component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
@@ -790,10 +790,10 @@ describe('Translation Suggestion Review Modal Component', function() {
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
       expect(contributionAndReviewService.reviewExplorationSuggestion)
-      .toHaveBeenCalledWith(
-        '1', 'suggestion_1', 'reject', 'Review message example',
-        'hint section of "StateName" card', jasmine.any(Function),
-        jasmine.any(Function));
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'reject', 'Review message example',
+          'hint section of "StateName" card', jasmine.any(Function),
+          jasmine.any(Function));
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1']);
     });
