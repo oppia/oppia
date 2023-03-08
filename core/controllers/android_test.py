@@ -60,7 +60,6 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
         )
 
 
-
 class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     """Tests for the AndroidActivityHandler."""
 
@@ -306,7 +305,6 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 ),
                 {}
             )
-
 
     def test_get_topic_returns_correct_json(self) -> None:
         topic = self.save_new_topic('topic_id', 'user_id')
