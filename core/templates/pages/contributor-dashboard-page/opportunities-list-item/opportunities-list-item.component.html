@@ -7,6 +7,15 @@
            class="progress">
         <div class="progress-bar bg-success"
              role="progressbar"
+             [style.width.%]="progressValue"
+             [attr.aria-valuenow]="progressValue !== undefined ? progressValue.toString() : ''"
+             [attr.aria-valuemin]="0"
+             [attr.aria-valuemax]="100"
+             [attr.aria-label]="progressBarLabel"
+             title="progressBar"
+             ngbTooltip="{{opportunity?.translationsCount}}/{{opportunity?.totalCount}} cards accepted"
+             container="body"
+             placement="bottom"
              [ngStyle]="progressBarStyle">
         </div>
       </div>
