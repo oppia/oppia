@@ -239,17 +239,17 @@
 }
 
 .completed-checkpoint-node {
+  align-items: center;
   background-color: #00645c;
   border-radius: 50%;
   color: #fff;
   display: flex;
+  font-size: 0.9em;
   height: 50px;
   justify-content: center;
   text-align: center;
   width: 50px;
   z-index: 0;
-  align-items: center;
-  font-size: 0.9em;
 }
 
 .in-progress-checkpoint-node {
@@ -259,12 +259,12 @@
   border-radius: 50%;
   color: #00645c;
   display: flex;
+  font-size: 0.9em;
   height: 50px;
   justify-content: center;
   text-align: center;
   width: 50px;
   z-index: 0;
-  font-size: 0.9em;
 }
 
 .incomplete-checkpoint-node {
