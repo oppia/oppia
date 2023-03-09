@@ -974,7 +974,8 @@ def can_access_translation_stats(
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in self.user.actions:
+        if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
+            self.user.actions):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
