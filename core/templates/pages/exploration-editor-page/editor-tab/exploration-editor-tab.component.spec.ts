@@ -20,7 +20,7 @@ import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { fakeAsync, TestBed, tick, flush, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
@@ -61,7 +61,6 @@ describe('Exploration editor tab component', () => {
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationStatesService: ExplorationStatesService;
   let explorationWarningsService: ExplorationWarningsService;
-  let hintObjectFactory: HintObjectFactory;
   let outcomeObjectFactory: OutcomeObjectFactory;
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -193,7 +192,6 @@ describe('Exploration editor tab component', () => {
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    hintObjectFactory = TestBed.inject(HintObjectFactory);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
@@ -735,7 +733,7 @@ describe('Exploration editor tab component', () => {
 
     expect(stateEditorService.interaction.hints).toEqual([]);
 
-    let displayedValue = [hintObjectFactory.createFromBackendDict({
+    let displayedValue = [Hint.createFromBackendDict({
       hint_content: {
         content_id: '',
         html: 'This is a hint'

@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
@@ -56,7 +56,6 @@ export class AddHintModalComponent
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private generateContentIdService: GenerateContentIdService,
-    private hintObjectFactory: HintObjectFactory,
     private ngbActiveModal: NgbActiveModal,
     private stateHintsService: StateHintsService
   ) {
@@ -103,7 +102,7 @@ export class AddHintModalComponent
     // Close the modal and save it afterwards.
     this.ngbActiveModal.close({
       hint: cloneDeep(
-        this.hintObjectFactory.createNew(contentId, this.tmpHint)),
+        Hint.createNew(contentId, this.tmpHint)),
       contentId: contentId
     });
   }

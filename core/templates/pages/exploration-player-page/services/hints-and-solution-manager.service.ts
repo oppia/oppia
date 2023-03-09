@@ -19,7 +19,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';

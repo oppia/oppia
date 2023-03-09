@@ -23,8 +23,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintBackendDict, Hint, HintObjectFactory } from
-  'domain/exploration/HintObjectFactory';
+import { HintBackendDict, Hint } from
+  'domain/exploration/hint-object.model';
 import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { SolutionBackendDict, Solution, SolutionObjectFactory } from
@@ -256,7 +256,6 @@ export class Interaction extends BaseTranslatableObject {
 export class InteractionObjectFactory {
   constructor(
       private answerGroupFactory: AnswerGroupObjectFactory,
-      private hintFactory: HintObjectFactory,
       private solutionFactory: SolutionObjectFactory,
       private outcomeFactory: OutcomeObjectFactory,
       private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory,
@@ -498,7 +497,7 @@ export class InteractionObjectFactory {
   createHintsFromBackendDict(
       hintBackendDicts: readonly HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
-      return this.hintFactory.createFromBackendDict(hintBackendDict);
+      return Hint.createFromBackendDict(hintBackendDict);
     });
   }
 

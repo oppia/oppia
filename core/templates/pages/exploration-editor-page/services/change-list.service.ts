@@ -34,7 +34,7 @@ import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subt
 import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
 import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
 import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Hint, HintBackendDict } from 'domain/exploration/HintObjectFactory';
+import { Hint, HintBackendDict } from 'domain/exploration/hint-object.model';
 import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
 import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { LostChange } from 'domain/exploration/LostChangeObjectFactory';

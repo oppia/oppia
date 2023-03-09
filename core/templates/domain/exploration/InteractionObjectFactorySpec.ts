@@ -22,7 +22,7 @@ import { AnswerGroupObjectFactory, AnswerGroupBackendDict } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { HintBackendDict, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint, HintBackendDict } from 'domain/exploration/hint-object.model';
 import { InteractionObjectFactory, Interaction, InteractionBackendDict } from
   'domain/exploration/InteractionObjectFactory';
 import { OutcomeBackendDict, OutcomeObjectFactory } from
@@ -39,7 +39,6 @@ describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
-  let hof: HintObjectFactory;
   let sof: SolutionObjectFactory;
   let answerGroupsDict: AnswerGroupBackendDict[];
   let defaultOutcomeDict: OutcomeBackendDict;
@@ -54,7 +53,6 @@ describe('Interaction object factory', () => {
     iof = TestBed.inject(InteractionObjectFactory);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    hof = TestBed.inject(HintObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
@@ -608,10 +606,10 @@ describe('Interaction object factory', () => {
         content_id: 'content_id_new'
       }
     };
-    const newHint = hof.createFromBackendDict(newHintDict);
+    const newHint = Hint.createFromBackendDict(newHintDict);
     expect(testInteraction.hints).toEqual(hintsDict.map(
       (hintDict: HintBackendDict) => {
-        return hof.createFromBackendDict(hintDict);
+        return Hint.createFromBackendDict(hintDict);
       }
     ));
     testInteraction.setHints([newHint]);

@@ -25,7 +25,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import {

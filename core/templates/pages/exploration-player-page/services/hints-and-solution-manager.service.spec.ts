@@ -19,14 +19,13 @@
 import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 
-import { Hint, HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 
 describe('HintsAndSolutionManager service', () => {
   let hasms: HintsAndSolutionManagerService;
-  let hof: HintObjectFactory;
   let sof: SolutionObjectFactory;
   let firstHint: Hint;
   let secondHint: Hint;
@@ -46,22 +45,21 @@ describe('HintsAndSolutionManager service', () => {
     spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter);
     hasms = TestBed.inject(HintsAndSolutionManagerService);
-    hof = TestBed.inject(HintObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
 
-    firstHint = hof.createFromBackendDict({
+    firstHint = Hint.createFromBackendDict({
       hint_content: {
         content_id: 'one',
         html: 'one',
       }
     });
-    secondHint = hof.createFromBackendDict({
+    secondHint = Hint.createFromBackendDict({
       hint_content: {
         content_id: 'two',
         html: 'two',
       }
     });
-    thirdHint = hof.createFromBackendDict({
+    thirdHint = Hint.createFromBackendDict({
       hint_content: {
         content_id: 'three',
         html: 'three',

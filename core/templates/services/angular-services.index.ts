@@ -73,7 +73,6 @@ import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -627,7 +626,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['GuppyInitializationService', GuppyInitializationService],
   ['HintAndSolutionModalService', HintAndSolutionModalService],
   ['HintsAndSolutionManagerService', HintsAndSolutionManagerService],
-  ['HintObjectFactory', HintObjectFactory],
   ['HistoryTabBackendApiService', HistoryTabBackendApiService],
   ['HistoryTabYamlConversionService', HistoryTabYamlConversionService],
   ['HtmlEscaperService', HtmlEscaperService],
