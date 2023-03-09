@@ -292,7 +292,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         .toHaveBeenCalledWith('Translation');
       expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
-          '1', 'suggestion_1', 'accept', 'Review message example: ' +
+          '1', 'suggestion_1', 'accept', 'Review message example',
           'This suggestion was submitted with reviewer edits.',
           'hint section of "StateName" card',
           jasmine.any(Function), jasmine.any(Function));
@@ -354,7 +354,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         .toHaveBeenCalledWith('Translation');
       expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
-          '1', 'suggestion_1', 'reject', 'Review message example: ' +
+          '1', 'suggestion_1', 'reject', 'Review message example',
           'This suggestion was rejected.',
           'hint section of "StateName" card',
           jasmine.any(Function), jasmine.any(Function));
