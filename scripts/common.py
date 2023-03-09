@@ -935,6 +935,7 @@ def is_oppia_server_already_running(
             print(
                 'There is already a server running on localhost:%s. '
                 'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port)
+                'Exiting.' % port
+            )
             return True
     return False
