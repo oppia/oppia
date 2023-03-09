@@ -77,7 +77,7 @@ export class StateInteractionEditorComponent
   directiveSubscriptions = new Subscription();
   hasLoaded: boolean;
   interactionEditorIsShown: boolean;
-  showToggleBtn: boolean = false;
+  showToggleBtn: boolean;
   interactionId: string;
   interactionIsDisabled: boolean;
   interactionPreviewHtml: string;
