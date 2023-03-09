@@ -1945,6 +1945,8 @@ class GenericTestBase(AppEngineTestBase):
     BLOG_ADMIN_USERNAME: Final = 'blogadm'
     BLOG_EDITOR_EMAIL: Final = 'blogeditor@example.com'
     BLOG_EDITOR_USERNAME: Final = 'blogeditor'
+    CLASSROOM_ADMIN_EMAIL: Final = 'classroomadmin@example.com'
+    CLASSROOM_ADMIN_USERNAME: Final = 'classroomadm'
     MODERATOR_EMAIL: Final = 'moderator@example.com'
     MODERATOR_USERNAME: Final = 'moderator'
     RELEASE_COORDINATOR_EMAIL: Final = 'releasecoordinator@example.com'
