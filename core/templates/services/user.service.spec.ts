@@ -234,8 +234,9 @@ describe('User Api Service', () => {
         let [profileImagePng, profileImageWebp] = (
           userService.getProfileImageDataUrl('tester'));
         let prformanceTime = profileImagePng.split('?')[1];
-        expect(profileImagePng).toEqual(defaultUrlPng + prformanceTime);
-        expect(profileImageWebp).toEqual(defaultUrlWebp + prformanceTime);
+        expect(profileImagePng).toEqual(defaultUrlPng + '?' + prformanceTime);
+        expect(profileImageWebp).toEqual(
+          defaultUrlWebp + '?' + prformanceTime);
 
         flushMicrotasks();
       }));
@@ -428,8 +429,10 @@ describe('User Api Service', () => {
         let [profileImagePng, profileImageWebp] = (
           userService.getProfileImageDataUrl('tester'));
         let prformanceTime = profileImagePng.split('?')[1];
-        expect(profileImagePng).toEqual(expectedPngImage + prformanceTime);
-        expect(profileImageWebp).toEqual(expectedWebpImage + prformanceTime);
+        expect(profileImagePng).toEqual(
+          expectedPngImage + '?' + prformanceTime);
+        expect(profileImageWebp).toEqual(
+          expectedWebpImage + '?' + prformanceTime);
 
         flushMicrotasks();
       }));
