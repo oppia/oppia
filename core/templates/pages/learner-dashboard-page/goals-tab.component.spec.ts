@@ -31,7 +31,7 @@ import { GoalsTabComponent } from './goals-tab.component';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { i } from 'mathjs';
+import { i, index, number } from 'mathjs';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
