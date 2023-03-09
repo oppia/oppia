@@ -227,10 +227,11 @@ describe('User Api Service', () => {
 
     it('should return the default profile image path when in emulator mode',
       fakeAsync(() => {
+        let prformanceTime = '?' + performance.now().toString();
         let defaultUrlWebp = urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH) + prformanceTime;
         let defaultUrlPng = urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH) + prformanceTime;
         let [profileImagePng, profileImageWebp] = (
           userService.getProfileImageDataUrl('tester'));
         expect(profileImagePng).toEqual(defaultUrlPng);
@@ -418,12 +419,13 @@ describe('User Api Service', () => {
 
     it('should return image path when in production mode',
       fakeAsync(() => {
+        let prformanceTime = '?' + performance.now().toString();
         let expectedPngImage = (
           'https://storage.googleapis.com/app_default_bucket/user/' +
-          'tester/assets/profile_picture.png');
+          'tester/assets/profile_picture.png') + prformanceTime;
         let expectedWebpImage = (
           'https://storage.googleapis.com/app_default_bucket/user/' +
-          'tester/assets/profile_picture.webp');
+          'tester/assets/profile_picture.webp') + prformanceTime;
         let [profileImagePng, profileImageWebp] = (
           userService.getProfileImageDataUrl('tester'));
         expect(profileImagePng).toEqual(expectedPngImage);

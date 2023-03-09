@@ -61,6 +61,9 @@ export class UserService {
   }
 
   getProfileImageDataUrl(username: string): [string, string] {
+    // Here we are using prformanceTime in order to avoid cache problems.
+    // For details have a look at - https://stackoverflow.com/a/126831
+    let prformanceTime = '?' + performance.now().toString();
     if (AssetsBackendApiService.EMULATOR_MODE) {
       let localStoredImage = this.imageLocalStorageService.getRawImageData(
         username + '_profile_picture.png');
@@ -69,7 +72,8 @@ export class UserService {
       let defaultUrlPng = this.urlInterpolationService.getStaticImageUrl(
         AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
       if (localStoredImage === null) {
-        return [defaultUrlPng, defaultUrlWebp];
+        return [
+          defaultUrlPng + prformanceTime, defaultUrlWebp + prformanceTime];
       }
       // Normally, we return a tuple of PNG image URL and WebP image URL.
       // In emulator mode we use local storage and we only store the PNG image.
@@ -83,7 +87,7 @@ export class UserService {
       let WebpImageUrl = this.urlInterpolationService.interpolateUrl(
         this.assetsBackendApiService.profileImageWebpUrlTemplate,
         {username: username});
-      return [pngImageUrl, WebpImageUrl];
+      return [pngImageUrl + prformanceTime, WebpImageUrl + prformanceTime];
     }
   }
 
