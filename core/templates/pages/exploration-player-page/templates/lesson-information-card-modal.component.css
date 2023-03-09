@@ -243,40 +243,42 @@
   border-radius: 50%;
   color: #fff;
   display: flex;
-  height: 25px;
+  height: 50px;
   justify-content: center;
   text-align: center;
-  width: 25px;
+  width: 50px;
   z-index: 0;
+  align-items: center;
+  font-size: 0.9em;
 }
 
 .in-progress-checkpoint-node {
-  align-items: flex-start;
+  align-items: center;
   background-color: #fff;
   border: 3.5px solid #00645c;
   border-radius: 50%;
   color: #00645c;
   display: flex;
-  font-size: 1.1em;
-  height: 35px;
+  height: 50px;
   justify-content: center;
   text-align: center;
-  width: 35px;
+  width: 50px;
   z-index: 0;
+  font-size: 0.9em;
 }
 
 .incomplete-checkpoint-node {
-  align-items: flex-end;
+  align-items: center;
   background-color: #fff;
   border: 3.5px solid #bbb;
   border-radius: 50%;
   color: #bbb;
   display: flex;
   font-size: 0.9em;
-  height: 25px;
+  height: 50px;
   justify-content: center;
   text-align: center;
-  width: 25px;
+  width: 50px;
   z-index: 0;
 }
 
