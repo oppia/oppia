@@ -4915,7 +4915,6 @@ title: Title
 
         exploration.validate()
 
-        self.maxDiff = None
         yaml_content = exploration.to_yaml()
         self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
 
