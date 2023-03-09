@@ -227,15 +227,15 @@ describe('User Api Service', () => {
 
     it('should return the default profile image path when in emulator mode',
       fakeAsync(() => {
-        let prformanceTime = '?' + performance.now().toString();
         let defaultUrlWebp = urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH) + prformanceTime;
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH);
         let defaultUrlPng = urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH) + prformanceTime;
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
         let [profileImagePng, profileImageWebp] = (
           userService.getProfileImageDataUrl('tester'));
-        expect(profileImagePng).toEqual(defaultUrlPng);
-        expect(profileImageWebp).toEqual(defaultUrlWebp);
+        let prformanceTime = profileImagePng.split('?')[1];
+        expect(profileImagePng).toEqual(defaultUrlPng + prformanceTime);
+        expect(profileImageWebp).toEqual(defaultUrlWebp + prformanceTime);
 
         flushMicrotasks();
       }));
@@ -419,17 +419,17 @@ describe('User Api Service', () => {
 
     it('should return image path when in production mode',
       fakeAsync(() => {
-        let prformanceTime = '?' + performance.now().toString();
         let expectedPngImage = (
           'https://storage.googleapis.com/app_default_bucket/user/' +
-          'tester/assets/profile_picture.png') + prformanceTime;
+          'tester/assets/profile_picture.png');
         let expectedWebpImage = (
           'https://storage.googleapis.com/app_default_bucket/user/' +
-          'tester/assets/profile_picture.webp') + prformanceTime;
+          'tester/assets/profile_picture.webp');
         let [profileImagePng, profileImageWebp] = (
           userService.getProfileImageDataUrl('tester'));
-        expect(profileImagePng).toEqual(expectedPngImage);
-        expect(profileImageWebp).toEqual(expectedWebpImage);
+        let prformanceTime = profileImagePng.split('?')[1];
+        expect(profileImagePng).toEqual(expectedPngImage + prformanceTime);
+        expect(profileImageWebp).toEqual(expectedWebpImage + prformanceTime);
 
         flushMicrotasks();
       }));
