@@ -311,8 +311,8 @@ export class PlaythroughService {
 
   private hasRecordingBegun(): boolean {
     return (
-      //Check this.recordedLearnerActions because
-      //it could be null before recording begun.
+      // Check this.recordedLearnerActions because
+      // it could be null before recording begun.
       this.recordedLearnerActions &&
       this.isPlaythroughRecordingEnabled()
     );
