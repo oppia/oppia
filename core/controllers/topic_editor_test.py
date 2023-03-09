@@ -1209,6 +1209,8 @@ class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.topic = topic_domain.Topic.create_default_topic(
@@ -1225,7 +1227,7 @@ class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.admin_id, self.topic)
 
     def test_topic_id_to_topic_name_handler_returns_correctly(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         url = '%s/?comma_separated_topic_ids=%s' % (
             feconf.TOPIC_ID_TO_TOPIC_NAME, 'topic_id'
