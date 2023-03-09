@@ -338,7 +338,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
       component.reviewMessage = 'Review message example';
       component.translationUpdated = true;
-      component.rejectAndReviewNext();
+      component.rejectAndReviewNext(component.reviewMessage);
 
       expect(component.activeSuggestionId).toBe('suggestion_2');
       expect(component.activeSuggestion).toEqual(suggestion2);
@@ -361,7 +361,7 @@ describe('Translation Suggestion Review Modal Component', function() {
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
-      component.rejectAndReviewNext();
+      component.rejectAndReviewNext(component.reviewMessage);
 
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
@@ -783,7 +783,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       spyOn(activeModal, 'close');
 
       component.reviewMessage = 'Review message example';
-      component.rejectAndReviewNext();
+      component.rejectAndReviewNext(component.reviewMessage);
 
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
