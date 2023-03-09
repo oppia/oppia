@@ -30,7 +30,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './goals-tab.component.css';
-import { i, index, number } from 'mathjs';
+import { i } from 'mathjs';
 
 @Component({
   selector: 'oppia-goals-tab',
