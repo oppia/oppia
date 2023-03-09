@@ -2347,6 +2347,86 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_translation_stats decorator."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_translation_stats
+        def get(self) -> None:
+            self.render_json({'success': 1})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/translation-stats', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_not_logged_in_user_cannot_access_translation_stats_page(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/translation-stats', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_normal_user_cannot_access_translation_stats_page(self) -> None:
+        self.login(self.user_email)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/translation-stats', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access translation stats.')
+        self.logout()
+
+    def test_translation_contributor_can_access_translation_stats_page(self) -> None:
+        self.login(self.user_email)
+        self.make_user_contribute_to_some_translation_language(self.user_id)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/translation-stats')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_admin_can_access_translation_stats_page(self) -> None:
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/translation-stats')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_translation_reviewer_cannot_access_translation_stats_page(self) -> None:
+        self.login(self.user_email)
+        self.make_user_reviewer_of_some_translation_language(self.user_id)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/translation-stats', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access translation stats.')
+        self.logout()
+        
+
 class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_manage_memcache decorator."""
 
