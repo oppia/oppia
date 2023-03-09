@@ -304,6 +304,7 @@
       "self", "sessionStorage", "status", "statusbar", "stop",
       "toolbar", "top"],
     "no-tabs": "error",
+    "no-unsafe-return": "error",
     "no-useless-escape": "off",
     "no-whitespace-before-property": "error",
     "no-trailing-spaces": [
