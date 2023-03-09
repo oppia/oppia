@@ -4680,66 +4680,66 @@ param_changes: []
 param_specs: {}
 schema_version: %d
 states:
- %s:
-   card_is_checkpoint: true
-   classifier_model_id: null
-   content:
-     content_id: content_0
-     html: ''
-   interaction:
-     answer_groups: []
-     confirmed_unclassified_answers: []
-     customization_args: {}
-     default_outcome:
-       dest: %s
-       dest_if_really_stuck: null
-       feedback:
-         content_id: default_outcome_1
-         html: ''
-       labelled_as_correct: false
-       missing_prerequisite_skill_id: null
-       param_changes: []
-       refresher_exploration_id: null
-     hints: []
-     id: null
-     solution: null
-   linked_skill_id: null
-   param_changes: []
-   recorded_voiceovers:
-     voiceovers_mapping:
-       content_0: {}
-       default_outcome_1: {}
-   solicit_answer_details: false
- New state:
-   card_is_checkpoint: false
-   classifier_model_id: null
-   content:
-     content_id: content_2
-     html: ''
-   interaction:
-     answer_groups: []
-     confirmed_unclassified_answers: []
-     customization_args: {}
-     default_outcome:
-       dest: New state
-       dest_if_really_stuck: null
-       feedback:
-         content_id: default_outcome_3
-         html: ''
-       labelled_as_correct: false
-       missing_prerequisite_skill_id: null
-       param_changes: []
-       refresher_exploration_id: null
-     hints: []
-     id: null
-     solution: null
-   linked_skill_id: null
-   param_changes: []
-   recorded_voiceovers:
-     voiceovers_mapping:
-       content_2: {}
-       default_outcome_3: {}
-   solicit_answer_details: false
+  %s:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: %s
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_0: {}
+        default_outcome_1: {}
+    solicit_answer_details: false
+  New state:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_2
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_3
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_2: {}
+        default_outcome_3: {}
+    solicit_answer_details: false
 states_schema_version: %d
 tags: []
 title: Title
@@ -4915,6 +4915,7 @@ title: Title
 
         exploration.validate()
 
+        self.maxDiff = None
         yaml_content = exploration.to_yaml()
         self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
 
