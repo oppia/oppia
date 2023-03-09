@@ -30,6 +30,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './goals-tab.component.css';
+import { i } from 'mathjs';
 
 @Component({
   selector: 'oppia-goals-tab',
@@ -90,7 +91,7 @@ export class GoalsTabComponent implements OnInit {
     this.currentGoalsStoryIsShown = [];
     this.showThreeDotsDropdown = [];
     this.currentGoalsStoryIsShown[0] = true;
-    this.showThreeDotsDropdown[0] = false;
+    this.showThreeDotsDropdown[i] = false;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/book_icon.png');
@@ -208,7 +209,7 @@ export class GoalsTabComponent implements OnInit {
       targetElement &&
       !this.dropdownRef.nativeElement.contains(targetElement)
     ) {
-      this.showThreeDotsDropdown[0] = false;
+      this.showThreeDotsDropdown[i] = false;
     }
   }
 
