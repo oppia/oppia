@@ -2372,7 +2372,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-    def test_not_logged_in_user_cannot_access_translation_stats_page(self) -> None:
+    def test_guest_user_cannot_access_translation_stats(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/translation-stats', expected_status_int=401)
@@ -2382,7 +2382,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
         self.logout()
 
-    def test_normal_user_cannot_access_translation_stats_page(self) -> None:
+    def test_normal_user_cannot_access_translation_stats(self) -> None:
         self.login(self.user_email)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2394,7 +2394,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             'You do not have credentials to access translation stats.')
         self.logout()
 
-    def test_translation_contributor_can_access_translation_stats_page(self) -> None:
+    def test_translation_admin_can_access_translation_stats(self) -> None:
         self.login(self.user_email)
         self.make_user_contribute_to_some_translation_language(self.user_id)
 
@@ -2404,7 +2404,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['success'], 1)
         self.logout()
 
-    def test_admin_can_access_translation_stats_page(self) -> None:
+    def test_admin_can_access_translation_stats(self) -> None:
         self.login(feconf.SYSTEM_EMAIL_ADDRESS)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2413,7 +2413,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['success'], 1)
         self.logout()
 
-    def test_translation_reviewer_cannot_access_translation_stats_page(self) -> None:
+    def test_translation_reviewer_cannot_access_translation_stats(self) -> None:
         self.login(self.user_email)
         self.make_user_reviewer_of_some_translation_language(self.user_id)
 
@@ -2425,7 +2425,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             response['error'],
             'You do not have credentials to access translation stats.')
         self.logout()
-        
+
 
 class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_manage_memcache decorator."""
