@@ -2396,7 +2396,6 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_translation_admin_can_access_translation_stats(self) -> None:
         self.login(self.user_email)
-        self.make_user_contribute_to_some_translation_language(self.user_id)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/translation-stats')
@@ -2415,7 +2414,6 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_translation_reviewer_cannot_access_translation_stats(self) -> None:
         self.login(self.user_email)
-        self.make_user_reviewer_of_some_translation_language(self.user_id)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
