@@ -431,7 +431,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   rejectAndReviewNext(reviewMessage: string): void {
     this.finalCommitMessage = this.generateCommitMessage();
-    if (this.translationUpdated) { }
+    if (this.translationUpdated){ }
     this.resolvingSuggestion = false;
     this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
       'Translation');
