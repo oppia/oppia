@@ -422,14 +422,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.reviewMessage, this.finalCommitMessage,
       this.resolveSuggestionAndUpdateModal.bind(this),
       (errorMessage) => {
-        this.rejectAndReviewNext();
+        this.rejectAndReviewNext(`Invalid Suggestion: ${errorMessage}`);
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(
           `Invalid Suggestion: ${errorMessage}`);
       });
   }
 
-  rejectAndReviewNext(): void {
+  rejectAndReviewNext(reviewMessage: string): void {
     this.finalCommitMessage = this.generateCommitMessage();
     if (this.translationUpdated) { }
     this.resolvingSuggestion = false;
@@ -444,7 +444,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       (errorMessage) => {
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(
-          `Invalid Suggestion: ${errorMessage}`);
+          'There was an error rejecting this suggestion');
       });
   }
 
