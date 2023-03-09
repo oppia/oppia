@@ -172,7 +172,7 @@
         <p class="testimonial-quote-details" [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></p>
         <p class="testimonial-student-details" [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></p>
       </div>
-      <div class="splash-arrows-container">
+      <div dir="ltr" class="splash-arrows-container">
         <span (click)="decrementDisplayedTestimonialId()" class="fas fa-angle-left oppia-splash-testimonial-arrow">
         </span>
         <span (click)="incrementDisplayedTestimonialId()" class="fas fa-angle-right oppia-splash-testimonial-arrow">
