@@ -26,7 +26,6 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
-from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -122,14 +121,13 @@ class QuestionCreationHandler(
             question.id,
             skill_ids,
             skill_difficulties)
-        html_list = question.get_all_html_content_strings()
-        filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(html_list))
         image_validation_error_message_suffix = (
             'Please go to the question editor for question with id %s and edit '
             'the image.' % question.id)
-        for filename in filenames:
-            image = self.request.get(filename)
+
+        try:
+            filename = self.request.get('filename')
+            image = self.request.get('image')
             if not image:
                 logging.exception(
                     'Image not provided for file with name %s when the question'
@@ -150,6 +148,8 @@ class QuestionCreationHandler(
             fs_services.save_original_and_compressed_versions_of_image(
                 filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
                 'image', image_is_compressible)
+        except Exception:
+            pass
 
         self.values.update({
             'question_id': question.id
