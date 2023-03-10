@@ -919,7 +919,8 @@ def run_ng_compilation() -> None:
 
 
 def is_oppia_server_already_running(
-        PORTS_USED_BY_OPPIA_PROCESSES: List[int]) -> bool:
+    PORTS_USED_BY_OPPIA_PROCESSES: List[int]
+) -> bool:
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
@@ -935,6 +936,7 @@ def is_oppia_server_already_running(
             print(
                 'There is already a server running on localhost:%s. '
                 'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port)
+                'Exiting.' % port
+            )
             return True
     return False
