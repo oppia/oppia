@@ -61,7 +61,7 @@ export class UserService {
   }
 
   getProfileImageDataUrl(username: string): [string, string] {
-    // TODO(17663): Remove use of performance.now with a long term fix
+    // TODO(#17663): Remove use of performance.now with a long term fix
     // in order to avoid cache problems.
     // Here we are using prformanceTime in order to avoid cache problems.
     // For details have a look at - https://stackoverflow.com/a/126831
