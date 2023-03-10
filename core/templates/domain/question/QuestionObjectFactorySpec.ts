@@ -20,7 +20,6 @@
 // QuestionObjectFactory.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { OutcomeObjectFactory } from
@@ -56,8 +55,6 @@ describe('Question object factory', function() {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory()));
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory());
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value(
