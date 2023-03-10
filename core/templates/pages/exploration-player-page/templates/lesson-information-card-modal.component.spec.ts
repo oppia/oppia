@@ -120,6 +120,7 @@ describe('Lesson Information card modal component', () => {
   let expId = 'expId';
   let expTitle = 'Exploration Title';
   let expDesc = 'Exploration Objective';
+  let expCategory = 'Exploration Category';
   let rating: ExplorationRatings;
 
   beforeEach(waitForAsync(() => {
@@ -160,7 +161,7 @@ describe('Lesson Information card modal component', () => {
     componentInstance = fixture.componentInstance;
 
     componentInstance.expInfo = {
-      category: '',
+      category: expCategory,
       community_owned: true,
       activity_type: '',
       last_updated_msec: 0,
@@ -213,6 +214,7 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.explorationId).toEqual(expId);
     expect(componentInstance.expTitle).toEqual(expTitle);
     expect(componentInstance.expDesc).toEqual(expDesc);
+    expect(componentInstance.expCategory).toEqual(expCategory);
     expect(componentInstance.averageRating).toBe(3);
     expect(componentInstance.numViews).toBe(100);
     expect(componentInstance.lastUpdatedString).toBe('June 28');
