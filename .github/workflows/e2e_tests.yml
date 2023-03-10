@@ -199,10 +199,10 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         suite:
-          - "should assign roles to users and change tag properties"
-          - "should check blog editor unable to publish duplicate blog post"
-          - "should create draft and delete draft blog post"
-          - "should publish blog post and delete published blog post"
+          - '"should assign roles to users and change tag properties"'
+          - '"should check blog editor unable to publish duplicate blog post"'
+          - '"should create draft and delete draft blog post"'
+          - '"should publish blog post and delete published blog post"'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
