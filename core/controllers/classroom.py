@@ -164,7 +164,7 @@ class ClassroomAdminPage(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
         """Handles GET requests."""
         self.render_template('classroom-admin-page.mainpage.html')
@@ -179,7 +179,7 @@ class ClassroomAdminDataHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
         """Handles GET requests."""
         classroom_id_to_classroom_name = (
@@ -200,7 +200,7 @@ class NewClassroomIdHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
         """Handles GET requests."""
         self.values.update({
@@ -257,7 +257,7 @@ class ClassroomHandler(
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_classroom_admin_page
     def put(self, classroom_id: str) -> None:
         """Updates properties of a given classroom."""
         assert self.normalized_payload is not None
@@ -271,7 +271,7 @@ class ClassroomHandler(
         classroom_config_services.update_or_create_classroom_model(classroom)
         self.render_json(self.values)
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_classroom_admin_page
     def delete(self, classroom_id: str) -> None:
         """Deletes classroom from the classroom admin page."""
         classroom_config_services.delete_classroom(classroom_id)
@@ -292,7 +292,7 @@ class ClassroomUrlFragmentHandler(
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_classroom_admin_page
     def get(self, classroom_url_fragment: str) -> None:
         """Get request to check whether a classroom with given exists."""
         classroom_url_fragment_exists = False

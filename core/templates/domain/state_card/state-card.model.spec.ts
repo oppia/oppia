@@ -31,13 +31,12 @@ import { SubtitledUnicode } from
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Voiceover } from 'domain/exploration/voiceover.model';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 
 
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
-  let hintObjectFactory: HintObjectFactory;
   let solutionObjectFactory: SolutionObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard1: StateCard;
@@ -49,7 +48,6 @@ describe('State card object factory', () => {
     });
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    hintObjectFactory = TestBed.inject(HintObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
@@ -290,7 +288,7 @@ describe('State card object factory', () => {
 
   it('should get all the hints from interaction', () => {
     let expectedResult = [
-      hintObjectFactory.createFromBackendDict({
+      Hint.createFromBackendDict({
         hint_content: {
           content_id: 'abc',
           html: 'hint 1'
