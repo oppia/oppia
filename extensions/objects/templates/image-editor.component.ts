@@ -272,7 +272,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     this.entityType = this.contextService.getEntityType();
 
     window.addEventListener('mouseup', (e) => {
-      e.preventDefault();
       this.userIsDraggingCropArea = false;
       this.userIsResizingCropArea = false;
     }, false);
