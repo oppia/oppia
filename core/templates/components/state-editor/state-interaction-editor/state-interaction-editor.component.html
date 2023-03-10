@@ -6,7 +6,7 @@
       <h3 class="oppia-exp-interaction-card-header">
         Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
       </h3>
-      <div *ngIf="showToggleBtn">
+      <div *ngIf="getCurrentInteractionName().length>0">
         <i class="fa fa-caret-down"
            *ngIf="!interactionEditorIsShown"
            aria-hidden="true">
@@ -21,7 +21,7 @@
          *ngIf="!interactionId">
       <button type="button"
               class="btn btn-secondary oppia-add-interaction-button e2e-test-open-add-interaction-modal"
-              (click)="openInteractionCustomizerModal() ; toggleBtn()"
+              (click)="openInteractionCustomizerModal()"
               *ngIf="editabilityService.isEditable()">
         + ADD INTERACTION
       </button>
