@@ -1,8 +1,8 @@
-{
+  {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "sourceType": "module",
-    "project": "./tsconfig.json"
+    "sourceType": "module"
+    "project": "webpack.dev.config.ts"
   },
   "extends": [
     "eslint:recommended"
@@ -218,7 +218,10 @@
       "all"
     ],
     "dot-notation": [
-      "off"
+      "error",
+      {
+        "allowKeywords": true
+      }
     ],
     "eol-last":[
       "error",
@@ -447,12 +450,6 @@
       {
         "before": false,
         "after": true
-      }
-    ],
-    "@typescript-eslint/dot-notation": [
-      "error",
-      {
-        "allowKeywords": true
       }
     ],
     "@typescript-eslint/lines-between-class-members": [
