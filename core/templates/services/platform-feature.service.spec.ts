@@ -164,6 +164,7 @@ describe('PlatformFeatureService', () => {
               [FeatureNames.AndroidBetaLandingPage]: true,
               [FeatureNames.BlogPages]: true,
               [FeatureNames.ContributorDashboardAccomplishments]: true,
+              [FeatureNames.DiagnosticTest]: true,
             }
           })
         });
