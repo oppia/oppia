@@ -260,10 +260,6 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click(
       'Confirm Topic creation button', confirmTopicCreationButton);
 
-    // problem could lie in that the image is not fully uploaded
-    // assert that the confirm topic creation button is enabled before proceeding
-    // maybe assert this in action.click()
-
     await waitFor.newTabToBeCreated(
       'Creating topic takes too long', '/topic_editor/');
     handles = await browser.getWindowHandles();

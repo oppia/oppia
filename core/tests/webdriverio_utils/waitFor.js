@@ -59,7 +59,7 @@ var elementToBeClickable = async function(element, errorMessage) {
   });
   var enabled = await element.isEnabled();
   if (!enabled) {
-    throw new Error("Element " + element + " is not enabled.");
+    throw new Error('Element ' + element + ' is not enabled.');
   }
 };
 
