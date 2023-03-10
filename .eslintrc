@@ -304,7 +304,6 @@
       "self", "sessionStorage", "status", "statusbar", "stop",
       "toolbar", "top"],
     "no-tabs": "error",
-    "no-unsafe-return": "error",
     "no-useless-escape": "off",
     "no-whitespace-before-property": "error",
     "no-trailing-spaces": [
@@ -419,6 +418,7 @@
         "args": "none"
       }
     ],
+    "@typescript-eslint/no-unsafe-return": ["error"],
     "@typescript-eslint/explicit-module-boundary-types": ["error"],
     "@typescript-eslint/prefer-as-const": ["error"],
     "@typescript-eslint/no-array-constructor": ["error"],
