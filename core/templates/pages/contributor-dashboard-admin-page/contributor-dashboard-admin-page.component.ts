@@ -55,7 +55,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
         var ctrl = this;
         ctrl.taskRunningInBackground = false;
         ctrl.statusMessage = '';
-        ctrl.isTranslationAdmin = false;
+        ctrl.UserIsTranslationAdmin = false;
 
         var handleErrorResponse = function(errorResponse) {
           ctrl.statusMessage = 'Server error: ' + errorResponse;
@@ -268,7 +268,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
             let translationCategories = {};
             let questionCategories = {};
             if (userInfo.isTranslationAdmin()) {
-              ctrl.isTranslationAdmin = true;
+              ctrl.UserIsTranslationAdmin = true;
               translationCategories = {
                 REVIEW_TRANSLATION: (
                   CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
