@@ -38,12 +38,14 @@ angular.module('oppia').component('topicEditorStoriesList', {
     './topic-editor-stories-list.component.html'),
   controller: [
     '$scope', '$window',
-    'NgbModal', 'TopicUpdateService',
+    'NgbModal', 'TopicEditorStateService',
+    'TopicUpdateService',
     'UndoRedoService', 'UrlInterpolationService',
     function(
         $scope, $window,
-        NgbModal, TopicUpdateService,
-        UndoRedoService, UrlInterpolationService) {
+        NgbModal, TopicEditorStateService,
+        TopicUpdateService,
+        UndoRedoService, UrlInterpolationService,) {
       var ctrl = this;
       var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
       $scope.openStoryEditor = function(storyId) {
@@ -109,6 +111,7 @@ angular.module('oppia').component('topicEditorStoriesList', {
       ctrl.$onInit = function() {
         $scope.STORY_TABLE_COLUMN_HEADINGS = [
           'title', 'node_count', 'publication_status'];
+        $scope.topicRights = TopicEditorStateService.getTopicRights();
       };
     }]
 });

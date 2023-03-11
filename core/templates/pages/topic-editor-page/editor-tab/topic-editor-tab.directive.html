@@ -204,17 +204,17 @@
               <span class="clickable-item"><[skillSummary.getDescription()]></span>
             </a>
             <div class="edit-options-container">
-              <i class="fa fa-ellipsis-v" ng-click="toggleUncategorizedSkillOptions($index)"></i>
+              <i class="fa fa-ellipsis-v" ng-click="topicRights.canEditTopic() && toggleUncategorizedSkillOptions($index)"></i>
             </div>
             <div class="uncategorized-skill-option-box"
                  ng-if="uncategorizedEditOptionsIndex === $index"
                  ng-mouseleave="toggleUncategorizedSkillOptions(null)"
                  ng-click="toggleUncategorizedSkillOptions(null)">
-              <div class="uncategorized-skill-edit-option" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)">
+              <div class="uncategorized-skill-edit-option" ng-click="topicRights.canEditTopic() && deleteUncategorizedSkillFromTopic(skillSummary)">
                 <i class="fa fa-trash"></i>
                 <span>Remove from topic</span>
               </div>
-              <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="changeSubtopicAssignment(null, skillSummary)">
+              <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="topicRights.canEditTopic() && changeSubtopicAssignment(null, skillSummary)">
                 <i class="fa fa-plus"></i>
                 <span>Assign to Subtopic</span>
               </div>
@@ -234,7 +234,7 @@
                 </span>
                 <div class="subtopic-edit-options-container edit-options-container">
                   <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
-                  <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
+                  <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options" ng-click="topicRights.canEditTopic() && showSubtopicEditOptions($index);$event.stopPropagation()"></i>
                   <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
                     <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
                     <span>Delete</span>
@@ -249,7 +249,7 @@
                     </a>
                     <div class="edit-options-container">
                       <span><[skillQuestionCountDict[skillSummary.getId()] ]></span>
-                      <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
+                      <i class="fa fa-ellipsis-v" ng-click="topicRights.canEditTopic() && showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
                     </div>
                     <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)" ng-click="showSkillEditOptions(null)">
                       <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
@@ -304,7 +304,7 @@
               {{skill.getDescription()}}
             </span>
             <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
-                    ng-click="removeSkillFromDiagnosticTest(skill)"
+                    ng-click="topicRights.canEditTopic() && removeSkillFromDiagnosticTest(skill)"
                     md-button
                     md-icon-button
                     aria-label="Clear">
@@ -333,7 +333,7 @@
               md-button
               ng-click="presentDiagnosticTestSkillDropdown()"
               ng-show="!diagnosticTestSkillsDropdownIsShown"
-              ng-disabled="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
+              ng-disabled="(availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3) && !topicRights.canEditTopic()">
         <div class="oppia-flex">
           <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
           <h4 class="oppia-button-text">Add diagnostic test skill</h4>

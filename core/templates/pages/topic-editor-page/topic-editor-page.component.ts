@@ -172,6 +172,11 @@ angular.module('oppia').directive('topicEditorPage', [
           };
 
           ctrl.getTotalWarningsCount = function() {
+            if (!$rootScope.topicRights.canEditTopic()) {
+              ctrl.authenticationIssue =
+                'You don\'t have permission to edit this topic';
+              return 1;
+            }
             var validationIssuesCount = ctrl.validationIssues.length;
             var prepublishValidationIssuesCount = (
               ctrl.prepublishValidationIssues.length);
@@ -179,6 +184,7 @@ angular.module('oppia').directive('topicEditorPage', [
           };
 
           ctrl.$onInit = function() {
+            $rootScope.topicRights = TopicEditorStateService.getTopicRights();
             LoaderService.showLoadingScreen('Loading Topic');
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(
