@@ -24,7 +24,6 @@ from __future__ import annotations
 
 from core.constants import constants
 from core.platform.translate import cloud_translate_emulator
-from core.platform.translate import cloud_translate_services
 
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
