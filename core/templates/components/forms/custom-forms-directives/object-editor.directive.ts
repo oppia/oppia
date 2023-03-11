@@ -71,6 +71,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { ComponentRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 const EDITORS = {
   'algebraic-expression': AlgebraicExpressionEditorComponent,
   'boolean': BooleanEditorComponent,
@@ -119,13 +120,13 @@ const EDITORS = {
 
 interface ObjectEditor {
   alwaysEditable: string;
-  initArgs: unknown;
+  initArgs: SchemaDefaultValue;
   isEditable: string;
   modalId: symbol;
   objType: string;
-  schema: unknown;
-  value: unknown;
-  valueChanged?: EventEmitter<unknown>;
+  schema: SchemaDefaultValue;
+  value: SchemaDefaultValue;
+  valueChanged?: EventEmitter<SchemaDefaultValue>;
   validityChange?: EventEmitter<Record<string, boolean>>;
   ngOnChanges?: (changes: SimpleChanges) => void;
 }
@@ -149,20 +150,20 @@ interface ObjectEditor {
 export class ObjectEditorComponent
 implements AfterViewInit, OnChanges, OnDestroy,
 ControlValueAccessor, Validator {
-  private _value: unknown;
+  private _value: SchemaDefaultValue;
   @Input() alwaysEditable: string;
-  @Input() initArgs: unknown;
+  @Input() initArgs: SchemaDefaultValue;
   @Input() isEditable: string;
   @Input() modalId: symbol;
   @Input() objType: string;
   @Input() schema;
   @Input() form;
   @Output() validityChange: EventEmitter<void> = new EventEmitter();
-  get value(): unknown {
+  get value(): SchemaDefaultValue {
     return this._value;
   }
 
-  @Input() set value(val: unknown) {
+  @Input() set value(val: SchemaDefaultValue) {
     const previousValue = this._value;
     this._value = val;
     // Ng-model can call write-obj before we create the component. Hence a
@@ -187,7 +188,7 @@ ControlValueAccessor, Validator {
   @Output() valueChange = new EventEmitter();
   componentRef: ComponentRef<ObjectEditor>;
   componentSubscriptions = new Subscription();
-  onChange: (_: unknown) => void = () => {};
+  onChange: (_: SchemaDefaultValue) => void = () => {};
   onTouch: () => void;
   onValidatorChange: () => void = () => {};
 
@@ -208,14 +209,14 @@ ControlValueAccessor, Validator {
     this.onValidatorChange = fn;
   }
 
-  writeValue(obj: unknown): void {
+  writeValue(obj: SchemaDefaultValue): void {
     if (obj === null || obj === undefined) {
       return;
     }
     this.value = obj;
   }
 
-  registerOnChange(fn: (_: unknown) => void): void {
+  registerOnChange(fn: (_: SchemaDefaultValue) => void): void {
     this.onChange = fn;
   }
 
@@ -245,6 +246,9 @@ ControlValueAccessor, Validator {
           EDITORS[editorName])
       );
       this.viewContainerRef.clear();
+      // Unknown is type is used because it is default property of
+      // createComponent. This is used to access the instance of the
+      // component created. The type of the instance is not known.
       const componentRef = this.viewContainerRef.createComponent<unknown>(
         componentFactory) as ComponentRef<ObjectEditor>;
 
