@@ -30,7 +30,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './goals-tab.component.css';
-import { i } from 'mathjs';
 
 @Component({
   selector: 'oppia-goals-tab',
@@ -91,7 +90,7 @@ export class GoalsTabComponent implements OnInit {
     this.currentGoalsStoryIsShown = [];
     this.showThreeDotsDropdown = [];
     this.currentGoalsStoryIsShown[0] = true;
-    this.showThreeDotsDropdown[i] = false;
+    this.showThreeDotsDropdown[0] = false;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/book_icon.png');
@@ -172,6 +171,7 @@ export class GoalsTabComponent implements OnInit {
         this.topicIdsInCurrentGoals.length < this.MAX_CURRENT_GOALS_LENGTH &&
         !this.topicIdsInCompletedGoals.includes(activityId)) {
         this.currentGoalsStoryIsShown.push(false);
+        this.showThreeDotsDropdown.push(false);
         this.currentGoals.push(topic);
         this.topicIdsInCurrentGoals.push(activityId);
         this.editGoalsTopicClassification.splice(
@@ -208,9 +208,7 @@ export class GoalsTabComponent implements OnInit {
     if (
       targetElement &&
       !this.dropdownRef.nativeElement.contains(targetElement)
-    ) {
-      this.showThreeDotsDropdown[i] = false;
-    }
+    ) {}
   }
 
   removeFromLearnerGoals(
@@ -227,6 +225,7 @@ export class GoalsTabComponent implements OnInit {
         activityId, activityTitle)
       .then(() => {
         this.currentGoalsStoryIsShown.splice(index, 1);
+        this.showThreeDotsDropdown.splice(index, 1);
         this.currentGoals.splice(index, 1);
         this.topicIdsInCurrentGoals.splice(index, 1);
         let indexOfTopic = this.topicIdsInEditGoals.indexOf(topicId);
