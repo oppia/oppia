@@ -16,7 +16,7 @@
  * @fileoverview Component for the filtering choices.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'oppia-filtered-choices-field',
@@ -37,6 +37,8 @@ export class FilteredChoicesFieldComponent {
 
   filteredChoices!: string[];
 
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+
   ngOnInit(): void {
     this.filteredChoices = this.choices;
   }
@@ -44,6 +46,7 @@ export class FilteredChoicesFieldComponent {
   filterChoices(searchTerm: string): void {
     this.filteredChoices = this.choices.filter(
       choice => choice.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+    this.changeDetectorRef.detectChanges();
   }
 
   updateSelection(selection: string): void {
