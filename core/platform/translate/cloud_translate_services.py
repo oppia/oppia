@@ -56,10 +56,14 @@ def translate_text(
     Returns:
         str. The translated text.
     """
-    if source_language not in constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES:
+    if source_language not in (
+        constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES):
         raise ValueError('Invalid source language code: %s' % source_language)
-    if target_language not in constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES:
+
+    if target_language not in (
+        constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES):
         raise ValueError('Invalid target language code: %s' % target_language)
+
     if source_language == target_language:
         return text
 
