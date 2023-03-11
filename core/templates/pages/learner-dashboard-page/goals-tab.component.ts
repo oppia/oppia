@@ -208,7 +208,7 @@ export class GoalsTabComponent implements OnInit {
     if (
       targetElement &&
       !this.dropdownRef.nativeElement.contains(targetElement)
-    ) {}
+    ) { }
   }
 
   removeFromLearnerGoals(
