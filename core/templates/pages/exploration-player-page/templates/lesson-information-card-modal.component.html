@@ -1,7 +1,8 @@
 <mat-card class="oppia-lesson-info-card">
   <div [ngStyle]="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
     <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)"
-         class="oppia-info-card-bg-image">
+         class="oppia-info-card-bg-image"
+         alt="{{ expCategory }}">
     <h2 class="oppia-info-card-title break-word" *ngIf="isHackyExpTitleTranslationDisplayed()">
       {{ expTitleTranslationKey | translate }}
     </h2>
