@@ -395,7 +395,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         suggestion_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='SUCCESS: 2')
         ])
 
         translation_stats_model = (

@@ -1844,6 +1844,28 @@ class QuestionReviewStats:
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
 
+    @classmethod
+    def create_default(
+        cls,
+        contributor_user_id: Optional[str] = None,
+        topic_id: Optional[str] = None
+    ) -> QuestionReviewStats:
+        """Create default question review stats.
+
+        Args:
+            contributor_user_id: str. User ID of the contributor to which
+                these stats belong.
+            topic_id: str. ID of the topic for which were
+                the questions created.
+
+        Returns:
+            QuestionReviewStats. Default question review stats.
+        """
+        return cls(
+            contributor_user_id, topic_id,
+            0, 0, 0, datetime.datetime.now(), datetime.datetime.now()
+        )
+
     def to_dict(self) -> QuestionReviewStatsDict:
         """Returns a dict representation of a QuestionContributionStats
         domain object.

@@ -28,6 +28,7 @@ from core.domain import opportunity_services
 from core.domain import skill_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -48,8 +49,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(opportunity_models, suggestion_models) = models.Registry.import_models([
-    models.Names.OPPORTUNITY, models.Names.SUGGESTION
+(opportunity_models, suggestion_models, topic_models) = models.Registry.import_models([
+    models.Names.OPPORTUNITY, models.Names.SUGGESTION, models.Names.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -354,6 +355,22 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 suggestion_services.get_suggestion_from_model)
             | 'Group submitted question suggestions by target' >> beam.GroupBy(lambda m: m.target_id)
         )
+        question_reviews_grouped_by_target = (
+            non_deleted_suggestion_models
+            | 'Filter question reviews' >> beam.Filter(
+                lambda m: (
+                    m.suggestion_type ==
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION
+                    and (
+                        m.status == suggestion_models.STATUS_ACCEPTED
+                        or m.status == suggestion_models.STATUS_REJECTED
+                    )
+                ))
+            | 'Transform to reviewed question suggestion domain object' >> beam.Map(
+                suggestion_services.get_suggestion_from_model)
+            | 'Group reviewed question suggestions by target' >> beam.GroupBy(lambda m: m.target_id)
+        )
+
         exp_opportunities = (
             self.pipeline
             | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(
@@ -399,6 +416,14 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Merge submitted question models' >> beam.CoGroupByKey()
             | 'Get rid of key of submitted question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
+        skill_opportunity_to_reviewed_suggestions = (
+            {
+                'suggestion': question_reviews_grouped_by_target,
+                'opportunity': skill_opportunities
+            }
+            | 'Merge reviewed question models' >> beam.CoGroupByKey()
+            | 'Get rid of key of reviewed question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
 
         translation_contribution_stats_results = (
             exp_opportunity_to_submitted_suggestions
@@ -428,6 +453,16 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     list(x['opportunity'][0])[0]
                     if len(x['opportunity']) else None,
                     True
+                ))
+        )
+        question_review_stats_results = (
+            skill_opportunity_to_reviewed_suggestions
+            | 'Generate question review stats' >> beam.ParDo(
+                lambda x: self._generate_question_stats(
+                    x['suggestion'][0] if len(x['suggestion']) else [],
+                    list(x['opportunity'][0])[0]
+                    if len(x['opportunity']) else None,
+                    False
                 ))
         )
 
@@ -461,6 +496,16 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Generate question contribution models from stats' >> beam.MapTuple(
                 self._generate_question_contribution_model)
         )
+        user_question_review_stats_models = (
+            question_review_stats_results
+            | 'Filter ok question review results' >> beam.Filter(
+                lambda key_and_result: key_and_result[1].is_ok())
+            | 'Unpack question review result' >> beam.MapTuple(
+                lambda key, result: (key, result.unwrap()))
+            | 'Combine the question review stats' >> beam.CombinePerKey(CombineQuestionReviewStats())
+            | 'Generate question review models from stats' >> beam.MapTuple(
+                self._generate_question_review_model)
+        )
 
         user_stats_error_job_run_results = (
             translation_contribution_stats_results
@@ -492,6 +537,16 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Transform question contribution result to job run result' >> (
                 job_result_transforms.ResultsToJobRunResults())
         )
+        user_question_review_stats_error_job_run_results = (
+            question_review_stats_results
+            | 'Filter question review err results' >> beam.Filter(
+                lambda key_and_result: key_and_result[1].is_err())
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Remove question review keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Transform question review result to job run result' >> (
+                job_result_transforms.ResultsToJobRunResults())
+        )
 
         unused_contribution_put_result = (
             user_contribution_stats_models
@@ -504,6 +559,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         unused_question_contribution_put_result = (
             user_question_contribution_stats_models
             | 'Put question contribution models into the datastore' >> ndb_io.PutModels()
+        )
+        unused_question_review_put_result = (
+            user_question_review_stats_models
+            | 'Put question review models into the datastore' >> ndb_io.PutModels()
         )
 
         user_stats_models_job_run_results = (
@@ -521,6 +580,11 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Create question contribution job run result' >> (
                 job_result_transforms.CountObjectsToJobRunResult())
         )
+        user_question_review_stats_models_job_run_results = (
+            user_question_review_stats_models
+            | 'Create question review job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult())
+        )
 
         return (
             (
@@ -529,7 +593,9 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 user_review_stats_error_job_run_results,
                 user_review_stats_models_job_run_results,
                 user_question_contribution_stats_error_job_run_results,
-                user_question_contribution_stats_models_job_run_results
+                user_question_contribution_stats_models_job_run_results,
+                user_question_review_stats_error_job_run_results,
+                user_question_review_stats_models_job_run_results
             )
             | 'Merge job run results' >> beam.Flatten()
         )
@@ -631,7 +697,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     ) -> Iterator[
         Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
     ]:
-        """Generates translation stats for each suggestion.
+        """Generates question stats for each suggestion.
 
         Args:
             suggestions: iter(SuggestionTranslateContent). Suggestions for which
@@ -653,40 +719,40 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 last_updated_date: str. When was the suggestion last updated.
                 created_date: str. When was the suggestion created.
         """
-        for topic in skill_services.get_all_topic_assignments_for_skill(
-            opportunity.id):
-            topic_id = topic.topic_id
-            for suggestion in suggestions:
-                if question_contribution_key_required:
-                    key = (
-                        suggestion_models
-                        .QuestionContributionStatsModel.construct_id(
-                            suggestion.author_id, topic_id))
-                    print('KEY OF SUB')
-                    print(key)
-                else:
-                    key = (
-                        suggestion_models
-                        .QuestionReviewStatsModel.construct_id(
-                            suggestion.final_reviewer_id,
-                            topic_id
+        with datastore_services.get_ndb_context():
+            for topic in skill_services.get_all_topic_assignments_for_skill(
+                opportunity.id):
+                topic_id = topic.topic_id
+                for suggestion in suggestions:
+                    if question_contribution_key_required:
+                        key = (
+                            suggestion_models
+                            .QuestionContributionStatsModel.construct_id(
+                                suggestion.author_id,
+                                topic_id
+                            )
                         )
-                    )
-                    print('KEY OF REV')
-                    print(key)
-                try:
-                    question_stats_dict = {
-                        'suggestion_status': suggestion.status,
-                        'edited_by_reviewer': suggestion.edited_by_reviewer,
-                        'content_word_count': 0,
-                        'last_updated_date': (
-                            suggestion.last_updated.date().isoformat())
-                    }
-                    yield (key, result.Ok(question_stats_dict))
-                except Exception as e:
-                    yield (
-                        key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
-                    )
+                    else:
+                        key = (
+                            suggestion_models
+                            .QuestionReviewStatsModel.construct_id(
+                                suggestion.final_reviewer_id,
+                                topic_id
+                            )
+                        )
+                    try:
+                        question_stats_dict = {
+                            'suggestion_status': suggestion.status,
+                            'edited_by_reviewer': suggestion.edited_by_reviewer,
+                            'content_word_count': 0,
+                            'last_updated_date': (
+                                suggestion.last_updated.date().isoformat())
+                        }
+                        yield (key, result.Ok(question_stats_dict))
+                    except Exception as e:
+                        yield (
+                            key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
+                        )
 
     @staticmethod
     def _generate_translation_contribution_model(
@@ -826,6 +892,51 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             )
             question_contribution_stats_model.update_timestamps()
             return question_contribution_stats_model
+
+    @staticmethod
+    def _generate_question_review_model(
+        entity_id: str,
+        question: suggestion_registry.QuestionReviewStats
+    ) -> suggestion_models.QuestionReviewStatsModel:
+        """Generate question review stats model from the domain object.
+
+        Args:
+            entity_id: str. The ID of the model.
+            question: QuestionReviewStats. Domain object.
+
+        Returns:
+            QuestionReviewStatsModel. The created model.
+        """
+        contributor_user_id, topic_id = entity_id.split('.')
+        with datastore_services.get_ndb_context():
+            question_review_stats_model = (
+                suggestion_models.QuestionReviewStatsModel(
+                    id=entity_id,
+                    reviewer_user_id=contributor_user_id,
+                    topic_id=topic_id,
+                    reviewed_questions_count=(
+                        question.reviewed_questions_count),
+                    accepted_questions_count=(
+                        question.accepted_questions_count),
+                    accepted_questions_with_reviewer_edits_count=(
+                        question
+                        .accepted_questions_with_reviewer_edits_count),
+                    first_contribution_date=(
+                        datetime.datetime.strptime(
+                            question.first_contribution_date,
+                            '%Y-%m-%d'
+                        )
+                    ),
+                    last_contribution_date=(
+                        datetime.datetime.strptime(
+                            question.last_contribution_date,
+                            '%Y-%m-%d'
+                        )
+                    )
+                )
+            )
+            question_review_stats_model.update_timestamps()
+            return question_review_stats_model
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -1039,7 +1150,7 @@ class CombineQuestionContributionStats(beam.CombineFn):  # type: ignore[misc]
         all_first_contributed_dates.sort()
         all_last_contributed_dates.sort()
 
-        return suggestion_registry.TranslationReviewStats(
+        return suggestion_registry.QuestionContributionStats(
             list(accumulators)[0].contributor_user_id,
             list(accumulators)[0].topic_id,
             sum(acc.submitted_questions_count for acc in accumulators),
@@ -1057,3 +1168,70 @@ class CombineQuestionContributionStats(beam.CombineFn):  # type: ignore[misc]
     ) -> suggestion_registry.QuestionContributionStats:
         return accumulator
 
+
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to assume
+# that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
+# subclass 'CombineFn' (has type 'Any')), we added an ignore here.
+class CombineQuestionReviewStats(beam.CombineFn):  # type: ignore[misc]
+    """CombineFn for combining the question review stats."""
+
+    def create_accumulator(
+        self
+    ) -> suggestion_registry.QuestionReviewStats:
+        return suggestion_registry.QuestionReviewStats.create_default()
+
+    def add_input(
+        self,
+        accumulator: suggestion_registry.QuestionReviewStats,
+        question: TranslationStatsDict
+    ) -> suggestion_registry.QuestionReviewStats:
+        is_accepted = (
+            question['suggestion_status'] ==
+            suggestion_models.STATUS_ACCEPTED
+        )
+        is_accepted_and_edited = (
+            is_accepted and question['edited_by_reviewer'])
+        return suggestion_registry.QuestionReviewStats(
+            accumulator.contributor_user_id,
+            accumulator.topic_id,
+            accumulator.reviewed_questions_count + 1,
+            accumulator.accepted_questions_count + int(is_accepted),
+            (
+                accumulator.accepted_questions_with_reviewer_edits_count +
+                int(is_accepted_and_edited)
+            ),
+            question['last_updated_date'],
+            question['last_updated_date']
+        )
+
+    def merge_accumulators(
+        self,
+        accumulators: Iterable[suggestion_registry.QuestionReviewStats]
+    ) -> suggestion_registry.QuestionReviewStats:
+        all_first_contributed_dates = [
+            acc.first_contribution_date for acc in accumulators
+        ]
+        all_last_contributed_dates = [
+            acc.last_contribution_date for acc in accumulators
+        ]
+        all_first_contributed_dates.sort()
+        all_last_contributed_dates.sort()
+
+        return suggestion_registry.QuestionReviewStats(
+            list(accumulators)[0].contributor_user_id,
+            list(accumulators)[0].topic_id,
+            sum(acc.reviewed_questions_count for acc in accumulators),
+            sum(acc.accepted_questions_count for acc in accumulators),
+            sum(
+                acc.accepted_questions_with_reviewer_edits_count
+                for acc in accumulators
+            ),
+            all_first_contributed_dates[0],
+            all_last_contributed_dates[-1]
+        )
+
+    def extract_output(
+        self, accumulator: suggestion_registry.QuestionReviewStats
+    ) -> suggestion_registry.QuestionReviewStats:
+        return accumulator
