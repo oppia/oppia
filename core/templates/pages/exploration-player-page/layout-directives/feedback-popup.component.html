@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div *ngIf="feedbackSubmitted">
+  <div aria-live="polite" *ngIf="feedbackSubmitted">
     {{ 'I18N_PLAYER_THANK_FEEDBACK' | translate }}
   </div>
 </div>
