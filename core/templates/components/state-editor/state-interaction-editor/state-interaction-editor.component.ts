@@ -42,7 +42,17 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { State } from 'domain/state/StateObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+
+export interface InitializeAnswerGroups {
+  interactionId: string;
+  answerGroups: AnswerGroup[];
+  defaultOutcome: Outcome;
+  confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
+}
 
 @Component({
   selector: 'oppia-state-interaction-editor',
@@ -67,7 +77,6 @@ export class StateInteractionEditorComponent
   directiveSubscriptions = new Subscription();
   hasLoaded: boolean;
   interactionEditorIsShown: boolean;
-  showToggleBtn: boolean = true;
   interactionId: string;
   interactionIsDisabled: boolean;
   interactionPreviewHtml: string;
@@ -245,10 +254,6 @@ export class StateInteractionEditorComponent
     });
   }
 
-  toggleBtn(): void {
-    this.showToggleBtn = !this.showToggleBtn;
-  }
-
   toggleInteractionEditor(): void {
     this.interactionEditorIsShown = !this.interactionEditorIsShown;
   }
@@ -270,7 +275,6 @@ export class StateInteractionEditorComponent
 
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionEditorIsShown = true;
-    this.showToggleBtn = false;
     this.hasLoaded = false;
     this.customizationModalReopened = false;
     this.directiveSubscriptions.add(
@@ -288,7 +292,7 @@ export class StateInteractionEditorComponent
             answerGroups: stateData.interaction.answerGroups,
             defaultOutcome: stateData.interaction.defaultOutcome,
             confirmedUnclassifiedAnswers: (
-              stateData.interaction.confirmedUnclassifiedAnswers)
+              stateData.interaction.confirmedUnclassifiedAnswers),
           });
 
           this._updateInteractionPreview();

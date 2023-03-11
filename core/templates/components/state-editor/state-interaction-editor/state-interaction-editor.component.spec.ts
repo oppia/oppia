@@ -201,7 +201,6 @@ describe('State Interaction component', () => {
       }
     };
     component.interactionEditorIsShown = true;
-    component.showToggleBtn = false;
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'image'
     );
@@ -210,11 +209,9 @@ describe('State Interaction component', () => {
     stateInteractionIdService.savedMemento = 'interactionID';
 
     component.toggleInteractionEditor();
-    component.toggleBtn();
 
     expect(component.getStaticImageUrl('image')).toEqual('image');
     expect(component.interactionEditorIsShown).toBe(false);
-    expect(component.showToggleBtn).toBe(true);
     expect(component._getInteractionPreviewTag(
       interactionCustomizationArgsValue)).toBe('htmlValue');
   });
