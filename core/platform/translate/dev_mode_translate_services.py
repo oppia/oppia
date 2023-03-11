@@ -22,6 +22,7 @@ See cloud_translate_emulator.py for more details"""
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.platform.translate import cloud_translate_emulator
 from core.platform.translate import cloud_translate_services
 
@@ -48,10 +49,14 @@ def translate_text(
     Returns:
         str. The translated text.
     """
-    if source_language not in cloud_translate_services.LANGUAGE_CODE_ALLOWLIST:
+    if source_language not in (
+        constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES):
         raise ValueError('Invalid source language code: %s' % source_language)
-    if target_language not in cloud_translate_services.LANGUAGE_CODE_ALLOWLIST:
+
+    if target_language not in (
+        constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES):
         raise ValueError('Invalid target language code: %s' % target_language)
+
     if source_language == target_language:
         return text
 
