@@ -5898,6 +5898,8 @@ export default {
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
 
+  "ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES": ["en", "es", "fr", "zh", "pt"],
+
   "DEFAULT_SKILL_DIFFICULTY": 0.6,
 
   "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
