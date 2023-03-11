@@ -11,23 +11,28 @@
         <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab" tabindex="0">
           <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected() }"></i>
         </a>
-        <div ng-show="$ctrl.getTotalWarningsCount()"
+        <div ng-show="$ctrl.getTotalWarningsCount() || $ctrl.authenticationIssue"
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
              ng-mouseover="$ctrl.warningsAreShown=true"
              ng-mouseleave="$ctrl.warningsAreShown=false"
              ng-click="$ctrl.selectMainTab()">
-          <span class="oppia-editor-warnings-count">
+          <span class="oppia-editor-warnings-count" ng-if="!$ctrl.authenticationIssue">
             <[$ctrl.getTotalWarningsCount()]>
+          </span>
+          <span class="oppia-editor-warnings-count" ng-if="$ctrl.authenticationIssue">
+            !
           </span>
           <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu topic-warning-container oppia-editor-warnings-box">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text"
-                ng-repeat="issue in $ctrl.validationIssues track by $index">
+                ng-repeat="issue in $ctrl.validationIssues track by $index"
+                ng-if="!$ctrl.authenticationIssue">
               <hr class="oppia-editor-warnings-separator">
               <[issue]>
             </li>
             <li class="oppia-editor-warnings-text"
-                ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
+                ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index"
+                ng-if="!$ctrl.authenticationIssue">
               <hr class="oppia-editor-warnings-separator">
               <[issue]>
             </li>
