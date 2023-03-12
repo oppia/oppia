@@ -88,17 +88,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             common, 'url_retrieve', mock_url_retrieve)
         self.extract_swap = self.swap(
             zipfile.ZipFile, 'extractall', mock_extractall)
-
-    def test_download_files_with_invalid_source_filenames(self) -> None:
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(
-            AssertionError,
-            'Expected list of filenames, got \'invalid source filename\''):
-            install_third_party.download_files(
-                'source_url', 'target_dir', 'invalid source filename')  # type: ignore[arg-type]
-
+            
     def test_download_files_with_valid_source_filenames(self) -> None:
         check_file_downloads = {
             'target_dir/file1': False,
