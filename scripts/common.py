@@ -187,10 +187,6 @@ WEBDRIVERIO_CONFIG_FILE_PATH = (
     os.path.join('core', 'tests', 'wdio.conf.js'))
 NODEMODULES_WDIO_BIN_PATH = (
     os.path.join(NODE_MODULES_PATH, '.bin', 'wdio'))
-NODEMODULES_JASMINE_BIN_PATH = (
-    os.path.join(NODE_MODULES_PATH, '.bin', 'jasmine'))
-JASMINE_CONFIG_FILE_PATH = (
-    os.path.join('core', 'tests', 'puppeteer-acceptance-tests', 'jasmine.json'))
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,

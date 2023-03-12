@@ -743,12 +743,19 @@ def managed_acceptance_tests_server(
     Raises:
         ValueError. Number of sharding instances are less than 0.
     """
-    SPEC_DIR_PATH = "core/tests/puppeteer-acceptance-tests/spec/"
+    nodemodules_jasmine_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jasmine')
+    puppeteer_acceptance_tests_dir_path = os.path.join(
+        'core', 'tests', 'puppeteer-acceptance-tests')
+    spec_dir_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'spec')
+    jasmine_config_file_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'jasmine.json')
 
     acceptance_tests_args = [
-        common.NODEMODULES_JASMINE_BIN_PATH,
-        '--config="%s"' % common.JASMINE_CONFIG_FILE_PATH,
-        '%s%s' % (SPEC_DIR_PATH, suite_name)
+        nodemodules_jasmine_bin_path,
+        '--config="%s"' % jasmine_config_file_path,
+        '%s%s' % (spec_dir_path, suite_name)
     ]
 
     # OK to use shell=True here because we are passing string literals and
