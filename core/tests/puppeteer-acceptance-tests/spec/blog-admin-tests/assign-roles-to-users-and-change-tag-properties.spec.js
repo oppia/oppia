@@ -24,7 +24,7 @@ const testConstants = require(
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Blog Admin', function() {
-  const ROLE_BLOG_ADMIN = 'blog-admin';
+  const ROLE_BLOG_ADMIN = 'blog admin';
   const ROLE_BLOG_POST_EDITOR = 'blog post editor';
   let superAdmin = null;
   let blogAdmin = null;
