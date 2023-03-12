@@ -88,7 +88,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             common, 'url_retrieve', mock_url_retrieve)
         self.extract_swap = self.swap(
             zipfile.ZipFile, 'extractall', mock_extractall)
-            
+
     def test_download_files_with_valid_source_filenames(self) -> None:
         check_file_downloads = {
             'target_dir/file1': False,
