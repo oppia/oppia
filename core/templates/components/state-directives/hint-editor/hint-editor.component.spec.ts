@@ -22,7 +22,7 @@ import { HintEditorComponent } from './hint-editor.component';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExternalSaveService } from 'services/external-save.service';
-import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('HintEditorComponent', () => {
