@@ -254,7 +254,8 @@
           <div *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
             <div class="submenu-notop-margin">
               <a (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT + '/' + topicSummary.getUrlFragment()); $event.stopPropagation()"
-                  href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
+                 class="underline"
+                 href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}/{{topicSummary.getUrlFragment()}}">
                 <span *ngIf="!isHackyTopicTitleTranslationDisplayed(idx)">
                   {{ topicSummary.getName() }}
                 </span>
