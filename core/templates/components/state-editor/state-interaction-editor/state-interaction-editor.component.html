@@ -6,9 +6,18 @@
       <h3 class="oppia-exp-interaction-card-header">
         Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
       </h3>
-      <div *ngIf="getCurrentInteractionName().length > 0">
-        <i class="fa fa-caret-{{ interactionEditorIsShown ? 'up' : 'down' }}" aria-hidden="true"></i>
-      </div>
+      <!-- <i class="fa fa-caret-down"
+        *ngIf="!interactionEditorIsShown"
+        aria-hidden="true">
+      </i>
+      <i class="fa fa-caret-up"
+      *ngIf="interactionEditorIsShown"
+      aria-hidden="true">
+    </i> -->
+    <div *ngIf="getCurrentInteractionName().length > 0">
+      <i class="fa fa-caret-{{ interactionEditorIsShown ? 'up' : 'down' }}" aria-hidden="true"></i>
+    </div>
+
     </div>
     <div class="oppia-add-interaction-button-container"
          *ngIf="!interactionId">
