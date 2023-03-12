@@ -135,7 +135,7 @@ export class OutcomeEditorComponent implements OnInit {
 
   isSelfLoopDestStuck(outcome: Outcome): boolean {
     if (outcome.destIfReallyStuck === null) {
-      outcome.destIfReallyStuck = 'Introduction';
+      return true;
     }
     return Boolean (
       outcome &&
