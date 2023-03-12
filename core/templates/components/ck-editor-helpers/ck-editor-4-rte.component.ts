@@ -294,7 +294,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var resize = () => {
       for (var i = 0; i < editable.length; i++) {
         (editable[i] as HTMLElement).style.width = '100%';
-      } 
+      }
     };
     for (let i of Object.keys(editable)) {
       (editable[i] as HTMLElement).onchange = () => {
@@ -393,7 +393,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
       // Set the css and icons for each toolbar button.
       const buttonSelectors = names.map((name) => `.cke_button__oppia${name}`);
-      const buttons = Array.from(document.querySelectorAll(buttonSelectors.join()));
+      const buttons = Array.from(document
+        .querySelectorAll(buttonSelectors.join()));
       buttons.forEach((button, index) => {
         if (button instanceof HTMLElement) {
           var icon = icons[index];
@@ -406,12 +407,14 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         }
       });
 
-      var ckeSeparators = Array.from(document.querySelectorAll('.cke_toolbar_separator'));
+      var ckeSeparators = Array.from(document
+        .querySelectorAll('.cke_toolbar_separator'));
       ckeSeparators.forEach((separator) => {
         separator.setAttribute('style', 'height:22px');
       });
-      
-      var ckeButtonIcons = Array.from(document.querySelectorAll('.cke_button_icon'));
+    
+      var ckeButtonIcons = Array.from(document
+        .querySelectorAll('.cke_button_icon'));
       ckeButtonIcons.forEach((buttonIcon) => {
         buttonIcon.setAttribute('style', 'height:24px;width:24px');
       });
@@ -434,18 +437,21 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           setTimeout(() => changeComboPanel(), 25);
         });
 
-        const comboOpens = Array.from(document.querySelectorAll('.cke_combo_open'));
-        comboOpens.forEach((comboOpen) => {
-          comboOpen.setAttribute('style', 'margin-left:-20px;margin-top:2px');
-        });
+      const comboOpens = Array.from(document
+        .querySelectorAll('.cke_combo_open'));
+      comboOpens.forEach((comboOpen) => {
+        comboOpen.setAttribute('style', 'margin-left:-20px;margin-top:2px');
+      });
 
-        const ckeComboTexts = Array.from(document.querySelectorAll('.cke_combo_text'));
-        ckeComboTexts.forEach((comboText) => {
-          comboText.setAttribute('style', 'padding:2px 5px 0px');
-        });
+      const ckeComboTexts = Array.from(document
+        .querySelectorAll('.cke_combo_text'));
+      ckeComboTexts.forEach((comboText) => {
+        comboText.setAttribute('style', 'padding:2px 5px 0px');
+      });
 
       if (!this.headersEnabled) {
-        const ckeFormatCombo = document.querySelector('.cke_combo__format') as HTMLElement;
+        const ckeFormatCombo = document
+          .querySelector('.cke_combo__format') as HTMLElement;
         ckeFormatCombo.setAttribute('style', 'display:none');
       }
 
