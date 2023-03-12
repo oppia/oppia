@@ -29,8 +29,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { Observable } from 'rxjs';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-import constants from 'assets/constants';
-
 interface SaveAudioResponse {
   'filename': string;
   'duration_secs': number;
@@ -83,7 +81,7 @@ export class AssetsBackendApiService {
     }
     return this.fetchFile(
       AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
-      constants.ASSET_TYPE_AUDIO);
+      AppConstants.ASSET_TYPE_AUDIO);
   }
 
   async loadImage(
@@ -94,7 +92,7 @@ export class AssetsBackendApiService {
       return new ImageFile(filename, data);
     }
     return this.fetchFile(
-      entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
   }
 
   async saveAudio(
@@ -107,6 +105,10 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveAudioResponse>(
         this.getAudioUploadUrl(explorationId), form).toPromise();
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse) {
         return Promise.reject(error.error);
@@ -126,6 +128,10 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveImageResponse>(
         this.getImageUploadUrl(entityType, entityId), form).toPromise();
+    // We use unknown type because we are unsure of the type of error
+    // that was thrown. Since the catch block cannot identify the
+    // specific type of error, we are unable to further optimise the
+    // code by introducing more types of errors.
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse) {
         return Promise.reject(error.error);
@@ -158,37 +164,37 @@ export class AssetsBackendApiService {
   }
 
   abortAllCurrentAudioDownloads(): void {
-    this.abortAllCurrentDownloads(constants.ASSET_TYPE_AUDIO);
+    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_AUDIO);
   }
 
   abortAllCurrentImageDownloads(): void {
-    this.abortAllCurrentDownloads(constants.ASSET_TYPE_IMAGE);
+    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_IMAGE);
   }
 
   getAssetsFilesCurrentlyBeingRequested(): (
     {[assetType: string]: readonly FileDownloadRequest[]}) {
     return {
-      [constants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
-      [constants.ASSET_TYPE_IMAGE]: this.imageFileDownloadRequests,
+      [AppConstants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
+      [AppConstants.ASSET_TYPE_IMAGE]: this.imageFileDownloadRequests,
     };
   }
 
   getAudioDownloadUrl(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, constants.ASSET_TYPE_AUDIO);
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_AUDIO);
   }
 
   getImageUrlForPreview(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
   }
 
   getThumbnailUrlForPreview(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, constants.ASSET_TYPE_THUMBNAIL);
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
   }
 
   private getDownloadUrl(
@@ -206,7 +212,7 @@ export class AssetsBackendApiService {
 
   private getFileDownloadRequestsByAssetType(
       assetType: string): FileDownloadRequest[] {
-    if (assetType === constants.ASSET_TYPE_AUDIO) {
+    if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
       return this.audioFileDownloadRequests;
     } else {
       return this.imageFileDownloadRequests;
@@ -235,7 +241,7 @@ export class AssetsBackendApiService {
     try {
       const blob = await blobPromise;
       this.assetsCache.set(filename, blob);
-      if (assetType === constants.ASSET_TYPE_AUDIO) {
+      if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
         return new AudioFile(filename, blob);
       } else {
         return new ImageFile(filename, blob);

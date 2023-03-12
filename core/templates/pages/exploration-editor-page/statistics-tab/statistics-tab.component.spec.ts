@@ -97,7 +97,9 @@ describe('Statistics Tab Component', () => {
 
     // This throws "Argument of type 'null' is not assignable to
     // parameter of type 'State'." We need to suppress this error
-    // because of the need to test validations.
+    // because of the need to test validations. This throws an
+    // error because the state with name 'Introduction' is not
+    // present in the states object.
     // @ts-ignore
     spyOn(statesObjectFactory, 'createFromBackendDict').and.returnValue(null);
 
@@ -115,15 +117,6 @@ describe('Statistics Tab Component', () => {
             }
           },
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {}
-            }
-          },
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -185,7 +178,6 @@ describe('Statistics Tab Component', () => {
             }
           },
           param_changes: [],
-          next_content_id_index: 3,
           card_is_checkpoint: true,
           linked_skill_id: null,
           content: {
@@ -201,11 +193,6 @@ describe('Statistics Tab Component', () => {
             }
           },
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {}
-            }
-          },
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -220,7 +207,6 @@ describe('Statistics Tab Component', () => {
             default_outcome: null
           },
           param_changes: [],
-          next_content_id_index: 0,
           card_is_checkpoint: false,
           linked_skill_id: null,
           content: {
@@ -240,15 +226,6 @@ describe('Statistics Tab Component', () => {
             }
           },
           solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {}
-            }
-          },
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -310,7 +287,6 @@ describe('Statistics Tab Component', () => {
             }
           },
           param_changes: [],
-          next_content_id_index: 3,
           card_is_checkpoint: false,
           linked_skill_id: null,
           content: {
@@ -344,7 +320,8 @@ describe('Statistics Tab Component', () => {
         language_code: 'en',
         correctness_feedback_enabled: true,
         objective: 'To learn',
-        states: explorationDict.states
+        states: explorationDict.states,
+        next_content_id_index: 6
       },
       exploration_metadata: {
         title: 'Exploration',
@@ -374,7 +351,8 @@ describe('Statistics Tab Component', () => {
       furthest_reached_checkpoint_exp_version: 1,
       furthest_reached_checkpoint_state_name: 'End',
       most_recently_reached_checkpoint_state_name: 'Mid',
-      most_recently_reached_checkpoint_exp_version: 2
+      most_recently_reached_checkpoint_exp_version: 2,
+      displayable_language_codes: []
     };
     spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
       .and.returnValue(Promise.resolve(explorationResponse));
@@ -400,12 +378,10 @@ describe('Statistics Tab Component', () => {
           }
         };
       }
-    // Using unknown type conversion to check for an invalid graph.
     } as unknown as States;
 
     component.expStats = {
       getStateStats: (name: string) => null
-    // Using unknown type conversion to check for an invalid graph.
     } as unknown as ExplorationStats;
 
     component.ngOnInit();

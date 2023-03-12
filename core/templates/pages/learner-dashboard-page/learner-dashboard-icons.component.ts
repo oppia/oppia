@@ -16,10 +16,10 @@
  * @fileoverview Component for showing learner dashboard icons.
  */
 
-import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerDashboardActivityBackendApiService } from
@@ -33,7 +33,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   selector: 'oppia-learner-dashboard-icons',
   templateUrl: './learner-dashboard-icons.component.html',
 })
-export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
+export class LearnerDashboardIconsComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -45,14 +45,6 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   activityIsCurrentlyHoveredOver: boolean = true;
   playlistTooltipIsEnabled: boolean = false;
-  @Input()
-  get activityActive(): boolean {
-    return this.activityIsCurrentlyHoveredOver;
-  }
-
-  set activityActive(hoverState: boolean) {
-    this.activityIsCurrentlyHoveredOver = hoverState;
-  }
 
   constructor(
     private learnerDashboardIdsBackendApiService:
@@ -71,11 +63,6 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
       );
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.activityActive !== undefined) {
-      this.setHoverState(changes.activityActive.currentValue);
-    }
-  }
 
   enablePlaylistTooltip(): void {
     this.playlistTooltipIsEnabled = true;
@@ -85,34 +72,25 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
     this.playlistTooltipIsEnabled = false;
   }
 
-  setHoverState(hoverState: boolean): void {
-    this.activityIsCurrentlyHoveredOver = hoverState;
-  }
 
   canActivityBeAddedToLearnerPlaylist(activityId: string): boolean {
     if (this.learnerDashboardActivityIds) {
       if (this.learnerDashboardActivityIds.includesActivity(
         activityId)) {
         return false;
-      } else {
-        if (this.isContainerNarrow) {
-          return true;
-        } else {
-          return this.activityIsCurrentlyHoveredOver;
-        }
       }
     }
-    return false;
+    return true;
   }
 
   belongsToLearnerPlaylist(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         return (
           this.learnerDashboardActivityIds.belongsToExplorationPlaylist(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         return (
           this.learnerDashboardActivityIds.belongsToCollectionPlaylist(
             this.activityId));
@@ -124,19 +102,19 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   belongsToCompletedActivities(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         return (
           this.learnerDashboardActivityIds.belongsToCompletedExplorations(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         return (
           this.learnerDashboardActivityIds.belongsToCompletedCollections(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_STORY) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_STORY) {
         return (
           this.learnerDashboardActivityIds.belongsToCompletedStories(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_LEARN_TOPIC) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_LEARN_TOPIC) {
         return (
           this.learnerDashboardActivityIds.belongsToLearntTopics(
             this.activityId));
@@ -148,15 +126,15 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
   belongsToIncompleteActivities(): boolean {
     var activityType = this.activityType;
     if (this.learnerDashboardActivityIds) {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         return (
           this.learnerDashboardActivityIds.belongsToIncompleteExplorations(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         return (
           this.learnerDashboardActivityIds.belongsToIncompleteCollections(
             this.activityId));
-      } else if (activityType === constants.ACTIVITY_TYPE_LEARN_TOPIC) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_LEARN_TOPIC) {
         return (
           this.learnerDashboardActivityIds.belongsToPartiallyLearntTopics(
             this.activityId));
@@ -170,10 +148,10 @@ export class LearnerDashboardIconsComponent implements OnInit, OnChanges {
       this.learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
         activityId, activityType));
     if (isSuccessfullyAdded) {
-      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         this.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
           activityId);
-      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
         this.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
           activityId);
       }

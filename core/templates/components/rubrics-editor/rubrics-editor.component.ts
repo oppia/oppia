@@ -18,10 +18,11 @@
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { Rubric } from 'domain/skill/rubric.model';
 import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+
 
 interface Explanation {
   [key: string]: string[];
@@ -53,7 +54,7 @@ interface SkillDescriptionStatusValuesInterface {
   templateUrl: './rubrics-editor.component.html'
 })
 export class RubricsEditorComponent {
-  @Output() saveRubric: EventEmitter<unknown> = (
+  @Output() saveRubric: EventEmitter<RubricData> = (
     new EventEmitter());
 
   // These properties below are initialized using Angular lifecycle hooks
@@ -69,7 +70,7 @@ export class RubricsEditorComponent {
     TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
 
   skillDifficultyMedium: string = (
-    constants.SKILL_DIFFICULTY_MEDIUM);
+    AppConstants.SKILL_DIFFICULTY_MEDIUM);
 
   explanationsMemento: Record<string, string[]> = {};
   explanationEditorIsOpen: Record<string, boolean[]> = {};

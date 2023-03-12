@@ -28,7 +28,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { AudioTranslationManagerService } from '../services/audio-translation-manager.service';
 import { AppConstants } from 'app.constants';
@@ -43,7 +42,6 @@ describe('InputResponsePairComponent', () => {
   let fixture: ComponentFixture<InputResponsePairComponent>;
   let explorationHtmlFormatter: ExplorationHtmlFormatterService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let playerTranscriptService: PlayerTranscriptService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let audioTranslationManagerService: AudioTranslationManagerService;
@@ -67,8 +65,6 @@ describe('InputResponsePairComponent', () => {
   }));
 
   beforeEach(() => {
-    writtenTranslationsObjectFactory = TestBed.get(
-      WrittenTranslationsObjectFactory);
     explorationHtmlFormatter = TestBed.get(ExplorationHtmlFormatterService);
     audioPlayerService = TestBed.get(AudioPlayerService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
@@ -146,7 +142,6 @@ describe('InputResponsePairComponent', () => {
           }
         }),
         RecordedVoiceovers.createEmpty(),
-        writtenTranslationsObjectFactory.createEmpty(),
         'content', audioTranslationLanguageService
       ));
   });
@@ -217,8 +212,9 @@ describe('InputResponsePairComponent', () => {
     component.data = {
       // This throws "Type '{ answerDetails: string; }' is not assignable to
       // type 'string'.". We need to suppress this error because we need to
-      // store "answerDetails" to test the relevant code.
-      // @ts-expect-error
+      // store "answerDetails" to test the relevant code. This is done to
+      // avoid the lint error "This test should have at least one expectation.".
+      // @ts-ignore
       learnerInput: {
         answerDetails: 'Answer Details'
       },

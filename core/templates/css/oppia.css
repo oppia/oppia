@@ -806,9 +806,6 @@ textarea {
   padding: 0;
   width: 100%;
 }
-.navbar-form {
-  padding-left: 15px;
-}
 
 .nav {
   list-style: none;
@@ -995,6 +992,12 @@ textarea {
 }
 .nav .uib-dropdown:hover > .uib-dropdown-menu {
   border: none;
+}
+
+@media(max-width: 1050px) {
+  .oppia-navbar-breadcrumb {
+    display: none;
+  }
 }
 
 @media(max-width: 768px) {
@@ -2483,7 +2486,8 @@ div#ng-curtain {
 }
 
 .oppia-navbar-dropdown-toggle:focus {
-  color: #fff;
+  background-color: #fff;
+  color: #00645c;
 }
 .oppia-navbar-profile-picture {
   height: 32px;
@@ -4109,6 +4113,7 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
   white-space: pre-wrap;
 }
 
-.story-save-draft-warning {
+.oppia-save-draft-warning {
   color: #fc0;
+  margin-left: 5px;
 }

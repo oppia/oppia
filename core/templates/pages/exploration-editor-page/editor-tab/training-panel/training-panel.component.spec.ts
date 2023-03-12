@@ -27,6 +27,7 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
 import { TrainingDataService } from './training-data.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { ResponsesService } from '../services/responses.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 class MockNgbModal {
@@ -60,6 +61,7 @@ describe('Training Panel Component', () => {
   let fixture: ComponentFixture<TrainingPanelComponent>;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let responsesService: ResponsesService;
+  let generateContentIdService: GenerateContentIdService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -98,7 +100,8 @@ describe('Training Panel Component', () => {
     explorationHtmlFormatterService =
       TestBed.inject(ExplorationHtmlFormatterService);
     responsesService = TestBed.inject(ResponsesService);
-
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    generateContentIdService.init(() => 0, () => { });
     spyOn(explorationHtmlFormatterService, 'getAnswerHtml')
       .and.returnValue('answerTemplate');
 
@@ -111,7 +114,8 @@ describe('Training Panel Component', () => {
     component.addingNewResponse = false;
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'InteractionAnswer'." We need to suppress this error because of the
-    // need to test validations.
+    // need to test validations. This error is thrown because the answer is
+    // null.
     // @ts-ignore
     component.answer = null;
     component.ngOnInit();

@@ -1006,7 +1006,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'ACCESS_TOPICS_AND_SKILLS_DASHBOARD', 'EDIT_SKILL',
             'DELETE_ANY_QUESTION', 'EDIT_ANY_STORY', 'PUBLISH_ANY_ACTIVITY',
             'EDIT_ANY_QUESTION', 'CREATE_NEW_SKILL', 'CHANGE_STORY_STATUS',
-            'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS'])
+            'CAN_MANAGE_VOICE_ARTIST', 'ACCESS_LEARNER_GROUPS',
+            'ACCESS_CLASSROOM_ADMIN_PAGE'])
         expected_roles = set(
             ['EXPLORATION_EDITOR', 'ADMIN', 'MODERATOR',
             'VOICEOVER_ADMIN'])
@@ -2185,18 +2186,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_raises_error_if_none_destination_is_provided_for_checkpoint(
         self
     ) -> None:
-        state = state_domain.State.create_default_state('state_1')
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
         state_answer_group: List[state_domain.AnswerGroup] = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     None, None, state_domain.SubtitledHtml(
-                        'feedback_1', '<p>state outcome html</p>'),
+                        'feedback_2', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_1',
+                                'contentId': 'rule_input_3',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
                 ],
@@ -2218,13 +2220,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup(
                 state_domain.Outcome(
                     'destination', None, state_domain.SubtitledHtml(
-                        'feedback_1', '<p>state outcome html</p>'),
+                        'feedback_4', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
                     state_domain.RuleSpec(
                         'Equals', {
                             'x': {
-                                'contentId': 'rule_input_1',
+                                'contentId': 'rule_input_5',
                                 'normalizedStrSet': ['Test rule spec.']
                                 }})
                 ],
@@ -2387,7 +2389,13 @@ states:
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
         dest: New state
         feedback:
@@ -2398,7 +2406,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: null
+      id: TextInput
       solution: null
     linked_skill_id: null
     next_content_id_index: 0
@@ -2407,6 +2415,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+        ca_placeholder_2: {}
     solicit_answer_details: false
     card_is_checkpoint: false
     written_translations:

@@ -31,6 +31,7 @@ import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
 
 export type ExplorationPropertyValues = (
   null |
+  number |
   string |
   string[] |
   boolean |
@@ -74,7 +75,7 @@ export class ExplorationPropertyService {
     },
   };
 
-  init(value: string | boolean | ParamChange[] | ParamSpecs): void {
+  init(value: string | number | boolean | ParamChange[] | ParamSpecs): void {
     if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }
@@ -144,7 +145,7 @@ export class ExplorationPropertyService {
     }
 
     this.changeListService.editExplorationProperty(
-      this.propertyName, newBackendValue, oldBackendValue);
+      this.propertyName, newBackendValue as string, oldBackendValue as string);
     this.savedMemento = cloneDeep(this.displayed);
 
     this._explorationPropertyChangedEventEmitter.emit();

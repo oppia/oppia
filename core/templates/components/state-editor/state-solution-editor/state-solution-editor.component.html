@@ -26,14 +26,16 @@
               </button>
             </div>
           </div>
-          <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
+          <ul class="nav oppia-option-list nav-stacked nav-pills"
+              role="tablist"
               *ngIf="savedMemento()">
-            <li class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
+            <li class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
+                role="tab">
               <div class="oppia-rule-header-warning-placement"
                    *ngIf="!isSolutionValid()"
                    (click)="toggleInlineSolutionEditorIsActive()"
                    [ngbTooltip]="getInvalidSolutionTooltip()"
-                   placement="bottom">
+                   placement="auto">
                 <div class="oppia-rule-header-warning-style">
                   ⚠
                 </div>
@@ -50,8 +52,7 @@
               <div *ngIf="inlineSolutionEditorIsActive">
                 <div class="oppia-editor-card-section e2e-test-oppia-solution-body">
                   <oppia-solution-editor (openSolutionEditorModal)="openAddOrUpdateSolutionModal()"
-                                         (saveSolution)="onSaveSolution($event)"
-                                         (showMarkAllAudioAsNeedingUpdateModalIfRequired)="openMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
+                                         (saveSolution)="onSaveSolution($event)">
                   </oppia-solution-editor>
                 </div>
               </div>

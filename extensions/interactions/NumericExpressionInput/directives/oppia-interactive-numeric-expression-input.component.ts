@@ -129,8 +129,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
         break;
       }
     }
-    this.guppyConfigurationService.changeDivSymbol(
-      (useFractionForDivision as unknown as { value: boolean }).value);
+    this.guppyConfigurationService.changeDivSymbol(useFractionForDivision);
     this.guppyInitializationService.init(
       'guppy-div-learner',
       placeholder.value.unicode,
@@ -148,6 +147,11 @@ export class InteractiveNumericExpressionInput implements OnInit {
         this.isCurrentAnswerValid();
       }
     });
+
+    Guppy.event('done', () => {
+      this.submitAnswer();
+    });
+
     Guppy.event('focus', (focusObj: FocusObj) => {
       if (!focusObj.focused) {
         this.isCurrentAnswerValid();

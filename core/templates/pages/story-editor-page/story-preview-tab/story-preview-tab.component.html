@@ -66,7 +66,7 @@
           <svg xmlns="http://www.w3.org/1600/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
                version="1.1"
-               viewBox="0 0 192 108" preserveAspectRatio="xMidYMid Meet">
+               viewBox="0 0 192 108" preserveAspectRatio="xMidYMid meet">
             <defs>
               <pattern id="image2{{i}}" patternUnits="userSpaceOnUse" height="108" width="192">
                 <rect width="192"
@@ -83,14 +83,13 @@
                 </image>
               </pattern>
             </defs>
-            <a xlink:href="getExplorationUrl(node)">
-              <rect width="192"
-                    height="108"
-                    x="0"
-                    y="0"
-                    attr.fill="url(#image2{{i}})">
-              </rect>
-            </a>
+            <rect [attr.href]="getExplorationUrl(node)"
+                  width="192"
+                  height="108"
+                  x="0"
+                  y="0"
+                  attr.fill="url(#image2{{i}})">
+            </rect>
           </svg>
         </div>
         <div class="story-text">

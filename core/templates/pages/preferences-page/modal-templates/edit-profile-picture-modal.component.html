@@ -20,7 +20,7 @@
       <div *ngIf="uploadedImage">
         <span>{{ 'I18N_PREFERENCES_PROFILE_PICTURE_DRAG' | translate }}</span>
         <div class="oppia-profile-picture-crop-area e2e-test-photo-crop">
-          <button class="btn btn-secondary oppia-profile-picture-reset-button" (click)="reset()">
+          <button class="btn btn-secondary oppia-profile-picture-reset-button" aria-label="close" (click)="reset()">
             <i class="fas fa-times oppia-vcenter"></i>
           </button>
           <img id="croppable-image" [src]="uploadedImage" #croppableImage>

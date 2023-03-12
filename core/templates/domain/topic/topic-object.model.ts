@@ -52,7 +52,7 @@ export interface TopicBackendDict {
   'skill_ids_for_diagnostic_test': string[];
 }
 
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export class Topic {
   _id: string;
@@ -215,8 +215,10 @@ export class Topic {
   }
 
   validate(): string[] {
-    let validUrlFragmentRegex = new RegExp(constants.VALID_URL_FRAGMENT_REGEX);
-    let topicUrlFragmentCharLimit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
+    let validUrlFragmentRegex = new RegExp(
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
+    let topicUrlFragmentCharLimit = (
+      AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
     let issues = [];
     if (this._name === '') {
       issues.push('Topic name should not be empty.');
@@ -285,11 +287,11 @@ export class Topic {
   }
 
   prepublishValidate(): string[] {
-    const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
+    const metaTagContentCharLimit = AppConstants.MAX_CHARS_IN_META_TAG_CONTENT;
     const pageTitleFragForWebCharMaxLimit = (
-      constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
     const pageTitleFragForWebCharMinLimit = (
-      constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -307,11 +309,11 @@ export class Topic {
     } else if (pageTitleFragForWebNumChars > pageTitleFragForWebCharMaxLimit) {
       issues.push(
         'Topic page title fragment should not be longer than ' +
-        `${constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
+        `${AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
     } else if (pageTitleFragForWebNumChars < pageTitleFragForWebCharMinLimit) {
       issues.push(
         'Topic page title fragment should not be shorter than ' +
-        `${constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
+        `${AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
     }
     if (!this._metaTagContent) {
       issues.push('Topic should have meta tag content.');
@@ -579,43 +581,51 @@ export class Topic {
     });
   }
 
-  // Reassigns all values within this topic to match the existing
-  // topic. This is performed as a deep copy such that none of the
+  // Creates a separate copy of this topic with the same values for the
+  // internal fields. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic.
-  copyFromTopic(otherTopic: Topic): void {
-    this._id = otherTopic.getId();
-    this.setName(otherTopic.getName());
-    this.setAbbreviatedName(otherTopic.getAbbreviatedName());
-    this.setUrlFragment(otherTopic.getUrlFragment());
-    this.setThumbnailFilename(otherTopic.getThumbnailFilename());
-    this.setThumbnailBgColor(otherTopic.getThumbnailBgColor());
-    this.setDescription(otherTopic.getDescription());
-    this.setLanguageCode(otherTopic.getLanguageCode());
-    this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
-    this.setMetaTagContent(otherTopic.getMetaTagContent());
-    this.setPageTitleFragmentForWeb(otherTopic.getPageTitleFragmentForWeb());
-    this.setSkillSummariesForDiagnosticTest(
-      otherTopic.getSkillSummariesForDiagnosticTest());
-    this._version = otherTopic.getVersion();
-    this._nextSubtopicId = otherTopic.getNextSubtopicId();
-    this.clearAdditionalStoryReferences();
-    this.clearCanonicalStoryReferences();
-    this.clearUncategorizedSkills();
-    this.clearSubtopics();
+  createCopyFromTopic(): Topic {
+    let id = this.getId();
+    let name = this.getName();
+    let abbreviatedName = this.getAbbreviatedName();
+    let urlFragment = this.getUrlFragment();
+    let thumbnailFilename = this.getThumbnailFilename();
+    let thumbnailBgColor = this.getThumbnailBgColor();
+    let description = this.getDescription();
+    let languageCode = this.getLanguageCode();
+    let practiceTabIsDisplayed = this.getPracticeTabIsDisplayed();
+    let metaTagContent = this.getMetaTagContent();
+    let pageTitleFragmentForWeb = this.getPageTitleFragmentForWeb();
+    let skillSummariesForDiagnosticTest =
+      this.getSkillSummariesForDiagnosticTest();
+    let version = this.getVersion();
+    let nextSubtopicId = this.getNextSubtopicId();
 
-    this._canonicalStoryReferences = otherTopic.getCanonicalStoryReferences();
-    this._additionalStoryReferences =
-        otherTopic.getAdditionalStoryReferences();
+    let newTopic = new Topic(
+      id, name, abbreviatedName, urlFragment, description,
+      languageCode, [], [], [], nextSubtopicId, version, [],
+      thumbnailFilename, thumbnailBgColor, {}, practiceTabIsDisplayed,
+      metaTagContent, pageTitleFragmentForWeb, []);
+    newTopic._skillSummariesForDiagnosticTest = skillSummariesForDiagnosticTest;
+    newTopic.clearAdditionalStoryReferences();
+    newTopic.clearCanonicalStoryReferences();
+    newTopic.clearUncategorizedSkills();
+    newTopic.clearSubtopics();
+
+    newTopic._canonicalStoryReferences = this.getCanonicalStoryReferences();
+    newTopic._additionalStoryReferences =
+        this.getAdditionalStoryReferences();
 
     let uncategorizedSkillSummaries =
-        otherTopic.getUncategorizedSkillSummaries();
+        this.getUncategorizedSkillSummaries();
     for (let i = 0; i < uncategorizedSkillSummaries.length; i++) {
-      this.addUncategorizedSkill(
+      newTopic.addUncategorizedSkill(
         uncategorizedSkillSummaries[i].getId(),
         uncategorizedSkillSummaries[i].getDescription());
     }
 
-    this._subtopics = cloneDeep(otherTopic.getSubtopics());
+    newTopic._subtopics = cloneDeep(this.getSubtopics());
+    return newTopic;
   }
 
 

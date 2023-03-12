@@ -1338,7 +1338,7 @@ export class SvgEditorComponent implements OnInit {
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
         fontStyle: this.fabricjsOptions.italic ? 'italic' : 'normal',
-      } as unknown as Partial<fabric.Object>);
+      } as Partial<fabric.Object>);
       this.canvas.renderAll();
     }
   }
@@ -1348,7 +1348,7 @@ export class SvgEditorComponent implements OnInit {
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
         fontWeight: this.fabricjsOptions.bold ? 'bold' : 'normal',
-      } as unknown as Partial<fabric.Object>);
+      } as Partial<fabric.Object>);
       this.canvas.renderAll();
     }
   }
@@ -1358,7 +1358,7 @@ export class SvgEditorComponent implements OnInit {
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
         fontFamily: this.fabricjsOptions.fontFamily,
-      } as unknown as Partial<fabric.Object>);
+      } as Partial<fabric.Object>);
       this.canvas.renderAll();
     }
   }
@@ -1375,11 +1375,11 @@ export class SvgEditorComponent implements OnInit {
         (object) => {
           object.set({
             radius: this.getSize() + 2
-          } as unknown as Partial<fabric.Object>);
+          } as Partial<fabric.Object>);
         });
       this.getQuadraticBezierCurve().set({
         strokeWidth: this.getSize()
-      } as unknown as Partial<fabric.Object>);
+      } as Partial<fabric.Object>);
       this.canvas.renderAll();
     } else {
       var shape = this.canvas.getActiveObject();
@@ -1389,12 +1389,12 @@ export class SvgEditorComponent implements OnInit {
       if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
         shape.set({
           strokeWidth: this.getSize()
-        } as unknown as Partial<fabric.Object>);
+        } as Partial<fabric.Object>);
         this.canvas.renderAll();
       } else if (shape && shape.get('type') === 'textbox') {
         shape.set({
           fontSize: this.getSize()
-        } as unknown as Partial<fabric.Object>);
+        } as Partial<fabric.Object>);
         this.canvas.renderAll();
       }
     }

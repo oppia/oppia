@@ -43,9 +43,7 @@ require('services/stateful/focus-manager.service.ts');
 require('domain/skill/skill-backend-api.service.ts');
 import { Subscription } from 'rxjs';
 
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import storyNodeConstants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 angular.module('oppia').directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -124,7 +122,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.skillInfoHasLoaded = false;
             _recalculateAvailableNodes();
             $scope.allowedBgColors = (
-              storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
+              AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
               .then(function(response) {
@@ -309,10 +307,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.skillIdToSummaryMap[summary.id] = summary.description;
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
                   $scope.story, $scope.getId(), summary.id);
-                // The catch parameter type can only be any or unknown. The type
-                // 'unknown' is safer than type 'any' because it reminds us
-                // that we need to performsome sorts of type-checks before
-                // operating on our values.
+                // Unknown type is used because we don't know which type of
+                // error is thrown.
               } catch (err: unknown) {
                 if (err instanceof Error) {
                   AlertsService.addInfoMessage(

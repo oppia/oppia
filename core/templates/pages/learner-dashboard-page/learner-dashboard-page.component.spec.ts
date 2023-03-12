@@ -136,6 +136,7 @@ describe('Learner dashboard page', () => {
     version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
+    next_content_id_index: 3,
     auto_tts_enabled: true,
     exploration_metadata: {
       title: 'Exploration',
@@ -449,7 +450,7 @@ describe('Learner dashboard page', () => {
             Object.assign(collectionDict, {
               title: titleList[i],
               category: categoryList[i]
-            }) as unknown as CollectionBackendDict
+            }) as CollectionBackendDict
           ));
         learnerDashboardCollectionsData.collection_playlist[i] = ({
           id: Number(i + 1).toString()
@@ -466,7 +467,7 @@ describe('Learner dashboard page', () => {
               // (1 to 8 is the complete collections).
               id: Number(i + 9).toString(),
               title: 'Collection Title ' + (i + 7),
-            }) as unknown as CollectionBackendDict
+            }) as CollectionBackendDict
           ));
       }
 

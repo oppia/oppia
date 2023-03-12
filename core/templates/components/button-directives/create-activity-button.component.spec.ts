@@ -193,8 +193,11 @@ describe('CreateActivityButtonComponent', () => {
       spyOn(urlService, 'getPathname').and.returnValue('not/creator-dashboard');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
-          replace: (val: string) => {}
-        }
+          _href: '',
+          href: '',
+          replace: (val: string) => {},
+        },
+        gtag: () => '',
       });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return ({

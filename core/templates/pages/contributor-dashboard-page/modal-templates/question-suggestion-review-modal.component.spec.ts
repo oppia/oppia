@@ -29,6 +29,7 @@ import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-e
 import { ContextService } from 'services/context.service';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import cloneDeep from 'lodash/cloneDeep';
 
 class MockActiveModal {
   close(): void {
@@ -170,10 +171,7 @@ describe('Question Suggestion Review Modal component', () => {
               param_changes: [],
               recorded_voiceovers: {
                 voiceovers_mapping: {}
-              },
-              written_translations: {
-                translations_mapping: {}
-              },
+              }
             },
           },
           skill_difficulty: skillDifficulty,
@@ -283,10 +281,7 @@ describe('Question Suggestion Review Modal component', () => {
               param_changes: [],
               recorded_voiceovers: {
                 voiceovers_mapping: {}
-              },
-              written_translations: {
-                translations_mapping: {}
-              },
+              }
             },
           },
           skill_difficulty: skillDifficulty,
@@ -330,7 +325,8 @@ describe('Question Suggestion Review Modal component', () => {
     component.suggestionId = suggestionId;
     component.misconceptionsBySkill = misconceptionsBySkill;
     // This throws "TS2322". We need to suppress this error because
-    // not all of the data is needed to run these tests.
+    // not all of the data is needed to run these tests. This is because
+    // the component is initialized with the data from the backend.
     // @ts-ignore
     component.suggestionIdToContribution = suggestionIdToContribution;
 
@@ -404,10 +400,17 @@ describe('Question Suggestion Review Modal component', () => {
         };
       }
 
+      const questionDict = cloneDeep(
+        component.suggestionIdToContribution[suggestionId]
+          .suggestion.change.question_dict
+      );
+
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return (
             { componentInstance: MockNgbModalRef,
-              result: Promise.resolve()
+              result: Promise.resolve(
+                {questionDict: questionDict, skillDifficulty: 0.3}
+              )
             }) as NgbModalRef;
       });
 
@@ -473,7 +476,7 @@ describe('Question Suggestion Review Modal component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-    it('should return nothing when edit question modal is' +
+    it('should update review question modal when edit question modal is' +
       ' resolved', fakeAsync(() => {
       class MockNgbModalRef {
         componentInstance = {
@@ -486,10 +489,30 @@ describe('Question Suggestion Review Modal component', () => {
         };
       }
 
+      const newContentHtml = 'new html';
+      const newSkillDifficulty = 1;
+
+      const suggestionChange = (
+        component.suggestionIdToContribution[suggestionId].suggestion.change);
+      const newQuestionDict = cloneDeep(suggestionChange.question_dict);
+      newQuestionDict.question_state_data.content.html = newContentHtml;
+
+      expect(
+        component.question.getStateData().content.html
+      ).toEqual(contentHtml);
+      expect(
+        suggestionChange.question_dict.question_state_data.content.html
+      ).toEqual(contentHtml);
+      expect(component.skillDifficulty).toBe(skillDifficulty);
+      expect(suggestionChange.skill_difficulty).toEqual(skillDifficulty);
+
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return (
             { componentInstance: MockNgbModalRef,
-              result: Promise.resolve()
+              result: Promise.resolve({
+                questionDict: newQuestionDict,
+                skillDifficulty: newSkillDifficulty
+              })
             }) as NgbModalRef;
       });
 
@@ -498,6 +521,18 @@ describe('Question Suggestion Review Modal component', () => {
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
+      expect(
+        component.question.getStateData().content.html
+      ).toEqual(newContentHtml);
+      expect(
+        suggestionChange.question_dict.question_state_data.content.html
+      ).toEqual(newContentHtml);
+      expect(component.skillDifficulty).toBe(newSkillDifficulty);
+      expect(suggestionChange.skill_difficulty).toEqual(newSkillDifficulty);
+
+      suggestionChange.question_dict.question_state_data.content.html = (
+        contentHtml);
+      suggestionChange.skill_difficulty = skillDifficulty;
     }));
 
     it('should initialize properties after component is initialized',
@@ -673,7 +708,8 @@ describe('Question Suggestion Review Modal component', () => {
       let details2 = component.allContributions['2'].details;
       // This throws "Type 'null' is not assignable to type
       // 'ActiveContributionDetailsDict'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This error is thrown
+      // because the details are null.
       // @ts-ignore
       component.allContributions['2'].details = null;
 
@@ -683,7 +719,8 @@ describe('Question Suggestion Review Modal component', () => {
       component.goToNextItem();
       // This throws "Type 'null' is not assignable to type
       // 'ActiveContributionDetailsDict'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This error is thrown
+      // because the details are null.
       // @ts-ignore
       component.allContributions['1'].details = null;
 

@@ -24,7 +24,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { TrainingDataService } from './training-data.service';
 import { ResponsesService } from '../services/responses.service';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
@@ -203,7 +203,7 @@ describe('Training Data Service', () => {
 
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'Outcome'." We need to suppress this error because of the need to
-    // test validations.
+    // test validations. This throws an error because the outcome is null.
     // @ts-ignore
     expect(trainingDataService.getAllPotentialOutcomes(
       new State(
@@ -226,7 +226,7 @@ describe('Training Data Service', () => {
           null,
           null,
         ), [], 'id', null),
-        null, null, true, true, null, 7)
+        null, null, true, null)
     )).toEqual([null, null, new Outcome(
       'Hola',
       null,
