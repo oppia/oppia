@@ -37,7 +37,7 @@ let testConstants = {
   },
   images: {
     blogPostThumbnailImage: path.resolve(
-      __dirname, '../../images/blog-post-thumbnail.svg')
+      __dirname, '../images/blog-post-thumbnail.svg')
   },
   DEFAULT_SPEC_TIMEOUT: 300000
 };
