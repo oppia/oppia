@@ -25,13 +25,15 @@ import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ResponseMusicNotesInput } from './directives/oppia-response-music-notes-input.component';
 import { ShortResponseMusicNotesInput } from './directives/oppia-short-response-music-notes-input.component';
 import { CommonModule } from '@angular/common';
+import { ObjectComponentsModule } from '../../../extensions/objects/object-components.module';
 
 @NgModule({
   imports: [
     SharedPipesModule,
     CommonModule,
     MaterialModule,
-    TranslateModule
+    TranslateModule,
+    ObjectComponentsModule,
   ],
   declarations: [
     MusicNotesInputComponent,
