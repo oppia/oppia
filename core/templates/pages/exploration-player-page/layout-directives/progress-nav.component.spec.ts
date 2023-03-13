@@ -44,7 +44,6 @@ describe('Progress nav component', () => {
 
   let urlService: UrlService;
   let playerPositionService: PlayerPositionService;
-  let browserCheckerService: BrowserCheckerService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
@@ -183,6 +182,16 @@ describe('Progress nav component', () => {
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1);
 
     expect(componentInstance.canWindowShowTwoCards()).toBeTrue();
+  });
+
+  it('should tell if generic submit button should be shown', () => {
+    spyOn(componentInstance, 'doesInteractionHaveNavSubmitButton')
+      .and.returnValues(false, true);
+    spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(false);
+
+    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeFalse();
+
+    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeTrue();
   });
 
   it('should tell if continue button should be shown', () => {
