@@ -120,7 +120,7 @@ export class TutorCardComponent {
   @Input() inputOutputHistoryIsShown!: boolean;
   @Input() checkpointCelebrationModalIsEnabled!: boolean;
   private _editorPreviewMode!: boolean;
-  lastAnswer!: string | null;
+  lastAnswer!: { answerDetails: string } | string | null;
   conceptCardIsBeingShown!: boolean;
   interactionIsActive!: boolean;
   waitingForOppiaFeedback: boolean = false;
@@ -129,7 +129,6 @@ export class TutorCardComponent {
   isIframed!: boolean;
   getCanAskLearnerForAnswerInfo!: () => boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
-  OPPIA_AVATAR_LINK_URL!: string | null;
   profilePicture!: string;
   directiveSubscriptions = new Subscription();
   arePreviousResponsesShown: boolean = false;
@@ -171,7 +170,6 @@ export class TutorCardComponent {
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService
         .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
-    this.OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
 
     this.profilePicture = this.urlInterpolationService
       .getStaticImageUrl('/avatar/user_blue_72px.png');

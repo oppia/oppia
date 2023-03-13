@@ -617,19 +617,23 @@ def get_all_stale_suggestion_ids() -> List[str]:
 
 
 def _update_suggestion(
-    suggestion: suggestion_registry.BaseSuggestion
+    suggestion: suggestion_registry.BaseSuggestion,
+    validate_suggestion: bool = True
 ) -> None:
     """Updates the given suggestion.
 
     Args:
         suggestion: Suggestion. The suggestion to be updated.
+        validate_suggestion: bool. Whether to validate the suggestion before
+            saving it.
     """
-    _update_suggestions([suggestion])
+    _update_suggestions([suggestion], validate_suggestion=validate_suggestion)
 
 
 def _update_suggestions(
     suggestions: List[suggestion_registry.BaseSuggestion],
-    update_last_updated_time: bool = True
+    update_last_updated_time: bool = True,
+    validate_suggestion: bool = True
 ) -> None:
     """Updates the given suggestions.
 
@@ -637,12 +641,19 @@ def _update_suggestions(
         suggestions: list(Suggestion). The suggestions to be updated.
         update_last_updated_time: bool. Whether to update the last_updated
             field of the suggestions.
+        validate_suggestion: bool. Whether to validate the suggestions before
+            saving them.
     """
     suggestion_ids = []
 
-    for suggestion in suggestions:
-        suggestion.validate()
-        suggestion_ids.append(suggestion.suggestion_id)
+    if validate_suggestion:
+        for suggestion in suggestions:
+            suggestion.validate()
+            suggestion_ids.append(suggestion.suggestion_id)
+    else:
+        suggestion_ids = [
+            suggestion.suggestion_id for suggestion in suggestions
+        ]
 
     suggestion_models_to_update_with_none = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
@@ -843,7 +854,7 @@ def reject_suggestions(
         suggestion.set_suggestion_status_to_rejected()
         suggestion.set_final_reviewer_id(reviewer_id)
 
-    _update_suggestions(suggestions)
+    _update_suggestions(suggestions, validate_suggestion=False)
 
     # Update the community contribution stats so that the number of suggestions
     # that are in review decreases, since these suggestions are no longer in

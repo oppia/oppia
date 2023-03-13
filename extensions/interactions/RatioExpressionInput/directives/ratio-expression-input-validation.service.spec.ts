@@ -25,8 +25,8 @@ import { RatioExpressionInputValidationService } from
   'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Rule } from
+  'domain/exploration/rule.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { RatioExpressionInputCustomizationArgs } from
@@ -43,8 +43,7 @@ describe('RatioExpressionInputValidationService', () => {
   let equals: Rule, isEquivalent: Rule;
   let hasNumberOfTermsEqualTo: Rule, hasSpecificTermEqualTo: Rule;
   let customizationArgs: RatioExpressionInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -55,7 +54,6 @@ describe('RatioExpressionInputValidationService', () => {
     validatorService = TestBed.get(RatioExpressionInputValidationService);
     oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -81,28 +79,28 @@ describe('RatioExpressionInputValidationService', () => {
       }
     };
 
-    isEquivalent = rof.createFromBackendDict({
+    isEquivalent = Rule.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
         x: [1, 2, 3]
       }
     }, 'RatioExpressionInput');
 
-    equals = rof.createFromBackendDict({
+    equals = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3]
       }
     }, 'RatioExpressionInput');
 
-    hasNumberOfTermsEqualTo = rof.createFromBackendDict({
+    hasNumberOfTermsEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 3
       }
     }, 'RatioExpressionInput');
 
-    hasSpecificTermEqualTo = rof.createFromBackendDict({
+    hasSpecificTermEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
         x: 1, y: 1
@@ -140,7 +138,7 @@ describe('RatioExpressionInputValidationService', () => {
       ' input.'
     }]);
 
-    let isEquivalentNonSimplified = rof.createFromBackendDict({
+    let isEquivalentNonSimplified = Rule.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
         x: [2, 4, 6]
@@ -159,7 +157,7 @@ describe('RatioExpressionInputValidationService', () => {
       ' input.'
     }]);
 
-    let equalFourTerms = rof.createFromBackendDict({
+    let equalFourTerms = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3, 4]
@@ -194,13 +192,13 @@ describe('RatioExpressionInputValidationService', () => {
       'matching input.'
     }]);
 
-    let equalsTwoTerms = rof.createFromBackendDict({
+    let equalsTwoTerms = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2]
       }
     }, 'RatioExpressionInput');
-    let hasNumberOfTermsEqualToLength2 = rof.createFromBackendDict({
+    let hasNumberOfTermsEqualToLength2 = Rule.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 2
@@ -234,7 +232,7 @@ describe('RatioExpressionInputValidationService', () => {
       'matching input.'
     }]);
 
-    let invalidHasSpecificTermEqualTo = rof.createFromBackendDict({
+    let invalidHasSpecificTermEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
         x: 4, y: 1
@@ -307,7 +305,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should not throw warnings on HasSpecificTermEqualTo when term number ' +
       'equals the expected number of terms', () => {
-    let validHasSpecificTermEqualTo = rof.createFromBackendDict({
+    let validHasSpecificTermEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
         x: 3, y: 1
@@ -322,7 +320,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should not throw warnings on HasSpecificTermEqualTo when expected ' +
       'number of terms is set to 0', () => {
-    let validHasSpecificTermEqualTo = rof.createFromBackendDict({
+    let validHasSpecificTermEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasSpecificTermEqualTo',
       inputs: {
         x: 3, y: 1

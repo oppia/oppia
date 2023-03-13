@@ -20,7 +20,6 @@
 // QuestionObjectFactory.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { OutcomeObjectFactory } from
@@ -29,7 +28,6 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
@@ -56,10 +54,7 @@ describe('Question object factory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(),
-        new RuleObjectFactory()));
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory());
+        new OutcomeObjectFactory()));
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value(
@@ -68,7 +63,6 @@ describe('Question object factory', function() {
     $provide.value(
       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
         new ParamChangeObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
