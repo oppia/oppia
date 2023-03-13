@@ -181,7 +181,6 @@ import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
@@ -487,6 +486,9 @@ import { QuestionValidationService } from './question-validation.service';
 import { MathInteractionsService } from './math-interactions.service';
 
 interface UpgradedServicesDict {
+  // Type 'unknown' is used here because we don't know the exact type of
+  // the service. We are using 'unknown' because we want to avoid using
+  // 'any' as it is not type safe.
   [service: string]: unknown;
 }
 @Injectable({
@@ -671,7 +673,6 @@ export class UpgradedServices {
     upgradedServices['GuestCollectionProgressService'] =
       new GuestCollectionProgressService(
         upgradedServices['WindowRef']);
-    upgradedServices['HintObjectFactory'] = new HintObjectFactory();
     upgradedServices['HtmlEscaperService'] = new HtmlEscaperService(
       upgradedServices['LoggerService']);
     upgradedServices['HttpXhrBackend'] = new HttpXhrBackend(
@@ -1186,7 +1187,6 @@ export class UpgradedServices {
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
       upgradedServices['AnswerGroupObjectFactory'],
-      upgradedServices['HintObjectFactory'],
       upgradedServices['SolutionObjectFactory'],
       upgradedServices['OutcomeObjectFactory'],
       upgradedServices['SubtitledUnicodeObjectFactory']);

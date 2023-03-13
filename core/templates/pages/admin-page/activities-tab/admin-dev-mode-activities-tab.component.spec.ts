@@ -76,7 +76,7 @@ describe('Admin dev mode activities tab', () => {
     let confirmResult = true;
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       confirm: () => confirmResult
-    });
+    } as Window);
 
     mockConfirmResult = (val) => {
       confirmResult = val;
