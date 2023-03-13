@@ -165,7 +165,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(addThumbnailImageButton);
-    await this.page.waitForSelector('body:not(.modal-open)');
+    await this.page.waitForTimeout(500);
     await this.expectPublishButtonToBeDisabled();
 
     await this.type(blogTitleInput, newBlogPostTitle);
@@ -193,7 +193,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(addThumbnailImageButton);
-    await this.page.waitForSelector('body:not(.modal-open)');
+    await this.page.waitForTimeout(500);
 
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
