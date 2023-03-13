@@ -192,14 +192,18 @@ def main(args: Optional[List[str]] = None) -> None:
     else:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
-    if (lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY or
-        parsed_args.skip_build):
+    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
+        print('Building files in production mode.')
+        if not parsed_args.skip_build:
+            build.main(args=['--prod_env'])
+        else:
+            build.main(args=[])
+            common.run_ng_compilation()
+            run_webpack_compilation()
+    else:
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
-    else:
-        print('Building files in production mode.')
-        build.main(args=['--prod_env'])
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
