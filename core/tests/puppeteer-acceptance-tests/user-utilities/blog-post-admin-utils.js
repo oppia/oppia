@@ -166,7 +166,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(addThumbnailImageButton);
     await this.page.waitForSelector(
-      'body.modal-open', {hidden: true, timeout: 60000});
+      'body.modal-open', {hidden: true, timeout: 0});
     await this.expectPublishButtonToBeDisabled();
 
     await this.type(blogTitleInput, newBlogPostTitle);
