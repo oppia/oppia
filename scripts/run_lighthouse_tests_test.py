@@ -351,6 +351,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                             args=['--mode', 'performance',
                                 '--shard', '1', '--skip_build'])
 
-        self.assertIn('Building files in production mode skipping webpack build.', self.print_arr)
+        self.assertIn(
+            'Building files in production mode skipping webpack build.',self.print_arr)
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
