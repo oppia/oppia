@@ -704,7 +704,9 @@ def _save_question(
     change_list: List[question_domain.QuestionChange],
     commit_message: str
 ) -> None:
-    """Validates a question and commits it to persistent storage.
+    """Validates a question and commits it to persistent storage. If
+    successful, increments the version number of the incoming question domain
+    object by 1.
 
     Args:
         committer_id: str. The id of the user who is performing the update
@@ -743,7 +745,8 @@ def update_question(
     committer_id: str,
     question_id: str,
     change_list: List[question_domain.QuestionChange],
-    commit_message: str
+    commit_message: str,
+    version: Optional[int] = None
 ) -> None:
     """Updates a question. Commits changes.
 
@@ -756,14 +759,28 @@ def update_question(
             question.
         commit_message: str. A description of changes made to the
             question.
+        version: int. Version of the question coming from payload while
+            updating question.
 
     Raises:
         ValueError. No commit message was provided.
+        Exception. Version of the incoming question and current question
+            differs.
     """
     if not commit_message:
         raise ValueError(
             'Expected a commit message, received none.')
     updated_question = apply_change_list(question_id, change_list)
+    if (version is not None) and (version < updated_question.version):
+        raise Exception(
+            'Unexpected error: trying to update version %s of question '
+            'from version %s. Please reload the page and try again.'
+            % (version, updated_question.version))
+    if (version is not None) and (version > updated_question.version):
+        raise Exception(
+            'Trying to update version %s of question from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (version, updated_question.version))
     _save_question(
         committer_id, updated_question, change_list, commit_message)
     create_question_summary(question_id)
