@@ -2364,7 +2364,6 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -2372,7 +2371,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-    def test_guest_user_cannot_access_translation_stats(self) -> None:
+    def test_not_logged_in_user_cannot_access_translation_stats(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/translation-stats', expected_status_int=401)
@@ -2382,9 +2381,8 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
         self.logout()
 
-    def test_normal_user_cannot_access_translation_stats(self) -> None:
+    def test_unauthorized_user_cannot_access_translation_stats(self) -> None:
         self.login(self.user_email)
-
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/translation-stats', expected_status_int=401)
@@ -2394,34 +2392,13 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             'You do not have credentials to access translation stats.')
         self.logout()
 
-    def test_translation_admin_can_access_translation_stats(self) -> None:
+    def test_authorized_user_can_access_translation_stats(self) -> None:
         self.login(self.user_email)
-
+        self.add_user_role(self.username, feconf.ROLE_ID_TRANSLATION_ADMIN)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/translation-stats')
 
         self.assertEqual(response['success'], 1)
-        self.logout()
-
-    def test_admin_can_access_translation_stats(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
-
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/translation-stats')
-
-        self.assertEqual(response['success'], 1)
-        self.logout()
-
-    def test_translation_reviewer_cannot_access_translation_stats(self) -> None:
-        self.login(self.user_email)
-
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/translation-stats', expected_status_int=401)
-
-        self.assertEqual(
-            response['error'],
-            'You do not have credentials to access translation stats.')
         self.logout()
 
 
