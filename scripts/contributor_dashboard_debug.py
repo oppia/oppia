@@ -216,7 +216,7 @@ class ContributorDashboardDebugInitializer:
     def _add_review_question_rights(
         self, username: str
     ) -> None:
-        """Adds review question rights to the user with the given username."""
+        """Adds review question rights to the user."""
         params = {
             'payload': json.dumps({'username': username}),
             'csrf_token': self.csrf_token
@@ -227,8 +227,8 @@ class ContributorDashboardDebugInitializer:
 
     def _add_review_translation_rights(
         self, username: str
-    ) -> None: 
-        """Adds review translation rights to the user with the given username."""
+    ) -> None:
+        """Adds review translation rights to the user."""
         params = {
             'payload': json.dumps({'username': username, 'language_code': 'ak'}),
             'csrf_token': self.csrf_token
