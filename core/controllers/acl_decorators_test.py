@@ -37,6 +37,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import role_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_services
@@ -52,7 +53,6 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Dict, Final, List, TypedDict, Union
-from oppia.core.domain import role_services
 import webapp2
 import webtest
 
