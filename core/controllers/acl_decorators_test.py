@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import json
-from typing_extensions import Self
 
 from core import android_validation_constants
 from core import feconf
