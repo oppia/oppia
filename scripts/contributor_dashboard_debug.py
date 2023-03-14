@@ -230,7 +230,8 @@ class ContributorDashboardDebugInitializer:
     ) -> None:
         """Adds review translation rights to the user."""
         params = {
-            'payload': json.dumps({'username': username, 'language_code': 'ak'}),
+            'payload': json.dumps({
+                'username': username, 'language_code': 'ak'}),
             'csrf_token': self.csrf_token
         }
 
