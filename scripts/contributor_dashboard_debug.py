@@ -213,7 +213,9 @@ class ContributorDashboardDebugInitializer:
         self._make_request(
             'POST', '/contributionrightshandler/submit_question', params=params)
 
-    def _add_review_question_rights(self, username: str) -> None:
+    def _add_review_question_rights(
+        self, username: str
+    ) -> None:
         """Adds review question rights to the user with the given username."""
         params = {
             'payload': json.dumps({'username': username}),
@@ -223,7 +225,9 @@ class ContributorDashboardDebugInitializer:
         self._make_request(
             'POST', '/contributionrightshandler/question', params=params)
 
-    def _add_review_translation_rights(self, username: str) -> None: 
+    def _add_review_translation_rights(
+        self, username: str
+    ) -> None: 
         """Adds review translation rights to the user with the given username."""
         params = {
             'payload': json.dumps({'username': username, 'language_code': 'ak'}),
