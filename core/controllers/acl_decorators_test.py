@@ -2367,7 +2367,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.user_email, self.username)
-        
+
         self.signup(
             self.TRANSLATION_ADMIN_EMAIL, self.TRANSLATION_ADMIN_USERNAME)
         self.add_user_role(
