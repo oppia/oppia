@@ -160,7 +160,7 @@
       <button class="btn btn-danger oppia-suggestion-resolve-button"
               *ngIf="reviewable"
               [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion"
-              (click)="rejectAndReviewNext()">
+              (click)="rejectAndReviewNext(reviewMessage)">
         <i [hidden]="!resolvingSuggestion"
            class="fa fa-spinner">
         </i>
