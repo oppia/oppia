@@ -2386,7 +2386,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'You do not have credentials to access translation stats')
+            'You do not have credentials to access translation stats.')
         self.logout()
 
     def test_unauthorized_user_cannot_access_translation_stats(self) -> None:
