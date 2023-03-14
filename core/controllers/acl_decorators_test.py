@@ -52,6 +52,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import Dict, Final, List, TypedDict, Union
+from oppia.core.domain import role_services
 import webapp2
 import webtest
 
@@ -2395,7 +2396,8 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_authorized_user_can_access_translation_stats(self) -> None:
         self.login(self.user_email)
-        self.add_user_role(self.username, feconf.ROLE_ID_TRANSLATION_ADMIN)
+        self.add_user_role(self.username, (
+            role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES))
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/translation-stats')
 
