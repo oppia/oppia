@@ -2364,6 +2364,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
