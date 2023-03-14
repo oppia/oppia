@@ -430,21 +430,26 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   rejectAndReviewNext(reviewMessage: string): void {
-    this.finalCommitMessage = this.generateCommitMessage();
-    this.resolvingSuggestion = false;
-    this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
-      'Translation');
+    if (this.validatorsService.isValidReviewMessage(reviewMessage,
+      /* ShowWarnings= */ true)) {
+      this.resolvingSuggestion = true;
+      this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
+        'Translation');
 
-    this.contributionAndReviewService.reviewExplorationSuggestion(
-      this.activeSuggestion.target_id, this.activeSuggestionId,
-      AppConstants.ACTION_REJECT_SUGGESTION,
-      this.reviewMessage, this.finalCommitMessage,
-      this.resolveSuggestionAndUpdateModal.bind(this),
-      (errorMessage) => {
-        this.alertsService.clearWarnings();
-        this.alertsService.addWarning(
-          'There was an error rejecting this suggestion');
-      });
+      // In case of rejection, the suggestion is not applied, so there is no
+      // commit message. Because there is no commit to make.
+      this.contributionAndReviewService.reviewExplorationSuggestion(
+        this.activeSuggestion.target_id, this.activeSuggestionId,
+        AppConstants.ACTION_REJECT_SUGGESTION,
+        reviewMessage || this.reviewMessage, null,
+        this.resolveSuggestionAndUpdateModal.bind(this),
+        (error) => {
+          this.alertsService.clearWarnings();
+          this.alertsService.addWarning(
+            'There was an error rejecting this suggestion');
+        }
+      );
+    }
   }
 
   // Returns the HTML content representing the most up-to-date exploration
