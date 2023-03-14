@@ -320,20 +320,16 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
-      // Suggestion 1's exploration_content_html matches its content_html.
-      expect(component.hasExplorationContentChanged()).toBe(false);
-      expect(component.displayExplorationContent()).toEqual(
-        suggestion1.change.content_html);
 
-      spyOn(
-        siteAnalyticsService,
-        'registerContributorDashboardRejectSuggestion');
       spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
         .and.callFake((
             targetId, suggestionId, action, reviewMessage, commitMessage,
             successCallback, errorCallback) => {
           return Promise.resolve(successCallback(suggestionId));
         });
+      spyOn(
+        siteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
       spyOn(activeModal, 'close');
 
       component.reviewMessage = 'Review message example';
@@ -344,19 +340,14 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.activeSuggestion).toEqual(suggestion2);
       expect(component.reviewable).toBe(reviewable);
       expect(component.reviewMessage).toBe('');
-      // Suggestion 2's exploration_content_html does not match its
-      // content_html.
-      expect(component.hasExplorationContentChanged()).toBe(true);
-      expect(component.displayExplorationContent()).toEqual(
-        suggestion2.exploration_content_html);
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
       expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'reject', 'Review message example',
-          'hint section of "StateName" card',
-          jasmine.any(Function), jasmine.any(Function));
+          null, jasmine.any(Function),
+          jasmine.any(Function));
 
       component.reviewMessage = 'Review message example 2';
       component.translationUpdated = false;
@@ -365,11 +356,6 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(
         siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Translation');
-      expect(contributionAndReviewService.reviewExplorationSuggestion)
-        .toHaveBeenCalledWith(
-          '2', 'suggestion_2', 'reject', 'Review message example 2',
-          'hint section of "StateName" card', jasmine.any(Function),
-          jasmine.any(Function));
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1', 'suggestion_2']);
     });
@@ -790,7 +776,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(contributionAndReviewService.reviewExplorationSuggestion)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'reject', 'Review message example',
-          'hint section of "StateName" card', jasmine.any(Function),
+          null, jasmine.any(Function),
           jasmine.any(Function));
       expect(activeModal.close).toHaveBeenCalledWith([
         'suggestion_1']);
