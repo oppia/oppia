@@ -96,6 +96,8 @@ AllowedDefaultValueTypes = Union[
     None
 ]
 
+AllowedDefaultValueTypes = Union[str, int, float, bool, None]
+CustomizationArgSpecsDict = Dict[str, Union[str, Dict[str, Any]]]
 
 class CustomizationArgSpecsDict(TypedDict):
     """Dictionary representing the CustomizationArgSpec object."""
@@ -107,34 +109,40 @@ class CustomizationArgSpecsDict(TypedDict):
     schema: Dict[str, Any]
     default_value: AllowedDefaultValueTypes
 
-
 class CustomizationArgSpec:
     """Value object for a customization arg specification."""
 
-    # Here we use type Any because the argument 'schema' can accept schema
-    # dictionaries and values in schema dictionaries can be of type str, List,
-    # Dict, nested Dict and other types too.
     def __init__(
         self,
         name: str,
         description: str,
-        schema: Dict[str, Any],
+        schema_definition: Dict[str, Any],
         default_value: AllowedDefaultValueTypes
     ) -> None:
+        """
+        Initializes the CustomizationArgSpec object.
+
+        Args:
+            name (str): The name of the customization argument.
+            description (str): A brief description of the customization argument.
+            schema_definition (Dict[str, Any]): The schema definition of the customization argument.
+            default_value (Union[str, int, float, bool, None]): The default value of the customization argument.
+        """
         self.name = name
         self.description = description
-        self.schema = schema
+        self.schema_definition = schema_definition
         self.default_value = default_value
 
     def to_dict(self) -> CustomizationArgSpecsDict:
-        """Returns a dict representing this CustomizationArgSpec domain object.
+        """
+        Returns a dictionary representation of the CustomizationArgSpec object.
 
         Returns:
-            dict. A dict, mapping all fields of CustomizationArgSpec instance.
+            Dict[str, Union[str, Dict[str, Any]]]: A dictionary containing all the fields of the CustomizationArgSpec object.
         """
         return {
             'name': self.name,
             'description': self.description,
-            'schema': self.schema,
+            'schema_definition': self.schema_definition,
             'default_value': self.default_value
         }
