@@ -37,7 +37,6 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_services
@@ -2372,6 +2371,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/translation-stats', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        self.add_user_role(self.username, feconf.ROLE_ID_TRANSLATION_ADMIN)
 
     def test_not_logged_in_user_cannot_access_translation_stats(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2396,8 +2396,6 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_authorized_user_can_access_translation_stats(self) -> None:
         self.login(self.user_email)
-        self.add_user_role(self.username, (
-            role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES))
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/translation-stats')
 
