@@ -3049,13 +3049,13 @@ title: Title
 
         Args:
             url: str. The url of where to put the object.
-            payload: dict. The dictionary to be sent over to the handler
+            payload: dict. The dictionary to be sent over to the handler.
             csrf_token: str. The csrf token to use.
             expected_status_int: int. The integer status code to expect. Will be
-            200 if not specified.
+                200 if not specified.
 
         Returns:
-            response: dict. A json dict response from the server.
+            dict. A json dict response from the server.
         """
         params = {'payload': json.dumps(payload)}
         if csrf_token:

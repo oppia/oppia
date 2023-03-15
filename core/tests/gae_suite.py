@@ -60,14 +60,13 @@ def create_test_suites(
 
     Args:
         test_target: str. The name of the test script.
-        Default to None if not specified.
+            Default to None if not specified.
 
     Returns:
-        master_test_suite: list. A list of tests within the test script.
+        list. A list of tests within the test script.
 
     Raises:
         Exception. The delimeter in the test_target should be a dot (.)
-
     """
 
     if test_target and '/' in test_target:
@@ -90,11 +89,7 @@ def main(args: Optional[List[str]] = None) -> None:
     """Runs the tests.
 
     Args:
-        args: list(str).
-        Defaults to None.
-
-    Returns:
-        None.
+        args: list. A list of.
 
     Raises:
         Exception. Directory invalid_path does not exist.
