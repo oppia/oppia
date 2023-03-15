@@ -2379,7 +2379,6 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_not_logged_in_user_cannot_access_translation_stats(self) -> None:
-        self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/translation-stats', expected_status_int=401)
