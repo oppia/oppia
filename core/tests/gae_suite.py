@@ -56,18 +56,19 @@ _PARSER.add_argument(
 def create_test_suites(
     test_target: Optional[str] = None
 ) -> List[unittest.TestSuite]:
-        """Creates test suites. If test_dir is None, runs all tests.
+    """Creates test suites. If test_target is None, runs all tests.
 
-        Args:
-            test_target: str. The name of the test script.
-            Defaults to None
+    Args:
+        test_target: str. The name of the test script.
+        Default to None if not specified.
 
-        Returns:
-            master_test_suite: list. A list of tests within the test script
+    Returns:
+        master_test_suite: list. A list of tests within the test script.
 
-        Raises:
-            Exception. The delimiter in test_target should be a dot (.)
-        """
+    Raises:
+        Exception. The delimeter in the test_target should be a dot (.)
+
+    """
 
     if test_target and '/' in test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
