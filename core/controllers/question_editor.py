@@ -17,7 +17,7 @@ and are created.
 """
 
 from __future__ import annotations
-
+import json
 import logging
 
 from core import feconf
@@ -124,10 +124,11 @@ class QuestionCreationHandler(
         image_validation_error_message_suffix = (
             'Please go to the question editor for question with id %s and edit '
             'the image.' % question.id)
+        filenames = json.loads(self.request.get('filenames'))
 
-        try:
-            filename = self.request.get('filename')
-            image = self.request.get('image')
+        for filename in filenames:
+            index = filenames.index(filename)
+            image = self.request.get(f'image{index}')
             if not image:
                 logging.exception(
                     'Image not provided for file with name %s when the question'
@@ -148,8 +149,6 @@ class QuestionCreationHandler(
             fs_services.save_original_and_compressed_versions_of_image(
                 filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
                 'image', image_is_compressible)
-        except Exception:
-            pass
 
         self.values.update({
             'question_id': question.id

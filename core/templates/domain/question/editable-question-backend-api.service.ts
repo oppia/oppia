@@ -87,8 +87,10 @@ export class EditableQuestionBackendApiService {
       body.append('payload', JSON.stringify(postData));
       let filenames = imagesData.map(obj => obj.filename);
       let imageBlobs = imagesData.map(obj => obj.imageBlob);
-      body.append('filename', filenames[0]);
-      body.append('image', imageBlobs[0]);
+      body.append('filenames', JSON.stringify(filenames));
+      for (let idx in imageBlobs) {
+        body.append(`image${idx}`, imageBlobs[idx]);
+      }
       this.http.post<CreateQuestionResponseBackendDict>(
         QuestionDomainConstants.QUESTION_CREATION_URL, body).toPromise()
         .then(response => {
