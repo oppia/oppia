@@ -212,7 +212,10 @@ class SkillOpportunityModel(base_models.BaseModel):
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_skill_opportunities(
-        cls, page_size: int, urlsafe_start_cursor: Optional[str]
+        cls,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+        topic_name: Optional[str]
     ) -> Tuple[Sequence[SkillOpportunityModel], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
@@ -222,6 +225,9 @@ class SkillOpportunityModel(base_models.BaseModel):
                 returned entities starts from this datastore cursor.
                 Otherwise, the returned entities start from the beginning
                 of the full list of entities.
+            topic_name: str or None. The topic for which skill opportunities
+                should be fetched. If the topic name is None, fetch skill
+                opportunities from all topics.
 
         Returns:
             3-tuple of (results, cursor, more). As described in fetch_page() at:
@@ -240,6 +246,11 @@ class SkillOpportunityModel(base_models.BaseModel):
             urlsafe_cursor=urlsafe_start_cursor)
 
         created_on_query = cls.get_all().order(cls.created_on)
+
+        if topic_name:
+            # If the topic name is provided, filter the query by topic name.
+            created_on_query = created_on_query.filter(cls.topic == topic_name)
+
         fetch_result: Tuple[
             Sequence[SkillOpportunityModel], datastore_services.Cursor, bool
         ] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
@@ -250,6 +261,7 @@ class SkillOpportunityModel(base_models.BaseModel):
             page_size + 1, start_cursor=start_cursor)
         plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
+
         # The urlsafe returns bytes and we need to decode them to string.
         return (
             query_models,
