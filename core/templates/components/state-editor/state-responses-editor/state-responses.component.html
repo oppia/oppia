@@ -38,7 +38,7 @@
                   ⚠
                 </div>
               </div>
-              <a (click)="changeActiveAnswerGroupIndex(index)" class="oppia-rule-tab e2e-test-response-tab" [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}">
+              <a tabindex="0" (keydown.enter)="changeActiveAnswerGroupIndex(answerGroups.length)" (click)="changeActiveAnswerGroupIndex(index)" class="oppia-rule-tab e2e-test-response-tab" [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}">
                 <oppia-response-header [index]="index"
                                        [summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
                                        [shortSummary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"

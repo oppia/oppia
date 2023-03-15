@@ -27,6 +27,8 @@
         <ng-template ngbNavContent>
           <div>
             <div *ngFor="let interactionId of category.interaction_ids"
+                 tabindex="0"
+                 (keydown.enter)="onChangeInteractionId(interactionId)"
                  (click)="onChangeInteractionId(interactionId)"
                  class="oppia-interaction-tile e2e-test-interaction-tile-{{ interactionId }}"
                  [ngbPopover]="getDescription(interactionId)"
