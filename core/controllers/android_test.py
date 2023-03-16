@@ -22,6 +22,7 @@ from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import topic_fetchers
 from core.platform import models
 from core.tests import test_utils
 
@@ -42,11 +43,15 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
     def test_initialize_in_production_raises_exception(self) -> None:
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception, 'Cannot load new structures data in production.')
+            Exception, 'Cannot load new structures data in production.'
+        )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
-                '/initialize_android_test_data', {}, use_payload=False,
-                csrf_token=None)
+                '/initialize_android_test_data',
+                {},
+                use_payload=False,
+                csrf_token=None
+            )
 
     def test_initialize_in_develop_passes(self) -> None:
         self.assertEqual(
@@ -59,6 +64,29 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
             ['generated_topic_id']
         )
 
+    def test_initialize_twice_regenerates_the_topic(self) -> None:
+        response_1 = self.post_json(
+            '/initialize_android_test_data',
+            {},
+            use_payload=False,
+            csrf_token=None
+        )
+        response_2 = self.post_json(
+            '/initialize_android_test_data',
+            {},
+            use_payload=False,
+            csrf_token=None,
+        )
+        self.assertNotEqual(
+            response_1['generated_topic_id'], response_2['generated_topic_id']
+        )
+        self.assertIsNone(topic_fetchers.get_topic_by_id(
+            response_1['generated_topic_id'], strict=False
+        ))
+        self.assertIsNotNone(topic_fetchers.get_topic_by_id(
+            response_2['generated_topic_id'], strict=False
+        ))
+
 
 class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     """Tests for the AndroidActivityHandler."""
@@ -70,7 +98,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_with_wrong_api_key_returns_error(self) -> None:
         secrets_swap = self.swap_to_always_return(
-            secrets_services, 'get_secret', 'not_key')
+            secrets_services, 'get_secret', 'not_key'
+        )
         with secrets_swap:
             self.get_json(
                 '/android_data?activity_type=story&'

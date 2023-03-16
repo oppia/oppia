@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import contextlib
-import json
 import logging
 import os
 import re
@@ -144,13 +143,12 @@ def managed_process(
 @contextlib.contextmanager
 def managed_dev_appserver(
     app_yaml_path: str,
-    additional_env: Optional[Dict[str, str]] = None,
+    env: Optional[Dict[str, str]] = None,
     log_level: str = 'info',
     host: str = '0.0.0.0',
     port: int = 8080,
     admin_host: str = '0.0.0.0',
     admin_port: int = 8000,
-    secrets: Optional[Dict[str, str]] = None,
     enable_host_checking: bool = True,
     automatic_restart: bool = False,
     skip_sdk_update_check: bool = False
@@ -160,7 +158,7 @@ def managed_dev_appserver(
     Args:
         app_yaml_path: str. Path to the app.yaml file which defines the
             structure of the server.
-        additional_env: dict(str: str) or None. Defines additional environment
+        env: dict(str: str) or None. Defines additional environment
             variables for the new process. These will be combined with the
             current process's environment variables to be consistent with
             default Python subprocess management behaviors.
@@ -171,8 +169,6 @@ def managed_dev_appserver(
         port: int. The lowest port to which application modules should bind.
         admin_host: str. The host name to which the admin server should bind.
         admin_port: int. The port to which the admin server should bind.
-        secrets: dict(). The dictionary of secrets to be available in the dev
-            server.
         enable_host_checking: bool. Whether to enforce HTTP Host checking for
             application modules, API server, and admin server. Host checking
             protects against DNS rebinding attacks, so only disable after
@@ -199,8 +195,6 @@ def managed_dev_appserver(
         '--dev_appserver_log_level', log_level,
         app_yaml_path
     ]
-    additional_env = {} if additional_env is None else additional_env
-    additional_env['SECRETS'] = json.dumps(secrets)
     with contextlib.ExitStack() as stack:
         # OK to use shell=True here because we are not passing anything that
         # came from an untrusted user, only other callers of the script,
@@ -209,7 +203,7 @@ def managed_dev_appserver(
             dev_appserver_args,
             human_readable_name='GAE Development Server',
             shell=True,
-            env={**os.environ, **additional_env}
+            env=env,
         ))
         common.wait_for_port_to_be_in_use(port)
         yield proc

@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import argparse
 import contextlib
-import json
 import time
 from typing import Iterator, Optional, Sequence
 
@@ -88,7 +87,6 @@ _PARSER.add_argument(
     help='optional; if specified, populate sample data that can be used to help'
          'develop for the contributor dashboard.',
     action='store_true')
-_PARSER.add_argument('--secrets', help='optional; specify secrets to be set')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
@@ -193,10 +191,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 watch_mode=True))
 
         app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
-        secrets = parsed_args.secrets
         dev_appserver = stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
-            secrets=None if secrets is None else json.loads(secrets),
             enable_host_checking=not parsed_args.disable_host_checking,
             automatic_restart=not parsed_args.no_auto_restart,
             skip_sdk_update_check=True,
