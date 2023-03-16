@@ -19,14 +19,14 @@
 require('services/external-rte-save.service.ts');
 
 angular.module('oppia').controller('RteHelperModalController', [
-  '$q', '$scope', '$window', '$timeout', '$uibModalInstance', 'AlertsService',
+  '$q', '$scope', '$timeout', '$uibModalInstance', 'AlertsService',
   'AssetsBackendApiService', 'ContextService',
   'ExternalRteSaveService', 'FocusManagerService',
   'ImageLocalStorageService', 'ImageUploadHelperService',
   'attrsCustomizationArgsDict', 'customizationArgSpecs',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'ENTITY_TYPE',
   function(
-      $q, $scope, $window, $timeout, $uibModalInstance, AlertsService,
+      $q, $scope, $timeout, $uibModalInstance, AlertsService,
       AssetsBackendApiService, ContextService,
       ExternalRteSaveService, FocusManagerService,
       ImageLocalStorageService, ImageUploadHelperService,
@@ -56,11 +56,7 @@ angular.module('oppia').controller('RteHelperModalController', [
     $scope.currentRteIsMathExpressionEditor = false;
     $scope.currentRteIsLinkEditor = false;
     $scope.tmpCustomizationArgs = [];
-    $scope.isSchemaValid = [];
-    $scope.isSaveEnabled = false;
     for (var i = 0; i < customizationArgSpecs.length; i++) {
-      $scope.isSchemaValid.push(
-        customizationArgSpecs[i].schema.validators ? false : true);
       var caName = customizationArgSpecs[i].name;
       if (caName === 'math_content') {
         $scope.currentRteIsMathExpressionEditor = true;
@@ -136,20 +132,6 @@ angular.module('oppia').controller('RteHelperModalController', [
     $scope.delete = function() {
       $uibModalInstance.dismiss(true);
     };
-
-    $window.addEventListener(
-      'inputValidityChange', function(event: CustomEvent) {
-        let schema = event.detail.schema;
-        let index = $scope.customizationArgSpecs.findIndex(
-          spec => spec.schema === schema);
-        $scope.isSchemaValid[index] = event.detail.inputValid;
-        $scope.isSaveEnabled = true;
-        for (var i = 0; i < $scope.isSchemaValid.length; i++) {
-          $scope.isSaveEnabled =
-            $scope.isSaveEnabled && $scope.isSchemaValid[i];
-        }
-        $scope.$digest();
-      });
 
     $scope.disableSaveButtonForMathRte = function() {
       // This method disables the save button when the Math SVG has not yet

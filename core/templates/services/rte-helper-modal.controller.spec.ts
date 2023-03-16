@@ -24,7 +24,6 @@ describe('Rte Helper Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var $timeout = null;
-  var $window = null;
 
   var mockExternalRteSaveEventEmitter = null;
 
@@ -34,12 +33,10 @@ describe('Rte Helper Modal Controller', function() {
     var ContextService = null;
     var customizationArgSpecs = [{
       name: 'heading',
-      default_value: 'default value',
-      schema: {}
+      default_value: 'default value'
     }, {
       name: 'video_id',
-      default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
-      schema: {}
+      default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU'
     }];
 
     beforeEach(angular.mock.module('oppia'));
@@ -103,8 +100,7 @@ describe('Rte Helper Modal Controller', function() {
       default_value: {
         raw_latex: '',
         svg_filename: ''
-      },
-      schema: {}
+      }
     }];
     var $q = null;
     var AssetsBackendApiService = null;
@@ -320,12 +316,10 @@ describe('Rte Helper Modal Controller', function() {
     var ContextService = null;
     const customizationArgSpecs = [{
       name: 'url',
-      default_value: 'google.com',
-      schema: {}
+      default_value: 'google.com'
     }, {
       name: 'text',
-      default_value: '',
-      schema: {}
+      default_value: ''
     }];
 
     beforeEach(angular.mock.module('oppia'));
@@ -434,12 +428,10 @@ describe('Rte Helper Modal Controller', function() {
       var ContextService = null;
       var customizationArgSpecs = [{
         name: 'heading',
-        default_value: '',
-        schema: {}
+        default_value: ''
       }, {
         name: 'video_id',
-        default_value: 'https://www.youtube.com',
-        schema: {}
+        default_value: 'https://www.youtube.com'
       }];
 
       beforeEach(angular.mock.module('oppia'));
@@ -497,81 +489,16 @@ describe('Rte Helper Modal Controller', function() {
       });
     });
 
-  describe('when editor has validator specs', function() {
-    var customizationArgSpecs = [{
-      schema: {
-        validators: [{
-          id: ''
-        }]
-      }
-    }];
-
-    beforeEach(angular.mock.module('oppia'));
-
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      mockExternalRteSaveEventEmitter = new EventEmitter();
-      $provide.value('ExternalRteSaveService', {
-        onExternalRteSave: mockExternalRteSaveEventEmitter
-      });
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      $timeout = $injector.get('$timeout');
-      var $rootScope = $injector.get('$rootScope');
-
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
-
-      $scope = $rootScope.$new();
-      $window = $injector.get('$window');
-      $controller(
-        'RteHelperModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance,
-          attrsCustomizationArgsDict: {
-          },
-          customizationArgSpecs: customizationArgSpecs,
-        });
-    }));
-
-    it('should check for input validity', ()=>{
-      $scope.customizationArgSpecs = [{
-        schema: {
-          validators: [{
-            id: ''
-          }]
-        }
-      }];
-      $scope.isSaveEnabled = false;
-      $scope.isSchemaValid.push(true);
-
-      let data = {schema: $scope.customizationArgSpecs[0].schema,
-        inputValid: false};
-      let customEvent = new CustomEvent('inputValidityChange', {detail: data});
-      $window.dispatchEvent(customEvent);
-      expect($scope.isSaveEnabled).toBeFalse();
-
-      data = {schema: $scope.customizationArgSpecs[0].schema,
-        inputValid: true};
-      customEvent = new CustomEvent('inputValidityChange', {detail: data});
-      $window.dispatchEvent(customEvent);
-      expect($scope.isSaveEnabled).toBeTrue();
-    });
-  });
-
   describe('when cancel is clicked with default customization args', () => {
     var customizationArgSpecs = [{
       name: 'filepath',
-      default_value: '',
-      schema: {}
+      default_value: ''
     }, {
       name: 'caption',
-      default_value: '',
-      schema: {}
+      default_value: ''
     }, {
       name: 'alt',
-      default_value: '',
-      schema: {}
+      default_value: ''
     }];
 
     beforeEach(angular.mock.module('oppia'));
@@ -617,16 +544,13 @@ describe('Rte Helper Modal Controller', function() {
   describe('when delete is clicked', () => {
     var customizationArgSpecs = [{
       name: 'filepath',
-      default_value: '',
-      schema: {}
+      default_value: ''
     }, {
       name: 'caption',
-      default_value: '',
-      schema: {}
+      default_value: ''
     }, {
       name: 'alt',
-      default_value: '',
-      schema: {}
+      default_value: ''
     }];
 
     beforeEach(angular.mock.module('oppia'));

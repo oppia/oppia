@@ -104,12 +104,4 @@ describe('Schema based editor component', function() {
     expect(component.localValue).toEqual(10);
     expect(form.$setValidity).toHaveBeenCalledTimes(2);
   }));
-
-  it('should pass validity boolean to the parent component', () => {
-    spyOn(window, 'dispatchEvent');
-    component.isInputValid(true);
-    let eventData = {schema: component.schema, inputValid: true};
-    expect(window.dispatchEvent).toHaveBeenCalledWith(
-      new CustomEvent('inputValidityChange', { detail: eventData }));
-  });
 });

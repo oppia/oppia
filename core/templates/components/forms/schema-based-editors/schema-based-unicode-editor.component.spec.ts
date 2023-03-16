@@ -72,6 +72,7 @@ describe('Schema Based Unicode Editor', () => {
       coding_mode: 'python',
     };
     component.disabled = true;
+    component.validators = [];
 
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
   });
@@ -134,7 +135,7 @@ describe('Schema Based Unicode Editor', () => {
     }));
 
   it('should get empty object on validating', () => {
-    expect(component.validate(new FormControl(1))).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual(null);
   });
 
   it('should write value', () => {
@@ -183,7 +184,7 @@ describe('Schema Based Unicode Editor', () => {
       keyCode: 13
     });
 
-    component.onKeypress(evt, true);
+    component.onKeypress(evt);
 
     expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
       .toHaveBeenCalled();

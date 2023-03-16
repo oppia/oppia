@@ -63,12 +63,6 @@ implements AfterViewInit, ControlValueAccessor, Validator {
     this.localValueChange.emit(val);
   }
 
-  isInputValid(event: boolean): void {
-    let eventData = {schema: this.schema, inputValid: event};
-    const evt = new CustomEvent('inputValidityChange', {detail: eventData});
-    window.dispatchEvent(evt);
-  }
-
   @Output() localValueChange = new EventEmitter();
   constructor(private elementRef: ElementRef) { }
 
