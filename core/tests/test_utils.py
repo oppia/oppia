@@ -36,6 +36,7 @@ import string
 from types import TracebackType
 import unittest
 
+from scripts import build
 from core import feconf
 from core import schema_utils
 from core import utils
@@ -2320,6 +2321,11 @@ title: Title
 
     def setUp(self) -> None:
         super().setUp()
+        def mock_set_constants():
+            """Mock build.set_constants_to_default method and not change constants.
+            """
+            raise Exception("Do not change constants in the test.")
+        self.swap(build, 'set_constants_to_default', mock_set_constants)
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
 
