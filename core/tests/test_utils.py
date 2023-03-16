@@ -36,7 +36,6 @@ import string
 from types import TracebackType
 import unittest
 
-from scripts import build
 from core import feconf
 from core import schema_utils
 from core import utils
@@ -75,6 +74,7 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
+from scripts import build
 
 import elasticsearch
 import requests_mock
