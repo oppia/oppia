@@ -17,7 +17,6 @@
 """Tests for core.storage.opportunity.gae_models."""
 
 from __future__ import annotations
-from unittest import result
 
 from core.platform import models
 from core.tests import test_utils
