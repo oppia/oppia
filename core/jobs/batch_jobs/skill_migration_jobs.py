@@ -246,10 +246,7 @@ class MigrateSkillModels(beam.PTransform):# type: ignore[misc]
             skill_objects_list_job_run_results
         ) | 'Flatten job run results' >> beam.Flatten()
 
-        return (
-            transformed_skill_objects_list,
-            job_run_results
-        )
+        return transformed_skill_objects_list, job_run_results
 
 
 class MigrateSkillJob(base_jobs.JobBase):
@@ -335,7 +332,8 @@ class MigrateSkillJob(base_jobs.JobBase):
         transformed_skill_objects_list, job_run_results = (
             self.pipeline
             | 'Perform migration and filter migration results' >> (
-                MigrateSkillModels())
+                MigrateSkillModels()
+            )
         )
 
         skill_models_to_put = (
@@ -381,7 +379,8 @@ class AuditSkillMigrationJob(base_jobs.JobBase):
         unused_transformed_skill_objects_list, job_run_results = (
             self.pipeline
             | 'Perform migration and filter migration results' >> (
-                MigrateSkillModels())
+                MigrateSkillModels()
+            )
         )
 
         return job_run_results

@@ -248,10 +248,7 @@ class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
             story_objects_list_job_run_results
         ) | 'Flatten job run results' >> beam.Flatten()
 
-        return (
-            transformed_story_objects_list,
-            job_run_results
-        )
+        return transformed_story_objects_list, job_run_results
 
 
 # TODO(#15927): This job needs to be kept in sync with AuditStoryMigrationJob
@@ -330,7 +327,8 @@ class MigrateStoryJob(base_jobs.JobBase):
         transformed_story_objects_list, job_run_results = (
             self.pipeline
             | 'Perform migration and filter migration results' >> (
-                MigrateStoryModels())
+                MigrateStoryModels()
+            )
         )
 
         story_models_to_put = (
@@ -376,7 +374,8 @@ class AuditStoryMigrationJob(base_jobs.JobBase):
         unused_transformed_story_objects_list, job_run_results = (
             self.pipeline
             | 'Perform migration and filter migration results' >> (
-                MigrateStoryModels())
+                MigrateStoryModels()
+            )
         )
 
         return job_run_results
