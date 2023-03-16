@@ -19,7 +19,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { Subscription } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
@@ -100,7 +99,6 @@ export class ProgressNavComponent {
     'ItemSelectionInput', 'MultipleChoiceInput'];
 
   constructor(
-    private browserCheckerService: BrowserCheckerService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,

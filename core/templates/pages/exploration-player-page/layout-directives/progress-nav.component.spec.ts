@@ -20,7 +20,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -68,7 +67,6 @@ describe('Progress nav component', () => {
         MockTranslatePipe
       ],
       providers: [
-        BrowserCheckerService,
         ExplorationEngineService,
         ExplorationPlayerStateService,
         FocusManagerService,
@@ -87,7 +85,6 @@ describe('Progress nav component', () => {
     componentInstance = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    browserCheckerService = TestBed.inject(BrowserCheckerService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     focusManagerService = TestBed.inject(FocusManagerService);
