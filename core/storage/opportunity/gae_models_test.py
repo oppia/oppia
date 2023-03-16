@@ -298,11 +298,11 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     def test_get_skill_opportunities_by_topic(self) -> None:
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
-                5, None, 'a_topic name' ))
-         # Ruling out the possibility of None for mypy type checking.
+                5, None, 'a_topic name'))
+        # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
-        self.assertEqual(result[0].id, 'opportunity_id1')
+        self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
 
