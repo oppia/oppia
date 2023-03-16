@@ -17,6 +17,7 @@
 """Tests for core.storage.opportunity.gae_models."""
 
 from __future__ import annotations
+from unittest import result
 
 from core.platform import models
 from core.tests import test_utils
@@ -248,11 +249,13 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
             id='opportunity_id1',
             skill_description='A skill description',
             question_count=20,
+            topic_name='a_topic name'
         ).put()
         opportunity_models.SkillOpportunityModel(
             id='opportunity_id2',
             skill_description='A skill description',
             question_count=30,
+            topic_name='b_topic name'
         ).put()
 
     def test_get_deletion_policy(self) -> None:
@@ -286,9 +289,20 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
                 .get_skill_opportunities(5, None, None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
-        self.assertEqual(len(results), 2)
+        self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
+        self.assertFalse(more)
+        self.assertTrue(isinstance(cursor, str))
+
+    def test_get_skill_opportunities_by_topic(self) -> None:
+        results, cursor, more = (
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                5, None, 'a_topic name' ))
+         # Ruling out the possibility of None for mypy type checking.
+        assert results is not None
+        self.assertEqual(len(results), 1)
+        self.assertEqual(result[0].id, 'opportunity_id1')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
 
