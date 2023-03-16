@@ -2321,7 +2321,7 @@ title: Title
 
     def setUp(self) -> None:
         super().setUp()
-        def mock_set_constants():
+        def mock_set_constants() -> None:
             """Mock build.set_constants_to_default method."""
             raise Exception('Do not change constants in the test.')
         self.swap(build, 'set_constants_to_default', mock_set_constants)
