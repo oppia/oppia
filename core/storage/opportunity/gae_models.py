@@ -242,7 +242,8 @@ class SkillOpportunityModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        topic_name = datastore_services.StringProperty(required=True, indexed=True)
+        topic_name = datastore_services.StringProperty(
+            required=True, indexed=True)
 
         start_cursor = datastore_services.make_cursor(
             urlsafe_cursor=urlsafe_start_cursor)
