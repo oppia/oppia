@@ -70,7 +70,7 @@
       <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
               *ngIf="reviewable"
               [disabled]="reviewMessage.length == 0"
-              (click)="reject()">Reject
+              (click)="reject(reviewMessage)">Reject
       </button>
     </div>
     <div tooltip-placement="bottom">
