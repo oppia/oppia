@@ -939,6 +939,51 @@ def can_access_release_coordinator_page(
     return test_can_access_release_coordinator_page
 
 
+def can_access_translation_stats(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether user can access translation stats.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access translation stats.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_translation_stats(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user can access translation stats.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access translation stats.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
+            self.user.actions):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access translation stats.')
+
+    return test_can_access_translation_stats
+
+
 def can_manage_memcache(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
