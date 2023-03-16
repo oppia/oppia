@@ -194,7 +194,7 @@ def main(args: Optional[List[str]] = None) -> None:
         server_mode = SERVER_MODE_PROD
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         if not parsed_args.skip_build:
-            # Also build webpack.
+            # Builds webpack.
             print('Building files in production mode.')
             build.main(args=['--prod_env'])
         else:
