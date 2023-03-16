@@ -249,7 +249,8 @@ class SkillOpportunityModel(base_models.BaseModel):
 
         if topic_name:
             # If the topic name is provided, filter the query by topic name.
-            created_on_query = created_on_query.filter(cls.topic_name == topic_name)
+            created_on_query = created_on_query.filter(
+                cls.topic_name == topic_name)
 
         fetch_result: Tuple[
             Sequence[SkillOpportunityModel], datastore_services.Cursor, bool
