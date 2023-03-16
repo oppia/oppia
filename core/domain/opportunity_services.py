@@ -737,7 +737,7 @@ def get_skill_opportunity_from_model(
 
 def get_skill_opportunities(
     cursor: Optional[str],
-    topic_name: Optional[str]
+    topic_name: Optional[str] = None
 ) -> Tuple[
     List[opportunity_domain.SkillOpportunity], Optional[str], bool
 ]:
@@ -764,7 +764,8 @@ def get_skill_opportunities(
     """
     skill_opportunity_models, cursor, more = (
         opportunity_models.SkillOpportunityModel
-        .get_skill_opportunities(constants.OPPORTUNITIES_PAGE_SIZE, cursor, topic_name))
+        .get_skill_opportunities(
+            constants.OPPORTUNITIES_PAGE_SIZE, cursor, topic_name))
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
         skill_opportunity = (
