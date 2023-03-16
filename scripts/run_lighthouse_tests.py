@@ -194,9 +194,11 @@ def main(args: Optional[List[str]] = None) -> None:
         server_mode = SERVER_MODE_PROD
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         if not parsed_args.skip_build:
+            # Also build webpack.
             print('Building files in production mode.')
             build.main(args=['--prod_env'])
         else:
+            # Skip webpack build if skip_build flag is passed.
             print('Building files in production mode skipping webpack build.')
             build.main(args=[])
             common.run_ng_compilation()
