@@ -277,6 +277,43 @@ class ContributionOpportunitiesHandler(
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
         return opportunity_dicts, next_cursor, more
 
+    def _get_question_opportunity_dicts(
+        self,
+        topic_name: Optional[str],
+        search_cursor: Optional[str]
+    ) -> Tuple[
+        List[opportunity_domain.SkillOpportunityDict],
+        Optional[str],
+        bool
+    ]:
+        """Returns a list of question opportunity dicts
+
+        Args:
+            topic_name: str or None. The topic for which the skill opportunities
+                should be fetched. If topic_name is empty or none, fetch skill
+                opportunities from all topic.
+            search_cursor: str or None. If provided, the list of returned
+                entities starts from this datastore cursor. Otherwise, the
+                returned entities start from the beginning of the full list of
+                entities.
+
+        Returns:
+            3-tuple(opportunities, cursor, more). where:
+            opportunities: list(dict). A list of SkillOpportunityDict
+                dicts.
+            cursor: str or None. A query cursor pointing to the next batch of
+                results. If there are no more results, this might be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
+        """
+        opportunities, next_cursor, more = (
+            opportunity_services.get_skill_opportunities(
+                search_cursor, topic_name
+            )
+        )
+        opportunity_dicts = [opp.to_dict() for opp in opportunities]
+        return opportunity_dicts, next_cursor, more
+
 
 class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of ReviewableOpportunitiesHandler's
