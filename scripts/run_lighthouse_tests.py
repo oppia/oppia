@@ -204,6 +204,7 @@ def main(args: Optional[List[str]] = None) -> None:
             common.run_ng_compilation()
             run_webpack_compilation()
     else:
+        # Accessibility mode skip webpack build
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
