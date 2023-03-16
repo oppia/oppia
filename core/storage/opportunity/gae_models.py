@@ -188,6 +188,8 @@ class SkillOpportunityModel(base_models.BaseModel):
     # The number of questions associated with this opportunity's skill.
     question_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
+    topic_name = datastore_services.StringProperty(
+            required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -242,8 +244,6 @@ class SkillOpportunityModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        topic_name = datastore_services.StringProperty(
-            required=True, indexed=True)
 
         start_cursor = datastore_services.make_cursor(
             urlsafe_cursor=urlsafe_start_cursor)
