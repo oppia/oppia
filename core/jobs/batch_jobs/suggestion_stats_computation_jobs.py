@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+import time
 
 from core import feconf
 from core.domain import exp_domain
@@ -65,212 +66,6 @@ class TranslationStatsDict(TypedDict):
     last_updated_date: datetime.date
 
 
-class GenerateTranslationContributionStats1Job(base_jobs.JobBase):
-    """Job that indexes the explorations in Elastic Search."""
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Generates the translation contributins stats.
-
-        Returns:
-            PCollection. A PCollection of 'SUCCESS x' results, where x is
-            the number of generated stats..
-        """
-        suggestions_grouped_by_target = (
-            self.pipeline
-            | 'Get all non-deleted suggestion models' >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False))
-            | 'Filter translate suggestions' >> beam.Filter(
-                lambda m: (
-                    m.suggestion_type ==
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                ))
-            | 'Transform to suggestion domain object' >> beam.Map(
-                suggestion_services.get_suggestion_from_model)
-            | 'Group by target' >> beam.GroupBy(lambda m: m.target_id)
-        )
-        exp_opportunities = (
-            self.pipeline
-            | 'Get all non-deleted opportunity models' >> ndb_io.GetModels(
-                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
-                    include_deleted=False))
-            | 'Transform to opportunity domain object' >> beam.Map(
-                opportunity_services.
-                get_exploration_opportunity_summary_from_model)
-            | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
-        )
-
-        user_stats_results = (
-            {
-                'suggestion': suggestions_grouped_by_target,
-                'opportunity': exp_opportunities
-            }
-            | 'Merge models' >> beam.CoGroupByKey()
-            | 'Get rid of key' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Generate stats' >> beam.ParDo(
-                lambda x: self._generate_stats(
-                    x['suggestion'][0] if len(x['suggestion']) else [],
-                    list(x['opportunity'][0])[0]
-                    if len(x['opportunity']) else None
-                ))
-        )
-
-        user_stats_models = (
-            user_stats_results
-            | 'Filter ok results' >> beam.Filter(
-                lambda key_and_result: key_and_result[1].is_ok())
-            | 'Unpack result' >> beam.MapTuple(
-                lambda key, result: (key, result.unwrap()))
-            | 'Combine the stats' >> beam.CombinePerKey(CombineStats())
-            | 'Generate models from stats' >> beam.MapTuple(
-                self._generate_translation_contribution_model)
-        )
-
-        user_stats_error_job_run_results = (
-            user_stats_results
-            | 'Filter err results' >> beam.Filter(
-                lambda key_and_result: key_and_result[1].is_err())
-            # Pylint disable is needed because pylint is not able to correctly
-            # detect that the value is passed through the pipe.
-            | 'Remove keys' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Transform result to job run result' >> (
-                job_result_transforms.ResultsToJobRunResults())
-        )
-
-        unused_put_result = (
-            user_stats_models
-            | 'Put models into the datastore' >> ndb_io.PutModels()
-        )
-
-        user_stats_models_job_run_results = (
-            user_stats_models
-            | 'Create job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
-        )
-
-        return (
-            (
-                user_stats_error_job_run_results,
-                user_stats_models_job_run_results
-            )
-            | 'Merge job run results' >> beam.Flatten()
-        )
-
-    @staticmethod
-    def _generate_stats(
-        suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
-        opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary]
-    ) -> Iterator[
-        Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
-    ]:
-        """Generates translation contribution stats for each suggestion.
-
-        Args:
-            suggestions: iter(SuggestionTranslateContent). Suggestions for which
-                the stats should be generated.
-            opportunity: ExplorationOpportunitySummary. Opportunity for which
-                were the suggestions generated. Used to extract topic ID.
-
-        Yields:
-            tuple(str, Dict(str, *)). Tuple of key and suggestion stats dict.
-            The stats dictionary has four fields:
-                suggestion_status: str. What is the status of the suggestion.
-                edited_by_reviewer: bool. Whether the suggestion was edited by
-                    the reviewer.
-                content_word_count: int. The word count of the content of
-                    the suggestion.
-                last_updated_date: str. When was the suggestion last updated.
-        """
-        # When opportunity is not available we leave the topic ID empty.
-        topic_id = ''
-        if opportunity is not None:
-            topic_id = opportunity.topic_id
-
-        for suggestion in suggestions:
-            key = (
-                suggestion_models
-                .TranslationContributionStatsModel.construct_id(
-                    suggestion.language_code, suggestion.author_id, topic_id))
-            try:
-                change = suggestion.change
-                # In the new translation command the content in set format is
-                # a list, content in unicode and html format is a string.
-                # This code normalizes the content to the list type so that
-                # we can easily count words.
-                if (
-                        change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
-                        translation_domain.TranslatableContentFormat
-                        .is_data_format_list(change.data_format)
-                ):
-                    content_items: Union[str, List[str]] = change.content_html
-                else:
-                    content_items = [change.content_html]
-
-                content_word_count = 0
-                for item in content_items:
-                    # Count the number of words in the original content,
-                    # ignoring any HTML tags and attributes.
-                    content_plain_text = html_cleaner.strip_html_tags(item)
-                    content_word_count += len(content_plain_text.split())
-
-                translation_contribution_stats_dict = {
-                    'suggestion_status': suggestion.status,
-                    'edited_by_reviewer': suggestion.edited_by_reviewer,
-                    'content_word_count': content_word_count,
-                    'last_updated_date': (
-                        suggestion.last_updated.date().isoformat())
-                }
-                yield (key, result.Ok(translation_contribution_stats_dict))
-            except Exception as e:
-                yield (
-                    key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
-                )
-
-    @staticmethod
-    def _generate_translation_contribution_model(
-        entity_id: str,
-        translation: suggestion_registry.TranslationContributionStats
-    ) -> suggestion_models.TranslationContributionStatsModel:
-        """Generate translation contribution stats model from the domain object.
-
-        Args:
-            entity_id: str. The ID of the model.
-            translation: TranslationContributionStats. Domain object.
-
-        Returns:
-            TranslationContributionStatsModel. The created model.
-        """
-        language_code, contributor_user_id, topic_id = entity_id.split('.')
-        with datastore_services.get_ndb_context():
-            translation_contributions_stats_model = (
-                suggestion_models.TranslationContributionStatsModel(
-                    id=entity_id,
-                    language_code=language_code,
-                    contributor_user_id=contributor_user_id,
-                    topic_id=topic_id,
-                    submitted_translations_count=(
-                        translation.submitted_translations_count),
-                    submitted_translation_word_count=(
-                        translation.submitted_translation_word_count),
-                    accepted_translations_count=(
-                        translation.accepted_translations_count),
-                    accepted_translations_without_reviewer_edits_count=(
-                        translation
-                        .accepted_translations_without_reviewer_edits_count
-                    ),
-                    accepted_translation_word_count=(
-                        translation.accepted_translation_word_count),
-                    rejected_translations_count=(
-                        translation.rejected_translations_count),
-                    rejected_translation_word_count=(
-                        translation.rejected_translation_word_count),
-                    contribution_dates=translation.contribution_dates
-                )
-            )
-            translation_contributions_stats_model.update_timestamps()
-            return translation_contributions_stats_model
-
-
 class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     """Job that generates contributor stats."""
 
@@ -281,36 +76,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS x' results, where x is
             the number of generated stats..
         """
-        existing_contributor_stats_models = (
-            self.pipeline
-            | 'Get all TranslationContributionStatsModels' >>
-                ndb_io.GetModels(
-                    suggestion_models.TranslationContributionStatsModel.get_all(
-                        include_deleted=False
-                    )
-                )
-        )
-        existing_reviewer_stats_models = (
-            self.pipeline
-            | 'Get all TranslationReviewStatsModels' >>
-                ndb_io.GetModels(
-                    suggestion_models.TranslationReviewStatsModel.get_all(
-                        include_deleted=False
-                    )
-                )
-        )
-
-        unused_contributor_stats_delete_result = (
-            existing_contributor_stats_models
-            | beam.Map(lambda model: model.key)
-            | 'Delete all TranslationContributionStatsModels' >> ndb_io.DeleteModels()
-        )
-        unused_reviewer_stats_delete_result = (
-            existing_reviewer_stats_models
-            | beam.Map(lambda model: model.key)
-            | 'Delete allTranslationReviewStatsModels' >> ndb_io.DeleteModels()
-        )
-
         non_deleted_suggestion_models = (
             self.pipeline
             | 'Get all non-deleted suggestion models' >> ndb_io.GetModels(
@@ -641,8 +406,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     suggestion_models
                     .TranslationContributionStatsModel.construct_id(
                         suggestion.language_code, suggestion.author_id, topic_id))
-                print('KEY OF SUB')
-                print(key)
             else:
                 key = (
                     suggestion_models
@@ -652,8 +415,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         topic_id
                     )
                 )
-                print('KEY OF REV')
-                print(key)
             try:
                 change = suggestion.change
                 # In the new translation command the content in set format is
@@ -1056,7 +817,7 @@ class CombineTranslationReviewStats(beam.CombineFn):  # type: ignore[misc]
             accumulator.reviewed_translations_count + 1,
             accumulator.reviewed_translation_word_count + word_count,
             accumulator.accepted_translations_count + int(is_accepted),
-            accumulator.accepted_translation_word_count + word_count,
+            accumulator.accepted_translation_word_count + word_count * int(is_accepted),
             (
                 accumulator.accepted_translations_with_reviewer_edits_count +
                 int(is_accepted_and_edited)
