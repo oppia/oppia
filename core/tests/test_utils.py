@@ -74,7 +74,6 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
-from scripts import build
 
 import elasticsearch
 import requests_mock
@@ -2321,10 +2320,6 @@ title: Title
 
     def setUp(self) -> None:
         super().setUp()
-        def mock_set_constants() -> None:
-            """Mock build.set_constants_to_default method."""
-            raise Exception('Do not change constants in the test.')
-        self.swap(build, 'set_constants_to_default', mock_set_constants)
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
 

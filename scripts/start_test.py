@@ -108,7 +108,7 @@ class StartTests(test_utils.GenericTestBase):
         self.swap_create_managed_web_browser = self.swap_to_always_raise(
             servers, 'create_managed_web_browser',
             Exception(MANAGED_WEB_BROWSER_ERROR))
-
+        self.swap_mock_set_constants_to_default = self.swap(build, 'set_constants_to_default', mock_print)
     def test_start_servers_successfully(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
