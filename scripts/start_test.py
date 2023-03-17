@@ -110,6 +110,7 @@ class StartTests(test_utils.GenericTestBase):
             Exception(MANAGED_WEB_BROWSER_ERROR))
         self.swap_mock_set_constants_to_default = self.swap(
             build, 'set_constants_to_default', mock_print)
+
     def test_start_servers_successfully(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
