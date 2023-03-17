@@ -727,6 +727,27 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_in_review_translation_suggestions_by_exp_id(
+        cls, exp_id: str
+    ) -> Sequence[GeneralSuggestionModel]:
+        """Gets all in-review translation suggestions matching the supplied
+        exp_id.
+
+        Args:
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions matching the supplied
+            exp_id.
+        """
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.target_id == exp_id
+        )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
     def get_in_review_translation_suggestions_by_exp_ids(
         cls, exp_ids: List[str], language_code: str
     ) -> Sequence[GeneralSuggestionModel]:

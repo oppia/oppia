@@ -5947,6 +5947,11 @@ export default {
   // Dashboard topic selector.
   "TOPIC_SENTINEL_NAME_ALL": "All",
 
+  // Review message to display for an obsolete translation suggestion with no
+  // exploration content.
+  // eslint-disable-next-line max-len
+  "OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG": "The original content was deleted and no longer needs translation. Sorry about that!",
+
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
 

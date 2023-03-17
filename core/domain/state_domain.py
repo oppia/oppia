@@ -4786,24 +4786,6 @@ class State(translation_domain.BaseTranslatableObject):
             content_id_generator.next_content_id_index
         )
 
-    def has_content_id(self, content_id: str) -> bool:
-        """Returns whether a given content ID is available in the translatable
-        content.
-
-        Args:
-            content_id: str. The content ID that needs to be checked for the
-                availability.
-
-        Returns:
-            bool. A boolean that indicates the availability of the content ID
-            in the translatable content.
-        """
-
-        available_translate_content = (
-            self.get_translatable_contents_collection()
-            .content_id_to_translatable_content)
-        return bool(content_id in available_translate_content)
-
 
 class StateVersionHistory:
     """Class to represent an element of the version history list of a state.
