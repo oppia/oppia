@@ -163,7 +163,7 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS SUCCESS: 1'
+                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
             )
         ])
 
@@ -186,10 +186,10 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS SUCCESS: 1'
+                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
             ),
             job_run_result.JobRunResult(
-                stdout='REJECTED SUGGESTIONS SUCCESS: 1'
+                stdout='REJECTED SUGGESTIONS COUNT SUCCESS: 1'
             )
         ])
 
@@ -261,10 +261,10 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS SUCCESS: 1'
+                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
             ),
             job_run_result.JobRunResult(
-                stdout='OBSOLETE SUGGESTIONS PER EXP ID SUCCESS: 1'
+                stdout='OBSOLETE SUGGESTIONS COUNT SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
                 f'Results are - {errored_value}'
@@ -300,7 +300,7 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS SUCCESS: 1'
+                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
             )
         ])
 

@@ -88,7 +88,7 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             )
             | 'Total processed suggestion count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL PROCESSED SUGGESTIONS'))
+                    'TOTAL PROCESSED SUGGESTIONS COUNT'))
         )
 
         updated_suggestions = (
@@ -105,7 +105,7 @@ class RejectTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             updated_suggestions
             | 'Rejected translation suggestion count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'REJECTED SUGGESTIONS'))
+                    'REJECTED SUGGESTIONS COUNT'))
         )
 
         unused_put_results = (
@@ -188,7 +188,7 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
             )
             | 'Total processed suggestion count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'TOTAL PROCESSED SUGGESTIONS'))
+                    'TOTAL PROCESSED SUGGESTIONS COUNT'))
         )
 
         suggestion_results = (
@@ -219,9 +219,11 @@ class AuditTranslationSuggestionsWithMissingContentIdJob(base_jobs.JobBase):
 
         obsolete_suggestions_count_job_run_results = (
             suggestion_results
+            | 'Flatten obsolete suggestions' >> (
+                beam.FlatMap(lambda report: report['obsolete_content']))
             | 'Report the obsolete suggestions count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'OBSOLETE SUGGESTIONS PER EXP ID')
+                    'OBSOLETE SUGGESTIONS COUNT')
             )
         )
 
