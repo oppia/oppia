@@ -1,9 +1,13 @@
 <div class="modal-header">
   <div class="oppia-modal-info">
-    <h3 class="oppia-modal-info-header">Review Translation Contributions</h3>
+    <h3 title="{{ heading }}"
+        class="oppia-modal-info-header">
+      {{ heading }}
+    </h3>
     <span title="{{ subheading }}"
           class="oppia-translation-modal-subheading e2e-translation-suggestion-review-subheading"
-          aria-hidden="false"> {{ subheading }}
+          aria-hidden="false">
+      {{ subheading }}
     </span>
     <span title="{{ activeContribution.details.chapter_title }}"
           class="oppia-translation-modal-subheading-lesson protractor-translation-suggestion-review-subheading"
@@ -32,12 +36,12 @@
            [ngClass]="isContentExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
            #contentContainer>
         <ul *ngIf="contentTypeIsSetOfStrings">
-          <li *ngFor="let item of displayExplorationContent(); index as idx">
+          <li *ngFor="let item of contentHtml; index as idx">
             {{ item }}
           </li>
         </ul>
         <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
-                                  [rteString]="displayExplorationContent()"
+                                  [rteString]="contentHtml"
                                   #contentPanel>
         </oppia-rte-output-display>
       </div>
@@ -110,22 +114,22 @@
     </div>
   </section>
   <section class="oppia-suggestion-review-exploration-change"
-           *ngIf="hasExplorationContentChanged()">
+           *ngIf="reviewable && hasExplorationContentChanged()">
     <p class="oppia-suggestion-review-exploration-change-note">
       <strong>
         NOTE: The content has been modified since this translation has been submitted.
         Please edit the translation as necessary.
-        The original content at the time of submission was:
+        The current content is:
       </strong>
     </p>
     <div class="oppia-suggestion-review-panel">
       <ul *ngIf="contentTypeIsSetOfStrings">
-        <li *ngFor="let item of contentHtml; index as idx">
+        <li *ngFor="let item of explorationContentHtml; index as idx">
           {{ item }}
         </li>
       </ul>
       <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
-                                [rteString]="contentHtml">
+                                [rteString]="explorationContentHtml">
       </oppia-rte-output-display>
     </div>
   </section>
@@ -205,7 +209,6 @@
   }
   .oppia-review-message {
     margin-top: 10px;
-    min-height: 100px;
     padding: 10px;
   }
   .oppia-review-buttons {
