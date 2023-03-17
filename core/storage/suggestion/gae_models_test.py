@@ -97,6 +97,30 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_5', None)
 
+    def test_get_in_review_translation_suggestions_by_exp_id(self) -> None:
+        model = suggestion_models.GeneralSuggestionModel
+        self.assertEqual(
+            model.get_in_review_translation_suggestions_by_exp_id(
+                self.target_id),
+            []
+        )
+
+        suggestion_id = 'exploration.exp1.thread_6'
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_1',
+            'reviewer_3', self.change_cmd, self.score_category,
+            suggestion_id, 'en')
+
+        created_suggestion_model = model.get_by_id(suggestion_id)
+        self.assertEqual(
+            model.get_in_review_translation_suggestions_by_exp_id(
+                self.target_id),
+            [created_suggestion_model]
+        )
+
     def test_get_all_in_review_translation_suggestions_by_exp_ids(
             self) -> None:
         model = suggestion_models.GeneralSuggestionModel

@@ -1,4 +1,4 @@
-name: End-to-End tests
+name: End-to-End and Lighthouse CI performance tests
 on:
   merge_group:
     types: [checks_requested]
@@ -188,4 +188,64 @@ jobs:
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "An E2E test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  lighthouse:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.8.15'
+          architecture: 'x64'
+      - uses: ./.github/actions/merge
+      - name: Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Download build files artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build_files
+          path: /home/runner/work/oppia/
+      - name: Unzip build files
+        run: |
+          ls -la
+          unzip build_files.zip
+          rm build_files.zip
+          echo "Files in ./:"
+          ls -la .
+          echo "Files in oppia_tools:"
+          ls -la oppia_tools
+          echo "Files in oppia:"
+          ls -la oppia
+          echo "Files in build:"
+          ls -la oppia/build
+          echo "Files in third_party:"
+          ls -la oppia/third_party
+        working-directory: /home/runner/work/oppia
+        shell: bash
+      - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install chrome
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.install_chrome_for_ci
+      - name: Run Lighthouse performance checks shard
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }} --skip_build
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
