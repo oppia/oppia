@@ -20,7 +20,7 @@ jobs:
         shard: [1, 2]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.8.15'
           architecture: 'x64'
