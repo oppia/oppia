@@ -41,7 +41,7 @@ class ItemSelectionInput(base.BaseInteraction):
     can_have_solution: bool = False
     # ItemSelectionInput's submit button is dynamic and is handled
     # separately.
-    show_generic_submit_button: bool = False
+    show_generic_submit_button: bool = True
 
     _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'minAllowableSelectionCount',
