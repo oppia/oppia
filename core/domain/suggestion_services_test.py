@@ -175,7 +175,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         def __init__(
             self, exploration_id: str, states: Dict[str, Dict[str, str]]
         ) -> None:
-            self.id = exploration_id
+            self.suggestion_id = exploration_id
             self.states = states
             self.category = 'Algebra'
 
@@ -1190,7 +1190,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         def __init__(
             self, exploration_id: str, states: Dict[str, Dict[str, str]]
         ) -> None:
-            self.id = exploration_id
+            self.suggestion_id = exploration_id
             self.states = states
             self.category = 'Algebra'
 

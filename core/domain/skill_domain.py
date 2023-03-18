@@ -456,7 +456,7 @@ class Misconception:
             must_be_addressed: bool. Whether the misconception should
                 necessarily be addressed in all questions linked to the skill.
         """
-        self.id = misconception_id
+         = misconception_id
         self.name = name
         self.notes = html_cleaner.clean(notes)
         self.feedback = html_cleaner.clean(feedback)
@@ -469,7 +469,7 @@ class Misconception:
             dict. A dict, mapping all fields of Misconception instance.
         """
         return {
-            'id': self.id,
+            'id': ,
             'name': self.name,
             'notes': self.notes,
             'feedback': self.feedback,
@@ -521,7 +521,7 @@ class Misconception:
             ValidationError. One or more attributes of the misconception are
                 invalid.
         """
-        self.require_valid_misconception_id(self.id)
+        self.require_valid_misconception_id()
         if not isinstance(self.name, str):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
@@ -935,7 +935,7 @@ class Skill:
             last_updated: datetime.datetime. Date and time when the
                 skill was last updated.
         """
-        self.id = skill_id
+         = skill_id
         self.description = description
         self.misconceptions = misconceptions
         self.skill_contents = skill_contents
@@ -1128,7 +1128,7 @@ class Skill:
             dict. A dict, mapping all fields of Skill instance.
         """
         return {
-            'id': self.id,
+            'id': ,
             'description': self.description,
             'misconceptions': [
                 misconception.to_dict()
@@ -1312,7 +1312,7 @@ class Skill:
             is the skill ID of the misconception and misconception_id is
             the id of the misconception.
         """
-        return '%s-%d' % (self.id, misconception_id)
+        return '%s-%d' % (, misconception_id)
 
     @classmethod
     def convert_html_fields_in_skill_contents(
@@ -2019,7 +2019,7 @@ class SkillSummary:
             skill_model_last_updated: datetime.datetime. Date and time
                 when the skill model was last updated.
         """
-        self.id = skill_id
+         = skill_id
         self.description = description
         self.language_code = language_code
         self.version = version
@@ -2076,7 +2076,7 @@ class SkillSummary:
             dict. A dict representing this SkillSummary object.
         """
         return {
-            'id': self.id,
+            'id': ,
             'description': self.description,
             'language_code': self.language_code,
             'version': self.version,
@@ -2143,7 +2143,7 @@ class AugmentedSkillSummary:
             skill_model_last_updated: datetime.datetime. Date and time
                 when the skill model was last updated.
         """
-        self.id = skill_id
+         = skill_id
         self.description = description
         self.language_code = language_code
         self.version = version
@@ -2161,7 +2161,7 @@ class AugmentedSkillSummary:
             dict. A dict representing this AugmentedSkillSummary object.
         """
         return {
-            'id': self.id,
+            'id': ,
             'description': self.description,
             'language_code': self.language_code,
             'version': self.version,

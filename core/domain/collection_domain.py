@@ -483,7 +483,7 @@ class Collection:
             last_updated: datetime.datetime. Date and time when the
                 collection was last updated.
         """
-        self.id = collection_id
+        self.suggestion_id = collection_id
         self.title = title
         self.category = category
         self.objective = objective
@@ -502,7 +502,7 @@ class Collection:
             dict. A dict, mapping all fields of Collection instance.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'category': self.category,
             'objective': self.objective,
@@ -1118,7 +1118,7 @@ class Collection:
         Returs:
             bool. True if the collection is a demo else False.
         """
-        return self.is_demo_collection_id(self.id)
+        return self.is_demo_collection_id(self.suggestion_id)
 
     def update_title(self, title: str) -> None:
         """Updates the title of the collection.
@@ -1435,7 +1435,7 @@ class CollectionSummary:
             collection_model_last_updated: datetime.datetime. Date and time
                 when the collection model was last updated.
         """
-        self.id = collection_id
+        self.suggestion_id = collection_id
         self.title = title
         self.category = category
         self.objective = objective
@@ -1460,7 +1460,7 @@ class CollectionSummary:
             dict. A dict, mapping all fields of CollectionSummary instance.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'category': self.category,
             'objective': self.objective,

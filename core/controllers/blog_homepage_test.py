@@ -450,18 +450,18 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
 
         self.signup(self.user_email, self.username)
 
-        self.ids_of_blog_posts_by_user_A = []
+        self.suggestion_ids_of_blog_posts_by_user_A = []
         for _ in range(2):
             blog_post = blog_services.create_new_blog_post(self.user_id_a)
-            self.ids_of_blog_posts_by_user_A.append(blog_post.id)
+            self.suggestion_ids_of_blog_posts_by_user_A.append(blog_post.id)
 
-        self.ids_of_blog_posts_by_user_B = []
+        self.suggestion_ids_of_blog_posts_by_user_B = []
         for _ in range(2):
             blog_post = blog_services.create_new_blog_post(self.user_id_b)
-            self.ids_of_blog_posts_by_user_B.append(blog_post.id)
+            self.suggestion_ids_of_blog_posts_by_user_B.append(blog_post.id)
 
         self.all_blog_post_ids = (
-            self.ids_of_blog_posts_by_user_A + self.ids_of_blog_posts_by_user_B
+            self.suggestion_ids_of_blog_posts_by_user_A + self.suggestion_ids_of_blog_posts_by_user_B
         )
 
         self.change_dict_1: blog_services.BlogPostChangeDict = {
@@ -471,7 +471,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             'tags': ['Math', 'Science']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_A[0], self.change_dict_1)
+            self.suggestion_ids_of_blog_posts_by_user_A[0], self.change_dict_1)
 
         self.change_dict_2: blog_services.BlogPostChangeDict = {
             'title': 'Welcome',
@@ -480,7 +480,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             'tags': ['Math', 'Social']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_A[1], self.change_dict_2)
+            self.suggestion_ids_of_blog_posts_by_user_A[1], self.change_dict_2)
 
         self.change_dict_3: blog_services.BlogPostChangeDict = {
             'title': 'New Lessons in Mathematics',
@@ -489,7 +489,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             'tags': ['Math', 'Oppia']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_B[0], self.change_dict_3)
+            self.suggestion_ids_of_blog_posts_by_user_B[0], self.change_dict_3)
 
         self.change_dict_4: blog_services.BlogPostChangeDict = {
             'title': 'Basic English Lessons',
@@ -498,7 +498,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
             'tags': ['English', 'Oppia', 'Social']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_B[1], self.change_dict_4)
+            self.suggestion_ids_of_blog_posts_by_user_B[1], self.change_dict_4)
 
         for blog_id in self.all_blog_post_ids:
             blog_services.publish_blog_post(blog_id)
@@ -511,13 +511,13 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 4)
 
         # Deleting a blog post should remove it from search results.
-        blog_services.delete_blog_post(self.ids_of_blog_posts_by_user_A[0])
+        blog_services.delete_blog_post(self.suggestion_ids_of_blog_posts_by_user_A[0])
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 3)
 
         # Unpublishing a blog post should remove it from search results.
-        blog_services.unpublish_blog_post(self.ids_of_blog_posts_by_user_A[1])
+        blog_services.unpublish_blog_post(self.suggestion_ids_of_blog_posts_by_user_A[1])
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 2)
@@ -563,7 +563,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 1)
         self.assertEqual(
             response_dict['blog_post_summaries_list'][0]['id'],
-            self.ids_of_blog_posts_by_user_A[0]
+            self.suggestion_ids_of_blog_posts_by_user_A[0]
         )
 
         self.logout()

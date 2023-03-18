@@ -189,7 +189,7 @@ class TopicModel(base_models.VersionedModel):
             the commit process. Contains the TopicRightsModel.
         """
         return {
-            'rights_model': TopicRightsModel.get_by_id(self.id)
+            'rights_model': TopicRightsModel.get_by_id(self.suggestion_id)
         }
 
     def compute_models_to_commit(
@@ -245,10 +245,10 @@ class TopicModel(base_models.VersionedModel):
             status = constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type,
+            self.suggestion_id, self.version, committer_id, commit_type,
             commit_message, commit_cmds, status, False
         )
-        topic_commit_log_entry.topic_id = self.id
+        topic_commit_log_entry.topic_id = self.suggestion_id
         return {
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
@@ -563,9 +563,9 @@ class TopicRightsModel(base_models.VersionedModel):
             status = constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log = TopicCommitLogEntryModel(
-            id=('rights-%s-%s' % (self.id, self.version)),
+            id=('rights-%s-%s' % (self.suggestion_id, self.version)),
             user_id=committer_id,
-            topic_id=self.id,
+            topic_id=self.suggestion_id,
             commit_type=commit_type,
             commit_message=commit_message,
             commit_cmds=commit_cmds,

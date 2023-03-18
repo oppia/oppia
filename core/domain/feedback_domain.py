@@ -116,7 +116,7 @@ class FeedbackThread:
     ) -> None:
         """Initializes a FeedbackThread object."""
 
-        self.id = thread_id
+        self.suggestion_id = thread_id
         self.entity_type = entity_type
         self.entity_id = entity_id
         self.state_name = state_name
@@ -146,7 +146,7 @@ class FeedbackThread:
             'status': self.status,
             'subject': self.subject,
             'summary': self.summary,
-            'thread_id': self.id,
+            'thread_id': self.suggestion_id,
             'message_count': self.message_count,
             'last_nonempty_message_text': self.last_nonempty_message_text,
             'last_nonempty_message_author_id': (
@@ -163,7 +163,7 @@ class FeedbackThread:
         Returns:
             str. The full id corresponding to the given message id.
         """
-        return '.'.join([self.id, str(message_id)])
+        return '.'.join([self.suggestion_id, str(message_id)])
 
     def get_last_two_message_ids(self) -> List[Optional[str]]:
         """Returns the full message ids of the last two messages of the thread.
@@ -212,7 +212,7 @@ class FeedbackMessage:
         last_updated: datetime.datetime,
         received_via_email: bool
     ) -> None:
-        self.id = full_message_id
+        self.suggestion_id = full_message_id
         self.thread_id = thread_id
         self.message_id = message_id
         self.author_id = author_id
@@ -230,7 +230,7 @@ class FeedbackMessage:
         Returns:
             str. The entity_id.
         """
-        return self.id.split('.')[1]
+        return self.suggestion_id.split('.')[1]
 
     @property
     def entity_type(self) -> str:
@@ -240,7 +240,7 @@ class FeedbackMessage:
         Returns:
             str. The entity_type.
         """
-        return self.id.split('.')[0]
+        return self.suggestion_id.split('.')[0]
 
     def to_dict(self) -> FeedbackMessageDict:
         """Returns a dict representation of this FeedbackMessage object.
@@ -299,7 +299,7 @@ class FeedbackAnalytics:
     ) -> None:
         """Initializes a FeedbackAnalytics object."""
 
-        self.id = entity_id
+        self.suggestion_id = entity_id
         self.entity_type = entity_type
         self.num_open_threads = num_open_threads
         self.num_total_threads = num_total_threads

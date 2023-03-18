@@ -403,7 +403,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. The entity_id.
         """
-        return self.id.split('.')[1]
+        return self.suggestion_id.split('.')[1]
 
     @property
     def entity_type(self) -> str:
@@ -412,7 +412,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. The entity_type.
         """
-        return self.id.split('.')[0]
+        return self.suggestion_id.split('.')[0]
 
     @classmethod
     def create(

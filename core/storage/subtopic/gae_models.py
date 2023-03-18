@@ -169,10 +169,10 @@ class SubtopicPageModel(base_models.VersionedModel):
         )
 
         subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type, commit_message,
+            self.suggestion_id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
-        subtopic_page_commit_log_entry.subtopic_page_id = self.id
+        subtopic_page_commit_log_entry.subtopic_page_id = self.suggestion_id
         # The order is important here, as the 'versioned_model' needs to be
         # after 'snapshot_content_model' otherwise it leads to problems with
         # putting the models into the datastore.

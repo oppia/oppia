@@ -218,7 +218,7 @@ class BaseInteraction:
         rules_index_dict = json.loads(
             constants.get_package_file_contents(
                 'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
-        self._cached_rules_dict = rules_index_dict[self.id]
+        self._cached_rules_dict = rules_index_dict[self.suggestion_id]
 
         return self._cached_rules_dict
 
@@ -240,7 +240,7 @@ class BaseInteraction:
         in a read-only view after it has been submitted.
         """
         html_templates = utils.get_file_contents(os.path.join(
-            feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
+            feconf.INTERACTIONS_DIR, self.suggestion_id, '%s.html' % self.suggestion_id))
         return html_templates
 
     @property
@@ -252,15 +252,15 @@ class BaseInteraction:
             '<script>%s</script>\n' %
             utils.get_file_contents(os.path.join(
                 feconf.INTERACTIONS_DIR,
-                self.id,
-                '%sValidationService.js' % self.id)))
+                self.suggestion_id,
+                '%sValidationService.js' % self.suggestion_id)))
 
     def to_dict(self) -> BaseInteractionDict:
         """Gets a dict representing this interaction. Only default values are
         provided.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'name': self.name,
             'description': self.description,
             'answer_type': self.answer_type,

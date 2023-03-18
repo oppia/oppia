@@ -789,7 +789,7 @@ class Subtopic:
                 in bytes.
             url_fragment: str. The url fragment for the subtopic.
         """
-        self.id = subtopic_id
+        self.suggestion_id = subtopic_id
         self.title = title
         self.skill_ids = skill_ids
         self.thumbnail_filename = thumbnail_filename
@@ -804,7 +804,7 @@ class Subtopic:
             dict. A dict, mapping all fields of Subtopic instance.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'skill_ids': self.skill_ids,
             'thumbnail_filename': self.thumbnail_filename,
@@ -1044,7 +1044,7 @@ class Topic:
             last_updated: datetime.datetime. Date and time when the
                 topic was last updated.
         """
-        self.id = topic_id
+        self.suggestion_id = topic_id
         self.name = name
         self.abbreviated_name = abbreviated_name
         self.url_fragment = url_fragment
@@ -1076,7 +1076,7 @@ class Topic:
             dict. A dict, mapping all fields of Topic instance.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'name': self.name,
             'abbreviated_name': self.abbreviated_name,
             'url_fragment': self.url_fragment,
@@ -2302,7 +2302,7 @@ class TopicSummary:
             topic_model_last_updated: datetime.datetime. Date and time
                 when the topic model was last updated.
         """
-        self.id = topic_id
+        self.suggestion_id = topic_id
         self.name = name
         self.description = description
         self.canonical_name = canonical_name
@@ -2409,7 +2409,7 @@ class TopicSummary:
             dict. A dict representing this TopicSummary object.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'name': self.name,
             'url_fragment': self.url_fragment,
             'language_code': self.language_code,
@@ -2448,7 +2448,7 @@ class TopicRights:
             topic_is_published: bool. Whether the topic is viewable by a
                 learner.
         """
-        self.id = topic_id
+        self.suggestion_id = topic_id
         self.manager_ids = manager_ids
         self.topic_is_published = topic_is_published
 

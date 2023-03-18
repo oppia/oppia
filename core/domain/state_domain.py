@@ -701,7 +701,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 in this interaction, or None if no solution exists for the
                 interaction.
         """
-        self.id = interaction_id
+        self.suggestion_id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
         # This is a dict: the keys are names of customization_args and the
@@ -737,7 +737,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 translatable_contents_collection
                 .add_fields_from_translatable_object(
                     answer_group,
-                    interaction_id=self.id
+                    interaction_id=self.suggestion_id
                 )
             )
         for customization_arg in self.customization_args.values():
@@ -745,7 +745,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
                 translatable_contents_collection
                 .add_fields_from_translatable_object(
                     customization_arg,
-                    interaction_id=self.id)
+                    interaction_id=self.suggestion_id)
             )
         for hint in self.hints:
             (
@@ -770,7 +770,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # argument names to a customization argument dict, the dict
         # representation of InteractionCustomizationArg.
         customization_args_dict = {}
-        if self.id:
+        if self.suggestion_id:
             for ca_name in self.customization_args:
                 customization_args_dict[ca_name] = (
                     self.customization_args[
@@ -782,7 +782,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # despite the names of the keys. This applies to customization_args_dict
         # below.
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'customization_args': customization_args_dict,
             'answer_groups': [group.to_dict() for group in self.answer_groups],
             'default_outcome': (
@@ -861,8 +861,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             bool. Whether the interaction is terminal.
         """
         return bool(
-            self.id and interaction_registry.Registry.get_interaction_by_id(
-                self.id
+            self.suggestion_id and interaction_registry.Registry.get_interaction_by_id(
+                self.suggestion_id
             ).is_terminal
         )
 
@@ -874,7 +874,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             bool. Whether the interaction is linear.
         """
         return interaction_registry.Registry.get_interaction_by_id(
-            self.id).is_linear
+            self.suggestion_id).is_linear
 
     def is_supported_on_android_app(self) -> bool:
         """Determines whether the interaction is a valid interaction that is
@@ -884,8 +884,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             bool. Whether the interaction is supported by the Android app.
         """
         return (
-            self.id is None or
-            self.id in android_validation_constants.VALID_INTERACTION_IDS
+            self.suggestion_id is None or
+            self.suggestion_id in android_validation_constants.VALID_INTERACTION_IDS
         )
 
     def is_rte_content_supported_on_android(
@@ -1978,16 +1978,16 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             ValidationError. One or more attributes of the InteractionInstance
                 are invalid.
         """
-        if not isinstance(self.id, str):
+        if not isinstance(self.suggestion_id, str):
             raise utils.ValidationError(
                 'Expected interaction id to be a string, received %s' %
-                self.id)
+                self.suggestion_id)
         try:
             interaction = interaction_registry.Registry.get_interaction_by_id(
-                self.id)
+                self.suggestion_id)
         except KeyError as e:
             raise utils.ValidationError(
-                'Invalid interaction id: %s' % self.id) from e
+                'Invalid interaction id: %s' % self.suggestion_id) from e
 
         self._validate_customization_args()
 
@@ -2024,7 +2024,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             hint.validate()
 
         if self.solution:
-            self.solution.validate(self.id)
+            self.solution.validate(self.suggestion_id)
 
         # TODO(#16236): Find a way to encode these checks more declaratively.
         # Conceptually the validation code should go in each interaction
@@ -2047,11 +2047,11 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             'EndExploration': self._validate_end_interaction
         }
 
-        if self.id in interaction_id_to_strict_validation_func:
-            interaction_id_to_strict_validation_func[self.id](strict)
+        if self.suggestion_id in interaction_id_to_strict_validation_func:
+            interaction_id_to_strict_validation_func[self.suggestion_id](strict)
 
-        elif self.id in interaction_id_to_non_strict_validation_func:
-            interaction_id_to_non_strict_validation_func[self.id]()
+        elif self.suggestion_id in interaction_id_to_non_strict_validation_func:
+            interaction_id_to_non_strict_validation_func[self.suggestion_id]()
 
     def _validate_customization_args(self) -> None:
         """Validates the customization arguments keys and values using
@@ -2072,7 +2072,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # argument names to a customization argument dict, the dict
         # representation of InteractionCustomizationArg.
         customization_args_dict = {}
-        if self.id:
+        if self.suggestion_id:
             for ca_name in self.customization_args:
                 try:
                     customization_args_dict[ca_name] = (
@@ -2089,17 +2089,17 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # Here, we are asserting that interaction_id is never going to be None,
         # Because this is a private method and before calling this method we are
         # already checking if interaction_id exists or not.
-        assert self.id is not None
+        assert self.suggestion_id is not None
         interaction = interaction_registry.Registry.get_interaction_by_id(
-            self.id)
+            self.suggestion_id)
         customization_args_util.validate_customization_args_and_values(
-            'interaction', self.id, customization_args_dict,
+            'interaction', self.suggestion_id, customization_args_dict,
             interaction.customization_arg_specs)
 
         self.customization_args = (
             InteractionInstance
             .convert_customization_args_dict_to_customization_args(
-                self.id,
+                self.suggestion_id,
                 customization_args_dict
             )
         )

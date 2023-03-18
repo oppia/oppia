@@ -43,7 +43,7 @@ class ActivityReference:
             activity_id: str. The activity id.
         """
         self.type = activity_type
-        self.id = activity_id
+        self.suggestion_id = activity_id
 
     def get_hash(self) -> str:
         """Returns a unique string for this ActivityReference domain object.
@@ -51,7 +51,7 @@ class ActivityReference:
         Returns:
             str. A unique string hash for this ActivityReference domain object.
         """
-        return '%s:%s' % (self.type, self.id)
+        return '%s:%s' % (self.type, self.suggestion_id)
 
     def validate(self) -> None:
         """Checks that all fields of this ActivityReference domain object
@@ -65,9 +65,9 @@ class ActivityReference:
                 constants.ACTIVITY_TYPE_COLLECTION
         )):
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, str):
+        if not isinstance(self.suggestion_id, str):
             raise Exception(
-                'Expected id to be a string but found %s' % self.id)
+                'Expected id to be a string but found %s' % self.suggestion_id)
 
     def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing this ActivityReference domain object.
@@ -78,7 +78,7 @@ class ActivityReference:
         """
         return {
             'type': self.type,
-            'id': self.id,
+            'id': self.suggestion_id,
         }
 
     @classmethod

@@ -203,10 +203,10 @@ class SkillModel(base_models.VersionedModel):
         )
 
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type, commit_message,
+            self.suggestion_id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
-        skill_commit_log_entry.skill_id = self.id
+        skill_commit_log_entry.skill_id = self.suggestion_id
         return {
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],

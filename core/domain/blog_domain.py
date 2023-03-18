@@ -113,7 +113,7 @@ class BlogPost:
             published_on: datetime.datetime. Date and time when the blog post is
                 last published.
         """
-        self.id = blog_post_id
+        self.suggestion_id = blog_post_id
         self.author_id = author_id
         self.title = title
         self.content = html_cleaner.clean(content)
@@ -299,7 +299,7 @@ class BlogPost:
         last_updated = utils.convert_naive_datetime_to_string(
             self.last_updated) if self.last_updated else None
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'author_id': self.author_id,
             'title': self.title,
             'content': self.content,
@@ -430,7 +430,7 @@ class BlogPostSummary:
                 is last published.
             deleted: bool. Whether the blog post is deleted or not.
         """
-        self.id = blog_post_id
+        self.suggestion_id = blog_post_id
         self.author_id = author_id
         self.title = title
         self.summary = summary
@@ -619,7 +619,7 @@ class BlogPostSummary:
         last_updated = utils.convert_naive_datetime_to_string(
             self.last_updated) if self.last_updated else None
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'author_id': self.author_id,
             'title': self.title,
             'summary': self.summary,
@@ -648,7 +648,7 @@ class BlogPostRights:
                 as editors for the blog post.
             blog_post_is_published: bool. Whether the blog is published or not.
         """
-        self.id = blog_post_id
+        self.suggestion_id = blog_post_id
         self.editor_ids = editor_ids
         self.blog_post_is_published = blog_post_is_published
 
@@ -660,7 +660,7 @@ class BlogPostRights:
             frontend.
         """
         return {
-            'blog_post_id': self.id,
+            'blog_post_id': self.suggestion_id,
             'editor_ids': self.editor_ids,
             'blog_post_is_published': self.blog_post_is_published
         }
@@ -700,7 +700,7 @@ class BlogAuthorDetails:
             last_updated: datetime.datetime. Date and time when the author
                 details were last updated.
         """
-        self.id = instance_id
+        self.suggestion_id = instance_id
         self.author_id = author_id
         self.displayed_author_name = displayed_author_name
         self.author_bio = author_bio

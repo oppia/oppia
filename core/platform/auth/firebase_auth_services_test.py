@@ -1077,11 +1077,11 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.id_token = (
+        self.suggestion_id_token = (
             self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL))
 
     def test_adds_cookie_to_response_from_id_token_in_request(self) -> None:
-        req = self.create_request(id_token=self.id_token)
+        req = self.create_request(id_token=self.suggestion_id_token)
         res = self.create_response()
 
         firebase_auth_services.establish_auth_session(req, res)
@@ -1091,7 +1091,7 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
     def test_does_nothing_when_request_has_cookie(self) -> None:
         cookie = firebase_auth.create_session_cookie(
-            self.id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
+            self.suggestion_id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
         req = self.create_request(session_cookie=cookie)
         res = self.create_response()
 

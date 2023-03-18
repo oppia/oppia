@@ -291,7 +291,7 @@ class ExplorationModel(base_models.VersionedModel):
             the commit process. Contains the ExplorationRightsModel.
         """
         return {
-            'rights_model': ExplorationRightsModel.get_by_id(self.id)
+            'rights_model': ExplorationRightsModel.get_by_id(self.suggestion_id)
         }
 
     # Here we use MyPy ignore because super class (VersionedModel)
@@ -342,7 +342,7 @@ class ExplorationModel(base_models.VersionedModel):
 
         exploration_rights_model = additional_models['rights_model']
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
-            self.id, self.version,
+            self.suggestion_id, self.version,
             committer_id,
             commit_type,
             commit_message,
@@ -350,7 +350,7 @@ class ExplorationModel(base_models.VersionedModel):
             exploration_rights_model.status,
             exploration_rights_model.community_owned
         )
-        exploration_commit_log.exploration_id = self.id
+        exploration_commit_log.exploration_id = self.suggestion_id
         return {
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
@@ -840,9 +840,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # ExplorationModel.
         if commit_type not in ['create', 'delete']:
             exploration_commit_log = ExplorationCommitLogEntryModel(
-                id=('rights-%s-%s' % (self.id, self.version)),
+                id=('rights-%s-%s' % (self.suggestion_id, self.version)),
                 user_id=committer_id,
-                exploration_id=self.id,
+                exploration_id=self.suggestion_id,
                 commit_type=commit_type,
                 commit_message=commit_message,
                 commit_cmds=commit_cmds,

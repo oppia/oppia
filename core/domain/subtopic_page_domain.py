@@ -281,7 +281,7 @@ class SubtopicPage:
                 subtopic page is written in.
             version: int. The current version of the subtopic.
         """
-        self.id = subtopic_page_id
+        self.suggestion_id = subtopic_page_id
         self.topic_id = topic_id
         self.page_contents = page_contents
         self.page_contents_schema_version = page_contents_schema_version
@@ -295,7 +295,7 @@ class SubtopicPage:
             dict. A dict, mapping all fields of SubtopicPage instance.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'topic_id': self.topic_id,
             'page_contents': self.page_contents.to_dict(),
             'page_contents_schema_version': self.page_contents_schema_version,
@@ -449,7 +449,7 @@ class SubtopicPage:
         Returns:
             int. The subtopic_id of the object.
         """
-        return int(self.id[len(self.topic_id) + 1:])
+        return int(self.suggestion_id[len(self.topic_id) + 1:])
 
     def update_page_contents_html(
         self, new_page_contents_html: state_domain.SubtitledHtml

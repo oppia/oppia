@@ -86,7 +86,7 @@ class ActivityRights:
         viewable_if_private: bool = False,
         first_published_msec: Optional[float] = None
     ) -> None:
-        self.id = exploration_id
+        self.suggestion_id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
         self.voice_artist_ids = voice_artist_ids

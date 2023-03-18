@@ -1036,7 +1036,7 @@ class VersionedModel(BaseModel):
         self.version += 1
 
         snapshot = self.compute_snapshot()
-        snapshot_id = self.get_snapshot_id(self.id, self.version)
+        snapshot_id = self.get_snapshot_id(self.suggestion_id, self.version)
 
         snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS.create(
             snapshot_id,
@@ -1081,7 +1081,7 @@ class VersionedModel(BaseModel):
 
             version_numbers = range(1, current_version + 1)
             snapshot_ids = [
-                self.get_snapshot_id(self.id, version_number)
+                self.get_snapshot_id(self.suggestion_id, version_number)
                 for version_number in version_numbers]
 
             metadata_keys = [
@@ -1097,7 +1097,7 @@ class VersionedModel(BaseModel):
             if self.COMMIT_LOG_ENTRY_CLASS is not None:
                 commit_log_ids = (
                     self.COMMIT_LOG_ENTRY_CLASS.get_instance_id(
-                        self.id, version_number)
+                        self.suggestion_id, version_number)
                     for version_number in version_numbers
                 )
                 commit_log_keys = [
@@ -1819,7 +1819,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             str. Instance id part of snapshot id.
         """
-        return self.id[:self.id.rfind(VERSION_DELIMITER)]
+        return self.suggestion_id[:self.suggestion_id.rfind(VERSION_DELIMITER)]
 
     def get_version_string(self) -> str:
         """Gets the version number from the snapshot id.
@@ -1827,7 +1827,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             str. Version number part of snapshot id.
         """
-        return self.id[self.id.rfind(VERSION_DELIMITER) + 1:]
+        return self.suggestion_id[self.suggestion_id.rfind(VERSION_DELIMITER) + 1:]
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
@@ -1908,7 +1908,7 @@ class BaseSnapshotContentModel(BaseModel):
         Returns:
             str. Instance id part of snapshot id.
         """
-        return self.id[:self.id.rfind(VERSION_DELIMITER)]
+        return self.suggestion_id[:self.suggestion_id.rfind(VERSION_DELIMITER)]
 
     def get_version_string(self) -> str:
         """Gets the version number from the snapshot id.
@@ -1916,7 +1916,7 @@ class BaseSnapshotContentModel(BaseModel):
         Returns:
             str. Version number part of snapshot id.
         """
-        return self.id[self.id.rfind(VERSION_DELIMITER) + 1:]
+        return self.suggestion_id[self.suggestion_id.rfind(VERSION_DELIMITER) + 1:]
 
 
 class BaseMapReduceBatchResultsModel(BaseModel):

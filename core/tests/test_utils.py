@@ -678,7 +678,7 @@ class AuthServicesStub:
         def __init__(
             self, user_id: str, deleted: bool = False
         ) -> None:
-            self.id = user_id
+            self.suggestion_id = user_id
             self.deleted = deleted
 
         def mark_as_deleted(self) -> None:
@@ -1162,7 +1162,7 @@ class TestBase(unittest.TestCase):
         Returns:
             str. The namespace.
         """
-        return self.id()[-100:]
+        return self.suggestion_id()[-100:]
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
         """Run the test, collecting the result into the specified TestResult.
@@ -1839,7 +1839,7 @@ class AppEngineTestBase(TestBase):
     def setUp(self) -> None:
         super().setUp()
         # Initialize namespace for the storage emulator.
-        storage_services.CLIENT.namespace = self.id()
+        storage_services.CLIENT.namespace = self.suggestion_id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
 

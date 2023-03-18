@@ -109,7 +109,7 @@ class ExplorationOpportunitySummary:
                 key and number of translation in review in that language as the
                 value.
         """
-        self.id = exp_id
+        self.suggestion_id = exp_id
         self.topic_id = topic_id
         self.topic_name = topic_name
         self.story_id = story_id
@@ -172,7 +172,7 @@ class ExplorationOpportunitySummary:
             contributor.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'topic_name': self.topic_name,
             'story_title': self.story_title,
             'chapter_title': self.chapter_title,
@@ -270,7 +270,7 @@ class SkillOpportunity:
             skill_description: str. The title of the skill.
             question_count: int. The total number of questions for the skill.
         """
-        self.id = skill_id
+        self.suggestion_id = skill_id
         self.skill_description = skill_description
         self.question_count = question_count
         self.validate()
@@ -314,7 +314,7 @@ class SkillOpportunity:
             are required to represent the opportunity to a contributor.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'skill_description': self.skill_description,
             'question_count': self.question_count
         }

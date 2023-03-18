@@ -451,7 +451,7 @@ class StoryNode:
                 has just created a story with the basic storyline (by providing
                 outlines) without linking an exploration to any node.
         """
-        self.id = node_id
+        self.suggestion_id = node_id
         self.title = title
         self.description = description
         self.thumbnail_filename = thumbnail_filename
@@ -538,7 +538,7 @@ class StoryNode:
             dict. A dict, mapping all fields of StoryNode instance.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'description': self.description,
             'thumbnail_filename': self.thumbnail_filename,
@@ -663,7 +663,7 @@ class StoryNode:
                 'Expected outline_is_finalized to be a boolean, received %s' %
                 self.outline_is_finalized)
 
-        self.require_valid_node_id(self.id)
+        self.require_valid_node_id(self.suggestion_id)
 
         if not isinstance(self.prerequisite_skill_ids, list):
             raise utils.ValidationError(
@@ -709,7 +709,7 @@ class StoryNode:
 
         for node_id in self.destination_node_ids:
             self.require_valid_node_id(node_id)
-            if node_id == self.id:
+            if node_id == self.suggestion_id:
                 raise utils.ValidationError(
                     'The story node with ID %s points to itself.' % node_id)
 
@@ -1028,7 +1028,7 @@ class Story:
             meta_tag_content: str. The meta tag content in the topic viewer
                 page.
         """
-        self.id = story_id
+        self.suggestion_id = story_id
         self.title = title
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
@@ -1248,7 +1248,7 @@ class Story:
             dict. A dict, mapping all fields of Story instance.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'description': self.description,
             'notes': self.notes,
@@ -1545,7 +1545,7 @@ class Story:
         Raises:
             Exception. The subtopic with the given id doesn't exist.
         """
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.suggestion_id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
@@ -1555,7 +1555,7 @@ class Story:
         else:
             raise Exception(
                 'The thumbnail %s for story with id %s does not exist'
-                ' in the filesystem.' % (new_thumbnail_filename, self.id))
+                ' in the filesystem.' % (new_thumbnail_filename, self.suggestion_id))
 
     def update_thumbnail_bg_color(
         self, thumbnail_bg_color: Optional[str]
@@ -1723,7 +1723,7 @@ class Story:
             Exception. The node with the given id doesn't exist.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
+        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.suggestion_id)
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
@@ -1735,7 +1735,7 @@ class Story:
         else:
             raise Exception(
                 'The thumbnail %s for story node with id %s does not exist'
-                ' in the filesystem.' % (new_thumbnail_filename, self.id))
+                ' in the filesystem.' % (new_thumbnail_filename, self.suggestion_id))
 
     def update_node_thumbnail_bg_color(
         self,
@@ -1950,7 +1950,7 @@ class StorySummary:
             story_model_last_updated: datetime.datetime. Date and time
                 when the story model was last updated.
         """
-        self.id = story_id
+        self.suggestion_id = story_id
         self.title = title
         self.description = description
         self.language_code = language_code
@@ -2029,7 +2029,7 @@ class StorySummary:
             dict. A dict representing this StorySummary object.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'description': self.description,
             'language_code': self.language_code,
@@ -2051,7 +2051,7 @@ class StorySummary:
             dict. A dict representing this StorySummary object.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'description': self.description,
             'node_titles': self.node_titles,

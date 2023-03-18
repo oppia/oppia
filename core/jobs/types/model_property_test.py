@@ -55,7 +55,7 @@ class RepeatedValueModel(base_models.BaseModel):
 class ModelPropertyTests(test_utils.TestBase):
 
     def setUp(self) -> None:
-        self.id_property = model_property.ModelProperty(
+        self.suggestion_id_property = model_property.ModelProperty(
             SubclassOfBaseModel, SubclassOfBaseModel.id)
         self.ndb_property = model_property.ModelProperty(
             SubclassOfBaseModel, SubclassOfBaseModel.value)
@@ -116,7 +116,7 @@ class ModelPropertyTests(test_utils.TestBase):
                 SubclassOfBaseModel, SubclassOfNdbModel.value)
 
     def test_model_kind_of_id_property(self) -> None:
-        self.assertEqual(self.id_property.model_kind, 'SubclassOfBaseModel')
+        self.assertEqual(self.suggestion_id_property.model_kind, 'SubclassOfBaseModel')
 
     def test_model_kind_of_ndb_property(self) -> None:
         self.assertEqual(self.ndb_property.model_kind, 'SubclassOfBaseModel')
@@ -126,7 +126,7 @@ class ModelPropertyTests(test_utils.TestBase):
             self.ndb_repeated_property.model_kind, 'RepeatedValueModel')
 
     def test_property_name_of_id_property(self) -> None:
-        self.assertEqual(self.id_property.property_name, 'id')
+        self.assertEqual(self.suggestion_id_property.property_name, 'id')
 
     def test_property_name_of_ndb_property(self) -> None:
         self.assertEqual(self.ndb_property.property_name, 'value')
@@ -135,7 +135,7 @@ class ModelPropertyTests(test_utils.TestBase):
         self.assertEqual(self.ndb_repeated_property.property_name, 'values')
 
     def test_str_of_id_property(self) -> None:
-        self.assertEqual(str(self.id_property), 'SubclassOfBaseModel.id')
+        self.assertEqual(str(self.suggestion_id_property), 'SubclassOfBaseModel.id')
 
     def test_str_of_ndb_property(self) -> None:
         self.assertEqual(str(self.ndb_property), 'SubclassOfBaseModel.value')
@@ -146,7 +146,7 @@ class ModelPropertyTests(test_utils.TestBase):
 
     def test_repr_of_id_property(self) -> None:
         self.assertEqual(
-            repr(self.id_property),
+            repr(self.suggestion_id_property),
             'ModelProperty(SubclassOfBaseModel, SubclassOfBaseModel.id)')
 
     def test_repr_of_ndb_property(self) -> None:
@@ -160,12 +160,12 @@ class ModelPropertyTests(test_utils.TestBase):
             'ModelProperty(RepeatedValueModel, RepeatedValueModel.values)')
 
     def test_equality(self) -> None:
-        self.assertNotEqual(self.id_property, self.ndb_property)
+        self.assertNotEqual(self.suggestion_id_property, self.ndb_property)
         self.assertNotEqual(self.ndb_property, self.ndb_repeated_property)
-        self.assertNotEqual(self.ndb_repeated_property, self.id_property)
+        self.assertNotEqual(self.ndb_repeated_property, self.suggestion_id_property)
 
         self.assertEqual(
-            self.id_property,
+            self.suggestion_id_property,
             model_property.ModelProperty(
                 SubclassOfBaseModel, SubclassOfBaseModel.id))
         self.assertEqual(
@@ -183,7 +183,7 @@ class ModelPropertyTests(test_utils.TestBase):
                 SubclassOfBaseModel, SubclassOfBaseModel.id),
         }
 
-        self.assertIn(self.id_property, id_property_set)
+        self.assertIn(self.suggestion_id_property, id_property_set)
         self.assertNotIn(self.ndb_property, id_property_set)
         self.assertNotIn(self.ndb_repeated_property, id_property_set)
 
@@ -194,7 +194,7 @@ class ModelPropertyTests(test_utils.TestBase):
         }
 
         self.assertIn(self.ndb_property, ndb_property_set)
-        self.assertNotIn(self.id_property, ndb_property_set)
+        self.assertNotIn(self.suggestion_id_property, ndb_property_set)
         self.assertNotIn(self.ndb_repeated_property, ndb_property_set)
 
     def test_hash_of_ndb_repeated_property(self) -> None:
@@ -204,14 +204,14 @@ class ModelPropertyTests(test_utils.TestBase):
         }
 
         self.assertIn(self.ndb_repeated_property, ndb_repeated_property_set)
-        self.assertNotIn(self.id_property, ndb_repeated_property_set)
+        self.assertNotIn(self.suggestion_id_property, ndb_repeated_property_set)
         self.assertNotIn(self.ndb_property, ndb_repeated_property_set)
 
     def test_yield_value_from_id_property(self) -> None:
         model = SubclassOfBaseModel(id='123')
 
         self.assertEqual(
-            list(self.id_property.yield_value_from_model(model)), ['123'])
+            list(self.suggestion_id_property.yield_value_from_model(model)), ['123'])
 
     def test_yield_value_from_ndb_property(self) -> None:
         model = SubclassOfBaseModel(value='abc')
@@ -237,10 +237,10 @@ class ModelPropertyTests(test_utils.TestBase):
             list(self.ndb_property.yield_value_from_model(model))
 
     def test_pickle_id_property(self) -> None:
-        pickle_value = pickle.loads(pickle.dumps(self.id_property))
+        pickle_value = pickle.loads(pickle.dumps(self.suggestion_id_property))
 
-        self.assertEqual(self.id_property, pickle_value)
-        self.assertIn(pickle_value, {self.id_property})
+        self.assertEqual(self.suggestion_id_property, pickle_value)
+        self.assertIn(pickle_value, {self.suggestion_id_property})
 
     def test_pickle_ndb_property(self) -> None:
         pickle_value = pickle.loads(pickle.dumps(self.ndb_property))

@@ -224,7 +224,7 @@ class BaseInteraction:
         rules_index_dict = json.loads(
             constants.get_package_file_contents(
                 'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
-        self._cached_rules_dict = rules_index_dict[self.id]
+        self._cached_rules_dict = rules_index_dict[self.suggestion_id]
 
         return self._cached_rules_dict
 
@@ -246,7 +246,7 @@ class BaseInteraction:
         provided.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'name': self.name,
             'description': self.description,
             'answer_type': self.answer_type,

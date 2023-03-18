@@ -2130,7 +2130,7 @@ class LearnerAnswerInfo:
             created_on: datetime. The time at which the answer details were
                 received.
         """
-        self.id = learner_answer_info_id
+        self.suggestion_id = learner_answer_info_id
         self.answer = answer
         self.answer_details = answer_details
         self.created_on = created_on
@@ -2142,7 +2142,7 @@ class LearnerAnswerInfo:
             dict. The learner_answer_info dict.
         """
         learner_answer_info_dict: LearnerAnswerInfoDict = {
-            'id': self.id,
+            'id': self.suggestion_id,
             'answer': self.answer,
             'answer_details': self.answer_details,
             'created_on': self.created_on.strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -2182,9 +2182,9 @@ class LearnerAnswerInfo:
 
     def validate(self) -> None:
         """Validates the LearnerAnswerInfo domain object."""
-        if not isinstance(self.id, str):
+        if not isinstance(self.suggestion_id, str):
             raise utils.ValidationError(
-                'Expected id to be a string, received %s' % self.id)
+                'Expected id to be a string, received %s' % self.suggestion_id)
         if self.answer is None:
             raise utils.ValidationError(
                 'The answer submitted by the learner cannot be empty')

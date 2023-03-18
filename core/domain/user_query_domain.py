@@ -70,7 +70,7 @@ class UserQuery:
             created_on: DateTime. The time when the query was created.
             deleted: bool. Whether the query is deleted.
         """
-        self.id = query_id
+        self.suggestion_id = query_id
         self.params = query_params
         self.submitter_id = submitter_id
         self.status = query_status

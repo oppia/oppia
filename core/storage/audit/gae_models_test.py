@@ -47,7 +47,7 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         audit_models.RoleQueryAuditModel(
-            id=self.ID,
+            id=self.suggestion_id,
             user_id=self.USER_ID,
             intent=feconf.ROLE_ACTION_ADD,
             role=self.ROLE,
@@ -90,9 +90,9 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model(self) -> None:
-        audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
+        audit_model = audit_models.RoleQueryAuditModel.get(self.suggestion_id)
 
-        self.assertEqual(audit_model.id, self.ID)
+        self.assertEqual(audit_model.id, self.suggestion_id)
         self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_ADD)
         self.assertEqual(audit_model.user_id, self.USER_ID)
         self.assertEqual(audit_model.role, self.ROLE)
@@ -113,7 +113,7 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         audit_models.UsernameChangeAuditModel(
-            id=self.ID,
+            id=self.suggestion_id,
             committer_id=self.COMMITTER_ID,
             old_username=self.OLD_USERNAME,
             new_username=self.NEW_USERNAME
@@ -154,9 +154,9 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model(self) -> None:
-        audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)
+        audit_model = audit_models.UsernameChangeAuditModel.get(self.suggestion_id)
 
-        self.assertEqual(audit_model.id, self.ID)
+        self.assertEqual(audit_model.id, self.suggestion_id)
         self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)
         self.assertEqual(audit_model.old_username, self.OLD_USERNAME)
         self.assertEqual(audit_model.new_username, self.NEW_USERNAME)

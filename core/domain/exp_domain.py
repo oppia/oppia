@@ -1355,7 +1355,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
         """
-        self.id = exploration_id
+        self.suggestion_id = exploration_id
         self.title = title
         self.category = category
         self.objective = objective
@@ -2195,7 +2195,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             bool. True is the current exploration is a demo exploration.
         """
-        return self.is_demo_exploration_id(self.id)
+        return self.is_demo_exploration_id(self.suggestion_id)
 
     def has_state_name(self, state_name: str) -> bool:
         """Whether the exploration has a state with the given state name.
@@ -5682,7 +5682,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. A dict mapping all fields of Exploration instance.
         """
         exploration_dict: ExplorationDict = ({
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'category': self.category,
             'author_notes': self.author_notes,
@@ -5881,7 +5881,7 @@ class ExplorationSummary:
                 Exploration is not published yet.
             deleted: bool. Whether the exploration is marked as deleted.
         """
-        self.id = exploration_id
+        self.suggestion_id = exploration_id
         self.title = title
         self.category = category
         self.objective = objective
@@ -6072,7 +6072,7 @@ class ExplorationSummary:
                 - 'objective': str. The exploration objective.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'title': self.title,
             'objective': self.objective,
         }

@@ -282,7 +282,7 @@ class CollectionModel(base_models.VersionedModel):
             the commit process. Contains the CollectionRightsModel.
         """
         return {
-            'rights_model': CollectionRightsModel.get_by_id(self.id)
+            'rights_model': CollectionRightsModel.get_by_id(self.suggestion_id)
         }
 
     # Here we use MyPy ignore because super class (VersionedModel)
@@ -333,7 +333,7 @@ class CollectionModel(base_models.VersionedModel):
 
         collection_rights_model = additional_models['rights_model']
         collection_commit_log = CollectionCommitLogEntryModel.create(
-            self.id,
+            self.suggestion_id,
             self.version,
             committer_id,
             commit_type,
@@ -342,7 +342,7 @@ class CollectionModel(base_models.VersionedModel):
             collection_rights_model.status,
             collection_rights_model.community_owned
         )
-        collection_commit_log.collection_id = self.id
+        collection_commit_log.collection_id = self.suggestion_id
         return {
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],
@@ -710,9 +710,9 @@ class CollectionRightsModel(base_models.VersionedModel):
         # CollectionModel.
         if commit_type not in ['create', 'delete']:
             collection_commit_log = CollectionCommitLogEntryModel(
-                id=('rights-%s-%s' % (self.id, self.version)),
+                id=('rights-%s-%s' % (self.suggestion_id, self.version)),
                 user_id=committer_id,
-                collection_id=self.id,
+                collection_id=self.suggestion_id,
                 commit_type=commit_type,
                 commit_message=commit_message,
                 commit_cmds=commit_cmds,

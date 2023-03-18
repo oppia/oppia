@@ -232,10 +232,10 @@ class QuestionModel(base_models.VersionedModel):
         )
 
         question_commit_log = QuestionCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type, commit_message,
+            self.suggestion_id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
-        question_commit_log.question_id = self.id
+        question_commit_log.question_id = self.suggestion_id
         return {
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
             'snapshot_content_model': models_to_put['snapshot_content_model'],

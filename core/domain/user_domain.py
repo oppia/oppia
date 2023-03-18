@@ -794,7 +794,7 @@ class ExpUserLastPlaythrough:
         last_updated: datetime.datetime,
         last_played_state_name: str
     ) -> None:
-        self.id = '%s.%s' % (user_id, exploration_id)
+        self.suggestion_id = '%s.%s' % (user_id, exploration_id)
         self.user_id = user_id
         self.exploration_id = exploration_id
         self.last_played_exp_version = last_played_exp_version
@@ -830,7 +830,7 @@ class IncompleteActivities:
         partially_learnt_topic_ids: List[str],
         partially_mastered_topic_id: Optional[str] = None
     ) -> None:
-        self.id = user_id
+        self.suggestion_id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
         self.story_ids = story_ids
@@ -930,7 +930,7 @@ class CompletedActivities:
         learnt_topic_ids: List[str],
         mastered_topic_ids: Optional[List[str]] = None
     ) -> None:
-        self.id = user_id
+        self.suggestion_id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
         self.story_ids = story_ids
@@ -1030,7 +1030,7 @@ class LearnerGoals:
         topic_ids_to_learn: List[str],
         topic_ids_to_master: List[str]
     ) -> None:
-        self.id = user_id
+        self.suggestion_id = user_id
         self.topic_ids_to_learn = topic_ids_to_learn
         self.topic_ids_to_master = topic_ids_to_master
 
@@ -1071,7 +1071,7 @@ class LearnerPlaylist:
         exploration_ids: List[str],
         collection_ids: List[str]
     ) -> None:
-        self.id = user_id
+        self.suggestion_id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
 
@@ -1190,7 +1190,7 @@ class UserContributionRights:
         can_review_questions: bool,
         can_submit_questions: bool
     ):
-        self.id = user_id
+        self.suggestion_id = user_id
         self.can_review_translation_for_language_codes = (
             can_review_translation_for_language_codes)
         self.can_review_voiceover_for_language_codes = (

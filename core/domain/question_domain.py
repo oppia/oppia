@@ -315,7 +315,7 @@ class Question(translation_domain.BaseTranslatableObject):
             last_updated: datetime.datetime. Date and time when the
                 question was last updated.
         """
-        self.id = question_id
+        self.suggestion_id = question_id
         self.question_state_data = question_state_data
         self.language_code = language_code
         self.question_state_data_schema_version = (
@@ -352,7 +352,7 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. A dict representation of the Question instance.
         """
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'question_state_data': self.question_state_data.to_dict(),
             'question_state_data_schema_version': (
                 self.question_state_data_schema_version),
@@ -1998,9 +1998,9 @@ class Question(translation_domain.BaseTranslatableObject):
     def validate(self) -> None:
         """Validates the Question domain object before it is saved."""
 
-        if not isinstance(self.id, str):
+        if not isinstance(self.suggestion_id, str):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self.id)
+                'Expected ID to be a string, received %s' % self.suggestion_id)
 
         if not isinstance(self.version, int):
             raise utils.ValidationError(
@@ -2137,7 +2137,7 @@ class QuestionSummary:
             question_model_last_updated: datetime.datetime. Date and time
                 when the question model was last updated.
         """
-        self.id = question_id
+        self.suggestion_id = question_id
         self.question_content = html_cleaner.clean(question_content)
         self.misconception_ids = misconception_ids
         self.interaction_id = interaction_id
@@ -2152,7 +2152,7 @@ class QuestionSummary:
         """
 
         return {
-            'id': self.id,
+            'id': self.suggestion_id,
             'question_content': self.question_content,
             'interaction_id': self.interaction_id,
             'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
@@ -2167,9 +2167,9 @@ class QuestionSummary:
             ValidationError. One or more attributes of question summary are
                 invalid.
         """
-        if not isinstance(self.id, str):
+        if not isinstance(self.suggestion_id, str):
             raise utils.ValidationError(
-                'Expected id to be a string, received %s' % self.id)
+                'Expected id to be a string, received %s' % self.suggestion_id)
 
         if not isinstance(self.question_content, str):
             raise utils.ValidationError(

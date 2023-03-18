@@ -849,18 +849,18 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Setup the blog posts to fit into different tags groups.
         # Also, ensure 2 of them have similar titles and are written by 2
         # different authors.
-        self.ids_of_blog_posts_by_user_A = []
+        self.suggestion_ids_of_blog_posts_by_user_A = []
         for _ in range(3):
             blog_post = blog_services.create_new_blog_post(self.user_id_a)
-            self.ids_of_blog_posts_by_user_A.append(blog_post.id)
+            self.suggestion_ids_of_blog_posts_by_user_A.append(blog_post.id)
 
-        self.ids_of_blog_posts_by_user_B = []
+        self.suggestion_ids_of_blog_posts_by_user_B = []
         for _ in range(4):
             blog_post = blog_services.create_new_blog_post(self.user_id_b)
-            self.ids_of_blog_posts_by_user_B.append(blog_post.id)
+            self.suggestion_ids_of_blog_posts_by_user_B.append(blog_post.id)
 
         self.all_blog_post_ids = (
-            self.ids_of_blog_posts_by_user_A + self.ids_of_blog_posts_by_user_B
+            self.suggestion_ids_of_blog_posts_by_user_A + self.suggestion_ids_of_blog_posts_by_user_B
         )
 
         change_dict_1: blog_services.BlogPostChangeDict = {
@@ -870,7 +870,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             'tags': ['Math', 'Science']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_A[0], change_dict_1)
+            self.suggestion_ids_of_blog_posts_by_user_A[0], change_dict_1)
 
         change_dict_2: blog_services.BlogPostChangeDict = {
             'title': 'Welcome',
@@ -879,7 +879,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             'tags': ['Math', 'Social']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_A[1], change_dict_2)
+            self.suggestion_ids_of_blog_posts_by_user_A[1], change_dict_2)
 
         change_dict_3: blog_services.BlogPostChangeDict = {
             'title': 'Intro to Mathematics in Oppia',
@@ -888,7 +888,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             'tags': ['Math']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_A[2], change_dict_3)
+            self.suggestion_ids_of_blog_posts_by_user_A[2], change_dict_3)
 
         change_dict_4: blog_services.BlogPostChangeDict = {
             'title': 'New Lessons in Mathematics',
@@ -897,7 +897,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             'tags': ['Math', 'Oppia']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_B[0], change_dict_4)
+            self.suggestion_ids_of_blog_posts_by_user_B[0], change_dict_4)
         change_dict_5: blog_services.BlogPostChangeDict = {
             'title': 'Basic English Lessons',
             'thumbnail_filename': 'thumbnail.svg',
@@ -905,7 +905,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             'tags': ['English', 'Oppia', 'Social']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_B[1], change_dict_5)
+            self.suggestion_ids_of_blog_posts_by_user_B[1], change_dict_5)
 
         change_dict_6: blog_services.BlogPostChangeDict = {
             'title': 'Basic',
@@ -914,7 +914,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             'tags': ['English', 'Science', 'Social']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_B[2], change_dict_6)
+            self.suggestion_ids_of_blog_posts_by_user_B[2], change_dict_6)
 
         change_dict_7: blog_services.BlogPostChangeDict = {
             'title': 'Basic Learning',
@@ -923,7 +923,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             'tags': ['English', 'Math', 'Science', 'Social']
         }
         blog_services.update_blog_post(
-            self.ids_of_blog_posts_by_user_B[3], change_dict_7)
+            self.suggestion_ids_of_blog_posts_by_user_B[3], change_dict_7)
 
         # Publishing blog post 0-6. Draft blog post summaries should not show up
         # in a search query, even if they're indexed. Publishing a blog post
@@ -993,8 +993,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
-                self.ids_of_blog_posts_by_user_A[0],
-                self.ids_of_blog_posts_by_user_A[2],
+                self.suggestion_ids_of_blog_posts_by_user_A[0],
+                self.suggestion_ids_of_blog_posts_by_user_A[2],
             ])
         )
 
@@ -1007,8 +1007,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
-                self.ids_of_blog_posts_by_user_B[1],
-                self.ids_of_blog_posts_by_user_B[2],
+                self.suggestion_ids_of_blog_posts_by_user_B[1],
+                self.suggestion_ids_of_blog_posts_by_user_B[2],
             ])
         )
 
@@ -1021,7 +1021,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
-                self.ids_of_blog_posts_by_user_A[1],
+                self.suggestion_ids_of_blog_posts_by_user_A[1],
             ])
         )
 
@@ -1034,8 +1034,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
-                self.ids_of_blog_posts_by_user_B[0],
-                self.ids_of_blog_posts_by_user_B[1],
+                self.suggestion_ids_of_blog_posts_by_user_B[0],
+                self.suggestion_ids_of_blog_posts_by_user_B[1],
             ])
         )
 
@@ -1048,7 +1048,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(blog_post_ids),
             sorted([
-                self.ids_of_blog_posts_by_user_B[1],
+                self.suggestion_ids_of_blog_posts_by_user_B[1],
             ])
         )
 
