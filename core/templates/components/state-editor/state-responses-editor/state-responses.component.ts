@@ -349,8 +349,9 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   deleteAnswerGroup(evt: Event, index: number): void {
     // Prevent clicking on the delete button from also toggling the
     // display state of the answer group.
-    if(evt.type == "click")
+    if (evt.type === 'click'){
       evt.stopPropagation();
+    }
 
     this.alertsService.clearWarnings();
     this.ngbModal.open(DeleteAnswerGroupModalComponent, {
