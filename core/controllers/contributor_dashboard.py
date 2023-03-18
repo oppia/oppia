@@ -397,7 +397,7 @@ class ReviewableOpportunitiesHandler(
         in_review_suggestion_target_ids = {
             suggestion.target_id
             for suggestion in
-            suggestion_services.get_suggestions_with_translatable_explorations(
+            suggestion_services.get_suggestions_with_editable_explorations(
                 in_review_suggestions)
         }
         exp_ids = [

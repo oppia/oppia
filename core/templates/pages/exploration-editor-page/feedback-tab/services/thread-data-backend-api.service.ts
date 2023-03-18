@@ -129,6 +129,21 @@ export class ThreadDataBackendApiService {
 
           this.feedbackThreads = feedbackThreadBackendDicts.map(
             dict => this.setFeedbackThreadFromBackendDict(dict));
+          // Open Threads should be displayed first and older threads should be
+          // Given priority over newer threads,
+          // While addressed threads are sorted by last updated time.
+          let openFeedbackThreads: FeedbackThread[] = [];
+          let otherFeedbackThreads: FeedbackThread[] = [];
+          for (let i = 0; i < this.feedbackThreads.length; i++) {
+            if (this.feedbackThreads[i].status === 'open') {
+              openFeedbackThreads.push(this.feedbackThreads[i]);
+            } else {
+              otherFeedbackThreads.push(this.feedbackThreads[i]);
+            }
+          }
+          openFeedbackThreads.reverse();
+          this.feedbackThreads =
+            openFeedbackThreads.concat(otherFeedbackThreads);
           this._feedbackThreadsInitializedEventEmitter.emit();
           return this.feedbackThreads;
         },
