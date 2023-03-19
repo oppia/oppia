@@ -48,7 +48,8 @@
       <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
         <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
           <oppia-input-response-pair [data]="responsePair"
-                                     [profilePicture]="profilePicture"
+                                     [profilePicturePngDataUrl]="profilePicturePngDataUrl"
+                                     [profilePictureWebpDataUrl]="profilePictureWebpDataUrl"
                                      [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                      [inputResponsePairId]="getInputResponsePairId($index)"
                                      [isLastPair]="false"
@@ -62,7 +63,8 @@
     <div class="conversation-skin-tutor-card-bottom-section" *ngIf="isInteractionInline() && displayedCard.getInputResponsePairs().length > 0">
       <oppia-input-response-pair [data]="displayedCard.getInputResponsePairs()[displayedCard.getInputResponsePairs().length - 1]"
                                  [bottomSection]="true"
-                                 [profilePicture]="profilePicture"
+                                 [profilePicturePngDataUrl]="profilePicturePngDataUrl"
+                                 [profilePictureWebpDataUrl]="profilePictureWebpDataUrl"
                                  [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                  [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
                                  [isLastPair]="true"
