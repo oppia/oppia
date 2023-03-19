@@ -139,7 +139,8 @@ export class OutcomeEditorComponent implements OnInit {
     }
     return Boolean (
       outcome &&
-    outcome.destIfReallyStuck === this.stateEditorService.getActiveStateName());
+      outcome.destIfReallyStuck === (
+        this.stateEditorService.getActiveStateName()));
   }
 
   getCurrentInteractionId(): string {
