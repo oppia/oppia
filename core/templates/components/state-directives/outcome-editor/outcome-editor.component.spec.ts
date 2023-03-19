@@ -406,6 +406,22 @@ describe('Outcome Editor Component', () => {
     expect(component.isSelfLoopDestStuck(outcome)).toBeFalse();
   });
 
+  it('should check if the destIfReally is null', () => {
+    let outcome = new Outcome(
+      'Me Llamo',
+      null,
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
+
+    expect(outcome.destIfReallyStuck).toBe(null);
+
+    expect(component.isSelfLoopDestStuck(outcome)).toBe(true);
+  });
+
   it('should open feedback editor if it is editable', () => {
     component.feedbackEditorIsOpen = false;
     component.isEditable = true;
