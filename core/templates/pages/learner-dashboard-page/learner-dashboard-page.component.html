@@ -261,14 +261,20 @@
                   <div class="row">
                     <div class="col-sm-9">
                       <span class="feedback-message-header">
-                        <span *ngIf="message.authorPictureDataUrl"
+                        <span *ngIf="message.authorUsername"
                               class="d-inline-block">
-                          <img [src]="decodePngURIData(message.authorPictureDataUrl)"
-                               class="oppia-navbar-profile-picture rounded-circle oppia-profile-picture"
-                               alt="User Avatar">
+                          <picture>
+                            <source type="image/webp"
+                                    [srcset]="getauthorPictureWebpDataUrl(message.authorUsername)">
+                            <source type="image/png"
+                                    [srcset]="getauthorPicturePngDataUrl(message.authorUsername)">
+                            <img class="oppia-navbar-profile-picture rounded-circle oppia-profile-picture"
+                                 [src]="getauthorPicturePngDataUrl(message.authorUsername)"
+                                 alt="User Avatar">
+                          </picture>
                         </span>
 
-                        <span *ngIf="!message.authorPictureDataUrl"
+                        <span *ngIf="!message.authorUsername"
                               class="d-inline-block">
                           <i class="oppia-profile-alignment fas fa-user-circle fa-2x"></i>
                         </span>
@@ -315,9 +321,13 @@
                   <div class="col-sm-1 feedback-message-author-picture oppia-feedback-message-spacing p-0">
                     <span class="feedback-message-header">
                       <span class="d-inline-block">
-                        <img [src]="profilePictureDataUrl"
-                             class="oppia-navbar-profile-picture rounded-circle feedback-thread-learner-profile-pic"
-                             alt="User Avatar">
+                        <picture>
+                          <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                          <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                          <img [src]="profilePicturePngDataUrl"
+                               class="oppia-navbar-profile-picture rounded-circle feedback-thread-learner-profile-pic"
+                               alt="User Avatar">
+                        </picture>
                       </span>
                     </span>
                   </div>
