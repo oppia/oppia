@@ -29,7 +29,6 @@ export interface BlogAuthorDetailsBackendDict {
 }
 export interface BlogDashboardBackendResponse {
   'author_details': BlogAuthorDetailsBackendDict;
-  'profile_picture_data_url': string;
   'no_of_published_blog_posts': number;
   'no_of_draft_blog_posts': number;
   'published_blog_post_summary_dicts': BlogPostSummaryBackendDict[];
@@ -42,7 +41,6 @@ interface NewBlogPostBackendResponse {
 export interface BlogDashboardData {
   displayedAuthorName: string;
   authorBio: string;
-  profilePictureDataUrl: string;
   numOfPublishedBlogPosts: number;
   numOfDraftBlogPosts: number;
   publishedBlogPostSummaryDicts: BlogPostSummary[];
@@ -66,7 +64,6 @@ export class BlogDashboardBackendApiService {
           resolve({
             displayedAuthorName: response.author_details.displayed_author_name,
             authorBio: response.author_details.author_bio,
-            profilePictureDataUrl: response.profile_picture_data_url,
             numOfDraftBlogPosts: response.no_of_draft_blog_posts,
             numOfPublishedBlogPosts: response.no_of_published_blog_posts,
             publishedBlogPostSummaryDicts: (
