@@ -136,7 +136,7 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
 
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
-    """Run the scripts to start end-to-end tests."""
+    """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
         sys.exit(1)
 
@@ -164,7 +164,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             port=GOOGLE_APP_ENGINE_PORT,
             log_level=args.server_log_level,
             # Automatic restart can be disabled since we don't expect code
-            # changes to happen while the e2e tests are running.
+            # changes to happen while the acceptance tests are running.
             automatic_restart=False,
             skip_sdk_update_check=True,
             env={
@@ -173,8 +173,8 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             }))
 
         proc = stack.enter_context(servers.managed_acceptance_tests_server(
-                suite_name=args.suite,
-                stdout=subprocess.PIPE))
+            suite_name=args.suite,
+            stdout=subprocess.PIPE))
 
         print('Servers have come up.\n')
 

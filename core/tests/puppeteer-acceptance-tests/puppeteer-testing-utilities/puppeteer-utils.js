@@ -41,6 +41,9 @@ module.exports = class baseUser {
   async openBrowser() {
     await puppeteer
       .launch({
+        /** TODO(#17761): Right as of now some acceptance tests are failing on
+         * headless mode. As per the expected behavior we need to make sure
+         * every test passes on both the mode. */
         headless: false,
         args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
       })
