@@ -1,6 +1,6 @@
 <div class="form-inline oppia-form-inline protractor-test-dest-if-stuck-bubble">
   <div class="oppia-rule-details-header">
-    <strong>(Optional) If the learner is really stuck, direct them to</strong>
+    <strong>(Optional) If the learner is really stuck, direct them to...</strong>
     <div ngbTooltip="{{ 'I18N_DEST_IF_STUCK_INFO_TOOLTIP' | translate }}"
          placement="right"
          class="dest-if-stuck-tooltip">
@@ -12,7 +12,7 @@
       <select class="form-control oppia-form-control"
               [(ngModel)]="outcome.destIfReallyStuck"
               (ngModelChange)="onDestIfStuckSelectorChange()">
-        <option *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
+        <option class="e2e-test-afterward-dest-selector" *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
       </select>
     </span>
   </div>

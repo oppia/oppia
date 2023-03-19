@@ -43,6 +43,7 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 
 import './top-navigation-bar.component.css';
+import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 
 interface LanguageInfo {
   id: string;
@@ -60,6 +61,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() headerText!: string;
   @Input() subheaderText!: string;
+
+  LEARNER_DASHBOARD_SECTION_I18N_IDS = (
+    LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
 
   DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
   MEDIUM_BLOG_URL = 'https://medium.com/oppia-org';
