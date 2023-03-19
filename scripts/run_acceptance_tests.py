@@ -28,7 +28,6 @@ from scripts import common  # isort:skip pylint: disable=wrong-import-position, 
 
 from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
-from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
 
 GOOGLE_APP_ENGINE_PORT: Final = 8181
