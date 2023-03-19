@@ -48,6 +48,7 @@ import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { UserInfo } from 'domain/user/user-info.model';
 import { FeatureStatusChecker } from 'domain/platform_feature/feature-status-summary.model';
 
 class MockWindowRef {
@@ -183,6 +184,8 @@ describe('Tutor card component', () => {
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   afterEach(() => {
@@ -190,10 +193,23 @@ describe('Tutor card component', () => {
   });
 
   it('should initialize', fakeAsync(() => {
+    const sampleUserInfoBackendObject = {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+    const sampleUserInfo = UserInfo.createFromBackendDict(
+      sampleUserInfoBackendObject);
     let mockOnActiveCardChangedEventEmitter = new EventEmitter<void>();
     let mockOnOppiaFeedbackAvailableEventEmitter = new EventEmitter<void>();
     let isIframed = false;
-    let profilePicture = 'profile_url';
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValues(
       true, false);
@@ -208,9 +224,9 @@ describe('Tutor card component', () => {
     spyOnProperty(explorationPlayerStateService, 'onOppiaFeedbackAvailable')
       .and.returnValue(mockOnOppiaFeedbackAvailableEventEmitter);
     spyOn(componentInstance, 'getInputResponsePairId').and.returnValue('hash');
-    spyOn(userService, 'getProfileImageDataUrlAsync').and.returnValue(
-      Promise.resolve(profilePicture));
     componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(sampleUserInfo));
 
     componentInstance.ngOnInit();
     componentInstance.isAudioBarExpandedOnMobileDevice();
@@ -221,7 +237,11 @@ describe('Tutor card component', () => {
 
     componentInstance.ngOnInit();
     tick();
-    expect(componentInstance.profilePicture).toEqual(profilePicture);
+    tick();
+    expect(componentInstance.profilePicturePngDataUrl).toEqual(
+      'default-image-url-png');
+    expect(componentInstance.profilePictureWebpDataUrl).toEqual(
+      'default-image-url-webp');
 
     expect(componentInstance.isIframed).toEqual(isIframed);
     expect(contextService.isInExplorationEditorPage).toHaveBeenCalled();
@@ -231,6 +251,28 @@ describe('Tutor card component', () => {
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
+
+  it('should set default profile pictures when username is null',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'updateDisplayedCard');
+      let userInfo = {
+        isLoggedIn: () => true,
+        getUsername: () => null
+      };
+
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+
+      componentInstance.ngOnInit();
+      tick();
+
+      expect(componentInstance.profilePicturePngDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      expect(componentInstance.profilePictureWebpDataUrl).toBe(
+        urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+    }));
 
   it('should refresh displayed card on changes', fakeAsync(() => {
     let updateDisplayedCardSpy = spyOn(

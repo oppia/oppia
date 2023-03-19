@@ -342,9 +342,15 @@
     <mat-card class="oppia-subscription-card e2e-test-subscription-card"
               *ngFor="let subscriber of subscribersList | sortBy: isCurrentSubscriptionSortDescending: sortSubscriptionFunction()">
       <a class="oppia-subscription-profile-link" [href]="'/profile/' + subscriber.username" target="_blank" rel="noopener">
-        <img [src]="getTrustedResourceUrl(subscriber.pictureDataUrl)"
-             class="oppia-subscription-card-profile-picture rounded-circle"
-             alt="subscriberImageUrl">
+        <picture>
+          <source type="image/webp"
+                  [srcset]="getProfileImageWebpDataUrl(subscriber.username)">
+          <source type="image/png"
+                  [srcset]="getProfileImagePngDataUrl(subscriber.username)">
+          <img class="oppia-subscription-card-profile-picture rounded-circle"
+               [src]="getProfileImagePngDataUrl(subscriber.username)"
+               alt="subscriberImageUrl">
+        </picture>
         <span class="oppia-subscription-card-summary">
           <div class="oppia-subscription-name-container">
             <strong class="e2e-test-subscription-name"
