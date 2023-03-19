@@ -47,10 +47,6 @@ The root folder MUST be named 'oppia'.
 """)
 
 _PARSER.add_argument(
-    '--skip-install',
-    help='If true, skips installing dependencies. The default value is false.',
-    action='store_true')
-_PARSER.add_argument(
     '--skip-build',
     help='If true, skips building files. The default value is false.',
     action='store_true')
@@ -102,16 +98,6 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
         sys.exit(1)
 
 
-def install_third_party_libraries(skip_install: bool) -> None:
-    """Run the installation script.
-
-    Args:
-        skip_install: bool. Whether to skip running the installation script.
-    """
-    if not skip_install:
-        install_third_party_libs.main()
-
-
 def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     """Build the javascript files.
 
@@ -139,8 +125,6 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
         sys.exit(1)
-
-    install_third_party_libraries(args.skip_install)
 
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
