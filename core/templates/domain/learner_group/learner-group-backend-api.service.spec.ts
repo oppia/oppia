@@ -263,7 +263,6 @@ describe('Learner Group Backend API Service', () => {
     );
     const sampleUserInfo = {
       username: 'username1',
-      profile_picture_data_url: 'profile_picture_url1',
       error: ''
     };
 
@@ -289,12 +288,10 @@ describe('Learner Group Backend API Service', () => {
     const allLearnersInfo = {
       learners_info: [{
         username: 'username1',
-        profile_picture_data_url: 'picture',
         error: ''
       }],
       invited_learners_info: [{
         username: 'username2',
-        profile_picture_data_url: 'picture2',
         error: ''
       }]
     };

@@ -30,6 +30,7 @@ import { CommunityLessonsTabComponent } from './community-lessons-tab.component'
 import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { UserService } from 'services/user.service';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
@@ -55,6 +56,7 @@ describe('Community lessons tab Component', () => {
   let ngbModal: NgbModal;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
+  let userService: UserService;
 
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
@@ -91,6 +93,7 @@ describe('Community lessons tab Component', () => {
       TestBed.inject(LearnerDashboardActivityBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    userService = TestBed.inject(UserService);
     component.incompleteExplorationsList = [];
     component.incompleteCollectionsList = [];
     component.completedExplorationsList = [];
@@ -99,6 +102,9 @@ describe('Community lessons tab Component', () => {
     component.collectionPlaylist = [];
     component.subscriptionsList = [];
     component.completedToIncompleteCollections = [];
+
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
 
     fixture.detectChanges();
   });
@@ -227,6 +233,16 @@ describe('Community lessons tab Component', () => {
     component.totalCompletedLessonsList = [completedSummary];
     result = component.getLessonType(completedSummary);
     expect(result).toEqual('Completed');
+  });
+
+  it('should get user profile image png data url correctly', () => {
+    expect(component.getProfileImagePngDataUrl('username')).toBe(
+      'default-image-url-png');
+  });
+
+  it('should get user profile image webp data url correctly', () => {
+    expect(component.getProfileImageWebpDataUrl('username')).toBe(
+      'default-image-url-webp');
   });
 
   it('should show username popover based on its length', () => {

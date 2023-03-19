@@ -193,7 +193,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Bloggers</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 0)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         blog_post_two_id = (
             blog_services.create_new_blog_post(self.blog_admin_id).id)
@@ -220,7 +219,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Blog</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 1)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         # Deleting blog admin's user setting model.
         blog_admin_model = (
@@ -242,7 +240,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Blog</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 1)
-        self.assertIsNone(json_response['profile_picture_data_url'])
 
     def test_should_get_correct_recommendations_for_post_page(self) -> None:
         self.signup(
@@ -407,7 +404,6 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             len(json_response['summary_dicts']), 1)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         blog_services.unpublish_blog_post(self.blog_post.id)
         json_response = self.get_json(

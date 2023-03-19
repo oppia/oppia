@@ -56,6 +56,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -121,8 +122,6 @@ describe('Learner dashboard page', () => {
   let pageTitleService: PageTitleService = null;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let urlService: UrlService;
-
-  let profilePictureDataUrl = 'profile-picture-url';
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -228,22 +227,18 @@ describe('Learner dashboard page', () => {
 
   let subscriptionsList = [{
     creator_impact: 0,
-    creator_picture_data_url: 'creatorA-url',
     creator_username: 'Bucky',
   },
   {
     creator_impact: 1,
-    creator_picture_data_url: 'creatorB-url',
     creator_username: 'Arrow',
   },
   {
     creator_impact: 3,
-    creator_picture_data_url: 'creatorD-url',
     creator_username: 'Deadpool',
   },
   {
     creator_impact: 2,
-    creator_picture_data_url: 'creatorC-url',
     creator_username: 'Captain America',
   }];
 
@@ -471,15 +466,8 @@ describe('Learner dashboard page', () => {
           ));
       }
 
-      spyOn(userService, 'getProfileImageDataUrlAsync').and
-        .callFake(async() => {
-          return Promise.resolve(profilePictureDataUrl);
-        });
-
-      spyOn(userService, 'getUserInfoAsync').and
-        .callFake(async() => {
-          return Promise.resolve(userInfo);
-        });
+      spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+        ['profile-image-url-png', 'profile-image-url-webp']);
 
       spyOn(
         learnerDashboardBackendApiService,
@@ -547,10 +535,38 @@ describe('Learner dashboard page', () => {
 
     it('should initialize correctly component properties after its' +
     ' initialization and get data from backend', fakeAsync(() => {
-      expect(component.profilePictureDataUrl).toBe(profilePictureDataUrl);
+      spyOn(userService, 'getUserInfoAsync').and
+        .callFake(async() => {
+          return Promise.resolve(userInfo);
+        });
+      component.ngOnInit();
+      flush();
+
+      expect(component.profilePicturePngDataUrl).toEqual(
+        'profile-image-url-png');
+      expect(component.profilePictureWebpDataUrl).toEqual(
+        'profile-image-url-webp');
       expect(component.username).toBe(userInfo.getUsername());
       expect(component.windowIsNarrow).toBeTrue();
     }));
+
+    it('should get default profile pictures when username is null',
+      fakeAsync(() => {
+        let userInfo = {
+          getUsername: () => null,
+          isSuperAdmin: () => true,
+          getEmail: () => 'test_email@example.com'
+        };
+        spyOn(userService, 'getUserInfoAsync')
+          .and.resolveTo(userInfo as UserInfo);
+        component.ngOnInit();
+        flush();
+
+        expect(component.profilePicturePngDataUrl).toEqual(
+          '/assets/images/avatar/user_blue_150px.png');
+        expect(component.profilePictureWebpDataUrl).toEqual(
+          '/assets/images/avatar/user_blue_150px.webp');
+      }));
 
     it('should check whether window is narrow on resizing the screen', () => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
@@ -564,6 +580,10 @@ describe('Learner dashboard page', () => {
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
       const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+      spyOn(userService, 'getUserInfoAsync').and
+        .callFake(async() => {
+          return Promise.resolve(userInfo);
+        });
 
       component.ngOnInit();
       flush();
@@ -605,6 +625,16 @@ describe('Learner dashboard page', () => {
 
       expect(component.getStaticImageUrl(imagePath)).toBe(
         '/assets/images/path/to/image.png');
+    });
+
+    it('should get user profile image png data url correctly', () => {
+      expect(component.getauthorPicturePngDataUrl('username')).toBe(
+        'profile-image-url-png');
+    });
+
+    it('should get user profile image webp data url correctly', () => {
+      expect(component.getauthorPictureWebpDataUrl('username')).toBe(
+        'profile-image-url-webp');
     });
 
     it('should toggle active subsection type when changing subsection type',
@@ -819,7 +849,6 @@ describe('Learner dashboard page', () => {
         current_content_html: 'A orange',
         description: 'Suggestion for english grammar',
         author_username: 'username2',
-        author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
       const threadSpy = spyOn(
@@ -858,7 +887,6 @@ describe('Learner dashboard page', () => {
         current_content_html: 'A orange',
         description: 'Suggestion for english grammar',
         author_username: 'username2',
-        author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
       const threadSpy = spyOn(
@@ -909,7 +937,6 @@ describe('Learner dashboard page', () => {
           current_content_html: 'A orange',
           description: 'Suggestion for english grammar',
           author_username: 'username2',
-          author_picture_data_url: 'foo',
           created_on_msecs: 1200
         }];
 
@@ -955,7 +982,6 @@ describe('Learner dashboard page', () => {
           current_content_html: 'A orange',
           description: 'Suggestion for english grammar',
           author_username: 'username2',
-          author_picture_data_url: 'foo',
           created_on_msecs: 1200
         }];
 
@@ -1095,8 +1121,8 @@ describe('Learner dashboard page', () => {
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         Promise.resolve('sample-csrf-token'));
 
-      spyOn(userService, 'getProfileImageDataUrlAsync')
-        .and.returnValue(Promise.resolve(profilePictureDataUrl));
+      spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+        ['default-image-url-png', 'default-image-url-webp']);
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(userInfo));

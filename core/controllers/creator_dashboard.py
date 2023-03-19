@@ -284,8 +284,6 @@ class CreatorDashboardHandler(
         subscribers_list = []
         for index, subscriber_settings in enumerate(subscribers_settings):
             subscriber_summary = {
-                'subscriber_picture_data_url': (
-                    subscriber_settings.profile_picture_data_url),
                 'subscriber_username': subscriber_settings.username,
                 'subscriber_impact': (
                     user_services.get_user_impact_score(subscriber_ids[index]))

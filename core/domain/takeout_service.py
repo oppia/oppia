@@ -23,6 +23,8 @@ import logging
 import re
 
 from core import feconf
+from core import utils
+from core.domain import fs_services
 from core.domain import takeout_domain
 from core.domain import user_services
 from core.platform import models
@@ -101,39 +103,22 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
         final_name = ('_').join([x.lower() for x in split_name])
         exported_data[final_name] = exported_model_data
 
-    # Separate out images. We store the images that need to be separated here
-    # as a dictionary mapping tuples to strings. The tuple value indicates the
-    # "path" to take to the image in the user's data dictionary, and the string
-    # indicates the filename that the exported image will be saved to.
-    replacement_instructions = [
-        takeout_domain.TakeoutImageReplacementInstruction(
-            ('user_settings', 'profile_picture_data_url'),
-            'user_settings_profile_picture.png',
-            'profile_picture_filename'
-        )
-    ]
     takeout_image_files: List[takeout_domain.TakeoutImage] = []
-    for replacement_instruction in replacement_instructions:
-        dictionary_path = replacement_instruction.dictionary_path
-        replacement_filename = replacement_instruction.export_filename
-        replacement_key = replacement_instruction.new_key
-
-        # Move pointer to the position indicated by the tuple.
-        pointer = exported_data
-        for key in dictionary_path[:-1]:
-            pointer = pointer[key]
-
-        # Swap out data with replacement filename.
-        image_key = dictionary_path[-1]
-        image_data = pointer[image_key]
-        if image_data is not None:
-            # Ruling out the possibility of Any for mypy type checking.
-            assert isinstance(image_data, str)
+    if user_settings is not None:
+        if user_settings.username is not None:
+            fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_USER, user_settings.username)
+            filename_png = 'profile_picture.png'
+            filename_webp = 'profile_picture.webp'
+            image_data_png = utils.convert_image_binary_to_data_url(
+                fs.get(filename_png), 'png')
+            image_data_webp = utils.convert_image_binary_to_data_url(
+                fs.get(filename_webp), 'webp')
             takeout_image_files.append(
-                takeout_domain.TakeoutImage(image_data, replacement_filename))
-            pointer[image_key] = replacement_filename
-
-        # Rename the key.
-        pointer[replacement_key] = pointer.pop(image_key)
+                takeout_domain.TakeoutImage(
+                    image_data_png, 'user_settings_profile_picture.png'))
+            takeout_image_files.append(
+                takeout_domain.TakeoutImage(
+                    image_data_webp, 'user_settings_profile_picture.webp'))
 
     return takeout_domain.TakeoutData(exported_data, takeout_image_files)

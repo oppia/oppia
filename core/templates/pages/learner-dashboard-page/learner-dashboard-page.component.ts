@@ -19,7 +19,6 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SafeResourceUrl } from '@angular/platform-browser';
 import { trigger, state, style, transition,
   animate, group } from '@angular/animations';
 import { TranslateService } from '@ngx-translate/core';
@@ -135,7 +134,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
 
   messageSendingInProgress!: boolean;
-  profilePictureDataUrl!: SafeResourceUrl;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   newMessage!: {
     'text': string | null;
   };
@@ -180,14 +180,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    let userProfileImagePromise =
-      this.userService.getProfileImageDataUrlAsync();
-    userProfileImagePromise.then(
-      dataUrl => {
-        this.profilePictureDataUrl =
-          decodeURIComponent(dataUrl);
-      });
-
     this.loaderService.showLoadingScreen('Loading');
 
     let userInfoPromise = this.userService.getUserInfoAsync();
@@ -195,6 +187,15 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       const username = userInfo.getUsername();
       if (username) {
         this.username = username;
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(username));
+      } else {
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       }
     });
     this.homeImageUrl = this.getStaticImageUrl('/learner_dashboard/home.svg');
@@ -285,6 +286,18 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  getauthorPicturePngDataUrl(username: string): string {
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getauthorPictureWebpDataUrl(username: string): string {
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
   }
 
   setPageTitle(): void {
@@ -552,7 +565,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         let newMessageSummary = (
           FeedbackMessageSummary.createNewMessage(
             this.threadSummary.totalMessageCount, newMessage,
-            this.username, String(this.profilePictureDataUrl)));
+            this.username));
         this.messageSummaries.push(newMessageSummary);
       });
   }

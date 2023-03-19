@@ -36,7 +36,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         """Tests the create_default_topic() function."""
         default_pending_deletion = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_id_a, 'a@example.com'))
+                self.user_id_a, 'username', 'a@example.com'))
         self.assertEqual(default_pending_deletion.user_id, self.user_id_a)
         self.assertEqual(default_pending_deletion.email, 'a@example.com')
         self.assertIsNone(
@@ -49,7 +49,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         """Tests the create_default_topic() function."""
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_id_a, 'a@example.com'))
+                self.user_id_a, 'username', 'a@example.com'))
         pending_deletion_request.pseudonymizable_entity_mappings = {
             'wrong_key': {}
         }

@@ -16,10 +16,14 @@
       {{ blogPostSummary.title }}
     </mat-card-title>
     <mat-card-header class="mt-2">
-      <img mat-card-avatar
-           [src]="authorProfilePictureUrl"
-           alt="Profile image of the author of the blog post"
-           class="e2e-test-profile-current-user-photo">
+      <picture>
+        <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
+        <source type="image/png" [srcset]="authorProfilePicPngUrl">
+        <img mat-card-avatar
+             [src]="authorProfilePicPngUrl"
+             class="e2e-test-profile-user-photo"
+             alt="Profile image of the author of the blog post">
+      </picture>
       <mat-card-subtitle class="e2e-test-username-visible">
         {{ blogPostSummary.displayedAuthorName }}
       </mat-card-subtitle>

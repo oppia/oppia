@@ -39,7 +39,6 @@ describe('Blog Dashboard backend api service', () => {
   };
   let blogDashboardBackendResponse: BlogDashboardBackendResponse = {
     author_details: authorDetials,
-    profile_picture_data_url: 'image',
     no_of_published_blog_posts: 0,
     no_of_draft_blog_posts: 0,
     published_blog_post_summary_dicts: [] as BlogPostSummaryBackendDict[],
@@ -60,8 +59,6 @@ describe('Blog Dashboard backend api service', () => {
   let blogDashboardDataObject: BlogDashboardData = {
     displayedAuthorName: 'test_name',
     authorBio: 'author bio',
-    profilePictureDataUrl: (
-      blogDashboardBackendResponse.profile_picture_data_url),
     numOfDraftBlogPosts: blogDashboardBackendResponse.no_of_draft_blog_posts,
     numOfPublishedBlogPosts: (
       blogDashboardBackendResponse.no_of_published_blog_posts),

@@ -42,6 +42,8 @@ interface SaveImageResponse {
   providedIn: 'root'
 })
 export class AssetsBackendApiService {
+  public readonly profileImagePngUrlTemplate: string;
+  public readonly profileImageWebpUrlTemplate: string;
   private readonly downloadUrlTemplate: string;
 
   /** List of audio files that have been requested but have not returned. */
@@ -64,6 +66,10 @@ export class AssetsBackendApiService {
     }
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
+    this.profileImagePngUrlTemplate = (
+      urlPrefix + '/user/<username>/assets/profile_picture.png');
+    this.profileImageWebpUrlTemplate = (
+      urlPrefix + '/user/<username>/assets/profile_picture.webp');
   }
 
   static get EMULATOR_MODE(): boolean {

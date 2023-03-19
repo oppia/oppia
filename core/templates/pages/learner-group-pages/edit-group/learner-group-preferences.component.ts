@@ -24,6 +24,7 @@ import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-in
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
+import { UserService } from 'services/user.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { DeleteLearnerGroupModalComponent } from '../templates/delete-learner-group-modal.component';
 import { InviteLearnersModalComponent } from '../templates/invite-learners-modal.component';
@@ -56,7 +57,8 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     private windowRef: WindowRef,
     private loaderService: LoaderService,
     private learnerGroupBackendApiService:
-      LearnerGroupBackendApiService
+      LearnerGroupBackendApiService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -212,8 +214,16 @@ export class LearnerGroupPreferencesComponent implements OnInit {
     this.invitedLearners = invitedLearners;
   }
 
-  getProfileImageDataUrl(dataUrl: string): string {
-    return decodeURIComponent(dataUrl);
+  getProfileImagePngDataUrl(username: string): string {
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
   }
 
   deleteLearnerGroup(): void {

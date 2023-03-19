@@ -41,7 +41,6 @@ interface DeleteBlogPostBackendResponse {
 interface BlogPostEditorBackendResponse {
   'blog_post_dict': BlogPostBackendDict;
   'displayed_author_name': string;
-  'profile_picture_data_url': string;
   'max_no_of_tags': number;
   'list_of_default_tags': string[];
 }
@@ -53,7 +52,6 @@ interface DoesBlogPostWithTitleExistBackendResponse {
 export interface BlogPostEditorData {
   blogPostDict: BlogPostData;
   displayedAuthorName: string;
-  profilePictureDataUrl: string;
   maxNumOfTags: number;
   listOfDefaulTags: string[];
 }
@@ -82,7 +80,6 @@ export class BlogPostEditorBackendApiService {
             blogPostDict: BlogPostData.createFromBackendDict(
               response.blog_post_dict),
             maxNumOfTags: response.max_no_of_tags,
-            profilePictureDataUrl: response.profile_picture_data_url,
             listOfDefaulTags: response.list_of_default_tags,
           });
         }, (errorResponse) => {

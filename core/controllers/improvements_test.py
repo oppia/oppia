@@ -514,7 +514,6 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             'issue_description': 'issue description',
             'status': 'resolved',
             'resolver_username': None,
-            'resolver_profile_picture_data_url': None,
             'resolved_on_msecs': utils.get_time_in_millisecs(self.MOCK_DATE),
         })
 

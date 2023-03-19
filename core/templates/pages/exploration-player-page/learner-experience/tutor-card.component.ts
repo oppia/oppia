@@ -129,7 +129,8 @@ export class TutorCardComponent {
   isIframed!: boolean;
   getCanAskLearnerForAnswerInfo!: () => boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
-  profilePicture!: string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   directiveSubscriptions = new Subscription();
   arePreviousResponsesShown: boolean = false;
   nextMilestoneChapterCount: number | null = null;
@@ -138,6 +139,7 @@ export class TutorCardComponent {
   checkMarkSkipped: boolean = false;
   confettiAnimationTimeout!: NodeJS.Timeout;
   skipClickListener: Function | null = null;
+  username!: string | null;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -162,27 +164,40 @@ export class TutorCardComponent {
     private translateService: TranslateService
   ) {}
 
+  async getUserInfoAsync(): Promise<void> {
+    const userInfo = await this.userService.getUserInfoAsync();
+    this.username = userInfo.getUsername();
+    if (!this._editorPreviewMode) {
+      if (this.username !== null) {
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(this.username));
+      } else {
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+      }
+    } else {
+      this.profilePictureWebpDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.profilePicturePngDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+    }
+  }
+
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+    this.getUserInfoAsync();
     this.isIframed = this.urlService.isIframed();
     this.getCanAskLearnerForAnswerInfo = (
       this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo);
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService
         .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
-
-    this.profilePicture = this.urlInterpolationService
-      .getStaticImageUrl('/avatar/user_blue_72px.png');
-
-    if (!this._editorPreviewMode) {
-      this.userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-        this.profilePicture = dataUrl;
-      });
-    } else {
-      this.profilePicture = (
-        this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-    }
 
     this.directiveSubscriptions.add(
       this.explorationPlayerStateService.onOppiaFeedbackAvailable.subscribe(

@@ -25,6 +25,7 @@ import { LearnerGroupUserInfo } from
 import { LearnerGroupUserProgress } from
   'domain/learner_group/learner-group-user-progress.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { UserService } from 'services/user.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 
 import './learner-group-overview.component.css';
@@ -45,7 +46,8 @@ export class LearnerGroupOverviewComponent implements OnInit {
 
   constructor(
     private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService
+      LearnerGroupSyllabusBackendApiService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -79,7 +81,6 @@ export class LearnerGroupOverviewComponent implements OnInit {
           storyCompletionsInfo.push(
             new LearnerGroupUserInfo(
               learnerProgress.username,
-              learnerProgress.profilePictureDataUrl,
               ''
             )
           );
@@ -102,7 +103,6 @@ export class LearnerGroupOverviewComponent implements OnInit {
           strugglingLearnerInfo.push(
             new LearnerGroupUserInfo(
               learnerProgress.username,
-              learnerProgress.profilePictureDataUrl,
               ''
             )
           );
@@ -112,8 +112,16 @@ export class LearnerGroupOverviewComponent implements OnInit {
     return strugglingLearnerInfo;
   }
 
-  getProfileImageDataUrl(dataUrl: string): string {
-    return decodeURIComponent(dataUrl);
+  getProfileImagePngDataUrl(username: string): string {
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
   }
 }
 

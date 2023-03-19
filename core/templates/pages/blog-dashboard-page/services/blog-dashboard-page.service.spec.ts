@@ -184,12 +184,6 @@ describe('Blog Post Page service', () => {
     expect(blogDashboardPageService.blogPostId).toEqual('abc123456abc');
   });
 
-  it('should set and retrieve author picture url correctly', () => {
-    blogDashboardPageService.authorPictureUrl = 'sample.png';
-
-    expect(blogDashboardPageService.authorPictureUrl).toEqual('sample.png');
-  });
-
   it('should set and retrieve blog post data correctly', () => {
     let summaryObject = BlogPostData.createFromBackendDict(
       { id: 'sampleId',

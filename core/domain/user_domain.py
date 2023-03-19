@@ -45,7 +45,6 @@ class UserSettingsDict(TypedDict):
     last_logged_in: Optional[datetime.datetime]
     last_created_an_exploration: Optional[datetime.datetime]
     last_edited_an_exploration: Optional[datetime.datetime]
-    profile_picture_data_url: Optional[str]
     default_dashboard: str
     creator_dashboard_display_pref: str
     user_bio: str
@@ -83,8 +82,6 @@ class UserSettings:
             last created an exploration.
         last_edited_an_exploration: datetime.datetime or None. When the user
             last edited an exploration.
-        profile_picture_data_url: str or None. User uploaded profile picture as
-            a dataURI string.
         default_dashboard: str. The default dashboard of the user.
         user_bio: str. User-specified biography.
         subject_interests: list(str) or None. Subject interests specified by
@@ -122,7 +119,6 @@ class UserSettings:
             Optional[datetime.datetime]) = None,
         last_edited_an_exploration: (
             Optional[datetime.datetime]) = None,
-        profile_picture_data_url: Optional[str]=None,
         default_dashboard: str = constants.DASHBOARD_TYPE_LEARNER,
         creator_dashboard_display_pref: str = (
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
@@ -161,8 +157,6 @@ class UserSettings:
                 user last created an exploration.
             last_edited_an_exploration: datetime.datetime or None. When the
                 user last edited an exploration.
-            profile_picture_data_url: str or None. User uploaded profile
-                picture as a dataURI string.
             default_dashboard: str. The default dashboard of the user.
             creator_dashboard_display_pref: str. The creator dashboard of the
                 user.
@@ -200,7 +194,6 @@ class UserSettings:
         self.last_logged_in = last_logged_in
         self.last_edited_an_exploration = last_edited_an_exploration
         self.last_created_an_exploration = last_created_an_exploration
-        self.profile_picture_data_url = profile_picture_data_url
         self.default_dashboard = default_dashboard
         self.creator_dashboard_display_pref = creator_dashboard_display_pref
         self.user_bio = user_bio
@@ -407,7 +400,6 @@ class UserSettings:
                 self.last_edited_an_exploration),
             'last_created_an_exploration': (
                 self.last_created_an_exploration),
-            'profile_picture_data_url': self.profile_picture_data_url,
             'default_dashboard': self.default_dashboard,
             'creator_dashboard_display_pref': (
                 self.creator_dashboard_display_pref),

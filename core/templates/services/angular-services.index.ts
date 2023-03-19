@@ -37,7 +37,6 @@ import { ExplorationCreationBackendApiService } from 'components/entity-creation
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
-import { ProfileLinkImageBackendApiService } from 'components/profile-link-directives/profile-link-image-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
@@ -731,7 +730,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['PreventPageUnloadEventService', PreventPageUnloadEventService],
   ['PredictionAlgorithmRegistryService', PredictionAlgorithmRegistryService],
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],
-  ['ProfileLinkImageBackendApiService', ProfileLinkImageBackendApiService],
   ['ProfilePageBackendApiService', ProfilePageBackendApiService],
   ['PromoBarBackendApiService', PromoBarBackendApiService],
   ['PythonProgramTokenizer', PythonProgramTokenizer],

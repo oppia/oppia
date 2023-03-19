@@ -32,7 +32,6 @@ describe('Learner Dashboard Backend API Service', () => {
 
   var sampleDataResults = {
     username: 'test',
-    profile_picture_data_url: 'TestURL',
     learner_dashboard_activity_ids: {
       completed_exploration_ids: [],
       exploration_playlist_ids: [],

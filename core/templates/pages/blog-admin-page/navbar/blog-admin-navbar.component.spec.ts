@@ -30,7 +30,8 @@ import { UserInfo } from 'domain/user/user-info.model';
 describe('Blog Admin navbar component', () => {
   let component: BlogAdminNavbarComponent;
   let userService: UserService;
-  let userProfileImage = 'profile-data-url';
+  let userProfilePngImage = 'path-to-png-profile-pic';
+  let userProfileWebpImage = 'path-to-webp-profile-pic';
   let userInfo = {
     getUsername: () => 'username1',
     isSuperAdmin: () => true
@@ -58,8 +59,8 @@ describe('Blog Admin navbar component', () => {
     userService = TestBed.inject(UserService);
     fixture.detectChanges();
 
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo(userProfileImage);
+    spyOn(userService, 'getProfileImageDataUrl')
+      .and.returnValue([userProfilePngImage, userProfileWebpImage]);
   }));
 
   it('should initialize component properties correctly', fakeAsync(() => {
@@ -69,7 +70,8 @@ describe('Blog Admin navbar component', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.profilePictureDataUrl).toBe(userProfileImage);
+    expect(component.profilePicturePngDataUrl).toBe(userProfilePngImage);
+    expect(component.profilePictureWebpDataUrl).toBe(userProfileWebpImage);
     expect(component.profileUrl).toBe(profileUrl);
     expect(component.profileDropdownIsActive).toBe(false);
   }));

@@ -3242,6 +3242,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_export_policy(), {
+                'username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,

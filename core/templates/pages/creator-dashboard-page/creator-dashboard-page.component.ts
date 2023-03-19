@@ -111,6 +111,18 @@ export class CreatorDashboardPageComponent {
   userDashboardDisplayPreference = (
     AppConstants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
 
+  getProfileImagePngDataUrl(username: string): string {
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
+      username);
+    return pngImageUrl;
+  }
+
+  getProfileImageWebpDataUrl(username: string): string {
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
+      username);
+    return webpImageUrl;
+  }
+
   setActiveTab(newActiveTabName: string): void {
     this.activeTab = newActiveTabName;
   }

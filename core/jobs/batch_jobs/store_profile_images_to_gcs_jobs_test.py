@@ -144,7 +144,7 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
         bucket = app_identity_services.get_gcs_resource_bucket_name()
         filepath_png = f'user/{username}/assets/profile_picture.png'
         filepath_webp = f'user/{username}/assets/profile_picture.webp'
-        png_binary = utils.convert_png_data_url_to_binary(data_url)
+        png_binary = utils.convert_data_url_to_binary(data_url, 'png')
         webp_binary = self._get_webp_binary_data(png_binary)
         storage_services.commit(bucket, filepath_png, png_binary, None)
         storage_services.commit(bucket, filepath_webp, webp_binary, None)
@@ -228,10 +228,10 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
         filepath_png = f'user/{self.user_1.username}/assets/profile_picture.png'
         filepath_webp = (
             f'user/{self.user_1.username}/assets/profile_picture.webp')
-        png_binary = utils.convert_png_data_url_to_binary(
-            user_services.DEFAULT_IDENTICON_DATA_URL)
-        valid_image_png_binary = utils.convert_png_data_url_to_binary(
-            VALID_IMAGE)
+        png_binary = utils.convert_data_url_to_binary(
+            user_services.DEFAULT_IDENTICON_DATA_URL, 'png')
+        valid_image_png_binary = utils.convert_data_url_to_binary(
+            VALID_IMAGE, 'png')
         webp_binary = self._get_webp_binary_data(valid_image_png_binary)
         storage_services.commit(bucket, filepath_png, png_binary, None)
         storage_services.commit(bucket, filepath_webp, webp_binary, None)

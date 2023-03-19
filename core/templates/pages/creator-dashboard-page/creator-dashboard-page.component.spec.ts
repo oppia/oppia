@@ -78,6 +78,8 @@ describe('Creator Dashboard Page Component', () => {
 
     spyOn(csrfService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
 
     // This approach was choosen because spyOn() doesn't work on properties
     // that doesn't have a get access type.
@@ -141,6 +143,16 @@ describe('Creator Dashboard Page Component', () => {
     component.createNewExploration();
     expect(
       explorationCreationService.createNewExploration).toHaveBeenCalled();
+  });
+
+  it('should get user profile image png data url correctly', () => {
+    expect(component.getProfileImagePngDataUrl('username')).toBe(
+      'default-image-url-png');
+  });
+
+  it('should get user profile image webp data url correctly', () => {
+    expect(component.getProfileImageWebpDataUrl('username')).toBe(
+      'default-image-url-webp');
   });
 
   describe('when fetching dashboard successfully and on explorations tab',

@@ -415,12 +415,14 @@
          (mouseleave)="closeSubmenuIfNotMobile($event)"
          autofocus>
         <div class="oppia-navbar-profile-picture-container dropdown-toggle">
-          <span *ngIf="profilePictureDataUrl">
-            <img [src]="profilePictureDataUrl"
+          <picture *ngIf="profilePicturePngDataUrl">
+            <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+            <source type="image/png" [srcset]="profilePicturePngDataUrl">
+            <img [src]="profilePicturePngDataUrl"
                  class="oppia-navbar-profile-picture rounded-circle"
                  alt="User Avatar">
-          </span>
-          <span *ngIf="!profilePictureDataUrl">
+          </picture>
+          <span *ngIf="!profilePicturePngDataUrl">
             <i class="fas fa-user-circle oppia-user-avatar-icon">
             </i>
             <span class="oppia-icon-accessibility-label">

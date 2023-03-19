@@ -63,7 +63,7 @@ class AuditInvalidProfilePictureJob(base_jobs.JobBase):
             # Ruling out the possibility of different types for
             # mypy type checking.
             assert isinstance(picture_str, str)
-            imgdata = utils.convert_png_data_url_to_binary(picture_str)
+            imgdata = utils.convert_data_url_to_binary(picture_str, 'png')
             image = Image.open(io.BytesIO(imgdata))
             width, height = image.size
             if width != 150 and height != 150:
@@ -151,7 +151,8 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
         width, height = 0, 0
 
         try:
-            imgdata = utils.convert_png_data_url_to_binary(profile_picture_data)
+            imgdata = utils.convert_data_url_to_binary(
+                profile_picture_data, 'png')
             height, width = image_services.get_image_dimensions(imgdata)
         except Exception:
             logging.exception('ERRORED EXCEPTION MIGRATION')
@@ -168,15 +169,15 @@ class FixInvalidProfilePictureJob(base_jobs.JobBase):
             raw_image_png = constants.get_package_file_contents(
                 'assets', default_image_path, binary_mode=True)
             user_model.profile_picture_data_url = (
-                utils.convert_png_or_webp_binary_to_data_url(
+                utils.convert_image_binary_to_data_url(
                     raw_image_png, 'png'))
 
         # Here we need to check for the default image again because there is a
         # possibility that in the above check we are not able to generate the
         # gravatar for the user having default image and we want to keep track
         # of all the default images.
-        imgdata = utils.convert_png_data_url_to_binary(
-            user_model.profile_picture_data_url)
+        imgdata = utils.convert_data_url_to_binary(
+            user_model.profile_picture_data_url, 'png')
         height, width = image_services.get_image_dimensions(imgdata)
         if (
             user_model.profile_picture_data_url ==

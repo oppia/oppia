@@ -26,6 +26,7 @@ import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-po
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { UserService } from 'services/user.service';
 
 describe('Blog Dashboard Tile Component', () => {
   let component: BlogCardComponent;
@@ -33,6 +34,7 @@ describe('Blog Dashboard Tile Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let contextService: ContextService;
   let sampleBlogPostSummary: BlogPostSummaryBackendDict;
+  let userService: UserService;
   class MockWindowRef {
     nativeWindow = {
       location: {
@@ -75,6 +77,7 @@ describe('Blog Dashboard Tile Component', () => {
     contextService = TestBed.inject(ContextService);
     component = fixture.componentInstance;
     mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    userService = TestBed.inject(UserService);
     sampleBlogPostSummary = {
       id: 'sampleId',
       author_username: 'test_username',
@@ -87,6 +90,8 @@ describe('Blog Dashboard Tile Component', () => {
       last_updated: '11/21/2014',
       published_on: '11/21/2014',
     };
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   it('should create', () => {
@@ -110,17 +115,14 @@ describe('Blog Dashboard Tile Component', () => {
     });
 
   it('should initialize', () => {
-    component.authorProfilePicDataUrl = 'data_image_url';
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
       sampleBlogPostSummary);
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue('sample_url');
     spyOn(contextService, 'isInBlogPostEditorPage').and.returnValue(true);
 
     component.ngOnInit();
 
-    expect(component.authorProfilePictureUrl).toEqual('data_image_url');
-    expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual('sample_url');
+    expect(component.authorProfilePicPngUrl).toEqual('default-image-url-png');
+    expect(component.authorProfilePicWebpUrl).toEqual('default-image-url-webp');
     expect(component.thumbnailUrl).toBe(
       '/assetsdevhandler/blog_post/sampleId/assets/' +
       'thumbnail/image.png');

@@ -48,7 +48,14 @@
                 </div>
                 <div *ngIf="getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-learners">
                   <div class="learner-info-card" *ngFor="let learnerInfo of getStrugglingLearnersInfoInSubtopics(subtopicSummary.subtopicPageId)">
-                    <img [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">
+                    <picture>
+                      <source type="image/webp"
+                              [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
+                      <source type="image/png"
+                              [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
+                      <img [src]="getProfileImagePngDataUrl(learnerInfo.username)"
+                           alt="User profile picture">
+                    </picture>
                     <div>{{learnerInfo.username}}</div>
                   </div>
                 </div>
@@ -75,7 +82,13 @@
               </div>
               <div *ngIf="getStoryCompletionsInfo(storySummary.getId()).length > 0" class="progress-summary-learners">
                 <div class="learner-info-card" *ngFor="let learnerInfo of getStoryCompletionsInfo(storySummary.getId())">
-                  <img [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">
+                  <picture>
+                    <source type="image/webp"
+                            [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
+                    <source type="image/png"
+                            [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
+                    <img [src]="getProfileImagePngDataUrl(learnerInfo.username)">
+                  </picture>
                   <div>{{learnerInfo.username}}</div>
                 </div>
               </div>

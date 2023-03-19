@@ -31,7 +31,8 @@ describe('Admin Navbar component', () => {
   let component: AdminNavbarComponent;
   let userService: UserService;
   let adminRouterService: AdminRouterService;
-  let userProfileImage = 'profile-data-url';
+  let userProfilePngImage = 'path-to-png-profile-pic';
+  let userProfileWebpImage = 'path-to-webp-profile-pic';
   let userInfo = {
     isModerator: () => true,
     getUsername: () => 'username1',
@@ -63,8 +64,8 @@ describe('Admin Navbar component', () => {
     adminRouterService = TestBed.get(AdminRouterService);
     fixture.detectChanges();
 
-    spyOn(userService, 'getProfileImageDataUrlAsync')
-      .and.resolveTo(userProfileImage);
+    spyOn(userService, 'getProfileImageDataUrl')
+      .and.returnValue([userProfilePngImage, userProfileWebpImage]);
   }));
 
   it('should initialize component properties correctly', fakeAsync(() => {
@@ -74,7 +75,8 @@ describe('Admin Navbar component', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.profilePictureDataUrl).toBe(userProfileImage);
+    expect(component.profilePicturePngDataUrl).toBe(userProfilePngImage);
+    expect(component.profilePictureWebpDataUrl).toBe(userProfileWebpImage);
     expect(component.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
     expect(component.username).toBe('username1');

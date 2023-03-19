@@ -904,7 +904,6 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(response['username'], 'invalid_username')
-        self.assertEqual(response['profile_picture_data_url'], '')
         self.assertEqual(
             response['error'],
             'User with username invalid_username does not exist.'
@@ -921,7 +920,6 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(response['username'], self.OWNER_USERNAME)
-        self.assertEqual(response['profile_picture_data_url'], '')
         self.assertEqual(
             response['error'],
             'You cannot invite yourself to the group'
@@ -941,7 +939,6 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(response['username'], self.NEW_USER_USERNAME)
-        self.assertEqual(response['profile_picture_data_url'], '')
         self.assertEqual(
             response['error'],
             'User with username %s has been already invited to join the '
@@ -965,10 +962,6 @@ class LearnerGroupSearchLearnerHandlerTests(test_utils.GenericTestBase):
             self.NEW_USER_USERNAME)
         assert user_settings is not None
         self.assertEqual(response['username'], user_settings.username)
-        self.assertEqual(
-            response['profile_picture_data_url'],
-            user_settings.profile_picture_data_url
-        )
         self.assertEqual(response['error'], '')
         self.logout()
 
@@ -1137,18 +1130,11 @@ class LearnerGroupLearnersInfoHandlerTests(test_utils.GenericTestBase):
             '/learner_group_learners_info_handler/%s' % self.learner_group_id
         )
 
-        learners_user_settings = user_services.get_users_settings(
-            [self.LEARNER_ID_1, self.LEARNER_ID_2], strict=True)
-
         learner_info = [{
-            'username': self.NEW_USER_USERNAME,
-            'profile_picture_data_url':
-                learners_user_settings[0].profile_picture_data_url
+            'username': self.NEW_USER_USERNAME
         }]
         invited_learner_info = [{
-            'username': self.LEARNER_USERNAME,
-            'profile_picture_data_url':
-                learners_user_settings[1].profile_picture_data_url
+            'username': self.LEARNER_USERNAME
         }]
         self.assertEqual(response['learners_info'], learner_info)
         self.assertEqual(

@@ -1,10 +1,13 @@
 <div *ngIf="activeTab === 'main'">
   <mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
     <mat-card-header class="blog-dashboard-header mr-0">
-      <img mat-card-avatar
-           [src]="authorProfilePictureUrl"
-           alt="Profile image of the author of the blog post"
-           class="e2e-test-profile-current-user-photo">
+      <picture>
+        <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
+        <source type="image/png" [srcset]="authorProfilePicPngUrl">
+        <img mat-card-avatar [src]="authorProfilePicPngUrl"
+             class="e2e-test-profile-user-photo"
+             alt="Profile image of the author of the blog post">
+      </picture>
       <mat-card-title class="w-100 d-flex justify-content-between">
         <span class="blog-dashboard-card-title e2e-test-username-visible">
           {{ authorName }}

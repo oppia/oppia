@@ -25,15 +25,16 @@ import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupUserInfo } from
   'domain/learner_group/learner-group-user-info.model';
+import { UserService } from 'services/user.service';
 
 describe('InviteLearnersComponent', () => {
   let component: InviteLearnersComponent;
   let fixture: ComponentFixture<InviteLearnersComponent>;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
+  let userService: UserService;
 
   const userInfo = LearnerGroupUserInfo.createFromBackendDict({
     username: 'username1',
-    profile_picture_data_url: 'profile_picture_url1',
     error: ''
   });
 
@@ -53,7 +54,10 @@ describe('InviteLearnersComponent', () => {
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
     fixture = TestBed.createComponent(InviteLearnersComponent);
+    userService = TestBed.inject(UserService);
     component = fixture.componentInstance;
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
     fixture.detectChanges();
   });
 
@@ -74,11 +78,20 @@ describe('InviteLearnersComponent', () => {
     })
   );
 
+  it('should get user profile image png data url correctly', () => {
+    expect(component.getProfileImagePngDataUrl('username')).toBe(
+      'default-image-url-png');
+  });
+
+  it('should get user profile image webp data url correctly', () => {
+    expect(component.getProfileImageWebpDataUrl('username')).toBe(
+      'default-image-url-webp');
+  });
+
   it('should show error message when trying to add an invalid learners to ' +
   'the learner group', fakeAsync(() => {
     const userInfo2 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username2',
-      profile_picture_data_url: '',
       error: 'You cannot invite yourself to the learner group.'
     });
     spyOn(learnerGroupBackendApiService, 'searchNewLearnerToAddAsync')

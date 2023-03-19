@@ -219,7 +219,6 @@ describe('Exploration improvements task registrar service', () => {
       issue_description: '20% of learners dropped at this state',
       status: 'open',
       resolver_username: null,
-      resolver_profile_picture_data_url: null,
       resolved_on_msecs: null,
     };
 

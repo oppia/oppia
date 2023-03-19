@@ -41,7 +41,6 @@ class MessageSummaryDict(TypedDict):
     text: str
     updated_status: str
     author_username: Optional[str]
-    author_picture_data_url: Optional[str]
     created_on_msecs: float
 
 
@@ -52,7 +51,6 @@ class SuggestionSummaryDict(TypedDict):
     current_content_html: str
     description: str
     author_username: Optional[str]
-    author_picture_data_url: Optional[str]
     created_on_msecs: float
 
 
@@ -275,8 +273,6 @@ class LearnerDashboardExplorationsProgressHandler(
 
         for index, creator_settings in enumerate(creators_settings):
             subscription_summary = {
-                'creator_picture_data_url': (
-                    creator_settings.profile_picture_data_url),
                 'creator_username': creator_settings.username,
                 'creator_impact': (
                     user_services.get_user_impact_score(
@@ -454,8 +450,6 @@ class LearnerDashboardFeedbackThreadHandler(
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
                 'author_username': suggestion_author_setting.username,
-                'author_picture_data_url': (
-                    suggestion_author_setting.profile_picture_data_url),
                 'created_on_msecs': utils.get_time_in_millisecs(
                     messages[0].created_on)
             }
@@ -467,18 +461,14 @@ class LearnerDashboardFeedbackThreadHandler(
 
             if author_settings is None:
                 author_username = None
-                author_picture_data_url = None
             else:
                 author_username = author_settings.username
-                author_picture_data_url = (
-                    author_settings.profile_picture_data_url)
 
             message_summary: MessageSummaryDict = {
                 'message_id': m.message_id,
                 'text': m.text,
                 'updated_status': m.updated_status,
                 'author_username': author_username,
-                'author_picture_data_url': author_picture_data_url,
                 'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
