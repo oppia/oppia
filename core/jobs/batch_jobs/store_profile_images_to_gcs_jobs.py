@@ -57,8 +57,8 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         """
         username = user_model.username
         filepath = f'user/{username}/assets/profile_picture.png'
-        profile_picture_binary = utils.convert_png_data_url_to_binary(
-            user_model.profile_picture_data_url)
+        profile_picture_binary = utils.convert_data_url_to_binary(
+            user_model.profile_picture_data_url, 'png')
         file_dict: gcs_io.FileObjectDict = {
             'filepath': filepath,
             'data': profile_picture_binary
@@ -80,8 +80,8 @@ class StoreProfilePictureToGCSJob(base_jobs.JobBase):
         """
         username = user_model.username
         filepath = f'user/{username}/assets/profile_picture.webp'
-        profile_picture_binary = utils.convert_png_data_url_to_binary(
-            user_model.profile_picture_data_url)
+        profile_picture_binary = utils.convert_data_url_to_binary(
+            user_model.profile_picture_data_url, 'png')
         output = io.BytesIO()
         image = Image.open(io.BytesIO(profile_picture_binary)).convert('RGB')
         image.save(output, 'webp')
@@ -174,13 +174,12 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
         Returns:
             str. The webp base64 string.
         """
-        png_binary = utils.convert_png_data_url_to_binary(png_base64)
+        png_binary = utils.convert_data_url_to_binary(png_base64, 'png')
         output = io.BytesIO()
         image = Image.open(io.BytesIO(png_binary)).convert('RGB')
         image.save(output, 'webp')
         webp_binary = output.getvalue()
-        return utils.convert_png_or_webp_binary_to_data_url(
-            webp_binary, 'webp')
+        return utils.convert_image_binary_to_data_url(webp_binary, 'webp')
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         users_with_valid_username = (
@@ -214,7 +213,7 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
             | 'Make tuple of username and data url for png' >> beam.Map(
                 lambda data: (
                     data[0].split('/')[1],
-                    utils.convert_png_or_webp_binary_to_data_url(
+                    utils.convert_image_binary_to_data_url(
                         data[1], 'png').replace('%2B', '+').replace(
                             '%3D', '=').replace('%0A', '')))
         )
@@ -270,8 +269,7 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
             | 'Make tuple of username and data url for webp' >> beam.Map(
                 lambda data: (
                     data[0].split('/')[1],
-                    utils.convert_png_or_webp_binary_to_data_url(
-                        data[1], 'webp'))
+                    utils.convert_image_binary_to_data_url(data[1], 'webp'))
             )
         )
 
