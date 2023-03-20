@@ -166,7 +166,9 @@ export const AppConstants = {
 
   SITE_NAME: 'Oppia.org',
 
-  DEFAULT_PROFILE_IMAGE_PATH: '/avatar/user_blue_72px.webp',
+  DEFAULT_PROFILE_IMAGE_WEBP_PATH: '/avatar/user_blue_150px.webp',
+
+  DEFAULT_PROFILE_IMAGE_PNG_PATH: '/avatar/user_blue_150px.png',
 
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).

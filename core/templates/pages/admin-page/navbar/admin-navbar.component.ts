@@ -36,7 +36,8 @@ export class AdminNavbarComponent implements OnInit {
   imagePath!: string;
   // Username is set to null if the user is not logged in.
   username: string | null = null;
-  profilePictureDataUrl: string = '';
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   isModerator: boolean = false;
   isSuperAdmin: boolean = false;
   profileUrl: string = '';
@@ -93,11 +94,6 @@ export class AdminNavbarComponent implements OnInit {
     return this.dropdownMenuIsActive = false;
   }
 
-  async getProfileImageDataAsync(): Promise<void> {
-    let dataUrl = await this.userService.getProfileImageDataUrlAsync();
-    this.profilePictureDataUrl = decodeURIComponent(dataUrl);
-  }
-
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
@@ -114,10 +110,11 @@ export class AdminNavbarComponent implements OnInit {
           username: this.username
         })
     );
+    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+      this.userService.getProfileImageDataUrl(this.username));
   }
 
   ngOnInit(): void {
-    this.getProfileImageDataAsync();
     this.getUserInfoAsync();
   }
 }
