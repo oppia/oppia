@@ -37,6 +37,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import translation_domain
 
 from typing import (
     Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, cast
@@ -79,7 +80,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     language_code: str
     last_updated: float
     edited_by_reviewer: bool
-    exploration_content_html: str
+    exploration_content_html: Optional[Union[str, List[str]]]
 
 
 SuggestionsProviderHandlerUrlPathArgsSchemaDictType = Dict[
@@ -241,13 +242,9 @@ class SuggestionHandler(
 
         suggestion_change = suggestion.change
         if (
-                suggestion_change.cmd == 'add_written_translation' and
-                suggestion_change.data_format in
-                (
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING,
-                    state_domain.WrittenTranslation
-                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+                suggestion_change.cmd == 'add_written_translation' and (
+                    translation_domain.TranslatableContentFormat
+                    .is_data_format_list(suggestion_change.data_format)
                 )
         ):
             self.render_json(self.values)
@@ -768,12 +765,9 @@ class ReviewableSuggestionsHandler(
                 suggestion_services
                 .get_reviewable_translation_suggestions_by_offset(
                     self.user_id, exp_ids, limit, offset, sort_key))
-            # Filter out obsolete translation suggestions, i.e. suggestions with
-            # translations that no longer match the current exploration content
-            # text. See issue #16536 for more details.
             suggestions = (
                 suggestion_services
-                .get_suggestions_with_translatable_explorations(
+                .get_suggestions_with_editable_explorations(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestions, next_offset = (
@@ -879,7 +873,7 @@ class UserSubmittedSuggestionsHandler(
             )
             suggestions_with_translatable_exps = (
                 suggestion_services
-                .get_suggestions_with_translatable_explorations(
+                .get_suggestions_with_editable_explorations(
                     translatable_suggestions))
             while (
                 len(translatable_suggestions) > 0 and
@@ -899,7 +893,7 @@ class UserSubmittedSuggestionsHandler(
                 )
                 suggestions_with_translatable_exps = (
                     suggestion_services
-                    .get_suggestions_with_translatable_explorations(
+                    .get_suggestions_with_editable_explorations(
                         translatable_suggestions
                     )
                 )
@@ -1027,6 +1021,7 @@ class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
 
     skill_difficulty: float
     question_state_data: state_domain.StateDict
+    next_content_id_index: int
 
 
 class UpdateQuestionSuggestionHandler(
@@ -1066,6 +1061,11 @@ class UpdateQuestionSuggestionHandler(
                         domain_objects_validator.validate_state_dict
                     )
                 }
+            },
+            'next_content_id_index': {
+                'schema': {
+                    'type': 'int'
+                }
             }
         }
     }
@@ -1088,7 +1088,9 @@ class UpdateQuestionSuggestionHandler(
         suggestion_services.update_question_suggestion(
             suggestion_id,
             self.normalized_payload['skill_difficulty'],
-            self.normalized_payload['question_state_data'])
+            self.normalized_payload['question_state_data'],
+            self.normalized_payload['next_content_id_index']
+        )
 
         self.render_json(self.values)
 
@@ -1163,10 +1165,10 @@ def _get_target_id_to_skill_opportunity_dict(
 def _construct_exploration_suggestions(
     suggestions: Sequence[suggestion_registry.BaseSuggestion]
 ) -> List[FrontendBaseSuggestionDict]:
-    """Returns exploration suggestions with current exploration content. This
-    method assumes that the supplied suggestions represent changes that are
-    still valid, e.g. the suggestions refer to content that still exist in the
-    linked exploration.
+    """Returns exploration suggestions with current exploration content. If the
+    exploration content is no longer available, e.g. the exploration state or
+    content was deleted, the suggestion's change content is used for the
+    exploration content instead.
 
     Args:
         suggestions: list(BaseSuggestion). A list of suggestions.
@@ -1181,8 +1183,13 @@ def _construct_exploration_suggestions(
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
     for suggestion in suggestions:
         exploration = exp_id_to_exp[suggestion.target_id]
-        content_html = exploration.get_content_html(
-            suggestion.change.state_name, suggestion.change.content_id)
+        content_html: Optional[Union[str, List[str]]] = None
+        try:
+            content_html = exploration.get_content_html(
+                suggestion.change.state_name, suggestion.change.content_id)
+        except ValueError:
+            # Exploration content is no longer available.
+            pass
         suggestion_dict = suggestion.to_dict()
         updated_suggestion_dict: FrontendBaseSuggestionDict = {
             'suggestion_id': suggestion_dict['suggestion_id'],

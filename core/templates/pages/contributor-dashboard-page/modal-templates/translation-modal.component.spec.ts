@@ -74,8 +74,8 @@ describe('Translation Modal Component', () => {
   };
   const getContentTranslatableItemWithText = (text: string) => {
     return {
-      data_format: 'html',
-      content: text,
+      content_format: 'html',
+      content_value: text,
       content_type: 'content',
       interaction_id: null,
       rule_type: null
@@ -123,7 +123,8 @@ describe('Translation Modal Component', () => {
     component.contentPanel = new RteOutputDisplayComponent(
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'ViewContainerRef'." We need to suppress this error because of
-      // the need to test validations.
+      // the need to test validations. This is because the component is not
+      // strictly typed yet.
       // @ts-ignore
       null, null, new ElementRef({offsetHeight: 200}), null);
     getUserContributionRightsDataAsyncSpy = spyOn(
@@ -513,20 +514,21 @@ describe('Translation Modal Component', () => {
         files: {}
       };
       component.ngOnInit();
+      tick();
 
       const sampleStateWiseContentMapping = {
         stateName1: {contentId1: getContentTranslatableItemWithText('text1')},
         stateName2: {
           contentId2: {
-            data_format: 'unicode',
-            content: 'Continue',
+            content_format: 'unicode',
+            content_value: 'Continue',
             content_type: 'interaction',
             interaction_id: null,
             rule_type: null
           },
           contentId3: {
-            data_format: 'set_of_normalized_string',
-            content: ['answer1', 'answer2', 'answer3'],
+            content_format: 'set_of_normalized_string',
+            content_value: ['answer1', 'answer2', 'answer3'],
             content_type: 'rule',
             interaction_id: 'TextInput',
             rule_type: 'Contains'

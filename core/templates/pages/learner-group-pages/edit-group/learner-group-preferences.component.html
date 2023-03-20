@@ -49,7 +49,14 @@
         <span class="group-learners-title">Current Group Learners({{learnerGroup.learnerUsernames.length}})</span>
         <div class="group-learners-card" *ngFor="let learnerInfo of currentLearnersInfo">
           <div class="group-learners-card-info">
-            <img class="group-learners-card-avatar" [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">
+            <picture>
+              <source type="image/webp"
+                      [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
+              <source type="image/png"
+                      [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
+              <img class="group-learners-card-avatar"
+                   [src]="getProfileImagePngDataUrl(learnerInfo.username)">
+            </picture>
             <span>{{learnerInfo.username}}</span>
           </div>
           <div class="group-learners-card-button">
@@ -69,7 +76,15 @@
         <span class="group-learners-title">Invites Pending({{learnerGroup.invitedLearnerUsernames.length}})</span>
         <div class="group-learners-card" *ngFor="let learnerInfo of invitedLearnersInfo">
           <div class="group-learners-card-info">
-            <img class="group-learners-card-avatar" [src]="getProfileImageDataUrl(learnerInfo.userProfilePictureUrl)">
+            <picture>
+              <source type="image/webp"
+                      [srcset]="getProfileImageWebpDataUrl(learnerInfo.username)">
+              <source type="image/png"
+                      [srcset]="getProfileImagePngDataUrl(learnerInfo.username)">
+              <img class="group-learners-card-avatar"
+                   [src]="getProfileImagePngDataUrl(learnerInfo.username)"
+                   alt="User profile picture">
+            </picture>
             <span>{{learnerInfo.username}}</span>
           </div>
           <div class="group-learners-card-buttons">

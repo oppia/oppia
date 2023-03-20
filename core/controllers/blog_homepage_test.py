@@ -193,7 +193,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Bloggers</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 0)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         blog_post_two_id = (
             blog_services.create_new_blog_post(self.blog_admin_id).id)
@@ -220,7 +219,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Blog</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 1)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         # Deleting blog admin's user setting model.
         blog_admin_model = (
@@ -242,7 +240,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             '<p>Hello Blog</p>',
             json_response['blog_post_dict']['content'])
         self.assertEqual(len(json_response['summary_dicts']), 1)
-        self.assertIsNone(json_response['profile_picture_data_url'])
 
     def test_should_get_correct_recommendations_for_post_page(self) -> None:
         self.signup(
@@ -342,6 +339,24 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             expected_status_int=404
         )
 
+    def test_raise_exception_if_blog_post_url_is_invalid(
+        self
+    ) -> None:
+        self.login(self.user_email)
+        # Blog post URL fragment is exceeding max character limit.
+        self.get_json(
+            '%s/%s' % (
+                feconf.BLOG_HOMEPAGE_DATA_URL,
+                'aa' * feconf.MAX_CHARS_IN_BLOG_POST_URL
+            ),
+            expected_status_int=400
+        )
+        # Blog post URL fragment fails minimum character validation.
+        self.get_json(
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_DATA_URL, 'aa'),
+            expected_status_int=400
+        )
+
 
 class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     """Checks that the author data and related blog summary cards are
@@ -389,7 +404,6 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             len(json_response['summary_dicts']), 1)
-        self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         blog_services.unpublish_blog_post(self.blog_post.id)
         json_response = self.get_json(

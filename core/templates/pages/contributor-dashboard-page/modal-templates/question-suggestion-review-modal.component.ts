@@ -76,7 +76,7 @@ interface SuggestionChangeDict {
 interface ActiveSuggestionDict {
   'author_name': string;
   'change': SuggestionChangeDict;
-  'exploration_content_html': string | string[];
+  'exploration_content_html': string | string[] | null;
   'language_code': string;
   'last_updated_msecs': number;
   'status': string;
@@ -173,7 +173,16 @@ export class QuestionSuggestionReviewModalComponent
       modalRef.componentInstance.skill = skillDict.skill;
       modalRef.componentInstance.skillDifficulty = this.skillDifficulty;
 
-      modalRef.result.then(() => {
+      modalRef.result.then((change) => {
+        // When the question suggestion editor modal is closed, the changes made
+        // in that modal should also be reflected in the question suggestion
+        // review modal. Then, the reviewers can see the changes they have made
+        // and know that their changes have been saved successfully.
+        this.allContributions[this.suggestionId].suggestion.change
+          .question_dict = change.questionDict;
+        this.allContributions[this.suggestionId].suggestion.change
+          .skill_difficulty = change.skillDifficulty;
+        this.refreshContributionState();
         this.editSuggestionEmitter.emit(
           {
             suggestionId: this.suggestionId,

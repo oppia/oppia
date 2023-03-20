@@ -20,11 +20,12 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/concept-card.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { Story } from 'domain/story/story.model';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -54,7 +55,6 @@ describe('Story node editor directive', function() {
   var CuratedExplorationValidationService = null;
   var AlertsService = null;
   var StoryEditorStateService = null;
-  var StoryObjectFactory = null;
   let focusManagerService: FocusManagerService = null;
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -66,7 +66,6 @@ describe('Story node editor directive', function() {
       'CuratedExplorationValidationService');
     AlertsService = $injector.get('AlertsService');
     storyUpdateService = $injector.get('StoryUpdateService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     focusManagerService = $injector.get('FocusManagerService');
     $q = $injector.get('$q');
@@ -108,7 +107,7 @@ describe('Story node editor directive', function() {
       },
       language_code: 'en'
     };
-    story = StoryObjectFactory.createFromBackendDict(sampleStoryBackendObject);
+    story = Story.createFromBackendDict(sampleStoryBackendObject);
     directive = $injector.get('storyNodeEditorDirective')[0];
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);

@@ -47,8 +47,7 @@ describe('State Translation Status Graph Component', () => {
 
   let stateName: string = 'State1';
   let state = {
-    recordedVoiceovers: {},
-    writtenTranslations: {}
+    recordedVoiceovers: {}
   } as State;
 
   beforeEach(waitForAsync(() => {
@@ -155,7 +154,8 @@ describe('State Translation Status Graph Component', () => {
       expect(() => {
         // This throws "Argument of type 'null' is not assignable to parameter
         // of type 'String'." We need to suppress this error
-        // because of the need to test validations.
+        // because of the need to test validations. This error is thrown
+        // because the function is called with null value.
         // @ts-ignore
         component.onClickStateInMap(null);
         tick();

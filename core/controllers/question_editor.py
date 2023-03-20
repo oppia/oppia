@@ -122,7 +122,7 @@ class QuestionCreationHandler(
             question.id,
             skill_ids,
             skill_difficulties)
-        html_list = question.question_state_data.get_all_html_content_strings()
+        html_list = question.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
         image_validation_error_message_suffix = (
@@ -263,6 +263,7 @@ class EditableQuestionDataHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
+    version: int
     commit_message: str
     change_list: List[question_domain.QuestionChange]
 
@@ -283,6 +284,11 @@ class EditableQuestionDataHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
             'commit_message': {
                 'schema': {
                     'type': 'basestring',
@@ -329,16 +335,18 @@ class EditableQuestionDataHandler(
         assert self.normalized_payload is not None
         commit_message = self.normalized_payload['commit_message']
         change_list = self.normalized_payload['change_list']
-
+        version = self.normalized_payload['version']
         for change in change_list:
             if (
                     change.cmd ==
                     question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION):
-                raise self.InvalidInputException
+                raise self.InvalidInputException(
+                    'Cannot create a new fully specified question'
+                )
 
         question_services.update_question(
             self.user_id, question_id, change_list,
-            commit_message)
+            commit_message, version)
 
         question_dict = question_services.get_question_by_id(
             question_id).to_dict()

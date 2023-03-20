@@ -20,6 +20,7 @@ import logging
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_domain
@@ -34,6 +35,7 @@ BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST: Final = (
     feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST
 )
+MAX_CHARS_IN_BLOG_POST_URL: Final = feconf.MAX_CHARS_IN_BLOG_POST_URL
 
 
 class BlogCardSummaryDict(TypedDict):
@@ -43,7 +45,6 @@ class BlogCardSummaryDict(TypedDict):
     title: str
     summary: str
     author_username: Optional[str]
-    profile_pic_url: Optional[str]
     url_fragment: str
     tags: List[str]
     thumbnail_filename: Optional[str]
@@ -91,7 +92,6 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'title': summary_dict['title'],
                 'summary': summary_dict['summary'],
                 'author_username': user_settings.username,
-                'profile_pic_url': user_settings.profile_picture_data_url,
                 'tags': summary_dict['tags'],
                 'thumbnail_filename': summary_dict['thumbnail_filename'],
                 'url_fragment': summary_dict['url_fragment'],
@@ -105,7 +105,6 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'title': summary_dict['title'],
                 'summary': summary_dict['summary'],
                 'author_username': 'author account deleted',
-                'profile_pic_url': None,
                 'tags': summary_dict['tags'],
                 'thumbnail_filename': summary_dict['thumbnail_filename'],
                 'url_fragment': summary_dict['url_fragment'],
@@ -234,8 +233,16 @@ class BlogPostDataHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_url': {
             'schema': {
-                'type': 'basestring'
-            }
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
+                },
+                {
+                    'id': 'has_length_at_least',
+                    'min_value': constants.BLOG_POST_ID_LENGTH
+                }]
+            },
         }
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
@@ -251,11 +258,8 @@ class BlogPostDataHandler(
         user_settings = user_services.get_user_settings(
             blog_post.author_id, strict=False)
         if user_settings:
-            profile_picture_data_url = (
-                user_settings.profile_picture_data_url)
             author_username = user_settings.username
         else:
-            profile_picture_data_url = None
             author_username = 'author account deleted'
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
@@ -317,7 +321,6 @@ class BlogPostDataHandler(
 
         self.values.update({
             'author_username': author_username,
-            'profile_picture_data_url': profile_picture_data_url,
             'blog_post_dict': authors_blog_post_dict,
             'summary_dicts': _get_blog_card_summary_dicts_for_homepage(
                 summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST])
@@ -386,8 +389,6 @@ class AuthorsPageHandler(
 
         self.values.update({
             'author_details': author_details,
-            'profile_picture_data_url': (
-                user_settings.profile_picture_data_url),
             'no_of_blog_post_summaries': num_of_published_blog_post_summaries,
             'summary_dicts': blog_post_summary_dicts
         })

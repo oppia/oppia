@@ -79,7 +79,8 @@ describe('Exploration Player State Service', () => {
       title: '',
       language_code: '',
       objective: '',
-      correctness_feedback_enabled: false
+      correctness_feedback_enabled: false,
+      next_content_id_index: 0
     },
     exploration_metadata: {
       title: '',
@@ -105,6 +106,7 @@ describe('Exploration Player State Service', () => {
     preferred_language_codes: [],
     auto_tts_enabled: false,
     correctness_feedback_enabled: true,
+    displayable_language_codes: [],
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
@@ -118,20 +120,10 @@ describe('Exploration Player State Service', () => {
     question_state_data: {
       classifier_model_id: null,
       param_changes: [],
-      next_content_id_index: 1,
       solicit_answer_details: false,
       content: {
         content_id: '1',
         html: 'Question 1'
-      },
-      written_translations: {
-        translations_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
       },
       interaction: {
         answer_groups: [{
@@ -233,6 +225,7 @@ describe('Exploration Player State Service', () => {
     },
     question_state_data_schema_version: 2,
     language_code: '',
+    next_content_id_index: 4,
     version: 1,
     linked_skill_ids: [],
     inapplicable_skill_misconception_ids: []
@@ -288,57 +281,56 @@ describe('Exploration Player State Service', () => {
     explorationPlayerStateService = TestBed
       .inject(ExplorationPlayerStateService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    playerTranscriptService = (playerTranscriptService as unknown) as
+    playerTranscriptService = playerTranscriptService as
       jasmine.SpyObj<PlayerTranscriptService>;
     statsReportingService = TestBed.inject(StatsReportingService);
-    statsReportingService = (statsReportingService as unknown) as
+    statsReportingService = statsReportingService as
       jasmine.SpyObj<StatsReportingService>;
     playthroughService = TestBed.inject(PlaythroughService);
-    playthroughService = (playthroughService as unknown) as
+    playthroughService = playthroughService as
       jasmine.SpyObj<PlaythroughService>;
     playerCorrectnessFeedbackEnabledService = TestBed.inject(
       PlayerCorrectnessFeedbackEnabledService);
     playerCorrectnessFeedbackEnabledService = (
-      playerCorrectnessFeedbackEnabledService as unknown) as
+      playerCorrectnessFeedbackEnabledService) as
       jasmine.SpyObj<PlayerCorrectnessFeedbackEnabledService>;
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    explorationEngineService = (explorationEngineService as unknown) as
+    explorationEngineService = explorationEngineService as
       jasmine.SpyObj<ExplorationEngineService>;
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    questionPlayerEngineService = (questionPlayerEngineService as unknown) as
+    questionPlayerEngineService = questionPlayerEngineService as
       jasmine.SpyObj<QuestionPlayerEngineService>;
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService);
     editableExplorationBackendApiService = (
-      editableExplorationBackendApiService as unknown) as
+      editableExplorationBackendApiService) as
       jasmine.SpyObj<EditableExplorationBackendApiService>;
     explorationFeaturesBackendApiService = TestBed.inject(
       ExplorationFeaturesBackendApiService);
     explorationFeaturesBackendApiService = (
-      explorationFeaturesBackendApiService as unknown) as
+      explorationFeaturesBackendApiService) as
       jasmine.SpyObj<ExplorationFeaturesBackendApiService>;
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     explorationFeaturesService = (
-      explorationFeaturesService as unknown) as
+      explorationFeaturesService) as
       jasmine.SpyObj<ExplorationFeaturesService>;
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
     numberAttemptsService = (
-      numberAttemptsService as unknown) as
+      numberAttemptsService) as
       jasmine.SpyObj<NumberAttemptsService>;
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionBackendApiService = (
-      questionBackendApiService as unknown) as
+      questionBackendApiService) as
       jasmine.SpyObj<QuestionBackendApiService>;
     pretestQuestionBackendApiService = TestBed.inject(
       PretestQuestionBackendApiService);
     pretestQuestionBackendApiService = (
-      pretestQuestionBackendApiService as unknown) as
+      pretestQuestionBackendApiService) as
       jasmine.SpyObj<PretestQuestionBackendApiService>;
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionObject = questionObjectFactory.createFromBackendDict(
       questionBackendDict);
-    urlService = (TestBed.inject(UrlService) as unknown) as
-      jasmine.SpyObj<UrlService>;
+    urlService = TestBed.inject(UrlService);
     diagnosticTestPlayerEngineService = TestBed.inject(
       DiagnosticTestPlayerEngineService);
   });
@@ -467,6 +459,7 @@ describe('Exploration Player State Service', () => {
         title: '',
         draft_change_list_id: 0,
         language_code: '',
+        next_content_id_index: 0,
         exploration_metadata: {
           title: 'Exploration',
           category: 'Algebra',

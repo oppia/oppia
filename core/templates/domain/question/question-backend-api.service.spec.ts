@@ -231,7 +231,13 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        ['1'], 'abc' as unknown as number, true
+        // This throws "Type string is not assignable to type
+        // 'number'." We need to suppress this error
+        // because of the need to test validations. This
+        // throws an error only in the frontend test and
+        // not in the backend test.
+        // @ts-ignore
+        ['1'], 'abc' as number, true
       ).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -273,7 +279,8 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionsAsync(
         // This throws "Type 'string' is not assignable to type 'string[]'."
         // We need to suppress this error because of the need to test
-        // validations.
+        // validations. This throws an error only in the frontend test and
+        // not in the backend test.
         // @ts-ignore
         'x', 1, true).then(successHandler, failHandler);
       flushMicrotasks();
@@ -290,7 +297,8 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionsAsync(
         // This throws "Type 'number[]' is not assignable to type 'string[]'."
         // We need to suppress this error because of the need to test
-        // validations.
+        // validations. This throws an error only in the frontend test and
+        // not in the backend test.
         // @ts-ignore
         [1, 2], 1, true
       ).then(successHandler, failHandler);
@@ -308,7 +316,8 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionsAsync(
         // This throws "Type 'null' is not assignable to type 'string[]'."
         // We need to suppress this error because of the need to test
-        // validations.
+        // validations. This throws an error only in the frontend test and
+        // not in the backend test.
         // @ts-ignore
         null, 1, true).then(successHandler, failHandler);
       flushMicrotasks();
@@ -409,20 +418,10 @@ describe('Question backend Api service', () => {
       question_state_data: {
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 1,
         solicit_answer_details: false,
         content: {
           content_id: '1',
           html: 'Question 1'
-        },
-        written_translations: {
-          translations_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {}
-          }
         },
         interaction: {
           answer_groups: [{
@@ -523,6 +522,7 @@ describe('Question backend Api service', () => {
       language_code: '',
       version: 1,
       linked_skill_ids: [],
+      next_content_id_index: 1,
       inapplicable_skill_misconception_ids: []
     };
 
@@ -531,20 +531,10 @@ describe('Question backend Api service', () => {
       question_state_data: {
         classifier_model_id: null,
         param_changes: [],
-        next_content_id_index: 1,
         solicit_answer_details: false,
         content: {
           content_id: '2',
           html: 'Question 2'
-        },
-        written_translations: {
-          translations_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {}
-          }
         },
         interaction: {
           answer_groups: [{
@@ -625,6 +615,7 @@ describe('Question backend Api service', () => {
       language_code: '',
       version: 1,
       linked_skill_ids: [],
+      next_content_id_index: 5,
       inapplicable_skill_misconception_ids: []
     };
 

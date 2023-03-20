@@ -579,11 +579,6 @@ URLS = [
         profile.BulkEmailWebhookEndpoint),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
-    get_redirect_route(
-        r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
-    get_redirect_route(
-        r'/preferenceshandler/profile_picture_by_username/<username>',
-        profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(
@@ -993,6 +988,9 @@ URLS = [
         r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
         blog_dashboard.BlogPostHandler),
     get_redirect_route(
+        r'%s/<blog_post_id>' % feconf.BLOG_TITLE_HANDLER,
+        blog_dashboard.BlogPostTitleHandler),
+    get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
     get_redirect_route(
@@ -1037,6 +1035,10 @@ URLS = [
         topics_and_skills_dashboard
             .CategorizedAndUntriagedSkillsDataHandler),
 
+    get_redirect_route(
+        r'/entity_translations_handler/<entity_type>/<entity_id>/'
+        r'<entity_version>/<language_code>',
+        reader.EntityTranslationHandler),
     get_redirect_route(
         r'/create_learner_group_handler',
         learner_group.CreateLearnerGroupHandler),

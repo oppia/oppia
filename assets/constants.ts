@@ -5168,7 +5168,7 @@ export default {
     "code": "prs",
     "description": "دری (Dari)",
     "direction": "rtl",
-    "decimal_separator": ","
+    "decimal_separator": "."
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
@@ -5947,6 +5947,11 @@ export default {
   // Dashboard topic selector.
   "TOPIC_SENTINEL_NAME_ALL": "All",
 
+  // Review message to display for an obsolete translation suggestion with no
+  // exploration content.
+  // eslint-disable-next-line max-len
+  "OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG": "The original content was deleted and no longer needs translation. Sorry about that!",
+
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
 
@@ -5984,9 +5989,8 @@ export default {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
-  // This represents the maximum number of characters in the URL fragment for
-  // the blog post.
-  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 65,
+  // This is same as base_models.ID_Length.
+  "BLOG_POST_ID_LENGTH": 12,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
@@ -6025,22 +6029,12 @@ export default {
       "hints": [],
       "solution": null
     },
-    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
-      "voiceovers_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
+      "voiceovers_mapping": {}
     },
     "solicit_answer_details": false,
-    "card_is_checkpoint": false,
-    "written_translations": {
-      "translations_mapping": {
-        "content": {},
-        "default_outcome": {}
-      }
-    }
+    "card_is_checkpoint": false
   },
 
   // Data required for Firebase authentication.
@@ -6082,7 +6076,7 @@ export default {
 
   // A regular expression for allowed characters in Title field for Blog Post.
   // eslint-disable-next-line max-len
-  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+([-:][ a-zA-Z0-9]+)*$",
+  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9(&!,'/)][a-zA-Z0-9(&!,'/) ]+([-:][ a-zA-Z0-9(&!,'/)]+)*$",
 
   // A regular expression for allowed characters in URL fragment for Blog Post.
   "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
@@ -6223,9 +6217,6 @@ export default {
   "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
-
-  // Link to open when the Oppia avatar is clicked on any page.
-  "OPPIA_AVATAR_LINK_URL": null,
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
@@ -6932,7 +6923,7 @@ export default {
     "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
     "edits_allowed"
   ],
-  "NON_METADATA_PROPERTIES": ["id", "states"],
+  "NON_METADATA_PROPERTIES": ["id", "states", "next_content_id_index"],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313
 } as const;

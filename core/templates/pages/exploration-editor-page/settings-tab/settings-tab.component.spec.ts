@@ -57,7 +57,6 @@ import { VersionHistoryBackendApiService } from '../services/version-history-bac
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 describe('Settings Tab Component', () => {
   let component: SettingsTabComponent;
@@ -419,7 +418,7 @@ describe('Settings Tab Component', () => {
         protocol: 'https:',
         host: 'oppia.org'
       }
-    });
+    } as Window);
     expect(component.getExplorePageUrl()).toBe('https://oppia.org/explore/exp1');
   });
 
@@ -468,7 +467,8 @@ describe('Settings Tab Component', () => {
       explorationInitStateNameService.init('First State');
       // This throws "Argument of type 'null' is not assignable to
       // parameter of type 'state'." We need to suppress this error
-      // because of the need to test validations.
+      // because of the need to test validations. This throws an
+      // error because the state name is invalid.
       // @ts-ignore
       spyOn(explorationStatesService, 'getState').and.returnValue(null);
       spyOn(alertsService, 'addWarning');
@@ -484,8 +484,7 @@ describe('Settings Tab Component', () => {
       spyOn(explorationStatesService, 'getState').and.returnValue(
         new State(
           null, null, null, {} as SubtitledHtml, {} as Interaction,
-          [], {} as RecordedVoiceovers, false, false,
-          {} as WrittenTranslations, 0));
+          [], {} as RecordedVoiceovers, false, false));
       spyOn(explorationInitStateNameService, 'saveDisplayedValue');
 
       component.saveExplorationInitStateName();
@@ -502,7 +501,7 @@ describe('Settings Tab Component', () => {
         location: {
           reload: () => {}
         }
-      });
+      } as Window);
 
       component.deleteExploration();
       tick();
@@ -520,7 +519,7 @@ describe('Settings Tab Component', () => {
       spyOn(alertsService, 'clearWarnings');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: ''
-      });
+      } as unknown as Window);
 
       component.deleteExploration();
       tick();

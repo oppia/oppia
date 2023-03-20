@@ -32,7 +32,7 @@ import { NumberWithUnitsObjectFactory } from
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { NumberWithUnitsCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
 @Injectable({
@@ -95,6 +95,8 @@ export class NumberWithUnitsValidationService {
       var laterInputString = laterInput.toMathjsCompatibleString();
       try {
         return unit(laterInputString).equals(unit(earlierInputString));
+      // Unknown type is used because we don't know which type of error
+      // is thrown.
       } catch (e: unknown) {
         var additionalInfo = (
           '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +

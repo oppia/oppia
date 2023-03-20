@@ -86,6 +86,8 @@ describe('Save Version Mismatch Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
+    content_id_for_state_content: 'content_0',
+    content_id_for_default_outcome: 'default_outcome_1'
   } as unknown as LostChange];
 
   let component: SaveVersionMismatchModalComponent;
@@ -133,8 +135,12 @@ describe('Save Version Mismatch Modal Component', () => {
       const reloadSpy = jasmine.createSpy('reload');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
-          reload: reloadSpy
-        }
+          _hash: '',
+          _hashChange: null,
+          hash: '',
+          reload: reloadSpy,
+        },
+        onhashchange: null,
       });
 
       component.discardChanges();
@@ -191,8 +197,12 @@ describe('Save Version Mismatch Modal Component', () => {
     const reloadSpy = jasmine.createSpy('reload');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        reload: reloadSpy
-      }
+        _hash: '',
+        _hashChange: null,
+        hash: '',
+        reload: reloadSpy,
+      },
+      onhashchange: null,
     });
     spyOn(document, 'createElement').and.returnValue(spyObj);
     component.hasLostChanges = true;

@@ -37,6 +37,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
@@ -57,6 +58,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 
@@ -460,13 +462,23 @@ class AdminHandler(
         Returns:
             Question. The dummy question with given values.
         """
+        content_id_generator = translation_domain.ContentIdGenerator()
+
         state = state_domain.State.create_default_state(
-            'ABC', is_initial_state=True)
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True)
+
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args({
             'placeholder': {
                 'value': {
-                    'content_id': 'ca_placeholder_0',
+                    'content_id': content_id_generator.generate(
+                        translation_domain.ContentType.CUSTOMIZATION_ARG
+                    ),
                     'unicode_str': ''
                 }
             },
@@ -476,26 +488,21 @@ class AdminHandler(
             }
         })
 
-        state.update_next_content_id_index(1)
         state.update_linked_skill_id(None)
-        state.update_content(state_domain.SubtitledHtml('1', question_content))
-        recorded_voiceovers = state_domain.RecordedVoiceovers({})
-        written_translations = state_domain.WrittenTranslations({})
-        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
-        recorded_voiceovers.add_content_id_for_voiceover('1')
-        recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
-        written_translations.add_content_id_for_translation('ca_placeholder_0')
-        written_translations.add_content_id_for_translation('1')
-        written_translations.add_content_id_for_translation('default_outcome')
+        state.update_content(state_domain.SubtitledHtml(
+            'content_0', question_content))
 
-        state.update_recorded_voiceovers(recorded_voiceovers)
-        state.update_written_translations(written_translations)
         solution = state_domain.Solution(
             'TextInput', False, 'Solution', state_domain.SubtitledHtml(
-                'solution', '<p>This is a solution.</p>'))
+                content_id_generator.generate(
+                    translation_domain.ContentType.SOLUTION),
+                '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+                state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.HINT),
+                    '<p>This is a hint.</p>')
             )
         ]
 
@@ -503,15 +510,19 @@ class AdminHandler(
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None, None, state_domain.SubtitledHtml(
-                    'feedback_id', '<p>Dummy Feedback</p>'),
+                None, None,
+                state_domain.SubtitledHtml(
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME),
+                    '<p>Dummy Feedback</p>'),
                 True, [], None, None
             )
         )
         question = question_domain.Question(
             question_id, state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
+            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [],
+            content_id_generator.next_content_id_index)
         return question
 
     def _create_dummy_skill(
@@ -1689,9 +1700,38 @@ class UpdateUsernameHandler(
         if user_services.is_username_taken(new_username):
             raise self.InvalidInputException('Username already taken.')
 
+        # Update profile picture.
+        old_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, old_username)
+        new_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, new_username)
+
+        if not old_fs.isfile('profile_picture.png'):
+            raise self.InvalidInputException(
+                'The user with username %s does not have a '
+                'profile picture with png extension.' % old_username
+            )
+
+        if not old_fs.isfile('profile_picture.webp'):
+            raise self.InvalidInputException(
+                'The user with username %s does not have a '
+                'profile picture with webp extension.' % old_username
+            )
+
+        image_png = old_fs.get('profile_picture.png')
+        old_fs.delete('profile_picture.png')
+        new_fs.commit(
+            'profile_picture.png', image_png, mimetype='image/png')
+
+        image_webp = old_fs.get('profile_picture.webp')
+        old_fs.delete('profile_picture.webp')
+        new_fs.commit(
+            'profile_picture.webp', image_webp, mimetype='image/webp')
+
         user_services.set_username(user_id, new_username)
         user_services.log_username_change(
             self.user_id, old_username, new_username)
+
         self.render_json({})
 
 

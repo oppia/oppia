@@ -21,14 +21,16 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 // This throws "Object is possibly undefined." The type undefined
 // comes here from ngx joyride dependency. We need to suppress this
-// error because of strict type checking.
+// error because of strict type checking. This error is thrown because
+// the type of the variable is undefined. This is because the type of
+// the variable is undefined. This is because the type of the variable
+// is undefined. This is because the type of the variable is undefined.
 // @ts-ignore
 import { JoyrideService } from 'ngx-joyride';
 import { Subscription } from 'rxjs';
 import { WelcomeTranslationModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { LoaderService } from 'services/loader.service';
@@ -76,7 +78,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private stateEditorService: StateEditorService,
     private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
-    private stateWrittenTranslationsService: StateWrittenTranslationsService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private userExplorationPermissionsService:
       UserExplorationPermissionsService,
@@ -90,9 +91,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     if (stateName) {
       this.stateRecordedVoiceoversService.init(
         stateName, this.explorationStatesService.getRecordedVoiceoversMemento(
-          stateName));
-      this.stateWrittenTranslationsService.init(
-        stateName, this.explorationStatesService.getWrittenTranslationsMemento(
           stateName));
     }
     this.showTranslationTabSubDirectives = true;

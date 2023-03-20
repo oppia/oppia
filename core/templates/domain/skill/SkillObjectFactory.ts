@@ -33,14 +33,14 @@ export interface SkillBackendDict {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ConceptCardObjectFactory, ConceptCard, ConceptCardBackendDict } from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard, ConceptCardBackendDict } from
+  'domain/skill/concept-card.model';
 import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
   from 'domain/skill/MisconceptionObjectFactory';
 import { Rubric, RubricBackendDict } from
   'domain/skill/rubric.model';
 import { ValidatorsService } from 'services/validators.service';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export class Skill {
   _id: string;
@@ -54,7 +54,7 @@ export class Skill {
   _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
-  SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
+  SKILL_DIFFICULTIES: readonly string[] = AppConstants.SKILL_DIFFICULTIES;
 
   constructor(
       id: string,
@@ -256,7 +256,6 @@ export class Skill {
 })
 export class SkillObjectFactory {
   constructor(
-    private conceptCardObjectFactory: ConceptCardObjectFactory,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private validatorService: ValidatorsService) {
   }
@@ -274,7 +273,7 @@ export class SkillObjectFactory {
       this.generateMisconceptionsFromBackendDict(
         skillBackendDict.misconceptions),
       this.generateRubricsFromBackendDict(skillBackendDict.rubrics),
-      this.conceptCardObjectFactory.createFromBackendDict(
+      ConceptCard.createFromBackendDict(
         skillBackendDict.skill_contents),
       skillBackendDict.language_code,
       skillBackendDict.version,

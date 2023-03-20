@@ -28,7 +28,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { AudioTranslationManagerService } from '../services/audio-translation-manager.service';
 import { AppConstants } from 'app.constants';
@@ -43,7 +42,6 @@ describe('InputResponsePairComponent', () => {
   let fixture: ComponentFixture<InputResponsePairComponent>;
   let explorationHtmlFormatter: ExplorationHtmlFormatterService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let playerTranscriptService: PlayerTranscriptService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let audioTranslationManagerService: AudioTranslationManagerService;
@@ -67,8 +65,6 @@ describe('InputResponsePairComponent', () => {
   }));
 
   beforeEach(() => {
-    writtenTranslationsObjectFactory = TestBed.get(
-      WrittenTranslationsObjectFactory);
     explorationHtmlFormatter = TestBed.get(ExplorationHtmlFormatterService);
     audioPlayerService = TestBed.get(AudioPlayerService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
@@ -146,19 +142,8 @@ describe('InputResponsePairComponent', () => {
           }
         }),
         RecordedVoiceovers.createEmpty(),
-        writtenTranslationsObjectFactory.createEmpty(),
         'content', audioTranslationLanguageService
       ));
-  });
-
-  it('should decode profile picture URI on initialization', () => {
-    component.profilePicture = '%2Fprofile%2Fuser%2F1';
-
-    expect(component.decodedProfilePicture).toBe(undefined);
-
-    component.ngOnInit();
-
-    expect(component.decodedProfilePicture).toBe('/profile/user/1');
   });
 
   it('should check if input response contains video rte element', () => {
@@ -217,8 +202,9 @@ describe('InputResponsePairComponent', () => {
     component.data = {
       // This throws "Type '{ answerDetails: string; }' is not assignable to
       // type 'string'.". We need to suppress this error because we need to
-      // store "answerDetails" to test the relevant code.
-      // @ts-expect-error
+      // store "answerDetails" to test the relevant code. This is done to
+      // avoid the lint error "This test should have at least one expectation.".
+      // @ts-ignore
       learnerInput: {
         answerDetails: 'Answer Details'
       },

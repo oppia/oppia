@@ -63,11 +63,15 @@ Note that the root folder MUST be named 'oppia'.
 
 _PARSER.add_argument(
     '--mode', help='Sets the mode for the lighthouse tests',
-    required=True, choices=['accessibility', 'performance'])
+    required=True,
+    choices=['accessibility', 'performance'])
 
 _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
     required=True, choices=['1', '2'])
+_PARSER.add_argument(
+    '--skip_build', help='Sets whether to skip webpack build',
+    action='store_true')
 
 
 def run_lighthouse_puppeteer_script() -> None:
@@ -129,9 +133,7 @@ def export_url(line: str) -> None:
     """
     url_parts = line.split('/')
     print('Parsing and exporting entity ID in line: %s' % line)
-    if 'collection_editor' in line:
-        os.environ['collection_id'] = url_parts[5]
-    elif 'create' in line:
+    if 'create' in line:
         os.environ['exploration_id'] = url_parts[4]
     elif 'topic_editor' in line:
         os.environ['topic_id'] = url_parts[4]
@@ -190,11 +192,19 @@ def main(args: Optional[List[str]] = None) -> None:
     else:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
-
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
-        print('Building files in production mode.')
-        build.main(args=['--prod_env'])
+        if not parsed_args.skip_build:
+            # Builds webpack.
+            print('Building files in production mode.')
+            build.main(args=['--prod_env'])
+        else:
+            # Skip webpack build if skip_build flag is passed.
+            print('Building files in production mode skipping webpack build.')
+            build.main(args=[])
+            common.run_ng_compilation()
+            run_webpack_compilation()
     else:
+        # Accessibility mode skip webpack build.
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()

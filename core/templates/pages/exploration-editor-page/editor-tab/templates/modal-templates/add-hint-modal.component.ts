@@ -22,9 +22,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/hint-object.model';
 import { ContextService } from 'services/context.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 
 interface HintFormSchema {
   type: string;
@@ -55,7 +56,6 @@ export class AddHintModalComponent
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private generateContentIdService: GenerateContentIdService,
-    private hintObjectFactory: HintObjectFactory,
     private ngbActiveModal: NgbActiveModal,
     private stateHintsService: StateHintsService
   ) {
@@ -73,7 +73,20 @@ export class AddHintModalComponent
   }
 
   isHintLengthExceeded(tmpHint: string): boolean {
-    return Boolean(tmpHint.length > 500);
+    // The variable charCount stores the number of remaining characters after
+    // removing the html tags from tmpHint.
+    const domParser = new DOMParser();
+    let charCount = 0;
+    if (tmpHint.length) {
+      let dom = domParser.parseFromString(tmpHint, 'text/html');
+      if (dom.body.textContent) {
+        charCount = dom.body.textContent.replace(
+          ExplorationEditorPageConstants.NEW_LINE_REGEX, '').length;
+      }
+    }
+    // Note: charCount does not include the characters from Rich Text ELements.
+    return Boolean(
+      charCount > ExplorationEditorPageConstants.HINT_CHARACTER_LIMIT);
   }
 
   updateLocalHint($event: string): void {
@@ -89,7 +102,7 @@ export class AddHintModalComponent
     // Close the modal and save it afterwards.
     this.ngbActiveModal.close({
       hint: cloneDeep(
-        this.hintObjectFactory.createNew(contentId, this.tmpHint)),
+        Hint.createNew(contentId, this.tmpHint)),
       contentId: contentId
     });
   }
