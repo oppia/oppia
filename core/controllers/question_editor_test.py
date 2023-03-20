@@ -380,7 +380,8 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         post_data = {
             'question_dict': question_dict,
             'skill_ids': [self.skill_id],
-            'skill_difficulties': [0.6]
+            'skill_difficulties': [0.6],
+            'filenames': json.dumps(['img.png'])
         }
 
         with utils.open_file(
@@ -391,7 +392,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.post_json(
             feconf.NEW_QUESTION_URL, post_data,
             csrf_token=csrf_token,
-            upload_files=[(filename, filename, raw_image)]
+            upload_files=[('image0', filename, raw_image)]
         )
         all_models = question_models.QuestionModel.get_all()
         questions = [
