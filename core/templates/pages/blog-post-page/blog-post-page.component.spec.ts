@@ -30,6 +30,8 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UrlService } from 'services/contextual/url.service';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UserService } from 'services/user.service';
+
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
@@ -73,6 +75,7 @@ describe('Blog home page component', () => {
   let component: BlogPostPageComponent;
   let mockWindowRef: MockWindowRef;
   let fixture: ComponentFixture<BlogPostPageComponent>;
+  let userService: UserService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -115,6 +118,7 @@ describe('Blog home page component', () => {
     mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    userService = TestBed.inject(UserService);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
   });
@@ -182,20 +186,19 @@ describe('Blog home page component', () => {
     component.blogPostPageData = {
       authorUsername: 'test_username',
       blogPostDict: blogPostData,
-      profilePictureDataUrl: 'sample-url',
       summaryDicts: [],
     };
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue('sample-url');
     spyOn(urlService, 'getBlogPostUrlFromUrl').
       and.returnValue('sample-post-url');
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
 
     component.ngOnInit();
 
     expect(component.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST).toBe(2);
     expect(component.blogPostUrlFragment).toBe('sample-post-url');
-    expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual('sample-url');
-    expect(component.authorProfilePicUrl).toBe('sample-url');
+    expect(component.authorProfilePicPngUrl).toEqual('default-image-url-png');
+    expect(component.authorProfilePicWebpUrl).toEqual('default-image-url-webp');
     expect(component.blogPost).toEqual(blogPostData);
     expect(component.postsToRecommend.length).toBe(0);
     expect(component.publishedDateString).toBe('November 21, 2014');
