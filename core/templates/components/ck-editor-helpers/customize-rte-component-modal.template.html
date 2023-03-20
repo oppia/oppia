@@ -29,7 +29,7 @@
     <input type="submit" class="btn btn-secondary e2e-test-cancel-rich-text-editor" value="Cancel" ng-click="cancel()">
     <input ng-if="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid || form.schemaForm.$pristine">
     <input ng-if="currentRteIsLinkEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid || disableSaveButtonForLinkRte() || form.schemaForm.$pristine">
-    <input ng-if="currentRteIsMathExpressionEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid || disableSaveButtonForMathRte() || form.schemaForm.$pristine">
+    <input ng-if="currentRteIsMathExpressionEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid || disableSaveButtonForMathRte()">
   </div>
 </div>
 <style>
