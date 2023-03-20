@@ -19,9 +19,6 @@
           <span class="oppia-editor-warnings-count" ng-if="!$ctrl.authenticationIssue">
             <[$ctrl.getTotalWarningsCount()]>
           </span>
-          <span class="oppia-editor-warnings-count" ng-if="$ctrl.authenticationIssue">
-            !
-          </span>
           <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu topic-warning-container oppia-editor-warnings-box">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text"
@@ -35,10 +32,6 @@
                 ng-if="!$ctrl.authenticationIssue">
               <hr class="oppia-editor-warnings-separator">
               <[issue]>
-            </li>
-            <li class="oppia-editor-warnings-text" ng-if="$ctrl.authenticationIssue">
-              <hr class="oppia-editor-warnings-separator">
-              <[$ctrl.authenticationIssue]>
             </li>
           </ul>
         </div>

@@ -204,7 +204,7 @@
               <span class="clickable-item"><[skillSummary.getDescription()]></span>
             </a>
             <div class="edit-options-container">
-              <i class="fa fa-ellipsis-v" ng-click="topicRights.canEditTopic() && toggleUncategorizedSkillOptions($index)"></i>
+              <i class="fa fa-ellipsis-v" ng-click="toggleUncategorizedSkillOptions($index)" ng-if="topicRights.canEditTopic()"></i>
             </div>
             <div class="uncategorized-skill-option-box"
                  ng-if="uncategorizedEditOptionsIndex === $index"
@@ -234,7 +234,7 @@
                 </span>
                 <div class="subtopic-edit-options-container edit-options-container">
                   <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
-                  <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options" ng-click="topicRights.canEditTopic() && showSubtopicEditOptions($index);$event.stopPropagation()"></i>
+                  <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options" ng-if="topicRights.canEditTopic()" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
                   <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
                     <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
                     <span>Delete</span>
@@ -249,7 +249,7 @@
                     </a>
                     <div class="edit-options-container">
                       <span><[skillQuestionCountDict[skillSummary.getId()] ]></span>
-                      <i class="fa fa-ellipsis-v" ng-click="topicRights.canEditTopic() && showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
+                      <i class="fa fa-ellipsis-v" ng-if="topicRights.canEditTopic()" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
                     </div>
                     <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)" ng-click="showSkillEditOptions(null)">
                       <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
@@ -304,10 +304,11 @@
               {{skill.getDescription()}}
             </span>
             <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
-                    ng-click="topicRights.canEditTopic() && removeSkillFromDiagnosticTest(skill)"
+                    ng-click="removeSkillFromDiagnosticTest(skill)"
                     md-button
                     md-icon-button
-                    aria-label="Clear">
+                    aria-label="Clear"
+                    disabled="topicRights.canEditTopic()">
               <md-icon>close</md-icon>
             </button>
           </div>

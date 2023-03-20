@@ -172,10 +172,6 @@ angular.module('oppia').directive('topicEditorPage', [
           };
 
           ctrl.getTotalWarningsCount = function() {
-            if (!TopicEditorStateService.getTopicRights().canEditTopic()) {
-              ctrl.authenticationIssue =
-                'You don\'t have permission to edit this topic';
-            }
             var validationIssuesCount = ctrl.validationIssues.length;
             var prepublishValidationIssuesCount = (
               ctrl.prepublishValidationIssues.length);
