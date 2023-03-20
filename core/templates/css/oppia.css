@@ -919,12 +919,12 @@ textarea {
   font-size: 20px;
   padding-top: 13px;
 }
-.oppia-navbar-breadcrumb li{
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  width: calc(100vw - 830px);
+.oppia-navbar-breadcrumb li {
   display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: calc(100vw - 830px);
 }
 
 .oppia-navbar-breadcrumb-separator {
