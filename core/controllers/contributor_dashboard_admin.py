@@ -368,7 +368,7 @@ class TranslationContributionStatsHandler(
         }
     }
 
-    @acl_decorators.can_access_contributor_dashboard_admin_page
+    @acl_decorators.can_access_translation_stats
     def get(self) -> None:
         assert self.normalized_request is not None
         username = self.normalized_request['username']
