@@ -252,38 +252,6 @@ class StartTests(test_utils.GenericTestBase):
             ],
             self.print_arr)
 
-    def test_start_servers_successfully_in_contributor_dashboard_debug_mode(
-        self
-    ) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import start
-        swap_build = self.swap_with_checks(
-            build, 'main', lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}])
-        populate_data_swap = self.swap_with_call_counter(
-            contributor_dashboard_debug.ContributorDashboardDebugInitializer,
-            'populate_debug_data'
-        )
-        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
-            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_create_server, self.swap_webpack_compiler:
-                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
-                        with self.swap_firebase_auth_emulator, self.swap_print:
-                            with populate_data_swap as populate_data_counter:
-                                start.main(args=['--contributor_dashboard'])
-
-        self.assertEqual(populate_data_counter.times_called, 1)
-        self.assertIn(
-            [
-                'INFORMATION',
-                (
-                    'Local development server is ready! Opening a default web '
-                    'browser window pointing to it: '
-                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                )
-            ],
-            self.print_arr)
-
     def test_could_not_auto_launch_web_browser(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start

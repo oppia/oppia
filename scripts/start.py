@@ -187,14 +187,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             skip_sdk_update_check=True,
             port=PORT_NUMBER_FOR_GAE_SERVER))
 
-        if parsed_args.contributor_dashboard_debug:
-            initializer = (
-                contributor_dashboard_debug
-                .ContributorDashboardDebugInitializer(
-                    base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER)
-            )
-            initializer.populate_debug_data()
-
         if parsed_args.no_browser:
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
