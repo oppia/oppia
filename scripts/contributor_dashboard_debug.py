@@ -14,9 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script assists development of the contributor dashboard. When the
-"contributor dashboard debug" flag is enabled, the start script will call the
-"populate_debug_data" function, which does the following:
+"""This script assists development of the contributor dashboard. After starting
+up a development server running Oppia, running this script does the following:
     1. Create an admin user with the username "a" and assign curriculum,
     translation, and question admin rights to "a".
     2. Create a non-admin user with the username "b" and give the user "submit
