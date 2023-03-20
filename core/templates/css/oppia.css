@@ -919,6 +919,13 @@ textarea {
   font-size: 20px;
   padding-top: 13px;
 }
+.oppia-navbar-breadcrumb li{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: calc(100vw - 830px);
+  display: inline-block;
+}
 
 .oppia-navbar-breadcrumb-separator {
   margin-right: 8px;
