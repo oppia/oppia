@@ -76,7 +76,7 @@ interface SuggestionChangeDict {
 interface ActiveSuggestionDict {
   'author_name': string;
   'change': SuggestionChangeDict;
-  'exploration_content_html': string | string[];
+  'exploration_content_html': string | string[] | null;
   'language_code': string;
   'last_updated_msecs': number;
   'status': string;

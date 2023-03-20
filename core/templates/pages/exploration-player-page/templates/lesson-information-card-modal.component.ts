@@ -63,6 +63,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   explorationId!: string;
   expTitle!: string;
   expDesc!: string;
+  expCategory!: string;
   contributorNames!: string[];
   checkpointCount!: number;
   expInfo!: LearnerExplorationSummaryBackendDict;
@@ -115,6 +116,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.explorationTags = this.getExplorationTagsSummary(this.expInfo.tags);
     this.explorationId = this.expInfo.id;
     this.expTitle = this.expInfo.title;
+    this.expCategory = this.expInfo.category;
     this.expDesc = this.expInfo.objective;
     this.infoCardBackgroundCss = {
       'background-color': this.expInfo.thumbnail_bg_color

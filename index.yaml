@@ -287,6 +287,13 @@ indexes:
   - name: suggestion_type
   - name: status
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: target_id
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer
