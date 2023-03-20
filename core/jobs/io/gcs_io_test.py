@@ -77,8 +77,8 @@ class WriteFileTest(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(filepath_p_collec, [7, 7])
 
     def test_write_binary_files_to_gcs(self) -> None:
-        binary_data = utils.convert_png_data_url_to_binary(
-            user_services.DEFAULT_IDENTICON_DATA_URL)
+        binary_data = utils.convert_data_url_to_binary(
+            user_services.DEFAULT_IDENTICON_DATA_URL, 'png')
         filepaths = [
             {
                 'filepath': 'dummy_folder/dummy_subfolder/dummy_file_1',
