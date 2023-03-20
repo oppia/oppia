@@ -30,23 +30,24 @@
 
 from __future__ import annotations
 
-import contextlib
 import hashlib
 import json
-import os
 
 from core import feconf
 from core.constants import constants
 
-import firebase_admin
-from firebase_admin import auth as firebase_auth
 import requests
-from typing import Dict, Final, Iterator, List
+from typing import Dict, Final, List
+
+PORT_NUMBER_FOR_GAE_SERVER: Final = 8181
 
 FIREBASE_AUTH_EMULATOR_HOST: Final = (
     'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT)
 FIREBASE_SIGN_IN_URL: Final = (
     'http://%s/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
+    % FIREBASE_AUTH_EMULATOR_HOST)
+FIREBASE_SIGN_UP_URL: Final = (
+    'http://%s/identitytoolkit.googleapis.com/v1/accounts:signUp'
     % FIREBASE_AUTH_EMULATOR_HOST)
 
 SUPER_ADMIN_EMAIL: Final = feconf.ADMIN_EMAIL_ADDRESS
@@ -82,9 +83,6 @@ class ContributorDashboardDebugInitializer:
         """Populate sample data to help develop for the contributor
         dashboard.
         """
-        firebase_admin.initialize_app(
-            options={'projectId': feconf.OPPIA_PROJECT_ID})
-
         self._sign_up_new_user(SUPER_ADMIN_EMAIL, SUPER_ADMIN_USERNAME)
         self._sign_up_new_user(CONTRIBUTOR_EMAIL, CONTRIBUTOR_USERNAME)
 
@@ -109,17 +107,9 @@ class ContributorDashboardDebugInitializer:
         # this script, clicking the "Sign In" button will generate a valid
         # password which is the same as that in the emulator.
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
+        token_id = self._sign_up_on_firebase(email, password)
+        self._begin_session(token_id)
 
-        # The FIREBASE_AUTH_EMULATOR_HOST environment variable is set to connect
-        # with the Firebase Authentication emulator.
-        with self._set_environ(
-            'FIREBASE_AUTH_EMULATOR_HOST', FIREBASE_AUTH_EMULATOR_HOST
-        ):
-            # Create a new user in Firebase.
-            firebase_auth.create_user(email=email, password=password)
-
-        # Sign up the new user in Oppia and set its username.
-        self._sign_in(email)
         self._make_request('GET', '/signup?return_url=/')
         self.csrf_token = self._get_csrf_token()
 
@@ -141,34 +131,31 @@ class ContributorDashboardDebugInitializer:
         self._make_request('GET', '/session_end')
         self.csrf_token = ''
 
-    @contextlib.contextmanager
-    def _set_environ(self, env_name: str, value: str) -> Iterator[None]:
-        """Temporarily set the environment variable 'env_name' to 'value' while
-        inside the ``with`` block.
-        """
-        old_value = os.environ.get(env_name)
-        os.environ[env_name] = value
-        try:
-            yield
-        finally:
-            if old_value is None:
-                del os.environ[env_name]
-            else:
-                os.environ[env_name] = old_value
+    def _sign_up_on_firebase(
+        self, email: str, password: str
+    ) -> str | None:
+        """Signs up on Firebase, and returns the token id."""
+        token_id = requests.post(
+            FIREBASE_SIGN_UP_URL,
+            params={'key': 'fake-api-key'},
+            json={
+                'email': email,
+                'password': password
+            }
+        ).json()['idToken']
+
+        return str(token_id) if token_id else None
 
     def _sign_in(self, email: str) -> None:
         """Begins a session with the given email, i.e. log in with the email."""
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
+        token_id = self._sign_in_on_firebase(email, password)
+        self._begin_session(token_id)
 
-        token_id = self._sign_in_with_email_and_password(email, password)
-        headers = {'Authorization': 'Bearer %s' % token_id}
-
-        self._make_request('GET', '/session_begin', headers=headers)
-
-    def _sign_in_with_email_and_password(
+    def _sign_in_on_firebase(
         self, email: str, password: str
     ) -> str | None:
-        """Signs in with email and password, and returns the token id."""
+        """Signs in on Firebase, and returns the token id."""
         token_id = requests.post(
             FIREBASE_SIGN_IN_URL,
             params={'key': 'fake-api-key'},
@@ -179,6 +166,11 @@ class ContributorDashboardDebugInitializer:
         ).json()['idToken']
 
         return str(token_id) if token_id else None
+
+    def _begin_session(self, token_id: str | None) -> None:
+        """Begins a session with the given token id."""
+        headers = {'Authorization': 'Bearer %s' % token_id}
+        self._make_request('GET', '/session_begin', headers=headers)
 
     def _get_csrf_token(self) -> str:
         """Gets the CSRF token."""
@@ -268,3 +260,19 @@ class ContributorDashboardDebugInitializer:
             method, self.base_url + url, headers=headers, params=params)
 
         return response
+
+
+def main() -> None:
+    """Populates data for contributor dashboard debug."""
+    initializer = (
+        ContributorDashboardDebugInitializer(
+            base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER
+        )
+    )
+    initializer.populate_debug_data()
+
+
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when contributor_dashboard_debug.py used as a script.
+if __name__ == '__main__': # pragma: no cover
+    main()
