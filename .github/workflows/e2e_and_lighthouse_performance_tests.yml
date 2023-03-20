@@ -254,7 +254,11 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
       - name: Run Acceptance Test ${{ matrix.suite }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          python -m scripts.run_acceptance_tests 
+            --skip-build 
+            --suite=${{ matrix.suite }} 
+            --prod_env
       - name: Uploading webpack bundles as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
