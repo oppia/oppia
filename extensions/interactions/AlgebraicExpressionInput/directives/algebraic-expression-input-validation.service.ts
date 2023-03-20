@@ -104,8 +104,8 @@ export class AlgebraicExpressionInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: (
-              'Input for rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-              ' uses these function(s) that aren\'t supported: ' +
+              'Input for learner answer ' + (j + 1) + ' from Oppia response ' +
+              (i + 1) + ' uses these function(s) that aren\'t supported: ' +
               '[' + unsupportedFunctions + ']' +
               ' The supported functions are: ' +
               '[' + this.supportedFunctionNames + ']'
@@ -133,9 +133,10 @@ export class AlgebraicExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                ' will never be matched because it is preceded ' +
-                'by an \'IsEquivalentTo\' rule with a matching input.')
+                'Learner answer ' + (j + 1) + ' from Oppia ' +
+                'response ' + (i + 1) + ' will never be matched because it ' +
+                'is preceded by an \'IsEquivalentTo\' answer ' +
+                'with a matching input.')
             });
           } else if (currentRuleType === 'MatchesExactlyWith' && (
             algebraicRulesService.MatchesExactlyWith(
@@ -145,9 +146,10 @@ export class AlgebraicExpressionInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'Rule ' + (j + 1) + ' from answer group ' + (i + 1) +
-                ' will never be matched because it is preceded ' +
-                'by a \'MatchesExactlyWith\' rule with a matching input.')
+                'Learner answer ' + (j + 1) + ' from Oppia ' +
+                'response ' + (i + 1) + ' will never be matched because it ' +
+                'is preceded by a \'MatchesExactlyWith\' answer ' +
+                'with a matching input.')
             });
           }
         }
@@ -176,8 +178,9 @@ export class AlgebraicExpressionInputValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
-          'The following variables are present in some of the answer groups ' +
-          'but are missing from the custom letters list: ' + missingVariables)
+          'The following variables are present in some of the Oppia ' +
+          'responses but are missing from the custom letters list: ' +
+          missingVariables)
       });
     }
 

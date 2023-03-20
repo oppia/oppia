@@ -160,8 +160,8 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
-            'from answer group 1'
+            message: 'Learner answer 2 from Oppia response 1 is the ' +
+            'same as answer 1 from Oppia response 1'
           }]);
         });
 
@@ -222,8 +222,8 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
-            'from answer group 1'
+            message: 'Learner answer 2 from Oppia response 1 is the ' +
+            'same as answer 1 from Oppia response 1'
           }]);
         });
 
@@ -284,8 +284,8 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
-            'from answer group 1'
+            message: 'Learner answer 2 from Oppia response 1 is the ' +
+            'same as answer 1 from Oppia response 1'
           }]);
         });
 
@@ -346,8 +346,8 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
-            'from answer group 1'
+            message: 'Learner answer 2 from Oppia response 1 is the ' +
+            'same as answer 1 from Oppia response 1'
           }]);
         });
 
@@ -408,8 +408,8 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
-            'from answer group 1'
+            message: 'Learner answer 2 from Oppia response 1 is the ' +
+            'same as answer 1 from Oppia response 1'
           }]);
         });
 
@@ -470,8 +470,8 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
-            'from answer group 1'
+            message: 'Learner answer 2 from Oppia response 1 is the ' +
+            'same as answer 1 from Oppia response 1'
           }]);
         });
 
@@ -532,8 +532,8 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 is the same as rule 1 ' +
-            'from answer group 1'
+            message: 'Learner answer 2 from Oppia response 1 is the ' +
+            'same as answer 1 from Oppia response 1'
           }]);
         });
 
@@ -610,8 +610,9 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 will never be matched ' +
-            'because it is made redundant by rule 1 from answer group 1.'
+            message: 'Learner answer 2 from Oppia response 1 will never ' +
+            'be matched because it is made redundant by answer 1 from Oppia ' +
+            'response 1.'
           }]);
         });
 
@@ -667,8 +668,9 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 will never be matched ' +
-            'because it is made redundant by rule 1 from answer group 1.'
+            message: 'Learner answer 2 from Oppia response 1 will never ' +
+            'be matched because it is made redundant by answer 1 from Oppia ' +
+            'response 1.'
           }]);
         });
 
@@ -724,8 +726,9 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 will never be matched ' +
-            'because it is made redundant by rule 1 from answer group 1.'
+            message: 'Learner answer 2 from Oppia response 1 will never ' +
+            'be matched because it is made redundant by answer 1 from Oppia ' +
+            'response 1.'
           }]);
         });
 
@@ -781,8 +784,9 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 will never be matched ' +
-            'because it is made redundant by rule 1 from answer group 1.'
+            message: 'Learner answer 2 from Oppia response 1 will never ' +
+            'be matched because it is made redundant by answer 1 from Oppia ' +
+            'response 1.'
           }]);
         });
 
@@ -838,8 +842,9 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 will never be matched ' +
-            'because it is made redundant by rule 1 from answer group 1.'
+            message: 'Learner answer 2 from Oppia response 1 will never ' +
+            'be matched because it is made redundant by answer 1 from Oppia ' +
+            'response 1.'
           }]);
         });
 
@@ -895,8 +900,9 @@ describe('SetInputValidationService', () => {
           );
           expect(warnings).toEqual([{
             type: WARNING_TYPES.ERROR,
-            message: 'Rule 2 from answer group 1 will never be matched ' +
-            'because it is made redundant by rule 1 from answer group 1.'
+            message: 'Learner answer 2 from Oppia response 1 will never ' +
+            'be matched because it is made redundant by answer 1 from Oppia ' +
+            'response 1.'
           }]);
         });
 

@@ -105,8 +105,9 @@ describe('AlgebraicExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
-      ' is preceded by an \'IsEquivalentTo\' rule with a matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by an \'IsEquivalentTo\' answer with ' +
+      'a matching input.'
     }]);
 
 
@@ -130,8 +131,9 @@ describe('AlgebraicExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
-      ' is preceded by an \'IsEquivalentTo\' rule with a matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by an \'IsEquivalentTo\' answer with ' +
+      'a matching input.'
     }]);
 
 
@@ -155,8 +157,9 @@ describe('AlgebraicExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
-      ' is preceded by a \'MatchesExactlyWith\' rule with a matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'MatchesExactlyWith\' answer ' +
+      'with a matching input.'
     }]);
   });
 
@@ -208,7 +211,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'The following variables are present in some of the answer groups ' +
+        'The following variables are present in some of the Oppia responses ' +
         'but are missing from the custom letters list: α,x')
     }]);
   });
@@ -259,8 +262,9 @@ describe('AlgebraicExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Input for rule 1 from answer group 1 uses these function(s) that ' +
-        'aren\'t supported: [log] The supported functions are: [sqrt,abs]')
+        'Input for learner answer 1 from Oppia response 1 uses these ' +
+        'function(s) that aren\'t supported: [log] The supported functions ' +
+        'are: [sqrt,abs]')
     }]);
   });
 });

@@ -1077,7 +1077,7 @@ describe('Exploration Warnings Service', () => {
       ],
       End: [
         'Please make sure end exploration interactions do not ' +
-         'have any answer groups.',
+         'have any Oppia responses.',
         'Checkpoints are not allowed on the last card of the lesson.',
         'Checkpoints must not be assigned to cards that can be bypassed.'
       ]
@@ -1603,7 +1603,7 @@ describe('Exploration Warnings Service', () => {
       ],
       End: [
         'Please make sure end exploration interactions do not ' +
-           'have any answer groups.',
+           'have any Oppia responses.',
         'Checkpoints are not allowed on the last card of the lesson.',
         'Checkpoints must not be assigned to cards that can be bypassed.'
       ]
@@ -2144,7 +2144,7 @@ describe('Exploration Warnings Service', () => {
       ],
       End: [
         'Please make sure end exploration interactions do not ' +
-           'have any answer groups.',
+           'have any Oppia responses.',
       ]
     });
   });

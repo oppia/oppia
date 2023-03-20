@@ -185,8 +185,8 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 upper bound of the range should be greater than' +
-      ' or equal to zero.'
+      message: 'Learner answer 2 upper bound of the range should be ' +
+      'greater than or equal to zero.'
     }]);
   });
 
@@ -199,7 +199,7 @@ describe('NumericInputValidationService', () => {
 
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 1 tolerance must be a positive value.'
+        message: 'Learner answer 1 tolerance must be a positive value.'
       }]);
     });
 
@@ -211,8 +211,8 @@ describe('NumericInputValidationService', () => {
       expect(customizationArgs.requireNonnegativeInput.value).toBe(true);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 1 Upper bound of the tolerance range should ' +
-        'be greater than or equal to zero.'
+        message: 'Learner answer 1 Upper bound of the tolerance ' +
+        'range should be greater than or equal to zero.'
       }]);
     });
 
@@ -223,7 +223,8 @@ describe('NumericInputValidationService', () => {
     expect(customizationArgs.requireNonnegativeInput.value).toBe(true);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 input should be greater than or equal to zero.'
+      message: 'Learner answer 1 input should be greater than ' +
+      'or equal to zero.'
     }]);
   });
 
@@ -234,7 +235,8 @@ describe('NumericInputValidationService', () => {
     expect(customizationArgs.requireNonnegativeInput.value).toBe(true);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 input should be greater than or equal to zero.'
+      message: 'Learner answer 1 input should be greater than ' +
+      'or equal to zero.'
     }]);
   });
 
@@ -246,7 +248,8 @@ describe('NumericInputValidationService', () => {
       expect(customizationArgs.requireNonnegativeInput.value).toBe(true);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 1 input should be greater than or equal to zero.'
+        message: 'Learner answer 1 input should be greater than ' +
+        'or equal to zero.'
       }]);
     });
 
@@ -260,11 +263,11 @@ describe('NumericInputValidationService', () => {
 
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'In Rule 1 from answer group 1, Please ensure ' +
+      message: 'In learner answer 1 from Oppia response 1, Please ensure ' +
       'that the second number is greater than the first number.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'In Rule 2 from answer group 1, Please ensure ' +
+      message: 'In learner answer 2 from Oppia response 1, Please ensure ' +
       'that the second number is greater than the first number.'
     }]);
   });
@@ -275,12 +278,12 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 upper bound of the range should be greater than or' +
-      ' equal to zero.'
+      message: 'Learner answer 1 upper bound of the range should be ' +
+      'greater than or equal to zero.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+        ' because it is made redundant by answer 1 from response 1.'
     }]);
   });
 
@@ -290,8 +293,8 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+      ' because it is made redundant by answer 1 from response 1.'
     }]);
   });
 
@@ -303,12 +306,12 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 upper bound of the range should be greater than' +
-      ' or equal to zero.'
+      message: 'Learner answer 1 upper bound of the range should be ' +
+      'greater than or equal to zero.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is made redundant by answer 1 from response 1.'
     }]);
   });
 
@@ -320,16 +323,16 @@ describe('NumericInputValidationService', () => {
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
       answerGroups[0].rules = [greaterThanNegativeOneRule, equalsZeroRule];
       warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
@@ -341,8 +344,8 @@ describe('NumericInputValidationService', () => {
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
       answerGroups[0].rules = [
         greaterThanOrEqualToNegativeOneRule, equalsZeroRule
@@ -351,8 +354,8 @@ describe('NumericInputValidationService', () => {
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 
@@ -363,8 +366,8 @@ describe('NumericInputValidationService', () => {
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from response 1.'
       }]);
     });
 

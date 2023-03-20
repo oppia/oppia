@@ -94,7 +94,7 @@ export class NumericInputValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
-          'In Rule ' + (ruleIndex + 1) + ' from answer group ' +
+          'In learner answer ' + (ruleIndex + 1) + ' from Oppia response ' +
           (answerGroupIndex + 1) + ', Please ensure that the second number ' +
           'is greater than the first number.')
       });
@@ -105,7 +105,7 @@ export class NumericInputValidationService {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'Rule ' + (ruleIndex + 1) + ' input ' +
+            'Learner answer ' + (ruleIndex + 1) + ' input ' +
             'should be greater than or equal to zero.')
         });
       }
@@ -142,7 +142,7 @@ export class NumericInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' upper bound of the range ' +
+                  'Learner answer ' + (j + 1) + ' upper bound of the range ' +
                   'should be greater than or equal to zero.')
               });
             }
@@ -173,7 +173,8 @@ export class NumericInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' tolerance must be a positive value.')
+                  'Learner answer ' + (j + 1) +
+                  ' tolerance must be a positive value.')
               });
             }
             if (
@@ -183,8 +184,8 @@ export class NumericInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' Upper bound of the tolerance range ' +
-                  'should be greater than or equal to zero.')
+                  'Learner answer ' + (j + 1) + ' Upper bound of the ' +
+                  'tolerance range should be greater than or equal to zero.')
               });
             }
             break;
@@ -195,10 +196,10 @@ export class NumericInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
-                'Rule ' + (j + 1) + ' from answer group ' +
-                (i + 1) + ' will never be matched because it ' +
-                'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
-                ' from answer group ' + (ranges[k].answerGroupIndex + 1) + '.')
+                'Learner answer ' + (j + 1) + ' from Oppia response ' +
+                (i + 1) + ' will never be matched because it is made ' +
+                'redundant by answer ' + (ranges[k].ruleIndex + 1) + ' from ' +
+                'response ' + (ranges[k].answerGroupIndex + 1) + '.')
             });
           }
         }

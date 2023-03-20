@@ -85,7 +85,7 @@ export class EndExplorationValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'Please make sure end exploration interactions do not ' +
-          'have any answer groups.'
+          'have any Oppia responses.'
       });
     }
     if (defaultOutcome) {

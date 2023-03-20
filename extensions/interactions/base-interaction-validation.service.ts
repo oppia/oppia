@@ -70,7 +70,7 @@ export class baseInteractionValidationService {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
-            'Please specify what Oppia should do in answer group ' +
+            'Please specify what Oppia should do in Oppia response ' +
             String(i + 1) + '.')
         });
       }
