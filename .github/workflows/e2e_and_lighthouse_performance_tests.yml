@@ -266,7 +266,12 @@ jobs:
           name: webpack-bundles
           path: /home/runner/work/oppia/oppia/build
       - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        if: ${{ 
+          failure() && 
+          github.event_name == 'push' && 
+          github.repository == 'oppia/oppia' && 
+          github.ref == 'refs/heads/develop'
+        }}
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "An acceptance test failed on the upstream develop branch."
