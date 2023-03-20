@@ -358,7 +358,6 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             )
         self.assertEqual(
             'new author name', json_response['displayed_author_name'])
-        self.assertIsNone(json_response['profile_picture_data_url'])
         assert self.blog_post.last_updated is not None
         expected_blog_post_dict = {
             'id': u'%s' % self.blog_post.id,
