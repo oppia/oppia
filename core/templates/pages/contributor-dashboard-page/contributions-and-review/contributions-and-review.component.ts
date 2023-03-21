@@ -665,7 +665,9 @@ export class ContributionsAndReview
         [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getReviewableQuestionSuggestionsAsync(
-              shouldResetOffset, this.reviewableQuestionsSortKey);
+              shouldResetOffset,
+              this.reviewableQuestionsSortKey,
+              this.translationTopicService.getActiveTopicName());
         }
       },
       [this.SUGGESTION_TYPE_TRANSLATE]: {
