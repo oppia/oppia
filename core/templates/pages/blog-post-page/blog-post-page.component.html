@@ -5,11 +5,14 @@
     </mat-card-title>
     <div class="blog-card-header-content">
       <mat-card-header [ngClass]="{'mb-5': !isSmallScreenViewActive(), 'mb-0': isSmallScreenViewActive()}">
-        <img mat-card-avatar
-             class="mr-2 e2e-test-author-profile-photo"
-             [src]="authorProfilePicUrl"
-             alt="Profile image of the author of the blog post"
-             (click)="navigateToAuthorProfilePage()">
+        <picture>
+          <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
+          <source type="image/png" [srcset]="authorProfilePicPngUrl">
+          <img mat-card-avatar class="mr-2 e2e-test-author-profile-photo"
+               [src]="authorProfilePicPngUrl"
+               alt="Profile image of the author of the blog post"
+               (click)="navigateToAuthorProfilePage()">
+        </picture>
         <mat-card-subtitle class="blog-author-name e2e-test-author-name" (click)="navigateToAuthorProfilePage()">
           {{ blogPost.displayedAuthorName }}
         </mat-card-subtitle>
@@ -78,7 +81,6 @@
       <div *ngFor="let blogPostSummary of postsToRecommend"
            class="blog-post-card mb-4 e2e-test-blog-post-list">
         <oppia-blog-card [blogPostSummary]="blogPostSummary"
-                         [authorProfilePicDataUrl]="blogPostSummary.authorProfilePicUrl"
                          [shownOnblogPostPage]="true"
                          class="e2e-test-blog-post-tile-item">
         </oppia-blog-card>

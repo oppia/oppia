@@ -57,7 +57,6 @@ describe('CreateLearnerGroupPageComponent', () => {
 
   const userInfo = LearnerGroupUserInfo.createFromBackendDict({
     username: 'username1',
-    profile_picture_data_url: 'profile_picture_url1',
     error: ''
   });
 
