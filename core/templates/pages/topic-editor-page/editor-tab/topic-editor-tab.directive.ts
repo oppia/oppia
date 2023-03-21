@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,597 +13,620 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the main topic editor.
+ * @fileoverview Component for the main topic editor.
  */
 
 import { ChangeSubtopicAssignmentModalComponent } from '../modal-templates/change-subtopic-assignment-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
 import { Subscription } from 'rxjs';
 import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { ContextService } from 'services/context.service';
+import { TopicUpdateService } from 'domain/topic/topic-update.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { EntityCreationService } from '../services/entity-creation.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { StoryCreationBackendApiService } from 'components/entity-creation-services/story-creation-backend-api.service';
+import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
+import { PageTitleService } from 'services/page-title.service';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { Subtopic } from 'domain/topic/subtopic.model';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Topic } from 'domain/topic/topic-object.model';
+import { TopicRights } from 'domain/topic/topic-rights.model';
+import { RearrangeSkillsInSubtopicsModalComponent } from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
-require(
-  'components/forms/custom-forms-directives/' +
-    'edit-thumbnail-modal.component.ts');
-require('components/entity-creation-services/story-creation.service.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/topic/topic-update.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
-require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
-require('pages/topic-editor-page/services/entity-creation.service.ts');
-require(
-  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts');
-require(
-  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
+@Component({
+  selector: 'oppia-topic-editor-tab',
+  templateUrl: './topic-editor-tab.directive.html'
+})
+export class TopicEditorTabComponent implements OnInit, OnDestroy {
+  skillCreationIsAllowed: boolean;
+  topic: Topic;
+  skillQuestionCountDict: object;
+  topicRights: TopicRights;
+  topicNameEditorIsShown: boolean;
+  topicDataHasLoaded: boolean;
+  editableName: string;
+  editableMetaTagContent: string;
+  editablePageTitleFragmentForWeb: string;
+  editablePracticeIsDisplayed: boolean;
+  initialTopicName: string;
+  initialTopicUrlFragment: string;
+  editableTopicUrlFragment: string;
+  editableDescription: string;
+  allowedBgColors;
+  topicNameExists: boolean;
+  topicUrlFragmentExists: boolean;
+  hostname: string;
+  selectedSkillForDiagnosticTest;
+  availableSkillSummariesForDiagnosticTest: ShortSkillSummary[];
+  selectedSkillSummariesForDiagnosticTest: ShortSkillSummary[];
+  diagnosticTestSkillsDropdownIsShown: boolean;
+  topicPreviewCardIsShown: boolean;
+  SUBTOPIC_LIST: string;
+  SKILL_LIST: string;
+  STORY_LIST: string;
+  subtopicCardSelectedIndexes: {};
+  subtopicsListIsShown: boolean;
+  selectedSkillEditOptionsIndex: {};
+  editableDescriptionIsEmpty: boolean;
+  topicDescriptionChanged: boolean;
+  subtopics: Subtopic[];
+  subtopicQuestionCountDict: {};
+  uncategorizedSkillSummaries: ShortSkillSummary[];
+  editableThumbnailDataUrl: string;
+  canonicalStorySummaries: StorySummary[];
+  mainTopicCardIsShown: boolean;
+  storiesListIsShown: boolean;
+  uncategorizedEditOptionsIndex: number;
+  subtopicEditOptionsAreShown: number;
+  skillOptionDialogueBox: boolean = true;
 
-require('services/context.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/image-upload-helper.service.ts');
-require('services/page-title.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require('domain/question/question-backend-api.service.ts');
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-backend-api.service.ts');
-require('base-components/loading-message.component.ts');
-require('services/ngb-modal.service.ts');
+  constructor(
+    private contextService: ContextService,
+    private entityCreationService: EntityCreationService,
+    private focusManagerService: FocusManagerService,
+    private imageUploadHelperService: ImageUploadHelperService,
+    private ngbModal: NgbModal,
+    private pageTitleService: PageTitleService,
+    private storyCreationBackendApiService: StoryCreationBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService:
+      TopicsAndSkillsDashboardBackendApiService,
+    private topicEditorStateService: TopicEditorStateService,
+    private topicEditorRoutingService: TopicEditorRoutingService,
+    private topicUpdateService: TopicUpdateService,
+    private undoRedoService: UndoRedoService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionsService: WindowDimensionsService,
+    private windowRef: WindowRef
+  ) {}
 
-angular.module('oppia').directive('topicEditorTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
-      controller: [
-        '$rootScope', '$scope', '$uibModal', 'ContextService',
-        'EntityCreationService', 'FocusManagerService',
-        'ImageUploadHelperService', 'NgbModal',
-        'PageTitleService', 'StoryCreationService', 'TopicEditorRoutingService',
-        'TopicEditorStateService', 'TopicUpdateService',
-        'TopicsAndSkillsDashboardBackendApiService', 'UndoRedoService',
-        'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
-        'MAX_CHARS_IN_META_TAG_CONTENT',
-        'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
-        'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
-        'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
-        'MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
-        function(
-            $rootScope, $scope, $uibModal, ContextService,
-            EntityCreationService, FocusManagerService,
-            ImageUploadHelperService, NgbModal,
-            PageTitleService, StoryCreationService, TopicEditorRoutingService,
-            TopicEditorStateService, TopicUpdateService,
-            TopicsAndSkillsDashboardBackendApiService, UndoRedoService,
-            UrlInterpolationService, WindowDimensionsService, WindowRef,
-            MAX_CHARS_IN_META_TAG_CONTENT,
-            MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
-            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
-            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
-            MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL,) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
-          $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
-            AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT);
-          $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
-          $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
-            MAX_CHARS_IN_TOPIC_DESCRIPTION);
-          $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
-          $scope.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
-            MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
-          $scope.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
-            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
-          ctrl.initEditor = function() {
-            $scope.skillCreationIsAllowed = (
-              TopicEditorStateService.isSkillCreationAllowed());
-            $scope.topic = TopicEditorStateService.getTopic();
-            $scope.skillQuestionCountDict = (
-              TopicEditorStateService.getSkillQuestionCountDict());
-            $scope.topicRights = TopicEditorStateService.getTopicRights();
-            $scope.topicNameEditorIsShown = false;
-            if (TopicEditorStateService.hasLoadedTopic()) {
-              $scope.topicDataHasLoaded = true;
-              $scope.$applyAsync();
-              FocusManagerService.setFocus('addStoryBtn');
-            }
-            $scope.editableName = $scope.topic.getName();
-            $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
-            $scope.editablePageTitleFragmentForWeb = (
-              $scope.topic.getPageTitleFragmentForWeb());
-            $scope.editablePracticeIsDisplayed = (
-              $scope.topic.getPracticeTabIsDisplayed());
-            $scope.initialTopicName = $scope.topic.getName();
-            $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
-            $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
-            $scope.editableDescription = $scope.topic.getDescription();
-            $scope.allowedBgColors = (
-              AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
-            $scope.topicNameExists = false;
-            $scope.topicUrlFragmentExists = false;
-            $scope.hostname = WindowRef.nativeWindow.location.hostname;
+  directiveSubscriptions = new Subscription();
 
-            $scope.getEligibleSkillSummariesForDiagnosticTest = function() {
-              let availableSkillSummaries = (
-                $scope.topic.getAvailableSkillSummariesForDiagnosticTest());
+  drop(event: CdkDragDrop<Subtopic[]>): void {
+    moveItemInArray(
+      this.subtopics,
+      event.previousIndex, event.currentIndex);
 
-              return availableSkillSummaries.filter(skillSummary => {
-                return (
-                  $scope.skillQuestionCountDict[skillSummary.getId()] >=
-                  MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL
-                );
-              });
-            };
-            $scope.availableSkillSummariesForDiagnosticTest = (
-              $scope.getEligibleSkillSummariesForDiagnosticTest());
-            $scope.selectedSkillSummariesForDiagnosticTest = (
-              $scope.topic.getSkillSummariesForDiagnosticTest());
-            $scope.diagnosticTestSkillsDropdownIsShown = false;
-            $scope.selectedSkillForDiagnosticTest = null;
+    this.topicUpdateService.rearrangeSubtopic(
+      this.topic, event.previousIndex, event.currentIndex);
+    this.initEditor();
+  }
 
-            $scope.presentDiagnosticTestSkillDropdown = function() {
-              $scope.diagnosticTestSkillsDropdownIsShown = true;
-            };
+  initEditor(): void {
+    this.skillCreationIsAllowed = (
+      this.topicEditorStateService.isSkillCreationAllowed());
+    this.topic = this.topicEditorStateService.getTopic();
+    this.skillQuestionCountDict = (
+      this.topicEditorStateService.getSkillQuestionCountDict());
+    this.topicRights = this.topicEditorStateService.getTopicRights();
+    this.topicNameEditorIsShown = false;
+    if (this.topicEditorStateService.hasLoadedTopic()) {
+      this.topicDataHasLoaded = true;
+      this.focusManagerService.setFocus('addStoryBtn');
+    }
+    this.editableName = this.topic.getName();
+    this.editableMetaTagContent = this.topic.getMetaTagContent();
+    this.editablePageTitleFragmentForWeb = (
+      this.topic.getPageTitleFragmentForWeb());
+    this.editablePracticeIsDisplayed = (
+      this.topic.getPracticeTabIsDisplayed());
+    this.initialTopicName = this.topic.getName();
+    this.initialTopicUrlFragment = this.topic.getUrlFragment();
+    this.editableTopicUrlFragment = this.topic.getUrlFragment();
+    this.editableDescription = this.topic.getDescription();
+    this.allowedBgColors = (
+      AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+    this.topicNameExists = false;
+    this.topicUrlFragmentExists = false;
+    this.hostname = this.windowRef.nativeWindow.location.hostname;
 
-            $scope.removeDiagnosticTestSkillDropdown = function() {
-              $scope.diagnosticTestSkillsDropdownIsShown = false;
-            };
+    this.availableSkillSummariesForDiagnosticTest = (
+      this.getEligibleSkillSummariesForDiagnosticTest());
+    this.selectedSkillSummariesForDiagnosticTest = (
+      this.topic.getSkillSummariesForDiagnosticTest());
+    this.diagnosticTestSkillsDropdownIsShown = false;
+    this.selectedSkillForDiagnosticTest = null;
 
-            $scope.addSkillForDiagnosticTest = async function() {
-              let skillToAdd = $scope.selectedSkillForDiagnosticTest;
-              $scope.selectedSkillForDiagnosticTest = null;
-              $scope.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
 
-              let skillSummary = (
-                $scope.availableSkillSummariesForDiagnosticTest.find(
-                  skill => skill.getId() === skillToAdd.getId())
-              );
-              if (skillSummary) {
-                let index = $scope.availableSkillSummariesForDiagnosticTest
-                  .indexOf(skillSummary);
-                $scope.availableSkillSummariesForDiagnosticTest.splice(
-                  index, 1);
-              }
+    this.editableDescriptionIsEmpty = (
+      this.editableDescription === '');
+    this.topicDescriptionChanged = false;
+    this.subtopics = this.topic.getSubtopics();
+    this.subtopicQuestionCountDict = {};
+    this.subtopics.map((subtopic) => {
+      const subtopicId = subtopic.getId();
+      this.subtopicQuestionCountDict[subtopicId] = 0;
+      subtopic.getSkillSummaries().map((skill) => {
+        this.subtopicQuestionCountDict[subtopicId] += (
+          this.skillQuestionCountDict[skill.id]);
+      });
+    });
+    this.uncategorizedSkillSummaries = (
+      this.topic.getUncategorizedSkillSummaries());
+    this.editableThumbnailDataUrl = (
+      this.imageUploadHelperService
+        .getTrustedResourceUrlForThumbnailFilename(
+          this.topic.getThumbnailFilename(),
+          this.contextService.getEntityType(),
+          this.contextService.getEntityId()));
+  }
 
-              TopicUpdateService.updateDiagnosticTestSkills(
-                $scope.topic,
-                cloneDeep($scope.selectedSkillSummariesForDiagnosticTest));
-              $scope.diagnosticTestSkillsDropdownIsShown = false;
-            };
+  getEligibleSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
+    let availableSkillSummaries = (
+      this.topic.getAvailableSkillSummariesForDiagnosticTest());
 
-            $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
-              let skillSummary = (
-                $scope.selectedSkillSummariesForDiagnosticTest.find(
-                  skill => skill.getId() === skillToRemove.getId())
-              );
-              if (skillSummary) {
-                let index = $scope.selectedSkillSummariesForDiagnosticTest
-                  .indexOf(skillSummary);
-                $scope.selectedSkillSummariesForDiagnosticTest.splice(
-                  index, 1);
-              }
+    let eligibleSkillSummaries = (
+      availableSkillSummaries.filter(
+        skillSummary =>
+          this.skillQuestionCountDict[skillSummary.getId()] >=
+       AppConstants.MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL
+      ));
+    return eligibleSkillSummaries;
+  }
 
-              $scope.availableSkillSummariesForDiagnosticTest.push(
-                skillToRemove);
+  addSkillForDiagnosticTest(): void {
+    let skillToAdd = this.selectedSkillForDiagnosticTest;
+    this.selectedSkillForDiagnosticTest = null;
+    this.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
 
-              TopicUpdateService.updateDiagnosticTestSkills(
-                $scope.topic,
-                cloneDeep($scope.selectedSkillSummariesForDiagnosticTest));
-            };
+    let skillSummary = (
+      this.availableSkillSummariesForDiagnosticTest.find(
+        skill => skill.getId() === skillToAdd.getId())
+    );
+    if (skillSummary) {
+      let index = this.availableSkillSummariesForDiagnosticTest
+        .indexOf(skillSummary);
+      this.availableSkillSummariesForDiagnosticTest.splice(
+        index, 1);
+    }
 
-            $scope.editableDescriptionIsEmpty = (
-              $scope.editableDescription === '');
-            $scope.topicDescriptionChanged = false;
-            $scope.subtopics = $scope.topic.getSubtopics();
-            $scope.subtopicQuestionCountDict = {};
-            $scope.subtopics.map((subtopic) => {
-              const subtopicId = subtopic.getId();
-              $scope.subtopicQuestionCountDict[subtopicId] = 0;
-              subtopic.getSkillSummaries().map((skill) => {
-                $scope.subtopicQuestionCountDict[subtopicId] += (
-                  $scope.skillQuestionCountDict[skill.id]);
-              });
-            });
-            $scope.uncategorizedSkillSummaries = (
-              $scope.topic.getUncategorizedSkillSummaries());
-            $scope.editableThumbnailDataUrl = (
-              ImageUploadHelperService
-                .getTrustedResourceUrlForThumbnailFilename(
-                  $scope.topic.getThumbnailFilename(),
-                  ContextService.getEntityType(),
-                  ContextService.getEntityId()));
-          };
+    this.topicUpdateService.updateDiagnosticTestSkills(
+      this.topic,
+      cloneDeep(this.selectedSkillSummariesForDiagnosticTest));
+    this.diagnosticTestSkillsDropdownIsShown = false;
+  }
 
-          $scope.getClassroomUrlFragment = function() {
-            return TopicEditorStateService.getClassroomUrlFragment();
-          };
+  removeSkillFromDiagnosticTest(skillToRemove: ShortSkillSummary): void {
+    let skillSummary = (
+      this.selectedSkillSummariesForDiagnosticTest.find(
+        skill => skill.getId() === skillToRemove.getId())
+    );
+    if (skillSummary) {
+      let index = this.selectedSkillSummariesForDiagnosticTest
+        .indexOf(skillSummary);
+      this.selectedSkillSummariesForDiagnosticTest.splice(
+        index, 1);
+    }
 
-          var _initStorySummaries = function() {
-            $scope.canonicalStorySummaries =
-              TopicEditorStateService.getCanonicalStorySummaries();
-          };
-          // This is added because when we create a skill from the topic
-          // editor, it gets assigned to that topic, and to reflect that
-          // change, we need to fetch the topic again from the backend.
-          $scope.refreshTopic = function() {
-            TopicEditorStateService.loadTopic($scope.topic.getId());
-          };
+    this.availableSkillSummariesForDiagnosticTest.push(
+      skillToRemove);
 
-          $scope.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
-          };
+    this.topicUpdateService.updateDiagnosticTestSkills(
+      this.topic,
+      cloneDeep(this.selectedSkillSummariesForDiagnosticTest));
+  }
 
-          $scope.toggleSubtopicCard = function(index) {
-            if ($scope.subtopicCardSelectedIndexes[index]) {
-              $scope.subtopicCardSelectedIndexes[index] = false;
-              return;
-            }
-            $scope.subtopicCardSelectedIndexes[index] = true;
-          };
+  getClassroomUrlFragment(): string {
+    return this.topicEditorStateService.getClassroomUrlFragment();
+  }
 
-          $scope.reassignSkillsInSubtopics = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                  'rearrange-skills-in-subtopics-modal.template.html'),
-              backdrop: 'static',
-              windowClass: 'rearrange-skills-modal',
-              controller: 'RearrangeSkillsInSubtopicsModalController',
-              controllerAs: '$ctrl',
-              size: 'xl'
-            }).result.then(function() {
-              ctrl.initEditor();
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
+  _initStorySummaries(): void {
+    this.canonicalStorySummaries =
+                this.topicEditorStateService.getCanonicalStorySummaries();
+  }
 
-          $scope.createCanonicalStory = function() {
-            if (UndoRedoService.getChangeCount() > 0) {
-              const modalRef = NgbModal.open(
-                SavePendingChangesModalComponent, {
-                  backdrop: true
-                });
+  // This is added because when we create a skill from the topic
+  // editor, it gets assigned to that topic, and to reflect that
+  // change, we need to fetch the topic again from the backend.
+  refreshTopic(): void {
+    this.topicEditorStateService.loadTopic(this.topic.getId());
+  }
 
-              modalRef.componentInstance.body = (
-                'Please save all pending changes ' +
-                'before exiting the topic editor.');
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 
-              modalRef.result.then(function() {}, function() {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              });
-            } else {
-              StoryCreationService.createNewCanonicalStory();
-            }
-          };
+  toggleSubtopicCard(index: string | number): void {
+    this.skillOptionDialogueBox = true;
+    if (this.subtopicCardSelectedIndexes[index]) {
+      this.subtopicCardSelectedIndexes[index] = false;
+      return;
+    }
+    this.subtopicCardSelectedIndexes[index] = true;
+  }
 
-          $scope.createSkill = function() {
-            if (UndoRedoService.getChangeCount() > 0) {
-              const modalRef = NgbModal.open(
-                SavePendingChangesModalComponent, {
-                  backdrop: true
-                });
+  reassignSkillsInSubtopics(): void {
+    this.ngbModal.open(RearrangeSkillsInSubtopicsModalComponent, {
+      backdrop: 'static',
+      windowClass: 'rearrange-skills-modal',
+      size: 'xl'
+    }).result.then(() => {
+      this.initEditor();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
 
-              modalRef.componentInstance.body = (
-                'Please save all pending changes ' +
-                'before exiting the topic editor.');
+  createCanonicalStory(): void {
+    if (this.undoRedoService.getChangeCount() > 0) {
+      const modalRef = this.ngbModal.open(
+        SavePendingChangesModalComponent, {
+          backdrop: true
+        });
 
-              modalRef.result.then(function() {}, function() {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              });
-            } else {
-              EntityCreationService.createSkill();
-            }
-          };
+      modalRef.componentInstance.body = (
+        'Please save all pending changes ' +
+                  'before exiting the topic editor.');
 
-          $scope.createSubtopic = function() {
-            EntityCreationService.createSubtopic($scope.topic);
-          };
+      modalRef.result.then(() => {}, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    } else {
+      this.storyCreationBackendApiService.createNewCanonicalStory();
+    }
+  }
 
-          $scope.updateTopicDescriptionStatus = function(description) {
-            $scope.editableDescriptionIsEmpty = (description === '');
-            $scope.topicDescriptionChanged = true;
-          };
+  createSkill(): void {
+    if (this.undoRedoService.getChangeCount() > 0) {
+      const modalRef = this.ngbModal.open(
+        SavePendingChangesModalComponent, {
+          backdrop: true
+        });
 
-          $scope.updateTopicName = function(newName) {
-            if (newName === $scope.initialTopicName) {
-              $scope.topicNameExists = false;
-              return;
-            }
-            if (newName) {
-              TopicEditorStateService.updateExistenceOfTopicName(
-                newName, function() {
-                  $scope.topicNameExists = (
-                    TopicEditorStateService.getTopicWithNameExists());
-                  TopicUpdateService.setTopicName($scope.topic, newName);
-                  $scope.topicNameEditorIsShown = false;
-                  $rootScope.$applyAsync();
-                });
-            } else {
-              TopicUpdateService.setTopicName($scope.topic, newName);
-              $scope.topicNameEditorIsShown = false;
-            }
-          };
+      modalRef.componentInstance.body = (
+        'Please save all pending changes ' +
+                  'before exiting the topic editor.');
 
-          $scope.updateTopicUrlFragment = function(newTopicUrlFragment) {
-            if (newTopicUrlFragment === $scope.initialTopicUrlFragment) {
-              $scope.topicUrlFragmentExists = false;
-              return;
-            }
-            if (newTopicUrlFragment) {
-              TopicEditorStateService.updateExistenceOfTopicUrlFragment(
-                newTopicUrlFragment, function() {
-                  $scope.topicUrlFragmentExists = (
-                    TopicEditorStateService.getTopicWithUrlFragmentExists());
-                  TopicUpdateService.setTopicUrlFragment(
-                    $scope.topic, newTopicUrlFragment);
-                  $rootScope.$applyAsync();
-                }, function() {
-                  TopicUpdateService.setTopicUrlFragment(
-                    $scope.topic, newTopicUrlFragment);
-                });
-            } else {
-              TopicUpdateService.setTopicUrlFragment(
-                $scope.topic, newTopicUrlFragment);
-            }
-          };
+      modalRef.result.then(() => {}, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    } else {
+      this.entityCreationService.createSkill();
+    }
+  }
 
-          $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
-            if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
-              return;
-            }
-            TopicUpdateService.setTopicThumbnailFilename(
-              $scope.topic, newThumbnailFilename);
-            $scope.$applyAsync();
-          };
+  createSubtopic(): void {
+    this.entityCreationService.createSubtopic();
+  }
 
-          $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
-            if (newThumbnailBgColor === $scope.topic.getThumbnailBgColor()) {
-              return;
-            }
-            TopicUpdateService.setTopicThumbnailBgColor(
-              $scope.topic, newThumbnailBgColor);
-            $scope.$applyAsync();
-          };
+  updateTopicDescriptionStatus(description: string): void {
+    this.editableDescriptionIsEmpty = (description === '');
+    this.topicDescriptionChanged = true;
+  }
 
-          $scope.updateTopicDescription = function(newDescription) {
-            if (newDescription !== $scope.topic.getDescription()) {
-              TopicUpdateService.setTopicDescription(
-                $scope.topic, newDescription);
-            }
-          };
+  updateTopicName(newName: string): void {
+    if (newName === this.initialTopicName) {
+      this.topicNameExists = false;
+      return;
+    }
+    if (newName) {
+      this.topicEditorStateService.updateExistenceOfTopicName(
+        newName, () => {
+          this.topicNameExists = (
+            this.topicEditorStateService.getTopicWithNameExists());
+          this.topicUpdateService.setTopicName(this.topic, newName);
+          this.topicNameEditorIsShown = false;
+        });
+    } else {
+      this.topicUpdateService.setTopicName(this.topic, newName);
+      this.topicNameEditorIsShown = false;
+    }
+  }
 
-          $scope.updateTopicMetaTagContent = function(newMetaTagContent) {
-            if (newMetaTagContent !== $scope.topic.getMetaTagContent()) {
-              TopicUpdateService.setMetaTagContent(
-                $scope.topic, newMetaTagContent);
-            }
-          };
+  updateTopicUrlFragment(newTopicUrlFragment: string): void {
+    if (newTopicUrlFragment === this.initialTopicUrlFragment) {
+      this.topicUrlFragmentExists = false;
+      return;
+    }
+    if (newTopicUrlFragment) {
+      this.topicEditorStateService.updateExistenceOfTopicUrlFragment(
+        newTopicUrlFragment, () => {
+          this.topicUrlFragmentExists = (
+            this.topicEditorStateService.getTopicWithUrlFragmentExists());
+          this.topicUpdateService.setTopicUrlFragment(
+            this.topic, newTopicUrlFragment);
+        }, () => {
+          this.topicUpdateService.setTopicUrlFragment(
+            this.topic, newTopicUrlFragment);
+        });
+    } else {
+      this.topicUpdateService.setTopicUrlFragment(
+        this.topic, newTopicUrlFragment);
+    }
+  }
 
-          $scope.updateTopicPageTitleFragmentForWeb = function(
-              newTopicPageTitleFragmentForWeb) {
-            let currentValue = $scope.topic.getPageTitleFragmentForWeb();
-            if (newTopicPageTitleFragmentForWeb !== currentValue) {
-              TopicUpdateService.setPageTitleFragmentForWeb(
-                $scope.topic, newTopicPageTitleFragmentForWeb);
-            }
-          };
+  updateTopicThumbnailFilename(newThumbnailFilename: string): void {
+    if (newThumbnailFilename === this.topic.getThumbnailFilename()) {
+      return;
+    }
+    this.topicUpdateService.setTopicThumbnailFilename(
+      this.topic, newThumbnailFilename);
+  }
 
-          // Only update the topic if 1) the creator is turning off the
-          // practice tab or 2) the creator is turning on the practice tab
-          // and it has enough practice questions.
-          $scope.updatePracticeTabIsDisplayed = function(
-              newPracticeTabIsDisplayed) {
-            if (!newPracticeTabIsDisplayed ||
-              $scope.doesTopicHaveMinimumPracticeQuestions()
-            ) {
-              TopicUpdateService.setPracticeTabIsDisplayed(
-                $scope.topic, newPracticeTabIsDisplayed);
-              $scope.editablePracticeIsDisplayed = newPracticeTabIsDisplayed;
-            }
-          };
+  updateTopicThumbnailBgColor(newThumbnailBgColor: string): void {
+    if (newThumbnailBgColor === this.topic.getThumbnailBgColor()) {
+      return;
+    }
+    this.topicUpdateService.setTopicThumbnailBgColor(
+      this.topic, newThumbnailBgColor);
+  }
 
-          $scope.doesTopicHaveMinimumPracticeQuestions = function() {
-            const skillQuestionCounts = (
-              Object.values($scope.skillQuestionCountDict));
-            const numberOfPracticeQuestions = (
-              skillQuestionCounts.reduce((a: number, b: number) => a + b, 0));
-            return (
-              numberOfPracticeQuestions >=
-              AppConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE
-            );
-          };
+  updateTopicDescription(newDescription: string): void {
+    if (newDescription !== this.topic.getDescription()) {
+      this.topicUpdateService.setTopicDescription(
+        this.topic, newDescription);
+    }
+  }
 
-          $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
-            TopicUpdateService.removeUncategorizedSkill(
-              $scope.topic, skillSummary);
-            $scope.removeSkillFromDiagnosticTest(skillSummary);
-            ctrl.initEditor();
-          };
+  updateTopicMetaTagContent(newMetaTagContent: string): void {
+    if (newMetaTagContent !== this.topic.getMetaTagContent()) {
+      this.topicUpdateService.setMetaTagContent(
+        this.topic, newMetaTagContent);
+    }
+  }
 
-          $scope.removeSkillFromSubtopic = function(subtopicId, skillSummary) {
-            $scope.selectedSkillEditOptionsIndex = {};
-            TopicUpdateService.removeSkillFromSubtopic(
-              $scope.topic, subtopicId, skillSummary);
-            ctrl.initEditor();
-          };
+  updateTopicPageTitleFragmentForWeb(
+      newTopicPageTitleFragmentForWeb: string): void {
+    let currentValue = this.topic.getPageTitleFragmentForWeb();
+    if (newTopicPageTitleFragmentForWeb !== currentValue) {
+      this.topicUpdateService.setPageTitleFragmentForWeb(
+        this.topic, newTopicPageTitleFragmentForWeb);
+    }
+  }
 
-          $scope.removeSkillFromTopic = function(subtopicId, skillSummary) {
-            $scope.selectedSkillEditOptionsIndex = {};
-            TopicUpdateService.removeSkillFromSubtopic(
-              $scope.topic, subtopicId, skillSummary);
-            $scope.deleteUncategorizedSkillFromTopic(skillSummary);
-          };
+  // Only update the topic if 1) the creator is turning off the
+  // practice tab or 2) the creator is turning on the practice tab
+  // and it has enough practice questions.
+  updatePracticeTabIsDisplayed(
+      newPracticeTabIsDisplayed: boolean): void {
+    if (!newPracticeTabIsDisplayed ||
+                this.doesTopicHaveMinimumPracticeQuestions()
+    ) {
+      this.topicUpdateService.setPracticeTabIsDisplayed(
+        this.topic, newPracticeTabIsDisplayed);
+      this.editablePracticeIsDisplayed = newPracticeTabIsDisplayed;
+    }
+  }
 
-          $scope.togglePreview = function() {
-            $scope.topicPreviewCardIsShown = !($scope.topicPreviewCardIsShown);
-          };
+  doesTopicHaveMinimumPracticeQuestions(): boolean {
+    const skillQuestionCounts = (
+      Object.values(this.skillQuestionCountDict));
+    const numberOfPracticeQuestions = (
+      skillQuestionCounts.reduce((a: number, b: number) => a + b, 0));
+    return (
+      numberOfPracticeQuestions >=
+                AppConstants.TOPIC_MINIMUM_QUESTIONS_TO_PRACTICE
+    );
+  }
 
-          $scope.deleteSubtopic = function(subtopicId) {
-            TopicEditorStateService.deleteSubtopicPage(
-              $scope.topic.getId(), subtopicId);
-            TopicUpdateService.deleteSubtopic($scope.topic, subtopicId);
-            ctrl.initEditor();
-          };
+  deleteUncategorizedSkillFromTopic(skillSummary: ShortSkillSummary): void {
+    this.topicUpdateService.removeUncategorizedSkill(
+      this.topic, skillSummary);
+    this.removeSkillFromDiagnosticTest(skillSummary);
+    this.initEditor();
+  }
 
-          $scope.navigateToSubtopic = function(subtopicId, subtopicName) {
-            PageTitleService.setNavbarTitleForMobileView('Subtopic Editor');
-            PageTitleService.setNavbarSubtitleForMobileView(subtopicName);
-            TopicEditorRoutingService.navigateToSubtopicEditorWithId(
-              subtopicId);
-          };
+  removeSkillFromSubtopic(
+      subtopicId: number, skillSummary: ShortSkillSummary): void {
+    this.skillOptionDialogueBox = true;
+    this.selectedSkillEditOptionsIndex = {};
+    this.topicUpdateService.removeSkillFromSubtopic(
+      this.topic, subtopicId, skillSummary);
+    this.initEditor();
+  }
 
-          $scope.getSkillEditorUrl = function(skillId) {
-            var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
-            return UrlInterpolationService.interpolateUrl(
-              SKILL_EDITOR_URL_TEMPLATE, {
-                skillId: skillId
-              }
-            );
-          };
+  removeSkillFromTopic(
+      subtopicId: number, skillSummary: ShortSkillSummary): void {
+    this.skillOptionDialogueBox = true;
+    this.selectedSkillEditOptionsIndex = {};
+    this.topicUpdateService.removeSkillFromSubtopic(
+      this.topic, subtopicId, skillSummary);
+    this.deleteUncategorizedSkillFromTopic(skillSummary);
+  }
 
-          $scope.navigateToSkill = function(skillId) {
-            TopicEditorRoutingService.navigateToSkillEditorWithId(skillId);
-          };
+  togglePreview(): void {
+    this.topicPreviewCardIsShown = !(this.topicPreviewCardIsShown);
+  }
 
-          $scope.getPreviewFooter = function() {
-            var canonicalStoriesLength = (
-              $scope.topic.getCanonicalStoryIds().length);
-            if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
-              return canonicalStoriesLength + ' Stories';
-            }
-            return '1 Story';
-          };
+  deleteSubtopic(subtopicId: number): void {
+    this.topicEditorStateService.deleteSubtopicPage(
+      this.topic.getId(), subtopicId);
+    this.topicUpdateService.deleteSubtopic(this.topic, subtopicId);
+    this.initEditor();
+  }
 
-          $scope.togglePreviewListCards = function(listType) {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
-            }
-            if (listType === $scope.SUBTOPIC_LIST) {
-              $scope.subtopicsListIsShown = !$scope.subtopicsListIsShown;
-            } else if (listType === $scope.STORY_LIST) {
-              $scope.storiesListIsShown = !$scope.storiesListIsShown;
-            } else {
-              $scope.mainTopicCardIsShown = !$scope.mainTopicCardIsShown;
-            }
-          };
+  navigateToSubtopic(subtopicId: number, subtopicName: string): void {
+    this.pageTitleService.setNavbarTitleForMobileView('Subtopic Editor');
+    this.pageTitleService.setNavbarSubtitleForMobileView(subtopicName);
+    this.topicEditorRoutingService.navigateToSubtopicEditorWithId(
+      subtopicId);
+  }
 
-          $scope.showSubtopicEditOptions = function(index) {
-            $scope.subtopicEditOptionsAreShown = (
-                ($scope.subtopicEditOptionsAreShown === index) ? null : index);
-          };
+  getSkillEditorUrl(skillId: string): string {
+    var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
+    return this.urlInterpolationService.interpolateUrl(
+      SKILL_EDITOR_URL_TEMPLATE, {
+        skillId: skillId
+      }
+    );
+  }
 
-          $scope.toggleUncategorizedSkillOptions = function(index) {
-            $scope.uncategorizedEditOptionsIndex = (
-                ($scope.uncategorizedEditOptionsIndex === index) ?
-                    null : index);
-          };
+  navigateToSkill(skillId: string): void {
+    this.topicEditorRoutingService.navigateToSkillEditorWithId(skillId);
+  }
 
-          $scope.changeSubtopicAssignment = function(
-              oldSubtopicId, skillSummary) {
-            const modalRef: NgbModalRef = NgbModal.open(
-              ChangeSubtopicAssignmentModalComponent, {
-                backdrop: 'static',
-                windowClass: 'oppia-change-subtopic-assignment-modal',
-                size: 'xl'
-              });
-            modalRef.componentInstance.subtopics = $scope.subtopics;
-            modalRef.result.then(function(newSubtopicId) {
-              if (oldSubtopicId === newSubtopicId) {
-                return;
-              }
-              TopicUpdateService.moveSkillToSubtopic(
-                $scope.topic, oldSubtopicId, newSubtopicId,
-                skillSummary);
-              ctrl.initEditor();
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
+  getPreviewFooter(): string {
+    var canonicalStoriesLength = (
+      this.topic.getCanonicalStoryIds().length);
+    if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
+      return canonicalStoriesLength + ' Stories';
+    }
+    return '1 Story';
+  }
 
-          $scope.onRearrangeSubtopicStart = function(fromIndex) {
-            $scope.fromIndex = fromIndex;
-          };
+  togglePreviewListCards(listType: string = null): void {
+    if (!this.windowDimensionsService.isWindowNarrow()) {
+      return;
+    }
+    if (listType === this.SUBTOPIC_LIST) {
+      this.subtopicsListIsShown = !this.subtopicsListIsShown;
+    } else if (listType === this.STORY_LIST) {
+      this.storiesListIsShown = !this.storiesListIsShown;
+    } else {
+      this.mainTopicCardIsShown = !this.mainTopicCardIsShown;
+    }
+  }
 
-          $scope.onRearrangeSubtopicEnd = function(toIndex) {
-            if ($scope.fromIndex === toIndex) {
-              return;
-            }
-            TopicUpdateService.rearrangeSubtopic(
-              $scope.topic, $scope.fromIndex, toIndex);
-            ctrl.initEditor();
-          };
+  showSubtopicEditOptions(index: number): void {
+    this.subtopicEditOptionsAreShown = (
+                  (this.subtopicEditOptionsAreShown === index) ? null : index);
+  }
 
-          $scope.showSkillEditOptions = function(subtopicIndex, skillIndex) {
-            if (Object.keys($scope.selectedSkillEditOptionsIndex).length) {
-              $scope.selectedSkillEditOptionsIndex = {};
-              return;
-            }
-            $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {};
-            $scope.selectedSkillEditOptionsIndex[subtopicIndex] = {
-              [skillIndex]: true
-            };
-          };
+  toggleUncategorizedSkillOptions(index: number): void {
+    this.uncategorizedEditOptionsIndex = (
+                  (this.uncategorizedEditOptionsIndex === index) ?
+                      null : index);
+  }
 
-          ctrl.$onInit = function() {
-            FocusManagerService.setFocus('addStoryBtn');
-            $scope.topicPreviewCardIsShown = false;
-            $scope.SUBTOPIC_LIST = 'subtopic';
-            $scope.SKILL_LIST = 'skill';
-            $scope.STORY_LIST = 'story';
-            $scope.topicDataHasLoaded = false;
-            $scope.subtopicCardSelectedIndexes = {};
-            $scope.selectedSkillEditOptionsIndex = {};
-            $scope.subtopicsListIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.storiesListIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            ctrl.directiveSubscriptions.add(
-              TopicEditorStateService.onTopicInitialized.subscribe(
-                () => ctrl.initEditor()
-              ));
-            ctrl.directiveSubscriptions.add(
-              TopicEditorStateService.onTopicReinitialized.subscribe(
-                () => ctrl.initEditor()
-              ));
-            $scope.mainTopicCardIsShown = true;
+  changeSubtopicAssignment(
+      oldSubtopicId: number,
+      skillSummary: ShortSkillSummary): void {
+    this.skillOptionDialogueBox = true;
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      ChangeSubtopicAssignmentModalComponent, {
+        backdrop: 'static',
+        windowClass: 'oppia-change-subtopic-assignment-modal',
+        size: 'xl'
+      });
+    modalRef.componentInstance.subtopics = this.subtopics;
+    modalRef.result.then((newSubtopicId) => {
+      if (oldSubtopicId === newSubtopicId) {
+        return;
+      }
+      this.topicUpdateService.moveSkillToSubtopic(
+        this.topic, oldSubtopicId, newSubtopicId,
+        skillSummary);
+      this.initEditor();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
 
-            ctrl.directiveSubscriptions.add(
-              TopicEditorStateService.onStorySummariesInitialized.subscribe(
-                () => _initStorySummaries()
-              )
-            );
-            ctrl.directiveSubscriptions.add(
-              TopicsAndSkillsDashboardBackendApiService.
-                onTopicsAndSkillsDashboardReinitialized.subscribe(
-                  () => {
-                    $scope.refreshTopic();
-                  }
-                )
-            );
-            ctrl.initEditor();
-            _initStorySummaries();
-          };
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
-          };
-        }
-      ]
+  showSkillEditOptions(
+      subtopicIndex: string | number = null,
+      skillIndex: number = null): void {
+    if (subtopicIndex === null &&
+        skillIndex === null) {
+      this.skillOptionDialogueBox = true;
+      return;
+    } else {
+      this.skillOptionDialogueBox = false;
+    }
+
+    if (Object.keys(this.selectedSkillEditOptionsIndex).length) {
+      this.selectedSkillEditOptionsIndex = {};
+      return;
+    }
+    this.selectedSkillEditOptionsIndex[subtopicIndex] = {};
+    this.selectedSkillEditOptionsIndex[subtopicIndex] = {
+      [skillIndex]: true
     };
-  }]);
+  }
+
+  presentDiagnosticTestSkillDropdown(): void {
+    this.diagnosticTestSkillsDropdownIsShown = true;
+  }
+
+  removeDiagnosticTestSkillDropdown(): void {
+    this.diagnosticTestSkillsDropdownIsShown = false;
+  }
+
+  ngOnInit(): void {
+    this.focusManagerService.setFocus('addStoryBtn');
+    this.topicPreviewCardIsShown = false;
+    this.SUBTOPIC_LIST = 'subtopic';
+    this.SKILL_LIST = 'skill';
+    this.STORY_LIST = 'story';
+    this.topicDataHasLoaded = false;
+    this.subtopicCardSelectedIndexes = {};
+    this.selectedSkillEditOptionsIndex = {};
+    this.subtopicsListIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.storiesListIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onTopicInitialized.subscribe(
+        () => this.initEditor()
+      ));
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onTopicReinitialized.subscribe(
+        () => this.initEditor()
+      ));
+    this.mainTopicCardIsShown = true;
+
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onStorySummariesInitialized.subscribe(
+        () => this._initStorySummaries()
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.topicsAndSkillsDashboardBackendApiService.
+        onTopicsAndSkillsDashboardReinitialized.subscribe(
+          () => {
+            this.refreshTopic();
+          }
+        )
+    );
+    this.initEditor();
+    this._initStorySummaries();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaTopicEditorTab',
+  downgradeComponent({
+    component: TopicEditorTabComponent
+  }) as angular.IDirectiveFactory);
