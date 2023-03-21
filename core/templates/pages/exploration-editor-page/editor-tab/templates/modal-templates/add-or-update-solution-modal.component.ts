@@ -63,7 +63,7 @@ export class AddOrUpdateSolutionModalComponent
   correctAnswerEditorHtml!: string;
   data!: SolutionInterface;
   // These properties are null until a solution is specified or removed.
-  savedMemento!: InteractionAnswer | null;
+  savedSolution!: InteractionAnswer | null;
   solutionType!: Solution | null;
   tempAnsOption!: string;
   COMPONENT_NAME_SOLUTION: string = AppConstants.COMPONENT_NAME_SOLUTION;
@@ -142,10 +142,10 @@ export class AddOrUpdateSolutionModalComponent
   ngOnInit(): void {
     this.solutionType = this.stateSolutionService.savedMemento;
     if (this.solutionType) {
-      this.savedMemento = (
+      this.savedSolution = (
         this.solutionType.correctAnswer);
     } else {
-      this.savedMemento = null;
+      this.savedSolution = null;
     }
     this.correctAnswerEditorHtml = (
       this.explorationHtmlFormatterService.getInteractionHtml(
@@ -153,7 +153,7 @@ export class AddOrUpdateSolutionModalComponent
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,
-        this.savedMemento ? 'savedMemento()' : null)
+        this.savedSolution ? 'savedSolution' : null)
     );
     this.answerIsValid = false;
     if (this.solutionType) {

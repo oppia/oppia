@@ -60,10 +60,10 @@ describe('Exploration Html Formatter Service', () => {
     }).toThrowError('Invalid interaction id: UnknownInteraction.');
   });
 
-  it('should fail for saved solution other than savedMemento()', () => {
+  it('should fail for saved solution other than savedSolution', () => {
     expect(() => {
       // This throws "Argument of type '"other"' is not assignable to parameter
-      // of type '"savedMemento()"'.". We need to suppress this error because
+      // of type '"savedSolution"'.". We need to suppress this error because
       // we want to test if error is thrown.
       // @ts-expect-error
       ehfs.getInteractionHtml('GraphInput', {}, true, null, 'other');
@@ -73,7 +73,7 @@ describe('Exploration Html Formatter Service', () => {
   it('should fail for non-alphabetic label for focus target', () => {
     expect(() => {
       ehfs.getInteractionHtml(
-        'GraphInput', {}, true, '<tag></tag>', 'savedMemento()');
+        'GraphInput', {}, true, '<tag></tag>', 'savedSolution');
     }).toThrowError('Unexpected label for focus target: <tag></tag>.');
   });
 
@@ -129,21 +129,21 @@ describe('Exploration Html Formatter Service', () => {
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-end-exploration ' +
         'label-for-focus-target="' + focusLabel + '" ' +
-        '[saved-solution]="savedMemento()" [last-answer]="null">' +
+        '[saved-solution]="savedSolution" [last-answer]="null">' +
         '</oppia-interactive-end-exploration>';
       expect(
         ehfs.getInteractionHtml(
-          interactionId, {}, false, focusLabel, 'savedMemento()')
+          interactionId, {}, false, focusLabel, 'savedSolution')
       ).toBe(expectedHtmlTag);
       interactionId = 'GraphInput';
       focusLabel = 'sampleLabel';
       expectedHtmlTag = '<oppia-interactive-graph-input ' +
         'label-for-focus-target="' + focusLabel + '" ' +
-        '[saved-solution]="savedMemento()" [last-answer]="null">' +
+        '[saved-solution]="savedSolution" [last-answer]="null">' +
         '</oppia-interactive-graph-input>';
       expect(
         ehfs.getInteractionHtml(
-          interactionId, {}, false, focusLabel, 'savedMemento()')
+          interactionId, {}, false, focusLabel, 'savedSolution')
       ).toBe(expectedHtmlTag);
     });
 
