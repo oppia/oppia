@@ -200,6 +200,18 @@ describe('Topic Editor Navbar', () => {
     ]);
   });
 
+  it('should load content properly', () => {
+    spyOn(componentInstance, 'getChangeListLength').and.returnValue(1);
+    spyOn(componentInstance, 'isTopicSaveable').and.returnValue(true);
+    spyOn(componentInstance, 'getTotalWarningsCount').and.returnValue(1);
+
+    componentInstance.ngAfterContentChecked();
+
+    expect(componentInstance.changeListLength).toEqual(1);
+    expect(componentInstance.totalWarningsCount).toEqual(1);
+    expect(componentInstance.topicIsSaveable).toBe(true);
+  });
+
   it('should validate topic when user undo or redo changes', () => {
     spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
@@ -452,7 +464,8 @@ describe('Topic Editor Navbar', () => {
     spyOn(topicEditorStateService, 'saveTopic').and.callFake(
       // This throws "Cannot set properties of undefined (setting
       // 'topicIsPublished')". We need to suppress this error because
-      // we can't return a true value here for spyOn.
+      // we can't return a true value here for spyOn. We need to
+      // return a promise here because the function is async.
       // @ts-ignore
       (commitMessage: string, successCallback: () => void) => {
         successCallback();

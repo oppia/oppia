@@ -17,7 +17,7 @@
  * of data related to exploration improvement tasks.
  */
 
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { merge } from 'd3-array';
 import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config.model';
@@ -38,7 +38,7 @@ import { ExplorationTaskType } from 'domain/improvements/exploration-task.model'
 @Injectable({
   providedIn: 'root'
 })
-export class ExplorationImprovementsService implements OnInit {
+export class ExplorationImprovementsService {
   // These properties are initialized using int method and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -64,7 +64,14 @@ export class ExplorationImprovementsService implements OnInit {
     private explorationStatsService: ExplorationStatsService,
     private stateTopAnswersStatsService: StateTopAnswersStatsService,
     private playthroughIssuesService: PlaythroughIssuesService,
-  ) {}
+  ) {
+    this.openHbrTasks = [];
+    this.ngrTasksOpenSinceInit = [];
+    this.initPromise = new Promise((resolve, reject) => {
+      this.resolveInitPromise = resolve;
+      this.rejectInitPromise = reject;
+    });
+  }
 
   async initAsync(): Promise<void> {
     if (!this.initializationHasStarted) {
@@ -134,7 +141,8 @@ export class ExplorationImprovementsService implements OnInit {
     const {openTasks, resolvedTaskTypesByStateName} = (
       await this.explorationImprovementsBackendApiService.getTasksAsync(expId));
     const topAnswersByStateName = (
-      await this.stateTopAnswersStatsService.getTopAnswersByStateNameAsync());
+      await this.stateTopAnswersStatsService.getTopAnswersByStateNameAsync(
+        expId, states));
     const playthroughIssues = await this.playthroughIssuesService.getIssues();
 
     this.openHbrTasks = (
@@ -173,15 +181,6 @@ export class ExplorationImprovementsService implements OnInit {
         this.explorationImprovementsTaskRegistryService.onStateInteractionSaved(
           state);
       });
-  }
-
-  ngOnInit(): void {
-    this.openHbrTasks = [];
-    this.ngrTasksOpenSinceInit = [];
-    this.initPromise = new Promise((resolve, reject) => {
-      this.resolveInitPromise = resolve;
-      this.rejectInitPromise = reject;
-    });
   }
 }
 
