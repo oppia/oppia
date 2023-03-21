@@ -140,7 +140,8 @@ export class ContributionAndReviewService {
         (AppConstants.OPPORTUNITIES_PAGE_SIZE * 2) - currentCacheSize,
         fetcher.offset,
         fetcher.sortKey,
-        explorationId
+        explorationId,
+        fetcher.topicName
       ).then((responseBody) => {
         const responseSuggestionIdToDetails = fetcher.suggestionIdToDetails;
         fetcher.suggestionIdToDetails = {};
