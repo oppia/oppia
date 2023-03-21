@@ -3557,6 +3557,44 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
     FIRST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
 
+    def test_create_default_translation_review_stats(self) -> None:
+        default_review_stats = suggestion_registry.TranslationReviewStats.create_default(
+            self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+        )
+
+        self.assertEquals(
+            default_review_stats.language_code,
+            self.LANGUAGE_CODE
+        )
+        self.assertEquals(
+            default_review_stats.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEquals(
+            default_review_stats.topic_id,
+            self.TOPIC_ID
+        )
+        self.assertEquals(
+            default_review_stats.reviewed_translations_count,
+            0
+        )
+        self.assertEquals(
+            default_review_stats.reviewed_translation_word_count,
+            0
+        )
+        self.assertEquals(
+            default_review_stats.accepted_translations_count,
+            0
+        )
+        self.assertEquals(
+            default_review_stats.accepted_translation_word_count,
+            0
+        )
+        self.assertEquals(
+            default_review_stats.accepted_translations_with_reviewer_edits_count,
+            0
+        )
+
     def test_create_translation_review_stats(self) -> None:
         expected_stats_dict = {
             'language_code': self.LANGUAGE_CODE,
@@ -3599,6 +3637,34 @@ class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
     FIRST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
 
+    def test_create_default_question_contribution_stats(self) -> None:
+        default_stats = (
+            suggestion_registry.QuestionContributionStats.create_default(
+                self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+            )
+        )
+
+        self.assertEquals(
+            default_stats.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEquals(
+            default_stats.topic_id,
+            self.TOPIC_ID
+        )
+        self.assertEquals(
+            default_stats.submitted_questions_count,
+            0
+        )
+        self.assertEquals(
+            default_stats.accepted_questions_count,
+            0
+        )
+        self.assertEquals(
+            default_stats.accepted_questions_without_reviewer_edits_count,
+            0
+        )
+
     def test_create_question_contribution_stats(self) -> None:
         expected_stats_dict = {
             'contributor_user_id': self.CONTRIBUTOR_USER_ID,
@@ -3637,6 +3703,34 @@ class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     FIRST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_default_question_review_stats(self) -> None:
+        default_stats = (
+            suggestion_registry.QuestionReviewStats.create_default(
+                self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+            )
+        )
+
+        self.assertEquals(
+            default_stats.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEquals(
+            default_stats.topic_id,
+            self.TOPIC_ID
+        )
+        self.assertEquals(
+            default_stats.reviewed_questions_count,
+            0
+        )
+        self.assertEquals(
+            default_stats.accepted_questions_count,
+            0
+        )
+        self.assertEquals(
+            default_stats.accepted_questions_with_reviewer_edits_count,
+            0
+        )
 
     def test_create_question_review_stats(self) -> None:
         expected_stats_dict = {
