@@ -490,9 +490,7 @@ export class ContributionsAndReview
     const fetchFunction = this.tabNameToOpportunityFetchFunction[
       this.activeTabSubtype][this.activeTabType];
 
-    return fetchFunction(
-      shouldResetOffset,
-      this.translationTopicService.getActiveTopicName()).then((response) => {
+    return fetchFunction(shouldResetOffset).then((response) => {
       Object.keys(response.suggestionIdToDetails).forEach(id => {
         this.contributions[id] = response.suggestionIdToDetails[id];
       });
@@ -659,33 +657,24 @@ export class ContributionsAndReview
 
     this.tabNameToOpportunityFetchFunction = {
       [this.SUGGESTION_TYPE_QUESTION]: {
-        [this.TAB_TYPE_CONTRIBUTIONS]: (
-            shouldResetOffset: boolean,
-            topicName?: string) => {
+        [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getUserCreatedQuestionSuggestionsAsync(
               shouldResetOffset, this.userCreatedQuestionsSortKey);
         },
-        [this.TAB_TYPE_REVIEWS]: (
-            shouldResetOffset: boolean,
-            topicName?: string) => {
-          // --- HERE it should start filtering by topicName.
+        [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getReviewableQuestionSuggestionsAsync(
               shouldResetOffset, this.reviewableQuestionsSortKey);
         }
       },
       [this.SUGGESTION_TYPE_TRANSLATE]: {
-        [this.TAB_TYPE_CONTRIBUTIONS]: (
-            shouldResetOffset: boolean,
-            topicName?: string) => {
+        [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getUserCreatedTranslationSuggestionsAsync(
               shouldResetOffset, this.userCreatedTranslationsSortKey);
         },
-        [this.TAB_TYPE_REVIEWS]: (
-            shouldResetOffset: boolean,
-            topicName?: string) => {
+        [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
           return this.contributionAndReviewService
             .getReviewableTranslationSuggestionsAsync(
               shouldResetOffset,
