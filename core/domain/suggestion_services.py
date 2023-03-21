@@ -36,6 +36,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import taskqueue_services
+from core.domain import topic_domain
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
@@ -1100,7 +1101,8 @@ def get_reviewable_question_suggestions_by_offset(
     user_id: str,
     limit: int,
     offset: int,
-    sort_key: Optional[str]
+    sort_key: Optional[str],
+    topics: List[topic_domain.Topic]
 ) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
     """Returns a list of question suggestions which the user
        can review.
@@ -1111,6 +1113,7 @@ def get_reviewable_question_suggestions_by_offset(
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
         sort_key: str|None. The key to sort the suggestions by.
+        topics: list(Topic)|None. The list of topics to filter by.
 
     Returns:
         Tuple of (results, next_offset). Where:
@@ -1122,7 +1125,7 @@ def get_reviewable_question_suggestions_by_offset(
     suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel
         .get_in_review_question_suggestions_by_offset(
-            limit, offset, user_id, sort_key))
+            limit, offset, user_id, sort_key, topics))
 
     question_suggestions = []
     for suggestion_model in suggestions:

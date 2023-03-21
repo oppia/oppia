@@ -37,6 +37,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
 
 from typing import (
@@ -680,6 +681,7 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     offset: int
     sort_key: str
     exploration_id: Optional[str]
+    topic_name: Optional[str]
 
 
 class ReviewableSuggestionsHandler(
@@ -736,6 +738,12 @@ class ReviewableSuggestionsHandler(
                     'type': 'basestring'
                 },
                 'default_value': None
+            },
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             }
         }
     }
@@ -770,10 +778,19 @@ class ReviewableSuggestionsHandler(
                 .get_suggestions_with_editable_explorations(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            topic_name = self.normalized_request.get('topic_name')
+            if topic_name is None:
+                topics = topic_fetchers.get_all_topics()
+            else:
+                topic = topic_fetchers.get_topic_by_name(topic_name)
+                if topic is None:
+                    raise self.InvalidInputException(
+                        'The supplied input topic: %s is not valid' % topic_name)
+                topics = [topic]
             suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key))
+                    self.user_id, limit, offset, sort_key, topics))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
