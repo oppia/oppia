@@ -101,7 +101,8 @@ export class ContributionAndReviewBackendApiService {
       limit: number,
       offset: number,
       sortKey: string,
-      explorationId?: string
+      explorationId?: string,
+      topicName?: string
   ): Promise<FetchSuggestionsResponse> {
     if (fetchType === this.SUBMITTED_QUESTION_SUGGESTIONS) {
       return this.fetchSubmittedSuggestionsAsync(
@@ -113,7 +114,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit, offset, sortKey);
+        'skill', 'add_question', limit, offset, sortKey, topicName);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
