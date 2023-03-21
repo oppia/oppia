@@ -25,6 +25,12 @@ up a development server running Oppia, running this script does the following:
     4. Add the topics linked to the lessons above to a classroom. This is needed
     for the topics, if published, to show up in the topic selectors and for the
     linked opportunities to show up in the "Submit Question" tab.
+Note: The standard process for generating data is via the Admin > Activities
+tab. Here is why we use a script but not the standard process to execute the
+above workflow. In the above workflow, creating new users requires beginning
+and ending sessions several times, but ending sessions on the Admin page causes
+a "Registration session expired" error. This issue should be resolved in future
+if we want to execute the above workflow on the Admin page.
 """
 
 from __future__ import annotations
