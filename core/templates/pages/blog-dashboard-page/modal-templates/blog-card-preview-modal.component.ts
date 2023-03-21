@@ -37,7 +37,6 @@ export class BlogCardPreviewModalComponent
   blogPostData!: BlogPostData;
   blogPostSummary!: BlogPostSummary;
   summaryContent!: string;
-  profilePicUrl!: string;
   constructor(
       ngbActiveModal: NgbActiveModal,
       private blogDashboardPageService: BlogDashboardPageService,
@@ -52,7 +51,6 @@ export class BlogCardPreviewModalComponent
       /<strong>(.*?)<\/strong>/g, ' ').replace(/<h1>(.*?)<\/h1>/g, ' ');
     this.summaryContent = this.truncatePipe.transform(
       rawContent, 300);
-    this.profilePicUrl = this.blogDashboardPageService.authorPictureUrl;
     let dateString;
     if (this.blogPostData.publishedOn) {
       dateString = this.blogPostData.publishedOn;

@@ -116,13 +116,11 @@ describe('Blog Card Preview Modal Component', () => {
       blogPostData.lastUpdated,
       blogPostData.lastUpdated);
     blogDashboardPageService.blogPostData = blogPostData;
-    blogDashboardPageService.authorPictureUrl = 'sample-url';
 
     component.ngOnInit();
 
     expect(component.blogPostSummary).toEqual(
       expectedBlogPostSummary);
-    expect(component.profilePicUrl).toBe('sample-url');
   });
 
   it('should initialize correctly when blog post is published', () => {
@@ -141,12 +139,10 @@ describe('Blog Card Preview Modal Component', () => {
       blogPostData.lastUpdated,
       blogPostData.publishedOn);
     blogDashboardPageService.blogPostData = blogPostData;
-    blogDashboardPageService.authorPictureUrl = 'sample-url';
 
     component.ngOnInit();
 
     expect(component.blogPostSummary).toEqual(
       expectedBlogPostSummary);
-    expect(component.profilePicUrl).toBe('sample-url');
   });
 });
