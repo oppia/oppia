@@ -219,6 +219,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             automatic_restart=False,
             skip_sdk_update_check=True,
             env={
+                **os.environ,
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
