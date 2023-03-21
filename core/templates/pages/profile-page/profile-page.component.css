@@ -104,6 +104,7 @@
 .oppia-profile-username-large-screen {
   display: block;
   font-size: 130%;
+  margin-left: 70px;
   margin-top: 20px;
   text-align: center;
 }
