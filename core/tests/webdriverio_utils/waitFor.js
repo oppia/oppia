@@ -57,6 +57,10 @@ var elementToBeClickable = async function(element, errorMessage) {
     timeout: DEFAULT_WAIT_TIME_MSECS,
     timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
+  var enabled = await element.isEnabled();
+  if (!enabled) {
+    throw new Error('Element ' + element + ' is not enabled.');
+  }
 };
 
 /**

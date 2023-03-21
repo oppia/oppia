@@ -5168,7 +5168,7 @@ export default {
     "code": "prs",
     "description": "دری (Dari)",
     "direction": "rtl",
-    "decimal_separator": ","
+    "decimal_separator": "."
   }, {
     "code": "pt",
     "description": "português (Portuguese)",
@@ -5946,6 +5946,11 @@ export default {
   // Represents the string value indicating "All topics" in the Contributor
   // Dashboard topic selector.
   "TOPIC_SENTINEL_NAME_ALL": "All",
+
+  // Review message to display for an obsolete translation suggestion with no
+  // exploration content.
+  // eslint-disable-next-line max-len
+  "OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG": "The original content was deleted and no longer needs translation. Sorry about that!",
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.

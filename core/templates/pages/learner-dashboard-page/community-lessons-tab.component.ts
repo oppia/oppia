@@ -164,7 +164,7 @@ export class CommunityLessonsTabComponent {
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [_ , webpImageUrl] = this.userService.getProfileImageDataUrl(
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
       username);
     return webpImageUrl;
   }

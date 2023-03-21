@@ -233,8 +233,10 @@ describe('User Api Service', () => {
           AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH);
         let [profileImagePng, profileImageWebp] = (
           userService.getProfileImageDataUrl('tester'));
-        expect(profileImagePng).toEqual(defaultUrlPng);
-        expect(profileImageWebp).toEqual(defaultUrlWebp);
+        let prformanceTime = profileImagePng.split('?')[1];
+        expect(profileImagePng).toEqual(defaultUrlPng + '?' + prformanceTime);
+        expect(profileImageWebp).toEqual(
+          defaultUrlWebp + '?' + prformanceTime);
 
         flushMicrotasks();
       }));
@@ -426,8 +428,11 @@ describe('User Api Service', () => {
           'tester/assets/profile_picture.webp');
         let [profileImagePng, profileImageWebp] = (
           userService.getProfileImageDataUrl('tester'));
-        expect(profileImagePng).toEqual(expectedPngImage);
-        expect(profileImageWebp).toEqual(expectedWebpImage);
+        let prformanceTime = profileImagePng.split('?')[1];
+        expect(profileImagePng).toEqual(
+          expectedPngImage + '?' + prformanceTime);
+        expect(profileImageWebp).toEqual(
+          expectedWebpImage + '?' + prformanceTime);
 
         flushMicrotasks();
       }));

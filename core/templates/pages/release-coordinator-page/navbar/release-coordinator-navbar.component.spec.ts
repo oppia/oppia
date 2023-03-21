@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
@@ -31,11 +31,6 @@ import { UserInfo } from 'domain/user/user-info.model';
 describe('Release coordinator navbar component', () => {
   let component: ReleaseCoordinatorNavbarComponent;
   let userService: UserService;
-  let userInfo = {
-    isModerator: () => true,
-    getUsername: () => 'username1',
-    isSuperAdmin: () => true
-  };
   let profileUrl = '/profile/username1';
   let fixture: ComponentFixture<ReleaseCoordinatorNavbarComponent>;
   beforeEach(fakeAsync(() => {
@@ -60,25 +55,51 @@ describe('Release coordinator navbar component', () => {
     fixture.detectChanges();
 
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+      ['profile-image-url-png', 'profile-image-url-webp']);
     spyOn(component.activeTabChange, 'emit');
     component.ngOnInit();
   }));
 
-  it('should initialize component properties correctly', () => {
+  it('should initialize component properties correctly', fakeAsync(() => {
+    let userInfo = {
+      isModerator: () => true,
+      getUsername: () => 'username1',
+      isSuperAdmin: () => true
+    };
+    spyOn(userService, 'getUserInfoAsync')
+      .and.resolveTo(userInfo as UserInfo);
+    component.ngOnInit();
+    flush();
+
     expect(component.profilePicturePngDataUrl).toEqual(
-      'default-image-url-png');
+      'profile-image-url-png');
     expect(component.profilePictureWebpDataUrl).toEqual(
-      'default-image-url-webp');
+      'profile-image-url-webp');
     expect(component.username).toBe('username1');
     expect(component.profileUrl).toEqual(profileUrl);
     expect(component.logoutUrl).toEqual('/logout');
     expect(component.profileDropdownIsActive).toBe(false);
     expect(component.activeTab).toBe(
       ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
-  });
+  }));
+
+  it('should get default profile pictures when username is null',
+    fakeAsync(() => {
+      let userInfo = {
+        getUsername: () => null,
+        isSuperAdmin: () => true,
+        getEmail: () => 'test_email@example.com'
+      };
+      spyOn(userService, 'getUserInfoAsync')
+        .and.resolveTo(userInfo as UserInfo);
+      component.ngOnInit();
+      flush();
+
+      expect(component.profilePicturePngDataUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.png');
+      expect(component.profilePictureWebpDataUrl).toEqual(
+        '/assets/images/avatar/user_blue_150px.webp');
+    }));
 
   it('should allow switching tabs correctly', () => {
     expect(component.activeTab).toBe(

@@ -51,7 +51,7 @@ describe('Topic Editor Routing Service', () => {
 
   beforeEach(() => {
     ters = TestBed.inject(TopicEditorRoutingService);
-    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
   });
 
   it('should return the default active tab name', () => {
@@ -94,6 +94,8 @@ describe('Topic Editor Routing Service', () => {
   });
 
   it('should return last visited subtopic id', () => {
+    ters.updateViewEventEmitter.emit();
+
     ters.navigateToSubtopicPreviewTab(1);
     ters.navigateToQuestionsTab();
     expect(ters.getLastSubtopicIdVisited()).toEqual(1);

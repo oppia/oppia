@@ -77,7 +77,7 @@ describe('Preferences Page Component', () => {
 
     class MockWindowRef {
       imageData: Record<string, string> = {};
-      nativeWindow = {
+      _window = {
         location: {
           reload: () => {}
         },
@@ -93,6 +93,10 @@ describe('Preferences Page Component', () => {
           }
         }
       };
+
+      get nativeWindow() {
+        return this._window;
+      }
     }
 
     class MockUserBackendApiService {
@@ -111,6 +115,7 @@ describe('Preferences Page Component', () => {
     }
 
     beforeEach(waitForAsync(() => {
+      mockWindowRef = new MockWindowRef();
       TestBed.configureTestingModule({
         imports: [
           NgbModalModule,
@@ -135,7 +140,7 @@ describe('Preferences Page Component', () => {
           UserService,
           {
             provide: WindowRef,
-            useClass: MockWindowRef
+            useValue: mockWindowRef
           }
         ],
         schemas: [NO_ERRORS_SCHEMA]
@@ -154,12 +159,11 @@ describe('Preferences Page Component', () => {
       alertsService = TestBed.inject(AlertsService);
       i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
       ngbModal = TestBed.inject(NgbModal);
-      mockWindowRef = TestBed.inject(WindowRef);
       mockUserBackendApiService = TestBed.inject(UserBackendApiService);
       imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-        ['default-image-url-png', 'default-image-url-webp']);
+        ['profile-image-url-png', 'profile-image-url-webp']);
     });
 
     it('should be defined', () => {
@@ -193,9 +197,9 @@ describe('Preferences Page Component', () => {
       expect(componentInstance.preferredLanguageCodes).toEqual(
         preferencesData.preferred_language_codes);
       expect(componentInstance.profilePicturePngDataUrl).toEqual(
-        'default-image-url-png');
+        'profile-image-url-png');
       expect(componentInstance.profilePictureWebpDataUrl).toEqual(
-        'default-image-url-webp');
+        'profile-image-url-webp');
       expect(componentInstance.defaultDashboard).toEqual(
         preferencesData.default_dashboard);
       expect(componentInstance.canReceiveEmailUpdates).toEqual(
@@ -216,12 +220,12 @@ describe('Preferences Page Component', () => {
 
     it('should get user profile image png data url correctly', () => {
       expect(componentInstance.getProfileImagePngDataUrl('username')).toBe(
-        'default-image-url-png');
+        'profile-image-url-png');
     });
 
     it('should get user profile image webp data url correctly', () => {
       expect(componentInstance.getProfileImageWebpDataUrl('username')).toBe(
-        'default-image-url-webp');
+        'profile-image-url-webp');
     });
 
     it('should set default profile pictures when username is null',
@@ -236,7 +240,7 @@ describe('Preferences Page Component', () => {
         spyOn(userService, 'getUserInfoAsync')
           .and.resolveTo(userInfo as UserInfo);
 
-          componentInstance.ngOnInit();
+        componentInstance.ngOnInit();
         tick();
 
         expect(componentInstance.profilePicturePngDataUrl).toEqual(
@@ -286,7 +290,7 @@ describe('Preferences Page Component', () => {
         tick();
         expect(
           i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
-            code);
+          code);
         expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
         expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
         expect(alertsService.addInfoMessage).toHaveBeenCalled();
@@ -369,18 +373,17 @@ describe('Preferences Page Component', () => {
 
     it('should edit profile picture modal raise error when image is invalid',
       fakeAsync(() => {
+        let error = 'Image uploaded is not valid.';
         let profilePictureDataUrl = 'data:text/plain;base64,JUMzJTg3JTJD';
         spyOn(ngbModal, 'open').and.returnValue({
           result: Promise.resolve(profilePictureDataUrl)
         } as NgbModalRef);
-        spyOn(mockWindowRef.nativeWindow.location, 'reload');
         spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
           .and.returnValue(null);
-        expect(() => {
-          componentInstance.showEditProfilePictureModal();
-          tick();
-          tick();
-        }).toThrowError('Image uploaded is not valid.');
+        spyOn(alertsService, 'addWarning');
+        componentInstance.showEditProfilePictureModal();
+        tick();
+        expect(alertsService.addWarning).toHaveBeenCalledWith(error);
       }));
 
     it('should handle edit profile picture modal is canceled', fakeAsync(() => {

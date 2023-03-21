@@ -196,7 +196,8 @@ export class PreferencesPageComponent {
     const newImageFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(image));
     if (newImageFile === null) {
-      throw new Error('Image uploaded is not valid.');
+      this.alertsService.addWarning('Image uploaded is not valid.');
+      return;
     }
     const reader = new FileReader();
     reader.onload = () => {
@@ -239,7 +240,7 @@ export class PreferencesPageComponent {
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [_ , webpImageUrl] = this.userService.getProfileImageDataUrl(
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
       username);
     return webpImageUrl;
   }

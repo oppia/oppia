@@ -137,7 +137,7 @@ describe('Contributor dashboard page', () => {
     const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
     nativeWindowSpy.and.returnValue({
       pageYOffset: 11
-    });
+    } as Window);
 
     component.scrollFunction();
 
@@ -329,7 +329,7 @@ describe('Contributor dashboard page', () => {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 79
-      });
+      } as Window);
 
       component.scrollFunction();
 
@@ -343,7 +343,7 @@ describe('Contributor dashboard page', () => {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 81
-      });
+      } as Window);
 
       component.scrollFunction();
       tick();

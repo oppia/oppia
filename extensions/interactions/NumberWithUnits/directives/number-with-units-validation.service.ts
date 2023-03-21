@@ -95,6 +95,8 @@ export class NumberWithUnitsValidationService {
       var laterInputString = laterInput.toMathjsCompatibleString();
       try {
         return unit(laterInputString).equals(unit(earlierInputString));
+      // Unknown type is used because we don't know which type of error
+      // is thrown.
       } catch (e: unknown) {
         var additionalInfo = (
           '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +
@@ -125,10 +127,10 @@ export class NumberWithUnitsValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
-                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
+                  'is made redundant by answer ' + (ranges[k].ruleIndex + 1) +
+                  ' from response ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
             }
@@ -139,10 +141,10 @@ export class NumberWithUnitsValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
-                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
+                  'is made redundant by answer ' + (ranges[k].ruleIndex + 1) +
+                  ' from response ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
             }

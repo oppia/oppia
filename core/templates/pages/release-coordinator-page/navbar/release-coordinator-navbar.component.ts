@@ -74,7 +74,6 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
-
     this.username = userInfo.getUsername();
     if (this.username) {
       this.profileUrl = (
