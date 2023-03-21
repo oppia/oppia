@@ -118,6 +118,11 @@ export class ContributorDashboardPageComponent
         activeTabType === 'reviews' &&
         activeSuggestionType === 'translate_content' &&
         this.activeTabName !== 'submitQuestionTab'
+      ) ||
+      (
+        activeTabType === 'reviews' &&
+        activeSuggestionType === 'add_question' &&
+        this.activeTabName !== 'submitQuestionTab'
       );
   }
 
