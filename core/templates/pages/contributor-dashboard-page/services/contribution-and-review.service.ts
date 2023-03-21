@@ -39,6 +39,7 @@ class SuggestionFetcher {
   // all matching results) in the next fetch.
   offset: number;
   sortKey: string;
+  topicName: string;
   // Cache of suggestions.
   suggestionIdToDetails: SuggestionDetailsDict;
 
@@ -182,9 +183,10 @@ export class ContributionAndReviewService {
 
   async getReviewableQuestionSuggestionsAsync(
       shouldResetOffset: boolean = true,
-      sortKey: string
+      sortKey: string, topicName: string
   ): Promise<FetchSuggestionsResponse> {
     this.reviewableQuestionFetcher.sortKey = sortKey;
+    this.reviewableQuestionFetcher.topicName = topicName;
     return this.fetchSuggestionsAsync(
       this.reviewableQuestionFetcher,
       shouldResetOffset);
