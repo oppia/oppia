@@ -89,7 +89,7 @@ def main(args: Optional[List[str]] = None) -> None:
     """Runs the tests.
 
     Args:
-        args: list. A list of.
+        args: list. A list of arguments to parse
 
     Raises:
         Exception. Directory invalid_path does not exist.
