@@ -146,16 +146,6 @@ describe('InputResponsePairComponent', () => {
       ));
   });
 
-  it('should decode profile picture URI on initialization', () => {
-    component.profilePicture = '%2Fprofile%2Fuser%2F1';
-
-    expect(component.decodedProfilePicture).toBe(undefined);
-
-    component.ngOnInit();
-
-    expect(component.decodedProfilePicture).toBe('/profile/user/1');
-  });
-
   it('should check if input response contains video rte element', () => {
     component.data = {
       learnerInput: '',
