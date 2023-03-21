@@ -444,7 +444,7 @@
 # Story project.
 /core/controllers/story*.py @oppia/lace-backend-reviewers
 /core/domain/story*.py @oppia/lace-backend-reviewers
-/core/templates/components/entity-creation-services/story-creation.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/entity-creation-services/story-creation-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/domain/story/ @oppia/lace-frontend-reviewers
 /core/templates/domain/story_viewer/ @oppia/lace-frontend-reviewers
 /core/templates/pages/story-editor-page/ @oppia/lace-frontend-reviewers
