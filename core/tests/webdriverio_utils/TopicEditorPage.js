@@ -74,7 +74,7 @@ var TopicEditorPage = function() {
     '.e2e-test-confirm-subtopic-creation-button');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var storyThumbnailButton = $(
-    '.e2e-test-thumbnail-editor .e2e-test-photo-button');
+    '.e2e-test-story-image .e2e-test-thumbnail-editor .e2e-test-photo-button');
   var addSubtopicButton = $('.e2e-test-add-subtopic-button');
   var newSubtopicTitlefield = $('.e2e-test-new-subtopic-title-field');
   var newSubtopicUrlFragmentField = $(
@@ -96,7 +96,7 @@ var TopicEditorPage = function() {
   };
   var storyListTable = $('.e2e-test-story-list-table');
   var storyThumbnailButton = $(
-    '.e2e-test-thumbnail-editor .e2e-test-photo-button');
+    '.e2e-test-story-image .e2e-test-thumbnail-editor .e2e-test-photo-button');
   var subtopicColumnsSelector = function() {
     return $$('.e2e-test-subtopic-column');
   };
@@ -309,6 +309,19 @@ var TopicEditorPage = function() {
     expect(uncategorizedSkillIndex).not.toEqual(-1);
     var toMove = uncategorizedSkills[uncategorizedSkillIndex];
     await dragAndDrop(toMove, target);
+  };
+
+  this.replacementDragSkillToSubtopic = async function(subtopicIndex = 0) {
+    await action.click(
+      'Save rearranged skills modal', $('.e2e-test-skill-item-edit-btn'));
+    await action.click('e2e-test-assign-subtopic', $(
+      '.e2e-test-assign-subtopic'));
+
+    await action.click('e2e-test-assign-subtopic', $$(
+      '.e2e-test-subtopic-name')[subtopicIndex]);
+
+    await action.click('e2e-test-assign-subtopic', $(
+      '.e2e-test-skill-assign-subtopic-confirm'));
   };
 
   this.saveRearrangedSkills = async function() {

@@ -432,6 +432,7 @@ import { ContributionAndReviewStatsBackendApiService } from 'pages/contributor-d
 import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
+import { StoryCreationBackendApiService } from 'components/entity-creation-services/story-creation-backend-api.service';
 import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
 import { VersionHistoryService } from 'pages/exploration-editor-page/services/version-history.service';
 import { ConceptCardManagerService } from 'pages/exploration-player-page/services/concept-card-manager.service';
@@ -820,6 +821,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],
+  ['StoryCreationBackendApiService', StoryCreationBackendApiService],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryEditorStalenessDetectionService',
     StoryEditorStalenessDetectionService],

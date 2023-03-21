@@ -5,69 +5,69 @@
     <col class="oppia-colgroup-col-3">
   </colgroup>
   <tr>
-    <th ng-repeat="key in STORY_TABLE_COLUMN_HEADINGS"
+    <th *ngFor="let key of STORY_TABLE_COLUMN_HEADINGS"
         class="dashboard-table-headings">
-      <p ng-if="key === 'title'" class="text-left">Title</p>
-      <p ng-if="key === 'node_count'" class="text-center">Chapters</p>
-      <p ng-if="key === 'publication_status'" class="text-center">Published?</p>
+      <p *ngIf="key === 'title'" class="text-left">Title</p>
+      <p *ngIf="key === 'node_count'" class="text-center">Chapters</p>
+      <p *ngIf="key === 'publication_status'" class="text-center">Published?</p>
     </th>
   </tr>
-  <tr ng-repeat="summary in $ctrl.storySummaries track by $index"
-      dnd-list="storySummaries"
-      dnd-dragstart="onMoveStoryStart($index)"
-      dnd-drop="onMoveStoryFinish($index)"
-      dnd-draggable="summary"
-      class="list-item e2e-test-story-list-item">
-    <td>
-      <a ng-click="openStoryEditor(summary.getId())" class="list-summary text-left">
-        <span class="e2e-test-story-title"> <[summary.getTitle()]> </span>
-      </a>
-    </td>
-    <td>
-      <a ng-click="openStoryEditor(summary.getId())" class="list-summary text-center">
-        <span> <[summary.getNodeTitles().length]> </span>
-      </a>
-    </td>
-    <td>
-      <a ng-click="openStoryEditor(summary.getId())" class="list-summary text-center">
-        <span class="e2e-test-story-publication-status"> <[summary.isStoryPublished() ? "Yes" : "No"]> </span>
-      </a>
-    </td>
-    <td>
-      <a ng-click="deleteCanonicalStory(summary.getId())" class="list-summary text-center">
-        <span class="fas fa-trash-alt"></span>
-      </a>
-    </td>
-  </tr>
+  <tbody cdkDropList
+         (cdkDropListDropped)="drop($event)">
+    <tr *ngFor="let summary of storySummaries; index as idx"
+        class="list-item e2e-test-list-view-item-item e2e-test-story-list-item"
+        cdkDrag>
+      <td>
+        <a (click)="openStoryEditor(summary.getId())" class="list-summary text-left">
+          <span class="e2e-test-story-title"> {{ summary.getTitle() }} </span>
+        </a>
+      </td>
+      <td>
+        <a (click)="openStoryEditor(summary.getId())" class="list-summary text-center">
+          <span> {{ summary.getNodeTitles().length }} </span>
+        </a>
+      </td>
+      <td>
+        <a (click)="openStoryEditor(summary.getId())" class="list-summary text-center">
+          <span class="e2e-test-story-publication-status"> {{ summary.isStoryPublished() ? "Yes" : "No" }} </span>
+        </a>
+      </td>
+      <td>
+        <a (click)="deleteCanonicalStory(summary.getId())" class="list-summary text-center">
+          <span class="fas fa-trash-alt"></span>
+        </a>
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 <style>
-  topic-editor-stories-list .list-view-item {
+  .list-item {
     background: #fff;
     margin: 20px 7.5px 0 12.5%;
     padding: 10px 20px;
     width: 75%;
   }
 
-  topic-editor-stories-list .dashboard-table {
+  .dashboard-table {
     font-size: 15px;
     margin-top: 2vh;
     width: 100%;
   }
 
-  topic-editor-stories-list .dashboard-table .dashboard-table-headings {
+  .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid #000;
     margin: 25px 0;
   }
 
-  topic-editor-stories-list .dashboard-table .dashboard-table-headings tr {
+  .dashboard-table .dashboard-table-headings tr {
     font-size: 16px;
     font-weight: bold;
   }
 
-  topic-editor-stories-list .list-summary,
-  topic-editor-stories-list .list-summary:active,
-  topic-editor-stories-list .list-summary:visited {
+  .list-summary,
+  .list-summary:active,
+  .list-summary:visited {
     color: inherit;
     display: block;
     height: 2em;
@@ -75,26 +75,50 @@
     text-decoration: none;
   }
 
-  topic-editor-stories-list .list-item:not(:last-child) {
+  .list-item:not(:last-child) {
     border-bottom: 1px solid #bbb;
   }
 
-  topic-editor-stories-list .list-item:hover {
+  .list-item:hover {
     background-color: #ededed;
   }
 
-  topic-editor-stories-list .list-summary span {
+  .list-summary span {
     display: inline-block;
     line-height: normal;
     vertical-align: middle;
   }
 
-  topic-editor-stories-list .oppia-colgroup-col-1 {
+  .oppia-colgroup-col-1 {
     width: 40%;
   }
 
-  topic-editor-stories-list .oppia-colgroup-col-2
-  topic-editor-stories-list .oppia-colgroup-col-3 {
+  .oppia-colgroup-col-2
+  .oppia-colgroup-col-3 {
     width: 30%;
+  }
+
+  .cdk-drag-preview {
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .list-item:last-child {
+    border: none;
+  }
+
+  .story-list.cdk-drop-list-dragging .list-item:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 </style>

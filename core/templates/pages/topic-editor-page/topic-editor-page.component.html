@@ -1,82 +1,106 @@
 <div class="navbar-helper" ng-if="$ctrl.topic">
   <div class="navbar-tabs">
     <div class="navbar-text">
-      <[$ctrl.getNavbarText()]>
+      {{ getNavbarText() }}
     </div>
     <div class="navbar-icons">
-      <li ng-class="{'navbar-tab-active': $ctrl.isMainEditorTabSelected(), 'uib-dropdown': $ctrl.getTotalWarningsCount()}"
-          ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>"
+      <li [ngClass]="{'navbar-tab-active': isMainEditorTabSelected(), 'dropdown': getTotalWarningsCount()}"
+          [attr.dropdown]="getTotalWarningsCount()"
           class="nav-item icon nav-list-item"
-          ng-click="$ctrl.selectMainTab()">
-        <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab" tabindex="0">
-          <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected() }"></i>
+          ngbDropdown
+          (click)="selectMainTab()">
+        <a ngbTooltip="Main Editor"
+           placement="bottom"
+           class="nav-link navbar-tab"
+           tabindex="0">
+          <i class="fas fa-pen navbar-tab-icon"
+             [ngClass]="{'navbar-tab-active-icon': isMainEditorTabSelected() }">
+          </i>
         </a>
-        <div ng-show="$ctrl.getTotalWarningsCount()"
+        <div ngbDropdownToggle
+             [hidden]="!getTotalWarningsCount()"
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-             ng-mouseover="$ctrl.warningsAreShown=true"
-             ng-mouseleave="$ctrl.warningsAreShown=false"
-             ng-click="$ctrl.selectMainTab()">
+             (mouseover)="warningsAreShown=true"
+             (mouseleave)="hideWarnings()"
+             (click)="selectMainTab()">
           <span class="oppia-editor-warnings-count">
-            <[$ctrl.getTotalWarningsCount()]>
+            {{ getTotalWarningsCount() }}
           </span>
-          <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu topic-warning-container oppia-editor-warnings-box">
+          <ul ngbDropdownMenu
+              *ngIf="warningsAreShown"
+              class="dropdown-menu topic-warning-container oppia-editor-warnings-box">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text"
-                ng-repeat="issue in $ctrl.validationIssues track by $index">
+                *ngFor="let issue of validationIssues">
               <hr class="oppia-editor-warnings-separator">
-              <[issue]>
+              {{ issue }}
             </li>
             <li class="oppia-editor-warnings-text"
-                ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
+                *ngFor="let issue of prepublishValidationIssues">
               <hr class="oppia-editor-warnings-separator">
-              <[issue]>
+              {{ issue }}
             </li>
           </ul>
         </div>
       </li>
 
-      <li ng-if="$ctrl.isInTopicEditorTabs()" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon nav-list-item" ng-click="$ctrl.selectQuestionsTab()">
-        <a class="nav-link  navbar-tab e2e-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" aria-label="Question editor">
-          <i class="fas fa-book-open navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}"></i>
+      <li *ngIf="isInTopicEditorTabs()"
+          [ngClass]="{'navbar-tab-active': getActiveTabName() === 'questions'}"
+          class="nav-item icon nav-list-item"
+          (click)="selectQuestionsTab()">
+        <a class="nav-link  navbar-tab e2e-test-questions-tab-button"
+           ngbTooltip="Questions Editor"
+           placement="bottom"
+           aria-label="Question editor">
+          <i class="fas fa-book-open navbar-tab-icon"
+             [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'questions'}">
+          </i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.isInPreviewTab()}" class="nav-item icon nav-list-item" ng-click="$ctrl.openTopicViewer()">
-        <a class="nav-link navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0">
-          <i class="fas fa-play navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isInPreviewTab()}"></i>
+      <li [ngClass]="{'navbar-tab-active': isInPreviewTab()}"
+          class="nav-item icon nav-list-item"
+          (click)="openTopicViewer()">
+        <a class="nav-link navbar-tab"
+           ngbTooltip="Preview"
+           placement="bottom"
+           tabindex="0">
+          <i class="fas fa-play navbar-tab-icon"
+             [ngClass]="{'navbar-tab-active-icon': isInPreviewTab()}">
+          </i>
         </a>
       </li>
     </div>
   </div>
 </div>
-<div class="topic-editor-main" ng-if="$ctrl.topic">
-  <div ng-if="$ctrl.getActiveTabName() === 'main' && $ctrl.getEntityType() === 'topic'">
-    <topic-editor-tab></topic-editor-tab>
+<div class="topic-editor-main" *ngIf="topic">
+  <div *ngIf="getActiveTabName() === 'main' && getEntityType() === 'topic'">
+    <oppia-topic-editor-tab></oppia-topic-editor-tab>
   </div>
 
-  <div ng-if="$ctrl.getActiveTabName() === 'questions'">
+  <div *ngIf="getActiveTabName() === 'questions'">
     <oppia-topic-questions-tab></oppia-topic-questions-tab>
   </div>
 
-  <div ng-if="$ctrl.getActiveTabName() === 'subtopic_editor'">
+  <div *ngIf="getActiveTabName() === 'subtopic_editor'">
     <oppia-subtopic-editor-tab></oppia-subtopic-editor-tab>
   </div>
 
-  <div ng-if="$ctrl.getActiveTabName() === 'topic_preview'">
+  <div *ngIf="getActiveTabName() === 'topic_preview'">
     <oppia-topic-preview-tab></oppia-topic-preview-tab>
   </div>
 
-  <div ng-if="$ctrl.getActiveTabName() === 'subtopic_preview'">
+  <div *ngIf="getActiveTabName() === 'subtopic_preview'">
     <oppia-subtopic-preview-tab></oppia-subtopic-preview-tab>
   </div>
 </div>
 
 <style>
-  topic-editor-page .topic-editor-main {
+  .topic-editor-main {
     margin-bottom: 50px;
     margin-top: 110px;
   }
-  topic-editor-page .navbar-helper {
+  .navbar-helper {
     background-color: #00609c;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
     height: 70px;
@@ -87,35 +111,35 @@
     width: 100%;
     z-index: 500;
   }
-  topic-editor-page .navbar-tabs {
+  .navbar-tabs {
     display: flex;
     flex-wrap: wrap;
     height: 100%;
     justify-content: flex-start;
     text-align: center;
   }
-  topic-editor-page .navbar-tab-icon {
+  .navbar-tab-icon {
     color: #fff;
     display: block;
     font-size: 22px;
     width: 100%;
   }
-  topic-editor-page .navbar-tab span {
+  .navbar-tab span {
     color: #fff;
     font-size: 12px;
   }
-  topic-editor-page .oppia-editor-warnings-box {
+  .oppia-editor-warnings-box {
     cursor: default;
     max-width: none;
   }
-  topic-editor-page .navbar-tab-active {
+  .navbar-tab-active {
     background-color: #e6e6e6;
     box-shadow: 0 3px 2px 0 #e6e6e6;
   }
-  topic-editor-page .navbar-tab-active-icon {
+  .navbar-tab-active-icon {
     color: #00609c;
   }
-  topic-editor-page .topic-warning-container {
+  .topic-warning-container {
     display: block;
   }
 
@@ -124,7 +148,7 @@
       display: none;
     }
   }
-  topic-editor-page .navbar-text {
+  .navbar-text {
     align-items: center;
     color: #fff;
     display: flex;
@@ -133,31 +157,31 @@
     margin-left: 4%;
     width: 35%;
   }
-  topic-editor-page .navbar-icons {
+  .navbar-icons {
     display: flex;
   }
-  topic-editor-page .nav-list-item {
+  .nav-list-item {
     align-items: center;
     cursor: pointer;
     display: flex;
     justify-content: center;
     width: 90px;
   }
-  topic-editor-page .navbar-icons .nav-list-item:hover {
+  .navbar-icons .nav-list-item:hover {
     background-color: #4eb0c0;
   }
 
   @media screen and (max-width: 800px) {
-    topic-editor-page .navbar-helper {
+    .navbar-helper {
       position: inherit;
     }
-    topic-editor-page .navbar-tabs {
+    .navbar-tabs {
       justify-content: center;
     }
-    topic-editor-page .navbar-text {
+    .navbar-text {
       display: none;
     }
-    topic-editor-page .topic-editor-main {
+    .topic-editor-main {
       margin-top: 16px;
     }
   }
