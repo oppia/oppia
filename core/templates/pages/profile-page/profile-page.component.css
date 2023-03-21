@@ -109,7 +109,7 @@
 }
 
 .oppia-profile-username-small-screen {
-  display: none;
+  display: inline-block;
   font-size: 110%;
   margin-top: 20px;
   max-width: 30px;

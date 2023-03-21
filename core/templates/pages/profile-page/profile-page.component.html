@@ -26,20 +26,13 @@
       </div>
 
       <div class="oppia-profile-text">
-        <h2 class="oppia-profile-username-large-screen">
+        <h1 class="oppia-profile-username-large-screen oppia-profile-username-small-screen">
           <span placement="right"
                 [ngbPopover]="usernameIsLong ? username.helpText : undefined"
                 triggers="mouseenter:mouseleave">
             <strong>{{ username.value | truncate:16 }}</strong>
           </span>
-        </h2>
-        <h2 class="oppia-profile-username-small-screen">
-          <span placement="right"
-                [ngbPopover]="username.helpText"
-                triggers="mouseenter:mouseleave">
-            <strong>{{ username.value | truncate:11 }}</strong>
-          </span>
-        </h2>
+        </h1>
 
         <p class="oppia-profile-first-contributed"
            *ngIf="firstContributionMsec">
