@@ -2,7 +2,7 @@
   <a href="/topics-and-skills-dashboard">
     Back to Topics Dashboard <i class="fa fa-angle-left"></i>
   </a>
-  <span><[editableName]></span>
+  <span>{{ editableName }}</span>
 </p>
 <a class="oppia-mobile-back-to-parent" href="/topics-and-skills-dashboard">
   <i class="fa fa-angle-left"></i>
@@ -10,275 +10,334 @@
 </a>
 <div role="form" class="form-horizontal topic-editor">
   <div class="topic-content-container">
-    <md-card class="oppia-long-text topic-item-card oppia-mobile-collapsible-card">
+    <mat-card class="oppia-long-text topic-item-card oppia-mobile-collapsible-card">
       <div class="topic-editor-main-container">
-        <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards()">
+        <div class="item-list-card-header oppia-mobile-collapsible-card-header"
+             (click)="togglePreviewListCards()">
           <h3 class="topic-card-header">Details</h3>
           <i class="fa fa-caret-down"
-             ng-if="!mainTopicCardIsShown"
+             *ngIf="!mainTopicCardIsShown"
              aria-hidden="true">
           </i>
           <i class="fa fa-caret-up"
-             ng-if="mainTopicCardIsShown"
+             *ngIf="mainTopicCardIsShown"
              aria-hidden="true">
           </i>
         </div>
-        <div ng-if="mainTopicCardIsShown">
+        <div *ngIf="mainTopicCardIsShown">
           <div class="oppia-mobile-collapsible-card-content">
             <div class="topic-name">
-              <label for="topicName" class="form-heading e2e-test-topic-name-heading">Name</label>
-              <input id="topicName" type="text" class="form-control e2e-test-topic-name-field"
-                     ng-disabled="!topicRights.canEditTopic()"
-                     ng-model="editableName" ng-blur="updateTopicName(editableName)"
+              <label for="topicName"
+                     class="form-heading e2e-test-topic-name-heading">
+                Name
+              </label>
+              <input id="topicName"
+                     type="text"
+                     class="form-control e2e-test-topic-name-field"
+                     [disabled]="!topicRights.canEditTopic()"
+                     [(ngModel)]="editableName"
+                     (blur)="updateTopicName(editableName)"
                      placeholder="Enter a name for the topic."
-                     maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>"
-                     ng-trim="false"
-                     ng-class="{'is-invalid': topicNameExists}">
+                     [maxlength]="MAX_CHARS_IN_TOPIC_NAME"
+                     [ngClass]="{'is-invalid': topicNameExists}">
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+                  Topic name should be at most {{ MAX_CHARS_IN_TOPIC_NAME }} characters.
                 </em>
               </span>
-              <div ng-if="topicNameExists" class="oppia-input-box-subtitle text-danger">
+              <div *ngIf="topicNameExists" class="oppia-input-box-subtitle text-danger">
                 <em>
                   A topic with this name already exists.
                 </em>
               </div>
             </div>
             <div class="topic-url-fragment">
-              <label for="topicUrlFragment" class="form-heading e2e-test-topic-url-fragment-heading">Topic URL Fragment</label>
-              <input id="topicUrlFragment" type="text" class="form-control e2e-test-topic-url-fragment-field"
-                     ng-disabled="!topicRights.canEditTopic()"
-                     ng-model="editableTopicUrlFragment" ng-blur="updateTopicUrlFragment(editableTopicUrlFragment)"
-                     maxlength="<[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]>" ng-trim="true"
-                     ng-class="{'is-invalid': topicUrlFragmentExists}">
+              <label for="topicUrlFragment"
+                     class="form-heading e2e-test-topic-url-fragment-heading">
+                Topic URL Fragment
+              </label>
+              <input id="topicUrlFragment"
+                     type="text"
+                     class="form-control e2e-test-topic-url-fragment-field"
+                     [disabled]="!topicRights.canEditTopic()"
+                     [(ngModel)]="editableTopicUrlFragment"
+                     (blur)="updateTopicUrlFragment(editableTopicUrlFragment)"
+                     [maxlength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
+                     [ngClass]="{'is-invalid': topicUrlFragmentExists}"
+                     trim>
               <span class="oppia-input-box-subtitle">
                 <em>
-                  The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]> characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                  The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_TOPIC_URL_FRAGMENT }} characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
                   This topic can be accessed at the following URL:<br>
-                  <[hostname]>/learn/<[getClassroomUrlFragment()]>/<[editableTopicUrlFragment]>
+                  {{ hostname }}/learn/{{ getClassroomUrlFragment() }}/{{ editableTopicUrlFragment }}
                 </em>
               </span>
-              <div ng-if="topicUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
+              <div *ngIf="topicUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
                 <em>
                   This topic URL fragment already exists.
                 </em>
               </div>
             </div>
-            <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
-              <label for="topicDescription" class="form-heading e2e-test-topic-description-heading">Description</label>
-              <textarea type="text" class="form-control topic-description e2e-test-topic-description-field"
-                        ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
-                        ng-change="updateTopicDescriptionStatus(editableDescription)"
-                        ng-blur="updateTopicDescription(editableDescription)"
-                        ng-disabled="!topicRights.canEditTopic()"
+            <div class="topic-description" [ngClass]="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+              <label for="topicDescription"
+                     class="form-heading e2e-test-topic-description-heading">
+                Description
+              </label>
+              <textarea type="text"
+                        class="form-control topic-description e2e-test-topic-description-field"
+                        [(ngModel)]="editableDescription"
+                        [maxlength]="MAX_CHARS_IN_TOPIC_DESCRIPTION"
+                        (change)="updateTopicDescriptionStatus(editableDescription)"
+                        (blur)="updateTopicDescription(editableDescription)"
+                        [disabled]="!topicRights.canEditTopic()"
                         aria-label="Topic Description"
                         placeholder="Enter the description of the topic">
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+                  Topic description should be at most {{ MAX_CHARS_IN_TOPIC_DESCRIPTION }} characters.
                 </em>
               </span>
-              <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
+              <span *ngIf="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
                 What does this topic contain?
               </span>
             </div>
-            <div class="topic-page-title" ng-class="{'has-error': editablePageTitleFragmentForWeb.length === 0}">
-              <label for="topicPageTitleFragmentForWeb" class="form-heading e2e-test-topic-page-title-fragment-label">Page Title Fragment For Web</label>
-              <textarea type="text" class="form-control topic-description e2e-test-topic-page-title-fragment-field"
-                        ng-model="editablePageTitleFragmentForWeb" maxlength="<[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]>"
-                        ng-blur="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
-                        ng-disabled="!topicRights.canEditTopic()"
+            <div class="topic-page-title"
+                 [ngClass]="{'has-error': editablePageTitleFragmentForWeb.length === 0}">
+              <label for="topicPageTitleFragmentForWeb"
+                     class="form-heading e2e-test-topic-page-title-fragment-label">
+                Page Title Fragment For Web
+              </label>
+              <textarea type="text"
+                        class="form-control topic-description e2e-test-topic-page-title-fragment-field"
+                        [(ngModel)]="editablePageTitleFragmentForWeb"
+                        [maxlength]="MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB"
+                        (blur)="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
+                        [disabled]="!topicRights.canEditTopic()"
                         aria-label="Page Title Fragment"
                         placeholder="Enter the page title for the topic">
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn <[editableName]> | Add, Subtract, Multiply and Divide | Oppia".
-                  It should be at least <[MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> and at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
+                  Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn {{ editableName }} | Add, Subtract, Multiply and Divide | Oppia".
+                  It should be at least {{ MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB }} and at most {{ MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB }} characters.
                 </em>
               </span>
             </div>
-            <div class="topic-meta-tag-content" ng-class="{'has-error': editableMetaTagContent.length === 0}">
-              <label for="topicMetaTagContent" class="form-heading e2e-test-topic-meta-tag-content-label">Meta Tag Content</label>
-              <textarea type="text" class="form-control topic-description e2e-test-topic-meta-tag-content-field"
-                        ng-model="editableMetaTagContent" maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>"
-                        ng-blur="updateTopicMetaTagContent(editableMetaTagContent)"
-                        ng-disabled="!topicRights.canEditTopic()"
+            <div class="topic-meta-tag-content"
+                 [ngClass]="{'has-error': editableMetaTagContent.length === 0}">
+              <label for="topicMetaTagContent"
+                     class="form-heading e2e-test-topic-meta-tag-content-label">Meta Tag Content
+              </label>
+              <textarea type="text"
+                        class="form-control topic-description e2e-test-topic-meta-tag-content-field"
+                        [(ngModel)]="editableMetaTagContent"
+                        [maxlength]="MAX_CHARS_IN_META_TAG_CONTENT"
+                        (blur)="updateTopicMetaTagContent(editableMetaTagContent)"
+                        [disabled]="!topicRights.canEditTopic()"
                         placeholder="Enter the meta tag content for the topic"
                         aria-label="Meta Tag Content">
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
                   Meta tags provide information about the webpage. This information will not displayed on the page but it can be read by search engines and web crawlers. This text will be shown to users in seach engine results.
-                  Topic meta tag content should be at most <[MAX_CHARS_IN_META_TAG_CONTENT]> characters.
+                  Topic meta tag content should be at most {{ MAX_CHARS_IN_META_TAG_CONTENT }} characters.
                 </em>
               </span>
             </div>
             <label class="form-heading">Thumbnail</label>
             <oppia-thumbnail-uploader [disabled]="!topicRights.canEditTopic()"
-                                      [use-local-storage]="false"
+                                      [useLocalStorage]="false"
                                       [filename]="topic.getThumbnailFilename()"
-                                      (update-filename)="updateTopicThumbnailFilename($event)"
-                                      [bg-color]="topic.getThumbnailBgColor()"
-                                      (update-bg-color)="updateTopicThumbnailBgColor($event)"
-                                      [allowed-bg-colors]="allowedBgColors"
-                                      [aspect-ratio]="'4:3'"
-                                      [preview-title]="editableName"
-                                      preview-description-bg-color="#2F6687"
-                                      [preview-footer]="topic.getCanonicalStoryIds().length + ' Lessons'">
+                                      (updateFilename)="updateTopicThumbnailFilename($event)"
+                                      [bgColor]="topic.getThumbnailBgColor()"
+                                      (updateBgColor)="updateTopicThumbnailBgColor($event)"
+                                      [allowedBgColors]="allowedBgColors"
+                                      [aspectRatio]="'4:3'"
+                                      [previewTitle]="editableName"
+                                      previewDescriptionBgColor="#2F6687"
+                                      [previewFooter]="topic.getCanonicalStoryIds().length + ' Lessons'">
             </oppia-thumbnail-uploader>
           </div>
         </div>
       </div>
-      <div ng-if="topic.getThumbnailFilename() && mainTopicCardIsShown">
-        <div ng-if="!topicPreviewCardIsShown" >
-          <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
+      <div *ngIf="topic.getThumbnailFilename() && mainTopicCardIsShown">
+        <div *ngIf="!topicPreviewCardIsShown" >
+          <button class="btn btn-default show-topic-preview-button"
+                  (click)="togglePreview()">
             Expand Preview
             <i class="fa fa-angle-down"></i>
           </button>
         </div>
-        <div ng-if="topicPreviewCardIsShown">
-          <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
+        <div *ngIf="topicPreviewCardIsShown">
+          <button class="btn btn-default show-topic-preview-button"
+                  (click)="togglePreview()">
             Collapse Preview
             <i class="fa fa-angle-up"></i>
           </button>
         </div>
-        <div ng-if="topic.getId() && topicPreviewCardIsShown">
+        <div *ngIf="topic.getId() && topicPreviewCardIsShown">
           <oppia-preview-thumbnail [name]="editableName"
-                                   [aspect-ratio]="'4:3'"
-                                   [preview-footer]="getPreviewFooter()"
+                                   [aspectRatio]="'4:3'"
+                                   [previewFooter]="getPreviewFooter()"
                                    [filename]="topic.getThumbnailFilename()"
-                                   [thumbnail-bg-color]="topic.getThumbnailBgColor()"
-                                   [bg-color]="'#2F6687'">
+                                   [thumbnailBgColor]="topic.getThumbnailBgColor()"
+                                   [bgColor]="'#2F6687'">
           </oppia-preview-thumbnail>
         </div>
       </div>
-    </md-card>
-    <md-card class="item-list-card subtopic-skill-card-container topic-bottom-card oppia-mobile-collapsible-card">
-      <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(SUBTOPIC_LIST)">
+    </mat-card>
+    <mat-card class="item-list-card subtopic-skill-card-container topic-bottom-card oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header"
+           (click)="togglePreviewListCards(SUBTOPIC_LIST)">
         <div class="subtopic-reassign-header">
           <h3>Subtopics</h3>
           <button class="reassign-button e2e-test-reassign-skill-button"
-                  ng-click="reassignSkillsInSubtopics()"
-                  ng-disabled="!topicRights.canEditTopic()">
+                  (click)="reassignSkillsInSubtopics()"
+                  [disabled]="!topicRights.canEditTopic()">
             REASSIGN
           </button>
           <i class="fa fa-caret-down"
-             ng-if="!subtopicsListIsShown"
+             *ngIf="!subtopicsListIsShown"
              aria-hidden="true">
           </i>
           <i class="fa fa-caret-up"
-             ng-if="subtopicsListIsShown"
+             *ngIf="subtopicsListIsShown"
              aria-hidden="true">
           </i>
         </div>
       </div>
-      <div ng-if="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
+      <div *ngIf="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
         <div>
           <label>
-            <input class="practice-tab-checkbox e2e-test-toggle-practice-tab" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)" ng-disabled="!topicRights.canEditTopic() || (!editablePracticeIsDisplayed && !doesTopicHaveMinimumPracticeQuestions())">
+            <input class="practice-tab-checkbox e2e-test-toggle-practice-tab"
+                   type="checkbox"
+                   [(ngModel)]="editablePracticeIsDisplayed"
+                   (change)="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)"
+                   [disabled]="!topicRights.canEditTopic() || (!editablePracticeIsDisplayed && !doesTopicHaveMinimumPracticeQuestions())">
             <span class="practice-tab-text"> Show Practice Tab to learners.</span>
           </label>
-          <i class="fas fa-info-circle practice-tab-info-circle" title="This setting show/hides the practice tab in the topic viewer page. This can only be enabled if there are at least 10 questions attached to the topic."></i>
+          <i class="fas fa-info-circle practice-tab-info-circle"
+             title="This setting show/hides the practice tab in the topic viewer page. This can only be enabled if there are at least 10 questions attached to the topic.">
+          </i>
         </div>
         <button class="btn add-subtopic-btn e2e-test-add-subtopic-button puppeteer-test-add-subtopic-button"
-                ng-click="createSubtopic()"
-                ng-disabled="!topicRights.canEditTopic()">
+                (click)="createSubtopic()"
+                [disabled]="!topicRights.canEditTopic()">
           + ADD SUBTOPIC
         </button>
-        <button ng-if="skillCreationIsAllowed" class="btn add-skill-btn e2e-test-add-skill-button puppeteer-test-add-skill-button" ng-click="createSkill()">
+        <button *ngIf="skillCreationIsAllowed"
+                class="btn add-skill-btn e2e-test-add-skill-button puppeteer-test-add-skill-button"
+                (click)="createSkill()">
           + ADD SKILL
         </button>
-        <div ng-if="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown">
+        <div *ngIf="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown">
           <div class="list-header">
             <span>Name</span>
             <span class="number-skills-header"># of Questions</span>
           </div>
-          <div class="subtopic-name-header skills-invalid" ng-if="uncategorizedSkillSummaries.length">
+          <div class="subtopic-name-header skills-invalid"
+               *ngIf="uncategorizedSkillSummaries.length">
             <span>Uncategorized Skills</span>
           </div>
-          <div ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index" class="subtopic-skill skills-list-item e2e-test-skill-item">
-            <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-              <span class="clickable-item"><[skillSummary.getDescription()]></span>
+          <div *ngFor="let skillSummary of uncategorizedSkillSummaries; index as $index"
+               class="subtopic-skill skills-list-item e2e-test-skill-item">
+            <a [href]="getSkillEditorUrl(skillSummary.getId())"
+               target="_blank"
+               rel="noopener">
+              <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
             </a>
             <div class="edit-options-container">
-              <i class="fa fa-ellipsis-v" ng-click="toggleUncategorizedSkillOptions($index)"></i>
+              <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn" (click)="toggleUncategorizedSkillOptions($index)"></i>
             </div>
             <div class="uncategorized-skill-option-box"
-                 ng-if="uncategorizedEditOptionsIndex === $index"
-                 ng-mouseleave="toggleUncategorizedSkillOptions(null)"
-                 ng-click="toggleUncategorizedSkillOptions(null)">
-              <div class="uncategorized-skill-edit-option" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)">
+                 *ngIf="uncategorizedEditOptionsIndex === $index"
+                 (mouseleave)="toggleUncategorizedSkillOptions(null)"
+                 (click)="toggleUncategorizedSkillOptions(null)">
+              <div class="uncategorized-skill-edit-option" (click)="deleteUncategorizedSkillFromTopic(skillSummary)">
                 <i class="fa fa-trash"></i>
                 <span>Remove from topic</span>
               </div>
-              <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="changeSubtopicAssignment(null, skillSummary)">
+              <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-subtopic" (click)="changeSubtopicAssignment(null, skillSummary)">
                 <i class="fa fa-plus"></i>
                 <span>Assign to Subtopic</span>
               </div>
             </div>
           </div>
-          <div ng-repeat="subtopic in subtopics track by $index"
-               ng-init="subtopicIndex = $index"
-               dnd-list="subtopics"
-               dnd-dragstart="onRearrangeSubtopicStart($index)"
-               dnd-drop="onRearrangeSubtopicEnd($index)"
-               dnd-draggable="subtopic">
-            <div class="subtopics-list-item">
-              <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
-                <span class="clickable-item" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
-                  <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
-                  <span class="e2e-test-subtopic"><[subtopic.getTitle()]></span>
-                </span>
-                <div class="subtopic-edit-options-container edit-options-container">
-                  <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
-                  <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
-                  <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
-                    <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
-                    <span>Delete</span>
-                  </div>
-                </div>
-              </div>
-              <div ng-if="subtopicCardSelectedIndexes[subtopicIndex]">
-                <div ng-if="subtopic.getSkillSummaries().length">
-                  <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skills-list-item skill-description-container">
-                    <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                      <span class="clickable-item"><[skillSummary.getDescription()]></span>
-                    </a>
-                    <div class="edit-options-container">
-                      <span><[skillQuestionCountDict[skillSummary.getId()] ]></span>
-                      <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
-                    </div>
-                    <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)" ng-click="showSkillEditOptions(null)">
-                      <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
-                        <i class="fa fa-trash"></i>
-                        <span>Remove from subtopic</span>
-                      </div>
-                      <div class="skill-edit-option" ng-click="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
-                        <i class="fa fa-plus"></i>
-                        <span>Change Subtopic</span>
-                      </div>
-                      <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
-                        <i class="fa fa-trash"></i>
-                        <span>Remove from topic</span>
-                      </div>
+          <div cdkDropList
+               (cdkDropListDropped)="drop($event)">
+            <div *ngFor="let subtopic of subtopics;index as subtopicIndex"
+                cdkDrag>
+              <div class="subtopics-list-item">
+                <div class="subtopic-name-header subtopic-name-card-header" (click)="toggleSubtopicCard(subtopicIndex)">
+                  <span class="clickable-item" (click)="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
+                    <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
+                    <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
+                  </span>
+                  <div class="subtopic-edit-options-container edit-options-container">
+                    <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
+                    <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options"
+                       (click)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()">
+                    </i>
+                    <div *ngIf="subtopicEditOptionsAreShown === subtopicIndex"
+                         class="subtopic-edit-options"
+                         (click)="deleteSubtopic(subtopic.getId())"
+                         (mouseleave)="showSubtopicEditOptions(null)">
+                      <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
+                      <span>Delete</span>
                     </div>
                   </div>
                 </div>
-                <div ng-if="!subtopic.getSkillSummaries().length">
-                  <span class="subtopic-skill">There are no skills associated to this subtopic.</span>
+                <div *ngIf="subtopicCardSelectedIndexes[subtopicIndex]">
+                  <div *ngIf="subtopic.getSkillSummaries().length">
+                    <div *ngFor="let skillSummary of subtopic.getSkillSummaries(); index as idx"
+                         class="subtopic-skill skills-list-item skill-description-container">
+                      <a [href]="getSkillEditorUrl(skillSummary.getId())"
+                         target="_blank"
+                         rel="noopener">
+                        <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
+                      </a>
+                      <div class="edit-options-container">
+                        <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
+                        <i class="fa fa-ellipsis-v"
+                           (click)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()">
+                        </i>
+                      </div>
+                      <div class="skill-option-box"
+                           *ngIf="!skillOptionDialogueBox && selectedSkillEditOptionsIndex && selectedSkillEditOptionsIndex[subtopicIndex] && selectedSkillEditOptionsIndex[subtopicIndex][idx]"
+                           (mouseleave)="showSkillEditOptions()"
+                           (click)="showSkillEditOptions()">
+                        <div class="skill-edit-option"
+                             (click)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
+                          <i class="fa fa-trash"></i>
+                          <span>Remove from subtopic</span>
+                        </div>
+                        <div class="skill-edit-option"
+                             (click)="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
+                          <i class="fa fa-plus"></i>
+                          <span>Change Subtopic</span>
+                        </div>
+                        <div class="skill-edit-option remove-from-topic-option"
+                             (click)="removeSkillFromTopic(subtopic.getId(), skillSummary)">
+                          <i class="fa fa-trash"></i>
+                          <span>Remove from topic</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="!subtopic.getSkillSummaries().length">
+                    <span class="subtopic-skill">There are no skills associated to this subtopic.</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </md-card>
-    <md-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
+    </mat-card>
+    <mat-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
       <div class="item-list-card-header oppia-mobile-collapsible-card-header"
-           ng-click="togglePreviewListCards()">
+           (click)="togglePreviewListCards()">
         <h3>Diagnostic test</h3>
       </div>
       <div>
@@ -293,122 +352,127 @@
         </p>
       </div>
       <div class="oppia-diagnostic-test-skill-list-header"
-           ng-if="selectedSkillSummariesForDiagnosticTest.length">
+           *ngIf="selectedSkillSummariesForDiagnosticTest.length">
         <strong>Diagnostic test skills</strong>
       </div>
-      <md-list>
-        <md-list-item class="oppia-diagnostic-test-skill_items-container"
-                      ng-repeat="skill in selectedSkillSummariesForDiagnosticTest">
+      <mat-list>
+        <mat-list-item class="oppia-diagnostic-test-skill_items-container"
+                       *ngFor="let skill of selectedSkillSummariesForDiagnosticTest">
           <div class="oppia-diagnostic-test-skill-items">
             <span>
               {{skill.getDescription()}}
             </span>
             <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
-                    ng-click="removeSkillFromDiagnosticTest(skill)"
-                    md-button
-                    md-icon-button
+                    (click)="removeSkillFromDiagnosticTest(skill)"
+                    mat-button
+                    mat-icon-button
                     aria-label="Clear">
-              <md-icon>close</md-icon>
+              <mat-icon>close</mat-icon>
             </button>
           </div>
-        </md-list-item>
-        <md-list-item ng-show="diagnosticTestSkillsDropdownIsShown">
-          <md-form-field class="oppia-diagnostic-test-skill-items">
-            <select class="form-control oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
-                    ng-model="selectedSkillForDiagnosticTest"
-                    ng-change="addSkillForDiagnosticTest()"
-                    ng-options="skillSummary.getDescription() for skillSummary in availableSkillSummariesForDiagnosticTest"
-                    aria-label="selection dropdown">
-            </select>
-          </md-form-field>
+        </mat-list-item>
+        <mat-list-item [hidden]="!diagnosticTestSkillsDropdownIsShown">
+          <select [(ngModel)]="selectedSkillForDiagnosticTest"
+                  class="form-control oppia-diagnostic-test-skill-items oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
+                  (change)="addSkillForDiagnosticTest()"
+                  aria-label="selection dropdown">
+            <option *ngFor="let skillSummary of availableSkillSummariesForDiagnosticTest"
+                    [ngValue]="skillSummary">
+                    {{ skillSummary.getDescription()  }}
+            </option>
+          </select>
+
           <button class="oppia-remove-diagnostic-test-skill-button"
-                  md-button md-icon-button
+                  mat-button mat-icon-button
                   aria-label="Clear"
-                  ng-click="removeDiagnosticTestSkillDropdown()">
-            <md-icon>close</md-icon>
+                  (click)="removeDiagnosticTestSkillDropdown()">
+            <mat-icon>close</mat-icon>
           </button>
-        </md-list-item>
-      </md-list>
+        </mat-list-item>
+      </mat-list>
       <button class="oppia-add-diagnostic-test-skills-button e2e-test-add-diagnostic-test-skill"
-              md-button
-              ng-click="presentDiagnosticTestSkillDropdown()"
-              ng-show="!diagnosticTestSkillsDropdownIsShown"
-              ng-disabled="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
+              mat-button
+              (click)="presentDiagnosticTestSkillDropdown()"
+              [hidden]="diagnosticTestSkillsDropdownIsShown"
+              [disabled]="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
         <div class="oppia-flex">
-          <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
+          <mat-icon aria-label="icon-button with a plus icon">add_circle</mat-icon>
           <h4 class="oppia-button-text">Add diagnostic test skill</h4>
         </div>
       </button>
       <div class="oppia-diagnostic-test-card-note">
-        <span ng-if="!availableSkillSummariesForDiagnosticTest.length && selectedSkillSummariesForDiagnosticTest.length < 3">
+        <span *ngIf="!availableSkillSummariesForDiagnosticTest.length && selectedSkillSummariesForDiagnosticTest.length < 3">
           <em>No more skills left for assignment.</em>
         </span>
-        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 3">
+        <span *ngIf="selectedSkillSummariesForDiagnosticTest.length === 3">
           <em>The maximum limit was reached for adding skills to the diagnostic test.</em>
         </span>
-        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 0 && availableSkillSummariesForDiagnosticTest.length > 0">
+        <span *ngIf="selectedSkillSummariesForDiagnosticTest.length === 0 && availableSkillSummariesForDiagnosticTest.length > 0">
           <em>Please add at least 1 skill for the diagnostic test.</em>
         </span>
       </div>
-    </md-card>
+    </mat-card>
   </div>
   <div class="topic-info-container">
-    <md-card class="item-list-card topic-item-card topic-bottom-card oppia-mobile-collapsible-card">
-      <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(STORY_LIST)">
+    <mat-card class="item-list-card topic-item-card topic-bottom-card oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header"
+           (click)="togglePreviewListCards(STORY_LIST)">
         <h3>Canonical Stories</h3>
         <i class="fa fa-caret-down e2e-test-story-dropdown"
-           ng-if="!storiesListIsShown"
+           *ngIf="!storiesListIsShown"
            aria-hidden="true">
         </i>
         <i class="fa fa-caret-up e2e-test-story-dropdown"
-           ng-if="storiesListIsShown"
+           *ngIf="storiesListIsShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
+      <div *ngIf="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
         <button class="btn add-story-btn e2e-test-create-story-button oppia-autofocus"
-                ng-click="createCanonicalStory()" focus-on="addStoryBtn" ng-disabled="!topicRights.canEditTopic()">
+                (click)="createCanonicalStory()"
+                [oppiaFocusOn]="addStoryBtn"
+                [disabled]="!topicRights.canEditTopic()">
           + ADD STORY
         </button>
         <div class="canonical-stories">
-          <topic-editor-stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
-                                     story-summaries="canonicalStorySummaries"
-                                     topic="topic">
-          </topic-editor-stories-list>
+          <oppia-topic-editor-stories-list *ngIf="topic.getCanonicalStoryIds().length > 0"
+                                           [storySummaries]="canonicalStorySummaries"
+                                           [topic]="topic">
+          </oppia-topic-editor-stories-list>
         </div>
       </div>
-    </md-card>
-    <md-card class="entity-count">
+    </mat-card>
+    <mat-card class="entity-count">
       <div class="subtopic-count">
-        <span class="subtopic-count-value" ng-if="!topicDataHasLoaded"><loading-dots></loading-dots></span>
-        <span class="subtopic-count-value" ng-if="topicDataHasLoaded"><[topic.getSubtopics().length]></span>
+        <span class="subtopic-count-value" *ngIf="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="subtopic-count-value" *ngIf="topicDataHasLoaded">{{ topic.getSubtopics().length }}</span>
         <span class="subtopic-count-text">Subtopics</span>
       </div>
       <div class="skill-count">
-        <span class="skill-count-value" ng-if="!topicDataHasLoaded"><loading-dots></loading-dots></span>
-        <span class="skill-count-value" ng-if="topicDataHasLoaded"><[topic.getSkillIds().length]></span>
+        <span class="skill-count-value" *ngIf="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="skill-count-value" *ngIf="topicDataHasLoaded">{{ topic.getSkillIds().length }}</span>
         <span class="skill-count-text">Skills</span>
       </div>
       <div class="story-count">
-        <span class="story-count-value" ng-if="!topicDataHasLoaded"><loading-dots></loading-dots></span>
-        <span class="story-count-value" ng-if="topicDataHasLoaded"><[topic.getCanonicalStoryIds().length]></span>
+        <span class="story-count-value" *ngIf="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="story-count-value" *ngIf="topicDataHasLoaded">{{ topic.getCanonicalStoryIds().length }}</span>
         <span class="story-count-text">Stories</span>
       </div>
-    </md-card>
+    </mat-card>
   </div>
   <div>
   </div>
 </div>
 <style>
-  topic-editor-tab .topic-editor thumbnail-uploader {
+  .topic-editor thumbnail-uploader {
     margin-bottom: 15px;
   }
 
-  topic-editor-tab .topic-editor textarea {
+  .topic-editor textarea {
     resize: vertical;
   }
 
-  topic-editor-tab .topic-editor {
+  .topic-editor {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -434,13 +498,13 @@
     margin-top: 20px;
   }
 
-  topic-editor-tab .topic-dashboard-link {
+  .topic-dashboard-link {
     font-size: 15px;
     margin-bottom: 35px;
     margin-left: 4%;
   }
 
-  topic-editor-tab .topic-dashboard-link a {
+  .topic-dashboard-link a {
     color: #015f9c;
     text-decoration: none;
   }
@@ -737,7 +801,7 @@
     width: fit-content;
   }
 
-  md-icon.md-default-theme, md-icon {
+  mat-icon.mat-default-theme, mat-icon {
     color: #00695e;
   }
 
@@ -803,12 +867,12 @@
   }
 
   @media screen and (max-width: 768px) {
-    topic-editor-tab .topic-editor {
+    .topic-editor {
       margin-bottom: 15px;
       width: 100%;
     }
 
-    topic-editor-tab .topic-dashboard-link {
+    .topic-dashboard-link {
       display: none;
     }
 
