@@ -28,6 +28,8 @@ import { Topic } from 'domain/topic/topic-object.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
+import { TopicRights } from 'domain/topic/topic-rights.model';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
 
 @Component({
   selector: 'oppia-topic-editor-stories-list',
@@ -36,6 +38,7 @@ import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal
 export class TopicEditorStoriesListComponent implements OnInit {
   @Input() storySummaries: StorySummary[];
   @Input() topic: Topic;
+  topicRights: TopicRights;
 
   STORY_TABLE_COLUMN_HEADINGS: string[];
 
@@ -44,7 +47,8 @@ export class TopicEditorStoriesListComponent implements OnInit {
     private topicUpdateService: TopicUpdateService,
     private undoRedoService: UndoRedoService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private topicEditorStateService: TopicEditorStateService
   ) {}
 
   STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
@@ -104,6 +108,7 @@ export class TopicEditorStoriesListComponent implements OnInit {
   ngOnInit(): void {
     this.STORY_TABLE_COLUMN_HEADINGS = [
       'title', 'node_count', 'publication_status'];
+    this.topicRights = this.topicEditorStateService.getTopicRights();
   }
 }
 

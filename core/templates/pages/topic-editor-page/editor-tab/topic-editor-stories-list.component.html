@@ -18,23 +18,23 @@
         class="list-item e2e-test-list-view-item-item e2e-test-story-list-item"
         cdkDrag>
       <td>
-        <a (click)="openStoryEditor(summary.getId())" class="list-summary text-left">
+        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="list-summary text-left">
           <span class="e2e-test-story-title"> {{ summary.getTitle() }} </span>
         </a>
       </td>
       <td>
-        <a (click)="openStoryEditor(summary.getId())" class="list-summary text-center">
+        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="list-summary text-center">
           <span> {{ summary.getNodeTitles().length }} </span>
         </a>
       </td>
       <td>
-        <a (click)="openStoryEditor(summary.getId())" class="list-summary text-center">
+        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="list-summary text-center">
           <span class="e2e-test-story-publication-status"> {{ summary.isStoryPublished() ? "Yes" : "No" }} </span>
         </a>
       </td>
       <td>
         <a (click)="deleteCanonicalStory(summary.getId())" class="list-summary text-center">
-          <span class="fas fa-trash-alt"></span>
+          <span class="fas fa-trash-alt" *ngIf="topicRights.canEditTopic()"></span>
         </a>
       </td>
     </tr>

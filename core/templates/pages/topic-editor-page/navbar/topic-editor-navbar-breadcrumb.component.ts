@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Topic } from 'domain/topic/topic-object.model';
 import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { TopicRights } from 'domain/topic/topic-rights.model';
 
 @Component({
   selector: 'oppia-topic-editor-navbar-breadcrumb',
@@ -32,6 +33,7 @@ export class TopicEditorNavbarBreadcrumbComponent {
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   topic!: Topic;
+  topicRights!: TopicRights;
 
   constructor(
     private topicEditorRoutingService: TopicEditorRoutingService,
@@ -65,6 +67,7 @@ export class TopicEditorNavbarBreadcrumbComponent {
         }
       ));
     this.topic = this.topicEditorStateService.getTopic();
+    this.topicRights = this.topicEditorStateService.getTopicRights();
   }
 }
 
