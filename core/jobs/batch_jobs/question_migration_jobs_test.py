@@ -18,10 +18,8 @@
 
 from __future__ import annotations
 
-import datetime
-
-from core import feconf
 from core.domain import question_domain
+from core.domain import question_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import question_migration_jobs
 from core.jobs.types import job_run_result
@@ -43,441 +41,341 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
         question_migration_jobs.PopulateQuestionSummaryVersionOneOffJob
     ] = question_migration_jobs.PopulateQuestionSummaryVersionOneOffJob
 
-    TOPIC_1_ID: Final = 'topic_1_id'
-    TOPIC_2_ID: Final = 'topic_2_id'
-
-    def setUp(self) -> None:
-        super().setUp()
-        first_topic_summary_model = self.create_model(
-            topic_models.TopicSummaryModel,
-            id=self.TOPIC_1_ID,
-            name='topic summary',
-            canonical_name='topic summary',
-            language_code='cs',
-            description='description',
-            url_fragment='/fragm',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
-            canonical_story_count=0,
-            additional_story_count=0,
-            total_skill_count=0,
-            total_published_node_count=0,
-            uncategorized_skill_count=0,
-            subtopic_count=0,
-            version=1
-        )
-        first_topic_summary_model.update_timestamps()
-        first_topic_summary_model.put()
-
-        second_topic_summary_model = self.create_model(
-            topic_models.TopicSummaryModel,
-            id=self.TOPIC_2_ID,
-            name='topic summary',
-            canonical_name='topic summary',
-            language_code='cs',
-            description='description',
-            url_fragment='/fragm',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
-            canonical_story_count=0,
-            additional_story_count=0,
-            total_skill_count=0,
-            total_published_node_count=0,
-            uncategorized_skill_count=0,
-            subtopic_count=0,
-            version=1
-        )
-        second_topic_summary_model.update_timestamps()
-        second_topic_summary_model.put()
-
-        first_topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel,
-            id=self.TOPIC_1_ID,
-            topic_is_published=False
-        )
-        first_topic_rights_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
-        second_topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel,
-            id=self.TOPIC_2_ID,
-            topic_is_published=False
-        )
-        second_topic_rights_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-        mock_story_reference_schema_version = 2
-        # A mock method to update story references is being
-        # used since there are no higher versions for story reference
-        # schema. This should be removed when newer schema versions are
-        # added.
-        def mock_update_story_references_from_model(
-            unused_cls: Type[topic_domain.Topic],
-            versioned_story_references: topic_domain.VersionedStoryReferencesDict, # pylint: disable=line-too-long
-            current_version: int
-        ) -> None:
-            versioned_story_references['schema_version'] = current_version + 1
-
-        self.story_reference_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION',
-            mock_story_reference_schema_version)
-        self.update_story_reference_swap = self.swap(
-            topic_domain.Topic, 'update_story_references_from_model',
-            classmethod(mock_update_story_references_from_model))
+    QUESTION_1_ID: Final = 'question_1_id'
+    answer_group1 = {
+        'outcome': {
+            'dest': None,
+            'dest_if_really_stuck': None,
+            'feedback': {
+                'content_id': 'feedback_1',
+                'html': '<p>Feedback</p>'
+            },
+            'labelled_as_correct': True,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        },
+        'rule_specs': [{
+            'inputs': {
+                'x': 'a - b'
+            },
+            'rule_type': 'ContainsSomeOf'
+        }, {
+            'inputs': {
+                'x': 'a - b'
+            },
+            'rule_type': 'MatchesExactlyWith'
+        }, {
+            'inputs': {
+                'x': 'a - b'
+            },
+            'rule_type': 'OmitsSomeOf'
+        }, {
+            'inputs': {
+                'x': 'a - b',
+                'y': []
+            },
+            'rule_type': 'MatchesWithGeneralForm'
+        }],
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+    }
+    answer_group2 = {
+        'outcome': {
+            'dest': None,
+            'dest_if_really_stuck': None,
+            'feedback': {
+                'content_id': 'feedback_2',
+                'html': '<p>Feedback</p>'
+            },
+            'labelled_as_correct': True,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        },
+        'rule_specs': [{
+            'inputs': {
+                'x': 'a - b'
+            },
+            'rule_type': 'ContainsSomeOf'
+        }, {
+            'inputs': {
+                'x': 'a - b',
+                'y': []
+            },
+            'rule_type': 'MatchesWithGeneralForm'
+        }],
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+    }
+    question_state_dict = {
+        'content': {
+            'content_id': 'content',
+            'html': 'Question 1'
+        },
+        'recorded_voiceovers': {
+            'voiceovers_mapping': {
+                'content': {},
+                'explanation_1': {},
+                'feedback_1': {},
+                'default_outcome_2': {},
+                'hint_1': {}
+            }
+        },
+        'written_translations': {
+            'translations_mapping': {
+                'content': {},
+                'explanation_1': {},
+                'feedback_1': {},
+                'default_outcome_2': {},
+                'hint_1': {}
+            }
+        },
+        'interaction': {
+            'answer_groups': [answer_group1, answer_group2],
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'customOskLetters': {
+                    'value': ['a', 'b']
+                },
+                'useFractionForDivision': {
+                    'value': False
+                }
+            },
+            'default_outcome': {
+                'dest': None,
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'default_outcome_2',
+                    'html': 'Correct Answer'
+                },
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'labelled_as_correct': True,
+                'missing_prerequisite_skill_id': None
+            },
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': 'Hint 1'
+                }
+            }],
+            'solution': {
+                'correct_answer': 'x-y',
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'content_id': 'explanation_1',
+                    'html': 'Solution explanation'
+                }
+            },
+            'id': 'AlgebraicExpressionInput'
+        },
+        'next_content_id_index': 4,
+        'param_changes': [],
+        'solicit_answer_details': False,
+        'card_is_checkpoint': False,
+        'linked_skill_id': None,
+        'classifier_model_id': None
+    }
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_unmigrated_topic_with_unmigrated_prop_is_migrated(self) -> None:
-        with self.story_reference_schema_version_swap, self.update_story_reference_swap: # pylint: disable=line-too-long
-            unmigrated_topic_model = self.create_model(
-                topic_models.TopicModel,
-                id=self.TOPIC_1_ID,
-                name='topic title',
-                description='description',
-                canonical_name='topic title',
-                subtopic_schema_version=3,
-                story_reference_schema_version=1,
-                next_subtopic_id=1,
-                language_code='cs',
-                url_fragment='topic',
-                page_title_fragment_for_web='fragm',
-            )
-            unmigrated_topic_model.update_timestamps()
-            unmigrated_topic_model.commit(
-                feconf.SYSTEM_COMMITTER_ID,
-                'Create topic',
-                [{'cmd': topic_domain.CMD_CREATE_NEW}]
-            )
-
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stdout='TOPIC PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(
-                    stdout='TOPIC MIGRATED SUCCESS: 1'),
-            ])
-
-            migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
-            self.assertEqual(migrated_topic_model.version, 2)
-            self.assertEqual(
-                migrated_topic_model.subtopic_schema_version,
-                feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
-            self.assertEqual(
-                migrated_topic_model.story_reference_schema_version,
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
-
-    def test_topic_summary_of_unmigrated_topic_is_updated(self) -> None:
-        unmigrated_topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_1_ID,
-            name='topic title',
-            description='description',
-            canonical_name='topic title',
-            subtopic_schema_version=3,
-            story_reference_schema_version=1,
-            next_subtopic_id=1,
-            language_code='cs',
-            url_fragment='topic',
-            page_title_fragment_for_web='fragm',
+    def test_version_is_added_after_running_job(self) -> None:
+        unmigrated_question_model = self.create_model(
+            question_models.QuestionModel,
+            id=self.QUESTION_1_ID,
+            question_state_data=self.question_state_dict,
+            language_code='en',
+            version=-1,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=45)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        unmigrated_question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+        question_services.create_question_summary(self.QUESTION_1_ID)
+        question_summary_model = question_models.QuestionSummaryModel.get(
+            self.QUESTION_1_ID
         )
-        unmigrated_topic_model.update_timestamps()
-        unmigrated_topic_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(stdout='TOPIC MIGRATED SUCCESS: 1'),
-        ])
-        migrated_topic_summary_model = topic_models.TopicSummaryModel.get(
-            self.TOPIC_1_ID
-        )
-        self.assertEqual(migrated_topic_summary_model.version, 2)
-
-    def test_broken_topic_leads_to_no_migration(self) -> None:
-        first_unmigrated_topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_1_ID,
-            name='topic title',
-            canonical_name='topic title',
-            description='description',
-            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=1,
-            next_subtopic_id=1,
-            language_code='abc',
-            url_fragment='topic',
-            page_title_fragment_for_web='fragm',
-        )
-        first_unmigrated_topic_model.update_timestamps()
-        first_unmigrated_topic_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
-        second_unmigrated_topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_2_ID,
-            name='topic title',
-            canonical_name='topic title',
-            description='description',
-            subtopic_schema_version=3,
-            story_reference_schema_version=1,
-            next_subtopic_id=1,
-            language_code='cs',
-            url_fragment='topic',
-            page_title_fragment_for_web='fragm',
-        )
-        second_unmigrated_topic_model.update_timestamps()
-        second_unmigrated_topic_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
+        self.assertEqual(question_summary_model.version, 0)
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr=(
-                    'TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError('
-                    '\'Invalid language code: abc\''
-                    '))": 1'
-                )
-            ),
-            job_run_result.JobRunResult(
-                stdout='TOPIC PROCESSED SUCCESS: 1'
-            )
-        ])
-        first_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_1_ID)
-        self.assertEqual(first_migrated_topic_model.version, 1)
-
-        second_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_2_ID)
-        self.assertEqual(second_migrated_topic_model.version, 1)
-
-    def test_migrated_topic_is_not_migrated(self) -> None:
-        unmigrated_topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_1_ID,
-            name='topic title',
-            description='description',
-            canonical_name='topic title',
-            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=1,
-            next_subtopic_id=1,
-            language_code='cs',
-            url_fragment='topic',
-            page_title_fragment_for_web='fragm',
-        )
-        unmigrated_topic_model.update_timestamps()
-        unmigrated_topic_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
-            ),
+                stdout='QUESTION SUMMARY PROCESSED SUCCESS: 1'),
         ])
 
-        migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
-        self.assertEqual(migrated_topic_model.version, 1)
+        updated_summary_model = question_models.QuestionSummaryModel.get(
+            self.QUESTION_1_ID
+        )
+        self.assertEqual(updated_summary_model.version, 1)
 
 
-class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
+class AuditPopulateQuestionSummaryVersionOneOffJobTests(
+    job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
-        topic_migration_jobs.AuditTopicMigrateJob
-    ] = topic_migration_jobs.AuditTopicMigrateJob
+        question_migration_jobs.AuditPopulateQuestionSummaryVersionOneOffJob
+    ] = question_migration_jobs.AuditPopulateQuestionSummaryVersionOneOffJob
 
-    TOPIC_1_ID: Final = 'topic_1_id'
-    TOPIC_2_ID: Final = 'topic_2_id'
-
-    def setUp(self) -> None:
-        super().setUp()
-        first_topic_summary_model = self.create_model(
-            topic_models.TopicSummaryModel,
-            id=self.TOPIC_1_ID,
-            name='topic summary',
-            canonical_name='topic summary',
-            language_code='cs',
-            description='description',
-            url_fragment='/fragm',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
-            canonical_story_count=0,
-            additional_story_count=0,
-            total_skill_count=0,
-            total_published_node_count=0,
-            uncategorized_skill_count=0,
-            subtopic_count=0,
-            version=1
-        )
-        first_topic_summary_model.update_timestamps()
-        first_topic_summary_model.put()
-
-        second_topic_summary_model = self.create_model(
-            topic_models.TopicSummaryModel,
-            id=self.TOPIC_2_ID,
-            name='topic summary',
-            canonical_name='topic summary',
-            language_code='cs',
-            description='description',
-            url_fragment='/fragm',
-            topic_model_last_updated=datetime.datetime.utcnow(),
-            topic_model_created_on=datetime.datetime.utcnow(),
-            canonical_story_count=0,
-            additional_story_count=0,
-            total_skill_count=0,
-            total_published_node_count=0,
-            uncategorized_skill_count=0,
-            subtopic_count=0,
-            version=1
-        )
-        second_topic_summary_model.update_timestamps()
-        second_topic_summary_model.put()
-
-        first_topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel,
-            id=self.TOPIC_1_ID,
-            topic_is_published=False
-        )
-        first_topic_rights_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
-        second_topic_rights_model = self.create_model(
-            topic_models.TopicRightsModel,
-            id=self.TOPIC_2_ID,
-            topic_is_published=False
-        )
-        second_topic_rights_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-        mock_story_reference_schema_version = 2
-        # A mock method to update story references is being
-        # used since there are no higher versions for story reference
-        # schema. This should be removed when newer schema versions are
-        # added.
-        def mock_update_story_references_from_model(
-            unused_cls: Type[topic_domain.Topic],
-            versioned_story_references: topic_domain.VersionedStoryReferencesDict, # pylint: disable=line-too-long
-            current_version: int
-        ) -> None:
-            versioned_story_references['schema_version'] = current_version + 1
-
-        self.story_reference_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION',
-            mock_story_reference_schema_version)
-        self.update_story_reference_swap = self.swap(
-            topic_domain.Topic, 'update_story_references_from_model',
-            classmethod(mock_update_story_references_from_model))
+    QUESTION_1_ID: Final = 'question_1_id'
+    answer_group1 = {
+        'outcome': {
+            'dest': None,
+            'dest_if_really_stuck': None,
+            'feedback': {
+                'content_id': 'feedback_1',
+                'html': '<p>Feedback</p>'
+            },
+            'labelled_as_correct': True,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        },
+        'rule_specs': [{
+            'inputs': {
+                'x': 'a - b'
+            },
+            'rule_type': 'ContainsSomeOf'
+        }, {
+            'inputs': {
+                'x': 'a - b'
+            },
+            'rule_type': 'MatchesExactlyWith'
+        }, {
+            'inputs': {
+                'x': 'a - b'
+            },
+            'rule_type': 'OmitsSomeOf'
+        }, {
+            'inputs': {
+                'x': 'a - b',
+                'y': []
+            },
+            'rule_type': 'MatchesWithGeneralForm'
+        }],
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+    }
+    answer_group2 = {
+        'outcome': {
+            'dest': None,
+            'dest_if_really_stuck': None,
+            'feedback': {
+                'content_id': 'feedback_2',
+                'html': '<p>Feedback</p>'
+            },
+            'labelled_as_correct': True,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        },
+        'rule_specs': [{
+            'inputs': {
+                'x': 'a - b'
+            },
+            'rule_type': 'ContainsSomeOf'
+        }, {
+            'inputs': {
+                'x': 'a - b',
+                'y': []
+            },
+            'rule_type': 'MatchesWithGeneralForm'
+        }],
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+    }
+    question_state_dict = {
+        'content': {
+            'content_id': 'content',
+            'html': 'Question 1'
+        },
+        'recorded_voiceovers': {
+            'voiceovers_mapping': {
+                'content': {},
+                'explanation_1': {},
+                'feedback_1': {},
+                'default_outcome_2': {},
+                'hint_1': {}
+            }
+        },
+        'written_translations': {
+            'translations_mapping': {
+                'content': {},
+                'explanation_1': {},
+                'feedback_1': {},
+                'default_outcome_2': {},
+                'hint_1': {}
+            }
+        },
+        'interaction': {
+            'answer_groups': [answer_group1, answer_group2],
+            'confirmed_unclassified_answers': [],
+            'customization_args': {
+                'customOskLetters': {
+                    'value': ['a', 'b']
+                },
+                'useFractionForDivision': {
+                    'value': False
+                }
+            },
+            'default_outcome': {
+                'dest': None,
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'default_outcome_2',
+                    'html': 'Correct Answer'
+                },
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'labelled_as_correct': True,
+                'missing_prerequisite_skill_id': None
+            },
+            'hints': [{
+                'hint_content': {
+                    'content_id': 'hint_1',
+                    'html': 'Hint 1'
+                }
+            }],
+            'solution': {
+                'correct_answer': 'x-y',
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'content_id': 'explanation_1',
+                    'html': 'Solution explanation'
+                }
+            },
+            'id': 'AlgebraicExpressionInput'
+        },
+        'next_content_id_index': 4,
+        'param_changes': [],
+        'solicit_answer_details': False,
+        'card_is_checkpoint': False,
+        'linked_skill_id': None,
+        'classifier_model_id': None
+    }
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    def test_broken_topic_leads_to_no_migration(self) -> None:
-        first_unmigrated_topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_1_ID,
-            name='topic title',
-            canonical_name='topic title',
-            description='description',
-            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=1,
-            next_subtopic_id=1,
-            language_code='abc',
-            url_fragment='topic',
-            page_title_fragment_for_web='fragm',
-        )
-        first_unmigrated_topic_model.update_timestamps()
-        first_unmigrated_topic_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
-        second_unmigrated_topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_2_ID,
-            name='topic title',
-            canonical_name='topic title',
-            description='description',
-            subtopic_schema_version=3,
-            story_reference_schema_version=1,
-            next_subtopic_id=1,
-            language_code='cs',
-            url_fragment='topic',
-            page_title_fragment_for_web='fragm',
-        )
-        second_unmigrated_topic_model.update_timestamps()
-        second_unmigrated_topic_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
+    def test_check_models_after_running_job(self) -> None:
+        unmigrated_question_model = self.create_model(
+            question_models.QuestionModel,
+            id=self.QUESTION_1_ID,
+            question_state_data=self.question_state_dict,
+            language_code='en',
+            version=-1,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=45)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        unmigrated_question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+        question_services.create_question_summary(self.QUESTION_1_ID)
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr=(
-                    'TOPIC PROCESSED ERROR: "(\'topic_1_id\', ValidationError('
-                    '\'Invalid language code: abc\''
-                    '))": 1'
-                )
-            ),
-            job_run_result.JobRunResult(
-                stdout='TOPIC PROCESSED SUCCESS: 1'
-            )
+                stdout='QUESTION SUMMARY PROCESSED SUCCESS: 1'),
         ])
-        first_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_1_ID)
-        self.assertEqual(first_migrated_topic_model.version, 1)
-
-        second_migrated_topic_model = topic_models.TopicModel.get(
-            self.TOPIC_2_ID)
-        self.assertEqual(second_migrated_topic_model.version, 1)
-
-    def test_migrated_topic_is_not_migrated(self) -> None:
-        unmigrated_topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_1_ID,
-            name='topic title',
-            description='description',
-            canonical_name='topic title',
-            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=1,
-            next_subtopic_id=1,
-            language_code='cs',
-            url_fragment='topic',
-            page_title_fragment_for_web='fragm',
-        )
-        unmigrated_topic_model.update_timestamps()
-        unmigrated_topic_model.commit(
-            feconf.SYSTEM_COMMITTER_ID,
-            'Create topic',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}]
-        )
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
-            job_run_result.JobRunResult(
-                stdout='TOPIC PREVIOUSLY MIGRATED SUCCESS: 1'
-            ),
-        ])
-
-        migrated_topic_model = topic_models.TopicModel.get(self.TOPIC_1_ID)
-        self.assertEqual(migrated_topic_model.version, 1)

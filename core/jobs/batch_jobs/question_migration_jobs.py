@@ -20,25 +20,20 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
 from core.domain import question_domain
-from core.domain import question_fetchers
 from core.domain import question_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
-from core.jobs.transforms import results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Iterable, Sequence, Tuple
+from typing import Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
     from mypy_imports import question_models
 
 (base_models, question_models) = models.Registry.import_models([
@@ -54,14 +49,14 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
         question_summary_id: str,
         question_summary_model: question_models.QuestionSummaryModel
     ) -> result.Result[Tuple[str, question_domain.QuestionSummary],
-    Tuple[str, Exception]
+        Tuple[str, Exception]
     ]:
         """Transform question summary model into question summary object.
 
         Args:
             question_summary_id: str. The id of the question summary.
             question_summary_model: QuestionSummaryModel. The question model
-            to migrate.
+                to migrate.
 
         Returns:
             Result((str, QuestionSummary), (str, Exception)). Result containing
@@ -70,8 +65,11 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             migration was successful and Exception is returned otherwise.
         """
         try:
-            question_summary = question_services.get_question_summary_from_model(
-                question_summary_model)
+            question_summary = (
+                question_services.get_question_summary_from_model(
+                question_summary_model
+                )
+            )
             question_summary.validate()
         except Exception as e:
             logging.exception(e)
@@ -88,17 +86,17 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
 
         Args:
             question_summary: QuestionSummary. The question summary domain
-            object.
+                object.
             question_summary_model: QuestionSummaryModel. The question summary
-            model to update.
+                model to update.
 
         Returns:
             QuestionSummaryModel. The updated question summary model to put
             into the datastore.
         """
         question_summary_dict = {
-            'question_content': question_summary.question_content,
             'interaction_id': question_summary.interaction_id,
+            'question_content': question_summary.question_content,
             'question_model_last_updated': question_summary.last_updated,
             'question_model_created_on': question_summary.created_on,
             'misconception_ids': question_summary.misconception_ids,
@@ -153,17 +151,106 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
         )
+        question_objects_list = (
+            {
+                'question_summary': transformed_question_summary,
+                'question_summary_model': question_summary_models,
+            }
+            | 'Merge objects' >> beam.CoGroupByKey()
+            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+        )
 
+        question_objects = (
+            question_objects_list
+            | 'Reorganize the objects' >> beam.Map(lambda objects: {
+                    'question_summary': objects['question_summary'][0],
+                    'question_summary_model': objects[
+                        'question_summary_model'][0],
+                })
+        )
         question_summary_models_to_put = (
-            transformed_question_summary
-            | 'Generate question summary to put' >> beam.MapTuple(
-                self._update_question_summary
-            )
+            question_objects
+            | 'Generate question summary to put' >> beam.Map(
+                lambda question_objects: self._update_question_summary(
+                    question_objects['question_summary'],
+                    question_objects['question_summary_model']
+            ))
         )
 
         unused_put_results = (
             question_summary_models_to_put
             | 'Put models into datastore' >> ndb_io.PutModels()
+        )
+
+        return transformed_question_summary_job_run_results
+
+
+class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
+    """Job that audits PopulateQuestionSummaryVersionOneOffJob."""
+
+    @staticmethod
+    def _transform_question_summary(
+        question_summary_id: str,
+        question_summary_model: question_models.QuestionSummaryModel
+    ) -> result.Result[Tuple[str, question_domain.QuestionSummary],
+        Tuple[str, Exception]
+    ]:
+        """Transform question summary model into question summary object.
+
+        Args:
+            question_summary_id: str. The id of the question summary.
+            question_summary_model: QuestionSummaryModel. The question model
+                to migrate.
+
+        Returns:
+            Result((str, QuestionSummary), (str, Exception)). Result containing
+            tuple that consist of question ID and either question summary
+            object or Exception. Question summary object is returned when the
+            migration was successful and Exception is returned otherwise.
+        """
+        try:
+            question_summary = (
+                question_services.get_question_summary_from_model(
+                question_summary_model
+                )
+            )
+            question_summary.validate()
+        except Exception as e:
+            logging.exception(e)
+            return result.Err((question_summary_id, e))
+
+        return result.Ok((question_summary_id, question_summary))
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the question migration.
+
+        Returns:
+            PCollection. A PCollection of results from the question
+            migration.
+        """
+        question_summary_models = (
+            self.pipeline
+            | 'Get all non-deleted question summary models' >> (
+                ndb_io.GetModels(
+                    question_models.QuestionSummaryModel.get_all())
+                )
+            # Pylint disable is needed because pylint is not able to correctly
+            # detect that the value is passed through the pipe.
+            | 'Add question summary keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda question_summary_model: question_summary_model.id)
+        )
+
+        all_transformed_question_summary_results = (
+            question_summary_models
+            | 'Transform model' >> beam.MapTuple(
+                self._transform_question_summary)
+        )
+
+        transformed_question_summary_job_run_results = (
+            all_transformed_question_summary_results
+            | 'Generates results' >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'QUESTION SUMMARY PROCESSED'))
         )
 
         return transformed_question_summary_job_run_results
