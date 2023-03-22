@@ -59,7 +59,7 @@ class StartTests(test_utils.GenericTestBase):
         self.swap_print = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
         def mock_constants() -> None:
-            print("mock_constants")
+            print('mock_set_constants_to_default')
         # We need to create a swap for install_third_party_libs because
         # scripts/start.py installs third party libraries whenever it is
         # imported.
