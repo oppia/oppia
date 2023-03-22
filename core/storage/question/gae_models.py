@@ -768,7 +768,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     # ids in the question.
     misconception_ids = (
         datastore_services.StringProperty(indexed=True, repeated=True))
-    version = datastore_services.IntegerProperty(required=True)    
+    version = datastore_services.IntegerProperty(required=True)  
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
