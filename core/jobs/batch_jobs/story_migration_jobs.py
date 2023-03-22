@@ -58,8 +58,8 @@ datastore_services = models.Registry.import_datastore_services()
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
 class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
-    """Transform that gets all Story models, performs migration
-      and filters any error results.
+    """Transform that gets all Story models, performs migration and filters any
+    error results.
     """
 
     @staticmethod
@@ -75,8 +75,8 @@ class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
         Args:
             story_id: str. The id of the story.
             story_model: StoryModel. The story model to migrate.
-            topic_id_to_topic: dict(str, Topic). The mapping from topic ID
-                to topic.
+            topic_id_to_topic: dict(str, Topic). The mapping from topic ID to
+            topic.
 
         Returns:
             Result((str, Story), (str, Exception)). Result containing tuple that
@@ -109,8 +109,8 @@ class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
 
         Args:
             story_id: str. The id of the story.
-            story_model: StoryModel. The story for which to generate
-                the change objects.
+            story_model: StoryModel. The story for which to generate the change
+            objects.
 
         Yields:
             (str, StoryChange). Tuple containing story ID and story change
@@ -131,8 +131,7 @@ class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult]
     ]:
-        """Migrate story objects and flush the input
-            in case of errors.
+        """Migrate story objects and flush the input in case of errors.
 
         Args:
             pipeline: Pipeline. Input beam pipeline.
@@ -302,12 +301,12 @@ class MigrateStoryJob(base_jobs.JobBase):
 
         Args:
             migrated_story: Story. The migrated story domain object.
-            story_summary_model: StorySummaryModel. The story summary model
-                to update.
+            story_summary_model: StorySummaryModel. The story summary model to
+            update.
 
         Returns:
-            StorySummaryModel. The updated story summary model to put into
-            the datastore.
+            StorySummaryModel. The updated story summary model to put into the
+            datastore.
         """
         story_summary = story_services.compute_summary_of_story(migrated_story)
         story_summary.version += 1
@@ -363,12 +362,10 @@ class AuditStoryMigrationJob(base_jobs.JobBase):
     """Job that audits migrated Story models."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of results from the audit of story
-        migration.
+        """Returns a PCollection of results from the audit of story migration.
 
         Returns:
-            PCollection. A PCollection of results from the story
-            migration.
+            PCollection. A PCollection of results from the story migration.
         """
 
         unused_transformed_story_objects_list, job_run_results = (

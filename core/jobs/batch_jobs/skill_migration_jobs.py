@@ -55,8 +55,8 @@ datastore_services = models.Registry.import_datastore_services()
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
 class MigrateSkillModels(beam.PTransform):# type: ignore[misc]
-    """Transform that gets all Skill models, performs migration
-      and filters any error results.
+    """Transform that gets all Skill models, performs migration and filters
+    any error results.
     """
 
     @staticmethod
@@ -93,8 +93,8 @@ class MigrateSkillModels(beam.PTransform):# type: ignore[misc]
 
         Args:
             skill_id: str. The id of the skill.
-            skill_model: SkillModel. The skill for which to generate
-                the change objects.
+            skill_model: SkillModel. The skill for which to generate the change
+            objects.
 
         Yields:
             (str, SkillChange). Tuple containing skill ID and skill change
@@ -138,8 +138,7 @@ class MigrateSkillModels(beam.PTransform):# type: ignore[misc]
         beam.PCollection[base_models.BaseModel],
         beam.PCollection[job_run_result.JobRunResult]
     ]:
-        """Migrate skill objects and flush the input
-            in case of errors.
+        """Migrate skill objects and flush the input in case of errors.
 
         Args:
             pipeline: Pipeline. Input beam pipeline.
@@ -307,8 +306,8 @@ class MigrateSkillJob(base_jobs.JobBase):
 
         Args:
             migrated_skill: Skill. The migrated skill domain object.
-            skill_summary_model: SkillSummaryModel. The skill summary model
-                to update.
+            skill_summary_model: SkillSummaryModel. The skill summary model to
+            update.
 
         Returns:
             SkillSummaryModel. The updated skill summary model to put into
@@ -368,12 +367,10 @@ class AuditSkillMigrationJob(base_jobs.JobBase):
     """Job that audits migrated Skill models."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of results from the audit of skill
-        migration.
+        """Returns a PCollection of results from the audit of skill migration.
 
         Returns:
-            PCollection. A PCollection of results from the skill
-            migration.
+            PCollection. A PCollection of results from the skill migration.
         """
 
         unused_transformed_skill_objects_list, job_run_results = (
