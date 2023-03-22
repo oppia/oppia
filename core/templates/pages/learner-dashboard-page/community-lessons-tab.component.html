@@ -358,8 +358,15 @@
     <mat-card class="oppia-subscription-card oppia-subscription-container-list"
       *ngFor="let subscription of subscriptionsList">
       <a class="oppia-subscription-profile-link" href="/profile/{{ subscription.username }}" target="_blank" rel="noopener">
-        <img [src]="decodePngURIData(subscription.pictureDataUrl)"
-             class="oppia-subscription-card-profile-picture rounded-circle">
+        <picture>
+          <source type="image/webp"
+                  [srcset]="getProfileImageWebpDataUrl(subscription.username)">
+          <source type="image/png"
+                  [srcset]="getProfileImagePngDataUrl(subscription.username)">
+          <img class="oppia-subscription-card-profile-picture rounded-circle"
+               [src]="getProfileImagePngDataUrl(subscription.username)"
+               alt="User Avatar">
+        </picture>
         <span class="oppia-subscription-card-summary text-dark">
           <div class="oppia-subscription-name">
             <strong class="e2e-test-subscription-name"
