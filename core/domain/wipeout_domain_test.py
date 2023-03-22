@@ -64,6 +64,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
     ) -> None:
         """Tests the validate() function when pseudonymizable_entity_mappings
         is empty."""
+
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
                 self.user_id_a, 'username', 'a@example.com'))
