@@ -25,7 +25,7 @@ jobs:
           repository: oppia/release-scripts
           event-type: develop-commit
           client-payload: '{
-            "versions": "${{ env.VERSION }}",
+            "version": "${{ env.VERSION }}",
             "app_name": "oppiaserver-backup-migration",
             "maintenance_mode": "false",
             "sha": "${{ github.sha }}",
