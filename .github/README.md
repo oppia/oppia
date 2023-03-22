@@ -38,6 +38,7 @@ If you have any feature requests or bug reports, please log them on our [issue t
 
 Please report security issues directly to admin@oppia.org.
 
+Don't forget to leave a star ⭐️
 
 ## License
 
