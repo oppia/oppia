@@ -94,7 +94,7 @@ class MigrateSkillModels(beam.PTransform):# type: ignore[misc]
         Args:
             skill_id: str. The id of the skill.
             skill_model: SkillModel. The skill for which to generate the change
-            objects.
+                objects.
 
         Yields:
             (str, SkillChange). Tuple containing skill ID and skill change
@@ -307,7 +307,7 @@ class MigrateSkillJob(base_jobs.JobBase):
         Args:
             migrated_skill: Skill. The migrated skill domain object.
             skill_summary_model: SkillSummaryModel. The skill summary model to
-            update.
+                update.
 
         Returns:
             SkillSummaryModel. The updated skill summary model to put into

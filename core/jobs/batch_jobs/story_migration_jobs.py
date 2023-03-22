@@ -76,7 +76,7 @@ class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
             story_id: str. The id of the story.
             story_model: StoryModel. The story model to migrate.
             topic_id_to_topic: dict(str, Topic). The mapping from topic ID to
-            topic.
+                topic.
 
         Returns:
             Result((str, Story), (str, Exception)). Result containing tuple that
@@ -110,7 +110,7 @@ class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
         Args:
             story_id: str. The id of the story.
             story_model: StoryModel. The story for which to generate the change
-            objects.
+                objects.
 
         Yields:
             (str, StoryChange). Tuple containing story ID and story change
@@ -302,7 +302,7 @@ class MigrateStoryJob(base_jobs.JobBase):
         Args:
             migrated_story: Story. The migrated story domain object.
             story_summary_model: StorySummaryModel. The story summary model to
-            update.
+                update.
 
         Returns:
             StorySummaryModel. The updated story summary model to put into the
