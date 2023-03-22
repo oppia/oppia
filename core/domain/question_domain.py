@@ -1992,7 +1992,8 @@ class Question(translation_domain.BaseTranslatableObject):
         self.question_state_data.validate(
             {},
             False,
-            tagged_skill_misconception_id_required=True)
+            tagged_skill_misconception_id_required=True,
+            strict=True)
         self.validate_translatable_contents(self.next_content_id_index)
 
     def validate(self) -> None:
