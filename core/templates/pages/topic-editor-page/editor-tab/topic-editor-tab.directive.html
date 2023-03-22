@@ -248,9 +248,10 @@
               <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
             </a>
             <div class="edit-options-container">
-              <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn" 
+              <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn"
                  (click)="toggleUncategorizedSkillOptions($index)"
-                 *ngIf="topicRights.canEditTopic()"></i>
+                 *ngIf="topicRights.canEditTopic()">
+              </i>
             </div>
             <div class="uncategorized-skill-option-box"
                  *ngIf="uncategorizedEditOptionsIndex === $index"
