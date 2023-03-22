@@ -256,3 +256,15 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
+
+    def test_remove_topics_when_learner_goals_model_does_not_exist(self) -> None:
+        non_existent_user_id = 'non_existent_user_id'
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get(non_existent_user_id, strict=False)
+        )
+
+        # Ensure that the function does not raise any error when the
+        # learner_goals_model does not exist for the given user_id.
+        learner_goals_services.remove_topics_from_learn_goal(
+            non_existent_user_id, [self.TOPIC_ID_1]
+        )
