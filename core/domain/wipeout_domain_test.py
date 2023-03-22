@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
+from core import utils
 from core.domain import wipeout_domain
 from core.tests import test_utils
 
@@ -60,8 +60,8 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
             pending_deletion_request.validate()
 
     def test_validate_succeeds_for_empty_pseudonymizable_entity_mappings(
-            self
-        ) -> None:
+        self
+    ) -> None:
         """Tests the validate() function when pseudonymizable_entity_mappings
         is empty."""
         pending_deletion_request = (
