@@ -2272,7 +2272,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             interaction_id='TextInput',
             question_model_created_on=self.fake_date_created,
             question_model_last_updated=self.fake_date_updated,
-            misconception_ids=['skill1-1', 'skill2-2']
+            misconception_ids=['skill1-1', 'skill2-2'],
+            version=1
         )
 
     def test_to_dict(self) -> None:
@@ -2287,7 +2288,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
                 self.fake_date_updated),
             'created_on_msec': utils.get_time_in_millisecs(
                 self.fake_date_created),
-            'misconception_ids': ['skill1-1', 'skill2-2']
+            'misconception_ids': ['skill1-1', 'skill2-2'],
+            'version': 1
         }
 
         self.assertEqual(expected_object_dict, self.observed_object.to_dict())
