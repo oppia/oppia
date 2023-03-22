@@ -20,7 +20,6 @@ import { Component, OnDestroy, OnInit} from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogDashboardData, BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { LoaderService } from 'services/loader.service';
 import { Subscription } from 'rxjs';
@@ -29,6 +28,8 @@ import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UserService } from 'services/user.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 @Component({
   selector: 'oppia-blog-dashboard-page',
   templateUrl: './blog-dashboard-page.component.html'
@@ -40,20 +41,22 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   activeTab!: string;
   authorName!: string;
   authorBio!: string;
-  authorProfilePictureUrl!: string;
+  authorProfilePicPngUrl!: string;
+  authorProfilePicWebpUrl!: string;
   blogDashboardData!: BlogDashboardData;
+  username!: string | null;
   windowIsNarrow: boolean = false;
   activeView: string = 'gridView';
   directiveSubscriptions = new Subscription();
-  DEFAULT_PROFILE_PICTURE_URL: string = '';
   constructor(
     private alertsService: AlertsService,
     private blogDashboardBackendService: BlogDashboardBackendApiService,
     private blogDashboardPageService: BlogDashboardPageService,
     private loaderService: LoaderService,
-    private urlInterpolationService: UrlInterpolationService,
+    private userService: UserService,
     private ngbModal: NgbModal,
     private windowDimensionService: WindowDimensionsService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
@@ -83,18 +86,30 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  async getUserInfoAsync(): Promise<void> {
+    const userInfo = await this.userService.getUserInfoAsync();
+    this.username = userInfo.getUsername();
+    if (this.username !== null) {
+      [this.authorProfilePicPngUrl, this.authorProfilePicWebpUrl] = (
+        this.userService.getProfileImageDataUrl(this.username));
+    } else {
+      this.authorProfilePicWebpUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.authorProfilePicPngUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+    }
+  }
+
   initMainTab(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-      .getStaticImageUrl('/general/no_profile_picture.png');
+    this.getUserInfoAsync();
     this.blogDashboardBackendService.fetchBlogDashboardDataAsync().then(
       (dashboardData) => {
         this.blogDashboardData = dashboardData;
         this.authorName = dashboardData.displayedAuthorName;
         this.authorBio = dashboardData.authorBio;
-        this.authorProfilePictureUrl = decodeURIComponent((
-          // eslint-disable-next-line max-len
-          dashboardData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
         this.loaderService.hideLoadingScreen();
         if (this.authorBio.length === 0) {
           this.showAuthorDetailsEditor();
