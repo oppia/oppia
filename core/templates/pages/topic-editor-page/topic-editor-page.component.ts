@@ -20,6 +20,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { Topic } from 'domain/topic/topic-object.model';
+import { TopicRights } from 'domain/topic/topic-rights.model';
 import { Subscription } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { ContextService } from 'services/context.service';
@@ -39,6 +40,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   validationIssues: string[];
   prepublishValidationIssues: string[];
   warningsAreShown: boolean;
+  topicRights: TopicRights;
 
   constructor(
     private bottomNavbarStatusService: BottomNavbarStatusService,
@@ -200,6 +202,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
     this.prepublishValidationIssues = [];
     this.warningsAreShown = false;
     this.bottomNavbarStatusService.markBottomNavbarStatus(true);
+    this.topicRights = this.topicEditorStateService.getTopicRights();
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
         () => this.setDocumentTitle()

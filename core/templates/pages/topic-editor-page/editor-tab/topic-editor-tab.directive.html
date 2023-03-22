@@ -194,7 +194,7 @@
           <h3>Subtopics</h3>
           <button class="reassign-button e2e-test-reassign-skill-button"
                   (click)="reassignSkillsInSubtopics()"
-                  [disabled]="!topicRights.canEditTopic()">
+                  *ngIf="topicRights.canEditTopic()">
             REASSIGN
           </button>
           <i class="fa fa-caret-down"
@@ -223,7 +223,7 @@
         </div>
         <button class="btn add-subtopic-btn e2e-test-add-subtopic-button puppeteer-test-add-subtopic-button"
                 (click)="createSubtopic()"
-                [disabled]="!topicRights.canEditTopic()">
+                *ngIf="topicRights.canEditTopic()">
           + ADD SUBTOPIC
         </button>
         <button *ngIf="skillCreationIsAllowed"
@@ -248,79 +248,98 @@
               <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
             </a>
             <div class="edit-options-container">
-              <i class="fa fa-ellipsis-v" ng-click="toggleUncategorizedSkillOptions($index)"></i>
+              <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn" 
+                 (click)="toggleUncategorizedSkillOptions($index)"
+                 *ngIf="topicRights.canEditTopic()"></i>
             </div>
             <div class="uncategorized-skill-option-box"
-                 ng-if="uncategorizedEditOptionsIndex === $index"
-                 ng-mouseleave="toggleUncategorizedSkillOptions(null)"
-                 ng-click="toggleUncategorizedSkillOptions(null)">
-              <div class="uncategorized-skill-edit-option" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)">
-                <i class="fa fa-trash"></i>
+                 *ngIf="uncategorizedEditOptionsIndex === $index"
+                 (mouseleave)="toggleUncategorizedSkillOptions(null)"
+                 (click)="toggleUncategorizedSkillOptions(null)">
+              <div class="uncategorized-skill-edit-option" (click)="deleteUncategorizedSkillFromTopic(skillSummary)">
+                <i class="fa fa-trash" *ngIf="topicRights.canEditTopic()"></i>
                 <span>Remove from topic</span>
               </div>
-              <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="changeSubtopicAssignment(null, skillSummary)">
-                <i class="fa fa-plus"></i>
+              <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-subtopic" (click)="changeSubtopicAssignment(null, skillSummary)">
+                <i class="fa fa-plus" *ngIf="topicRights.canEditTopic()"></i>
                 <span>Assign to Subtopic</span>
               </div>
             </div>
           </div>
-          <div ng-repeat="subtopic in subtopics track by $index"
-               ng-init="subtopicIndex = $index"
-               dnd-list="subtopics"
-               dnd-dragstart="onRearrangeSubtopicStart($index)"
-               dnd-drop="onRearrangeSubtopicEnd($index)"
-               dnd-draggable="subtopic">
-            <div class="subtopics-list-item">
-              <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
-                <span class="clickable-item" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
-                  <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
-                  <span class="e2e-test-subtopic"><[subtopic.getTitle()]></span>
-                </span>
-                <div class="subtopic-edit-options-container edit-options-container">
-                  <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
-                  <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
-                  <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
-                    <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
-                    <span>Delete</span>
-                  </div>
-                </div>
-              </div>
-              <div ng-if="subtopicCardSelectedIndexes[subtopicIndex]">
-                <div ng-if="subtopic.getSkillSummaries().length">
-                  <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skills-list-item skill-description-container">
-                    <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                      <span class="clickable-item"><[skillSummary.getDescription()]></span>
-                    </a>
-                    <div class="edit-options-container">
-                      <span><[skillQuestionCountDict[skillSummary.getId()] ]></span>
-                      <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
-                    </div>
-                    <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)" ng-click="showSkillEditOptions(null)">
-                      <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
-                        <i class="fa fa-trash"></i>
-                        <span>Remove from subtopic</span>
-                      </div>
-                      <div class="skill-edit-option" ng-click="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
-                        <i class="fa fa-plus"></i>
-                        <span>Change Subtopic</span>
-                      </div>
-                      <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
-                        <i class="fa fa-trash"></i>
-                        <span>Remove from topic</span>
-                      </div>
+          <div cdkDropList
+               (cdkDropListDropped)="drop($event)">
+            <div *ngFor="let subtopic of subtopics;index as subtopicIndex"
+                cdkDrag>
+              <div class="subtopics-list-item">
+                <div class="subtopic-name-header subtopic-name-card-header" (click)="toggleSubtopicCard(subtopicIndex)">
+                  <span class="clickable-item" (click)="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
+                    <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
+                    <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
+                  </span>
+                  <div class="subtopic-edit-options-container edit-options-container">
+                    <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
+                    <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options"
+                       (click)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()"
+                       *ngIf="topicRights.canEditTopic()">
+                    </i>
+                    <div *ngIf="subtopicEditOptionsAreShown === subtopicIndex"
+                         class="subtopic-edit-options"
+                         (click)="deleteSubtopic(subtopic.getId())"
+                         (mouseleave)="showSubtopicEditOptions(null)">
+                      <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
+                      <span>Delete</span>
                     </div>
                   </div>
                 </div>
-                <div ng-if="!subtopic.getSkillSummaries().length">
-                  <span class="subtopic-skill">There are no skills associated to this subtopic.</span>
+                <div *ngIf="subtopicCardSelectedIndexes[subtopicIndex]">
+                  <div *ngIf="subtopic.getSkillSummaries().length">
+                    <div *ngFor="let skillSummary of subtopic.getSkillSummaries(); index as idx"
+                         class="subtopic-skill skills-list-item skill-description-container">
+                      <a [href]="getSkillEditorUrl(skillSummary.getId())"
+                         target="_blank"
+                         rel="noopener">
+                        <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
+                      </a>
+                      <div class="edit-options-container">
+                        <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
+                        <i class="fa fa-ellipsis-v"
+                           (click)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()"
+                           *ngIf="topicRights.canEditTopic()">
+                        </i>
+                      </div>
+                      <div class="skill-option-box"
+                           *ngIf="!skillOptionDialogueBox && selectedSkillEditOptionsIndex && selectedSkillEditOptionsIndex[subtopicIndex] && selectedSkillEditOptionsIndex[subtopicIndex][idx]"
+                           (mouseleave)="showSkillEditOptions()"
+                           (click)="showSkillEditOptions()">
+                        <div class="skill-edit-option"
+                             (click)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
+                          <i class="fa fa-trash"></i>
+                          <span>Remove from subtopic</span>
+                        </div>
+                        <div class="skill-edit-option"
+                             (click)="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
+                          <i class="fa fa-plus"></i>
+                          <span>Change Subtopic</span>
+                        </div>
+                        <div class="skill-edit-option remove-from-topic-option"
+                             (click)="removeSkillFromTopic(subtopic.getId(), skillSummary)">
+                          <i class="fa fa-trash"></i>
+                          <span>Remove from topic</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="!subtopic.getSkillSummaries().length">
+                    <span class="subtopic-skill">There are no skills associated to this subtopic.</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </md-card>
-    <md-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
+    </mat-card>
+    <mat-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
       <div class="item-list-card-header oppia-mobile-collapsible-card-header"
            (click)="togglePreviewListCards()">
         <h3>Diagnostic test</h3>
@@ -348,11 +367,12 @@
               {{skill.getDescription()}}
             </span>
             <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
-                    ng-click="removeSkillFromDiagnosticTest(skill)"
-                    md-button
-                    md-icon-button
-                    aria-label="Clear">
-              <md-icon>close</md-icon>
+                    (click)="removeSkillFromDiagnosticTest(skill)"
+                    mat-button
+                    mat-icon-button
+                    aria-label="Clear"
+                    *ngIf="topicRights.canEditTopic()">
+              <mat-icon>close</mat-icon>
             </button>
           </div>
         </mat-list-item>
@@ -370,19 +390,20 @@
           <button class="oppia-remove-diagnostic-test-skill-button"
                   mat-button mat-icon-button
                   aria-label="Clear"
-                  (click)="removeDiagnosticTestSkillDropdown()">
+                  (click)="removeDiagnosticTestSkillDropdown()"
+                  *ngIf="topicRights.canEditTopic()">
             <mat-icon>close</mat-icon>
           </button>
         </mat-list-item>
       </mat-list>
       <button class="oppia-add-diagnostic-test-skills-button e2e-test-add-diagnostic-test-skill"
-              md-button
-              ng-click="presentDiagnosticTestSkillDropdown()"
-              ng-show="!diagnosticTestSkillsDropdownIsShown"
-              ng-disabled="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
+              mat-button
+              (click)="presentDiagnosticTestSkillDropdown()"
+              [hidden]="diagnosticTestSkillsDropdownIsShown"
+              [disabled]="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
         <div class="oppia-flex">
-          <mat-icon aria-label="icon-button with a plus icon">add_circle</mat-icon>
-          <h4 class="oppia-button-text">Add diagnostic test skill</h4>
+          <mat-icon aria-label="icon-button with a plus icon" *ngIf="topicRights.canEditTopic()">add_circle</mat-icon>
+          <h4 class="oppia-button-text" *ngIf="topicRights.canEditTopic()">Add diagnostic test skill</h4>
         </div>
       </button>
       <div class="oppia-diagnostic-test-card-note">
@@ -416,7 +437,7 @@
         <button class="btn add-story-btn e2e-test-create-story-button oppia-autofocus"
                 (click)="createCanonicalStory()"
                 [oppiaFocusOn]="addStoryBtn"
-                [disabled]="!topicRights.canEditTopic()">
+                *ngIf="topicRights.canEditTopic()">
           + ADD STORY
         </button>
         <div class="canonical-stories">

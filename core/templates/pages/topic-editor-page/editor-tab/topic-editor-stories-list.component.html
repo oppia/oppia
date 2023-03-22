@@ -34,7 +34,7 @@
       </td>
       <td>
         <a (click)="deleteCanonicalStory(summary.getId())" class="list-summary text-center">
-          <span class="fas fa-trash-alt" ng-if="topicRights.canEditTopic()"></span>
+          <span class="fas fa-trash-alt" *ngIf="topicRights.canEditTopic()"></span>
         </a>
       </td>
     </tr>
