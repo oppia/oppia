@@ -94,6 +94,8 @@ describe('Topic Editor Routing Service', () => {
   });
 
   it('should return last visited subtopic id', () => {
+    ters.updateViewEventEmitter.emit();
+
     ters.navigateToSubtopicPreviewTab(1);
     ters.navigateToQuestionsTab();
     expect(ters.getLastSubtopicIdVisited()).toEqual(1);

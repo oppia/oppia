@@ -16,8 +16,8 @@
  * @fileoverview Component for the contributor dashboard page.
  */
 
+import { AppConstants } from 'app.constants';
 import { Component, OnInit } from '@angular/core';
-import { SafeUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -41,7 +41,8 @@ export class ContributorDashboardPageComponent
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   defaultHeaderVisible!: boolean;
-  profilePictureDataUrl!: SafeUrl | string;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
   userInfoIsLoading!: boolean;
   userIsLoggedIn!: boolean;
   userIsReviewer!: boolean;
@@ -187,19 +188,24 @@ export class ContributorDashboardPageComponent
 
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userInfoIsLoading = false;
+      this.profilePictureWebpDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+      this.profilePicturePngDataUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       if (userInfo.isLoggedIn()) {
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
+        if (this.username !== null) {
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+            this.userService.getProfileImageDataUrl(this.username));
+        }
       } else {
         this.userIsLoggedIn = false;
         this.username = '';
       }
     });
-
-    this.userService.getProfileImageDataUrlAsync().then(
-      (dataUrl) => {
-        this.profilePictureDataUrl = decodeURIComponent(dataUrl);
-      });
 
     this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((topicNames) => {

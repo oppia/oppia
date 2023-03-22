@@ -272,11 +272,14 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertIsInstance(random_string, str)
         self.assertEqual(len(random_string), 12)
 
-    def test_convert_png_data_url_to_binary_with_incorrect_prefix(self) -> None:
+    def test_convert_data_url_to_binary_with_incorrect_prefix(
+        self
+    ) -> None:
         with self.assertRaisesRegex(
-            Exception, 'The given string does not represent a PNG data URL'
+            Exception, 'The given string does not represent a png data URL'
         ):
-            utils.convert_png_data_url_to_binary('data:image/jpg;base64,')
+            utils.convert_data_url_to_binary(
+                'data:image/jpg;base64,', 'png')
 
     def test_get_thumbnail_icon_url_for_category(self) -> None:
         self.assertEqual(
@@ -805,24 +808,25 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
         self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])
 
-    def test_convert_png_data_url_to_binary(self) -> None:
+    def test_convert_data_url_to_binary(self) -> None:
         image_data_url = '%s%s' % (
             utils.PNG_DATA_URL_PREFIX,
             urllib.parse.quote(base64.b64encode(b'test123'))
         )
 
         self.assertEqual(
-            utils.convert_png_data_url_to_binary(image_data_url), b'test123')
+            utils.convert_data_url_to_binary(
+                image_data_url, 'png'), b'test123')
 
-    def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(
+    def test_convert_data_url_to_binary_raises_if_prefix_is_missing(
             self
     ) -> None:
         image_data_url = urllib.parse.quote(base64.b64encode(b'test123'))
 
         with self.assertRaisesRegex(
-            Exception, 'The given string does not represent a PNG data URL.'
+            Exception, 'The given string does not represent a png data URL.'
         ):
-            utils.convert_png_data_url_to_binary(image_data_url)
+            utils.convert_data_url_to_binary(image_data_url, 'png')
 
     def test_quoted_string(self) -> None:
         self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')
@@ -959,10 +963,10 @@ class UtilsTests(test_utils.GenericTestBase):
             filepath_webp, raw_bytes=True, mode='rb')
         return (file_contents_png, file_contents_webp)
 
-    def test_convert_png_or_webp_binary_to_data_url(self) -> None:
+    def test_convert_image_binary_to_data_url(self) -> None:
         file_contents_png, file_contents_webp = self._get_png_and_webp_image()
-        self.assertEqual(utils.convert_png_or_webp_binary_to_data_url(file_contents_png, 'png'), 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D')  # pylint: disable=line-too-long
-        self.assertEqual(utils.convert_png_or_webp_binary_to_data_url(file_contents_webp, 'webp'), 'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA') # pylint: disable=line-too-long
+        self.assertEqual(utils.convert_image_binary_to_data_url(file_contents_png, 'png'), 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAGCAIAAACAbBMhAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAySURBVBhXY/iPDYBEV6xY0draCuFDAEgUKMTAANUEUYFuAkQFihIIGwigosiG/P//HwD5HmjphyAmJQAAAABJRU5ErkJggg%3D%3D')  # pylint: disable=line-too-long
+        self.assertEqual(utils.convert_image_binary_to_data_url(file_contents_webp, 'webp'), 'data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoHAAYAAgA0JaQAAv%2B5x9YuAAD%2B%2B0nD9oP5zmavp/Nyl8%2Bf/REL9weER482Ugrc/6dmq28Kx1pj/se/CsMAAAAA') # pylint: disable=line-too-long
 
     def test_raise_error_invalid_convert_webp_binary_to_data_url(
         self
@@ -971,7 +975,7 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'The given string does not represent a webp image.'
         ):
-            utils.convert_png_or_webp_binary_to_data_url(
+            utils.convert_image_binary_to_data_url(
                 file_contents_png, 'webp')
 
     def test_get_exploration_components_from_dir_with_yaml_content(self) -> None: # pylint: disable=line-too-long
