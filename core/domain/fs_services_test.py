@@ -332,3 +332,12 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
         self.assertTrue(self.fs.isfile('job_id-classifier-data.pb.xz'))
         fs_services.delete_classifier_data('exp_id', 'job_id')
         self.assertFalse(self.fs.isfile('job_id-classifier-data.pb.xz'))
+
+    def test_delete_non_existent_classifier_data(self) -> None:
+        """Test that delete_classifier_data does not raise an error when trying
+        to delete non-existent classifier data.
+        """
+        filepath = 'job_id_2-classifier-data.pb.xz'
+        self.assertFalse(self.fs.isfile(filepath))
+        fs_services.delete_classifier_data('exp_id', 'job_id_2')
+        self.assertFalse(self.fs.isfile(filepath))
