@@ -96,7 +96,6 @@ describe('Creator Dashboard backend API service', () => {
       total_plays: 1
     },
     subscribers_list: [{
-      subscriber_picture_data_url: 'path/to/img',
       subscriber_username: 'username',
       subscriber_impact: 0
     }],
