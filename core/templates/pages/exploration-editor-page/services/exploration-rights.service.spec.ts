@@ -36,7 +36,6 @@ describe('Exploration rights service', () => {
   let clearWarningsSpy: jasmine.Spy;
   let successHandler: jasmine.Spy;
   let failHandler: jasmine.Spy;
-  let alertsService: AlertsService;
   let serviceData: ExplorationRightsBackendData = {
     rights: {
       owner_names: ['abc'],

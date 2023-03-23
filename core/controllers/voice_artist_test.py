@@ -444,7 +444,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_cannot_assign_voice_artist_to_invalid_user(self) -> None:
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
-            'username': "invalid"
+            'username': 'invalid'
         }
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
