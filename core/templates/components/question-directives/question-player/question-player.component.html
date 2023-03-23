@@ -12,7 +12,7 @@
             matTooltipClass="oppia-mat-tooltip-list">
         Beta
       </span>
-      <div [hidden]="!(totalQuestions > 0)">
+      <div tabindex="0" [hidden]="!(totalQuestions > 0)">
         <h3 class="oppia-question-player-header">Question {{currentQuestion}}/{{totalQuestions}}</h3>
         <div class="oppia-question-player-progress">
           <div class="current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
