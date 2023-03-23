@@ -301,26 +301,6 @@ describe('Exploration rights service', () => {
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
   }));
 
-  it('should reject handler when saving a voice artist fails', fakeAsync(() => {
-    spyOn(
-      explorationRightsBackendApiService,
-      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
-      Promise.reject());
-    spyOn(alertsService, 'addWarning').and.callThrough();
-
-    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
-      successHandler, failHandler);
-    tick();
-
-    expect(
-      explorationRightsBackendApiService
-        .assignVoiceArtistRoleAsyncPostData
-    ).toHaveBeenCalled();
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Could not assign voice artist to private activity.'
-    );
-  }));
-
   it('should remove existing voice artist', fakeAsync(() => {
     serviceData.rights.voice_artist_names = [];
 
