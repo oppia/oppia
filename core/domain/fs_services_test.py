@@ -216,7 +216,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         # Get the content of the image after attempting the second save.
         new_saved_image_content = fs.get('image/%s' % self.FILENAME)
 
-        # Check that the content of the image remains the same after the second save attempt.
+        # Check that the content of the image remains the same after the second
+        # save attempt.
         self.assertEqual(saved_image_content, new_saved_image_content)
 
     def test_compress_image_on_prod_mode_with_small_image_size(self) -> None:
