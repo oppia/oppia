@@ -189,6 +189,37 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
         self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
+    def test_save_original_and_compressed_versions_of_image_non_existent_files(self) -> None:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            original_image_content = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
+
+        # Delete the files if they exist
+        if fs.isfile('image/%s' % self.FILENAME):
+            fs.delete('image/%s' % self.FILENAME)
+        if fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME):
+            fs.delete('image/%s' % self.COMPRESSED_IMAGE_FILENAME)
+        if fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME):
+            fs.delete('image/%s' % self.MICRO_IMAGE_FILENAME)
+
+        # Test if the functions return false when the files don't exist
+        self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
+        self.assertFalse(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+        self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+        # Call save_original_and_compressed_versions_of_image to save the files
+        fs_services.save_original_and_compressed_versions_of_image(
+            self.FILENAME, 'exploration', self.EXPLORATION_ID,
+            original_image_content, 'image', True)
+
+        # Test if the functions return true after saving the files
+        self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
+        self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+        self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
     def test_compress_image_on_prod_mode_with_small_image_size(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
