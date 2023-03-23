@@ -53,7 +53,6 @@ describe('Exploration rights service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        AlertsService,
         {
           provide: ExplorationDataService,
           useValue: {
@@ -83,7 +82,6 @@ describe('Exploration rights service', () => {
     clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
-    alertsService = TestBed.inject(AlertsService);
   });
 
   afterEach(() => {
