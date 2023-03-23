@@ -24,11 +24,10 @@ import sys
 
 from typing import Final, List, Optional, Tuple
 
-from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
-
-from core.constants import constants  # isort:skip
-from scripts import build  # isort:skip
-from scripts import servers  # isort:skip
+from core.constants import constants
+from scripts import common
+from scripts import build
+from scripts import servers
 
 GOOGLE_APP_ENGINE_PORT: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
