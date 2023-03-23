@@ -22,12 +22,12 @@ import os
 import subprocess
 import sys
 
-from typing import Final, List, Optional, Tuple
-
 from core.constants import constants
-from scripts import common
 from scripts import build
+from scripts import common
 from scripts import servers
+
+from typing import Final, List, Optional, Tuple
 
 GOOGLE_APP_ENGINE_PORT: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
