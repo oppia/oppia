@@ -36,7 +36,6 @@ describe('Exploration rights service', () => {
   let clearWarningsSpy: jasmine.Spy;
   let successHandler: jasmine.Spy;
   let failHandler: jasmine.Spy;
-  // Let alertsService: AlertsService;
   let serviceData: ExplorationRightsBackendData = {
     rights: {
       owner_names: ['abc'],
@@ -54,7 +53,6 @@ describe('Exploration rights service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        // AlertsService,
         {
           provide: ExplorationDataService,
           useValue: {
@@ -73,7 +71,6 @@ describe('Exploration rights service', () => {
     ers = TestBed.inject(ExplorationRightsService);
     explorationDataService = TestBed.inject(ExplorationDataService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    // AlertsService = TestBed.inject(AlertsService);
     explorationRightsBackendApiService =
       TestBed.inject(ExplorationRightsBackendApiService);
   });
