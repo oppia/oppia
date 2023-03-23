@@ -36,6 +36,7 @@ describe('Exploration rights service', () => {
   let clearWarningsSpy: jasmine.Spy;
   let successHandler: jasmine.Spy;
   let failHandler: jasmine.Spy;
+  // Let alertsService: AlertsService;
   let serviceData: ExplorationRightsBackendData = {
     rights: {
       owner_names: ['abc'],
@@ -53,6 +54,7 @@ describe('Exploration rights service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
+        // AlertsService,
         {
           provide: ExplorationDataService,
           useValue: {
@@ -71,6 +73,7 @@ describe('Exploration rights service', () => {
     ers = TestBed.inject(ExplorationRightsService);
     explorationDataService = TestBed.inject(ExplorationDataService);
     httpTestingController = TestBed.inject(HttpTestingController);
+    // AlertsService = TestBed.inject(AlertsService);
     explorationRightsBackendApiService =
       TestBed.inject(ExplorationRightsBackendApiService);
   });
@@ -318,6 +321,22 @@ describe('Exploration rights service', () => {
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(ers.voiceArtistNames).toEqual([]);
+  }));
+
+  it('should reject handler when saving a voice artist fails', fakeAsync(() => {
+    spyOn(
+      explorationRightsBackendApiService,
+      'assignVoiceArtistRoleAsyncPostData').and.returnValue(
+      Promise.reject());
+
+    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
+      successHandler, failHandler);
+    tick();
+
+    expect(
+      explorationRightsBackendApiService
+        .assignVoiceArtistRoleAsyncPostData
+    ).toHaveBeenCalled();
   }));
 
   it('should check user already has roles', () => {
