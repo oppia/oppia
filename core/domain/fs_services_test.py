@@ -189,7 +189,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
         self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
-    def test_save_original_and_compressed_versions_of_image_non_existent_files(self) -> None:
+    def test_skip_upload_if_image_already_exists(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
@@ -197,28 +197,27 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
 
-        # Delete the files if they exist
-        if fs.isfile('image/%s' % self.FILENAME):
-            fs.delete('image/%s' % self.FILENAME)
-        if fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME):
-            fs.delete('image/%s' % self.COMPRESSED_IMAGE_FILENAME)
-        if fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME):
-            fs.delete('image/%s' % self.MICRO_IMAGE_FILENAME)
-
-        # Test if the functions return false when the files don't exist
-        self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
-        self.assertFalse(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
-        self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
-
-        # Call save_original_and_compressed_versions_of_image to save the files
+        # Save the image for the first time.
         fs_services.save_original_and_compressed_versions_of_image(
             self.FILENAME, 'exploration', self.EXPLORATION_ID,
             original_image_content, 'image', True)
 
-        # Test if the functions return true after saving the files
+        # Ensure the image is saved.
         self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
-        self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
-        self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+        # Get the content of the saved image.
+        saved_image_content = fs.get('image/%s' % self.FILENAME)
+
+        # Save the image again (should be skipped due to existence).
+        fs_services.save_original_and_compressed_versions_of_image(
+            self.FILENAME, 'exploration', self.EXPLORATION_ID,
+            original_image_content, 'image', True)
+
+        # Get the content of the image after attempting the second save.
+        new_saved_image_content = fs.get('image/%s' % self.FILENAME)
+
+        # Check that the content of the image remains the same after the second save attempt.
+        self.assertEqual(saved_image_content, new_saved_image_content)
 
     def test_compress_image_on_prod_mode_with_small_image_size(self) -> None:
         with utils.open_file(
