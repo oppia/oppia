@@ -194,7 +194,7 @@
           <h3>Subtopics</h3>
           <button class="reassign-button e2e-test-reassign-skill-button"
                   (click)="reassignSkillsInSubtopics()"
-                  [disabled]="!topicRights.canEditTopic()">
+                  *ngIf="topicRights.canEditTopic()">
             REASSIGN
           </button>
           <i class="fa fa-caret-down"
@@ -223,7 +223,7 @@
         </div>
         <button class="btn add-subtopic-btn e2e-test-add-subtopic-button puppeteer-test-add-subtopic-button"
                 (click)="createSubtopic()"
-                [disabled]="!topicRights.canEditTopic()">
+                *ngIf="topicRights.canEditTopic()">
           + ADD SUBTOPIC
         </button>
         <button *ngIf="skillCreationIsAllowed"
@@ -248,18 +248,21 @@
               <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
             </a>
             <div class="edit-options-container">
-              <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn" (click)="toggleUncategorizedSkillOptions($index)"></i>
+              <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn"
+                 (click)="toggleUncategorizedSkillOptions($index)"
+                 *ngIf="topicRights.canEditTopic()">
+              </i>
             </div>
             <div class="uncategorized-skill-option-box"
                  *ngIf="uncategorizedEditOptionsIndex === $index"
                  (mouseleave)="toggleUncategorizedSkillOptions(null)"
                  (click)="toggleUncategorizedSkillOptions(null)">
               <div class="uncategorized-skill-edit-option" (click)="deleteUncategorizedSkillFromTopic(skillSummary)">
-                <i class="fa fa-trash"></i>
+                <i class="fa fa-trash" *ngIf="topicRights.canEditTopic()"></i>
                 <span>Remove from topic</span>
               </div>
               <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-subtopic" (click)="changeSubtopicAssignment(null, skillSummary)">
-                <i class="fa fa-plus"></i>
+                <i class="fa fa-plus" *ngIf="topicRights.canEditTopic()"></i>
                 <span>Assign to Subtopic</span>
               </div>
             </div>
@@ -277,7 +280,8 @@
                   <div class="subtopic-edit-options-container edit-options-container">
                     <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
                     <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options"
-                       (click)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()">
+                       (click)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()"
+                       *ngIf="topicRights.canEditTopic()">
                     </i>
                     <div *ngIf="subtopicEditOptionsAreShown === subtopicIndex"
                          class="subtopic-edit-options"
@@ -300,7 +304,8 @@
                       <div class="edit-options-container">
                         <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
                         <i class="fa fa-ellipsis-v"
-                           (click)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()">
+                           (click)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()"
+                           *ngIf="topicRights.canEditTopic()">
                         </i>
                       </div>
                       <div class="skill-option-box"
@@ -366,7 +371,8 @@
                     (click)="removeSkillFromDiagnosticTest(skill)"
                     mat-button
                     mat-icon-button
-                    aria-label="Clear">
+                    aria-label="Clear"
+                    *ngIf="topicRights.canEditTopic()">
               <mat-icon>close</mat-icon>
             </button>
           </div>
@@ -385,7 +391,8 @@
           <button class="oppia-remove-diagnostic-test-skill-button"
                   mat-button mat-icon-button
                   aria-label="Clear"
-                  (click)="removeDiagnosticTestSkillDropdown()">
+                  (click)="removeDiagnosticTestSkillDropdown()"
+                  *ngIf="topicRights.canEditTopic()">
             <mat-icon>close</mat-icon>
           </button>
         </mat-list-item>
@@ -396,8 +403,8 @@
               [hidden]="diagnosticTestSkillsDropdownIsShown"
               [disabled]="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
         <div class="oppia-flex">
-          <mat-icon aria-label="icon-button with a plus icon">add_circle</mat-icon>
-          <h4 class="oppia-button-text">Add diagnostic test skill</h4>
+          <mat-icon aria-label="icon-button with a plus icon" *ngIf="topicRights.canEditTopic()">add_circle</mat-icon>
+          <h4 class="oppia-button-text" *ngIf="topicRights.canEditTopic()">Add diagnostic test skill</h4>
         </div>
       </button>
       <div class="oppia-diagnostic-test-card-note">
@@ -431,7 +438,7 @@
         <button class="btn add-story-btn e2e-test-create-story-button oppia-autofocus"
                 (click)="createCanonicalStory()"
                 [oppiaFocusOn]="addStoryBtn"
-                [disabled]="!topicRights.canEditTopic()">
+                *ngIf="topicRights.canEditTopic()">
           + ADD STORY
         </button>
         <div class="canonical-stories">
