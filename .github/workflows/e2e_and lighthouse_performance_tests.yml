@@ -124,7 +124,7 @@ jobs:
             requirements_dev.txt
       - name: Check if build artifact still exists
         id: check_build_artifact
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           script: |
             const artifacts = await github.actions.listWorkflowRunArtifacts({
