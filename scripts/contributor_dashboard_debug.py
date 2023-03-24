@@ -138,7 +138,7 @@ class ContributorDashboardDebugInitializer:
 
     def _sign_up_on_firebase(
         self, email: str, password: str
-    ) -> str | None:
+    ) -> str:
         """Signs up on Firebase, and returns the token id."""
         token_id = requests.post(
             FIREBASE_SIGN_UP_URL,
@@ -149,7 +149,7 @@ class ContributorDashboardDebugInitializer:
             }
         ).json()['idToken']
 
-        return str(token_id) if token_id else None
+        return str(token_id)
 
     def _sign_in(self, email: str) -> None:
         """Begins a session with the given email, i.e. log in with the email."""
@@ -159,7 +159,7 @@ class ContributorDashboardDebugInitializer:
 
     def _sign_in_on_firebase(
         self, email: str, password: str
-    ) -> str | None:
+    ) -> str:
         """Signs in on Firebase, and returns the token id."""
         token_id = requests.post(
             FIREBASE_SIGN_IN_URL,
@@ -170,7 +170,7 @@ class ContributorDashboardDebugInitializer:
             }
         ).json()['idToken']
 
-        return str(token_id) if token_id else None
+        return str(token_id)
 
     def _begin_session(self, token_id: str | None) -> None:
         """Begins a session with the given token id."""
@@ -268,7 +268,7 @@ class ContributorDashboardDebugInitializer:
 
 
 def main() -> None:
-    """Populates data for contributor dashboard debug."""
+    """Populates data for contributor dashboard debugging."""
     initializer = (
         ContributorDashboardDebugInitializer(
             base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER
