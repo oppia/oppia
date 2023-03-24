@@ -104,17 +104,18 @@ export class GraphInputValidationService {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
               message: (
-                'The graph used in the rule ' + (j + 1) + ' in group ' +
-                (i + 1) + ' exceeds supported maximum number of vertices ' +
-                'of ' + ISOMORPHISM_VERTICES_LIMIT +
-                ' for isomorphism check.')
+                'The graph used in the learner answer ' + (j + 1) +
+                ' in Oppia response ' + (i + 1) +
+                ' exceeds supported maximum number of vertices ' + 'of ' +
+                ISOMORPHISM_VERTICES_LIMIT + ' for isomorphism check.')
             });
           } else if (gInputs.vertices.length > this.VERTICES_LIMIT) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
               message: (
-                'The graph used in the rule ' + (j + 1) + ' in group ' +
-                (i + 1) + ' exceeds supported maximum number of vertices ' +
+                'The graph used in the learner answer ' + (j + 1) +
+                ' in Oppia response ' + (i + 1) +
+                ' exceeds supported maximum number of vertices ' +
                 'of ' + this.VERTICES_LIMIT + '.')
             });
           }
@@ -122,7 +123,7 @@ export class GraphInputValidationService {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.CRITICAL,
             message: (
-              'The rule ' + (j + 1) + ' in group ' + (i + 1) +
+              'Learner answer ' + (j + 1) + ' in Oppia response ' + (i + 1) +
               ' is invalid.')
           });
         }
