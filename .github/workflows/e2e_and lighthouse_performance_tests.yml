@@ -123,28 +123,38 @@ jobs:
             requirements_dev.in
             requirements_dev.txt
       - name: Check if build artifact still exists
-        uses: xSAVIKx/artifact-exists-action@v0
         id: check_build_artifact
+        uses: actions/github-script@v3
         with:
-          name: 'build_files'
-      - if: "!steps.check_build_artifact.outputs.exists"
+          script: |
+            const artifacts = await github.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.run_id }},
+            });
+            const buildFilesArtifact = artifacts.data.find(a => a.name === 'build_files');
+            console.log('Build Artifact' + (buildFilesArtifact ? 'exists.' : 'does not exist.'));
+            core.setOutput('build_artifact_exists', buildFilesArtifact)
+        }
+      token: ${{ secrets.GITHUB_TOKEN }}
+      - if: ${{ !steps.check_build_artifact.outputs.exists }}
         uses: ./.github/actions/install-oppia-dependencies
       - name: (Artifact re-build) Install chrome
-        if: "!steps.check_build_artifact.outputs.exists"
+        if: ${{ !steps.check_build_artifact.outputs.exists }}
         run: python -m scripts.install_chrome_for_ci
       - name: (Artifact re-build) Install ffmpeg
-        if: "!steps.check_build_artifact.outputs.exists"
+        if: ${{ !steps.check_build_artifact.outputs.exists }}
         run: sudo apt install ffmpeg
       - name: (Artifact re-build) Build Webpack
-        if: "!steps.check_build_artifact.outputs.exists"
+        if: ${{ !steps.check_build_artifact.outputs.exists }}
         run: python -m scripts.build --prod_env
       - name: (Artifact re-build) Zip build files
-        if: "!steps.check_build_artifact.outputs.exists"
+        if: ${{ !steps.check_build_artifact.outputs.exists }}
         run: |
           zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
         working-directory: /home/runner/work/oppia
       - name: (Artifact re-build) Upload build files 
-        if: "!steps.check_build_artifact.outputs.exists"
+        if: ${{ !steps.check_build_artifact.outputs.exists }}
         uses: actions/upload-artifact@v3
         with:
           name: build_files
@@ -186,8 +196,10 @@ jobs:
         shell: bash
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
+        if: ${{ !steps.check_build_artifact.outputs.exists }}
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
+        if: ${{ !steps.check_build_artifact.outputs.exists }}
         run: sudo apt install ffmpeg
       - name: Run E2E Test ${{ matrix.suite }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
