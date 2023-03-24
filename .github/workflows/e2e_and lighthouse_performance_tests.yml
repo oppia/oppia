@@ -135,7 +135,6 @@ jobs:
             const buildFilesArtifact = artifacts.data.find(a => a.name === 'build_files');
             console.log('Build Artifact' + (buildFilesArtifact ? 'exists.' : 'does not exist.'));
             core.setOutput('build_artifact_exists', buildFilesArtifact)
-        }
       token: ${{ secrets.GITHUB_TOKEN }}
       - if: ${{ !steps.check_build_artifact.outputs.exists }}
         uses: ./.github/actions/install-oppia-dependencies
