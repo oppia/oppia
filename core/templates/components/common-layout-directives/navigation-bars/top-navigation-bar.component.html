@@ -55,7 +55,6 @@
             class="nav-item  oppia-navbar-clickable-dropdown e2e-test-home-oppia-list-item">
           <a (keydown)="onMenuKeypress($event, 'homeMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab"
-             role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              aria-hidden="false"
@@ -76,7 +75,6 @@
           <a ngbDropdownToggle
              (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle learn-tab"
-             role="menuitem"
              aria-haspopup="true"
              aria-expanded="false"
              aria-hidden="false"
