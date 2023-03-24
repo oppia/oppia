@@ -122,18 +122,6 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - uses: ./.github/actions/merge
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: /home/runner/work/oppia/yarn_cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
       - name: Check if build artifact still exists
         uses: xSAVIKx/artifact-exists-action@v0
         id: check_build_artifact
@@ -162,6 +150,18 @@ jobs:
           name: build_files
           path: /home/runner/work/oppia/build_files.zip
           retention-days: 1
+      - uses: ./.github/actions/merge
+      - name: Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: /home/runner/work/oppia/yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - name: Download build files artifact
         uses: actions/download-artifact@v3
         with:
