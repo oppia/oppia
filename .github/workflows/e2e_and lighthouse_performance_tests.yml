@@ -134,7 +134,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Check if build artifact exists
+      - name: Check if build artifact stil lexists
         id: check_build_artifact
         uses: actions/github-script@v3
         with:
