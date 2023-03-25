@@ -25,9 +25,8 @@ import sys
 from core.constants import constants
 from scripts import build
 from scripts import common
+from scripts import run_e2e_tests
 from scripts import servers
-from scripts.run_e2e_tests import build_js_files
-from scripts.run_e2e_tests import is_oppia_server_already_running
 
 from typing import Final, List, Optional, Tuple
 
@@ -73,7 +72,7 @@ _PARSER.add_argument(
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
-    if is_oppia_server_already_running():
+    if run_e2e_tests.is_oppia_server_already_running():
         sys.exit(1)
 
     with contextlib.ExitStack() as stack:
@@ -82,7 +81,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         if args.skip_build:
             build.modify_constants(prod_env=args.prod_env)
         else:
-            build_js_files(dev_mode, source_maps=args.source_maps)
+            run_e2e_tests.build_js_files(dev_mode, source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
