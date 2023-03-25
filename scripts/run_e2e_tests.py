@@ -188,7 +188,7 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start end-to-end tests."""
-    if is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
+    if is_oppia_server_already_running():
         sys.exit(1)
 
     install_third_party_libraries(args.skip_install)
