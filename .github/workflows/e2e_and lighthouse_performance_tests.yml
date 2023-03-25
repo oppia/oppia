@@ -127,6 +127,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const fs = require("fs");
             const name = "/home/runner/work/oppia/build_files.zip"
             
             try {
