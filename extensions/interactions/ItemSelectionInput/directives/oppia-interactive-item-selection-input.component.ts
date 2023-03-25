@@ -160,7 +160,9 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     // Deselect previously selected option.
     var selectedElement = (
       document.querySelector(
-        'button.multiple-choice-option.selected'));
+        'button.multiple-choice-option.selected'
+      )
+    );
     if (selectedElement) {
       selectedElement.classList.remove('selected');
     }

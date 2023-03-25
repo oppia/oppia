@@ -39,8 +39,7 @@ class ItemSelectionInput(base.BaseInteraction):
     # Radio buttons get unselected when specifying a solution. This needs to be
     # fixed before solution feature can support this interaction.
     can_have_solution: bool = False
-    # ItemSelectionInput's submit button is dynamic and is handled
-    # separately.
+    # ItemSelectionInput interaction must contain a generic submit button.
     show_generic_submit_button: bool = True
 
     _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{

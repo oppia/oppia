@@ -221,7 +221,6 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       };
       component.choices = ['choice 1', 'choice 2'];
       component.choicesValue = [
-        SubtitledHtml.createDefault('choice 1', 'content_id_1'),
         SubtitledHtml.createDefault('choice 1', 'content_id_1')
       ];
 
