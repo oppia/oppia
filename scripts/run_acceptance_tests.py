@@ -25,11 +25,9 @@ import sys
 from core.constants import constants
 from scripts import build
 from scripts import common
-from scripts.run_e2e_tests import (
-    is_oppia_server_already_running,
-    run_webpack_compilation,
-    build_js_files)
 from scripts import servers
+from scripts.run_e2e_tests import build_js_files
+from scripts.run_e2e_tests import is_oppia_server_already_running
 
 from typing import Final, List, Optional, Tuple
 
@@ -75,7 +73,7 @@ _PARSER.add_argument(
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
-    if is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
+    if is_oppia_server_already_running():
         sys.exit(1)
 
     with contextlib.ExitStack() as stack:

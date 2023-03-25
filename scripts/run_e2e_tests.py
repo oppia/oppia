@@ -109,15 +109,9 @@ MOBILE_SUITES = [
 ]
 
 
-def is_oppia_server_already_running(
-    PORTS_USED_BY_OPPIA_PROCESSES: List[int]
-) -> bool:
+def is_oppia_server_already_running() -> bool:
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
-
-    Args:
-        PORTS_USED_BY_OPPIA_PROCESSES: list(int). List of addresses to check if
-            being used by another processes.
 
     Returns:
         bool. Whether there is a running Oppia instance.
@@ -127,8 +121,7 @@ def is_oppia_server_already_running(
             print(
                 'There is already a server running on localhost:%s. '
                 'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port
-            )
+                'Exiting.' % port)
             return True
     return False
 
