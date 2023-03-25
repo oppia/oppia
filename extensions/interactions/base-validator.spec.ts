@@ -131,7 +131,7 @@ describe('Interaction validator', function() {
         var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
         expect(warnings).toEqual([{
           type: WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in answer group 2.'
+          message: 'Please specify what Oppia should do in Oppia response 2.'
         }]);
       }
     );
@@ -201,10 +201,10 @@ describe('Interaction validator', function() {
         badAnswerGroups, badOutcome, currentState);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Please specify what Oppia should do in answer group 2.'
+        message: 'Please specify what Oppia should do in Oppia response 2.'
       }, {
         type: WARNING_TYPES.ERROR,
-        message: 'Please specify what Oppia should do in answer group 3.'
+        message: 'Please specify what Oppia should do in Oppia response 3.'
       }, {
         type: WARNING_TYPES.ERROR,
         message: (

@@ -283,7 +283,6 @@ describe('Blog Post Page Root', () => {
       let sampleBlogPostPageData: BlogPostPageData = {
         authorUsername: 'test_username',
         blogPostDict: sampleBlogPost,
-        profilePictureDataUrl: 'sample-url',
         summaryDicts: [],
       };
       spyOn(blogHomePageBackendApiService, 'fetchBlogPostPageDataAsync')
