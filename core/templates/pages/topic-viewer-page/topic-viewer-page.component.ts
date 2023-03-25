@@ -80,6 +80,23 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     private translateService: TranslateService
   ) {}
 
+  ACTION_OPEN!: string;
+  ACTION_CLOSE!: string;
+  KEYBOARD_EVENT_TO_KEY_CODES!: {
+    enter: {
+        shiftKeyIsPressed: boolean;
+        keyCode: number;
+        };
+    tab: {
+        shiftKeyIsPressed: boolean;
+        keyCode: number;
+        };
+    shiftTab: {
+      shiftKeyIsPressed: boolean;
+      keyCode: number;
+      };
+    };
+
   ngOnInit(): void {
     if (this.urlService.getPathname().endsWith('revision')) {
       this.activeTab = 'subtopics';

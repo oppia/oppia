@@ -1,0 +1,10 @@
+use_python() {
+  local python_root=$(pyenv root)/versions/$1
+  load_prefix "$python_root"
+  if [[ -x "$python_root/bin/python" ]]; then
+    layout python "$python_root/bin/python"
+  else
+    echo "Error: $python_root/bin/python can't be executed."
+    exit
+  fi
+}
