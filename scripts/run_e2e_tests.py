@@ -109,9 +109,15 @@ MOBILE_SUITES = [
 ]
 
 
-def is_oppia_server_already_running() -> bool:
+def is_oppia_server_already_running(
+    PORTS_USED_BY_OPPIA_PROCESSES: List[int]
+) -> bool:
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
+
+    Args:
+        PORTS_USED_BY_OPPIA_PROCESSES: list(int). List of addresses to check if
+            being used by another processes.
 
     Returns:
         bool. Whether there is a running Oppia instance.
@@ -121,7 +127,8 @@ def is_oppia_server_already_running() -> bool:
             print(
                 'There is already a server running on localhost:%s. '
                 'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port)
+                'Exiting.' % port
+            )
             return True
     return False
 
@@ -188,7 +195,7 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start end-to-end tests."""
-    if common.is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
+    if is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
         sys.exit(1)
 
     install_third_party_libraries(args.skip_install)

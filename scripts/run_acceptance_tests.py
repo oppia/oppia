@@ -25,6 +25,10 @@ import sys
 from core.constants import constants
 from scripts import build
 from scripts import common
+from scripts.run_e2e_tests import (
+    is_oppia_server_already_running,
+    run_webpack_compilation,
+    build_js_files)
 from scripts import servers
 
 from typing import Final, List, Optional, Tuple
@@ -69,59 +73,9 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def run_webpack_compilation(source_maps: bool = False) -> None:
-    """Runs webpack compilation.
-
-    Args:
-        source_maps: bool. Whether to compile with source maps.
-    """
-    max_tries = 5
-    webpack_bundles_dir_name = 'webpack_bundles'
-
-    for _ in range(max_tries):
-        try:
-            managed_webpack_compiler = (
-                servers.managed_webpack_compiler(use_source_maps=source_maps))
-            with managed_webpack_compiler as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
-            return
-        if os.path.isdir(webpack_bundles_dir_name):
-            break
-    else:
-        # We didn't break out of the loop, meaning all attempts have failed.
-        print('Failed to complete webpack compilation, exiting...')
-        sys.exit(1)
-
-
-def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
-    """Build the javascript files.
-
-    Args:
-        dev_mode: bool. Represents whether to run the related commands in dev
-            mode.
-        source_maps: bool. Represents whether to use source maps while
-            building webpack.
-    """
-    if not dev_mode:
-        print('Generating files for production mode...')
-
-        build_args = ['--prod_env']
-        if source_maps:
-            build_args.append('--source_maps')
-        build.main(args=build_args)
-
-    else:
-        build.main(args=[])
-        common.run_ng_compilation()
-        run_webpack_compilation(source_maps=source_maps)
-
-
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
-    if common.is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
+    if is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
         sys.exit(1)
 
     with contextlib.ExitStack() as stack:
