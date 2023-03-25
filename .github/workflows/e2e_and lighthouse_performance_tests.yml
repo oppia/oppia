@@ -127,14 +127,32 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const artifacts = await github.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: ${{ github.run_id }},
-            });
-            const buildFilesArtifact = artifacts.data.find(a => a.name === 'build_files');
-            console.log('Build Artifact' + (buildFilesArtifact ? 'exists.' : 'does not exist.'));
-            core.setOutput('build_artifact_exists', buildFilesArtifact)
+            const core = require("@actions/core");
+            const artifact = require("@actions/artifact");
+            const fs = require("fs");
+            const name = "/home/runner/work/oppia/build_files.zip"
+            
+            try {
+              const tempArtifactPath = fs.mkdtempSync("artifactExists") + `/${name}`;
+              const artifactClient = artifact.create();
+              const downloadOptions = {
+                createArtifactFolder: false,
+              };
+              try {
+                const downloadResponse = await artifactClient.downloadArtifact(
+                  name,
+                  tempArtifactPath,
+                  downloadOptions
+                );
+                core.info(`Artifact ${downloadResponse.artifactName} exists.`);
+                core.setOutput("exists", true);
+              } catch (err) {
+                core.info(`Artifact ${name} does not exist.`);
+                core.setOutput("exists", false);
+              }
+            } catch (err) {
+              core.setFailed(err.message);
+            }
       - if: ${{ !steps.check_build_artifact.outputs.exists }}
         uses: ./.github/actions/install-oppia-dependencies
       - name: (Artifact re-build) Install chrome
