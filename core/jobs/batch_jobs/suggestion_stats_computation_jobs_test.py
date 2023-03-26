@@ -22,7 +22,6 @@ import datetime
 
 from core import feconf
 from core.constants import constants
-from core.domain import change_domain
 from core.domain import exp_domain
 from core.domain import question_domain
 from core.domain import skill_domain
@@ -39,7 +38,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import Dict, Final, List, Mapping, Set, Tuple, Type, Union
+from typing import Dict, Final, List, Set, Tuple, Type, Union
 
 MYPY = False
 if MYPY:
@@ -428,7 +427,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.contribution_dates,
             [datetime.datetime.utcnow().date()]
         )
-        
+
         self.assertEqual(
             translation_review_stats_model.language_code, self.LANG_1)
         self.assertEqual(
@@ -466,7 +465,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         self.save_new_skill(
             skill_id, self.author_id, description='description')
         return skill_id
-    
+
     def _create_valid_question_data(
         self,
         default_dest_state_name: str,
@@ -543,7 +542,8 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         """
         skill_id = skill_services.get_new_skill_id()
         skill = (
-            skill_domain.Skill.create_default_skill(skill_id, 'description', []))
+            skill_domain.Skill.create_default_skill(
+                skill_id, 'description', []))
         skill.rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
@@ -596,7 +596,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
-        
+
         content_id_generator = translation_domain.ContentIdGenerator()
         state = self._create_valid_question_data(
             'default_state', content_id_generator)
@@ -649,10 +649,10 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
                 'reviewer_1'))
 
-        self.assertEquals(
+        self.assertEqual(
             len(question_stats_models), 1
         )
-        self.assertEquals(
+        self.assertEqual(
             len(question_review_stats_models), 1
         )
 
@@ -688,7 +688,8 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(question_review_stats_model.topic_id, topic_id)
         self.assertEqual(
             question_review_stats_model.reviewed_questions_count, 1)
-        self.assertEqual(question_review_stats_model.accepted_questions_count, 1)
+        self.assertEqual(
+            question_review_stats_model.accepted_questions_count, 1)
         self.assertEqual(
             question_review_stats_model
             .accepted_questions_with_reviewer_edits_count,
@@ -805,7 +806,9 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create(entry_stats)
             | beam.CombinePerKey(
-                suggestion_stats_computation_jobs.CombineTranslationContributionStats())
+                suggestion_stats_computation_jobs
+                .CombineTranslationContributionStats()
+            )
             | beam.Values()  # pylint: disable=no-value-for-parameter
             | beam.Map(lambda stats: stats.to_dict())
         )

@@ -3562,35 +3562,35 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
         )
 
-        self.assertEquals(
+        self.assertEqual(
             default_review_stats.language_code,
             self.LANGUAGE_CODE
         )
-        self.assertEquals(
+        self.assertEqual(
             default_review_stats.contributor_user_id,
             self.CONTRIBUTOR_USER_ID
         )
-        self.assertEquals(
+        self.assertEqual(
             default_review_stats.topic_id,
             self.TOPIC_ID
         )
-        self.assertEquals(
+        self.assertEqual(
             default_review_stats.reviewed_translations_count,
             0
         )
-        self.assertEquals(
+        self.assertEqual(
             default_review_stats.reviewed_translation_word_count,
             0
         )
-        self.assertEquals(
+        self.assertEqual(
             default_review_stats.accepted_translations_count,
             0
         )
-        self.assertEquals(
+        self.assertEqual(
             default_review_stats.accepted_translation_word_count,
             0
         )
-        self.assertEquals(
+        self.assertEqual(
             default_review_stats.accepted_translations_with_reviewer_edits_count,
             0
         )
@@ -3644,23 +3644,23 @@ class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        self.assertEquals(
+        self.assertEqual(
             default_stats.contributor_user_id,
             self.CONTRIBUTOR_USER_ID
         )
-        self.assertEquals(
+        self.assertEqual(
             default_stats.topic_id,
             self.TOPIC_ID
         )
-        self.assertEquals(
+        self.assertEqual(
             default_stats.submitted_questions_count,
             0
         )
-        self.assertEquals(
+        self.assertEqual(
             default_stats.accepted_questions_count,
             0
         )
-        self.assertEquals(
+        self.assertEqual(
             default_stats.accepted_questions_without_reviewer_edits_count,
             0
         )
@@ -3711,23 +3711,23 @@ class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        self.assertEquals(
+        self.assertEqual(
             default_stats.contributor_user_id,
             self.CONTRIBUTOR_USER_ID
         )
-        self.assertEquals(
+        self.assertEqual(
             default_stats.topic_id,
             self.TOPIC_ID
         )
-        self.assertEquals(
+        self.assertEqual(
             default_stats.reviewed_questions_count,
             0
         )
-        self.assertEquals(
+        self.assertEqual(
             default_stats.accepted_questions_count,
             0
         )
-        self.assertEquals(
+        self.assertEqual(
             default_stats.accepted_questions_with_reviewer_edits_count,
             0
         )

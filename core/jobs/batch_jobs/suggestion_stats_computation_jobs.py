@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import datetime
-import time
 
 from core import feconf
 from core.domain import exp_domain
@@ -29,7 +28,6 @@ from core.domain import opportunity_services
 from core.domain import skill_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
-from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -50,8 +48,8 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(opportunity_models, suggestion_models, topic_models) = models.Registry.import_models([
-    models.Names.OPPORTUNITY, models.Names.SUGGESTION, models.Names.TOPIC
+(opportunity_models, suggestion_models) = models.Registry.import_models([
+    models.Names.OPPORTUNITY, models.Names.SUGGESTION
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -90,9 +88,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
                 ))
-            | 'Transform to submitted suggestion domain object' >> beam.Map(
-                suggestion_services.get_suggestion_from_model)
-            | 'Group submitted suggestions by target' >> beam.GroupBy(lambda m: m.target_id)
+            | 'Transform to submitted suggestion domain object' >> (
+                beam.Map(suggestion_services.get_suggestion_from_model))
+            | 'Group submitted suggestions by target' >> (
+                beam.GroupBy(lambda m: m.target_id))
         )
         reviewed_translation_suggestions_grouped_by_target = (
             non_deleted_suggestion_models
@@ -107,7 +106,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 ))
             | 'Transform to reviewed suggestion domain object' >> beam.Map(
                 suggestion_services.get_suggestion_from_model)
-            | 'Group reviewed suggestions by target' >> beam.GroupBy(lambda m: m.target_id)
+            | 'Group reviewed suggestions by target' >> (
+                beam.GroupBy(lambda m: m.target_id))
         )
         question_suggestions_grouped_by_target = (
             non_deleted_suggestion_models
@@ -116,9 +116,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_ADD_QUESTION
                 ))
-            | 'Transform to submitted question suggestion domain object' >> beam.Map(
-                suggestion_services.get_suggestion_from_model)
-            | 'Group submitted question suggestions by target' >> beam.GroupBy(lambda m: m.target_id)
+            | 'Transform to submitted question suggestion domain object' >> (
+                beam.Map(suggestion_services.get_suggestion_from_model))
+            | 'Group submitted question suggestions by target' >> (
+                beam.GroupBy(lambda m: m.target_id))
         )
         question_reviews_grouped_by_target = (
             non_deleted_suggestion_models
@@ -131,9 +132,11 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         or m.status == suggestion_models.STATUS_REJECTED
                     )
                 ))
-            | 'Transform to reviewed question suggestion domain object' >> beam.Map(
-                suggestion_services.get_suggestion_from_model)
-            | 'Group reviewed question suggestions by target' >> beam.GroupBy(lambda m: m.target_id)
+            | 'Transform to reviewed question suggestion domain object' >> (
+                beam.Map(suggestion_services.get_suggestion_from_model)
+            )
+            | 'Group reviewed question suggestions by target' >> (
+                beam.GroupBy(lambda m: m.target_id))
         )
 
         exp_opportunities = (
@@ -148,15 +151,18 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         )
         skill_opportunities = (
             self.pipeline
-            | 'Get all non-deleted skill opportunity models' >> ndb_io.GetModels(
-                opportunity_models.SkillOpportunityModel.get_all(
-                    include_deleted=False))
+            | 'Get all non-deleted skill opportunity models' >> (
+                ndb_io.GetModels(
+                    opportunity_models.SkillOpportunityModel.get_all(
+                        include_deleted=False)
+                )
+            )
             | 'Transform to skill opportunity domain object' >> beam.Map(
                 opportunity_services.
                 get_skill_opportunity_from_model)
             | 'Group skill opportunity by ID' >> beam.GroupBy(lambda m: m.id)
         )
-        
+
         exp_opportunity_to_submitted_suggestions = (
             {
                 'suggestion': translation_suggestions_grouped_by_target,
@@ -167,7 +173,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         )
         exp_opportunity_to_reviewed_submitted_suggestions = (
             {
-                'suggestion': reviewed_translation_suggestions_grouped_by_target,
+                'suggestion': (
+                    reviewed_translation_suggestions_grouped_by_target),
                 'opportunity': exp_opportunities
             }
             | 'Merge reviewed models' >> beam.CoGroupByKey()
@@ -237,7 +244,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack contribution result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
-            | 'Combine the contribution stats' >> beam.CombinePerKey(CombineTranslationContributionStats())
+            | 'Combine the contribution stats' >> (
+                beam.CombinePerKey(CombineTranslationContributionStats()))
             | 'Generate contribution models from stats' >> beam.MapTuple(
                 self._generate_translation_contribution_model)
         )
@@ -247,7 +255,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack review result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
-            | 'Combine the review stats' >> beam.CombinePerKey(CombineTranslationReviewStats())
+            | 'Combine the review stats' >> (
+                beam.CombinePerKey(CombineTranslationReviewStats()))
             | 'Generate review models from stats' >> beam.MapTuple(
                 self._generate_translation_review_model)
         )
@@ -257,7 +266,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack question contribution result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
-            | 'Combine the question contribution stats' >> beam.CombinePerKey(CombineQuestionContributionStats())
+            | 'Combine the question contribution stats' >> (
+                beam.CombinePerKey(CombineQuestionContributionStats()))
             | 'Generate question contribution models from stats' >> beam.MapTuple(
                 self._generate_question_contribution_model)
         )
@@ -267,7 +277,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack question review result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
-            | 'Combine the question review stats' >> beam.CombinePerKey(CombineQuestionReviewStats())
+            | 'Combine the question review stats' >> (
+                beam.CombinePerKey(CombineQuestionReviewStats()))
             | 'Generate question review models from stats' >> beam.MapTuple(
                 self._generate_question_review_model)
         )
@@ -323,11 +334,13 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         )
         unused_question_contribution_put_result = (
             user_question_contribution_stats_models
-            | 'Put question contribution models into the datastore' >> ndb_io.PutModels()
+            | 'Put question contribution models into the datastore' >> (
+                ndb_io.PutModels())
         )
         unused_question_review_put_result = (
             user_question_review_stats_models
-            | 'Put question review models into the datastore' >> ndb_io.PutModels()
+            | 'Put question review models into the datastore' >> (
+                ndb_io.PutModels())
         )
 
         user_stats_models_job_run_results = (
@@ -387,7 +400,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 TranslationReviewStatsModel. A reference to the model which the
                 stats are generated.
 
-
         Yields:
             tuple(str, Dict(str, *)). Tuple of key and suggestion stats dict.
             The stats dictionary has four fields:
@@ -428,7 +440,9 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         translation_domain.TranslatableContentFormat
                         .is_data_format_list(change.data_format)
                 ):
-                    content_items: Union[str, List[str]] = change.translation_html
+                    content_items: Union[
+                        str, List[str]
+                    ] = change.translation_html
                 else:
                     content_items = [change.translation_html]
 
@@ -812,7 +826,8 @@ class CombineTranslationReviewStats(beam.CombineFn):  # type: ignore[misc]
             accumulator.reviewed_translations_count + 1,
             accumulator.reviewed_translation_word_count + word_count,
             accumulator.accepted_translations_count + int(is_accepted),
-            accumulator.accepted_translation_word_count + word_count * int(is_accepted),
+            accumulator.accepted_translation_word_count + word_count * int(
+                is_accepted),
             (
                 accumulator.accepted_translations_with_reviewer_edits_count +
                 int(is_accepted_and_edited)
