@@ -642,12 +642,22 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(stdout='SUCCESS: 1')
         ])
 
-        question_stats_model = (
-            suggestion_models.QuestionContributionStatsModel.get(
-                'author_1', topic_id))
-        question_review_stats_model = (
-            suggestion_models.QuestionReviewStatsModel.get(
-                'reviewer_1', topic_id))
+        question_stats_models = (
+            suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(
+                'author_1'))
+        question_review_stats_models = (
+            suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
+                'reviewer_1'))
+
+        self.assertEquals(
+            len(question_stats_models), 1
+        )
+        self.assertEquals(
+            len(question_review_stats_models), 1
+        )
+
+        question_stats_model = question_stats_models[0]
+        question_review_stats_model = question_review_stats_models[0]
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_stats_model is not None
@@ -795,7 +805,7 @@ class CombineStatsTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create(entry_stats)
             | beam.CombinePerKey(
-                suggestion_stats_computation_jobs.CombineStats())
+                suggestion_stats_computation_jobs.CombineTranslationContributionStats())
             | beam.Values()  # pylint: disable=no-value-for-parameter
             | beam.Map(lambda stats: stats.to_dict())
         )

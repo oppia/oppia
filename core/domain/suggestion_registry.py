@@ -1472,12 +1472,12 @@ class TranslationContributionStats:
         """Create default translation contribution stats.
 
         Args:
-            language_code: str. The language code for which are these stats
+            language_code: str. The language code for which these stats
                 generated.
             contributor_user_id: str. User ID of the contributor to which
                 these stats belong.
-            topic_id: str. ID of the topic for which were
-                the translations created.
+            topic_id: str. ID of the topic for which the translations
+                were created.
 
         Returns:
             TranslationContributionStats. Default translation contribution
@@ -1616,12 +1616,12 @@ class TranslationReviewStats:
         """Create default translation review stats.
 
         Args:
-            language_code: str. The language code for which are these stats
+            language_code: str. The language code for which these stats
                 generated.
             reviewer_user_id: str. User ID of the reviewer to which
                 these stats belong.
-            topic_id: str. ID of the topic for which were
-                the translations created.
+            topic_id: str. ID of the topic for which the translations
+                were created.
 
         Returns:
             TranslationContributionStats. Default translation contribution
@@ -1741,8 +1741,8 @@ class QuestionContributionStats:
         Args:
             contributor_user_id: str. User ID of the contributor to which
                 these stats belong.
-            topic_id: str. ID of the topic for which were
-                the translations created.
+            topic_id: str. ID of the topic for which the translations
+                were created.
 
         Returns:
             QuestionContributionStats. Default question contribution

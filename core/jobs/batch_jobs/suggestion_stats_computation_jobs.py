@@ -57,8 +57,8 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class TranslationStatsDict(TypedDict):
-    """Type for the translation contributions stats dictionary."""
+class ContributionStatsDict(TypedDict):
+    """Type for the contribution stats dictionary."""
 
     suggestion_status: str
     edited_by_reviewer: bool
@@ -190,59 +190,59 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Get rid of key of reviewed question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
-        translation_contribution_stats_results = (
+        translation_contribution_stats_keys_and_results = (
             exp_opportunity_to_submitted_suggestions
-            | 'Generate contribution stats' >> beam.ParDo(
+            | 'Generate translation contribution stats' >> beam.ParDo(
                 lambda x: self._generate_translation_stats(
                     x['suggestion'][0] if len(x['suggestion']) else [],
                     list(x['opportunity'][0])[0]
                     if len(x['opportunity']) else None,
-                    True
+                    suggestion_models.TranslationContributionStatsModel
                 ))
         )
-        translation_review_stats_results = (
+        translation_review_stats_keys_and_results = (
             exp_opportunity_to_reviewed_submitted_suggestions
-            | 'Generate review stats' >> beam.ParDo(
+            | 'Generate translation review stats' >> beam.ParDo(
                 lambda x: self._generate_translation_stats(
                     x['suggestion'][0] if len(x['suggestion']) else [],
                     list(x['opportunity'][0])[0]
                     if len(x['opportunity']) else None,
-                    False
+                    suggestion_models.TranslationReviewStatsModel
                 ))
         )
-        question_contribution_stats_results = (
+        question_contribution_stats_keys_and_results = (
             skill_opportunity_to_submitted_suggestions
             | 'Generate question contribution stats' >> beam.ParDo(
                 lambda x: self._generate_question_stats(
                     x['suggestion'][0] if len(x['suggestion']) else [],
                     list(x['opportunity'][0])[0]
                     if len(x['opportunity']) else None,
-                    True
+                    suggestion_models.QuestionContributionStatsModel
                 ))
         )
-        question_review_stats_results = (
+        question_review_stats_keys_and_results = (
             skill_opportunity_to_reviewed_suggestions
             | 'Generate question review stats' >> beam.ParDo(
                 lambda x: self._generate_question_stats(
                     x['suggestion'][0] if len(x['suggestion']) else [],
                     list(x['opportunity'][0])[0]
                     if len(x['opportunity']) else None,
-                    False
+                    suggestion_models.QuestionReviewStatsModel
                 ))
         )
 
         user_contribution_stats_models = (
-            translation_contribution_stats_results
+            translation_contribution_stats_keys_and_results
             | 'Filter contribution ok results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack contribution result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
-            | 'Combine the contribution stats' >> beam.CombinePerKey(CombineStats())
+            | 'Combine the contribution stats' >> beam.CombinePerKey(CombineTranslationContributionStats())
             | 'Generate contribution models from stats' >> beam.MapTuple(
                 self._generate_translation_contribution_model)
         )
         user_review_stats_models = (
-            translation_review_stats_results
+            translation_review_stats_keys_and_results
             | 'Filter ok review results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack review result' >> beam.MapTuple(
@@ -252,7 +252,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 self._generate_translation_review_model)
         )
         user_question_contribution_stats_models = (
-            question_contribution_stats_results
+            question_contribution_stats_keys_and_results
             | 'Filter ok question contribution results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack question contribution result' >> beam.MapTuple(
@@ -262,7 +262,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 self._generate_question_contribution_model)
         )
         user_question_review_stats_models = (
-            question_review_stats_results
+            question_review_stats_keys_and_results
             | 'Filter ok question review results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack question review result' >> beam.MapTuple(
@@ -273,7 +273,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         )
 
         user_stats_error_job_run_results = (
-            translation_contribution_stats_results
+            translation_contribution_stats_keys_and_results
             | 'Filter contribution err results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_err())
             # Pylint disable is needed because pylint is not able to correctly
@@ -283,7 +283,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults())
         )
         user_review_stats_error_job_run_results = (
-            translation_review_stats_results
+            translation_review_stats_keys_and_results
             | 'Filter review err results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_err())
             # Pylint disable is needed because pylint is not able to correctly
@@ -293,7 +293,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults())
         )
         user_question_contribution_stats_error_job_run_results = (
-            question_contribution_stats_results
+            question_contribution_stats_keys_and_results
             | 'Filter question contribution err results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_err())
             # Pylint disable is needed because pylint is not able to correctly
@@ -303,7 +303,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults())
         )
         user_question_review_stats_error_job_run_results = (
-            question_review_stats_results
+            question_review_stats_keys_and_results
             | 'Filter question review err results' >> beam.Filter(
                 lambda key_and_result: key_and_result[1].is_err())
             # Pylint disable is needed because pylint is not able to correctly
@@ -369,7 +369,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     def _generate_translation_stats(
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary],
-        translation_contribution_key_required: bool
+        model: Union[
+            suggestion_models.TranslationContributionStatsModel,
+            suggestion_models.TranslationReviewStatsModel
+        ]
     ) -> Iterator[
         Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
     ]:
@@ -380,9 +383,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 the stats should be generated.
             opportunity: ExplorationOpportunitySummary. Opportunity for which
                 were the suggestions generated. Used to extract topic ID.
-            translation_contribution_key_required: bool. Whether the key of
-                the tuple should be constructed from
-                TranslationContributionStatsModel.
+            model: TranslationContributionStatsModel|
+                TranslationReviewStatsModel. A reference to the model which the
+                stats are generated.
+
 
         Yields:
             tuple(str, Dict(str, *)). Tuple of key and suggestion stats dict.
@@ -401,19 +405,17 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-            if translation_contribution_key_required:
-                key = (
-                    suggestion_models
-                    .TranslationContributionStatsModel.construct_id(
-                        suggestion.language_code, suggestion.author_id, topic_id))
+            if model == suggestion_models.TranslationContributionStatsModel:
+                key = model.construct_id(
+                    suggestion.language_code,
+                    suggestion.author_id,
+                    topic_id
+                )
             else:
-                key = (
-                    suggestion_models
-                    .TranslationReviewStatsModel.construct_id(
-                        suggestion.language_code,
-                        suggestion.final_reviewer_id,
-                        topic_id
-                    )
+                key = model.construct_id(
+                    suggestion.language_code,
+                    suggestion.final_reviewer_id,
+                    topic_id
                 )
             try:
                 change = suggestion.change
@@ -454,7 +456,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     def _generate_question_stats(
         suggestions: Iterable[suggestion_registry.SuggestionAddQuestion],
         opportunity: Optional[opportunity_domain.SkillOpportunity],
-        question_contribution_key_required: bool
+        model: Union[
+            suggestion_models.QuestionContributionStatsModel,
+            suggestion_models.QuestionReviewStatsModel
+        ]
     ) -> Iterator[
         Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
     ]:
@@ -465,9 +470,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 the stats should be generated.
             opportunity: SkillOpportunity. Opportunity for which
                 were the suggestions generated. Used to extract topic ID.
-            question_contribution_key_required: bool. Whether the key of
-                the tuple should be constructed from
-                TranslationContributionStatsModel.
+            model: QuestionContributionStatsModel|QuestionReviewStatsModel. A
+                reference to the model which the stats are generated.
 
         Yields:
             tuple(str, Dict(str, *)). Tuple of key and suggestion stats dict.
@@ -485,35 +489,26 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 opportunity.id):
                 topic_id = topic.topic_id
                 for suggestion in suggestions:
-                    if question_contribution_key_required:
-                        key = (
-                            suggestion_models
-                            .QuestionContributionStatsModel.construct_id(
-                                suggestion.author_id,
-                                topic_id
-                            )
+                    if model == (
+                        suggestion_models.QuestionContributionStatsModel
+                    ):
+                        key = model.construct_id(
+                            suggestion.author_id,
+                            topic_id
                         )
                     else:
-                        key = (
-                            suggestion_models
-                            .QuestionReviewStatsModel.construct_id(
-                                suggestion.final_reviewer_id,
-                                topic_id
-                            )
+                        key = model.construct_id(
+                            suggestion.final_reviewer_id,
+                            topic_id
                         )
-                    try:
-                        question_stats_dict = {
-                            'suggestion_status': suggestion.status,
-                            'edited_by_reviewer': suggestion.edited_by_reviewer,
-                            'content_word_count': 0,
-                            'last_updated_date': (
-                                suggestion.last_updated.date().isoformat())
-                        }
-                        yield (key, result.Ok(question_stats_dict))
-                    except Exception as e:
-                        yield (
-                            key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
-                        )
+                    question_stats_dict = {
+                        'suggestion_status': suggestion.status,
+                        'edited_by_reviewer': suggestion.edited_by_reviewer,
+                        'content_word_count': 0,
+                        'last_updated_date': (
+                            suggestion.last_updated.date().isoformat())
+                    }
+                    yield (key, result.Ok(question_stats_dict))
 
     @staticmethod
     def _generate_translation_contribution_model(
@@ -704,8 +699,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to assume
 # that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
 # subclass 'CombineFn' (has type 'Any')), we added an ignore here.
-class CombineStats(beam.CombineFn):  # type: ignore[misc]
-    """CombineFn for combining the stats."""
+class CombineTranslationContributionStats(beam.CombineFn):  # type: ignore[misc]
+    """CombineFn for combining the translation contribution stats."""
 
     def create_accumulator(
         self
@@ -715,7 +710,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
     def add_input(
         self,
         accumulator: suggestion_registry.TranslationContributionStats,
-        translation: TranslationStatsDict
+        translation: ContributionStatsDict
     ) -> suggestion_registry.TranslationContributionStats:
         is_accepted = (
             translation['suggestion_status'] ==
@@ -791,7 +786,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
 # that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
 # subclass 'CombineFn' (has type 'Any')), we added an ignore here.
 class CombineTranslationReviewStats(beam.CombineFn):  # type: ignore[misc]
-    """CombineFn for combining the translatin review stats."""
+    """CombineFn for combining the translation review stats."""
 
     def create_accumulator(
         self
@@ -801,7 +796,7 @@ class CombineTranslationReviewStats(beam.CombineFn):  # type: ignore[misc]
     def add_input(
         self,
         accumulator: suggestion_registry.TranslationReviewStats,
-        translation: TranslationStatsDict
+        translation: ContributionStatsDict
     ) -> suggestion_registry.TranslationReviewStats:
         is_accepted = (
             translation['suggestion_status'] ==
@@ -876,7 +871,7 @@ class CombineQuestionContributionStats(beam.CombineFn):  # type: ignore[misc]
     def add_input(
         self,
         accumulator: suggestion_registry.QuestionContributionStats,
-        question: TranslationStatsDict
+        question: ContributionStatsDict
     ) -> suggestion_registry.QuestionContributionStats:
         is_accepted = (
             question['suggestion_status'] ==
@@ -945,7 +940,7 @@ class CombineQuestionReviewStats(beam.CombineFn):  # type: ignore[misc]
     def add_input(
         self,
         accumulator: suggestion_registry.QuestionReviewStats,
-        question: TranslationStatsDict
+        question: ContributionStatsDict
     ) -> suggestion_registry.QuestionReviewStats:
         is_accepted = (
             question['suggestion_status'] ==
