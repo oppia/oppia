@@ -264,6 +264,8 @@
   .oppia-collapsed-user-info {
     display: flex;
     flex-direction: row;
+      transform: scale(0.8);
+    
   }
   .oppia-collapsed-mascot-avatar-container {
     margin: 0 20px;
@@ -413,6 +415,8 @@
   .oppia-profile-picture-icon {
     color: #009688;
     font-size: 120px;
+  transition: transform 0.5s ease;
+
   }
   .oppia-opportunities-tabs {
     background-color: #fff;
@@ -439,10 +443,12 @@
     align-items: center;
     display: flex;
     height: 100%;
+     height: 60px;
     justify-content: flex-start;
     margin: auto;
     max-width: 1200px;
     width: 80%;
+     transition: height 0.5s ease;
   }
   .oppia-contributor-username-and-review-rights-container {
     align-items: center;
@@ -450,7 +456,9 @@
     flex-grow: 1;
     justify-content: start;
     padding-left: 25px;
-    width: 100%;
+    width: 100%;  
+  transition: transform 0.5s ease;
+
   }
   .oppia-opportunities-tab-customization-container {
     align-items: center;
@@ -551,6 +559,7 @@
   }
   .oppia-contributor-dashboard-collapsible-header {
     display: none;
+      transform: scale(0.8);
   }
   .oppia-translate-y {
     -webkit-animation: translate-y 0.5s ease-out alternate;
