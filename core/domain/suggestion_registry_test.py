@@ -3558,8 +3558,11 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
     LAST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
 
     def test_create_default_translation_review_stats(self) -> None:
-        default_review_stats = suggestion_registry.TranslationReviewStats.create_default(
-            self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+        default_review_stats = (
+            suggestion_registry
+            .TranslationReviewStats.create_default(
+                self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+            )
         )
 
         self.assertEqual(
@@ -3591,7 +3594,9 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             0
         )
         self.assertEqual(
-            default_review_stats.accepted_translations_with_reviewer_edits_count,
+            (
+                default_review_stats
+                .accepted_translations_with_reviewer_edits_count),
             0
         )
 

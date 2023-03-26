@@ -99,10 +99,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 lambda m: (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                    and (
-                        m.status == suggestion_models.STATUS_ACCEPTED
-                        or m.status == suggestion_models.STATUS_REJECTED
-                    )
+                    in [
+                        m.status == suggestion_models.STATUS_ACCEPTED,
+                        m.status == suggestion_models.STATUS_REJECTED
+                    ]
                 ))
             | 'Transform to reviewed suggestion domain object' >> beam.Map(
                 suggestion_services.get_suggestion_from_model)
@@ -127,10 +127,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 lambda m: (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_ADD_QUESTION
-                    and (
-                        m.status == suggestion_models.STATUS_ACCEPTED
-                        or m.status == suggestion_models.STATUS_REJECTED
-                    )
+                    in [
+                        m.status == suggestion_models.STATUS_ACCEPTED,
+                        m.status == suggestion_models.STATUS_REJECTED
+                    ]
                 ))
             | 'Transform to reviewed question suggestion domain object' >> (
                 beam.Map(suggestion_services.get_suggestion_from_model)
@@ -268,8 +268,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 lambda key, result: (key, result.unwrap()))
             | 'Combine the question contribution stats' >> (
                 beam.CombinePerKey(CombineQuestionContributionStats()))
-            | 'Generate question contribution models from stats' >> beam.MapTuple(
-                self._generate_question_contribution_model)
+            | 'Generate question contribution models from stats' >> (
+                beam.MapTuple(self._generate_question_contribution_model))
         )
         user_question_review_stats_models = (
             question_review_stats_keys_and_results
@@ -396,8 +396,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 the stats should be generated.
             opportunity: ExplorationOpportunitySummary. Opportunity for which
                 were the suggestions generated. Used to extract topic ID.
-            model: TranslationContributionStatsModel|
-                TranslationReviewStatsModel. A reference to the model which the
+            model: TranslationContributionStatsModel|TranslationReviewStatsModel
+                . A reference to the model which the
                 stats are generated.
 
         Yields:
@@ -894,7 +894,6 @@ class CombineQuestionContributionStats(beam.CombineFn):  # type: ignore[misc]
         )
         is_accepted_and_not_edited = (
             is_accepted and not question['edited_by_reviewer'])
-        word_count = question['content_word_count']
         return suggestion_registry.QuestionContributionStats(
             accumulator.contributor_user_id,
             accumulator.topic_id,
