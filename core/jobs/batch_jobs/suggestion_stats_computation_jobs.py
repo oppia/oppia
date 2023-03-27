@@ -483,7 +483,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 the stats should be generated.
             opportunity: SkillOpportunity. Opportunity for which
                 were the suggestions generated. Used to extract topic ID.
-            model: QuestionContributionStatsModel|QuestionReviewStatsModel. A
+            model: QuestionContributionStatsModel | QuestionReviewStatsModel. A
                 reference to the model which the stats are generated.
 
         Yields:

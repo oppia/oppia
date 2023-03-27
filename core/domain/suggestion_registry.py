@@ -1609,9 +1609,9 @@ class TranslationReviewStats:
     @classmethod
     def create_default(
         cls,
-        language_code: Optional[str] = None,
-        reviewer_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
+        language_code: str,
+        reviewer_user_id: str,
+        topic_id: str
     ) -> TranslationReviewStats:
         """Create default translation review stats.
 
@@ -1733,8 +1733,8 @@ class QuestionContributionStats:
     @classmethod
     def create_default(
         cls,
-        contributor_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
+        contributor_user_id: str,
+        topic_id: str
     ) -> QuestionContributionStats:
         """Create default question contribution stats.
 
@@ -1847,8 +1847,8 @@ class QuestionReviewStats:
     @classmethod
     def create_default(
         cls,
-        contributor_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
+        contributor_user_id: str,
+        topic_id: str
     ) -> QuestionReviewStats:
         """Create default question review stats.
 
