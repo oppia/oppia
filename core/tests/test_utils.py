@@ -1852,7 +1852,8 @@ class AppEngineTestBase(TestBase):
         datastore_services.delete_multi(
             list(datastore_services.query_everything().iter(keys_only=True)))
         storage_services.CLIENT.reset()
-        self.contextManager.__exit__(None, None, None)
+        if self.contextManager:
+            self.contextManager.__exit__(None, None, None)
         super().tearDown()
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
