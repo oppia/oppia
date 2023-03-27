@@ -110,7 +110,7 @@ class StartTests(test_utils.GenericTestBase):
             servers, 'create_managed_web_browser',
             Exception(MANAGED_WEB_BROWSER_ERROR))
         self.swap_mock_set_constants_to_default = self.swap(
-            build, 'set_constants_to_default', mock_constants)
+            common, 'set_constants_to_default', mock_constants)
 
     def test_start_servers_successfully(self) -> None:
         with self.swap_install_third_party_libs:
@@ -330,3 +330,20 @@ class StartTests(test_utils.GenericTestBase):
                 )
             ],
             self.print_arr)
+
+    def test_not_mock_set_constants_to_default_error(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import start
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}])
+        assertException = self.assertRaisesRegex(Exception, 'Please mock this method in the test.')
+
+        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
+            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
+                with self.swap_create_server, self.swap_webpack_compiler:
+                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
+                        with self.swap_firebase_auth_emulator, self.swap_print:
+                            with assertException:
+                                start.main(args=[])
+

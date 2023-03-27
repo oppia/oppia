@@ -74,6 +74,7 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
+from scripts import common
 
 import elasticsearch
 import requests_mock
@@ -1819,7 +1820,6 @@ class AppEngineTestBase(TestBase):
     SERVER_NAME: Final = 'localhost'
     SERVER_PORT: Final = '8080'
     DEFAULT_VERSION_HOSTNAME: Final = '%s:%s' % (HTTP_HOST, SERVER_PORT)
-
     # Here we use type Any because in subclasses derived from this class we
     # can provide an arbitrary number of arguments with different types. So,
     # to allow every type of argument we used Any here.
@@ -1842,11 +1842,14 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
+        self.contextManager = self.swap(common, 'set_constants_to_default', self.mock_set_constants_to_default)
+        self.contextManager.__enter__()
 
     def tearDown(self) -> None:
         datastore_services.delete_multi(
             list(datastore_services.query_everything().iter(keys_only=True)))
         storage_services.CLIENT.reset()
+        self.contextManager.__exit__(None, None, None)
         super().tearDown()
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
@@ -1915,6 +1918,9 @@ class AppEngineTestBase(TestBase):
         """
         return self._platform_taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
+
+    def mock_set_constants_to_default(self) -> None:
+        raise Exception('Please mock this method in the test.')
 
 
 class GenericTestBase(AppEngineTestBase):
@@ -2260,6 +2266,7 @@ title: Title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
+    contextManager = None
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
         """Run the test, collecting the result into the specified TestResult.

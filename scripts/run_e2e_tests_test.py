@@ -390,10 +390,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'modify_constants', lambda *_, **__: None,
+            common, 'modify_constants', lambda *_, **__: None,
             expected_kwargs=[{'prod_env': False}]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'set_constants_to_default', lambda: None))
+            common, 'set_constants_to_default', lambda: None))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
