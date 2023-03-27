@@ -1820,6 +1820,7 @@ class AppEngineTestBase(TestBase):
     SERVER_NAME: Final = 'localhost'
     SERVER_PORT: Final = '8080'
     DEFAULT_VERSION_HOSTNAME: Final = '%s:%s' % (HTTP_HOST, SERVER_PORT)
+
     # Here we use type Any because in subclasses derived from this class we
     # can provide an arbitrary number of arguments with different types. So,
     # to allow every type of argument we used Any here.
@@ -1843,7 +1844,8 @@ class AppEngineTestBase(TestBase):
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
         self.contextManager = self.swap(
-            common, 'set_constants_to_default', self.mock_set_constants_to_default)
+            common, 'set_constants_to_default',
+            self.mock_set_constants_to_default)
         self.contextManager.__enter__()
 
     def tearDown(self) -> None:
