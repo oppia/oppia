@@ -256,7 +256,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       this.contextService.setImageSaveDestinationToLocalStorage();
     }
 
-    this.windowRef.nativeWindow.location.hash = this.questionId;
+    this.windowRef.nativeWindow.location.hash = '/questions#' + this.questionId;
   }
 
   removeQuestionSkillLinkAsync(questionId: string, skillId: string): void {

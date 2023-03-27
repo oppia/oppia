@@ -17,7 +17,7 @@ and are created.
 """
 
 from __future__ import annotations
-
+import json
 import logging
 
 from core import feconf
@@ -26,7 +26,6 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
-from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -122,34 +121,38 @@ class QuestionCreationHandler(
             question.id,
             skill_ids,
             skill_difficulties)
-        html_list = question.get_all_html_content_strings()
-        filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(html_list))
         image_validation_error_message_suffix = (
             'Please go to the question editor for question with id %s and edit '
             'the image.' % question.id)
-        for filename in filenames:
-            image = self.request.get(filename)
-            if not image:
-                logging.exception(
-                    'Image not provided for file with name %s when the question'
-                    ' with id %s was created.' % (filename, question.id))
-                raise self.InvalidInputException(
-                    'No image data provided for file with name %s. %s'
-                    % (filename, image_validation_error_message_suffix))
-            try:
-                file_format = (
-                    image_validation_services.validate_image_and_filename(
-                        image, filename))
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(
-                    '%s %s' % (e, image_validation_error_message_suffix)
-                )
-            image_is_compressible = (
-                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-            fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
-                'image', image_is_compressible)
+
+        filenames = self.payload.get('filenames')
+
+        if filenames:
+            filenames_list = json.loads(filenames)
+            for filename in filenames_list:
+                index = filenames_list.index(filename)
+                image = self.request.get(f'image{index}')
+                if not image:
+                    logging.exception(
+                        'Image not provided for file with'
+                        ' name %s when the question'
+                        ' with id %s was created.' % (filename, question.id))
+                    raise self.InvalidInputException(
+                        'No image data provided for file with name %s. %s'
+                        % (filename, image_validation_error_message_suffix))
+                try:
+                    file_format = (
+                        image_validation_services.validate_image_and_filename(
+                            image, filename))
+                except utils.ValidationError as e:
+                    raise self.InvalidInputException(
+                        '%s %s' % (e, image_validation_error_message_suffix)
+                    )
+                image_is_compressible = (
+                    file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+                fs_services.save_original_and_compressed_versions_of_image(
+                    filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
+                    'image', image_is_compressible)
 
         self.values.update({
             'question_id': question.id
