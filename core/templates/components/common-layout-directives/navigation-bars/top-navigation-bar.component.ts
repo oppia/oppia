@@ -105,15 +105,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   labelForClearingFocus!: string;
   sidebarIsShown: boolean = false;
   windowIsNarrow: boolean = false;
+  profilePicturePngDataUrl!: string;
+  profilePictureWebpDataUrl!: string;
 
-  // The 'username', 'profilePageUrl' and 'profilePictureDataUrl' properties
+  // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
   // which sends a HTTP request to the backend.
   // Until the response object is received and the method returns,
   // these properties remain undefined.
   username: string | undefined;
   profilePageUrl: string | undefined;
-  profilePictureDataUrl: string | undefined;
 
   // The 'activeMenuName' property is not initialized in the constructor
   // or in a lifecycle hook, and is set based on certain
@@ -173,7 +174,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.getProfileImageDataAsync();
     this.currentUrl =
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
     this.url = new URL(this.windowRef.nativeWindow.location.toString());
@@ -266,6 +266,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           '/profile/<username>', {
             username: this.username
           });
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
+          this.userService.getProfileImageDataUrl(this.username));
+      } else {
+        this.profilePicturePngDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+        this.profilePictureWebpDataUrl = (
+          this.urlInterpolationService.getStaticImageUrl(
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
       }
     });
 
@@ -359,11 +368,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       return (space < width) ? (Math.round(space - width)) : 0;
     }
     return 0;
-  }
-
-  async getProfileImageDataAsync(): Promise<void> {
-    let dataUrl = await this.userService.getProfileImageDataUrlAsync();
-    this.profilePictureDataUrl = decodeURIComponent(dataUrl);
   }
 
   getStaticImageUrl(imagePath: string): string {
