@@ -2269,7 +2269,6 @@ title: Title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
-    contextManager = None
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
         """Run the test, collecting the result into the specified TestResult.
