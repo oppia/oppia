@@ -71,6 +71,7 @@
   display: grid;
   grid-template-columns: 210px 210px 210px;
   justify-content: space-evenly;
+  margin-bottom: 10vh;
   margin-top: 40px;
   overflow-y: auto;
   padding-bottom: 30vh;
@@ -171,6 +172,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
     grid-template-columns: 150px 150px 150px;
+    margin-bottom: 28vh;
     margin-top: 5vh;
     padding-bottom: 140px;
   }
