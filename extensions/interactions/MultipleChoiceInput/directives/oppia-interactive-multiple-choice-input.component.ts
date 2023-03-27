@@ -115,9 +115,10 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
       // Combine labels for voiceover.
       let combinedChoiceLabels = '';
-      for (const choice of choices.value) {
+      for (let i = 0; i < choices.value.length; i++) {
+        const index = this.choices[i].originalIndex;
         combinedChoiceLabels += this.audioTranslationManagerService
-          .cleanUpHTMLforVoiceover(choice.html);
+          .cleanUpHTMLforVoiceover(choices.value[index].html);
       }
       // Say the choices aloud if autoplay is enabled.
       this.audioTranslationManagerService.setSequentialAudioTranslations(
