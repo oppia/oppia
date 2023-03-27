@@ -1842,7 +1842,8 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
-        self.contextManager = self.swap(common, 'set_constants_to_default', self.mock_set_constants_to_default)
+        self.contextManager = self.swap(
+            common, 'set_constants_to_default', self.mock_set_constants_to_default)
         self.contextManager.__enter__()
 
     def tearDown(self) -> None:

@@ -913,9 +913,11 @@ def run_ng_compilation() -> None:
         print('Failed to complete ng build compilation, exiting...')
         sys.exit(1)
 
+
 def set_constants_to_default() -> None:
     """Set variables in constants.ts and feconf.py to default values."""
     modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
+
 
 def modify_constants(
     prod_env: bool = False,

@@ -337,13 +337,13 @@ class StartTests(test_utils.GenericTestBase):
         swap_build = self.swap_with_checks(
             build, 'main', lambda **unused_kwargs: None,
             expected_kwargs=[{'args': []}])
-        assertException = self.assertRaisesRegex(Exception, 'Please mock this method in the test.')
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'Please mock this method in the test.')
 
         with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_create_server, self.swap_webpack_compiler:
                     with self.swap_extend_index_yaml, self.swap_dev_appserver:
                         with self.swap_firebase_auth_emulator, self.swap_print:
-                            with assertException:
+                            with assert_raises_regexp:
                                 start.main(args=[])
-
