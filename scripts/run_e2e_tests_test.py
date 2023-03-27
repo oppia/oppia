@@ -56,6 +56,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
+        def mock_constants() -> None:
+            print('mock_set_constants_to_default')
+        self.swap_mock_set_constants_to_default = self.swap(
+            common, 'set_constants_to_default', mock_constants)
+
     def tearDown(self) -> None:
         try:
             self.exit_stack.close()
@@ -265,12 +270,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
-
-        def mock_constants() -> None:
-            print('mock_set_constants_to_default')
-        self.swap_mock_set_constants_to_default = self.swap(
-            common, 'set_constants_to_default', mock_constants)
-
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(args=[])
 
@@ -316,11 +315,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 },
             ]))
         args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
-
-        def mock_constants() -> None:
-            print('mock_set_constants_to_default')
-        self.swap_mock_set_constants_to_default = self.swap(
-            common, 'set_constants_to_default', mock_constants)
 
         with self.swap_mock_set_constants_to_default:
             lines, _ = run_e2e_tests.run_tests(args)
@@ -476,10 +470,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        def mock_constants() -> None:
-            print('mock_set_constants_to_default')
-        self.swap_mock_set_constants_to_default = self.swap(
-            common, 'set_constants_to_default', mock_constants)
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(args=['--debug_mode'])
 
@@ -520,10 +510,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        def mock_constants() -> None:
-            print('mock_set_constants_to_default')
-        self.swap_mock_set_constants_to_default = self.swap(
-            common, 'set_constants_to_default', mock_constants)
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(
                 args=['--chrome_driver_version', CHROME_DRIVER_VERSION])
@@ -565,10 +551,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        def mock_constants() -> None:
-            print('mock_set_constants_to_default')
-        self.swap_mock_set_constants_to_default = self.swap(
-            common, 'set_constants_to_default', mock_constants)
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(
                 args=['--suite', 'collections'])
@@ -594,11 +576,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_cloud_datastore_emulator', mock_managed_process))
-
-        def mock_constants() -> None:
-            print('mock_set_constants_to_default')
-        self.swap_mock_set_constants_to_default = self.swap(
-            common, 'set_constants_to_default', mock_constants)
 
         with self.assertRaisesRegex(SystemExit, '^1$'):
             with self.swap_mock_set_constants_to_default:
