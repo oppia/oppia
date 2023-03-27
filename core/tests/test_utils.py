@@ -1852,7 +1852,7 @@ class AppEngineTestBase(TestBase):
         datastore_services.delete_multi(
             list(datastore_services.query_everything().iter(keys_only=True)))
         storage_services.CLIENT.reset()
-        if self.contextManager is not None:
+        if hasattr(self, 'contextManager'):
             self.contextManager.__exit__(None, None, None)
         super().tearDown()
 
