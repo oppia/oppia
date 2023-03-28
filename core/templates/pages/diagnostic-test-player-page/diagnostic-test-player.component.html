@@ -120,7 +120,6 @@
     display: flex;
     float: right;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    position: absolute;
     text-transform: uppercase;
   }
   .oppia-back-button-text-class {
@@ -191,6 +190,7 @@
     margin: 5%;
   }
   .oppia-start-button {
+    display: block;
     margin: 20px 0;
     text-align: center;
   }
@@ -254,5 +254,86 @@
   }
   .oppia-otter-image {
     max-width: 7em;
+  }
+
+  @media(max-width: 500px) {
+    .oppia-introductory-card {
+      margin-left: auto;
+      width: 100%;
+    }
+    .oppia-image {
+      align-items: center;
+      display: flex;
+      margin-right: 30px;
+    }
+    .oppia-diagnostic-test-start-button {
+      background-color: #00645c;
+      color: #fff;
+      float: right;
+      font-size: 1em;
+      margin-top: 5vh;
+      text-transform: uppercase;
+    }
+    .oppia-test-introduction-text {
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 1em;
+    }
+    .oppia-anchor-tag-under-button {
+      color: white;
+      display: contents;
+      text-decoration: none;
+    }
+    .oppia-diagnostic-test-session {
+      color: #01645c;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 1.5em;
+      margin: auto;
+      padding: 10px;
+      text-align: center;
+    }
+    .oppia-question-player-card {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+      height: 100px;
+      margin: auto;
+      padding: 20px;
+      width: 100%;
+    }
+    .oppia-result-page-container {
+      margin: auto;
+      width: 335px;
+    }
+    .oppia-no-recommendation-header-text {
+      color: #00645c;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      font-size: 1.2em;
+      margin-left: 15px;
+    }
+    .oppia-otter-image {
+      max-width: 5em;
+    }
+    .oppia-recommendation-card-heading {
+      color: #00645c;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      font-size: 1.2em;
+      text-align: center;
+    }
+    .oppia-recommendation-card-text {
+      font-size: 1.1em;
+      margin: 5%;
+    }
+    .oppia-topic-summary-tile {
+      width: 120px;
+    }
+    .oppia-start-topic-button {
+      background-color: #00645c;
+      color: #fff;
+      font-weight: bold;
+      min-width: auto;
+      padding: 10px;
+      text-transform: uppercase;
+      width: fit-content;
+    }
   }
 </style>
