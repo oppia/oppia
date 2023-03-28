@@ -726,22 +726,18 @@ def managed_webdriverio_server(
 
 @contextlib.contextmanager
 def managed_acceptance_tests_server(
-    suite_name: str = 'full',
+    suite_name: str,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the Acceptance server gracefully.
 
     Args:
-        suite_name: str. The suite name whose tests should be run. If the value
-            is `full`, all tests will run.
+        suite_name: str. The suite name whose tests should be run.
         stdout: int. This parameter specifies the executed program's standard
             output file handle.
 
     Yields:
-        psutil.Process. The webdriverio process.
-
-    Raises:
-        ValueError. Number of sharding instances are less than 0.
+        psutil.Process. The jasmine testing process.
     """
     nodemodules_jasmine_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jasmine')

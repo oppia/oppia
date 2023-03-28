@@ -69,10 +69,13 @@ _PARSER.add_argument(
     help='Build webpack with source maps.',
     action='store_true')
 
+build_js_files = run_e2e_tests.build_js_files
+is_oppia_server_already_running = run_e2e_tests.is_oppia_server_already_running
+run_webpack_compilation = run_e2e_tests.run_webpack_compilation
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
-    if run_e2e_tests.is_oppia_server_already_running():
+    if is_oppia_server_already_running():
         sys.exit(1)
 
     with contextlib.ExitStack() as stack:
@@ -81,7 +84,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         if args.skip_build:
             build.modify_constants(prod_env=args.prod_env)
         else:
-            run_e2e_tests.build_js_files(dev_mode, source_maps=args.source_maps)
+            build_js_files(dev_mode, source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
