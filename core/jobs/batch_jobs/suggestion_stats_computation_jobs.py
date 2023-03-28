@@ -382,10 +382,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     def _generate_translation_stats(
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary],
-        model: (
-            suggestion_models.TranslationContributionStatsModel |
+        model: Union[
+            suggestion_models.TranslationContributionStatsModel,
             suggestion_models.TranslationReviewStatsModel
-        )
+        ]
     ) -> Iterator[
         Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
     ]:
@@ -396,8 +396,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 the stats should be generated.
             opportunity: ExplorationOpportunitySummary. Opportunity for which
                 were the suggestions generated. Used to extract topic ID.
-            model: TranslationContributionStatModel|TranslationReviewStatsModel.
-                A reference to the model which the stats are generated.
+            model: TranslationStatsModel. A reference to the model which the
+                stats are generated.
 
         Yields:
             tuple(str, Dict(str, *)). Tuple of key and suggestion stats dict.
@@ -469,10 +469,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     def _generate_question_stats(
         suggestions: Iterable[suggestion_registry.SuggestionAddQuestion],
         opportunity: Optional[opportunity_domain.SkillOpportunity],
-        model: (
-            suggestion_models.QuestionContributionStatsModel |
+        model: Union[
+            suggestion_models.QuestionContributionStatsModel,
             suggestion_models.QuestionReviewStatsModel
-        )
+        ]
     ) -> Iterator[
         Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
     ]:
