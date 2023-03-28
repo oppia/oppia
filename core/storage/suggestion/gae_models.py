@@ -780,7 +780,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         offset: int,
         user_id: str,
         sort_key: Optional[str],
-        topics: Optional[List[topic_domain.Topic]],
+        topics: Optional[List[topic_domain.Topic]] = None,
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
