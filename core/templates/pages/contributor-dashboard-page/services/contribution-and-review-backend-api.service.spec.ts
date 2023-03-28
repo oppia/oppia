@@ -178,6 +178,37 @@ describe('Contribution and review backend API service', () => {
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
+    it('should fetch reviewable question suggestions from topic Addition',
+      fakeAsync(() => {
+        spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
+        const url = '/getreviewablesuggestions/exploration/translate_content' +
+        '?limit=10&offset=0&sort_key=Date&topic_name=addition';
+
+        carbas.fetchSuggestionsAsync(
+          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          explorationId
+        ).then(successHandler, failureHandler);
+        const req = http.expectOne(url);
+        expect(req.request.method).toEqual('GET');
+        req.flush(suggestionsBackendObject);
+        flushMicrotasks();
+
+        expect(carbas.fetchReviewableSuggestionsAsync)
+          .toHaveBeenCalledWith(
+            'exploration',
+            'translate_content',
+            AppConstants.OPPORTUNITIES_PAGE_SIZE,
+            0,
+            'Date',
+            explorationId
+          );
+        expect(successHandler).toHaveBeenCalled();
+        expect(failureHandler).not.toHaveBeenCalled();
+      }));
+
     it('should throw error if fetch type is invalid', fakeAsync(() => {
       carbas.fetchSuggestionsAsync(
         'INVALID_SUGGESTION_TYPE',
