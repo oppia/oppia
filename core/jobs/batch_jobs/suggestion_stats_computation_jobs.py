@@ -416,19 +416,19 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-            if model == suggestion_models.TranslationContributionStatsModel:
-                key = model.construct_id(
-                    suggestion.language_code,
-                    suggestion.author_id,
-                    topic_id
-                )
-            else:
-                key = model.construct_id(
-                    suggestion.language_code,
-                    suggestion.final_reviewer_id,
-                    topic_id
-                )
             try:
+                if model == suggestion_models.TranslationContributionStatsModel:
+                    key = model.construct_id(
+                        suggestion.language_code,
+                        suggestion.author_id,
+                        topic_id
+                    )
+                else:
+                    key = model.construct_id(
+                        suggestion.language_code,
+                        suggestion.final_reviewer_id,
+                        topic_id
+                    )
                 change = suggestion.change
                 # In the new translation command the content in set format is
                 # a list, content in unicode and html format is a string.
