@@ -416,19 +416,21 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
+            if model == suggestion_models.TranslationContributionStatsModel:
+                key = model.construct_id(
+                    suggestion.language_code,
+                    suggestion.author_id,
+                    topic_id
+                )
+            else:
+                if suggestion.final_reviewer_id is None:
+                    raise Exception('Reviewer ID should not be None.')
+                key = model.construct_id(
+                    suggestion.language_code,
+                    suggestion.final_reviewer_id,
+                    topic_id
+                )
             try:
-                if model == suggestion_models.TranslationContributionStatsModel:
-                    key = model.construct_id(
-                        suggestion.language_code,
-                        suggestion.author_id,
-                        topic_id
-                    )
-                else:
-                    key = model.construct_id(
-                        suggestion.language_code,
-                        suggestion.final_reviewer_id,
-                        topic_id
-                    )
                 change = suggestion.change
                 # In the new translation command the content in set format is
                 # a list, content in unicode and html format is a string.
@@ -484,7 +486,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             opportunity: SkillOpportunity. Opportunity for which
                 were the suggestions generated. Used to extract topic ID.
             model: QuestionStatsModel. A reference to the model which the
-                stats are generated.
+            stats are generated.
 
         Yields:
             tuple(str, Dict(str, *)). Tuple of key and suggestion stats dict.
@@ -510,6 +512,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                             topic_id
                         )
                     else:
+                        if suggestion.final_reviewer_id is None:
+                            raise Exception('Reviewer ID should not be None.')
                         key = model.construct_id(
                             suggestion.final_reviewer_id,
                             topic_id
@@ -600,18 +604,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         .accepted_translations_with_reviewer_edits_count),
                     accepted_translation_word_count=(
                         translation.accepted_translation_word_count),
-                    first_contribution_date=(
-                        datetime.datetime.strptime(
-                            translation.first_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    ),
-                    last_contribution_date=(
-                        datetime.datetime.strptime(
-                            translation.last_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    )
+                    first_contribution_date=translation.first_contribution_date,
+                    last_contribution_date=translation.last_contribution_date
                 )
             )
             translation_review_stats_model.update_timestamps()
@@ -645,18 +639,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     accepted_questions_without_reviewer_edits_count=(
                         question
                         .accepted_questions_without_reviewer_edits_count),
-                    first_contribution_date=(
-                        datetime.datetime.strptime(
-                            question.first_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    ),
-                    last_contribution_date=(
-                        datetime.datetime.strptime(
-                            question.last_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    )
+                    first_contribution_date=question.first_contribution_date,
+                    last_contribution_date=question.last_contribution_date
                 )
             )
             question_contribution_stats_model.update_timestamps()
@@ -690,18 +674,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     accepted_questions_with_reviewer_edits_count=(
                         question
                         .accepted_questions_with_reviewer_edits_count),
-                    first_contribution_date=(
-                        datetime.datetime.strptime(
-                            question.first_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    ),
-                    last_contribution_date=(
-                        datetime.datetime.strptime(
-                            question.last_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    )
+                    first_contribution_date=question.first_contribution_date,
+                    last_contribution_date=question.last_contribution_date
                 )
             )
             question_review_stats_model.update_timestamps()
