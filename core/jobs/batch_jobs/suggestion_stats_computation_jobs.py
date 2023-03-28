@@ -423,10 +423,11 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     topic_id
                 )
             else:
-                if suggestion.final_reviewer_id is None:
-                    yield (
-                        'FAILED', result.Err('Reviewer ID should not be None.'))
-                key = model.construct_id(
+                # Here we use MyPy ignore because in earlier steps of
+                # the job, we filtered the suggestions that were
+                # reviewed. Hence the final_reviewer_id should exists
+                # and not a None type.
+                key = model.construct_id(   # type: ignore[arg-type]
                     suggestion.language_code,
                     suggestion.final_reviewer_id,
                     topic_id
@@ -513,12 +514,11 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                             topic_id
                         )
                     else:
-                        if suggestion.final_reviewer_id is None:
-                            yield (
-                                'FAILED',
-                                result.Err('Reviewer ID should not be None.')
-                            )
-                        key = model.construct_id(
+                        # Here we use MyPy ignore because in earlier steps of
+                        # the job, we filtered the suggestions that were
+                        # reviewed. Hence the final_reviewer_id should exists
+                        # and not a None type.
+                        key = model.construct_id(   # type: ignore[arg-type]
                             suggestion.final_reviewer_id,
                             topic_id
                         )
