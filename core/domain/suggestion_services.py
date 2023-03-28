@@ -2344,6 +2344,12 @@ def _update_translation_review_stats_models(
     """
     stats_dict = {}
     for stat in translation_review_stats:
+        if stat.language_code is None:
+            raise Exception('Language code should not be None.')
+        if stat.contributor_user_id is None:
+            raise Exception('Contributor user ID should not be None.')
+        if stat.topic_id is None:
+            raise Exception('Topic ID should not be None.')
         stat_id = suggestion_models.TranslationReviewStatsModel.construct_id(
             stat.language_code, stat.contributor_user_id, stat.topic_id)
         stats_dict[stat_id] = stat
@@ -2392,6 +2398,10 @@ def _update_question_contribution_stats_models(
     """
     stats_dict = {}
     for stat in question_contribution_stats:
+        if stat.contributor_user_id is None:
+            raise Exception('Contributor user ID should not be None.')
+        if stat.topic_id is None:
+            raise Exception('Topic ID should not be None.')
         stat_id = suggestion_models.QuestionContributionStatsModel.construct_id(
             stat.contributor_user_id, stat.topic_id)
         stats_dict[stat_id] = stat
@@ -2434,6 +2444,10 @@ def _update_question_review_stats_models(
     """
     stats_dict = {}
     for stat in question_review_stats:
+        if stat.contributor_user_id is None:
+            raise Exception('Contributor user ID should not be None.')
+        if stat.topic_id is None:
+            raise Exception('Topic ID should not be None.')
         stat_id = suggestion_models.QuestionReviewStatsModel.construct_id(
             stat.contributor_user_id, stat.topic_id)
         stats_dict[stat_id] = stat
