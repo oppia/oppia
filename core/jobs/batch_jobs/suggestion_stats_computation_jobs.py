@@ -487,7 +487,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             opportunity: SkillOpportunity. Opportunity for which
                 were the suggestions generated. Used to extract topic ID.
             model: QuestionStatsModel. A reference to the model which the
-            stats are generated.
+                stats are generated.
 
         Yields:
             tuple(str, Dict(str, *)). Tuple of key and suggestion stats dict.
