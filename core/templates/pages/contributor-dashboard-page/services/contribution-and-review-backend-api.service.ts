@@ -114,7 +114,7 @@ export class ContributionAndReviewBackendApiService {
     }
     if (fetchType === this.REVIEWABLE_QUESTION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
-        'skill', 'add_question', limit, offset, sortKey, topicName);
+        'skill', 'add_question', limit, offset, sortKey, undefined, topicName);
     }
     if (fetchType === this.REVIEWABLE_TRANSLATION_SUGGESTIONS) {
       return this.fetchReviewableSuggestionsAsync(
@@ -155,7 +155,8 @@ export class ContributionAndReviewBackendApiService {
       limit: number,
       offset: number,
       sortKey: string,
-      explorationId?: string
+      explorationId?: string,
+      topicName?: string
   ): Promise<FetchSuggestionsResponse> {
     const url = this.urlInterpolationService.interpolateUrl(
       this.REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
@@ -168,6 +169,7 @@ export class ContributionAndReviewBackendApiService {
       offset: string;
       sort_key: string;
       exploration_id?: string;
+      topic_name?: string;
     } = {
       limit: limit.toString(),
       offset: offset.toString(),
@@ -175,6 +177,9 @@ export class ContributionAndReviewBackendApiService {
     };
     if (explorationId !== undefined) {
       params.exploration_id = explorationId;
+    }
+    if (topicName !== undefined) {
+      params.topic_name = topicName;
     }
     return this.http.get<FetchSuggestionsResponse>(
       url,
