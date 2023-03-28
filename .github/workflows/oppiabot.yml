@@ -1,6 +1,8 @@
 name: Oppiabot
 
 on:
+  merge_group:
+    types: [checks_requested]
   issues:
     types:
       - labeled
