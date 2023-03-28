@@ -427,11 +427,11 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 # the job, we filtered the suggestions that were
                 # reviewed. Hence the final_reviewer_id should exists
                 # and not a None type.
-                key = model.construct_id(   # type: ignore[arg-type]
+                key = model.construct_id(
                     suggestion.language_code,
                     suggestion.final_reviewer_id,
                     topic_id
-                )
+                )   # type: ignore[arg-type]
             try:
                 change = suggestion.change
                 # In the new translation command the content in set format is
@@ -518,10 +518,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         # the job, we filtered the suggestions that were
                         # reviewed. Hence the final_reviewer_id should exists
                         # and not a None type.
-                        key = model.construct_id(   # type: ignore[arg-type]
+                        key = model.construct_id(
                             suggestion.final_reviewer_id,
                             topic_id
-                        )
+                        )   # type: ignore[arg-type]
                     question_stats_dict = {
                         'suggestion_status': suggestion.status,
                         'edited_by_reviewer': suggestion.edited_by_reviewer,
