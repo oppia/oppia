@@ -73,6 +73,7 @@ build_js_files = run_e2e_tests.build_js_files
 is_oppia_server_already_running = run_e2e_tests.is_oppia_server_already_running
 run_webpack_compilation = run_e2e_tests.run_webpack_compilation
 
+
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if is_oppia_server_already_running():
