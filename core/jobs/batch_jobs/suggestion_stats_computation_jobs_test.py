@@ -455,17 +455,6 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             datetime.datetime.utcnow().date()
         )
 
-    def _create_skill(self) -> str:
-        """Creates a skill for a question.
-
-        Returns:
-            str. A skill ID.
-        """
-        skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, self.author_id, description='description')
-        return skill_id
-
     def _create_valid_question_data(
         self,
         default_dest_state_name: str,
