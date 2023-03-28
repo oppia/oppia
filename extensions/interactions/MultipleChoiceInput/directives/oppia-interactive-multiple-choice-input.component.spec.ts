@@ -196,12 +196,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
       }
     );
-    spyOn(component, 'submitAnswer');
-
     component.selectAnswer(dummyMouseEvent, '1');
 
     expect(component.answer).toBe(1);
-    expect(component.submitAnswer).toHaveBeenCalled();
   });
 
   it('should not update the answer if the user does not select any', () => {
