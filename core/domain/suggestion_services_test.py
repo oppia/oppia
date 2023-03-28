@@ -1831,7 +1831,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 self.reviewer_id_1,
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                topics=None
+            ))
 
         # Expect that the results correspond to question suggestions.
         self.assertEqual(len(suggestions), 2)

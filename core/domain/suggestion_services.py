@@ -1102,7 +1102,7 @@ def get_reviewable_question_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
-    topics: List[topic_domain.Topic]
+    topics: Optional[List[topic_domain.Topic]]
 ) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
     """Returns a list of question suggestions which the user
        can review.
