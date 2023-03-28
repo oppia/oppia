@@ -37,8 +37,8 @@ if MYPY: # pragma: no cover
 
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
-# successful migration, this file should be renamed as classroom_domain and
-# the exiting classroom domain file should be deleted, until then both of
+# successful migration, this file should be renamed as classroom_services and
+# the exiting classroom services file should be deleted, until then both of
 # the files will exist simultaneously.
 
 
