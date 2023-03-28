@@ -1582,9 +1582,9 @@ class TranslationReviewStats:
 
     def __init__(
         self,
-        language_code: str,
-        contributor_user_id: str,
-        topic_id: str,
+        language_code: Optional[str],
+        contributor_user_id: Optional[str],
+        topic_id: Optional[str],
         reviewed_translations_count: int,
         reviewed_translation_word_count: int,
         accepted_translations_count: int,
@@ -1609,9 +1609,9 @@ class TranslationReviewStats:
     @classmethod
     def create_default(
         cls,
-        language_code: str,
-        reviewer_user_id: str,
-        topic_id: str
+        language_code: Optional[str] = None,
+        reviewer_user_id: Optional[str] = None,
+        topic_id: Optional[str] = None
     ) -> TranslationReviewStats:
         """Create default translation review stats.
 
@@ -1712,8 +1712,8 @@ class QuestionContributionStats:
 
     def __init__(
         self,
-        contributor_user_id: str,
-        topic_id: str,
+        contributor_user_id: Optional[str],
+        topic_id: Optional[str],
         submitted_questions_count: int,
         accepted_questions_count: int,
         accepted_questions_without_reviewer_edits_count: int,
@@ -1733,8 +1733,8 @@ class QuestionContributionStats:
     @classmethod
     def create_default(
         cls,
-        contributor_user_id: str,
-        topic_id: str
+        contributor_user_id: Optional[str] = None,
+        topic_id: Optional[str] = None
     ) -> QuestionContributionStats:
         """Create default question contribution stats.
 
@@ -1826,8 +1826,8 @@ class QuestionReviewStats:
 
     def __init__(
         self,
-        contributor_user_id: str,
-        topic_id: str,
+        contributor_user_id: Optional[str],
+        topic_id: Optional[str],
         reviewed_questions_count: int,
         accepted_questions_count: int,
         accepted_questions_with_reviewer_edits_count: int,
@@ -1847,8 +1847,8 @@ class QuestionReviewStats:
     @classmethod
     def create_default(
         cls,
-        contributor_user_id: str,
-        topic_id: str
+        contributor_user_id: Optional[str] = None,
+        topic_id: Optional[str] = None
     ) -> QuestionReviewStats:
         """Create default question review stats.
 
