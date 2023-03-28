@@ -780,7 +780,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         offset: int,
         user_id: str,
         sort_key: Optional[str],
-        topics: Optional[topic_domain.Topic],
+        topics: Optional[List[topic_domain.Topic]],
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -829,9 +829,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     included_in_topics = False
                     if topics is not None:
                         for topic in topics:
-                            # ERROR in line below: 'Topic' object has no attribute 'question_ids'
-                            #   Question: How to get the question_ids of a topic?
-                            if suggestion_model.target_id in topic.question_ids:
+                            topic_skills = topic.get_all_skill_ids()
+
+                            if suggestion_model.target_id in topic_skills:
+                                
                                 included_in_topics = True
                                 break
 
