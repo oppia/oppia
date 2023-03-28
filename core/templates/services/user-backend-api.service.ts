@@ -22,7 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
 
 export interface SubscriptionSummary {
-  'creator_picture_data_url': string;
   'creator_username': string;
   'creator_impact': number;
 }
@@ -38,7 +37,6 @@ interface NonEmailPreferencesBackendDict {
   'preferred_language_codes': string[];
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
-  'profile_picture_data_url': string;
   'default_dashboard': string;
   'user_bio': string;
   'subject_interests': string;
@@ -78,10 +76,10 @@ export interface UserContributionRightsDataBackendDict {
 })
 export class UserBackendApiService {
   constructor(
-    private http: HttpClient) {}
+    private http: HttpClient
+  ) {}
 
   private USER_INFO_URL = '/userinfohandler';
-  private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
@@ -94,14 +92,6 @@ export class UserBackendApiService {
       (backendDict) => {
         return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
           backendDict) : UserInfo.createDefault();
-      });
-  }
-
-  async getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
-    return this.http.get<PreferencesBackendDict>(
-      this.PROFILE_PICTURE_URL).toPromise().then(
-      (backendDict) => {
-        return backendDict.profile_picture_data_url || defaultUrl;
       });
   }
 
