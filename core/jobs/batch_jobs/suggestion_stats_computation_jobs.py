@@ -424,7 +424,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 )
             else:
                 if suggestion.final_reviewer_id is None:
-                    raise Exception('Reviewer ID should not be None.')
+                    yield (
+                        'FAILED', result.Err('Reviewer ID should not be None.'))
                 key = model.construct_id(
                     suggestion.language_code,
                     suggestion.final_reviewer_id,
@@ -513,7 +514,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         )
                     else:
                         if suggestion.final_reviewer_id is None:
-                            raise Exception('Reviewer ID should not be None.')
+                            yield (
+                                'FAILED',
+                                result.Err('Reviewer ID should not be None.')
+                            )
                         key = model.construct_id(
                             suggestion.final_reviewer_id,
                             topic_id
