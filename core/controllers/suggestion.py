@@ -785,7 +785,8 @@ class ReviewableSuggestionsHandler(
                 topic = topic_fetchers.get_topic_by_name(topic_name)
                 if topic is None:
                     raise self.InvalidInputException(
-                        'The supplied input topic: %s is not valid' % topic_name)
+                        'The supplied input topic: %s is not valid'
+                        % topic_name)
                 topics = [topic]
             suggestions, next_offset = (
                 suggestion_services

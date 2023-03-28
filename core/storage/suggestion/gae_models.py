@@ -832,7 +832,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
                             topic_skills = topic.get_all_skill_ids()
 
                             if suggestion_model.target_id in topic_skills:
-                                
                                 included_in_topics = True
                                 break
 
