@@ -1549,9 +1549,9 @@ class TranslationContributionStats:
 class TranslationReviewStatsDict(TypedDict):
     """Dictionary representing the TranslationReviewStats object."""
 
-    language_code: str
-    contributor_user_id: str
-    topic_id: str
+    language_code: Optional[str]
+    contributor_user_id: Optional[str]
+    topic_id: Optional[str]
     reviewed_translations_count: int
     reviewed_translation_word_count: int
     accepted_translations_count: int
@@ -1566,8 +1566,8 @@ class TranslationReviewStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    language_code: str
-    topic_id: str
+    language_code: Optional[str]
+    topic_id: Optional[str]
     reviewed_translations_count: int
     reviewed_translation_word_count: int
     accepted_translations_count: int
@@ -1685,8 +1685,8 @@ class TranslationReviewStats:
 class QuestionContributionStatsDict(TypedDict):
     """Dictionary representing the QuestionContributionStats object."""
 
-    contributor_user_id: str
-    topic_id: str
+    contributor_user_id: Optional[str]
+    topic_id: Optional[str]
     submitted_questions_count: int
     accepted_questions_count: int
     accepted_questions_without_reviewer_edits_count: int
@@ -1699,7 +1699,7 @@ class QuestionContributionStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    topic_id: str
+    topic_id: Optional[str]
     submitted_questions_count: int
     accepted_questions_count: int
     accepted_questions_without_reviewer_edits_count: int
@@ -1799,8 +1799,8 @@ class QuestionContributionStats:
 class QuestionReviewStatsDict(TypedDict):
     """Dictionary representing the QuestionReviewStats object."""
 
-    contributor_user_id: str
-    topic_id: str
+    contributor_user_id: Optional[str]
+    topic_id: Optional[str]
     reviewed_questions_count: int
     accepted_questions_count: int
     accepted_questions_with_reviewer_edits_count: int
@@ -1813,7 +1813,7 @@ class QuestionReviewStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    topic_id: str
+    topic_id: Optional[str]
     reviewed_questions_count: int
     accepted_questions_count: int
     accepted_questions_with_reviewer_edits_count: int
