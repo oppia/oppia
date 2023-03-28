@@ -2341,6 +2341,11 @@ def _update_translation_review_stats_models(
     Args:
         translation_review_stats: list(TranslationReviewStats). A list of
             TranslationReviewStats domain objects.
+
+    Raises:
+        Exception. Language is None.
+        Exception. Contributor user ID is None.
+        Exception. Topic ID is None.
     """
     stats_dict = {}
     for stat in translation_review_stats:
@@ -2395,6 +2400,10 @@ def _update_question_contribution_stats_models(
     Args:
         question_contribution_stats: list(QuestionContributionStats). A list of
             QuestionContribution domain objects.
+
+    Raises:
+        Exception. Contributor user ID is None.
+        Exception. Topic ID is None.
     """
     stats_dict = {}
     for stat in question_contribution_stats:
@@ -2441,6 +2450,10 @@ def _update_question_review_stats_models(
     Args:
         question_review_stats: list(QuestionReviewStats). A list of
             QuestionReviewStats domain objects.
+
+    Raises:
+        Exception. Contributor user ID is None.
+        Exception. Topic ID is None.
     """
     stats_dict = {}
     for stat in question_review_stats:
