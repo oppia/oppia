@@ -20,7 +20,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -44,7 +43,6 @@ describe('Progress nav component', () => {
 
   let urlService: UrlService;
   let playerPositionService: PlayerPositionService;
-  let browserCheckerService: BrowserCheckerService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
@@ -69,7 +67,6 @@ describe('Progress nav component', () => {
         MockTranslatePipe
       ],
       providers: [
-        BrowserCheckerService,
         ExplorationEngineService,
         ExplorationPlayerStateService,
         FocusManagerService,
@@ -88,7 +85,6 @@ describe('Progress nav component', () => {
     componentInstance = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    browserCheckerService = TestBed.inject(BrowserCheckerService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     focusManagerService = TestBed.inject(FocusManagerService);
@@ -178,40 +174,6 @@ describe('Progress nav component', () => {
     expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
   }));
 
-  it('should return true if interaction has special case for mobile', () => {
-    spyOn(browserCheckerService, 'isMobileDevice')
-      .and.returnValue(true);
-    componentInstance.interactionId = 'ItemSelectionInput';
-    expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
-      .toBeTrue();
-    expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
-  });
-
-  it('should return false if interaction id is not item selection input',
-    () => {
-      spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
-      componentInstance.interactionId = 'not item selection input';
-
-      expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
-        .toBeFalse();
-      expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
-    });
-
-  it('should not resolve special case for interaction if in desktop mode',
-    () => {
-      spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
-      componentInstance.interactionCustomizationArgs = {
-        maxAllowableSelectionCount: {
-          value: 2
-        }
-      };
-      componentInstance.interactionId = 'ItemSelectionInput';
-
-      expect(componentInstance.doesInteractionHaveSpecialCaseForMobile())
-        .toBeTrue();
-      expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
-    });
-
   it('should tell if window can show two cards', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1);
@@ -220,13 +182,13 @@ describe('Progress nav component', () => {
   });
 
   it('should tell if generic submit button should be shown', () => {
-    spyOn(componentInstance, 'doesInteractionHaveSpecialCaseForMobile')
-      .and.returnValues(true, false);
     spyOn(componentInstance, 'doesInteractionHaveNavSubmitButton')
-      .and.returnValue(false);
+      .and.returnValues(false, true);
+    spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(false);
+
+    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeFalse();
 
     expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeTrue();
-    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeFalse();
   });
 
   it('should tell if continue button should be shown', () => {

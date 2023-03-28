@@ -148,9 +148,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     // Selected current option.
     (event.currentTarget as HTMLDivElement).classList.add('selected');
     this.answer = parseInt(answer, 10);
-    if (!this.browserCheckerService.isMobileDevice()) {
-      this.submitAnswer();
-    }
   }
 
   submitAnswer(): void {

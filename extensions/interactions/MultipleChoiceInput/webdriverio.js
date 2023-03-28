@@ -55,9 +55,13 @@ var expectInteractionDetailsToMatch = async function(
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' {String} is the text on the multiple-choice item to select.
 var submitAnswer = async function(elem, answer) {
-  var submitBtn = elem.$('oppia-interactive-multiple-choice-input')
+  var selectionInputItem = elem.$('oppia-interactive-multiple-choice-input')
     .$(`button=${answer}`);
-  await action.click('Submit Buttom', submitBtn);
+  await action.click('Selection Input Item', selectionInputItem);
+
+  var submitAnswerButton = $(
+    '.e2e-test-submit-answer-button');
+  await action.click('Submit answer button', submitAnswerButton);
 };
 
 var answerObjectType = 'NonnegativeInt';

@@ -95,16 +95,6 @@
       </div>
     </div>
 
-    <div *ngIf="displayedCard.getInteractionId() === 'MultipleChoiceInput'"
-         class="oppia-mcq-question-description-text">
-      <span>
-        <i>
-          Note: When you select an option, the quiz will automatically
-          move to the next question.
-        </i>
-      </span>
-    </div>
-
     <div *ngIf="!isInteractionInline() && !conceptCardIsBeingShown"
          class="conversation-skin-inline-interaction">
       <div class="oppia-conversation-skin-instruction-container">
