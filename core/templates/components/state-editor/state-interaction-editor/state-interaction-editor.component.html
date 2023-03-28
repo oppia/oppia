@@ -6,14 +6,16 @@
       <h3 class="oppia-exp-interaction-card-header">
         Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
       </h3>
-      <i class="fa fa-caret-down"
-         *ngIf="!interactionEditorIsShown"
-         aria-hidden="true">
-      </i>
-      <i class="fa fa-caret-up"
-         *ngIf="interactionEditorIsShown"
-         aria-hidden="true">
-      </i>
+      <div *ngIf="getCurrentInteractionName().length>0">
+        <i class="fa fa-caret-down"
+           *ngIf="!interactionEditorIsShown"
+           aria-hidden="true">
+        </i>
+        <i class="fa fa-caret-up"
+           *ngIf="interactionEditorIsShown"
+           aria-hidden="true">
+        </i>
+      </div>
     </div>
     <div class="oppia-add-interaction-button-container"
          *ngIf="!interactionId">
@@ -60,7 +62,7 @@
                     class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
                     (click)="deleteInteraction()"
                     *ngIf="editabilityService.isEditable()">
-              <i class="fas fa-times oppia-delete-interaction-icon"></i>
+              <i class="fas fa-times oppia-delete-interaction-icon" title="Delete interaction"></i>
             </button>
           </div>
         </div>

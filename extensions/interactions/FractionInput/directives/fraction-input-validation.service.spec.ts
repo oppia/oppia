@@ -256,8 +256,8 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be matched' +
+        ' because it is made redundant by answer 1 from Oppia response 1.'
     }]);
   });
 
@@ -283,8 +283,9 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from ' +
+        'Oppia response 1.'
     }]);
 
     answerGroups[0].rules = [equivalentToOneAndSimplestFormRule, equalsOneRule];
@@ -293,8 +294,9 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from ' +
+        'Oppia response 1.'
     }]);
   });
 
@@ -307,8 +309,9 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
+      message: 'Learner answer 1 from Oppia response 2 will never be ' +
+        'matched because it is made redundant by answer 1 from ' +
+        'Oppia response 1.'
     }]);
   });
 
@@ -320,8 +323,9 @@ describe('FractionInputValidationService', () => {
         goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Rule 2 from answer group 1 will never be matched ' +
-          'because it is made redundant by rule 1 from answer group 1.'
+        message: 'Learner answer 2 from Oppia response 1 will never be ' +
+        'matched because it is made redundant by answer 1 from ' +
+        'Oppia response 1.'
       }]);
     });
 
@@ -332,7 +336,7 @@ describe('FractionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 will never be matched ' +
+      message: 'Learner answer 1 from Oppia response 1 will never be matched ' +
         'because it is not in simplest form.'
     }]);
   });
@@ -345,7 +349,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
@@ -360,7 +364,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
@@ -375,7 +379,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
@@ -389,7 +393,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' is invalid: denominator should be ' +
         'greater than zero.')
     }]);
@@ -405,7 +409,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule ' + 1 + ' from answer group ' +
+          'Learner answer ' + 1 + ' from Oppia response ' +
           1 + ' will never be matched because it is an ' +
           'improper fraction')
       }]);
@@ -421,7 +425,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule ' + 1 + ' from answer group ' +
+          'Learner answer ' + 1 + ' from Oppia response ' +
           1 + ' will never be matched because it has a ' +
           'non zero integer part')
       }]);
@@ -447,7 +451,7 @@ describe('FractionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: (
-        'Rule ' + 1 + ' from answer group ' +
+        'Learner answer ' + 1 + ' from Oppia response ' +
         1 + ' will never be matched because integer part ' +
         'has to be zero')
     }]);
@@ -497,7 +501,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 1 is invalid as ' +
+          'Learner answer 1 from Oppia response 1 is invalid as ' +
           'integer part should be zero')
       }]);
 
@@ -509,7 +513,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 1 is invalid as ' +
+          'Learner answer 1 from Oppia response 1 is invalid as ' +
           'improper fractions are not allowed')
       }]);
 
@@ -520,7 +524,7 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 1 is invalid as ' +
+          'Learner answer 1 from Oppia response 1 is invalid as ' +
           'sign should be positive')
       }]);
 
@@ -540,8 +544,9 @@ describe('FractionInputValidationService', () => {
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: (
-          'Rule 1 from answer group 2 will never be matched because it ' +
-          'is made redundant by rule 1 from answer group 1.')
+          'Learner answer 1 from Oppia response 2 will never be ' +
+          'matched because it is made redundant by ' +
+          'answer 1 from Oppia response 1.')
       }]);
     });
 });

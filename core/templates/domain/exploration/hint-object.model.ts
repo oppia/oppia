@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Hint
+ * @fileoverview Model class for creating new frontend instances of Hint
  * domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import {
   SubtitledHtml,
@@ -46,26 +43,16 @@ export class Hint extends BaseTranslatableObject {
       hint_content: this.hintContent.toBackendDict()
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class HintObjectFactory {
-  constructor() {}
-
-  createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
+  static createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
     return new Hint(
       SubtitledHtml.createFromBackendDict(
         hintBackendDict.hint_content));
   }
 
-  createNew(hintContentId: string, hintContent: string): Hint {
+  static createNew(hintContentId: string, hintContent: string): Hint {
     return new Hint(
       SubtitledHtml.createDefault(
         hintContent, hintContentId));
   }
 }
-
-angular.module('oppia').factory(
-  'HintObjectFactory', downgradeInjectable(HintObjectFactory));
