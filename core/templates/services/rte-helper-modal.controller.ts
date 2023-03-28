@@ -53,6 +53,18 @@ angular.module('oppia').controller('RteHelperModalController', [
       $scope.modalIsLoading = false;
     });
 
+    // Any form control which is invalid has class name 'ng-invalid'.Using this
+    // property, we can make the form invalid and thus
+    // the Save button can be disabled
+    $scope.disableSave = function() {
+      let disable = false;
+      $scope.form.schemaForm.$getControls().forEach((control)=>{
+        disable ||= control.$$element[0].children[0].
+          classList.contains('ng-invalid');
+      });
+      return disable;
+    };
+
     $scope.currentRteIsMathExpressionEditor = false;
     $scope.currentRteIsLinkEditor = false;
     $scope.tmpCustomizationArgs = [];
