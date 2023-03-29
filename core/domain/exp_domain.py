@@ -1294,148 +1294,6 @@ class MatchedDenominatorDict(TypedDict):
     denominator: int
 
 
-def common_validation_checks_of_questions_and_exps(
-    state: state_domain.State,
-    state_name: str,
-    all_state_names: List[str],
-    strict: bool = False,
-) -> None:
-    """Validation checks that are common between Question and Exploration
-    instance.
-
-    Args:
-        state: state_domain.State. The state of the entity
-            (Question or Exploration).
-        state_name: str. The name of the state.
-        all_state_names: List[str]. The list of state names.
-        strict: bool. If True means the entity is published otherwise it
-            is unpublished.
-
-    Raises:
-        ValidationError. One or more attributes of the entity are invalid.
-    """
-    for answer_group in state.interaction.answer_groups:
-        if not answer_group.outcome.dest:
-            raise utils.ValidationError(
-                'Every outcome should have a destination.')
-        if not isinstance(answer_group.outcome.dest, str):
-            raise utils.ValidationError(
-                'Expected outcome dest to be a string, received %s'
-                % answer_group.outcome.dest)
-
-        outcome = answer_group.outcome
-        if outcome.dest_if_really_stuck is not None:
-            if not isinstance(outcome.dest_if_really_stuck, str):
-                raise utils.ValidationError(
-                    'Expected dest_if_really_stuck to be a '
-                    'string, received %s' %
-                    outcome.dest_if_really_stuck)
-
-        # Check group destinations.
-        if answer_group.outcome.dest not in all_state_names:
-            raise utils.ValidationError(
-                'The destination %s is not a valid state.'
-                % answer_group.outcome.dest)
-
-        # Check group if-stuck destinations.
-        if (
-            answer_group.outcome.dest_if_really_stuck is not None and
-            answer_group.outcome.dest_if_really_stuck not in all_state_names
-        ):
-            raise utils.ValidationError(
-                'The destination for the stuck learner %s '
-                'is not a valid state.'
-                % answer_group.outcome.dest_if_really_stuck)
-
-        # Check that, if the outcome is a non-self-loop, then the
-        # refresher_exploration_id is None.
-        if (
-            answer_group.outcome.refresher_exploration_id is not None and
-            answer_group.outcome.dest != state_name
-        ):
-            raise utils.ValidationError(
-                'The outcome for an answer group in state %s has a '
-                'refresher exploration ID, but is not a self-loop.'
-                % state_name)
-
-    interaction_default_outcome = state.interaction.default_outcome
-    if interaction_default_outcome is not None:
-        if not interaction_default_outcome.dest:
-            raise utils.ValidationError(
-                'Every outcome should have a destination.')
-        if not isinstance(interaction_default_outcome.dest, str):
-            raise utils.ValidationError(
-                'Expected outcome dest to be a string, received %s'
-                % interaction_default_outcome.dest)
-
-        if interaction_default_outcome.dest_if_really_stuck is not None:
-            if not isinstance(
-                interaction_default_outcome.dest_if_really_stuck, str
-            ):
-                raise utils.ValidationError(
-                    'Expected dest_if_really_stuck to be a '
-                    'string, received %s'
-                    % interaction_default_outcome.dest_if_really_stuck)
-
-        # Check the default destination, if any.
-        if interaction_default_outcome.dest not in all_state_names:
-            raise utils.ValidationError(
-                'The destination %s is not a valid state.'
-                % interaction_default_outcome.dest)
-
-        # Check default if-stuck destinations.
-        if (
-            interaction_default_outcome.dest_if_really_stuck is not None and
-            interaction_default_outcome.dest_if_really_stuck not in all_state_names
-        ):
-            raise utils.ValidationError(
-                'The destination for the stuck learner %s '
-                'is not a valid state.'
-                % interaction_default_outcome.dest_if_really_stuck)
-
-        # Check that, if the outcome is a non-self-loop, then the
-        # refresher_exploration_id is None.
-        if (
-            interaction_default_outcome.refresher_exploration_id is not None and
-            interaction_default_outcome.dest != state_name
-        ):
-            raise utils.ValidationError(
-                'The default outcome for state %s has a refresher '
-                'exploration ID, but is not a self-loop.' % state_name)
-
-    if strict:
-        if interaction_default_outcome is not None:
-            # Check that, if the outcome is a self-loop, then the
-            # outcome is not labelled as correct.
-            if (
-                interaction_default_outcome.dest == state_name and
-                interaction_default_outcome.labelled_as_correct
-            ):
-                raise utils.ValidationError(
-                    'The default outcome for state %s is labelled '
-                    'correct but is a self-loop.' % state_name)
-
-        for group in state.interaction.answer_groups:
-            # Check that, if the outcome is a self-loop, then the
-            # outcome is not labelled as correct.
-            if (
-                group.outcome.dest == state_name and
-                group.outcome.labelled_as_correct
-            ):
-                raise utils.ValidationError(
-                    'The outcome for an answer group in state %s is '
-                    'labelled correct but is a self-loop.' % state_name)
-
-            if (
-                group.outcome.labelled_as_correct and
-                group.outcome.dest_if_really_stuck is not None
-            ):
-                raise utils.ValidationError(
-                    'The outcome for the state is labelled '
-                    'correct but a destination for the stuck learner '
-                    'is specified.')
-
-
 class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
@@ -1828,8 +1686,46 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 allow_null_interaction=not strict,
                 tagged_skill_misconception_id_required=False,
                 strict=strict)
-            common_validation_checks_of_questions_and_exps(
-                state, state_name, all_state_names, strict)
+            # The checks below perform validation on the Outcome domain object
+            # that is specific to answer groups in explorations, but not
+            # questions. This logic is here because the validation checks in
+            # the Outcome domain object are used by both explorations and
+            # questions.
+            for answer_group in state.interaction.answer_groups:
+                if not answer_group.outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(answer_group.outcome.dest, str):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % answer_group.outcome.dest)
+
+                outcome = answer_group.outcome
+                if outcome.dest_if_really_stuck is not None:
+                    if not isinstance(outcome.dest_if_really_stuck, str):
+                        raise utils.ValidationError(
+                            'Expected dest_if_really_stuck to be a '
+                            'string, received %s' %
+                            outcome.dest_if_really_stuck)
+
+            if state.interaction.default_outcome is not None:
+                if not state.interaction.default_outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(state.interaction.default_outcome.dest, str):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % state.interaction.default_outcome.dest)
+
+                interaction_default_outcome = state.interaction.default_outcome
+                if interaction_default_outcome.dest_if_really_stuck is not None:
+                    if not isinstance(
+                        interaction_default_outcome.dest_if_really_stuck, str
+                    ):
+                        raise utils.ValidationError(
+                            'Expected dest_if_really_stuck to be a '
+                            'string, received %s'
+                            % interaction_default_outcome.dest_if_really_stuck)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -1922,9 +1818,66 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         % (param_change.name, state_name))
 
         # Check that all answer groups, outcomes, and param_changes are valid.
+        all_state_names = list(self.states.keys())
         for state_name, state in self.states.items():
             interaction = state.interaction
+            default_outcome = interaction.default_outcome
+
+            if default_outcome is not None:
+                # Check the default destination, if any.
+                if default_outcome.dest not in all_state_names:
+                    raise utils.ValidationError(
+                        'The destination %s is not a valid state.'
+                        % default_outcome.dest)
+
+                # Check default if-stuck destinations.
+                if (
+                    default_outcome.dest_if_really_stuck is not None and
+                    default_outcome.dest_if_really_stuck not in all_state_names
+                ):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % default_outcome.dest_if_really_stuck)
+
+                # Check that, if the outcome is a non-self-loop, then the
+                # refresher_exploration_id is None.
+                if (
+                    default_outcome.refresher_exploration_id is not None and
+                    default_outcome.dest != state_name
+                ):
+                    raise utils.ValidationError(
+                        'The default outcome for state %s has a refresher '
+                        'exploration ID, but is not a self-loop.' % state_name)
+
             for group in interaction.answer_groups:
+                # Check group destinations.
+                if group.outcome.dest not in all_state_names:
+                    raise utils.ValidationError(
+                        'The destination %s is not a valid state.'
+                        % group.outcome.dest)
+
+                # Check group if-stuck destinations.
+                if (
+                    group.outcome.dest_if_really_stuck is not None and
+                    group.outcome.dest_if_really_stuck not in all_state_names
+                ):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % group.outcome.dest_if_really_stuck)
+
+                # Check that, if the outcome is a non-self-loop, then the
+                # refresher_exploration_id is None.
+                if (
+                    group.outcome.refresher_exploration_id is not None and
+                    group.outcome.dest != state_name
+                ):
+                    raise utils.ValidationError(
+                        'The outcome for an answer group in state %s has a '
+                        'refresher exploration ID, but is not a self-loop.'
+                        % state_name)
+
                 for param_change in group.outcome.param_changes:
                     if param_change.name not in self.param_specs:
                         raise utils.ValidationError(
@@ -2042,6 +1995,43 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 warnings_list.append(
                     'An objective must be specified (in the \'Settings\' tab).'
                 )
+
+            # Check that self-loop outcomes are not labelled as correct.
+            all_state_names = list(self.states.keys())
+            for state_name, state in self.states.items():
+                interaction = state.interaction
+                default_outcome = interaction.default_outcome
+
+                if default_outcome is not None:
+                    # Check that, if the outcome is a self-loop, then the
+                    # outcome is not labelled as correct.
+                    if (
+                        default_outcome.dest == state_name and
+                        default_outcome.labelled_as_correct
+                    ):
+                        raise utils.ValidationError(
+                            'The default outcome for state %s is labelled '
+                            'correct but is a self-loop.' % state_name)
+
+                for group in interaction.answer_groups:
+                    # Check that, if the outcome is a self-loop, then the
+                    # outcome is not labelled as correct.
+                    if (
+                        group.outcome.dest == state_name and
+                        group.outcome.labelled_as_correct
+                    ):
+                        raise utils.ValidationError(
+                            'The outcome for an answer group in state %s is '
+                            'labelled correct but is a self-loop.' % state_name)
+
+                    if (
+                        group.outcome.labelled_as_correct and
+                        group.outcome.dest_if_really_stuck is not None
+                    ):
+                        raise utils.ValidationError(
+                            'The outcome for the state is labelled '
+                            'correct but a destination for the stuck learner '
+                            'is specified.')
 
             if len(warnings_list) > 0:
                 warning_str = ''
