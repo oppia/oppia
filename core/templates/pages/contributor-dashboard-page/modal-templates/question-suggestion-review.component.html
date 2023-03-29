@@ -3,9 +3,9 @@
     <h1 class="oppia-question-header">
       {{questionHeader}}
     </h1>
-    <h3 class="oppia-mobile-question-header" title="{{questionHeader}}">
+    <h2 class="oppia-mobile-question-header" title="{{questionHeader}}">
       {{questionHeader.substring(0, 25)}}{{questionHeader.length > 25 ? "...": ""}}
-    </h3>
+    </h2>
     <h4 class="author-header"
         *ngIf="reviewable">
       Submitted by {{authorName}}
