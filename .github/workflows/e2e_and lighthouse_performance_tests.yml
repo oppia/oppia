@@ -127,9 +127,9 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const artifact = require("@actions/artifact");
             const fs = require("fs");
             const name = "/home/runner/work/oppia/build_files.zip"
-            
             try {
               const tempArtifactPath = fs.mkdtempSync("artifactExists") + `/${name}`;
               const artifactClient = artifact.create();
