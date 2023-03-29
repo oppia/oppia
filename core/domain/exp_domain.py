@@ -1678,7 +1678,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'Expected states to be a dict, received %s' % self.states)
         if not self.states:
             raise utils.ValidationError('This exploration has no states.')
-        all_state_names = list(self.states.keys())
         for state_name, state in self.states.items():
             self._validate_state_name(state_name)
             state.validate(
