@@ -14,12 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Currently, the classroom data is stored in the config model and we are
-# planning to migrate the storage into a new Classroom model. After the
-# successful migration, this file should be renamed as classroom_domain and
-# the exiting classroom domain file should be deleted, until then both of
-# the files will exist simultaneously.
-
 """Domain objects for Classroom."""
 
 from __future__ import annotations
@@ -41,6 +35,12 @@ class ClassroomDict(TypedDict):
     topic_list_intro: str
     topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
 
+
+# TODO(#17246): Currently, the classroom data is stored in the config model and
+# we are planning to migrate the storage into a new Classroom model. After the
+# successful migration, this file should be renamed as classroom_domain and
+# the exiting classroom domain file should be deleted, until then both of
+# the files will exist simultaneously.
 
 class Classroom:
     """Domain object for a classroom."""

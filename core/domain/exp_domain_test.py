@@ -4665,6 +4665,91 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
+    SAMPLE_YAML_CONTENT: str = (
+        """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: Category
+correctness_feedback_enabled: true
+edits_allowed: true
+init_state_name: %s
+language_code: en
+next_content_id_index: 4
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: %d
+states:
+  %s:
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content_0
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: %s
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_1
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_0: {}
+        default_outcome_1: {}
+    solicit_answer_details: false
+  New state:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content_2
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome_3
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content_2: {}
+        default_outcome_3: {}
+    solicit_answer_details: false
+states_schema_version: %d
+tags: []
+title: Title
+version: 0
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_STATE_SCHEMA_VERSION)
+
     YAML_CONTENT_INVALID_SCHEMA_VERSION: Final = (
         """author_notes: ''
 auto_tts_enabled: true
@@ -7035,6 +7120,7 @@ states:
 states_schema_version: 55
 tags: []
 title: Title
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -7293,6 +7379,7 @@ states:
 states_schema_version: 55
 tags: []
 title: Title
+version: 0
 """)
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
@@ -7468,6 +7555,7 @@ states:
 states_schema_version: 55
 tags: []
 title: Title
+version: 0
 """)
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
@@ -7677,6 +7765,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -7968,6 +8057,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_rte)
@@ -8180,6 +8270,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -8356,6 +8447,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -8824,6 +8916,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -9251,6 +9344,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -9488,6 +9582,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -9798,6 +9893,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -10125,6 +10221,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -10329,6 +10426,7 @@ states:
 states_schema_version: 52
 tags: []
 title: ''
+version: 0
 """)
 
         latest_sample_yaml_content_for_item_selection_interac_2: str = (
@@ -10442,6 +10540,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -10589,6 +10688,7 @@ states:
 states_schema_version: 52
 tags: []
 title: ''
+version: 0
 """)
 
         latest_sample_yaml_content_for_item_selection_interac_3: str = (
@@ -10698,6 +10798,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -10817,6 +10918,7 @@ states:
 states_schema_version: 52
 tags: []
 title: ''
+version: 0
 """)
 
         latest_sample_yaml_content_for_item_selection_interac_4: str = (
@@ -10919,6 +11021,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -11286,6 +11389,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content_for_drag_and_drop_interac_1)
@@ -11565,6 +11669,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -11723,6 +11828,7 @@ states:
 states_schema_version: 52
 tags: []
 title: ''
+version: 0
 """)
 
         latest_sample_yaml_content_for_drag_and_drop_interac_3: str = (
@@ -11837,6 +11943,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -12318,6 +12425,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(
@@ -12539,6 +12647,7 @@ states:
 states_schema_version: 55
 tags: []
 title: ''
+version: 0
 """)
 
         exploration = exp_domain.Exploration.from_yaml(

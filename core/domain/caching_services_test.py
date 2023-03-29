@@ -144,7 +144,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'next_content_id_index': 7,
         'edits_allowed': True,
         'language_code': 'en',
-        'blurb': ''
+        'blurb': '',
+        'version': 1
     }
 
     # The correct json encoded version of the above exploration containing

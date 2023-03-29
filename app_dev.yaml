@@ -142,3 +142,4 @@ env_variables:
   DATASTORE_HOST: "http://localhost:8089"
   DATASTORE_PROJECT_ID: "dev-project-id"
   DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
+  SECRETS: "{\"ANDROID_BUILD_SECRET\": \"android-build-secret\"}"

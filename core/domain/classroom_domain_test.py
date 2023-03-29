@@ -32,3 +32,17 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         self.assertEqual(classroom_data.topic_ids, [])
         self.assertEqual(classroom_data.course_details, 'general details')
         self.assertEqual(classroom_data.topic_list_intro, 'general intro')
+
+    def test_to_dict_returns_correct_dict(self) -> None:
+        classroom_data = classroom_domain.Classroom(
+            'exp', 'exp/', [], 'general details', 'general intro')
+        self.assertEqual(
+            classroom_data.to_dict(),
+            {
+                'name': classroom_data.name,
+                'url_fragment': classroom_data.url_fragment,
+                'topic_ids': classroom_data.topic_ids,
+                'course_details': classroom_data.course_details,
+                'topic_list_intro': classroom_data.topic_list_intro
+            }
+        )

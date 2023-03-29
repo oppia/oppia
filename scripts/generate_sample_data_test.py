@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/contributor_dashboard_debug.py."""
+"""Unit tests for scripts/generate_sample_data.py."""
 
 from __future__ import annotations
 
@@ -33,11 +33,10 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services_test
 from core.tests import test_utils
 
-from scripts import contributor_dashboard_debug
+from scripts import generate_sample_data
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
-
 import requests
 from typing import Dict, List, Optional
 import webtest
@@ -68,7 +67,7 @@ class MockResponse:
         return self.json_dict
 
 
-class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
+class GenerateSampleDataTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
@@ -77,35 +76,29 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.firebase_sdk_stub.install(self)
         self.token_by_email: Dict[str, str] = {}
         self.token_of_current_user: Optional[str] = None
-        self.initializer = (
-            contributor_dashboard_debug.ContributorDashboardDebugInitializer(
-                base_url=''))
+        self.initializer = generate_sample_data.GenerateSampleData(base_url='')
 
         self.initializer.csrf_token = self.get_new_csrf_token()
 
         self.request_swap = self.swap(
-            self.initializer.session,
-            'request',
-            self._mock_request)
+            self.initializer.session, 'request', self._mock_request)
 
         self.init_app_swap = self.swap_with_call_counter(
             firebase_admin, 'initialize_app')
 
         admin_password = hashlib.md5(
-            contributor_dashboard_debug.SUPER_ADMIN_EMAIL.encode(
-                'utf-8')).hexdigest()
+            generate_sample_data.SUPER_ADMIN_EMAIL.encode('utf-8')).hexdigest()
         contributor_password = hashlib.md5(
-            contributor_dashboard_debug.CONTRIBUTOR_EMAIL.encode(
-                'utf-8')).hexdigest()
+            generate_sample_data.CONTRIBUTOR_EMAIL.encode('utf-8')).hexdigest()
         self.create_user_swap = self.swap_with_checks(
             firebase_auth, 'create_user', self._mock_firebase_auth_create_user,
             expected_kwargs=[
                 {
-                    'email': contributor_dashboard_debug.SUPER_ADMIN_EMAIL,
+                    'email': generate_sample_data.SUPER_ADMIN_EMAIL,
                     'password': admin_password
                 },
                 {
-                    'email': contributor_dashboard_debug.CONTRIBUTOR_EMAIL,
+                    'email': generate_sample_data.CONTRIBUTOR_EMAIL,
                     'password': contributor_password
                 }
             ]
@@ -157,26 +150,25 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         """Sets the environment variables to simulate a login of admin."""
         self.login(email, is_super_admin=True)
 
-    def test_populate_debug_data(self) -> None:
+    def test_generate_sample_data(self) -> None:
         with self.request_swap, self.create_user_swap, self.begin_session_swap:
             with self.init_app_swap as init_app_counter:
-                self.initializer.populate_debug_data()
+                self.initializer.generate_sample_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         # Asserts that the function _mock_login_as_admin() is called.
         self.assertEqual(
-            os.environ['USER_EMAIL'],
-            contributor_dashboard_debug.SUPER_ADMIN_EMAIL)
+            os.environ['USER_EMAIL'], generate_sample_data.SUPER_ADMIN_EMAIL)
         self.assertEqual(os.environ['USER_IS_ADMIN'], '1')
 
         self._assert_user_roles(
-            contributor_dashboard_debug.SUPER_ADMIN_USERNAME,
-            contributor_dashboard_debug.SUPER_ADMIN_ROLES)
+            generate_sample_data.SUPER_ADMIN_USERNAME,
+            generate_sample_data.SUPER_ADMIN_ROLES)
         self._assert_can_submit_question_suggestions(
-            contributor_dashboard_debug.CONTRIBUTOR_USERNAME)
+            generate_sample_data.CONTRIBUTOR_USERNAME)
         self._assert_generate_sample_new_structures_data()
         self._assert_topics_in_classroom(
-            contributor_dashboard_debug.CLASSROOM_NAME)
+            generate_sample_data.CLASSROOM_NAME)
 
     def _assert_user_roles(self, username: str, roles: List[str]) -> None:
         """Asserts that the user has the given roles."""
@@ -239,7 +231,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
         with self.request_swap, self.create_user_swap, self.begin_session_swap:
             with self.init_app_swap as init_app_counter:
-                self.initializer.populate_debug_data()
+                self.initializer.generate_sample_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         # Asserts that the environment variable 'FIREBASE_AUTH_EMULATOR_HOST' is
@@ -251,11 +243,11 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             self.assertNotIn('FIREBASE_AUTH_EMULATOR_HOST', auth_host)
 
         self._assert_sign_up_new_user(
-            contributor_dashboard_debug.SUPER_ADMIN_EMAIL,
-            contributor_dashboard_debug.SUPER_ADMIN_USERNAME)
+            generate_sample_data.SUPER_ADMIN_EMAIL,
+            generate_sample_data.SUPER_ADMIN_USERNAME)
         self._assert_sign_up_new_user(
-            contributor_dashboard_debug.CONTRIBUTOR_EMAIL,
-            contributor_dashboard_debug.CONTRIBUTOR_USERNAME)
+            generate_sample_data.CONTRIBUTOR_EMAIL,
+            generate_sample_data.CONTRIBUTOR_USERNAME)
 
     def _assert_sign_up_new_user(self, email: str, username: str) -> None:
         """Asserts that the function _mock_firebase_auth_create_user() is called
@@ -270,25 +262,24 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         sign_in_swap = self.swap_with_checks(
             requests, 'post', self._mock_firebase_auth_sign_in,
             expected_args=[
-                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL,),
-                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL,),
-                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL,)
+                (generate_sample_data.FIREBASE_SIGN_IN_URL,),
+                (generate_sample_data.FIREBASE_SIGN_IN_URL,),
+                (generate_sample_data.FIREBASE_SIGN_IN_URL,)
             ]
         )
 
         with self.request_swap, self.create_user_swap:
             with sign_in_swap, self.init_app_swap as init_app_counter:
-                self.initializer.populate_debug_data()
+                self.initializer.generate_sample_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         # Asserts that the function _mock_firebase_auth_sign_in() is called.
         self.assertEqual(
             self.token_of_current_user,
-            self.token_by_email[contributor_dashboard_debug.SUPER_ADMIN_EMAIL])
+            self.token_by_email[generate_sample_data.SUPER_ADMIN_EMAIL])
         # Asserts that the function mock_establish_auth_session() is called.
         self.assertEqual(
-            os.environ['USER_EMAIL'],
-            contributor_dashboard_debug.SUPER_ADMIN_EMAIL)
+            os.environ['USER_EMAIL'], generate_sample_data.SUPER_ADMIN_EMAIL)
         self.assertEqual(os.environ['USER_IS_ADMIN'], '1')
 
     def _mock_firebase_auth_sign_in(

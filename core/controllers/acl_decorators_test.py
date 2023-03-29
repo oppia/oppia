@@ -7690,3 +7690,85 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
 
         self.assertEqual(response['success'], 1)
         self.logout()
+
+
+class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
+    """Tests for is_from_oppia_android_build decorator."""
+
+    user_email = 'user@example.com'
+    username = 'user'
+    secret = 'webhook_secret'
+    invalid_secret = 'invalid'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+            'GET': {}
+        }
+
+        @acl_decorators.is_from_oppia_android_build
+        def get(self) -> None:
+            self.render_json({'secret': self.request.headers.get('X-ApiKey')})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_secret_page', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_error_when_android_build_secret_is_none(self) -> None:
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        swap_api_key_secrets_return_none = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            lambda _: None,
+            expected_args=[
+                ('ANDROID_BUILD_SECRET',),
+            ]
+        )
+
+        with testapp_swap:
+            with swap_api_key_secrets_return_none:
+                response = self.get_json(
+                    '/mock_secret_page',
+                    expected_status_int=401,
+                    headers={'X-ApiKey': 'secret'}
+                )
+
+        self.assertEqual(
+            response['error'],
+            'The incoming request is not a valid Oppia Android build request.'
+        )
+
+    def test_error_when_given_api_key_is_invalid(self) -> None:
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        mailchimp_swap = self.swap_to_always_return(
+            secrets_services, 'get_secret', 'secret')
+
+        with testapp_swap, mailchimp_swap:
+            response = self.get_json(
+                '/mock_secret_page',
+                expected_status_int=401,
+                headers={'X-ApiKey': 'nonsecret'}
+            )
+
+        self.assertEqual(
+            response['error'],
+            'The incoming request is not a valid Oppia Android build request.'
+        )
+
+    def test_no_error_when_given_api_key_is_valid(self) -> None:
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        mailchimp_swap = self.swap_to_always_return(
+            secrets_services, 'get_secret', 'secret')
+
+        with testapp_swap, mailchimp_swap:
+            response = self.get_json(
+                '/mock_secret_page',
+                expected_status_int=200,
+                headers={'X-ApiKey': 'secret'}
+            )
+
+        self.assertEqual(response['secret'], 'secret')

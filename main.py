@@ -24,7 +24,7 @@ from core.constants import constants
 from core.controllers import access_validators
 from core.controllers import acl_decorators
 from core.controllers import admin
-from core.controllers import android_e2e_config
+from core.controllers import android
 from core.controllers import base
 from core.controllers import beam_jobs
 from core.controllers import blog_admin
@@ -1098,7 +1098,8 @@ URLS = [
         learner_group.LearnerStoriesChaptersProgressHandler),
     get_redirect_route(
         '/learner_groups_feature_status_handler',
-        learner_group.LearnerGroupsFeatureStatusHandler)
+        learner_group.LearnerGroupsFeatureStatusHandler),
+    get_redirect_route('/android_data', android.AndroidActivityHandler)
 ]
 
 # Adding redirects for topic landing pages.
@@ -1113,7 +1114,7 @@ if constants.DEV_MODE:
     URLS.append(
         get_redirect_route(
             r'/initialize_android_test_data',
-            android_e2e_config.InitializeAndroidTestDataHandler))
+            android.InitializeAndroidTestDataHandler))
 
 # Adding redirects for all stewards landing pages.
 for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:

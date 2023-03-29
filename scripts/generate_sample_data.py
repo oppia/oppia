@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script assists development of the contributor dashboard. When the
-"contributor dashboard debug" flag is enabled, the start script will call the
-"populate_debug_data" function, which does the following:
+"""This script assists development of the contributor dashboard and testing of
+Android build process. When the "--generate_sample_data" flag is enabled,
+the start script will call the "generate_sample_data" function, which does the
+following:
     1. Create an admin user with the username "a" and assign curriculum,
     translation, and question admin rights to "a".
     2. Create a non-admin user with the username "b" and give the user "submit
@@ -62,7 +63,7 @@ CLASSROOM_NAME: Final = 'math'
 CLASSROOM_URL_FRAGMENT: Final = 'math'
 
 
-class ContributorDashboardDebugInitializer:
+class GenerateSampleData:
     """Contains functions that populate sample data by sending requests to the
     development server.
 
@@ -78,10 +79,8 @@ class ContributorDashboardDebugInitializer:
         self.base_url = base_url
         self.csrf_token = ''
 
-    def populate_debug_data(self) -> None:
-        """Populate sample data to help develop for the contributor
-        dashboard.
-        """
+    def generate_sample_data(self) -> None:
+        """Generate sample data."""
         firebase_admin.initialize_app(
             options={'projectId': feconf.OPPIA_PROJECT_ID})
 

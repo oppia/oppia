@@ -457,7 +457,7 @@ class BaseModel(datastore_services.Model):
         datastore_services.put_multi(entities)
 
     @classmethod
-    def delete_multi(cls, entities: List[SELF_BASE_MODEL]) -> None:
+    def delete_multi(cls, entities: Sequence[SELF_BASE_MODEL]) -> None:
         """Deletes the given datastore_services.Model instances.
 
         Args:

@@ -2620,6 +2620,7 @@ states:
 states_schema_version: %d
 tags: []
 title: A title
+version: 2
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
@@ -2724,6 +2725,7 @@ states:
 states_schema_version: %d
 tags: []
 title: A title
+version: 3
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,

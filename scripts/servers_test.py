@@ -459,7 +459,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('dev_appserver.py', popen_calls[0].program_args)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
+        self.assertEqual(list(popen_calls[0].kwargs.keys()), ['shell', 'env'])
 
     def test_managed_elasticsearch_dev_server(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())

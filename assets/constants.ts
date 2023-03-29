@@ -38,9 +38,13 @@ export default {
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
+  "ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS": "exp_translations",
   "ACTIVITY_TYPE_COLLECTION": "collection",
   "ACTIVITY_TYPE_STORY": "story",
+  "ACTIVITY_TYPE_SKILL": "skill",
+  "ACTIVITY_TYPE_SUBTOPIC": "subtopic",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
+  "ACTIVITY_TYPE_CLASSROOM": "classroom",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -6923,7 +6927,9 @@ export default {
     "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
     "edits_allowed"
   ],
-  "NON_METADATA_PROPERTIES": ["id", "states", "next_content_id_index"],
+  "NON_METADATA_PROPERTIES": [
+    "id", "states", "next_content_id_index", "version"
+  ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313
 } as const;
