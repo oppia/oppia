@@ -122,6 +122,8 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
+      - name: install @actions/artifact for checking build artifact
+        run: npm i @actions/artifact
       - name: Check if build artifact still exists
         id: check_build_artifact
         uses: actions/github-script@v6
