@@ -20,8 +20,8 @@ from core.constants import constants
 from core.tests import test_utils
 from scripts import build
 from scripts import common
-from scripts import contributor_dashboard_debug
 from scripts import extend_index_yaml
+from scripts import generate_sample_data
 from scripts import install_third_party_libs
 from scripts import servers
 
@@ -100,7 +100,7 @@ class StartTests(test_utils.GenericTestBase):
                 'enable_host_checking': True,
                 'automatic_restart': True,
                 'skip_sdk_update_check': True,
-                'port': PORT_NUMBER_FOR_GAE_SERVER
+                'port': PORT_NUMBER_FOR_GAE_SERVER,
             }])
         self.swap_create_server = self.swap_with_checks(
             servers, 'create_managed_web_browser',
@@ -261,7 +261,19 @@ class StartTests(test_utils.GenericTestBase):
             ],
             self.print_arr)
 
-    def test_start_servers_successfully_in_contributor_dashboard_debug_mode(
+    def test_start_servers_with_contributor_dashboard_debug_flag_fails(
+        self
+    ) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import start
+        with self.assertRaisesRegex(
+            Exception,
+            'The \'--contributor_dashboard_debug\' flag is deprecated'
+            'use \'--generate_sample_data\' instead.'
+        ):
+            start.main(args=['--contributor_dashboard_debug'])
+
+    def test_start_servers_successfully_with_generate_sample_data_flag(
         self
     ) -> None:
         with self.swap_install_third_party_libs:
@@ -270,8 +282,7 @@ class StartTests(test_utils.GenericTestBase):
             build, 'main', lambda **unused_kwargs: None,
             expected_kwargs=[{'args': []}])
         populate_data_swap = self.swap_with_call_counter(
-            contributor_dashboard_debug.ContributorDashboardDebugInitializer,
-            'populate_debug_data'
+            generate_sample_data.GenerateSampleData, 'generate_sample_data'
         )
         with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
@@ -280,7 +291,7 @@ class StartTests(test_utils.GenericTestBase):
                         with self.swap_firebase_auth_emulator, self.swap_print:
                             with populate_data_swap as populate_data_counter:
                                 with self.swap_mock_set_constants_to_default:
-                                    start.main(args=['--contributor_dashboard'])
+                                    start.main(args=['--generate_sample_data'])
 
         self.assertEqual(populate_data_counter.times_called, 1)
         self.assertIn(
