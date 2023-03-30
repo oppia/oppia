@@ -21,7 +21,6 @@ from core.tests import test_utils
 from scripts import build
 from scripts import common
 from scripts import extend_index_yaml
-from scripts import generate_sample_data
 from scripts import install_third_party_libs
 from scripts import servers
 
@@ -99,7 +98,7 @@ class StartTests(test_utils.GenericTestBase):
                 'enable_host_checking': True,
                 'automatic_restart': True,
                 'skip_sdk_update_check': True,
-                'port': PORT_NUMBER_FOR_GAE_SERVER,
+                'port': PORT_NUMBER_FOR_GAE_SERVER
             }])
         self.swap_create_server = self.swap_with_checks(
             servers, 'create_managed_web_browser',
