@@ -140,7 +140,7 @@ describe('Rte Helper Modal Controller', function() {
       );
       $compile(element)($scope);
       $scope.$digest();
-      expect($scope.disableSave()).toBe(true);
+      expect($scope.isFormSaveable()).toBe(false);
     });
   });
 
