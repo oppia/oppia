@@ -122,60 +122,6 @@ jobs:
             requirements.txt
             requirements_dev.in
             requirements_dev.txt
-      - name: install @actions/artifact for checking build artifact
-        run: npm i @actions/artifact --force
-      - name: Check if build artifact still exists
-        id: check_build_artifact
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const artifact = require("@actions/artifact");
-            const fs = require("fs");
-            const name = "/home/runner/work/oppia/build_files.zip"
-            try {
-              const tempArtifactPath = fs.mkdtempSync("artifactExists") + `/${name}`;
-              const artifactClient = artifact.create();
-              const downloadOptions = {
-                createArtifactFolder: false,
-              };
-              try {
-                const downloadResponse = await artifactClient.downloadArtifact(
-                  name,
-                  tempArtifactPath,
-                  downloadOptions
-                );
-                core.info(`Artifact ${downloadResponse.artifactName} exists.`);
-                core.setOutput("exists", true);
-              } catch (err) {
-                core.info(`Artifact ${name} does not exist.`);
-                core.setOutput("exists", false);
-              }
-            } catch (err) {
-              core.setFailed(err.message);
-            }
-      - if: ${{ !steps.check_build_artifact.outputs.exists }}
-        uses: ./.github/actions/install-oppia-dependencies
-      - name: (Artifact re-build) Install chrome
-        if: ${{ !steps.check_build_artifact.outputs.exists }}
-        run: python -m scripts.install_chrome_for_ci
-      - name: (Artifact re-build) Install ffmpeg
-        if: ${{ !steps.check_build_artifact.outputs.exists }}
-        run: sudo apt install ffmpeg
-      - name: (Artifact re-build) Build Webpack
-        if: ${{ !steps.check_build_artifact.outputs.exists }}
-        run: python -m scripts.build --prod_env
-      - name: (Artifact re-build) Zip build files
-        if: ${{ !steps.check_build_artifact.outputs.exists }}
-        run: |
-          zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
-        working-directory: /home/runner/work/oppia
-      - name: (Artifact re-build) Upload build files 
-        if: ${{ !steps.check_build_artifact.outputs.exists }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: build_files
-          path: /home/runner/work/oppia/build_files.zip
-          retention-days: 1
       - uses: ./.github/actions/merge
       - name: Cache node modules
         uses: actions/cache@v3
@@ -188,7 +134,39 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Download build files artifact
+      - name: Attempt to download build files artifact
+        id: download_artifact_1
+        uses: actions/download-artifact@v3
+        continue-on-error: true
+        with:
+          name: build_files
+          path: /home/runner/work/oppia/
+      - if: steps.download_artifact_1.outcome == 'failure'
+        uses: ./.github/actions/install-oppia-dependencies
+      - name: (Artifact re-build) Install chrome
+        if: steps.download_artifact_1.outcome == 'failure'
+        run: python -m scripts.install_chrome_for_ci
+      - name: (Artifact re-build) Install ffmpeg
+        if: steps.download_artifact_1.outcome == 'failure'
+        run: sudo apt install ffmpeg
+      - name: (Artifact re-build) Build Webpack
+        if: steps.download_artifact_1.outcome == 'failure'
+        run: python -m scripts.build --prod_env
+      - name: (Artifact re-build) Zip build files
+        if: steps.download_artifact_1.outcome == 'failure'
+        run: |
+          zip -rqy build_files.zip oppia/third_party oppia_tools oppia/build oppia/webpack_bundles oppia/proto_files oppia/app.yaml oppia/assets/hashes.json oppia/proto_files oppia/extensions/classifiers/proto/* oppia/backend_prod_files oppia/dist
+        working-directory: /home/runner/work/oppia
+      - name: (Artifact re-build) Upload build files 
+        if: steps.download_artifact_1.outcome == 'failure'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_files
+          path: /home/runner/work/oppia/build_files.zip
+          retention-days: 1
+      - name: (artifact re-build) Retry build files download
+        if: steps.download_artifact_1.outcome == 'failure'
+        id: download_artifact_1
         uses: actions/download-artifact@v3
         with:
           name: build_files
