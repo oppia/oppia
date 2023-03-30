@@ -20,6 +20,8 @@
 import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'oppia-mark-translations-as-needing-update-modal',
@@ -30,17 +32,32 @@ export class MarkTranslationsAsNeedingUpdateModalComponent
   @Input() contentId!: string;
   @Input() markNeedsUpdateHandler!: (contentId: string) => void;
   @Input() removeHandler!: (contentId: string) => void;
+  @ViewChild('updateForm', { static: false }) updateForm!: NgForm;
 
+  updateReasons: string[] = [
+    'Spelling/grammar mistake',
+    'Missing/incorrect translation',
+    'Outdated information',
+    'Other'
+  ];
+
+  selectedReason: string = '';
   constructor(
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
+markNeedsUpdate(): void {
+    if (this.selectedReason === '') {
+      // Show an error message if no reason is selected.
+      this.updateForm.controls['reason'].setErrors({ required: true });
+      return;
+    }
 
-  markNeedsUpdate(): void {
     this.markNeedsUpdateHandler(this.contentId);
     this.ngbActiveModal.close();
   }
+
 
   removeTranslations(): void {
     this.removeHandler(this.contentId);
