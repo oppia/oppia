@@ -94,6 +94,56 @@ describe('Rte Helper Modal Controller', function() {
     });
   });
 
+  describe('when there are validation errors in any form control', function() {
+    var customizationArgSpecs = [{
+      name: 'alt',
+      default_value: 'def',
+      schema: {
+        type: 'unicode',
+        validators: [{
+          id: 'has_length_at_least',
+          min_value: 5
+        }]
+      }
+    }];
+    var $compile;
+
+    beforeEach(angular.mock.module('oppia'));
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      var $rootScope = $injector.get('$rootScope');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $compile = $injector.get('$compile');
+      $controller(
+        'RteHelperModalController', {
+          $scope: $scope,
+          $uibModalInstance: $uibModalInstance,
+          attrsCustomizationArgsDict: {
+            heading: 'This value is not default.'
+          },
+          customizationArgSpecs: customizationArgSpecs,
+        });
+    }));
+
+    it('should disable save button', function() {
+      let element = angular.element(
+        '<form name="form.schemaForm">' +
+            '<schema-based-editor ng-model="tmp">' +
+              '<div class = "ng-invalid">' +
+              '</div>' +
+            '</schema-based-editor>' +
+        '</form>'
+      );
+      $compile(element)($scope);
+      $scope.$digest();
+      expect($scope.isFormSaveable()).toBe(false);
+    });
+  });
+
   describe('when the editor is Math expression editor', function() {
     var customizationArgSpecs = [{
       name: 'math_content',
