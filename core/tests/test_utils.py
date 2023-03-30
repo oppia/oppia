@@ -2255,6 +2255,7 @@ states:
 states_schema_version: %d
 tags: []
 title: Title
+version: 1
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
