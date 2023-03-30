@@ -3710,7 +3710,7 @@ class State(translation_domain.BaseTranslatableObject):
                 allowed to be unspecified.
             tagged_skill_misconception_id_required: bool. The 'tagged_skill_
                 misconception_id' is required or not.
-            strict: bool. Tells if the exploration is strict or not.
+            strict: bool. Tells if the entity is strict or not.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.
