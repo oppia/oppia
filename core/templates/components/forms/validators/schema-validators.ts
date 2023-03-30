@@ -18,6 +18,57 @@
 
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { AppConstants } from 'app.constants';
+import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
+import cloneDeep from 'lodash/cloneDeep';
+import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
+
+type ValidatorKeyType = keyof Omit<typeof SchemaValidators, 'prototype'>;
+type ValidatorFunctionType = (typeof SchemaValidators)[ValidatorKeyType];
+type FilterArgsType = Parameters<ValidatorFunctionType>[0];
+
+export const validate = (
+    control: AbstractControl, validators: OppiaValidator[]
+): ValidationErrors | null => {
+  let underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
+  if (!validators || validators.length === 0) {
+    return null;
+  }
+  let errorsPresent = false;
+  let allValidationErrors: ValidationErrors = {};
+  for (const validatorSpec of validators) {
+    const validatorName = underscoresToCamelCasePipe.transform(
+      validatorSpec.id
+    ) as ValidatorKeyType;
+    const filterArgs = Object.fromEntries(
+      Object.entries(validatorSpec)
+        .filter(([key, _]) => key !== 'id')
+        .map(
+          ([key, value]) => {
+            return [
+              underscoresToCamelCasePipe.transform(key),
+              cloneDeep(value)
+            ];
+          })
+    ) as FilterArgsType;
+    if (SchemaValidators[validatorName]) {
+      const error = (
+        SchemaValidators[
+          validatorName
+        ] as (arg: FilterArgsType) => ReturnType<ValidatorFunctionType>
+      )(filterArgs)(control);
+      if (error !== null) {
+        errorsPresent = true;
+        allValidationErrors = {...allValidationErrors, ...error};
+      }
+    } else {
+      // TODO(#15190): Throw an error if validator not found.
+    }
+  }
+  if (!errorsPresent) {
+    return null;
+  }
+  return allValidationErrors;
+};
 
 export class SchemaValidators {
   static hasLengthAtLeast(

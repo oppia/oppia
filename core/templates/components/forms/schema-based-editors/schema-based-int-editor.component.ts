@@ -21,12 +21,9 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, Abst
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { validate } from 'components/forms/validators/schema-validators';
+import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
 
-interface OppiaValidator {
-  id: string;
-  'min_value': number;
-  'max_value': number;
-}
 
 @Component({
   selector: 'schema-based-int-editor',
@@ -82,7 +79,7 @@ implements ControlValueAccessor, OnInit, Validator {
     if (control && typeof control.value !== 'number') {
       return {invalidType: typeof control.value};
     }
-    return null;
+    return validate(control, this.validators);
   }
 
   onKeypress(evt: KeyboardEvent): void {

@@ -32,12 +32,9 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { SchemaDefaultValue } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { validate } from 'components/forms/validators/schema-validators';
+import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
 
-interface OppiaValidator {
-  id: string;
-  'min_value': number;
-  'max_value': number;
-}
 
 @Component({
   selector: 'schema-based-unicode-editor',
@@ -124,8 +121,8 @@ implements ControlValueAccessor, OnInit, Validator {
   registerOnTouched(fn: SchemaDefaultValue): void {
   }
 
-  validate(control: AbstractControl): ValidationErrors {
-    return {};
+  validate(control: AbstractControl): ValidationErrors | null {
+    return validate(control, this.validators);
   }
 
   ngOnInit(): void {
