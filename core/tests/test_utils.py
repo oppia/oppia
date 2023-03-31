@@ -1843,6 +1843,9 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
+        # Mock set_constans_to_default method to throw an exception.
+        # Don't directly change constants file in the test.
+        # Mock this method again in your test.
         self.contextManager = self.swap(
             common, 'set_constants_to_default',
             self.mock_set_constants_to_default)
@@ -1924,6 +1927,10 @@ class AppEngineTestBase(TestBase):
             queue_name=queue_name)
 
     def mock_set_constants_to_default(self) -> None:
+        """Change constants file in the test could lead to other
+        tests fail. Mock set_constants_to_default method in your test
+        will suppress this exception.
+        """
         raise Exception('Please mock this method in the test.')
 
 
