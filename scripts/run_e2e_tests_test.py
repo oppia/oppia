@@ -18,7 +18,6 @@
 from __future__ import annotations
 
 import contextlib
-import os
 import subprocess
 import sys
 import time
