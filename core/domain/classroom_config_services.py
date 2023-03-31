@@ -14,12 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Currently, the classroom data is stored in the config model and we are
-# planning to migrate the storage into a new Classroom model. After the
-# successful migration, this file should be renamed as classroom_services and
-# the exiting classroom service file should be deleted, until then both of
-# the files will exist simultaneously.
-
 """Commands for operations on classrooms."""
 
 from __future__ import annotations
@@ -34,6 +28,12 @@ if MYPY: # pragma: no cover
     from mypy_imports import classroom_models
 
 (classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
+
+# TODO(#17246): Currently, the classroom data is stored in the config model and
+# we are planning to migrate the storage into a new Classroom model. After the
+# successful migration, this file should be renamed as classroom_services and
+# the existing classroom services file should be deleted, until then both of
+# the files will exist simultaneously.
 
 
 def get_all_classrooms() -> List[classroom_config_domain.Classroom]:
