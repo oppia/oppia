@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/contributor_dashboard_debug.py."""
+"""Unit tests for scripts/populate_sample_data.py."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services_test
 from core.tests import test_utils
 
-from scripts import contributor_dashboard_debug
+from scripts import populate_sample_data
 
 import requests
 from typing import Dict, List, Optional
@@ -73,7 +73,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.token_by_email: Dict[str, str] = {}
         self.token_of_current_user: Optional[str] = None
         self.initializer = (
-            contributor_dashboard_debug.DebugInitializer(
+            populate_sample_data.DebugInitializer(
                 base_url=''))
 
         self.initializer.csrf_token = self.get_new_csrf_token()
@@ -87,9 +87,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             requests, 'post',
             self._mock_post_to_firebase,
             expected_args=[
-                (contributor_dashboard_debug.FIREBASE_SIGN_UP_URL,),
-                (contributor_dashboard_debug.FIREBASE_SIGN_UP_URL,),
-                (contributor_dashboard_debug.FIREBASE_SIGN_IN_URL,)
+                (populate_sample_data.FIREBASE_SIGN_UP_URL,),
+                (populate_sample_data.FIREBASE_SIGN_UP_URL,),
+                (populate_sample_data.FIREBASE_SIGN_IN_URL,)
             ]
         )
 
@@ -133,7 +133,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         """
         email = kwargs['json']['email']
 
-        if url == contributor_dashboard_debug.FIREBASE_SIGN_UP_URL:
+        if url == populate_sample_data.FIREBASE_SIGN_UP_URL:
             auth_id = self.get_auth_id_from_email(email)
             self.token_by_email[email] = (
                 self.firebase_sdk_stub.create_user(auth_id, email))
@@ -147,10 +147,10 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
     def test_populate_data_is_called(self) -> None:
         populate_data_swap = self.swap_with_call_counter(
-            contributor_dashboard_debug.DebugInitializer,
+            populate_sample_data.DebugInitializer,
             'populate_data')
         with populate_data_swap as call_counter:
-            contributor_dashboard_debug.main()
+            populate_sample_data.main()
 
         self.assertEqual(call_counter.times_called, 1)
 
@@ -159,19 +159,19 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             self.initializer.populate_data()
 
         self._assert_sign_up_new_user(
-            contributor_dashboard_debug.SUPER_ADMIN_EMAIL,
-            contributor_dashboard_debug.SUPER_ADMIN_USERNAME)
+            populate_sample_data.SUPER_ADMIN_EMAIL,
+            populate_sample_data.SUPER_ADMIN_USERNAME)
         self._assert_sign_up_new_user(
-            contributor_dashboard_debug.CONTRIBUTOR_EMAIL,
-            contributor_dashboard_debug.CONTRIBUTOR_USERNAME)
+            populate_sample_data.CONTRIBUTOR_EMAIL,
+            populate_sample_data.CONTRIBUTOR_USERNAME)
         self._assert_user_roles(
-            contributor_dashboard_debug.SUPER_ADMIN_USERNAME,
-            contributor_dashboard_debug.SUPER_ADMIN_ROLES)
+            populate_sample_data.SUPER_ADMIN_USERNAME,
+            populate_sample_data.SUPER_ADMIN_ROLES)
         self._assert_can_submit_question_suggestions(
-            contributor_dashboard_debug.CONTRIBUTOR_USERNAME)
+            populate_sample_data.CONTRIBUTOR_USERNAME)
         self._assert_generate_sample_new_structures_data()
         self._assert_topics_in_classroom(
-            contributor_dashboard_debug.CLASSROOM_NAME)
+            populate_sample_data.CLASSROOM_NAME)
 
     def _assert_user_roles(self, username: str, roles: List[str]) -> None:
         """Asserts that the user has the given roles."""

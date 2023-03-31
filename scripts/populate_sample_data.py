@@ -278,6 +278,6 @@ def main() -> None:
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when contributor_dashboard_debug.py used as a script.
+# it will only be called when populate_sample_data.py used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()
