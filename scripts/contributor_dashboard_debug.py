@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script assists development of the contributor dashboard. After starting
+"""This script populates sample data for assisting development. After starting
 up a development server running Oppia, running this script does the following:
     1. Create an admin user with the username "a" and assign curriculum,
     translation, and question admin rights to "a".
@@ -68,9 +68,9 @@ CLASSROOM_NAME: Final = 'math'
 CLASSROOM_URL_FRAGMENT: Final = 'math'
 
 
-class ContributorDashboardDebugInitializer:
-    """Contains functions that populate sample data by sending requests to the
-    development server.
+class DebugInitializer:
+    """Contains functions that populate sample data for debugging by sending
+    requests to the development server.
 
     Attributes:
         session: object(Session). The requests.Session object to send requests
@@ -84,7 +84,7 @@ class ContributorDashboardDebugInitializer:
         self.base_url = base_url
         self.csrf_token = ''
 
-    def populate_debug_data(self) -> None:
+    def populate_data(self) -> None:
         """Populate sample data to help develop for the contributor
         dashboard.
         """
@@ -270,11 +270,11 @@ class ContributorDashboardDebugInitializer:
 def main() -> None:
     """Populates data for contributor dashboard debugging."""
     initializer = (
-        ContributorDashboardDebugInitializer(
+        DebugInitializer(
             base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER
         )
     )
-    initializer.populate_debug_data()
+    initializer.populate_data()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

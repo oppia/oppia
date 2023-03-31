@@ -73,7 +73,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.token_by_email: Dict[str, str] = {}
         self.token_of_current_user: Optional[str] = None
         self.initializer = (
-            contributor_dashboard_debug.ContributorDashboardDebugInitializer(
+            contributor_dashboard_debug.DebugInitializer(
                 base_url=''))
 
         self.initializer.csrf_token = self.get_new_csrf_token()
@@ -145,18 +145,18 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         """Sets the environment variables to simulate a login of admin."""
         self.login(email, is_super_admin=True)
 
-    def test_populate_debug_data_is_called(self) -> None:
-        populate_debug_data_swap = self.swap_with_call_counter(
-            contributor_dashboard_debug.ContributorDashboardDebugInitializer,
-            'populate_debug_data')
-        with populate_debug_data_swap as call_counter:
+    def test_populate_data_is_called(self) -> None:
+        populate_data_swap = self.swap_with_call_counter(
+            contributor_dashboard_debug.DebugInitializer,
+            'populate_data')
+        with populate_data_swap as call_counter:
             contributor_dashboard_debug.main()
 
         self.assertEqual(call_counter.times_called, 1)
 
-    def test_populate_debug_data(self) -> None:
+    def test_populate_data(self) -> None:
         with self.request_swap, self.post_to_firebase_swap:
-            self.initializer.populate_debug_data()
+            self.initializer.populate_data()
 
         self._assert_sign_up_new_user(
             contributor_dashboard_debug.SUPER_ADMIN_EMAIL,
