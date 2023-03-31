@@ -137,7 +137,7 @@
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
-/scripts/contributor_dashboard_debug.py @oppia/contributor-experience-team
+/scripts/generate_sample_data*.py @oppia/contributor-experience-team @oppia/web-android-compatibility-reviewers
 
 
 # Core documentation
@@ -741,7 +741,8 @@
 /.github/stale.yml @oppia/dev-workflow-reviewers
 /.github/workflows/ @oppia/dev-workflow-reviewers @oppia/automated-qa-reviewers
 # Files needed by the Android team.
-/core/controllers/android_e2e_config*.py @oppia/web-android-compatibility-reviewers
+/core/controllers/android*.py @oppia/web-android-compatibility-reviewers
+/core/domain/android*.py @oppia/web-android-compatibility-reviewers
 /core/android_validation_constants*.py @oppia/web-android-compatibility-reviewers
 /extensions/interactions/rule_templates.json @oppia/web-android-compatibility-reviewers
 # Files owned by core reviewers.
