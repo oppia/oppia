@@ -40,7 +40,8 @@ import apache_beam as beam
 import result
 
 from typing import (
-    Dict, Iterable, Iterator, List, Optional, Set, Tuple, TypedDict, Union)
+    Dict, Iterable, Iterator, List, Optional, Set, Tuple, Type, TypedDict, Union
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -383,8 +384,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary],
         model: Union[
-            suggestion_models.TranslationContributionStatsModel,
-            suggestion_models.TranslationReviewStatsModel
+            Type[suggestion_models.TranslationContributionStatsModel],
+            Type[suggestion_models.TranslationReviewStatsModel]
         ]
     ) -> Iterator[
         Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
@@ -474,8 +475,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         suggestions: Iterable[suggestion_registry.SuggestionAddQuestion],
         opportunity: Optional[opportunity_domain.SkillOpportunity],
         model: Union[
-            suggestion_models.QuestionContributionStatsModel,
-            suggestion_models.QuestionReviewStatsModel
+            Type[suggestion_models.QuestionContributionStatsModel],
+            Type[suggestion_models.QuestionReviewStatsModel]
         ]
     ) -> Iterator[
         Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
