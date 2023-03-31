@@ -172,7 +172,7 @@ class DebugInitializer:
 
         return str(token_id)
 
-    def _begin_session(self, token_id: str | None) -> None:
+    def _begin_session(self, token_id: str) -> None:
         """Begins a session with the given token id."""
         headers = {'Authorization': 'Bearer %s' % token_id}
         self._make_request('GET', '/session_begin', headers=headers)
