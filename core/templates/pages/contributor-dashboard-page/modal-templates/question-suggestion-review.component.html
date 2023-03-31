@@ -48,8 +48,9 @@
   <section [hidden]="!reviewable"
            class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
-      Review message (required if rejecting):
+      <label for="question-review-message">Review message (required if rejecting):</label>
       <textarea class="e2e-test-suggestion-review-message w-100"
+                id="question-review-message"
                 rows="3"
                 [(ngModel)]="reviewMessage">
       </textarea>
