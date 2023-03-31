@@ -166,7 +166,7 @@ jobs:
           retention-days: 1
       - name: (artifact re-build) Retry build files download
         if: steps.download_artifact_1.outcome == 'failure'
-        id: download_artifact_1
+        id: download_artifact_2
         uses: actions/download-artifact@v3
         with:
           name: build_files
