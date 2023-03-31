@@ -72,6 +72,7 @@ PORTS_USED_BY_OPPIA_PROCESSES: Final = [
     ELASTICSEARCH_SERVER_PORT,
 ]
 
+
 class MockCompiler:
     def wait(self) -> None: # pylint: disable=missing-docstring
         pass
@@ -1275,6 +1276,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_chrome_bin_setup_with_error(self) -> None:
         print_arr = []
+
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
@@ -1303,4 +1305,3 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertTrue(common.is_oppia_server_already_running(
             PORTS_USED_BY_OPPIA_PROCESSES))
-

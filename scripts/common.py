@@ -921,7 +921,7 @@ def is_oppia_server_already_running(
 
     Args:
         PORTS_USED_BY_OPPIA_PROCESSES: list(int). The list of ports used by the
-        processes.
+            processes.
 
     Returns:
         bool. Whether there is a running Oppia instance.
