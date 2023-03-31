@@ -1052,6 +1052,11 @@ textarea {
   text-align: center;
 }
 
+.oppia-exploration-tutorial-help-link {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
 .oppia-exploration-ctrl {
   margin: 15px 0;
 }
