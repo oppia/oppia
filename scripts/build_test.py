@@ -75,10 +75,17 @@ def mock_managed_process(
 class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.exit_stack = contextlib.ExitStack()
+
     def tearDown(self) -> None:
-        super().tearDown()
-        build.safe_delete_directory_tree(TEST_DIR)
-        build.safe_delete_directory_tree(EMPTY_DIR)
+        try:
+            self.exit_stack.close()
+        finally:
+            super().tearDown()
+            build.safe_delete_directory_tree(TEST_DIR)
+            build.safe_delete_directory_tree(EMPTY_DIR)
 
     def test_minify_func_with_invalid_filepath(self) -> None:
         """Tests minify_func with an invalid filepath."""

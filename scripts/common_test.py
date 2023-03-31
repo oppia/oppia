@@ -98,10 +98,14 @@ class CommonTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.exit_stack = contextlib.ExitStack()
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
+
+    def tearDown(self) -> None:
+        self.exit_stack.close()
 
     def test_run_ng_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
