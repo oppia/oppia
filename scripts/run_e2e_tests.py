@@ -109,50 +109,6 @@ MOBILE_SUITES = [
 ]
 
 
-def is_oppia_server_already_running() -> bool:
-    """Check if the ports are taken by any other processes. If any one of
-    them is taken, it may indicate there is already one Oppia instance running.
-
-    Returns:
-        bool. Whether there is a running Oppia instance.
-    """
-    for port in PORTS_USED_BY_OPPIA_PROCESSES:
-        if common.is_port_in_use(port):
-            print(
-                'There is already a server running on localhost:%s. '
-                'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port)
-            return True
-    return False
-
-
-def run_webpack_compilation(source_maps: bool = False) -> None:
-    """Runs webpack compilation.
-
-    Args:
-        source_maps: bool. Whether to compile with source maps.
-    """
-    max_tries = 5
-    webpack_bundles_dir_name = 'webpack_bundles'
-
-    for _ in range(max_tries):
-        try:
-            managed_webpack_compiler = (
-                servers.managed_webpack_compiler(use_source_maps=source_maps))
-            with managed_webpack_compiler as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
-            return
-        if os.path.isdir(webpack_bundles_dir_name):
-            break
-    else:
-        # We didn't break out of the loop, meaning all attempts have failed.
-        print('Failed to complete webpack compilation, exiting...')
-        sys.exit(1)
-
-
 def install_third_party_libraries(skip_install: bool) -> None:
     """Run the installation script.
 
@@ -163,32 +119,9 @@ def install_third_party_libraries(skip_install: bool) -> None:
         install_third_party_libs.main()
 
 
-def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
-    """Build the javascript files.
-
-    Args:
-        dev_mode: bool. Represents whether to run the related commands in dev
-            mode.
-        source_maps: bool. Represents whether to use source maps while
-            building webpack.
-    """
-    if not dev_mode:
-        print('Generating files for production mode...')
-
-        build_args = ['--prod_env']
-        if source_maps:
-            build_args.append('--source_maps')
-        build.main(args=build_args)
-
-    else:
-        build.main(args=[])
-        common.run_ng_compilation()
-        run_webpack_compilation(source_maps=source_maps)
-
-
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start end-to-end tests."""
-    if is_oppia_server_already_running():
+    if common.is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
         sys.exit(1)
 
     install_third_party_libraries(args.skip_install)
@@ -199,7 +132,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         if args.skip_build:
             build.modify_constants(prod_env=args.prod_env)
         else:
-            build_js_files(dev_mode, source_maps=args.source_maps)
+            build.build_js_files(dev_mode, source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())

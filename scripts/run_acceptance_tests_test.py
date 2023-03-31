@@ -61,22 +61,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         finally:
             super().tearDown()
 
-    def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            common, 'is_port_in_use', value=False))
-
-        self.assertFalse(
-            run_acceptance_tests.is_oppia_server_already_running())
-
-    def test_is_oppia_server_already_running_when_a_port_is_open(
-        self
-    ) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_port_in_use',
-            lambda port: port == run_acceptance_tests.GOOGLE_APP_ENGINE_PORT))
-
-        self.assertTrue(run_acceptance_tests.is_oppia_server_already_running())
-
     def test_wait_for_port_to_be_in_use_when_port_successfully_opened(
         self
     ) -> None:
@@ -111,106 +95,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             mock_sleep.times_called,
             common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
-    def test_run_webpack_compilation_success(self) -> None:
-        old_os_path_isdir = os.path.isdir
-
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return True
-            return old_os_path_isdir(path)
-
-        # The webpack compilation processes will be called 4 times as
-        # mock_isdir will return true after 4 calls.
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-
-        run_acceptance_tests.run_webpack_compilation()
-
-    def test_run_webpack_compilation_failed(self) -> None:
-        old_os_path_isdir = os.path.isdir
-
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return False
-            return old_os_path_isdir(path)
-
-        # The webpack compilation processes will be called five times.
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]))
-
-        run_acceptance_tests.run_webpack_compilation()
-
-    def test_build_js_files_in_dev_mode_with_hash_file_exists(self) -> None:
-        old_os_path_isdir = os.path.isdir
-
-        def mock_os_path_isdir(path: str) -> bool:
-            if path == 'webpack_bundles':
-                return True
-            return old_os_path_isdir(path)
-
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            os.path, 'isdir', mock_os_path_isdir))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, called=False))
-
-        run_acceptance_tests.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
-        return_code = 2
-        self.exit_stack.enter_context(self.swap_to_always_raise(
-            servers, 'managed_webpack_compiler',
-            error=subprocess.CalledProcessError(return_code, [])))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(return_code,)]))
-
-        run_acceptance_tests.build_js_files(True)
-
-    def test_build_js_files_in_prod_mode(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': ['--prod_env']}]))
-
-        run_acceptance_tests.build_js_files(False)
-
-    def test_build_js_files_in_prod_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': ['--prod_env', '--source_maps']}]))
-
-        run_acceptance_tests.build_js_files(False, source_maps=True)
-
-    def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'run_cmd', lambda *_: None, called=False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'main', lambda *_, **__: None,
-            expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'run_webpack_compilation', lambda **_: None,
-            expected_kwargs=[{'source_maps': True}]))
-
-        run_acceptance_tests.build_js_files(True, source_maps=True)
-
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             run_acceptance_tests,
@@ -226,7 +110,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             run_acceptance_tests, 'is_oppia_server_already_running',
             lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
@@ -266,7 +150,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             run_acceptance_tests, 'is_oppia_server_already_running',
             lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
@@ -396,46 +280,14 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_acceptance_tests.main(args=['--skip-build'])
-
-    def test_start_tests_in_debug_mode(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'is_oppia_server_already_running',
-            lambda *_: False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'build_js_files', lambda *_, **__: None,
-            expected_args=[(True,)]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_firebase_auth_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_dev_appserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_redis_server', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_acceptance_tests_server', mock_managed_process,
-            expected_kwargs=[
-                {
-                    'suite_name': 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',  # pylint: disable=line-too-long
-                    'stdout': subprocess.PIPE,
-                },
-            ]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(0,)]))
-
-        run_acceptance_tests.main(args=['--debug_mode'])
+        run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js', '--skip-build'])  # pylint: disable=line-too-long
 
     def test_start_tests_in_jasmine(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             run_acceptance_tests, 'is_oppia_server_already_running',
             lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'build_js_files', lambda *_, **__: None,
+            build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))

@@ -41,7 +41,7 @@ from scripts import install_python_dev_dependencies
 from scripts import servers
 
 import github
-from typing import Generator, List, Literal, NoReturn
+from typing import Final, Generator, List, Literal, NoReturn
 
 from . import common
 
@@ -65,6 +65,12 @@ _MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
     pool_size=None,
 )
 
+GOOGLE_APP_ENGINE_PORT: Final = 9001
+ELASTICSEARCH_SERVER_PORT: Final = 9200
+PORTS_USED_BY_OPPIA_PROCESSES: Final = [
+    GOOGLE_APP_ENGINE_PORT,
+    ELASTICSEARCH_SERVER_PORT,
+]
 
 class MockCompiler:
     def wait(self) -> None: # pylint: disable=missing-docstring
@@ -1280,3 +1286,21 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             common.setup_chrome_bin_env_variable()
         self.assertIn('Chrome is not found, stopping...', print_arr)
+
+    def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
+        self.exit_stack.enter_context(self.swap_to_always_return(
+            common, 'is_port_in_use', value=False))
+
+        self.assertFalse(common.is_oppia_server_already_running(
+            PORTS_USED_BY_OPPIA_PROCESSES))
+
+    def test_is_oppia_server_already_running_when_a_port_is_open(
+        self
+    ) -> None:
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'is_port_in_use',
+            lambda port: port == GOOGLE_APP_ENGINE_PORT))
+
+        self.assertTrue(common.is_oppia_server_already_running(
+            PORTS_USED_BY_OPPIA_PROCESSES))
+
