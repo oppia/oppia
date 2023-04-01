@@ -2375,6 +2375,19 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'received 123'):
             self.observed_object.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_invalid_version(self) -> None:
+        """Test to verify that the validation fails when
+        version value is an invalid.
+        """
+        self.observed_object.version = -2  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be non-negative, received -2'):
+            self.observed_object.validate()
+
 
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Question Skill Link Domain object."""

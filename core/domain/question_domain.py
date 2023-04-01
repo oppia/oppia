@@ -2202,6 +2202,14 @@ class QuestionSummary:
             raise utils.ValidationError(
                 'Expected misconception ids to be a list of '
                 'strings, received %s' % self.misconception_ids)
+        if not isinstance(self.version, int):
+            raise utils.ValidationError(
+                'Expected version to be int, received %s' % self.version)
+        if self.version < 0:
+            raise utils.ValidationError(
+                'Expected version to be non-negative, received %s' % (
+                    self.version))
+
 
 
 class QuestionSkillLinkDict(TypedDict):
