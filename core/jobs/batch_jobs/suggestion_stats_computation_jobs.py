@@ -412,14 +412,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 created_date: str. When was the suggestion created.
         """
         # When opportunity is not available we leave the topic ID empty.
-        print('================MODEL================')
-        print('================MODEL================')
-        print('================MODEL================')
-        print('================MODEL================')
-        print('================MODEL================')
-        print('================MODEL================')
-        print('================MODEL================')
-        print(model)
         topic_id = ''
         if opportunity is not None:
             topic_id = opportunity.topic_id
@@ -510,6 +502,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 last_updated_date: str. When was the suggestion last updated.
                 created_date: str. When was the suggestion created.
         """
+        # When opportunity is not available we leave the skill ID empty.
         skill_id = ''
         if opportunity is not None:
             skill_id = opportunity.id
