@@ -99,10 +99,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Filter reviewed translate suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                    in [
-                        m.status == suggestion_models.STATUS_ACCEPTED,
-                        m.status == suggestion_models.STATUS_REJECTED
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT and
+                    m.status in [
+                        suggestion_models.STATUS_ACCEPTED,
+                        suggestion_models.STATUS_REJECTED
                     ]
                 ))
             | 'Transform to reviewed suggestion domain object' >> beam.Map(
@@ -127,10 +127,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Filter question reviews' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION
-                    in [
-                        m.status == suggestion_models.STATUS_ACCEPTED,
-                        m.status == suggestion_models.STATUS_REJECTED
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION and
+                    m.status in [
+                        suggestion_models.STATUS_ACCEPTED,
+                        suggestion_models.STATUS_REJECTED
                     ]
                 ))
             | 'Transform to reviewed question suggestion domain object' >> (
@@ -412,6 +412,14 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 created_date: str. When was the suggestion created.
         """
         # When opportunity is not available we leave the topic ID empty.
+        print('================MODEL================')
+        print('================MODEL================')
+        print('================MODEL================')
+        print('================MODEL================')
+        print('================MODEL================')
+        print('================MODEL================')
+        print('================MODEL================')
+        print(model)
         topic_id = ''
         if opportunity is not None:
             topic_id = opportunity.topic_id
@@ -502,9 +510,12 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 last_updated_date: str. When was the suggestion last updated.
                 created_date: str. When was the suggestion created.
         """
+        skill_id = ''
+        if opportunity is not None:
+            skill_id = opportunity.id
         with datastore_services.get_ndb_context():
             for topic in skill_services.get_all_topic_assignments_for_skill(
-                opportunity.id):
+                skill_id):
                 topic_id = topic.topic_id
                 for suggestion in suggestions:
                     if model == (
@@ -609,8 +620,18 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         .accepted_translations_with_reviewer_edits_count),
                     accepted_translation_word_count=(
                         translation.accepted_translation_word_count),
-                    first_contribution_date=translation.first_contribution_date,
-                    last_contribution_date=translation.last_contribution_date
+                    first_contribution_date=(
+                        datetime.datetime.strptime(
+                            translation.first_contribution_date,
+                            '%Y-%m-%d'
+                        )
+                    ),
+                    last_contribution_date=(
+                        datetime.datetime.strptime(
+                            translation.last_contribution_date,
+                            '%Y-%m-%d'
+                        )
+                    )
                 )
             )
             translation_review_stats_model.update_timestamps()
@@ -644,8 +665,18 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     accepted_questions_without_reviewer_edits_count=(
                         question
                         .accepted_questions_without_reviewer_edits_count),
-                    first_contribution_date=question.first_contribution_date,
-                    last_contribution_date=question.last_contribution_date
+                    first_contribution_date=(
+                        datetime.datetime.strptime(
+                            question.first_contribution_date,
+                            '%Y-%m-%d'
+                        )
+                    ),
+                    last_contribution_date=(
+                        datetime.datetime.strptime(
+                            question.last_contribution_date,
+                            '%Y-%m-%d'
+                        )
+                    )
                 )
             )
             question_contribution_stats_model.update_timestamps()
@@ -679,8 +710,18 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     accepted_questions_with_reviewer_edits_count=(
                         question
                         .accepted_questions_with_reviewer_edits_count),
-                    first_contribution_date=question.first_contribution_date,
-                    last_contribution_date=question.last_contribution_date
+                    first_contribution_date=(
+                        datetime.datetime.strptime(
+                            question.first_contribution_date,
+                            '%Y-%m-%d'
+                        )
+                    ),
+                    last_contribution_date=(
+                        datetime.datetime.strptime(
+                            question.last_contribution_date,
+                            '%Y-%m-%d'
+                        )
+                    )
                 )
             )
             question_review_stats_model.update_timestamps()

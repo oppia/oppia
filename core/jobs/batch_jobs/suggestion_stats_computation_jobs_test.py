@@ -545,12 +545,10 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
 
         topic_id = topic_fetchers.get_new_topic_id()
         canonical_story_references = [
-            topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in []
+            topic_domain.StoryReference.create_default_story_reference('story_id1')
         ]
         additional_story_references = [
-            topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in []
+            topic_domain.StoryReference.create_default_story_reference('story_id2')
         ]
         uncategorized_skill_ids = [skill_id]
         subtopic = topic_domain.Subtopic.from_dict({
@@ -563,7 +561,7 @@ class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
             'url_fragment': 'subtopic-one'
         })
         subtopics = [subtopic]
-        skill_ids_for_diagnostic_test = []
+        skill_ids_for_diagnostic_test = [skill_id]
 
         topic = topic_domain.Topic(
             topic_id, 'Topic1', 'topic-three', 'topic-three', None,
