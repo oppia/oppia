@@ -187,7 +187,7 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
             id=self.QUESTION_1_ID,
             question_state_data=self.question_state_dict,
             language_code='en',
-            version=-1,
+            version=1,
             linked_skill_ids=['skill_id'],
             question_state_data_schema_version=45)
         commit_cmd = question_domain.QuestionChange({
@@ -196,7 +196,12 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
         commit_cmd_dicts = [commit_cmd.to_dict()]
         unmigrated_question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
-        question_services.create_question_summary(self.QUESTION_1_ID)
+        question = question_services.get_question_by_id(self.QUESTION_1_ID)
+        question_summary = question_services.compute_summary_of_question(
+            question
+        )
+        question_summary.version = 0
+        question_services.save_question_summary(question_summary)
         question_summary_model = question_models.QuestionSummaryModel.get(
             self.QUESTION_1_ID
         )
@@ -209,7 +214,10 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
         updated_summary_model = question_models.QuestionSummaryModel.get(
             self.QUESTION_1_ID
         )
-        self.assertEqual(updated_summary_model.version, 1)
+        self.assertEqual(
+            updated_summary_model.version, 
+            unmigrated_question_model.version
+        )
 
 
 class AuditPopulateQuestionSummaryVersionOneOffJobTests(

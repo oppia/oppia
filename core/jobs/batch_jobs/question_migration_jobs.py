@@ -79,12 +79,14 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
 
     @staticmethod
     def _update_question_summary(
+        question: question_domain.Question,
         question_summary: question_domain.QuestionSummary,
         question_summary_model: question_models.QuestionSummaryModel
     ) -> question_models.QuestionSummaryModel:
         """Adds version to get an updated question summary model.
 
         Args:
+            question: Question. The question domain object.
             question_summary: QuestionSummary. The question summary domain
                 object.
             question_summary_model: QuestionSummaryModel. The question summary
@@ -100,7 +102,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             'question_model_last_updated': question_summary.last_updated,
             'question_model_created_on': question_summary.created_on,
             'misconception_ids': question_summary.misconception_ids,
-            'version': 1
+            'version': question.version
         }
 
         if question_summary_model is not None:
@@ -119,6 +121,15 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             PCollection. A PCollection of results from the question
             migration.
         """
+        all_question_models = (
+            self.pipeline
+            | 'Get all non-deleted question models' >> (
+                ndb_io.GetModels(question_models.QuestionModel.get_all()))
+            # Pylint disable is needed becasue pylint is not able to correclty
+            # detect that the value is passed through the pipe.
+            | 'Add question keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda question_model: question_model.id)
+        )        
         question_summary_models = (
             self.pipeline
             | 'Get all non-deleted question summary models' >> (
@@ -153,6 +164,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
         )
         question_objects_list = (
             {
+                'question': all_question_models,
                 'question_summary': transformed_question_summary,
                 'question_summary_model': question_summary_models,
             }
@@ -163,6 +175,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
         question_objects = (
             question_objects_list
             | 'Reorganize the objects' >> beam.Map(lambda objects: {
+                    'question': objects['question'][0],
                     'question_summary': objects['question_summary'][0],
                     'question_summary_model': objects[
                         'question_summary_model'][0],
@@ -172,6 +185,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             question_objects
             | 'Generate question summary to put' >> beam.Map(
                 lambda question_objects: self._update_question_summary(
+                    question_objects['question'],
                     question_objects['question_summary'],
                     question_objects['question_summary_model']
             ))
