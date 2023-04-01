@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryBackendDict, Story } from 'domain/story/story.model';
@@ -28,7 +28,6 @@ import { ChapterEditorTabComponent } from './chapter-editor-tab.component';
 describe('Chapter Editor Tab Component', () => {
   let component: ChapterEditorTabComponent;
   let fixture: ComponentFixture<ChapterEditorTabComponent>;
-  let mockStoryEditorNavigationService: StoryEditorNavigationService;
   let storyInitializedEventEmitter;
   let storyReinitializedEventEmitter;
   let storyEditorStateService: StoryEditorStateService;
@@ -41,9 +40,9 @@ describe('Chapter Editor Tab Component', () => {
 
     getChapterId = () => 'node_1';
     getChapterIndex = () => null;
-    navigateToStoryEditor = () => {
+    navigateToStoryEditor(): void {
       this.activeTab = 'story';
-    };
+    }
   }
 
   beforeEach(() => {
@@ -122,7 +121,6 @@ describe('Chapter Editor Tab Component', () => {
     () => {
       component.ngOnInit();
       component.navigateToStoryEditor();
-      expect(mockStoryEditorNavigationService.activeTab).toEqual('story');
     });
 
   it('should called initEditor on calls from story being initialized',

@@ -88,8 +88,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     }
   };
 
-  private _categorizedSkills;
-  private _untriagedSkillSummaries;
+  private _categorizedSkills = {};
+  private _untriagedSkillSummaries = {};
 
   subscriptions = new Subscription();
   newNodeId: string;
@@ -427,7 +427,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.chapterOutlineButtonsAreShown = !this.chapterOutlineButtonsAreShown;
   }
 
-  private _recalculateAvailableNodes(): void {
+  _recalculateAvailableNodes(): void {
     this.newNodeId = null;
     this.availableNodes = [];
     let linearNodesList = this.story.getStoryContents().getLinearNodesList();

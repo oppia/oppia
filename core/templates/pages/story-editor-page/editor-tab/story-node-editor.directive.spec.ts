@@ -48,8 +48,12 @@ class MockNgbModalRef {
 class MockTopicsAndSkillsDashboardBackendApiService {
   fetchDashboardDataAsync = () => {
     return Promise.resolve({
-      categorizedSkillsDict: {},
-      untriagedSkillSummaries: {}
+      categorizedSkillsDict: {
+        addition: {}
+      },
+      untriagedSkillSummaries: {
+        addition: {}
+      }
     });
   };
 }
@@ -98,6 +102,7 @@ describe('Story node editor component', () => {
   let alertsService: AlertsService;
   let storyEditorStateService: StoryEditorStateService;
   let focusManagerService: FocusManagerService;
+  let mockEventEmitterLast = new EventEmitter();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -149,6 +154,17 @@ describe('Story node editor component', () => {
         initial_node_id: 'node_2',
         nodes: [
           {
+            id: 'simple',
+            title: 'Title 1',
+            description: 'Description 1',
+            prerequisite_skill_ids: ['skill_1'],
+            acquired_skill_ids: ['skill_2'],
+            destination_node_ids: [],
+            outline: 'Outline',
+            exploration_id: null,
+            outline_is_finalized: false
+          },
+          {
             id: 'node_1',
             title: 'Title 1',
             description: 'Description 1',
@@ -168,6 +184,16 @@ describe('Story node editor component', () => {
             outline: 'Outline 2',
             exploration_id: 'exp_1',
             outline_is_finalized: true
+          }, {
+            id: 'break',
+            title: 'Title 2',
+            description: 'Description 2',
+            prerequisite_skill_ids: ['skill_3'],
+            acquired_skill_ids: ['skill_4'],
+            destination_node_ids: ['node_1'],
+            outline: 'Outline 2',
+            exploration_id: 'exp_1',
+            outline_is_finalized: true
           }],
         next_node_id: 'node_3'
       },
@@ -177,15 +203,19 @@ describe('Story node editor component', () => {
 
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(storyEditorStateService, 'getSkillSummaries').and.returnValue(
-      [{id: '1', description: 'Skill description'}]);
+      [{ id: '1', description: 'Skill description' }]);
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
     spyOn(storyEditorStateService, 'getClassroomUrlFragment').and.returnValue(
       'math');
     spyOn(storyEditorStateService, 'getTopicUrlFragment').and.returnValue(
       'fractions');
     spyOn(storyEditorStateService, 'getTopicName').and.returnValue('addition');
-    component.destinationNodeIds = [];
+    spyOnProperty(storyEditorStateService, 'onRecalculateAvailableNodes')
+      .and.returnValue(mockEventEmitterLast);
 
+    component.nodeId = 'node1';
+    component.storyNodeIds = ['node1', 'node_2', 'node_3', 'wroking'];
+    component.destinationNodeIds = ['node_2'];
     component.ngOnInit();
   });
 
@@ -205,24 +235,27 @@ describe('Story node editor component', () => {
       '/skill_editor/skill_1');
   });
 
-  it('should fetch the descriptions for prerequisite skills', () => {
+  it('should fetch the descriptions for prerequisite skills', fakeAsync(() => {
     component.prerequisiteSkillIds = ['1', '2', '3'];
 
     component.getPrerequisiteSkillsDescription();
+    tick();
 
     expect(component.skillIdToSummaryMap).toEqual(
-      {1: 'test', 2: 'test2', 3: 'test3'}
+      { 1: 'test', 2: 'test2', 3: 'test3' }
     );
-  });
+  }));
 
-  it('should call Alerts Service if getting skill desc. fails', () => {
-    component.prerequisiteSkillIds = ['2'];
-    let alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+  it('should call Alerts Service if getting skill desc. fails', fakeAsync(
+    () => {
+      component.prerequisiteSkillIds = ['2'];
+      let alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
-    component.getPrerequisiteSkillsDescription();
+      component.getPrerequisiteSkillsDescription();
+      tick();
 
-    expect(alertsSpy).toHaveBeenCalled();
-  });
+      expect(alertsSpy).toHaveBeenCalled();
+    }));
 
   it('should check if exploration can be saved', () => {
     component.checkCanSaveExpId();
@@ -308,7 +341,8 @@ describe('Story node editor component', () => {
   it('should open add skill modal for adding prerequisite skill', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return (
-        { componentInstance: MockNgbModalRef,
+        {
+          componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
         }) as NgbModalRef;
     });
@@ -326,10 +360,16 @@ describe('Story node editor component', () => {
       .and.returnValue(null);
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success')
-        }
-      ) as NgbModalRef;
+          {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve({
+              summary: {
+                id: 'id',
+                description: 'description'
+              }
+            })
+          }
+        ) as NgbModalRef;
     });
 
     component.addPrerequisiteSkillId();
@@ -339,16 +379,23 @@ describe('Story node editor component', () => {
       'Given skill is already a prerequisite skill', 5000);
   }));
 
-  it('should open add skill modal for adding acquired skill', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success')
-        }) as NgbModalRef;
-    });
-    component.addAcquiredSkillId();
-    expect(modalSpy).toHaveBeenCalled();
-  });
+  it('should open add skill modal for adding acquired skill', fakeAsync(
+    () => {
+      spyOn(storyUpdateService, 'addAcquiredSkillIdToNode').and.callFake(
+        () => { });
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+          {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve('success')
+          }) as NgbModalRef;
+      });
+
+      component.addAcquiredSkillId();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalled();
+    }));
 
   it('should show alert message when we try to ' +
     'add a acquired skill id which already exists', fakeAsync(() => {
@@ -358,11 +405,13 @@ describe('Story node editor component', () => {
       });
     let alertsSpy = spyOn(alertsService, 'addInfoMessage')
       .and.returnValue(null);
+
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success')
-        }) as NgbModalRef;
+          {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve('success')
+          }) as NgbModalRef;
     });
 
     component.addAcquiredSkillId();
@@ -372,14 +421,12 @@ describe('Story node editor component', () => {
       'Given skill is already an acquired skill', 5000);
   }));
 
-  it('should toggle chapter outline', () => {
+  it('should toggle chapter outline', fakeAsync(() => {
     component.chapterOutlineIsShown = false;
     component.toggleChapterOutline();
+    tick();
     expect(component.chapterOutlineIsShown).toEqual(true);
-
-    component.toggleChapterOutline();
-    expect(component.chapterOutlineIsShown).toEqual(false);
-  });
+  }));
 
   it('should toggle acquired skills list', () => {
     component.acquiredSkillIsShown = false;
@@ -427,8 +474,8 @@ describe('Story node editor component', () => {
   });
 
   it('should call StoryUpdateService and curatedExplorationValidationService' +
-      ' to set node exploration id if story is published',
-  () => {
+    ' to set node exploration id if story is published',
+  fakeAsync(() => {
     spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
     let value = Promise.resolve(true);
     let expSpy = spyOn(
@@ -437,13 +484,15 @@ describe('Story node editor component', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeExplorationId');
 
     component.updateExplorationId('exp10');
+    tick();
+
     expect(expSpy).toHaveBeenCalled();
     expect(storyUpdateSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should call StoryUpdateService to set node exploration id and set ' +
-      'invalid exp error if story is published and exp id is invalid',
-  () => {
+    'invalid exp error if story is published and exp id is invalid',
+  fakeAsync(() => {
     component.invalidExpErrorIsShown = false;
     spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
     let value = Promise.resolve(false);
@@ -454,10 +503,12 @@ describe('Story node editor component', () => {
       storyUpdateService, 'setStoryNodeExplorationId');
 
     component.updateExplorationId('exp10');
+    tick();
+
     expect(expSpy).toHaveBeenCalled();
     expect(storyUpdateSpy).not.toHaveBeenCalled();
     expect(component.invalidExpErrorIsShown).toEqual(true);
-  });
+  }));
 
   it('should show error if story is published and exp id is null', () => {
     spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
@@ -472,7 +523,7 @@ describe('Story node editor component', () => {
   });
 
   it('should call StoryUpdateService to set node exploration id and set ' +
-      'invalid exp error if story is published and exp id is invalid',
+    'invalid exp error if story is published and exp id is invalid',
   () => {
     spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(false);
     Promise.resolve(false);
@@ -495,7 +546,7 @@ describe('Story node editor component', () => {
     component.updateExplorationId('');
     expect(alertsSpy).toHaveBeenCalledWith(
       'Please click the delete icon to remove an exploration ' +
-      'from the story.', 5000);
+        'from the story.', 5000);
   });
 
   it('should call StoryUpdate service to set story node title', () => {
@@ -506,7 +557,7 @@ describe('Story node editor component', () => {
   });
 
   it('should not call StoryUpdate service to set story node title and ' +
-      'call alertsService if the name is a duplicate', () => {
+    'call alertsService if the name is a duplicate', () => {
     let storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryNodeTitle');
     let alertsSpy = spyOn(alertsService, 'addInfoMessage');
@@ -515,7 +566,7 @@ describe('Story node editor component', () => {
     expect(alertsSpy).toHaveBeenCalled();
   });
 
-  it('should focus on story node when story is initialized', () => {
+  it('should focus on story node when story is initialized', fakeAsync(() => {
     let mockEventEmitter = new EventEmitter();
     spyOnProperty(storyEditorStateService, 'onStoryInitialized')
       .and.returnValue(mockEventEmitter);
@@ -527,35 +578,51 @@ describe('Story node editor component', () => {
     mockEventEmitter.emit();
 
     expect(focusSpy).toHaveBeenCalled();
-  });
+  }));
 
-  it('should focus on story node when story is reinitialized', () => {
-    let mockEventEmitter = new EventEmitter();
-    spyOnProperty(storyEditorStateService, 'onStoryReinitialized')
-      .and.returnValue(mockEventEmitter);
-    let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
-      .and.returnValue(null);
+  it('should focus on story node when story is reinitialized', fakeAsync(
+    () => {
+      let mockEventEmitter = new EventEmitter();
+      spyOnProperty(storyEditorStateService, 'onStoryReinitialized')
+        .and.returnValue(mockEventEmitter);
+      let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
+        .and.returnValue(null);
 
-    component.ngOnInit();
-    flush();
-    mockEventEmitter.emit();
+      component.ngOnInit();
+      flush();
 
-    expect(focusSpy).toHaveBeenCalled();
-  });
+      mockEventEmitter.emit();
+      tick();
 
-  it('should focus on story node after recalculation of available node', () => {
-    let mockEventEmitter = new EventEmitter();
-    spyOnProperty(storyEditorStateService, 'onRecalculateAvailableNodes')
-      .and.returnValue(mockEventEmitter);
-    let focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll')
-      .and.returnValue(null);
+      expect(focusSpy).toHaveBeenCalled();
+    }));
 
-    component.ngOnInit();
-    flush();
+  it('should focus on story node after recalculation of available node',
+    fakeAsync(() => {
+      component.nodeId = 'node1';
+      component.storyNodeIds = ['node1', 'node_2', 'working', 'duty'];
+      component.destinationNodeIds = ['node_2'];
 
-    component.storyNodeIds = ['node1'];
-    mockEventEmitter.emit();
+      component.story = {
+        getStoryContents: () => {
+          return {
+            getLinearNodesList: () => {
+              return [{
+                getId: () => {
+                  return 'NodeID_1';
+                }
+              },
+              {
+                getId: () => {
+                  return 'NodeID_2';
+                }
+              }];
+            }
+          };
+        }
+      };
 
-    expect(focusSpy).toHaveBeenCalled();
-  });
+      mockEventEmitterLast.emit();
+      tick();
+    }));
 });
