@@ -129,7 +129,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             # detect that the value is passed through the pipe.
             | 'Add question keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda question_model: question_model.id)
-        )        
+        )
         question_summary_models = (
             self.pipeline
             | 'Get all non-deleted question summary models' >> (

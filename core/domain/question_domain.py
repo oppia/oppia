@@ -2211,7 +2211,6 @@ class QuestionSummary:
                     self.version))
 
 
-
 class QuestionSkillLinkDict(TypedDict):
     """Dictionary representing the QuestionSkillLink domain object."""
 

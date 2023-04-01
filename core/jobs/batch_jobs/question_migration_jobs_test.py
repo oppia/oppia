@@ -215,7 +215,7 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
             self.QUESTION_1_ID
         )
         self.assertEqual(
-            updated_summary_model.version, 
+            updated_summary_model.version,
             unmigrated_question_model.version
         )
 
