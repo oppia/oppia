@@ -24,7 +24,7 @@ import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_i
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 import { StoryEditorPageComponent } from './story-editor-page.component';
 import { PageTitleService } from '../../services/page-title.service';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { StoryEditorStateService } from './services/story-editor-state.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
@@ -302,7 +302,6 @@ describe('Story Editor Page Component', () => {
 
   it('should open topic editor page when there is no change',
     () => {
-      spyOn(storyEditorStateService, 'getStory').and.stub();
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
       spyOn(mockedWindow, 'open').and.callThrough();
 
@@ -364,15 +363,17 @@ describe('Story Editor Page Component', () => {
     expect(component.warningsAreShown).toEqual(true);
   });
 
-  it('should return true if the main editor tab is select', () => {
+  it('should return true if the main editor tab is select', fakeAsync(() => {
     mockStoryEditorNavigationService.activeTab = 'story_editor';
     mockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
+    tick();
     expect(component.isMainEditorTabSelected()).toEqual(true);
 
     mockStoryEditorNavigationService.activeTab = 'story_preview';
     mockStoryEditorNavigationService.getActiveTab = () => 'story_preview';
+    tick();
     expect(component.isMainEditorTabSelected()).toEqual(false);
-  });
+  }));
 
   it('should check if url contains story preview', () => {
     spyOn(storyEditorStateService, 'loadStory').and.stub();
