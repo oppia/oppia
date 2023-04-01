@@ -4006,6 +4006,7 @@ div.oppia-issues-learner-action {
   margin-right: 10px;
 }
 .oppia-welcome-modal .oppia-welcome-modal-button:hover,
+.oppia-welcome-modal .oppia-welcome-modal-button:focus,
 .oppia-welcome-modal .oppia-welcome-modal-button:active {
   background-color: rgba(5, 190, 178, 1);
   color: #fff;
