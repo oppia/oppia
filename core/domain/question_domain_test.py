@@ -2382,7 +2382,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         """Test to verify that the validation fails when
         version value is an invalid.
         """
-        self.observed_object.version = -2  # type: ignore[assignment]
+        self.observed_object.version = -2
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected version to be non-negative, received -2'):
