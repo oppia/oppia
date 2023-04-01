@@ -20,7 +20,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { BackendChangeObject, Change, DomainObject } from 'domain/editor/undo_redo/change.model';
@@ -60,6 +60,8 @@ type Command = BackendChangeObject['cmd'];
   providedIn: 'root'
 })
 export class StoryUpdateService {
+  private _storyChapterUpdateEventEmitter = new EventEmitter<void>();
+
   constructor(
     private _undoRedoService: UndoRedoService,
     private _alertsService: AlertsService,
@@ -401,9 +403,11 @@ export class StoryUpdateService {
       }, (changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -424,9 +428,11 @@ export class StoryUpdateService {
       }, (changeDict, story) => {
         // ---- Apply ----
         story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -651,10 +657,12 @@ export class StoryUpdateService {
         // ---- Apply ----
         story.getStoryContents().addPrerequisiteSkillIdToNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().removePrerequisiteSkillIdFromNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -682,10 +690,12 @@ export class StoryUpdateService {
         // ---- Apply ----
         story.getStoryContents().removePrerequisiteSkillIdFromNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().addPrerequisiteSkillIdToNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -708,10 +718,12 @@ export class StoryUpdateService {
         // ---- Apply ----
         story.getStoryContents().addAcquiredSkillIdToNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().removeAcquiredSkillIdFromNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
   }
 
@@ -739,11 +751,17 @@ export class StoryUpdateService {
         // ---- Apply ----
         story.getStoryContents().removeAcquiredSkillIdFromNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       }, (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().addAcquiredSkillIdToNode(
           nodeId, skillId);
+        this._storyChapterUpdateEventEmitter.emit();
       });
+  }
+
+  get storyChapterUpdateEventEmitter(): EventEmitter<void> {
+    return this._storyChapterUpdateEventEmitter;
   }
 }
 
