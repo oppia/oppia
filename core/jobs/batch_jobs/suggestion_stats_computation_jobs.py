@@ -462,7 +462,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     'edited_by_reviewer': suggestion.edited_by_reviewer,
                     'content_word_count': content_word_count,
                     'last_updated_date': (
-                        suggestion.last_updated.date().isoformat())
+                        suggestion.last_updated.date())
                 }
                 yield (key, result.Ok(translation_contribution_stats_dict))
             except Exception as e:
@@ -532,7 +532,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         'edited_by_reviewer': suggestion.edited_by_reviewer,
                         'content_word_count': 0,
                         'last_updated_date': (
-                            suggestion.last_updated.date().isoformat())
+                            suggestion.last_updated.date())
                     }
                     yield (key, result.Ok(question_stats_dict))
 
@@ -613,18 +613,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                         .accepted_translations_with_reviewer_edits_count),
                     accepted_translation_word_count=(
                         translation.accepted_translation_word_count),
-                    first_contribution_date=(
-                        datetime.datetime.strptime(
-                            translation.first_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    ),
-                    last_contribution_date=(
-                        datetime.datetime.strptime(
-                            translation.last_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    )
+                    first_contribution_date=translation.first_contribution_date,
+                    last_contribution_date=translation.last_contribution_date
                 )
             )
             translation_review_stats_model.update_timestamps()
@@ -658,18 +648,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     accepted_questions_without_reviewer_edits_count=(
                         question
                         .accepted_questions_without_reviewer_edits_count),
-                    first_contribution_date=(
-                        datetime.datetime.strptime(
-                            question.first_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    ),
-                    last_contribution_date=(
-                        datetime.datetime.strptime(
-                            question.last_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    )
+                    first_contribution_date=question.first_contribution_date,
+                    last_contribution_date=question.last_contribution_date
                 )
             )
             question_contribution_stats_model.update_timestamps()
@@ -703,18 +683,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                     accepted_questions_with_reviewer_edits_count=(
                         question
                         .accepted_questions_with_reviewer_edits_count),
-                    first_contribution_date=(
-                        datetime.datetime.strptime(
-                            question.first_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    ),
-                    last_contribution_date=(
-                        datetime.datetime.strptime(
-                            question.last_contribution_date,
-                            '%Y-%m-%d'
-                        )
-                    )
+                    first_contribution_date=question.first_contribution_date,
+                    last_contribution_date=question.last_contribution_date
                 )
             )
             question_review_stats_model.update_timestamps()
