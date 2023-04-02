@@ -190,6 +190,10 @@ export class RteHelperModalComponent {
     });
 
     this.customizationArgsForm = this.fb.group(formGroupControls);
+
+    setTimeout(() => {
+      this.modalIsLoading = false;
+    });
   }
 
   cancel(): void {
