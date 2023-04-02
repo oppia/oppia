@@ -49,6 +49,7 @@ import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-grou
 import { UrlService } from 'services/contextual/url.service';
 
 import './learner-dashboard-page.component.css';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-learner-dashboard-page',
@@ -176,7 +177,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private pageTitleService: PageTitleService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -597,6 +599,11 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   decodePngURIData(base64ImageData: string): string {
     return decodeURIComponent(base64ImageData);
+  }
+
+  onLogoutButtonClicked(): void {
+    this.windowRef.nativeWindow.localStorage.removeItem(
+      'last_uploaded_audio_lang');
   }
 }
 

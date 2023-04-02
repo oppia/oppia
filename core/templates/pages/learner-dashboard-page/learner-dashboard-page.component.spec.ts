@@ -57,7 +57,6 @@ import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UserInfo } from 'domain/user/user-info.model';
-
 @Pipe({name: 'slice'})
 class MockSlicePipe {
   transform(value: string, params: Object | undefined): string {
@@ -122,6 +121,7 @@ describe('Learner dashboard page', () => {
   let pageTitleService: PageTitleService = null;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let urlService: UrlService;
+  let mockWindowRef: MockWindowRef;
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -332,6 +332,19 @@ describe('Learner dashboard page', () => {
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => true
   };
+
+  class MockWindowRef {
+    nativeWindow = {
+      localStorage: {
+        last_uploaded_audio_lang: 'en',
+        removeItem: (name: string) => {}
+      },
+      sessionStorage: {
+        last_uploaded_audio_lang: 'en',
+        removeItem: (name: string) => {}
+      },
+    };
+  }
 
   describe('when succesfully fetching learner dashboard data', () => {
     beforeEach(async(() => {
@@ -1385,6 +1398,18 @@ describe('Learner dashboard page', () => {
       component.ngOnDestroy();
 
       expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+    });
+
+    it('should clear last uploaded audio language on logout', () => {
+      spyOn(mockWindowRef.nativeWindow.localStorage, 'removeItem');
+  
+      expect(mockWindowRef.nativeWindow.localStorage.last_uploaded_audio_lang)
+        .toBe('en');
+  
+      component.onLogoutButtonClicked();
+  
+      expect(mockWindowRef.nativeWindow.localStorage.removeItem)
+        .toHaveBeenCalledWith('last_uploaded_audio_lang');
     });
   });
 });
