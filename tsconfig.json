@@ -18,6 +18,7 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "baseUrl": ".",
+    "noErrorTruncation": true,
     "paths": {
       "analytics-constants": ["assets/analytics-constants.json"],
       "app.constants": ["core/templates/app.constants"],

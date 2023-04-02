@@ -181,6 +181,8 @@ import { MatMenuModule} from '@angular/material/menu';
 import { DynamicComponentModule } from 'value_generators/templates/dynamic-component.module';
 import { ThanksForDonatingModalComponent } from 'pages/donate-page/thanks-for-donating-modal.component';
 import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for-subscribing-modal.component';
+import { RteHelperModalComponent } from 'services/rte-helper-modal.controller';
+import { DirectivesModule } from 'directives/directives.module';
 
 @NgModule({
   imports: [
@@ -214,7 +216,8 @@ import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for
     MatProgressSpinnerModule,
     NgbModalModule,
     TranslateModule,
-    DynamicComponentModule
+    DynamicComponentModule,
+    DirectivesModule
   ],
 
   providers: [
@@ -351,6 +354,7 @@ import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for
     ReviewTestPageComponent,
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
+    RteHelperModalComponent
   ],
 
   entryComponents: [
@@ -480,7 +484,8 @@ import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     CopierComponent,
-    RandomSelectorComponent
+    RandomSelectorComponent,
+    RteHelperModalComponent
   ],
 
   exports: [
@@ -621,6 +626,7 @@ import { ThanksForSubscribingModalComponent } from 'pages/donate-page/thanks-for
     ComponentOverviewComponent,
     TranslateModule,
     VisualizationSortedTilesComponent,
+    RteHelperModalComponent
   ],
 })
 

@@ -100,7 +100,6 @@ angular.module('oppia').config([
       'AlertsService',
       'TranslationFileHashLoaderBackendApiService',
       'UrlInterpolationService',
-      'RteHelperService',
       'HtmlEscaperService',
       'ContextService'
     ];

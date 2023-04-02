@@ -163,7 +163,7 @@ describe('Assets Backend API Service', () => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
 
-      assetsBackendApiService.saveMathExpresionImage(
+      assetsBackendApiService.saveMathExpressionImage(
         imageBlob, 'newMathExpression.svg', 'exploration', 'expid12345')
         .then(onSuccess, onFailure);
       flushMicrotasks();
@@ -202,7 +202,7 @@ describe('Assets Backend API Service', () => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
 
-      assetsBackendApiService.saveMathExpresionImage(
+      assetsBackendApiService.saveMathExpressionImage(
         imageBlob, 'new.svg', 'exploration', 'expid12345')
         .then(onSuccess, onFailure);
       flushMicrotasks();
@@ -231,7 +231,7 @@ describe('Assets Backend API Service', () => {
           assetsBackendApiService, 'getImageUploadUrl'
         ).and.throwError(Error('token'));
 
-        assetsBackendApiService.saveMathExpresionImage(
+        assetsBackendApiService.saveMathExpressionImage(
           imageBlob, 'new.svg', 'exploration', 'expid12345'
         ).then(onSuccess, onFailure);
         flushMicrotasks();
