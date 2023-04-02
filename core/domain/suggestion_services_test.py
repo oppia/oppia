@@ -2448,6 +2448,118 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_services._update_translation_contribution_stats_models(  # pylint: disable=protected-access
                 [translation_contribution_stats])
 
+    def test_update_translation_review_stats_without_language_codes(
+        self
+    ) -> None:
+        stats = (
+            suggestion_registry.TranslationReviewStats(
+                None, 'user1', 'topic1', 1, 1, 1, 0, 1,
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Language code should not be None.'):
+            suggestion_services._update_translation_review_stats_models(  # pylint: disable=protected-access
+                [stats])
+
+    def test_update_translation_review_stats_without_contributor_id(
+        self
+    ) -> None:
+        stats = (
+            suggestion_registry.TranslationReviewStats(
+                'hi', None, 'topic1', 1, 1, 1, 0, 1,
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Contributor user ID should not be None.'):
+            suggestion_services._update_translation_review_stats_models(  # pylint: disable=protected-access
+                [stats])
+
+    def test_update_translation_review_stats_without_topic_id(
+        self
+    ) -> None:
+        stats = (
+            suggestion_registry.TranslationReviewStats(
+                'hi', 'user1', None, 1, 1, 1, 0, 1,
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Topic ID should not be None.'):
+            suggestion_services._update_translation_review_stats_models(  # pylint: disable=protected-access
+                [stats])
+
+    def test_update_question_contribution_stats_without_contributor_id(
+        self
+    ) -> None:
+        stats = (
+            suggestion_registry.QuestionContributionStats(
+                None, 'topic1', 1, 1, 1,
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Contributor user ID should not be None.'):
+            suggestion_services._update_question_contribution_stats_models(  # pylint: disable=protected-access
+                [stats])
+
+    def test_update_question_contribution_stats_without_topic_id(
+        self
+    ) -> None:
+        stats = (
+            suggestion_registry.QuestionContributionStats(
+                'user1', None, 1, 1, 1,
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Topic ID should not be None.'):
+            suggestion_services._update_question_contribution_stats_models(  # pylint: disable=protected-access
+                [stats])
+
+    def test_update_question_review_stats_without_contributor_id(
+        self
+    ) -> None:
+        stats = (
+            suggestion_registry.QuestionReviewStats(
+                None, 'topic1', 1, 1, 1,
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Contributor user ID should not be None.'):
+            suggestion_services._update_question_review_stats_models(  # pylint: disable=protected-access
+                [stats])
+
+    def test_update_question_review_stats_without_topic_id(
+        self
+    ) -> None:
+        stats = (
+            suggestion_registry.QuestionReviewStats(
+                'user1', None, 1, 1, 1,
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173836)
+            )
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'Topic ID should not be None.'):
+            suggestion_services._update_question_review_stats_models(  # pylint: disable=protected-access
+                [stats])
+
     def test_get_translation_contribution_stats_for_invalid_id_with_strict_true(
         self
     ) -> None:
