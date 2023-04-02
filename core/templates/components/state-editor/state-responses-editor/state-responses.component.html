@@ -72,10 +72,10 @@
                                                [addState]="addState">
                     </oppia-answer-group-editor>
                   </div>
-                  <div class="btn btn-danger oppia-delete-response e2e-test-delete-response"
-                       *ngIf="editabilityService.isEditable()"
-                       (click)="deleteAnswerGroup($event, index)">
-                    Delete Response
+                  <div *ngIf="editabilityService.isEditable()">
+                    <button type="button" class="btn btn-danger oppia-delete-response e2e-test-delete-response" (click)="deleteAnswerGroup($event, index)">  
+                      Delete Response
+                    </button>
                   </div>
                 </div>
               </div>
