@@ -223,8 +223,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Generate question contribution stats' >> beam.ParDo(
                 lambda x: self._generate_question_stats(
                     x['suggestion'][0] if len(x['suggestion']) else [],
-                    list(x['opportunity'][0])[0]
-                    if len(x['opportunity']) else None,
+                    list(x['opportunity'][0])[0].id
+                    if len(x['opportunity']) else '',
                     suggestion_models.QuestionContributionStatsModel
                 ))
         )
@@ -233,8 +233,8 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Generate question review stats' >> beam.ParDo(
                 lambda x: self._generate_question_stats(
                     x['suggestion'][0] if len(x['suggestion']) else [],
-                    list(x['opportunity'][0])[0]
-                    if len(x['opportunity']) else None,
+                    list(x['opportunity'][0])[0].id
+                    if len(x['opportunity']) else '',
                     suggestion_models.QuestionReviewStatsModel
                 ))
         )
@@ -473,7 +473,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     @staticmethod
     def _generate_question_stats(
         suggestions: Iterable[suggestion_registry.SuggestionAddQuestion],
-        opportunity: Optional[opportunity_domain.SkillOpportunity],
+        skill_id: str,
         model: Union[
             Type[suggestion_models.QuestionContributionStatsModel],
             Type[suggestion_models.QuestionReviewStatsModel]
@@ -486,8 +486,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         Args:
             suggestions: iter(SuggestionTranslateContent). Suggestions for which
                 the stats should be generated.
-            opportunity: SkillOpportunity. Opportunity for which
-                were the suggestions generated. Used to extract topic ID.
+            skill_id: str. The skill ID which the suggestion is created for.
             model: QuestionStatsModel. A reference to the model which the
                 stats are generated.
 
@@ -502,10 +501,6 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 last_updated_date: str. When was the suggestion last updated.
                 created_date: str. When was the suggestion created.
         """
-        # When opportunity is not available we leave the skill ID empty.
-        skill_id = ''
-        if opportunity is not None:
-            skill_id = opportunity.id
         with datastore_services.get_ndb_context():
             for topic in skill_services.get_all_topic_assignments_for_skill(
                 skill_id):
