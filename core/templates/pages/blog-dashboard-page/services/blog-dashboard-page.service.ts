@@ -36,7 +36,6 @@ export class BlogDashboardPageService {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _blogPostData!: BlogPostData;
   private _blogPostId: string = '';
-  private _authorPictureUrl: string = '';
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
 
@@ -115,14 +114,6 @@ export class BlogDashboardPageService {
 
   get blogPostData(): BlogPostData {
     return this._blogPostData;
-  }
-
-  get authorPictureUrl(): string {
-    return this._authorPictureUrl;
-  }
-
-  set authorPictureUrl(url: string) {
-    this._authorPictureUrl = url;
   }
 
   set imageUploaderIsNarrow(value: boolean) {

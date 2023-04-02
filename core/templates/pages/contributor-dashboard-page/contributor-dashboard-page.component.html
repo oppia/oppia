@@ -27,12 +27,14 @@
           <div class="oppia-outer-container">
             <div class="oppia-user-and-rights">
               <div class="oppia-profile-details-container">
-                <span *ngIf="profilePictureDataUrl">
-                  <img [src]="profilePictureDataUrl"
+                <picture *ngIf="profilePicturePngDataUrl">
+                  <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                  <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                  <img [src]="profilePicturePngDataUrl"
                        class="rounded-circle"
                        alt="User Avatar">
-                </span>
-                <span *ngIf="!profilePictureDataUrl">
+                </picture>
+                <span *ngIf="!profilePicturePngDataUrl">
                   <i class="fas fa-user-circle oppia-profile-picture-icon"></i>
                 </span>
               </div>
@@ -152,12 +154,14 @@
              *ngIf="activeTabName === 'myContributionTab'">
           <div class="oppia-collapsed-user-info">
             <div class="oppia-profile-details-container">
-              <span *ngIf="profilePictureDataUrl">
-                <img [src]="profilePictureDataUrl"
+              <picture *ngIf="profilePicturePngDataUrl">
+                <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                <img [src]="profilePicturePngDataUrl"
                      class="rounded-circle collapsed-oppia-contributor-img"
                      alt="User Avatar">
-              </span>
-              <span *ngIf="!profilePictureDataUrl">
+              </picture>
+              <span *ngIf="!profilePicturePngDataUrl">
                 <i class="fas fa-user-circle oppia-profile-picture-icon collapsed-oppia-contributor-img"></i>
               </span>
             </div>
