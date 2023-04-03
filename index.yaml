@@ -439,3 +439,26 @@ indexes:
   - name: suggestion_type
   - name: target_id
   - name: author_id
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: created_on
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: created_on
+
+- kind: UserContributionProficiencyModel
+  properties:
+  - name: deleted
+  - name: score_category
+  - name: score

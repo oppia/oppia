@@ -52,14 +52,14 @@ if MYPY:
 StatsType = List[Tuple[str, Dict[str, Union[bool, int, str]]]]
 
 
-class GenerateTranslationContributionStatsJobTests(job_test_utils.JobTestBase):
+class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
         suggestion_stats_computation_jobs
-        .GenerateTranslationContributionStatsJob
+        .GenerateContributionStatsJob
     ] = (
         suggestion_stats_computation_jobs
-        .GenerateTranslationContributionStatsJob
+        .GenerateContributionStatsJob
     )
 
     VALID_USER_ID_1: Final = 'uid_%s' % (

@@ -65,7 +65,7 @@ class ContributionStatsDict(TypedDict):
     last_updated_date: datetime.date
 
 
-class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
+class GenerateContributionStatsJob(base_jobs.JobBase):
     """Job that generates contributor stats."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -122,7 +122,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Group submitted question suggestions by target' >> (
                 beam.GroupBy(lambda m: m.target_id))
         )
-        question_reviews_grouped_by_target = (
+        reviewed_question_suggestions_grouped_by_target = (
             non_deleted_suggestion_models
             | 'Filter question reviews' >> beam.Filter(
                 lambda m: (
@@ -150,7 +150,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 get_exploration_opportunity_summary_from_model)
             | 'Group by ID' >> beam.GroupBy(lambda m: m.id)
         )
-        skill_opportunities = (
+        skill_opportunities_by_id = (
             self.pipeline
             | 'Get all non-deleted skill opportunity models' >> (
                 ndb_io.GetModels(
@@ -172,7 +172,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             | 'Merge models' >> beam.CoGroupByKey()
             | 'Get rid of key submitted objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
-        exp_opportunity_to_reviewed_submitted_suggestions = (
+        exp_opportunity_to_reviewed_suggestions = (
             {
                 'suggestion': (
                     reviewed_translation_suggestions_grouped_by_target),
@@ -184,15 +184,15 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
         skill_opportunity_to_submitted_suggestions = (
             {
                 'suggestion': question_suggestions_grouped_by_target,
-                'opportunity': skill_opportunities
+                'opportunity': skill_opportunities_by_id
             }
             | 'Merge submitted question models' >> beam.CoGroupByKey()
             | 'Get rid of key of submitted question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
         skill_opportunity_to_reviewed_suggestions = (
             {
-                'suggestion': question_reviews_grouped_by_target,
-                'opportunity': skill_opportunities
+                'suggestion': reviewed_question_suggestions_grouped_by_target,
+                'opportunity': skill_opportunities_by_id
             }
             | 'Merge reviewed question models' >> beam.CoGroupByKey()
             | 'Get rid of key of reviewed question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
@@ -209,7 +209,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 ))
         )
         translation_review_stats_keys_and_results = (
-            exp_opportunity_to_reviewed_submitted_suggestions
+            exp_opportunity_to_reviewed_suggestions
             | 'Generate translation review stats' >> beam.ParDo(
                 lambda x: self._generate_translation_stats(
                     x['suggestion'][0] if len(x['suggestion']) else [],

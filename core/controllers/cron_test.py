@@ -787,7 +787,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             expected_kwargs=[{
                 'job_class': (
                     suggestion_stats_computation_jobs
-                    .GenerateTranslationContributionStatsJob),
+                    .GenerateContributionStatsJob),
             }]
         )
         with swap_with_checks, self.testapp_swap:
