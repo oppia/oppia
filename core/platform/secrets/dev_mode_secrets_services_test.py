@@ -18,27 +18,20 @@
 
 from __future__ import annotations
 
-import types
+import os
 
-from core.platform.secrets import cloud_secrets_services
+from core.platform.secrets import dev_mode_secrets_services
 from core.tests import test_utils
 
 
-class CloudSecretsServicesTests(test_utils.GenericTestBase):
+class DevModeSecretsServicesTests(test_utils.GenericTestBase):
     """Tests for the Python Cloud Secret services."""
 
     def test_get_secret_returns_existing_secret(self) -> None:
-        with self.swap_to_always_return(
-            cloud_secrets_services.CLIENT,
-            'access_secret_version',
-            types.SimpleNamespace(payload=types.SimpleNamespace(data=b'secre'))
-        ):
-            self.assertEqual(cloud_secrets_services.get_secret('name'), 'secre')
+        with self.swap(os, 'environ', {'SECRETS': '{"name": "secret"}'}):
+            self.assertEqual(
+                dev_mode_secrets_services.get_secret('name'), 'secret')
 
     def test_get_secret_returns_none_when_secret_does_not_exist(self) -> None:
-        with self.swap_to_always_raise(
-            cloud_secrets_services.CLIENT,
-            'access_secret_version',
-            Exception('Secret not found')
-        ):
-            self.assertIsNone(cloud_secrets_services.get_secret('name2'))
+        with self.swap(os, 'environ', {'SECRETS': '{"name": "secret"}'}):
+            self.assertIsNone(dev_mode_secrets_services.get_secret('name2'))
