@@ -26,7 +26,7 @@ import { ExplorationRightsService } from './exploration-rights.service';
 import { ExplorationRightsBackendApiService, ExplorationRightsBackendData } from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
-fdescribe('Exploration rights service', () => {
+describe('Exploration rights service', () => {
   let ers: ExplorationRightsService;
   let als: AlertsService;
   let httpTestingController: HttpTestingController;
