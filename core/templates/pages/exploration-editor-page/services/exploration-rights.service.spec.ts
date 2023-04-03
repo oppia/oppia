@@ -26,7 +26,7 @@ import { ExplorationRightsService } from './exploration-rights.service';
 import { ExplorationRightsBackendApiService, ExplorationRightsBackendData } from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
-describe('Exploration rights service', () => {
+fdescribe('Exploration rights service', () => {
   let ers: ExplorationRightsService;
   let als: AlertsService;
   let httpTestingController: HttpTestingController;
@@ -321,10 +321,13 @@ describe('Exploration rights service', () => {
   }));
 
   it('should reject handler when saving a voice artist fails', fakeAsync(() => {
+    const errorMessage = 'An error occurred while assigning voice artist role.';
+    const responseError = { error: { error: errorMessage } };
     spyOn(
       explorationRightsBackendApiService,
       'assignVoiceArtistRoleAsyncPostData').and.returnValue(
-      Promise.reject());
+      Promise.reject(responseError));
+    spyOn(als, 'addWarning');
 
     ers.assignVoiceArtistRoleAsync('voiceArtist').then(
       successHandler, failHandler);
@@ -334,6 +337,10 @@ describe('Exploration rights service', () => {
       explorationRightsBackendApiService
         .assignVoiceArtistRoleAsyncPostData
     ).toHaveBeenCalled();
+
+    expect(als.addWarning).toHaveBeenCalledWith(
+      errorMessage
+    );
   }));
 
   it('should check user already has roles', () => {
