@@ -33,7 +33,7 @@
             <div class="completed-progress-bar"
                  [style.width.%]="getCompletedProgressBarWidth()">
             </div>
-            <span class="progress" aria-label="'Completed progress : ' + getCompletedProgressBarWidth() + '%'"></span>
+            <span class="progress" attr.aria-label="'Completed progress : ' + getCompletedProgressBarWidth() + '%'"></span>
           </div>
           <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
                [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
