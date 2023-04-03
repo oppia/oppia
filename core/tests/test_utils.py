@@ -1250,6 +1250,12 @@ class TestBase(unittest.TestCase):
     def get_static_asset_url(self, asset_suffix: str) -> str:
         """Returns the relative path for the asset, appending it to the
         corresponding cache slug. asset_suffix should have a leading slash.
+
+        Args:
+            asset_suffix: str. The asset suffix to append to the cache slug.
+
+        Returns:
+            str. The relative path for the asset.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
@@ -3040,7 +3046,18 @@ version: 1
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
-        """PUT an object to the server with JSON and return the response."""
+        """PUT an object to the server with JSON and return the response.
+
+        Args:
+            url: str. The url of where to put the object.
+            payload: dict. The dictionary to be sent over to the handler.
+            csrf_token: str. The csrf token to use.
+            expected_status_int: int. The integer status code to expect. Will be
+                200 if not specified.
+
+        Returns:
+            dict. A json dict response from the server.
+        """
         params = {'payload': json.dumps(payload)}
         if csrf_token:
             params['csrf_token'] = csrf_token

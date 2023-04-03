@@ -26,21 +26,28 @@ from typing import List
 
 
 class GaeSuiteTests(test_utils.GenericTestBase):
+    """Test the methods for creating test suites"""
 
     def test_cannot_create_test_suites_with_invalid_test_target_format(
         self
     ) -> None:
+        """Creates target_test with invalid name."""
+
         with self.assertRaisesRegex(
             Exception, 'The delimiter in test_target should be a dot (.)'):
             gae_suite.create_test_suites(test_target='core/controllers')
 
     def test_create_test_suites(self) -> None:
+        """Creates target_test with valid name."""
+
         test_suite = gae_suite.create_test_suites(
             test_target='core.tests.gae_suite_test')
         self.assertEqual(len(test_suite), 1)
         self.assertEqual(type(test_suite[0]), unittest.suite.TestSuite)
 
     def test_cannot_add_directory_with_invalid_path(self) -> None:
+        """Creates invalid path."""
+
         dir_to_add_swap = self.swap(
             common, 'DIRS_TO_ADD_TO_SYS_PATH', ['invalid_path'])
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
