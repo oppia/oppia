@@ -32,10 +32,12 @@
                  [ngbPopover]="getDescription(interactionId)"
                  placement="bottom"
                  triggers="mouseenter:mouseleave">
-              <img [src]="getInteractionThumbnailImageUrl(interactionId)">
-              <div class="oppia-interaction-tile-name fx-row fx-main-center fx-cross-center">
-                {{ getTitle(interactionId) }}
-              </div>
+              <button class="oppia-interaction-card">
+                <img [src]="getInteractionThumbnailImageUrl(interactionId)">
+                <div class="oppia-interaction-tile-name fx-row fx-main-center fx-cross-center">
+                  {{ getTitle(interactionId) }}
+                </div>
+              </button>
             </div>
           </div>
         </ng-template>
@@ -112,6 +114,12 @@
 </div>
 
 <style>
+  .oppia-interaction-card {
+    border: 0;
+    margin: 0 0;
+    padding: 0 0;
+  }
+
   .modal-footer {
     display: flex;
     justify-content: flex-end;
