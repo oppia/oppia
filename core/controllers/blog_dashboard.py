@@ -27,7 +27,6 @@ from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
-from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -128,7 +127,6 @@ class BlogDashboardDataHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
-        user_settings = user_services.get_user_settings(self.user_id)
         author_details = (
             blog_services.get_blog_author_details(self.user_id).to_dict())
         no_of_published_blog_posts = 0
@@ -154,7 +152,6 @@ class BlogDashboardDataHandler(
                     draft_blog_post_summaries))
         self.values.update({
             'author_details': author_details,
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
             'no_of_published_blog_posts': no_of_published_blog_posts,
             'no_of_draft_blog_posts': no_of_draft_blog_posts,
             'published_blog_post_summary_dicts': published_post_summary_dicts,
@@ -275,13 +272,6 @@ class BlogPostHandler(
             raise self.PageNotFoundException(
                 'The blog post with the given id or url doesn\'t exist.')
 
-        user_settings = user_services.get_user_settings(
-            blog_post.author_id, strict=False)
-        if user_settings:
-            profile_picture_data_url = user_settings.profile_picture_data_url
-        else:
-            profile_picture_data_url = None
-
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id)
         max_no_of_tags = config_domain.Registry.get_config_property(
@@ -304,7 +294,6 @@ class BlogPostHandler(
         self.values.update({
             'blog_post_dict': blog_post_dict_for_dashboard,
             'displayed_author_name': author_details.displayed_author_name,
-            'profile_picture_data_url': profile_picture_data_url,
             'max_no_of_tags': max_no_of_tags,
             'list_of_default_tags': list_of_default_tags
         })
