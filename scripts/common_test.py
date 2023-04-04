@@ -41,7 +41,7 @@ from scripts import install_python_dev_dependencies
 from scripts import servers
 
 import github
-from typing import Generator, List, Literal, NoReturn
+from typing import Final, Generator, List, Literal, NoReturn
 
 from . import common
 
@@ -64,6 +64,13 @@ _MOCK_REQUESTER = github.Requester.Requester(  # type: ignore[call-arg]
     retry=None,
     pool_size=None,
 )
+
+GOOGLE_APP_ENGINE_PORT: Final = 9001
+ELASTICSEARCH_SERVER_PORT: Final = 9200
+PORTS_USED_BY_OPPIA_PROCESSES: Final = [
+    GOOGLE_APP_ENGINE_PORT,
+    ELASTICSEARCH_SERVER_PORT,
+]
 
 
 class MockCompiler:
@@ -91,10 +98,14 @@ class CommonTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.exit_stack = contextlib.ExitStack()
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
+
+    def tearDown(self) -> None:
+        self.exit_stack.close()
 
     def test_run_ng_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
@@ -1269,6 +1280,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_chrome_bin_setup_with_error(self) -> None:
         print_arr = []
+
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
@@ -1280,3 +1292,20 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             common.setup_chrome_bin_env_variable()
         self.assertIn('Chrome is not found, stopping...', print_arr)
+
+    def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
+        self.exit_stack.enter_context(self.swap_to_always_return(
+            common, 'is_port_in_use', value=False))
+
+        self.assertFalse(common.is_oppia_server_already_running(
+            PORTS_USED_BY_OPPIA_PROCESSES))
+
+    def test_is_oppia_server_already_running_when_a_port_is_open(
+        self
+    ) -> None:
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'is_port_in_use',
+            lambda port: port == GOOGLE_APP_ENGINE_PORT))
+
+        self.assertTrue(common.is_oppia_server_already_running(
+            PORTS_USED_BY_OPPIA_PROCESSES))

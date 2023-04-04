@@ -1,5 +1,13 @@
 <a *ngIf="isUsernameLinkable(username)" [href]="profileUrl" [smartRouterLink]="profileUrl">
-  <img [src]="profilePicture" alt="User Avatar" class="rounded-circle">
+  <picture>
+    <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+    <source type="image/png" [srcset]="profilePicturePngDataUrl">
+    <img [src]="profilePicturePngDataUrl" class="rounded-circle" alt="User Avatar">
+  </picture>
 </a>
 
-<img *ngIf="!isUsernameLinkable(username)" [src]="profilePicture" alt="">
+<picture *ngIf="!isUsernameLinkable(username)">
+  <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+  <source type="image/png" [srcset]="profilePicturePngDataUrl">
+  <img [src]="profilePicturePngDataUrl" class="rounded-circle" alt="User Avatar">
+</picture>

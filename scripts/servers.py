@@ -201,7 +201,7 @@ def managed_dev_appserver(
             dev_appserver_args,
             human_readable_name='GAE Development Server',
             shell=True,
-            env=env
+            env=env,
         ))
         common.wait_for_port_to_be_in_use(port)
         yield proc
@@ -722,3 +722,47 @@ def managed_webdriverio_server(
             yield proc
     finally:
         del os.environ['MOBILE']
+
+
+@contextlib.contextmanager
+def managed_acceptance_tests_server(
+    suite_name: str,
+    stdout: int = subprocess.PIPE,
+) -> Iterator[psutil.Process]:
+    """Returns context manager to start/stop the Acceptance server gracefully.
+
+    Args:
+        suite_name: str. The suite name whose tests should be run.
+        stdout: int. This parameter specifies the executed program's standard
+            output file handle.
+
+    Yields:
+        psutil.Process. The jasmine testing process.
+    """
+    nodemodules_jasmine_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jasmine')
+    puppeteer_acceptance_tests_dir_path = os.path.join(
+        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+    spec_dir_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'spec')
+    jasmine_config_file_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'jasmine.json')
+
+    acceptance_tests_args = [
+        nodemodules_jasmine_bin_path,
+        '--config="%s"' % jasmine_config_file_path,
+        '%s' % os.path.join(spec_dir_path, suite_name)
+    ]
+
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
+    managed_acceptance_tests_proc = managed_process(
+        acceptance_tests_args,
+        human_readable_name='Acceptance Tests Server',
+        shell=True,
+        raise_on_nonzero_exit=False,
+        stdout=stdout,
+    )
+
+    with managed_acceptance_tests_proc as proc:
+        yield proc

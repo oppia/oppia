@@ -37,7 +37,6 @@ import { ExplorationCreationBackendApiService } from 'components/entity-creation
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
-import { ProfileLinkImageBackendApiService } from 'components/profile-link-directives/profile-link-image-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
@@ -433,6 +432,7 @@ import { ContributionAndReviewStatsBackendApiService } from 'pages/contributor-d
 import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-page/services/contribution-and-review-stats.service';
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
+import { StoryCreationBackendApiService } from 'components/entity-creation-services/story-creation-backend-api.service';
 import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
 import { VersionHistoryService } from 'pages/exploration-editor-page/services/version-history.service';
 import { ConceptCardManagerService } from 'pages/exploration-player-page/services/concept-card-manager.service';
@@ -731,7 +731,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['PreventPageUnloadEventService', PreventPageUnloadEventService],
   ['PredictionAlgorithmRegistryService', PredictionAlgorithmRegistryService],
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],
-  ['ProfileLinkImageBackendApiService', ProfileLinkImageBackendApiService],
   ['ProfilePageBackendApiService', ProfilePageBackendApiService],
   ['PromoBarBackendApiService', PromoBarBackendApiService],
   ['PythonProgramTokenizer', PythonProgramTokenizer],
@@ -822,6 +821,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],
+  ['StoryCreationBackendApiService', StoryCreationBackendApiService],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryEditorStalenessDetectionService',
     StoryEditorStalenessDetectionService],

@@ -163,7 +163,7 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
                   'contains a choice that does not match any of ' +
                   'the choices in the customization arguments.')
               });
@@ -172,7 +172,7 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
                   'refers to an invalid choice position.')
               });
             }
@@ -182,7 +182,7 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
                   'will never be matched because both the selected ' +
                   'elements are same.')
               });
@@ -194,7 +194,7 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
                   'contains choices that do not match any of ' +
                   'the choices in the customization arguments.')
               });
@@ -237,7 +237,7 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
+                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
                   (i + 1) + ' will never be matched because there will be ' +
                   'at least 2 elements at incorrect positions if multiple ' +
                   'elements cannot occupy the same position.')
@@ -253,7 +253,7 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
                   'options do not match customization argument choices.')
               });
             }
@@ -271,9 +271,9 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
                   'will never be matched because it is made redundant by ' +
-                  `rule ${ranges[k].ruleIndex + 1} from answer group ` +
+                  `answer ${ranges[k].ruleIndex + 1} from response ` +
                   `${ranges[k].answerGroupIndex + 1}.`)
               });
             }
