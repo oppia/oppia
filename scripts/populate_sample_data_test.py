@@ -62,7 +62,7 @@ class MockResponse:
         return self.json_dict
 
 
-class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
+class SampleDataInitializerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
@@ -73,7 +73,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.token_by_email: Dict[str, str] = {}
         self.token_of_current_user: Optional[str] = None
         self.initializer = (
-            populate_sample_data.DebugInitializer(
+            populate_sample_data.SampleDataInitializer(
                 base_url=''))
 
         self.initializer.csrf_token = self.get_new_csrf_token()
@@ -147,7 +147,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
     def test_populate_data_is_called(self) -> None:
         populate_data_swap = self.swap_with_call_counter(
-            populate_sample_data.DebugInitializer,
+            populate_sample_data.SampleDataInitializer,
             'populate_data')
         with populate_data_swap as call_counter:
             populate_sample_data.main()

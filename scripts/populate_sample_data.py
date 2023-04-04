@@ -68,9 +68,9 @@ CLASSROOM_NAME: Final = 'math'
 CLASSROOM_URL_FRAGMENT: Final = 'math'
 
 
-class DebugInitializer:
-    """Contains functions that populate sample data for debugging by sending
-    requests to the development server.
+class SampleDataInitializer:
+    """Contains functions that populate sample data by sending requests to the
+    development server.
 
     Attributes:
         session: object(Session). The requests.Session object to send requests
@@ -270,7 +270,7 @@ class DebugInitializer:
 def main() -> None:
     """Populates data for contributor dashboard debugging."""
     initializer = (
-        DebugInitializer(
+        SampleDataInitializer(
             base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER
         )
     )
