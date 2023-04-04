@@ -33,7 +33,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
 import { EntityTranslationsService } from 'services/entity-translations.services';
-import { UserExplorationPermissionsService } from '../../services/user-exploration-permissions.service';
 
 class MockNgbModal {
   open() {
@@ -59,18 +58,6 @@ describe('Translator Overview component', () => {
   let routerService: RouterService;
   let entityTranslationsService: EntityTranslationsService;
 
-  class MockUserExplorationPermissionsService {
-    getPermissionsAsync() {
-      return Promise.resolve({
-        canVoiceover: true
-      });
-    }
-
-    fetchPermissionsAsync() {
-      return Promise.resolve();
-    }
-  }
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -83,11 +70,7 @@ describe('Translator Overview component', () => {
           provide: NgbModal,
           useClass: MockNgbModal
         },
-        WindowRef,
-        {
-          provide: UserExplorationPermissionsService,
-          useClass: MockUserExplorationPermissionsService
-        }
+        WindowRef
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
