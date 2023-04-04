@@ -97,7 +97,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             common,
-            'is_oppia_server_already_running', lambda *_: True))
+            'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
