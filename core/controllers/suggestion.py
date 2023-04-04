@@ -779,9 +779,8 @@ class ReviewableSuggestionsHandler(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             topic_name = self.normalized_request.get('topic_name')
-            if topic_name is None:
-                topics = topic_fetchers.get_all_topics()
-            else:
+            topics = None
+            if topic_name is not None:
                 topic = topic_fetchers.get_topic_by_name(topic_name)
                 if topic is None:
                     raise self.InvalidInputException(
