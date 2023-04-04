@@ -76,6 +76,7 @@ class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
     def setUp(self) -> None:
+        super.setUp()
         self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self) -> None:
