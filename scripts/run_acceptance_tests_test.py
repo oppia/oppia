@@ -29,9 +29,7 @@ from scripts import run_acceptance_tests
 from scripts import scripts_test_utils
 from scripts import servers
 
-from typing import ContextManager, Final, Tuple
-
-CHROME_DRIVER_VERSION: Final = '77.0.3865.40'
+from typing import ContextManager, Tuple
 
 
 def mock_managed_process(
@@ -103,12 +101,12 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             servers, 'managed_portserver', mock_managed_process))
 
         with self.assertRaisesRegex(SystemExit, '1'):
-            run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+            run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running',
-            lambda *_: True, expected_args=[(
+            lambda *_: False, expected_args=[(
                 run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'build_js_files', lambda *_, **__: None,
@@ -129,14 +127,14 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             servers, 'managed_acceptance_tests_server', mock_managed_process,
             expected_kwargs=[
                 {
-                    'suite_name': 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',  # pylint: disable=line-too-long
+                    'suite_name': 'testSuite',
                     'stdout': subprocess.PIPE,
                 },
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+        run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_acceptance_tests_server(
@@ -149,7 +147,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running',
-            lambda *_: True, expected_args=[(
+            lambda *_: False, expected_args=[(
                 run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'build_js_files', lambda *_, **__: None,
@@ -169,11 +167,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             mock_managed_acceptance_tests_server,
             expected_kwargs=[
                 {
-                    'suite_name': 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',  # pylint: disable=line-too-long
+                    'suite_name': 'testSuite',
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=protected-access, line-too-long
+        args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'testSuite'])  # pylint: disable=protected-access, line-too-long
 
         lines, _ = run_acceptance_tests.run_tests(args)
 
@@ -193,7 +191,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
 
-        run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+        run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_no_rerun_when_tests_flake_with_rerun_no(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
@@ -206,7 +204,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
-        run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+        run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_no_rerun_when_tests_flake_with_rerun_unknown(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
@@ -219,7 +217,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
-        run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+        run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_no_reruns_off_ci_fail(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
@@ -232,7 +230,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
 
-        run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+        run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_no_reruns_off_ci_pass(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
@@ -245,12 +243,12 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+        run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_skip_build(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running',
-            lambda *_: True, expected_args=[(
+            lambda *_: False, expected_args=[(
                 run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'modify_constants', lambda *_, **__: None,
@@ -276,19 +274,19 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             servers, 'managed_acceptance_tests_server', mock_managed_process,
             expected_kwargs=[
                 {
-                    'suite_name': 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',  # pylint: disable=line-too-long
+                    'suite_name': 'testSuite',
                     'stdout': subprocess.PIPE,
                 },
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_acceptance_tests.main(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js', '--skip-build'])  # pylint: disable=line-too-long
+        run_acceptance_tests.main(args=['--suite', 'testSuite', '--skip-build'])
 
     def test_start_tests_in_jasmine(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running',
-            lambda *_: True, expected_args=[(
+            lambda *_: False, expected_args=[(
                 run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'build_js_files', lambda *_, **__: None,
@@ -309,12 +307,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             servers, 'managed_acceptance_tests_server', mock_managed_process,
             expected_kwargs=[
                 {
-                    'suite_name': 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',  # pylint: disable=line-too-long
+                    'suite_name': 'testSuite',
                     'stdout': subprocess.PIPE,
                 },
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_acceptance_tests.main(
-            args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+        run_acceptance_tests.main(args=['--suite', 'testSuite'])
