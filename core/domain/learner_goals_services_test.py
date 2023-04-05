@@ -257,6 +257,46 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
+    def test_remove_topics_from_learn_goal_executed_correctly(
+        self
+    ) -> None:
+        self.assertEqual(self._get_all_topic_ids_to_learn(
+            self.viewer_id), [])
+
+        # Add topics to learner goals.
+        learner_goals_services.mark_topic_to_learn(
+            self.viewer_id, self.TOPIC_ID_1)
+        learner_goals_services.mark_topic_to_learn(
+            self.viewer_id, self.TOPIC_ID_2)
+        self.assertEqual(self._get_all_topic_ids_to_learn(
+            self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
+
+        # Remove a topic from learner goals.
+        learner_goals_services.remove_topics_from_learn_goal(
+            self.viewer_id, [self.TOPIC_ID_1])
+        self.assertEqual(self._get_all_topic_ids_to_learn(
+            self.viewer_id), [self.TOPIC_ID_2])
+
+        # Check if the removed topic is not present in the learner goals.
+        learner_goals = learner_goals_services.get_all_topic_ids_to_learn(
+            self.viewer_id)
+        self.assertNotIn(self.TOPIC_ID_1, learner_goals)
+
+        # Check if the remaining topic is still present in the learner goals.
+        self.assertIn(self.TOPIC_ID_2, learner_goals)
+
+        # Remove the remaining topic from learner goals.
+        learner_goals_services.remove_topics_from_learn_goal(
+            self.viewer_id, [self.TOPIC_ID_2])
+        self.assertEqual(self._get_all_topic_ids_to_learn(
+            self.viewer_id), [])
+
+        # Check if both topics are not present in the learner goals.
+        learner_goals = learner_goals_services.get_all_topic_ids_to_learn(
+            self.viewer_id)
+        self.assertNotIn(self.TOPIC_ID_1, learner_goals)
+        self.assertNotIn(self.TOPIC_ID_2, learner_goals)
+
     def test_remove_topics_when_learner_goals_model_does_not_exist(
         self
     ) -> None:
