@@ -57,7 +57,8 @@ class StartTests(test_utils.GenericTestBase):
             return MockCompilerContextManager()
         self.swap_print = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
-
+        def mock_constants() -> None:
+            print('mock_set_constants_to_default')
         # We need to create a swap for install_third_party_libs because
         # scripts/start.py installs third party libraries whenever it is
         # imported.
@@ -107,6 +108,8 @@ class StartTests(test_utils.GenericTestBase):
         self.swap_create_managed_web_browser = self.swap_to_always_raise(
             servers, 'create_managed_web_browser',
             Exception(MANAGED_WEB_BROWSER_ERROR))
+        self.swap_mock_set_constants_to_default = self.swap(
+            common, 'set_constants_to_default', mock_constants)
 
     def test_start_servers_successfully(self) -> None:
         with self.swap_install_third_party_libs:
@@ -119,7 +122,8 @@ class StartTests(test_utils.GenericTestBase):
                 with self.swap_create_server, self.swap_webpack_compiler:
                     with self.swap_extend_index_yaml, self.swap_dev_appserver:
                         with self.swap_firebase_auth_emulator, self.swap_print:
-                            start.main(args=[])
+                            with self.swap_mock_set_constants_to_default:
+                                start.main(args=[])
 
         self.assertIn(
             [
@@ -143,7 +147,8 @@ class StartTests(test_utils.GenericTestBase):
                 with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
                     with self.swap_extend_index_yaml, swap_build:
                         with self.swap_print:
-                            start.main(args=['--prod_env'])
+                            with self.swap_mock_set_constants_to_default:
+                                start.main(args=['--prod_env'])
 
         self.assertIn(
             [
@@ -169,7 +174,8 @@ class StartTests(test_utils.GenericTestBase):
                 with self.swap_create_server, self.swap_webpack_compiler:
                     with self.swap_extend_index_yaml, self.swap_dev_appserver:
                         with self.swap_firebase_auth_emulator, self.swap_print:
-                            start.main(args=['--maintenance_mode'])
+                            with self.swap_mock_set_constants_to_default:
+                                start.main(args=['--maintenance_mode'])
 
         self.assertIn(
             [
@@ -196,7 +202,8 @@ class StartTests(test_utils.GenericTestBase):
                 with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
                     with self.swap_extend_index_yaml, swap_check_port_in_use:
                         with self.swap_print, swap_build, self.swap_ng_build:
-                            start.main(args=['--no_browser'])
+                            with self.swap_mock_set_constants_to_default:
+                                start.main(args=['--no_browser'])
 
         self.assertIn(
             [
@@ -239,7 +246,8 @@ class StartTests(test_utils.GenericTestBase):
                 with swap_emulator_mode, self.swap_dev_appserver:
                     with self.swap_extend_index_yaml, swap_build:
                         with self.swap_print, self.swap_ng_build:
-                            start.main(args=['--source_maps'])
+                            with self.swap_mock_set_constants_to_default:
+                                start.main(args=['--source_maps'])
 
         self.assertIn(
             [
@@ -265,7 +273,8 @@ class StartTests(test_utils.GenericTestBase):
                     with self.swap_webpack_compiler, self.swap_dev_appserver:
                         with self.swap_extend_index_yaml, self.swap_print:
                             with self.swap_firebase_auth_emulator:
-                                start.main(args=[])
+                                with self.swap_mock_set_constants_to_default:
+                                    start.main(args=[])
 
         self.assertIn(
             [
@@ -287,3 +296,20 @@ class StartTests(test_utils.GenericTestBase):
                 )
             ],
             self.print_arr)
+
+    def test_not_mock_set_constants_to_default_error(self) -> None:
+        with self.swap_install_third_party_libs:
+            from scripts import start
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}])
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'Please mock this method in the test.')
+
+        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
+            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
+                with self.swap_create_server, self.swap_webpack_compiler:
+                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
+                        with self.swap_firebase_auth_emulator, self.swap_print:
+                            with assert_raises_regexp:
+                                start.main(args=[])

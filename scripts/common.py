@@ -912,3 +912,48 @@ def run_ng_compilation() -> None:
     if not os.path.isdir(ng_bundles_dir_name):
         print('Failed to complete ng build compilation, exiting...')
         sys.exit(1)
+
+
+def set_constants_to_default() -> None:
+    """Set variables in constants.ts and feconf.py to default values."""
+    modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
+
+
+def modify_constants(
+    prod_env: bool = False,
+    emulator_mode: bool = True,
+    maintenance_mode: bool = False
+) -> None:
+    """Modify constants.ts and feconf.py.
+
+    Args:
+        prod_env: bool. Whether the server is started in prod mode.
+        emulator_mode: bool. Whether the server is started in emulator mode.
+        maintenance_mode: bool. Whether the site should be put into
+            the maintenance mode.
+    """
+    dev_mode_variable = (
+        '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"DEV_MODE": (true|false)',
+        dev_mode_variable,
+        expected_number_of_replacements=1
+    )
+    emulator_mode_variable = (
+        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"EMULATOR_MODE": (true|false)',
+        emulator_mode_variable,
+        expected_number_of_replacements=1
+    )
+
+    enable_maintenance_mode_variable = (
+        'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
+    inplace_replace_file(
+        FECONF_PATH,
+        r'ENABLE_MAINTENANCE_MODE = (True|False)',
+        enable_maintenance_mode_variable,
+        expected_number_of_replacements=1
+    )

@@ -220,51 +220,6 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
         prod_yaml_file.write(content)
 
 
-def modify_constants(
-    prod_env: bool = False,
-    emulator_mode: bool = True,
-    maintenance_mode: bool = False
-) -> None:
-    """Modify constants.ts and feconf.py.
-
-    Args:
-        prod_env: bool. Whether the server is started in prod mode.
-        emulator_mode: bool. Whether the server is started in emulator mode.
-        maintenance_mode: bool. Whether the site should be put into
-            the maintenance mode.
-    """
-    dev_mode_variable = (
-        '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
-    common.inplace_replace_file(
-        common.CONSTANTS_FILE_PATH,
-        r'"DEV_MODE": (true|false)',
-        dev_mode_variable,
-        expected_number_of_replacements=1
-    )
-    emulator_mode_variable = (
-        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
-    common.inplace_replace_file(
-        common.CONSTANTS_FILE_PATH,
-        r'"EMULATOR_MODE": (true|false)',
-        emulator_mode_variable,
-        expected_number_of_replacements=1
-    )
-
-    enable_maintenance_mode_variable = (
-        'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
-    common.inplace_replace_file(
-        common.FECONF_PATH,
-        r'ENABLE_MAINTENANCE_MODE = (True|False)',
-        enable_maintenance_mode_variable,
-        expected_number_of_replacements=1
-    )
-
-
-def set_constants_to_default() -> None:
-    """Set variables in constants.ts and feconf.py to default values."""
-    modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
-
-
 def _minify_css(source_path: str, target_path: str) -> None:
     """Runs the given file through a minifier and outputs it to target_path.
 
@@ -1425,7 +1380,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 'minify_third_party_libs_only should not be '
                 'set in non-prod env.')
 
-    modify_constants(
+    common.modify_constants(
         prod_env=options.prod_env,
         emulator_mode=not options.deploy_mode,
         maintenance_mode=options.maintenance_mode)
