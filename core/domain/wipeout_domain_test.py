@@ -76,7 +76,7 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
     def test_validate_success_for_correct_key_in_activity_mappings(
         self
     ) -> None:
-        """Tests the create_default_topic() function with correct keys."""
+        """Tests the validate() function with correct keys."""
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
                 self.user_id_a, 'username', 'a@example.com'))
