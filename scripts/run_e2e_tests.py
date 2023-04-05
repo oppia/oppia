@@ -197,10 +197,10 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         dev_mode = not args.prod_env
 
         if args.skip_build:
-            build.modify_constants(prod_env=args.prod_env)
+            common.modify_constants(prod_env=args.prod_env)
         else:
             build_js_files(dev_mode, source_maps=args.source_maps)
-        stack.callback(build.set_constants_to_default)
+        stack.callback(common.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
