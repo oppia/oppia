@@ -96,8 +96,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests,
-            'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: True,
+            expected_args=[(run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
@@ -106,8 +106,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'is_oppia_server_already_running',
-            lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: True,
+            expected_args=[(run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
@@ -146,8 +146,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                     alive=False))
 
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'is_oppia_server_already_running',
-            lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: True,
+            expected_args=[(run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
@@ -246,8 +246,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_skip_build(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'is_oppia_server_already_running',
-            lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: True,
+            expected_args=[(run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'modify_constants', lambda *_, **__: None,
             expected_kwargs=[{'prod_env': False}]))
@@ -283,8 +283,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_in_jasmine(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            run_acceptance_tests, 'is_oppia_server_already_running',
-            lambda *_: False))
+            common, 'is_oppia_server_already_running', lambda *_: True,
+            expected_args=[(run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
