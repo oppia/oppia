@@ -6,6 +6,7 @@
 oppia-exploration-summary-tile .oppia-exploration-dashboard-card {
   position: relative;
   text-align: left;
+  width: 198px;
   z-index: 5;
 }
 
@@ -48,6 +49,7 @@ oppia-exploration-summary-tile .oppia-learner-confirm-button {
 oppia-exploration-summary-tile .mobile-activity-summary-card {
   box-shadow: slategrey 2px 4px 4px 0;
   padding: 0 0 0 0;
+  width: 340px;
 }
 
 oppia-exploration-summary-tile .mobile-exploration-card-image-container {
