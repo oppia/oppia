@@ -75,17 +75,10 @@ def mock_managed_process(
 class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
-    def setUp(self) -> None:
-        super().setUp()
-        self.exit_stack = contextlib.ExitStack()
-
     def tearDown(self) -> None:
-        try:
-            self.exit_stack.close()
-        finally:
-            super().tearDown()
-            build.safe_delete_directory_tree(TEST_DIR)
-            build.safe_delete_directory_tree(EMPTY_DIR)
+        super().tearDown()
+        build.safe_delete_directory_tree(TEST_DIR)
+        build.safe_delete_directory_tree(EMPTY_DIR)
 
     def test_minify_func_with_invalid_filepath(self) -> None:
         """Tests minify_func with an invalid filepath."""
@@ -1259,6 +1252,20 @@ class BuildTests(test_utils.GenericTestBase):
                 AssertionError, 'webpack_bundles should be non-empty.'
             ):
                 build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
+
+
+class E2EBuildTests(test_utils.GenericTestBase):
+    """Test the end to end build methods."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exit_stack = contextlib.ExitStack()
+
+    def tearDown(self) -> None:
+        try:
+            self.exit_stack.close()
+        finally:
+            super().tearDown()
 
     def test_run_webpack_compilation_success(self) -> None:
         old_os_path_isdir = os.path.isdir

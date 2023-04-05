@@ -178,6 +178,14 @@ _PARSER.add_argument(
     help='Build webpack with source maps.')
 
 
+class DependencyBundleDict(TypedDict):
+    """Dictionary that represents dependency bundle."""
+
+    js: List[str]
+    css: List[str]
+    fontsPath: str
+
+
 def run_webpack_compilation(source_maps: bool = False) -> None:
     """Runs webpack compilation.
 
@@ -226,14 +234,6 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
         main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation(source_maps=source_maps)
-
-
-class DependencyBundleDict(TypedDict):
-    """Dictionary that represents dependency bundle."""
-
-    js: List[str]
-    css: List[str]
-    fontsPath: str
 
 
 def generate_app_yaml(deploy_mode: bool = False) -> None:
