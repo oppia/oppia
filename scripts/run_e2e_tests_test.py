@@ -55,6 +55,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
+        def mock_constants() -> None:
+            print('mock_set_constants_to_default')
+        self.swap_mock_set_constants_to_default = self.swap(
+            common, 'set_constants_to_default', mock_constants)
+
     def tearDown(self) -> None:
         try:
             self.exit_stack.close()
@@ -154,8 +159,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             ]))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
-
-        run_e2e_tests.main(args=[])
+        with self.swap_mock_set_constants_to_default:
+            run_e2e_tests.main(args=[])
 
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_webdriverio_server(
@@ -201,7 +206,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             ]))
         args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
 
-        lines, _ = run_e2e_tests.run_tests(args)
+        with self.swap_mock_set_constants_to_default:
+            lines, _ = run_e2e_tests.run_tests(args)
 
         self.assertEqual(
             [line.decode('utf-8') for line in lines],
@@ -281,10 +287,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'modify_constants', lambda *_, **__: None,
+            common, 'modify_constants', lambda *_, **__: None,
             expected_kwargs=[{'prod_env': False}]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'set_constants_to_default', lambda: None))
+            common, 'set_constants_to_default', lambda: None))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -356,7 +362,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_e2e_tests.main(args=['--debug_mode'])
+        with self.swap_mock_set_constants_to_default:
+            run_e2e_tests.main(args=['--debug_mode'])
 
     def test_start_tests_in_with_chromedriver_flag(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -396,8 +403,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_e2e_tests.main(
-            args=['--chrome_driver_version', CHROME_DRIVER_VERSION])
+        with self.swap_mock_set_constants_to_default:
+            run_e2e_tests.main(
+                args=['--chrome_driver_version', CHROME_DRIVER_VERSION])
 
     def test_start_tests_in_webdriverio(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -437,8 +445,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_e2e_tests.main(
-            args=['--suite', 'collections'])
+        with self.swap_mock_set_constants_to_default:
+            run_e2e_tests.main(
+                args=['--suite', 'collections'])
 
     def test_do_not_run_with_test_non_mobile_suite_in_mobile_mode(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -464,4 +473,5 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             servers, 'managed_cloud_datastore_emulator', mock_managed_process))
 
         with self.assertRaisesRegex(SystemExit, '^1$'):
-            run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
+            with self.swap_mock_set_constants_to_default:
+                run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
