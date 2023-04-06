@@ -83,6 +83,7 @@ export class GoalsTabComponent implements OnInit {
   editGoalsTopicClassification: number[] = [];
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
   windowIsNarrow: boolean = false;
+  // showThreeDotsDropdown: boolean = false;
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
@@ -90,7 +91,6 @@ export class GoalsTabComponent implements OnInit {
     this.currentGoalsStoryIsShown = [];
     this.showThreeDotsDropdown = [];
     this.currentGoalsStoryIsShown[0] = true;
-    this.showThreeDotsDropdown[0] = false;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
       '/learner_dashboard/book_icon.png');
@@ -171,7 +171,6 @@ export class GoalsTabComponent implements OnInit {
         this.topicIdsInCurrentGoals.length < this.MAX_CURRENT_GOALS_LENGTH &&
         !this.topicIdsInCompletedGoals.includes(activityId)) {
         this.currentGoalsStoryIsShown.push(false);
-        this.showThreeDotsDropdown.push(false);
         this.currentGoals.push(topic);
         this.topicIdsInCurrentGoals.push(activityId);
         this.editGoalsTopicClassification.splice(
@@ -192,7 +191,7 @@ export class GoalsTabComponent implements OnInit {
   }
 
   toggleThreeDotsDropdown(index: number): void {
-    this.showThreeDotsDropdown[index] = !(this.showThreeDotsDropdown[index]);
+    this.showThreeDotsDropdown[index] = !this.showThreeDotsDropdown[index];
   }
 
   /**
@@ -202,13 +201,17 @@ export class GoalsTabComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
-    if (!this.dropdownRef) {
-      return;
+    for(let i=0 ;i<this.showThreeDotsDropdown.length;i++){
+      if (!this.showThreeDotsDropdown[i]) {
+        return;
+      }
+      if (
+        targetElement &&
+        !this.dropdownRef.nativeElement.contains(targetElement)
+      ) {
+        this.showThreeDotsDropdown[i] = false;
+      }
     }
-    if (
-      targetElement &&
-      !this.dropdownRef.nativeElement.contains(targetElement)
-    ) { }
   }
 
   removeFromLearnerGoals(
@@ -225,7 +228,6 @@ export class GoalsTabComponent implements OnInit {
         activityId, activityTitle)
       .then(() => {
         this.currentGoalsStoryIsShown.splice(index, 1);
-        this.showThreeDotsDropdown.splice(index, 1);
         this.currentGoals.splice(index, 1);
         this.topicIdsInCurrentGoals.splice(index, 1);
         let indexOfTopic = this.topicIdsInEditGoals.indexOf(topicId);
