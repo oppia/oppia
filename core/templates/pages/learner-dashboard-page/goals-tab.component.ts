@@ -83,7 +83,6 @@ export class GoalsTabComponent implements OnInit {
   editGoalsTopicClassification: number[] = [];
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
   windowIsNarrow: boolean = false;
-  // showThreeDotsDropdown: boolean = false;
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
