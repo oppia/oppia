@@ -17,11 +17,11 @@
 from __future__ import annotations
 
 import datetime
-
 from core import feconf
 from core import utils
 from core.domain import feedback_domain
 from core.tests import test_utils
+from core.domain.feedback_domain import FullyQualifiedMessageIdentifier
 
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
@@ -118,6 +118,12 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_message_dict, observed_message.to_dict())
 
+class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
+    def test_initialization(self):
+        fully_qualified_message = FullyQualifiedMessageIdentifier('thread_id', 123)
+        self.assertEqual(fully_qualified_message.thread_id, 'thread_id')
+        self.assertEqual(fully_qualified_message.message_id, 123)
+
 
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
@@ -157,3 +163,43 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_feedback_message_reference.to_dict(),
             expected_feedback_message_reference)
+
+
+class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
+    def setUp(self) -> None:
+        super().setUp() 
+        self.thread_id = 'exp.thread'
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+   
+    def test_to_dict(self) -> None:
+        fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+        expected_feedback_thread_summary: feedback_domain.FeedbackThreadDict={
+            'status' : 'open',
+            'original_author_id' : self.viewer_id,
+            'last_updated_msecs': utils.get_time_in_millisecs(fake_date),
+            'last_message_text' : 'last message',
+            'total_message_count' : 1,
+            'last_message_is_read' : True,
+            'second_last_message_is_read' : True,
+            'author_last_message' : 'author last message',
+            'author_second_last_message' : '',
+            'exploration_title' : 'title',
+            'exploration_id' : 'id',
+            'thread_id' : 'ok' ,
+        }
+    
+
+        observed_thread = feedback_domain.FeedbackThreadSummary(
+            expected_feedback_thread_summary['status'],self.viewer_id, fake_date,
+            expected_feedback_thread_summary['last_message_text'],1,True,True,
+            expected_feedback_thread_summary['author_last_message'],expected_feedback_thread_summary['author_second_last_message'],
+            expected_feedback_thread_summary['exploration_title'],expected_feedback_thread_summary['exploration_id'],
+            expected_feedback_thread_summary['thread_id'])
+
+        
+        self.assertDictEqual(
+            expected_feedback_thread_summary, observed_thread.to_dict())
+
+    
