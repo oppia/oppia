@@ -45,6 +45,7 @@ class Registry:
         platform_parameter_domain.DataTypes.BOOL: False,
         platform_parameter_domain.DataTypes.NUMBER: 0,
         platform_parameter_domain.DataTypes.STRING: '',
+        platform_parameter_domain.DataTypes.LIST_STR: [],
     }
 
     # The keys of parameter_registry are the property names, and the values

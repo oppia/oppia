@@ -133,6 +133,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         parameter.validate()
         self.assertEqual(parameter.default_value, 0)
 
+    def test_default_value_of_list_platform_parameter(self) -> None:
+        parameter = registry.Registry.create_platform_parameter(
+            ParamNames.PARAMETER_A, 'test', DataTypes.LIST_STR)
+        parameter.validate()
+        self.assertEqual(parameter.default_value, [])
+
     def test_get_platform_parameter(self) -> None:
         parameter_name = 'parameter_a'
         self._create_example_parameter_with_name(parameter_name)
