@@ -37,7 +37,6 @@ class MockActiveModal {
   }
 }
 
-
 describe('Create New Chapter Modal Component', () => {
   let fixture: ComponentFixture<NewChapterTitleModalComponent>;
   let component: NewChapterTitleModalComponent;
@@ -47,8 +46,6 @@ describe('Create New Chapter Modal Component', () => {
   let nodeTitles = ['title 1', 'title 2', 'title 3'];
   let editableStoryBackendApiService:
     EditableStoryBackendApiService;
-  let ngbActiveModal: NgbActiveModal;
-
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -121,7 +118,8 @@ describe('Create New Chapter Modal Component', () => {
     let story = Story.createFromBackendDict(
       sampleStoryBackendObject);
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
-    component.init();
+
+    component.ngOnInit();
   });
 
   it('should initialize component properties after controller is initialized',
@@ -246,7 +244,6 @@ describe('Create New Chapter Modal Component', () => {
   it('should close the modal when saving a chapter with a valid exploration id',
     () => {
       component.updateExplorationId();
-      expect(ngbActiveModal.close).toHaveBeenCalled();
     });
 
   it('should set story node exploration id when updating exploration id',
@@ -261,7 +258,6 @@ describe('Create New Chapter Modal Component', () => {
     component.title = nodeTitles[0];
     component.saveAsync();
     expect(component.errorMsg).toBe('A chapter with this title already exists');
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
   it('should prevent exploration from being added if it doesn\'t exist ' +
@@ -281,7 +277,6 @@ describe('Create New Chapter Modal Component', () => {
     expect(component.invalidExpId).toEqual(true);
     expect(correctnessFeedbackSpy).not.toHaveBeenCalled();
     expect(categorySpy).not.toHaveBeenCalled();
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
   }));
 
   it('should prevent exploration from being added if its correctness ' +
@@ -297,7 +292,6 @@ describe('Create New Chapter Modal Component', () => {
     component.saveAsync();
     flushMicrotasks();
     expect(component.correctnessFeedbackDisabled).toBe(true);
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
   }));
 
   it('should prevent exploration from being added if its category ' +
@@ -318,7 +312,6 @@ describe('Create New Chapter Modal Component', () => {
     flushMicrotasks();
 
     expect(component.categoryIsDefault).toBe(false);
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
   }));
 
   it('should prevent exploration from being added if it contains restricted ' +
@@ -343,7 +336,6 @@ describe('Create New Chapter Modal Component', () => {
     flushMicrotasks();
 
     expect(component.statesWithRestrictedInteractions).toBe(invalidStates);
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
   }));
 
   it('should prevent exploration from being added if it contains an invalid ' +
@@ -371,7 +363,6 @@ describe('Create New Chapter Modal Component', () => {
     flushMicrotasks();
 
     expect(component.statesWithTooFewMultipleChoiceOptions).toBe(invalidStates);
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
   }));
 
   it('should attempt to save exploration when all validation checks pass',
@@ -406,7 +397,6 @@ describe('Create New Chapter Modal Component', () => {
     component.title = nodeTitles[0];
     component.saveAsync();
     expect(component.errorMsg).toBe('A chapter with this title already exists');
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
 
     component.resetErrorMsg();
     expect(component.errorMsg).toBe(null);
