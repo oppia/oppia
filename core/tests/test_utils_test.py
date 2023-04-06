@@ -147,6 +147,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
             self.assertEqual(data.get('value'), 'foobar')
 
     def test_wrapper_calls_passed_lambdas(self) -> None:
+        """Tests that FunctionWrapper also works for lambdas."""
         data = {}
 
         def mock_function_with_side_effect(string: str) -> str:
@@ -161,6 +162,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
 
 class AuthServicesStubTests(test_utils.GenericTestBase):
+    """Test the methods for AuthServices."""
 
     EMAIL: Final = 'user@test.com'
 
