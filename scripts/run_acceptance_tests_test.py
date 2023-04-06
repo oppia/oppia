@@ -52,6 +52,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
+        def mock_constants() -> None:
+            print('mock_set_constants_to_default')
+        self.swap_mock_set_constants_to_default = self.swap(
+            common, 'set_constants_to_default', mock_constants)
+
     def tearDown(self) -> None:
         try:
             self.exit_stack.close()
@@ -134,7 +139,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_acceptance_tests.main(args=['--suite', 'testSuite'])
+        with self.swap_mock_set_constants_to_default:
+            run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_acceptance_tests_server(
@@ -173,7 +179,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             ]))
         args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'testSuite'])  # pylint: disable=protected-access, line-too-long
 
-        lines, _ = run_acceptance_tests.run_tests(args)
+        with self.swap_mock_set_constants_to_default:
+            lines, _ = run_acceptance_tests.run_tests(args)
 
         self.assertEqual(
             [line.decode('utf-8') for line in lines],
@@ -251,10 +258,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             lambda *_: False, expected_args=[(
                 run_acceptance_tests.PORTS_USED_BY_OPPIA_PROCESSES,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'modify_constants', lambda *_, **__: None,
+            common, 'modify_constants', lambda *_, **__: None,
             expected_kwargs=[{'prod_env': False}]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            build, 'set_constants_to_default', lambda: None))
+            common, 'set_constants_to_default', lambda: None))
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -314,4 +321,5 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        run_acceptance_tests.main(args=['--suite', 'testSuite'])
+        with self.swap_mock_set_constants_to_default:
+            run_acceptance_tests.main(args=['--suite', 'testSuite'])
