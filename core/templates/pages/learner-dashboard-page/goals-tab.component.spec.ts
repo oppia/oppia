@@ -41,7 +41,7 @@ class MockRemoveActivityNgbModalRef {
   };
 }
 
-fdescribe('Goals tab Component', () => {
+describe('Goals tab Component', () => {
   let component: GoalsTabComponent;
   let fixture: ComponentFixture<GoalsTabComponent>;
   let learnerDashboardActivityBackendApiService:
@@ -343,23 +343,23 @@ fdescribe('Goals tab Component', () => {
     for(let i=1;i<component.currentGoals.length;i++){
       // expect(component.showThreeDotsDropdown[i]).toBe(false);
 
-      component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+    component.toggleThreeDotsDropdown(i);
+    expect(component.showThreeDotsDropdown[i]).toBe(true);
 
-      component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(false);
+    component.toggleThreeDotsDropdown(i);
+    expect(component.showThreeDotsDropdown[i]).toBe(false);
 
-      component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+    component.toggleThreeDotsDropdown(i);
+    expect(component.showThreeDotsDropdown[i]).toBe(true);
 
-      let fakeClickAwayEvent = new MouseEvent('click');
-      Object.defineProperty(
-        fakeClickAwayEvent,
-        'target',
-        {value: document.createElement('div')});
-      component.onDocumentClick(fakeClickAwayEvent);
-      fixture.detectChanges();
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+    let fakeClickAwayEvent = new MouseEvent('click');
+    Object.defineProperty(
+      fakeClickAwayEvent,
+      'target',
+      {value: document.createElement('div')});
+    component.onDocumentClick(fakeClickAwayEvent);
+    fixture.detectChanges();
+    expect(component.showThreeDotsDropdown[i]).toBe(true);
 
       // Three dots are not shown when no goals are present.
       component.dropdownRef = undefined;
