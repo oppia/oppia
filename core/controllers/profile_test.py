@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 import io
 import logging
+import os
 import re
 import zipfile
 
@@ -27,6 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -382,19 +384,26 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        assert user_settings.profile_picture_data_url is not None
-        self.assertTrue(test_utils.check_image_png_or_webp(
-            user_settings.profile_picture_data_url))
+        # Ruling out the possibility of different types for mypy type checking.
+        assert isinstance(user_settings.username, str)
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, user_settings.username)
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
             {
                 'update_type': 'profile_picture_data_url',
-                'data': 'new_profile_picture_data_url'},
+                'data': user_services.DEFAULT_IDENTICON_DATA_URL},
             csrf_token=csrf_token)
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            user_settings.profile_picture_data_url,
-            'new_profile_picture_data_url')
+        profile_data = utils.convert_image_binary_to_data_url(
+            fs.get('profile_picture.png'), 'png')
+        self.assertEqual(profile_data, user_services.DEFAULT_IDENTICON_DATA_URL)
         self.logout()
 
     def test_can_update_default_dashboard(self) -> None:
@@ -461,30 +470,6 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
             'User bio exceeds maximum character limit: 2000',
             user_bio_response['error'])
         self.logout()
-
-
-class ProfileLinkTests(test_utils.GenericTestBase):
-
-    USERNAME: Final = 'abc123'
-    EMAIL: Final = 'abc123@gmail.com'
-    PROFILE_PIC_URL: Final = (
-        '/preferenceshandler/profile_picture_by_username/'
-    )
-
-    def test_get_profile_picture_invalid_username(self) -> None:
-        self.get_json(
-            '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME),
-            expected_status_int=404)
-
-    def test_get_profile_picture_valid_username(self) -> None:
-        self.signup(self.EMAIL, self.USERNAME)
-        response_dict = self.get_json(
-            '%s%s' % (self.PROFILE_PIC_URL, self.USERNAME)
-        )
-        # Every user must have a profile picture.
-        self.assertEqual(
-            response_dict['profile_picture_data_url_for_username'],
-            user_services.DEFAULT_IDENTICON_DATA_URL)
 
 
 class EmailPreferencesTests(test_utils.GenericTestBase):
@@ -684,27 +669,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
-
-
-class ProfilePictureHandlerTests(test_utils.GenericTestBase):
-
-    def test_get_profile_picture_with_updated_value(self) -> None:
-        self.get_json(
-            '/preferenceshandler/profile_picture', expected_status_int=401)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.login(self.OWNER_EMAIL)
-        user_settings = user_services.get_user_settings(owner_id)
-        response = self.get_json('/preferenceshandler/profile_picture')
-        self.assertEqual(
-            response['profile_picture_data_url'],
-            user_settings.profile_picture_data_url)
-        user_services.update_profile_picture_data_url(
-            owner_id, 'new_profile_picture')
-        response = self.get_json('/preferenceshandler/profile_picture')
-        self.assertEqual(
-            response['profile_picture_data_url'], 'new_profile_picture')
-        self.logout()
 
 
 class SignupTests(test_utils.GenericTestBase):
@@ -1245,7 +1209,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             last_edited_an_exploration=user_settings.last_edited_an_exploration,
             last_created_an_exploration=(
                 user_settings.last_created_an_exploration),
-            profile_picture_data_url=user_settings.profile_picture_data_url,
             default_dashboard=user_settings.default_dashboard,
             creator_dashboard_display_pref=(
                 user_settings.creator_dashboard_display_pref),
@@ -1277,7 +1240,8 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 zf_saved.namelist(),
                 [
                     'oppia_takeout_data.json',
-                    'images/user_settings_profile_picture.png'
+                    'images/user_settings_profile_picture.png',
+                    'images/user_settings_profile_picture.webp'
                 ]
             )
 
@@ -1307,7 +1271,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             last_edited_an_exploration=user_settings.last_edited_an_exploration,
             last_created_an_exploration=(
                 user_settings.last_created_an_exploration),
-            profile_picture_data_url=user_settings.profile_picture_data_url,
             default_dashboard=user_settings.default_dashboard,
             creator_dashboard_display_pref=(
                 user_settings.creator_dashboard_display_pref),
@@ -1323,6 +1286,23 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 user_settings.preferred_translation_language_code),
             deleted=user_settings.deleted
         ).put()
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image_png = f.read()
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
+            'rb',
+            encoding=None
+        ) as f:
+            raw_image_webp = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, user_settings.username)
+        fs.commit('profile_picture.png', raw_image_png, mimetype='image/png')
+        fs.commit('profile_picture.webp', raw_image_webp, mimetype='image/webp')
 
         time_swap = self.swap(
             user_services, 'record_user_logged_in', lambda *args: None)

@@ -321,7 +321,7 @@ describe('Translation Modal Component', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
-    it('should compute panel overlfow after the view has initialized', () => {
+    it('should compute panel overflow after the view has initialized', () => {
       spyOn(component, 'computePanelOverflowState');
 
       component.ngAfterViewInit();
@@ -329,10 +329,10 @@ describe('Translation Modal Component', () => {
       expect(component.computePanelOverflowState).toHaveBeenCalled();
     });
 
-    it('should compute editor overlfow after the view has changed', () => {
+    it('should compute editor overflow after the view has changed', () => {
       spyOn(component, 'computeTranslationEditorOverflowState');
 
-      component.ngAfterViewChecked();
+      component.ngAfterContentChecked();
 
       expect(component.computeTranslationEditorOverflowState)
         .toHaveBeenCalled();

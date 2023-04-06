@@ -59,7 +59,8 @@ var createStoryButtonSelector = '.e2e-test-create-story-button';
 var storyNameField = '.e2e-test-new-story-title-field';
 var storyUrlFragmentField = '.e2e-test-new-story-url-fragment-field';
 var storyDescriptionField = '.e2e-test-new-story-description-field';
-var storyThumbnailButton = '.e2e-test-photo-button';
+var storyThumbnailButton = (
+  'oppia-create-new-story-modal .e2e-test-photo-button');
 var storyUploadButton = '.e2e-test-photo-upload-input';
 var storyPhotoSubmit = '.e2e-test-photo-upload-submit';
 var confirmStoryCreationButton =
