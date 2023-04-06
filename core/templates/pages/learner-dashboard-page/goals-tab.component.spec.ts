@@ -340,7 +340,7 @@ describe('Goals tab Component', () => {
   });
 
   it('should correctly show and hide the dropdown', () => {
-    for (let i = 1; i<component.currentGoals.length;i++) {
+    for (let i = 1; i < component.currentGoals.length; i++) {
 
       component.toggleThreeDotsDropdown(i);
       expect(component.showThreeDotsDropdown[i]).toBe(true);
