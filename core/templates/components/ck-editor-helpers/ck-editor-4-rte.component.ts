@@ -404,7 +404,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           .css('width', '24px')
           .css('padding', '0px 0px');
       });
-      
+
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_toolbar_separator')
         .css('height', '22px');
@@ -432,10 +432,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           setTimeout(() => changeComboPanel(), 25);
         });
 
-        // TODO(#12882): Remove the use of jQuery.
+      // TODO(#12882): Remove the use of jQuery.
       $('.cke_combo_open')
-      .css('margin-left', '-20px')
-      .css('margin-top', '2px');
+        .css('margin-left', '-20px')
+        .css('margin-top', '2px');
 
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_combo_text')
