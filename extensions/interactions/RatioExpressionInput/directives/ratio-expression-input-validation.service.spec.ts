@@ -133,9 +133,9 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'Equals\' rule with a matching' +
-      ' input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'Equals\' ' +
+      'answer with a matching input.'
     }]);
 
     let isEquivalentNonSimplified = Rule.createFromBackendDict({
@@ -152,9 +152,9 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
-      ' input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'IsEquivalent\' ' +
+      'answer with a matching input.'
     }]);
 
     let equalFourTerms = Rule.createFromBackendDict({
@@ -171,13 +171,13 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because ' +
-      'the \'HasNumberOfTermsEqualTo\' rule is preceded by a rule with a ' +
-      'matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'HasNumberOfTermsEqualTo\' ' +
+      'answer with a matching input.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it has differing number of terms than required.'
+      message: 'Learner answer 3 from Oppia response 1 will never be matched' +
+      ' because it has differing number of terms than required.'
     }]);
 
     // The second rule will never get matched.
@@ -187,9 +187,9 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because ' +
-      'it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a ' +
-      'matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'HasNumberOfTermsEqualTo\' ' +
+      'answer with a matching input.'
     }]);
 
     let equalsTwoTerms = Rule.createFromBackendDict({
@@ -212,12 +212,12 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 will never be matched because' +
-      ' it has differing number of terms than required.'
+      message: 'Learner answer 1 from Oppia response 1 will never be matched' +
+      ' because it has differing number of terms than required.'
     }, {
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it has differing number of terms than required.'
+      message: 'Learner answer 3 from Oppia response 1 will never be matched' +
+      ' because it has differing number of terms than required.'
     }]);
 
     // The second rule will never get matched.
@@ -227,9 +227,9 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because ' +
-      'it is preceded by a \'HasSpecificTermEqualTo\' rule with a ' +
-      'matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'HasSpecificTermEqualTo\' ' +
+      'answer with a matching input.'
     }]);
 
     let invalidHasSpecificTermEqualTo = Rule.createFromBackendDict({
@@ -244,8 +244,8 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 will never be matched because ' +
-      'it expects more terms than the answer allows.'
+      message: 'Learner answer 1 from Oppia response 1 will never be matched' +
+      ' because it expects more terms than the answer allows.'
     }]);
   });
 

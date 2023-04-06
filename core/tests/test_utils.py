@@ -74,6 +74,7 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
 from proto_files import text_classifier_pb2
+from scripts import common
 
 import elasticsearch
 import requests_mock
@@ -1250,6 +1251,12 @@ class TestBase(unittest.TestCase):
     def get_static_asset_url(self, asset_suffix: str) -> str:
         """Returns the relative path for the asset, appending it to the
         corresponding cache slug. asset_suffix should have a leading slash.
+
+        Args:
+            asset_suffix: str. The asset suffix to append to the cache slug.
+
+        Returns:
+            str. The relative path for the asset.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
@@ -1842,11 +1849,20 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
+        # Mock set_constans_to_default method to throw an exception.
+        # Don't directly change constants file in the test.
+        # Mock this method again in your test.
+        self.contextManager = self.swap(
+            common, 'set_constants_to_default',
+            self.mock_set_constants_to_default)
+        self.contextManager.__enter__()
 
     def tearDown(self) -> None:
         datastore_services.delete_multi(
             list(datastore_services.query_everything().iter(keys_only=True)))
         storage_services.CLIENT.reset()
+        if hasattr(self, 'contextManager'):
+            self.contextManager.__exit__(None, None, None)
         super().tearDown()
 
     def run(self, result: Optional[unittest.TestResult] = None) -> None:
@@ -1915,6 +1931,13 @@ class AppEngineTestBase(TestBase):
         """
         return self._platform_taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
+
+    def mock_set_constants_to_default(self) -> None:
+        """Change constants file in the test could lead to other
+        tests fail. Mock set_constants_to_default method in your test
+        will suppress this exception.
+        """
+        raise Exception('Please mock this method in the test.')
 
 
 class GenericTestBase(AppEngineTestBase):
@@ -2255,6 +2278,7 @@ states:
 states_schema_version: %d
 tags: []
 title: Title
+version: 1
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
@@ -3039,7 +3063,18 @@ title: Title
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:
-        """PUT an object to the server with JSON and return the response."""
+        """PUT an object to the server with JSON and return the response.
+
+        Args:
+            url: str. The url of where to put the object.
+            payload: dict. The dictionary to be sent over to the handler.
+            csrf_token: str. The csrf token to use.
+            expected_status_int: int. The integer status code to expect. Will be
+                200 if not specified.
+
+        Returns:
+            dict. A json dict response from the server.
+        """
         params = {'payload': json.dumps(payload)}
         if csrf_token:
             params['csrf_token'] = csrf_token
