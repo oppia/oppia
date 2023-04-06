@@ -471,6 +471,12 @@ describe('Story node editor component', () => {
 
     component.toggleChapterOutlineButtons();
     expect(component.chapterOutlineButtonsAreShown).toEqual(false);
+
+    component.chapterOutlineButtonsAreShown = false;
+    component.editableOutline = '';
+    component.updateLocalEditableOutline('value');
+
+    expect(component.editableOutline).toBe('value');
   });
 
   it('should call StoryUpdateService and curatedExplorationValidationService' +

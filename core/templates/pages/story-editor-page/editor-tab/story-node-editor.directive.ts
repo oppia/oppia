@@ -16,7 +16,7 @@
  * @fileoverview Component for the story node editor.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -99,6 +99,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private curatedExplorationValidationService:
     CuratedExplorationValidationService,
+    private changeDetectorRef: ChangeDetectorRef,
     private focusManagerService: FocusManagerService,
     private ngbModal: NgbModal,
     private pageTitleService: PageTitleService,
@@ -421,6 +422,16 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   toggleExplorationInputButtons(): void {
     this.explorationInputButtonsAreShown = (
       !this.explorationInputButtonsAreShown);
+  }
+
+  updateLocalEditableOutline($event: string): void {
+    if (this.editableOutline !== $event) {
+      this.editableOutline = $event;
+      if (!this.chapterOutlineButtonsAreShown && $event) {
+        this.toggleChapterOutlineButtons();
+      }
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   toggleChapterOutlineButtons(): void {
