@@ -2,7 +2,7 @@
   <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
     <div class="topic-viewer-tabs-list">
       <ul class="topic-viewer-tabs" [ngClass]="checkTabletView() ? 'pad-top-mobile': 'pad-top-desktop'">
-        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}">
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}" tabindex="0">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('story')">
             <img *ngIf="!checkTabletView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
             <a class="tab-title"
@@ -10,7 +10,7 @@
             </a>
           </div>
         </li>
-        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}">
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}" tabindex="0">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
             <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
             <a class="tab-title e2e-test-practice-tab-link"
@@ -18,7 +18,7 @@
             </a>
           </div>
         </li>
-        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}">
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}" tabindex="0">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
             <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
             <a class="tab-title e2e-test-revision-tab-link"
