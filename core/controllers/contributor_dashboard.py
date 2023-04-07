@@ -138,9 +138,10 @@ class ContributionOpportunitiesHandler(
         language_code = self.normalized_request.get('language_code')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
+            topic_name = self.normalized_request.get('topic_name')
             skill_opportunities, next_cursor, more = (
                 self._get_skill_opportunities_with_corresponding_topic_name(
-                    search_cursor))
+                    search_cursor, topic_name))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
             topic_name = self.normalized_request.get('topic_name')
@@ -164,7 +165,8 @@ class ContributionOpportunitiesHandler(
         self.render_json(self.values)
 
     def _get_skill_opportunities_with_corresponding_topic_name(
-        self, cursor: Optional[str]
+        self, cursor: Optional[str],
+        topic_name: Optional[str]
     ) -> Tuple[
         List[ClientSideSkillOpportunityDict], Optional[str], bool
     ]:
@@ -175,6 +177,8 @@ class ContributionOpportunitiesHandler(
             cursor: str or None. If provided, the list of returned entities
                 starts from this datastore cursor. Otherwise, the returned
                 entities start from the beginning of the full list of entities.
+            topic_name: str or None. If provided, fetch the skill opportunties
+            of this topic. Otherwise, return all the skill opportunities.
 
         Returns:
             3-tuple(opportunities, cursor, more). where:
@@ -203,8 +207,27 @@ class ContributionOpportunitiesHandler(
             for skill_id in topic.get_all_skill_ids():
                 classroom_topic_skill_id_to_topic_name[skill_id] = topic.name
 
-        skill_opportunities, cursor, more = (
-            opportunity_services.get_skill_opportunities(cursor))
+        skill_opportunities = None
+        cursor = None
+        more = False
+        skill_ids = None
+
+        if topic_name is not None:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            if topic is None:
+                return [], None, False
+            skill_ids = topic.get_all_skill_ids()
+
+            if not skill_ids:
+                return [], None, False
+            skill_opportunities, cursor, more = (
+                opportunity_services.get_skill_opportunities(cursor, skill_ids))
+
+        else:
+            skill_opportunities, cursor, more = (
+                opportunity_services.get_skill_opportunities(cursor, None)
+            )
+
         opportunities: List[ClientSideSkillOpportunityDict] = []
         # Fetch opportunities until we have at least a page's worth that
         # correspond to a classroom or there are no more opportunities.
@@ -235,7 +258,7 @@ class ContributionOpportunitiesHandler(
                     len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE):
                 break
             skill_opportunities, cursor, more = (
-                opportunity_services.get_skill_opportunities(cursor))
+                opportunity_services.get_skill_opportunities(cursor, skill_ids))
 
         return opportunities, cursor, more
 
