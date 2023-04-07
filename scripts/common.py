@@ -218,6 +218,7 @@ PORTS_USED_BY_OPPIA_PROCESSES: Final = [
     ELASTICSEARCH_SERVER_PORT,
 ]
 
+
 def is_windows_os() -> bool:
     """Check if the running system is Windows."""
     return OS_NAME == 'Windows'

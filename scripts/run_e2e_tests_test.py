@@ -123,7 +123,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
@@ -170,7 +170,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     alive=False))
 
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
@@ -278,7 +278,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_skip_build(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(True,)]))
@@ -322,7 +322,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_in_debug_mode(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
@@ -362,7 +362,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_in_with_chromedriver_flag(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
@@ -403,7 +403,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_in_webdriverio(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
@@ -444,7 +444,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_do_not_run_with_test_non_mobile_suite_in_mobile_mode(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_oppia_server_already_running', lambda *_: True))
+            common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'install_third_party_libraries', lambda _: None,
             expected_args=[(False,)]))
