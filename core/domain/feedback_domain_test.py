@@ -116,7 +116,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             expected_message_dict['text'], fake_date, fake_date, False)
         self.assertDictEqual(
             expected_message_dict, observed_message.to_dict())
-        
+
 
 class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
 
