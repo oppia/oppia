@@ -1280,3 +1280,99 @@ class CommonTests(test_utils.GenericTestBase):
         ):
             common.setup_chrome_bin_env_variable()
         self.assertIn('Chrome is not found, stopping...', print_arr)
+
+    def test_modify_constants(self) -> None:
+        mock_constants_path = 'mock_app_dev.yaml'
+        mock_feconf_path = 'mock_app.yaml'
+        constants_path_swap = self.swap(
+            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
+        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+
+        constants_temp_file = tempfile.NamedTemporaryFile()
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
+        setattr(
+            constants_temp_file, 'name', mock_constants_path)
+        with utils.open_file(mock_constants_path, 'w') as tmp:
+            tmp.write('export = {\n')
+            tmp.write('  "DEV_MODE": true,\n')
+            tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('};')
+
+        feconf_temp_file = tempfile.NamedTemporaryFile()
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
+        setattr(feconf_temp_file, 'name', mock_feconf_path)
+        with utils.open_file(mock_feconf_path, 'w') as tmp:
+            tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+
+        with constants_path_swap, feconf_path_swap:
+            common.modify_constants(prod_env=True, maintenance_mode=False)
+            with utils.open_file(
+                mock_constants_path, 'r') as constants_file:
+                self.assertEqual(
+                    constants_file.read(),
+                    'export = {\n'
+                    '  "DEV_MODE": false,\n'
+                    '  "EMULATOR_MODE": true,\n'
+                    '};')
+            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                self.assertEqual(
+                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+
+            common.modify_constants(prod_env=False, maintenance_mode=True)
+            with utils.open_file(
+                mock_constants_path, 'r') as constants_file:
+                self.assertEqual(
+                    constants_file.read(),
+                    'export = {\n'
+                    '  "DEV_MODE": true,\n'
+                    '  "EMULATOR_MODE": true,\n'
+                    '};')
+            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                self.assertEqual(
+                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
+
+        constants_temp_file.close()
+        feconf_temp_file.close()
+
+    def test_set_constants_to_default(self) -> None:
+        mock_constants_path = 'mock_app_dev.yaml'
+        mock_feconf_path = 'mock_app.yaml'
+        constants_path_swap = self.swap(
+            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
+        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
+
+        constants_temp_file = tempfile.NamedTemporaryFile()
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
+        setattr(
+            constants_temp_file, 'name', mock_constants_path)
+        with utils.open_file(mock_constants_path, 'w') as tmp:
+            tmp.write('export = {\n')
+            tmp.write('  "DEV_MODE": false,\n')
+            tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('};')
+
+        feconf_temp_file = tempfile.NamedTemporaryFile()
+        # Here MyPy assumes that the 'name' attribute is read-only. In order to
+        # silence the MyPy complaints `setattr` is used to set the attribute.
+        setattr(feconf_temp_file, 'name', mock_feconf_path)
+        with utils.open_file(mock_feconf_path, 'w') as tmp:
+            tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
+        self.contextManager.__exit__(None, None, None)
+        with constants_path_swap, feconf_path_swap:
+            common.set_constants_to_default()
+            with utils.open_file(
+                mock_constants_path, 'r') as constants_file:
+                self.assertEqual(
+                    constants_file.read(),
+                    'export = {\n'
+                    '  "DEV_MODE": true,\n'
+                    '  "EMULATOR_MODE": true,\n'
+                    '};')
+            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                self.assertEqual(
+                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+        constants_temp_file.close()
+        feconf_temp_file.close()
