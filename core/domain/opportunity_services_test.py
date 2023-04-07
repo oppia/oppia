@@ -573,14 +573,14 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
     def test_create_new_skill_creates_new_skill_opportunity(self) -> None:
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
         self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='skill_description')
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity.id, self.SKILL_ID)
@@ -602,7 +602,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity.id, self.SKILL_ID)
@@ -639,7 +639,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'Updated misconception name.')
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity.id, self.SKILL_ID)
         self.assertEqual(opportunity.skill_description, 'new_description')
@@ -651,20 +651,20 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'bad_skill_id', 'bad_description')
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
     def test_delete_skill_deletes_skill_opportunity(self) -> None:
         self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='skill_description')
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
 
         skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
     def test_publish_story_creates_exploration_opportunity(self) -> None:
@@ -743,7 +743,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             content_id_generator.next_content_id_index)
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(len(skill_opportunities), 1)
         self.assertEqual(opportunity.question_count, 1)
@@ -762,7 +762,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity.question_count, 1)
 
@@ -782,7 +782,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.USER_ID, self.QUESTION_ID, [self.SKILL_ID], [0.3])
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity.question_count, 1)
 
@@ -799,7 +799,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         question_services.delete_question(self.USER_ID, self.QUESTION_ID)
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(len(skill_opportunities), 1)
         self.assertEqual(opportunity.question_count, 0)
@@ -822,7 +822,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID)
 
         skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None, None))
+            opportunity_services.get_skill_opportunities(None))
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity.question_count, 0)
 

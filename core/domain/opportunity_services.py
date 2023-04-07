@@ -737,7 +737,7 @@ def get_skill_opportunity_from_model(
 
 def get_skill_opportunities(
     cursor: Optional[str],
-    skill_ids: Optional[List[str]]
+    skill_ids: Optional[List[str]] = None
 ) -> Tuple[
     List[opportunity_domain.SkillOpportunity], Optional[str], bool
 ]:

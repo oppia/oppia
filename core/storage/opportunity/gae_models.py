@@ -218,7 +218,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     @classmethod
     def get_skill_opportunities(
         cls, page_size: int, urlsafe_start_cursor: Optional[str],
-        skill_ids: Optional[List[str]]
+        skill_ids: Optional[List[str]] = None
     ) -> Tuple[Sequence[SkillOpportunityModel], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
