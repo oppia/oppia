@@ -29,13 +29,6 @@ from scripts import servers
 
 from typing import Final, List, Optional, Tuple
 
-GOOGLE_APP_ENGINE_PORT: Final = 8181
-ELASTICSEARCH_SERVER_PORT: Final = 9200
-PORTS_USED_BY_OPPIA_PROCESSES: Final = [
-    GOOGLE_APP_ENGINE_PORT,
-    ELASTICSEARCH_SERVER_PORT,
-]
-
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
@@ -71,7 +64,7 @@ _PARSER.add_argument(
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
-    if common.is_oppia_server_already_running(PORTS_USED_BY_OPPIA_PROCESSES):
+    if common.is_oppia_server_already_running():
         sys.exit(1)
 
     with contextlib.ExitStack() as stack:
@@ -93,7 +86,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
-            port=GOOGLE_APP_ENGINE_PORT,
+            port=common.GOOGLE_APP_ENGINE_PORT,
             log_level=args.server_log_level,
             # Automatic restart can be disabled since we don't expect code
             # changes to happen while the acceptance tests are running.

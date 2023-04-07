@@ -1390,8 +1390,7 @@ class CommonTests(test_utils.GenericTestBase):
             stack.enter_context(self.swap_to_always_return(
                 common, 'is_port_in_use', value=False))
 
-            self.assertFalse(common.is_oppia_server_already_running(
-                PORTS_USED_BY_OPPIA_PROCESSES))
+            self.assertFalse(common.is_oppia_server_already_running())
 
     def test_is_oppia_server_already_running_when_a_port_is_open(
         self
@@ -1401,5 +1400,4 @@ class CommonTests(test_utils.GenericTestBase):
                 common, 'is_port_in_use',
                 lambda port: port == GOOGLE_APP_ENGINE_PORT))
 
-            self.assertTrue(common.is_oppia_server_already_running(
-                PORTS_USED_BY_OPPIA_PROCESSES))
+            self.assertTrue(common.is_oppia_server_already_running())

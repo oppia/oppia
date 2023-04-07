@@ -36,7 +36,7 @@ from urllib import request as urlrequest
 from core import constants
 from scripts import servers
 
-from typing import Dict, Generator, List, Optional, Union
+from typing import Dict, Final, Generator, List, Optional, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -211,6 +211,12 @@ CHROME_PATHS = [
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 ]
 
+GOOGLE_APP_ENGINE_PORT: Final = 9001
+ELASTICSEARCH_SERVER_PORT: Final = 9200
+PORTS_USED_BY_OPPIA_PROCESSES: Final = [
+    GOOGLE_APP_ENGINE_PORT,
+    ELASTICSEARCH_SERVER_PORT,
+]
 
 def is_windows_os() -> bool:
     """Check if the running system is Windows."""
@@ -959,14 +965,9 @@ def modify_constants(
     )
 
 
-def is_oppia_server_already_running(
-        PORTS_USED_BY_OPPIA_PROCESSES: List[int]) -> bool:
+def is_oppia_server_already_running() -> bool:
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
-
-    Args:
-        PORTS_USED_BY_OPPIA_PROCESSES: list(int). The list of ports used by the
-            processes.
 
     Returns:
         bool. Whether there is a running Oppia instance.
