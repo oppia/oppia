@@ -283,7 +283,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     def test_get_skill_opportunities(self) -> None:
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel
-                .get_skill_opportunities(5, None))
+                .get_skill_opportunities(5, None, None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 2)
@@ -295,7 +295,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     def test_get_skill_opportunities_pagination(self) -> None:
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
-                1, None))
+                1, None, None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
@@ -305,7 +305,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
 
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
-                1, cursor))
+                1, cursor, None))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
