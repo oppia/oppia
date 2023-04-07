@@ -36,7 +36,6 @@ core.domain.email_manager_test
 core.domain.event_services_test
 core.domain.exp_domain_test
 core.domain.exp_services_test
-core.domain.feedback_domain_test
 core.domain.feedback_services_test
 core.domain.fs_services_test
 core.domain.html_cleaner_test
