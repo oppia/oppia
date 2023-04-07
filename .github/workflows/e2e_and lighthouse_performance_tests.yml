@@ -123,13 +123,15 @@ jobs:
             requirements_dev.in
             requirements_dev.txt
       - uses: ./.github/actions/merge
-      - name: Cache node modules
+      - name: Cache node modules and third_party/static
         uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
-          path: /home/runner/work/oppia/yarn_cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          path: |
+            /home/runner/work/oppia/yarn_cache
+            /home/runner/work/oppia/oppia/third_party/static
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock', 'dependencies.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -141,7 +143,8 @@ jobs:
         with:
           name: build_files
           path: /home/runner/work/oppia/
-      - if: steps.download_artifact_1.outcome == 'failure'
+      - name: (Artifact re-build) Install Oppia Dependencies
+        if: steps.download_artifact_1.outcome == 'failure'
         uses: ./.github/actions/install-oppia-dependencies
       - name: (Artifact re-build) Install chrome
         if: steps.download_artifact_1.outcome == 'failure'
@@ -164,14 +167,11 @@ jobs:
           name: build_files
           path: /home/runner/work/oppia/build_files.zip
           retention-days: 1
-      - name: (artifact re-build) Retry build files download
+      - name: (artifact re-build) Remove build_files.zip
         if: steps.download_artifact_1.outcome == 'failure'
-        id: download_artifact_2
-        uses: actions/download-artifact@v3
-        with:
-          name: build_files
-          path: /home/runner/work/oppia/
+        run: rm build_files.zip
       - name: Unzip build files
+        if: steps.download_artifact_1.outcome != 'failure'
         run: |
           ls -la
           unzip build_files.zip
@@ -188,7 +188,8 @@ jobs:
           ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
-      - uses: ./.github/actions/install-oppia-dependencies
+      - if: steps.download_artifact_1.outcome != 'failure'
+        uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         if: steps.download_artifact_1.outcome != 'failure'
         run: python -m scripts.install_chrome_for_ci
