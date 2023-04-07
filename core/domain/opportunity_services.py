@@ -736,7 +736,8 @@ def get_skill_opportunity_from_model(
 
 
 def get_skill_opportunities(
-    cursor: Optional[str]
+    cursor: Optional[str],
+    skill_ids: Optional[List[str]]
 ) -> Tuple[
     List[opportunity_domain.SkillOpportunity], Optional[str], bool
 ]:
@@ -746,6 +747,9 @@ def get_skill_opportunities(
         cursor: str or None. If provided, the list of returned entities
             starts from this datastore cursor. Otherwise, the returned
             entities start from the beginning of the full list of entities.
+        skill_ids: List[str] or None. If provided, return skill opportunties
+            with matching skill_ids. Otherwise, return all skill
+            opportunities.
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
@@ -760,7 +764,8 @@ def get_skill_opportunities(
     """
     skill_opportunity_models, cursor, more = (
         opportunity_models.SkillOpportunityModel
-        .get_skill_opportunities(constants.OPPORTUNITIES_PAGE_SIZE, cursor))
+        .get_skill_opportunities(
+            constants.OPPORTUNITIES_PAGE_SIZE, cursor, skill_ids))
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
         skill_opportunity = (
