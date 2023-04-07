@@ -41,7 +41,7 @@ from scripts import install_python_dev_dependencies
 from scripts import servers
 
 import github
-from typing import Final, Generator, List, Literal, NoReturn
+from typing import Generator, List, Literal, NoReturn
 
 from . import common
 
