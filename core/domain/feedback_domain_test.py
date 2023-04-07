@@ -21,7 +21,6 @@ from core import feconf
 from core import utils
 from core.domain import feedback_domain
 from core.tests import test_utils
-from core.domain.feedback_domain import FullyQualifiedMessageIdentifier
 
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
@@ -119,8 +118,15 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             expected_message_dict, observed_message.to_dict())
 
 class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
+
+
+    """Unit tests for the FullyQualifiedMessageIdentifier class."""
+
     def test_initialization(self) -> None:
-        qualified_message = FullyQualifiedMessageIdentifier('thread_id', 123)
+        qualified_message = feedback_domain.FullyQualifiedMessageIdentifier(
+            'thread_id',
+            123
+        )
         self.assertEqual(qualified_message.thread_id, 'thread_id')
         self.assertEqual(qualified_message.message_id, 123)
 
@@ -176,7 +182,7 @@ class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.thread_id = "exp.thread"
+        self.thread_id = 'exp.thread'
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -197,7 +203,6 @@ class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
             'thread_id': self.THREAD_ID,
         }
 
-
         observed_thread = feedback_domain.FeedbackThreadSummary(
             expected_feedback_thread_summary['status'],
             str(self.viewer_id),
@@ -213,7 +218,7 @@ class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
             expected_feedback_thread_summary['thread_id']
         )
 
-        self.assertDictEqual(expected_feedback_thread_summary,
-                            observed_thread.to_dict())
-
-    
+        self.assertDictEqual(
+            expected_feedback_thread_summary,
+            observed_thread.to_dict()
+        )
