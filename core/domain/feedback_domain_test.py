@@ -119,7 +119,6 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 
 class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
 
-
     """Unit tests for the FullyQualifiedMessageIdentifier class."""
 
     def test_initialization(self) -> None:
@@ -129,6 +128,7 @@ class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
         )
         self.assertEqual(qualified_message.thread_id, 'thread_id')
         self.assertEqual(qualified_message.message_id, 123)
+
 
 
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
