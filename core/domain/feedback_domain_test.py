@@ -120,9 +120,9 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 
 class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
     def test_initialization(self) -> None:
-        fully_qualified_message = FullyQualifiedMessageIdentifier('thread_id', 123)
-        self.assertEqual(fully_qualified_message.thread_id, 'thread_id')
-        self.assertEqual(fully_qualified_message.message_id, 123)
+        qualified_message = FullyQualifiedMessageIdentifier('thread_id', 123)
+        self.assertEqual(qualified_message.thread_id, 'thread_id')
+        self.assertEqual(qualified_message.message_id, 123)
 
 
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
@@ -166,13 +166,13 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
 
 class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
-    STATUS = "open"
-    LAST_MESSAGE = "last message"
-    AUTHOR_LAST_MESSAGE = "author last message"
-    AUTHOR_SECOND_LAST_MESSAGE = ""
-    EXPLORATION_TITLE = "title"
-    EXPLORATION_ID = "id"
-    THREAD_ID = "ok"
+    STATUS = 'open'
+    LAST_MESSAGE = 'last message'
+    AUTHOR_LAST_MESSAGE = 'author last message'
+    AUTHOR_SECOND_LAST_MESSAGE = ''
+    EXPLORATION_TITLE = 'title'
+    EXPLORATION_ID = 'id'
+    THREAD_ID = 'ok'
 
     def setUp(self) -> None:
         super().setUp()
@@ -199,12 +199,12 @@ class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
 
 
         observed_thread = feedback_domain.FeedbackThreadSummary(
-            expected_feedback_thread_summary['status'], 
-            str(self.viewer_id), 
+            expected_feedback_thread_summary['status'],
+            str(self.viewer_id),
             fake_date,
-            expected_feedback_thread_summary['last_message_text'], 
-            1, 
-            True, 
+            expected_feedback_thread_summary['last_message_text'],
+            1,
+            True,
             True,
             expected_feedback_thread_summary['author_last_message'],
             expected_feedback_thread_summary['author_second_last_message'],
@@ -213,6 +213,7 @@ class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
             expected_feedback_thread_summary['thread_id']
         )
 
-        self.assertDictEqual(expected_feedback_thread_summary, observed_thread.to_dict())
+        self.assertDictEqual(expected_feedback_thread_summary,
+                            observed_thread.to_dict())
 
     
