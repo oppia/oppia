@@ -204,18 +204,18 @@ class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
         }
 
         observed_thread = feedback_domain.FeedbackThreadSummary(
-            expected_feedback_thread_summary['status'],
+            str(expected_feedback_thread_summary['status']),
             str(self.viewer_id),
             fake_date,
-            expected_feedback_thread_summary['last_message_text'],
+            str(expected_feedback_thread_summary['last_message_text']),
             1,
             True,
             True,
-            expected_feedback_thread_summary['author_last_message'],
-            expected_feedback_thread_summary['author_second_last_message'],
-            expected_feedback_thread_summary['exploration_title'],
-            expected_feedback_thread_summary['exploration_id'],
-            expected_feedback_thread_summary['thread_id']
+            str(expected_feedback_thread_summary['author_last_message']),
+            str(expected_feedback_thread_summary['author_second_last_message']),
+            str(expected_feedback_thread_summary['exploration_title']),
+            str(expected_feedback_thread_summary['exploration_id']),
+            str(expected_feedback_thread_summary['thread_id'])
         )
 
         self.assertDictEqual(
