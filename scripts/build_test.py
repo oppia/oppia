@@ -775,103 +775,6 @@ class BuildTests(test_utils.GenericTestBase):
         app_yaml_temp_file.close()
         app_dev_yaml_temp_file.close()
 
-    def test_modify_constants(self) -> None:
-        mock_constants_path = 'mock_app_dev.yaml'
-        mock_feconf_path = 'mock_app.yaml'
-        constants_path_swap = self.swap(
-            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
-        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
-
-        constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write('export = {\n')
-            tmp.write('  "DEV_MODE": true,\n')
-            tmp.write('  "EMULATOR_MODE": false,\n')
-            tmp.write('};')
-
-        feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
-
-        with constants_path_swap, feconf_path_swap:
-            build.modify_constants(prod_env=True, maintenance_mode=False)
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": false,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
-
-            build.modify_constants(prod_env=False, maintenance_mode=True)
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
-
-        constants_temp_file.close()
-        feconf_temp_file.close()
-
-    def test_set_constants_to_default(self) -> None:
-        mock_constants_path = 'mock_app_dev.yaml'
-        mock_feconf_path = 'mock_app.yaml'
-        constants_path_swap = self.swap(
-            common, 'CONSTANTS_FILE_PATH', mock_constants_path)
-        feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
-
-        constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write('export = {\n')
-            tmp.write('  "DEV_MODE": false,\n')
-            tmp.write('  "EMULATOR_MODE": false,\n')
-            tmp.write('};')
-
-        feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
-
-        with constants_path_swap, feconf_path_swap:
-            build.set_constants_to_default()
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
-
-        constants_temp_file.close()
-        feconf_temp_file.close()
-
     def test_safe_delete_file(self) -> None:
         """Test safe_delete_file with both existent and non-existent
         filepath.
@@ -1007,7 +910,7 @@ class BuildTests(test_utils.GenericTestBase):
         build_using_webpack_swap = self.swap(
             build, 'build_using_webpack', mock_build_using_webpack)
         modify_constants_swap = self.swap(
-            build, 'modify_constants', mock_modify_constants)
+            common, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
         generate_python_package_swap = self.swap(
@@ -1066,7 +969,7 @@ class BuildTests(test_utils.GenericTestBase):
         build_using_webpack_swap = self.swap(
             build, 'build_using_webpack', mock_build_using_webpack)
         modify_constants_swap = self.swap(
-            build, 'modify_constants', mock_modify_constants)
+            common, 'modify_constants', mock_modify_constants)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
         clean_swap = self.swap(build, 'clean', mock_clean)
@@ -1112,7 +1015,7 @@ class BuildTests(test_utils.GenericTestBase):
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         modify_constants_swap = self.swap(
-            build, 'modify_constants', mock_modify_constants)
+            common, 'modify_constants', mock_modify_constants)
         clean_swap = self.swap(build, 'clean', mock_clean)
 
         with ensure_files_exist_swap, modify_constants_swap, clean_swap:
@@ -1182,7 +1085,7 @@ class BuildTests(test_utils.GenericTestBase):
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         modify_constants_swap = self.swap(
-            build, 'modify_constants', mock_modify_constants)
+            common, 'modify_constants', mock_modify_constants)
         clean_swap = self.swap(build, 'clean', mock_clean)
         with ensure_files_exist_swap, modify_constants_swap, clean_swap:
             build.main(args=['--prod_env', '--minify_third_party_libs_only'])
