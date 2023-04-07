@@ -211,10 +211,10 @@ CHROME_PATHS = [
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 ]
 
-GOOGLE_APP_ENGINE_PORT: Final = 9001
+GAE_PORT_FOR_LOCAL_E2E_TESTING: Final = 9001
 ELASTICSEARCH_SERVER_PORT: Final = 9200
-PORTS_USED_BY_OPPIA_PROCESSES: Final = [
-    GOOGLE_APP_ENGINE_PORT,
+PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
+    GAE_PORT_FOR_LOCAL_E2E_TESTING,
     ELASTICSEARCH_SERVER_PORT,
 ]
 
@@ -973,7 +973,7 @@ def is_oppia_server_already_running() -> bool:
     Returns:
         bool. Whether there is a running Oppia instance.
     """
-    for port in PORTS_USED_BY_OPPIA_PROCESSES:
+    for port in PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING:
         if is_port_in_use(port):
             print(
                 'There is already a server running on localhost:%s. '
