@@ -178,7 +178,7 @@ class ContributionOpportunitiesHandler(
                 starts from this datastore cursor. Otherwise, the returned
                 entities start from the beginning of the full list of entities.
             topic_name: str or None. If provided, fetch the skill opportunties
-            of this topic. Otherwise, return all the skill opportunities.
+                of this topic. Otherwise, return all the skill opportunities.
 
         Returns:
             3-tuple(opportunities, cursor, more). where:
