@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform import models
 
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -188,6 +188,10 @@ class SkillOpportunityModel(base_models.BaseModel):
     # The number of questions associated with this opportunity's skill.
     question_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
+    # The id of the corresponding skill.
+    # Here we use MyPy ignore because 'id' is being used as a
+    # StringProperty instead of a string.
+    id: str = datastore_services.StringProperty(required=True, indexed=True)  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -205,14 +209,16 @@ class SkillOpportunityModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     # TODO(#13523): Change the return value of the function below from
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
     def get_skill_opportunities(
-        cls, page_size: int, urlsafe_start_cursor: Optional[str]
+        cls, page_size: int, urlsafe_start_cursor: Optional[str],
+        skill_ids: Optional[List[str]]
     ) -> Tuple[Sequence[SkillOpportunityModel], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
@@ -222,6 +228,9 @@ class SkillOpportunityModel(base_models.BaseModel):
                 returned entities starts from this datastore cursor.
                 Otherwise, the returned entities start from the beginning
                 of the full list of entities.
+            skill_ids: List[str] or None. If provided, fetch the skill
+                opportunities matching the skill ids of particular topic.
+                Otherwise, fetch skill opportunities of all topics.
 
         Returns:
             3-tuple of (results, cursor, more). As described in fetch_page() at:
@@ -240,6 +249,13 @@ class SkillOpportunityModel(base_models.BaseModel):
             urlsafe_cursor=urlsafe_start_cursor)
 
         created_on_query = cls.get_all().order(cls.created_on)
+
+        if skill_ids:
+            created_on_query = created_on_query.filter(
+                # Here we use MyPy ignore because of mypy check error
+                # str doesn't support IN.
+                datastore_services.any_of(cls.id.IN(skill_ids))) # type: ignore[attr-defined]
+
         fetch_result: Tuple[
             Sequence[SkillOpportunityModel], datastore_services.Cursor, bool
         ] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
