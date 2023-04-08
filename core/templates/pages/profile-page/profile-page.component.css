@@ -104,13 +104,12 @@
 .oppia-profile-username-large-screen {
   display: block;
   font-size: 130%;
-  margin-left: 70px;
   margin-top: 20px;
   text-align: center;
 }
 
 .oppia-profile-username-small-screen {
-  display: inline-block;
+  display: none;
   font-size: 110%;
   margin-top: 20px;
   max-width: 30px;
