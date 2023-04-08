@@ -26,11 +26,11 @@
       </div>
 
       <div class="oppia-profile-text">
-        <h1 class="oppia-profile-username-large-screen oppia-profile-username-small-screen">
+        <h1 class="oppia-profile-username">
           <span placement="right"
-                aria-label="Username"
                 [ngbPopover]="usernameIsLong ? username.helpText : undefined"
-                triggers="mouseenter:mouseleave">
+                triggers="mouseenter:mouseleave"
+                aria-label="Username">
             <strong>{{ username.value | truncate:16 }}</strong>
           </span>
         </h1>
