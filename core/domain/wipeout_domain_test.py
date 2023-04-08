@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
 from core.domain import wipeout_domain
 from core.tests import test_utils
@@ -58,3 +59,30 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
             'pseudonymizable_entity_mappings contain wrong key'
         ):
             pending_deletion_request.validate()
+
+    def test_validate_succeeds_for_empty_pseudonymizable_entity_mappings(
+        self
+    ) -> None:
+        """Tests the validate() function when pseudonymizable_entity_mappings
+        is empty.
+        """
+        pending_deletion_request = (
+            wipeout_domain.PendingDeletionRequest.create_default(
+                self.user_id_a, 'username', 'a@example.com'))
+        # No exception should be raised as the pseudonymizable_entity_mappings
+        # is empty.
+        pending_deletion_request.validate()
+
+    def test_validate_success_for_correct_key_in_activity_mappings(
+        self
+    ) -> None:
+        """Tests the validate() function with correct keys."""
+        pending_deletion_request = (
+            wipeout_domain.PendingDeletionRequest.create_default(
+                self.user_id_a, 'username', 'a@example.com'))
+        valid_key = feconf.ValidModelNames.ACTIVITY.value
+        pending_deletion_request.pseudonymizable_entity_mappings = {
+            valid_key: {}
+        }
+        # No exception should be raised when the key is valid.
+        pending_deletion_request.validate()
