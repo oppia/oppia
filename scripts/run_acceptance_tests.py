@@ -78,10 +78,10 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
-        # if constants.EMULATOR_MODE:
-        #     stack.enter_context(servers.managed_firebase_auth_emulator())
-        #     stack.enter_context(
-        #         servers.managed_cloud_datastore_emulator(clear_datastore=True))
+        if constants.EMULATOR_MODE:
+            stack.enter_context(servers.managed_firebase_auth_emulator())
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(clear_datastore=True))
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(servers.managed_dev_appserver(
