@@ -24,8 +24,6 @@
       <button class="md-button oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button"
               (click)="onSubmitFromSubmitButton()"
               *ngIf="data.correctAnswer === undefined && shouldAdditionalSubmitButtonBeShown()"
-              onblur="this.style.border = 'none';"
-              onfocus="this.style.border = '2px solid black';"
               [disabled]="isSubmitButtonDisabled()">
           Submit
       </button>
@@ -53,3 +51,9 @@
     Check and Save Solution
   </button>
 </div>
+
+<style>
+  .oppia-learner-submit-answer-button:focus {
+    border: 2px solid #000;
+  }
+</style>
