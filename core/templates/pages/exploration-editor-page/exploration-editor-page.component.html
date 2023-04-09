@@ -14,7 +14,7 @@
     <div class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
-        <a href="#" 
+        <a href="#"
            class="nav-link navbar-tab e2e-test-main-tab"
            [ngbTooltip]="'Editor'"
            placement="{{countWarnings() ? 'left' : 'bottom'}}"
