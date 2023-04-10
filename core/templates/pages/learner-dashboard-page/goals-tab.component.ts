@@ -58,7 +58,7 @@ export class GoalsTabComponent implements OnInit {
 
   // Child dropdown is undefined because initially it is in closed state using
   // the following property: {'static' = false}.
-  @ViewChild('dropdown', {'static': false}) dropdownRef: ElementRef | undefined;
+  @ViewChild('dropdown', {'static': false}) dropdownRef: ElementRef | any;
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];
