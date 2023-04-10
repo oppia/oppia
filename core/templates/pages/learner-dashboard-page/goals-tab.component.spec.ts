@@ -359,7 +359,7 @@ describe('Goals tab Component', () => {
     expect(component.showThreeDotsDropdown[0]).toBe(false);
 
     // Three dots are not shown when no goals are present.
-    component.dropdownRef = undefined;
+    component.dropdownRef = boolean[i];
     component.onDocumentClick(fakeClickAwayEvent);
     fixture.detectChanges();
     expect(component.showThreeDotsDropdown[0]).toBe(false);
@@ -383,7 +383,7 @@ describe('Goals tab Component', () => {
       expect(component.showThreeDotsDropdown[i]).toBe(true);
 
       // Three dots are not shown when no goals are present.
-      component.dropdownRef = undefined;
+      component.dropdownRef = boolean[i];
       component.onDocumentClick(fakeClickAwayEvent);
       fixture.detectChanges();
       expect(component.showThreeDotsDropdown[i]).toBe(true);
