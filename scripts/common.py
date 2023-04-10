@@ -957,3 +957,31 @@ def modify_constants(
         enable_maintenance_mode_variable,
         expected_number_of_replacements=1
     )
+
+    branch_name_variable = (
+        '"BRANCH_NAME": "%s"'
+        % subprocess.check_output(
+            ['git', 'branch', '--show-current'],
+            encoding='utf-8'
+        ).strip().split('\n')[0]
+    )
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"BRANCH_NAME": ".*"',
+        branch_name_variable,
+        expected_number_of_replacements=1
+    )
+
+    short_commit_hash_variable = (
+        '"SHORT_COMMIT_HASH": "%s"'
+        % subprocess.check_output(
+            ['git', 'rev-parse', '--short', 'HEAD'],
+            encoding='utf-8'
+        ).strip().split('\n')[0]
+    )
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"SHORT_COMMIT_HASH": ".*"',
+        short_commit_hash_variable,
+        expected_number_of_replacements=1
+    )

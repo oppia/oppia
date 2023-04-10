@@ -33,6 +33,8 @@ export class OppiaFooterComponent {
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  BRANCH_NAME = AppConstants.BRANCH_NAME;
+  SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
 
   constructor(
     private platformFeatureService: PlatformFeatureService
