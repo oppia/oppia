@@ -3710,7 +3710,10 @@ class State(translation_domain.BaseTranslatableObject):
                 allowed to be unspecified.
             tagged_skill_misconception_id_required: bool. The 'tagged_skill_
                 misconception_id' is required or not.
-            strict: bool. Tells if the exploration is strict or not.
+            strict: bool. Tells if the validation is strict or not. Validation
+                should be strict for all published entities, i.e. those that
+                are viewable by a learner. It can be non-strict for entities
+                that are only viewable by lesson creators.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.

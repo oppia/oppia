@@ -1939,6 +1939,11 @@ class Question(translation_domain.BaseTranslatableObject):
                 dest_is_specified = True
             if answer_group.outcome.dest_if_really_stuck is not None:
                 dest_if_stuck_is_specified = True
+            if answer_group.outcome.refresher_exploration_id is not None:
+                raise utils.ValidationError(
+                    'refresher_exploration_id should be None for '
+                    'Question outcome.'
+                )
 
         # Ruling out the possibility of None for MyPy type checking, because
         # interaction.default_outcome can be None in the case of explorations
@@ -1954,6 +1959,12 @@ class Question(translation_domain.BaseTranslatableObject):
 
         if interaction.default_outcome.dest_if_really_stuck is not None:
             dest_if_stuck_is_specified = True
+
+        if interaction.default_outcome.refresher_exploration_id is not None:
+            raise utils.ValidationError(
+                'refresher_exploration_id should be None for '
+                'Question default outcome.'
+            )
 
         if not at_least_one_correct_answer:
             raise utils.ValidationError(
@@ -1992,7 +2003,8 @@ class Question(translation_domain.BaseTranslatableObject):
         self.question_state_data.validate(
             {},
             False,
-            tagged_skill_misconception_id_required=True)
+            tagged_skill_misconception_id_required=True,
+            strict=True)
         self.validate_translatable_contents(self.next_content_id_index)
 
     def validate(self) -> None:
