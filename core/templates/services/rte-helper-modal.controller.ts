@@ -44,29 +44,52 @@ const typedCloneDeep = <T>(obj: T): T => cloneDeep(obj);
 
 type ComponentSpecsType = typeof ServicesConstants.RTE_COMPONENT_SPECS;
 
+// ConvertStringLiteralsToString recursively converts all string literals in a
+// type to the string type.
+// It uses conditional types to check if T is a string, an object, or
+// something else.
 type ConvertStringLiteralsToString<T> = T extends string
-  ? string
+  ? string // If T is a string, return the string type.
   : T extends object
+  // // If T is an object, map each key K of T to a new object with the same
+  // key but a value of ConvertStringLiteralsToString<T[K]>.
   ? { [K in keyof T]: ConvertStringLiteralsToString<T[K]> }
-  : T;
+  : T; // If T is not a string or an object, return T unchanged.
 
-
+// CustomizationArgsSpecsType extracts the customization_arg_specs array from
+// each component in ComponentSpecsType.
+// It uses mapped types to iterate over each key K in ComponentSpecsType, and
+// then indexes into the object using [number] to represent any index in the
+// array.
 export type CustomizationArgsSpecsType = {
   [K in keyof ComponentSpecsType]:
   ComponentSpecsType[K]['customization_arg_specs'][number][];
+  // Finally, use [keyof ComponentSpecsType] to create a union of all the array
+  // types.
 }[keyof ComponentSpecsType];
-
+// CustomizationArgsForRteType maps the customization_arg_specs array to an
+// object with keys as 'name' and values as the 'default_value'.
+// It uses mapped types and Extract to achieve this.
 export type CustomizationArgsForRteType = {
   [K in CustomizationArgsSpecsType[number]['name']]:
   ConvertStringLiteralsToString<
+    // Extract is used to find the correct customization_arg_specs object that
+    // has the 'name' property equal to K.
     Extract<CustomizationArgsSpecsType[number], { name: K }>['default_value']
   >
 };
 
+// CustomizationArgsNameAndValueArray creates an array of objects with 'name'
+// and 'value' properties for each component.
+// The 'name' property comes from the customization_arg_specs, while the 'value'
+// property is derived from the 'default_value'.
 type CustomizationArgsNameAndValueArray = {
   [K in keyof ComponentSpecsType]: {
+    // Extract the 'name' property from the customization_arg_specs array.
     name: ComponentSpecsType[K]['customization_arg_specs'][number]['name'];
     value: (
+      // Check if the 'name' property is equal to 'math_content' using a
+      // conditional type.
       ComponentSpecsType[K][
         'customization_arg_specs'][number]['name'] extends 'math_content' ?
       ConvertStringLiteralsToString<
@@ -76,11 +99,15 @@ type CustomizationArgsNameAndValueArray = {
       svgFile: string | null;
       mathExpressionSvgIsBeingProcessed: boolean;
     } :
+    // If the 'name' property is not equal to 'math_content', create a type with
+    // the 'default_value' converted to a string.
     ConvertStringLiteralsToString<
       ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
     >);
   }[];
+  // Finally, use [keyof ComponentSpecsType] to create a union.
 }[keyof ComponentSpecsType];
+
 
 @Component({
   selector: 'oppia-rte-helper-modal',
