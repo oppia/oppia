@@ -22,6 +22,7 @@ import subprocess
 import sys
 import time
 
+from core.constants import constants
 from core.tests import test_utils
 from scripts import build
 from scripts import common
@@ -313,3 +314,38 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         with self.swap_mock_set_constants_to_default:
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
+
+    def test_start_tests_with_emulator_mode_false(self) -> None:
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'build_js_files', lambda *_, **__: None,
+            expected_args=[(True,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_firebase_auth_emulator', mock_managed_process,
+            called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_dev_appserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_redis_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process,
+            called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_acceptance_tests_server', mock_managed_process,
+            expected_kwargs=[
+                {
+                    'suite_name': 'testSuite',
+                    'stdout': subprocess.PIPE,
+                },
+            ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(0,)]))
+
+        with self.swap_mock_set_constants_to_default:
+            with self.swap(constants, 'EMULATOR_MODE', False):
+                run_acceptance_tests.main(args=['--suite', 'testSuite'])
