@@ -28,6 +28,10 @@ const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
 const addRoleButton = 'button.oppia-add-role-button';
+const adminPageTab = testConstants.URLs.AdminPage;
+const reloadThreeBallsExploration = 'button.e2e-test-reload-exploration-button:nth-child(21)'
+const labelForConfirmReload = 'OK';
+const reloadSuccess = 'div.oppia-status-message-container.e2e-test-status-message'
 
 module.exports = class e2eSuperAdmin extends baseUser {
   /**
@@ -100,5 +104,17 @@ module.exports = class e2eSuperAdmin extends baseUser {
     }, role);
     showMessage(`User ${username} does not have the ${role} role!`);
     await this.goto(currentPageUrl);
+  }
+
+  /**
+   * The function creates a new exploration in the community page
+   * */
+  async createNewTestExploration()
+  {
+    await this.goto(adminPageTab);
+    await this.clickOn(reloadThreeBallsExploration);
+    await this.clickOn(labelForConfirmReload);
+    await this.page.waitForSelector(reloadSuccess);
+    showMessage(`Exploration Three Balls is added to the community page!`);
   }
 };
