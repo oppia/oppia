@@ -311,7 +311,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
 
         # Ensure that the function does not raise any error when the
         # learner_goals_model does not exist for the given user_id.
-        learner_goals_services.remove_topics_from_lea.rn_goal(
+        learner_goals_services.remove_topics_from_learn_goal(
             non_existent_user_id, [self.TOPIC_ID_1]
         )
 
