@@ -938,7 +938,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(sorted_results[1].id, suggestion_1_id)
         self.assertEqual(offset_6, 3)
 
-    def test_get_in_review_question_suggestions_by_offset_with_filter(self) -> None:
+    def test_get_in_review_question_suggestions_by_offset_with_filter(
+            self
+        ) -> None:
         suggestion_1_id = 'skill1.thread1'
         suggestion_2_id = 'skill2.thread2'
         skill_1_id = 'skill_1'
