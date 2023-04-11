@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core import feconf
 from core.constants import constants
 from core.domain import learner_goals_services
@@ -26,7 +28,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
-from unittest import mock
 
 from typing import Final, List
 
