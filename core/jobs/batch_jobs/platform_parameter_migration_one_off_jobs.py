@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs used for migrating the question models."""
+"""Jobs related to PlatformParameterModel."""
 
 from __future__ import annotations
 
@@ -221,7 +221,7 @@ class ValidatePlatformParameterModelOneOffJob(base_jobs.JobBase):
         platform_param_with_failed_validation = (
             validated_platform_parameter_models
             | 'Filter models with failed validation' >> beam.Filter(
-                lambda object: object[1] is False)
+                lambda model: model[1] is False)
         )
 
         report_platform_param_with_failed_validation = (
@@ -236,7 +236,7 @@ class ValidatePlatformParameterModelOneOffJob(base_jobs.JobBase):
         platform_param_with_success_validation = (
             validated_platform_parameter_models
             | 'Filter models with success validation' >> beam.Filter(
-                lambda object: object[1] is True)
+                lambda model: model[1] is True)
         )
 
         report_platform_param_with_success_validation = (
