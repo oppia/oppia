@@ -311,11 +311,11 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
 
         # Ensure that the function does not raise any error when the
         # learner_goals_model does not exist for the given user_id.
-        learner_goals_services.remove_topics_from_learn_goal(
+        learner_goals_services.remove_topics_from_lea.rn_goal(
             non_existent_user_id, [self.TOPIC_ID_1]
         )
 
-    # Here we use object because 
+    # Here we use object because
     # the mock.patch.object method is being used to patch a specific method
     # (get_learner_goals_from_model) of the learner_goals_services module.
     def test_get_learner_goals_from_model_called(self) -> None:
