@@ -131,16 +131,16 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         file_name = 'test_file.txt'
         file_content = b'This is a test file.'
 
-        # Check if the file does not exist before committing
+        # Check if the file does not exist before committing.
         self.assertFalse(self.fs.isfile(file_name))
 
-        # Commit the file
+        # Commit the file.
         self.fs.commit(file_name, file_content)
 
-        # Check if the file exists after committing
+        # Check if the file exists after committing.
         self.assertTrue(self.fs.isfile(file_name))
 
-        # Check if the committed file has the correct content
+        # Check if the committed file has the correct content.
         committed_content = self.fs.get(file_name)
         self.assertEqual(committed_content, file_content)
 
