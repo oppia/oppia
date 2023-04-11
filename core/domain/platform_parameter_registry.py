@@ -350,6 +350,7 @@ class Registry:
             model_instance = config_models.PlatformParameterModel.create(
                 param.name,
                 [rule.to_dict() for rule in param.rules],
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                param.is_feature
             )
         return model_instance

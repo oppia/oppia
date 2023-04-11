@@ -52,10 +52,19 @@ def _populate_platform_parameter_model(
         config_models.PlatformParameterModel. The populated
         PlatformParameterModel.
     """
-    platform_param_domain = (
-        platform_parameter_registry.Registry.get_platform_parameter(
-            platform_param_id))
-    platform_param_domain_dict = platform_param_domain.to_dict()
+    param_with_init_settings = (
+        platform_parameter_registry.Registry.parameter_registry[
+        platform_param_id])
+    platform_param_domain_dict = {
+        'name': param_with_init_settings.name,
+        'description': param_with_init_settings.description,
+        'data_type': param_with_init_settings.data_type,
+        'rules': platform_param_model.rules,
+        'rule_schema_version': platform_param_model.rule_schema_version,
+        'default_value': param_with_init_settings.default_value,
+        'is_feature': param_with_init_settings.is_feature,
+        'feature_stage': param_with_init_settings.feature_stage,
+    }
     platform_param_dict = {
         'rules': platform_param_domain_dict['rules'],
         'rule_schema_version': (
@@ -63,7 +72,6 @@ def _populate_platform_parameter_model(
         'is_feature': platform_param_domain_dict['is_feature']
     }
     platform_param_model.populate(**platform_param_dict)
-
     return platform_param_model
 
 
@@ -99,7 +107,7 @@ class PopulatePlatformParameterModelOneOffJob(base_jobs.JobBase):
         populated_plat_parameter_job_run_result = (
             populate_platform_parameter_models
             | 'Generate results' >> (
-                job_result_transforms.ResultsToJobRunResults(
+                job_result_transforms.CountObjectsToJobRunResult(
                     'PLATFORM PARAMETER PROCESSED'))
         )
 
@@ -128,8 +136,7 @@ class AuditPopulatePlatformParameterModelOneOffJob(base_jobs.JobBase):
             self.pipeline
             | 'Get all non-deleted platform-parameter models' >> (
                 ndb_io.GetModels(
-                    config_models.PlatformParameterModel.get_all())
-                )
+                    config_models.PlatformParameterModel.get_all()))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add platform-parameter keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
@@ -145,8 +152,8 @@ class AuditPopulatePlatformParameterModelOneOffJob(base_jobs.JobBase):
         populated_plat_parameter_job_run_result = (
             populate_platform_parameter_models
             | 'Generate results' >> (
-                job_result_transforms.ResultsToJobRunResults(
-                    'AUDIT JOB FOR PLATFORM PARAMETER PROCESSED'))
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'AUDIT PLATFORM PARAMETER PROCESSED'))
         )
 
         return populated_plat_parameter_job_run_result
@@ -169,13 +176,14 @@ class ValidatePlatformParameterModelOneOffJob(base_jobs.JobBase):
             of the model, second index represents whether the model has
             a type of bool or not, third index represents the type of the model.
         """
-        platform_param_domain = (
-            platform_parameter_registry.Registry.get_platform_parameter(
-                platform_param_id))
+        param_with_init_settings = (
+            platform_parameter_registry.Registry.parameter_registry[
+            platform_param_id])
 
-        if not platform_param_domain.data_type == 'bool':
-            return (platform_param_id, False, platform_param_domain.data_type)
-        return (platform_param_id, True, platform_param_domain.data_type)
+        if not param_with_init_settings.data_type == 'bool':
+            return (
+                platform_param_id, False, param_with_init_settings.data_type)
+        return (platform_param_id, True, param_with_init_settings.data_type)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the platform-parameter
@@ -200,13 +208,13 @@ class ValidatePlatformParameterModelOneOffJob(base_jobs.JobBase):
         total_platform_features = (
             all_platform_parameter_models
             | 'Report total platform features' >> (
-                job_result_transforms.ResultsToJobRunResults(
+                job_result_transforms.CountObjectsToJobRunResult(
                     'TOTAL PLATFORM FEATURES'))
         )
 
         validated_platform_parameter_models = (
             all_platform_parameter_models
-            | 'Validate platform parameter model' >> beam.MapTuple(
+            | 'Validate platform parameter model' >> beam.Map(
                 self._validate_platform_parameter_model)
         )
 
@@ -234,7 +242,7 @@ class ValidatePlatformParameterModelOneOffJob(base_jobs.JobBase):
         report_platform_param_with_success_validation = (
             platform_param_with_success_validation
             | 'Generate results for valid platform features' >> (
-                job_result_transforms.ResultsToJobRunResults(
+                job_result_transforms.CountObjectsToJobRunResult(
                     'VALID PLATFORM FEATURES'))
         )
 
