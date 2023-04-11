@@ -126,6 +126,24 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         destination_fs.copy(self.fs.assets_path, 'abc2.png')
         self.assertTrue(destination_fs.isfile('abc2.png'))
 
+    def test_commit(self) -> None:
+        """Test if the commit function is saving the file correctly."""
+        file_name = 'test_file.txt'
+        file_content = b'This is a test file.'
+
+        # Check if the file does not exist before committing
+        self.assertFalse(self.fs.isfile(file_name))
+
+        # Commit the file
+        self.fs.commit(file_name, file_content)
+
+        # Check if the file exists after committing
+        self.assertTrue(self.fs.isfile(file_name))
+
+        # Check if the committed file has the correct content
+        committed_content = self.fs.get(file_name)
+        self.assertEqual(committed_content, file_content)
+
 
 class DirectoryTraversalTests(test_utils.GenericTestBase):
     """Tests to check for the possibility of directory traversal."""
