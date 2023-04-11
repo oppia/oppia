@@ -22,9 +22,9 @@ import datetime
 
 from core import feconf
 from core.constants import constants
+from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
-from core.domain import topic_domain
 
 from typing import Dict, Final, Mapping
 
