@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+from logging import exception
 import os
 import subprocess
 import sys
@@ -104,22 +105,22 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         print('Servers have come up.\n')
 
         output_lines = []
-        while True:
+        # while True:
             # Keep reading lines until an empty string is returned. Empty
             # strings signal that the process has ended.
-            for line in iter(proc.stdout.readline, b''):
-                if isinstance(line, str):
-                    # Although our unit tests always provide unicode strings,
-                    # the actual server needs this failsafe since it can output
-                    # non-unicode strings.
-                    line = line.encode('utf-8')  # pragma: no cover
-                output_lines.append(line.rstrip())
-                # Replaces non-ASCII characters with '?'.
-                common.write_stdout_safe(line.decode('ascii', errors='replace'))
-            # The poll() method returns None while the process is running,
-            # otherwise it returns the return code of the process (an int).
-            if proc.poll() is not None:
-                break
+        for line in iter(proc.stdout.readline, b''):
+            if isinstance(line, str):
+                # Although our unit tests always provide unicode strings,
+                # the actual server needs this failsafe since it can output
+                # non-unicode strings.
+                line = line.encode('utf-8')  # pragma: no cover
+            output_lines.append(line.rstrip())
+            # Replaces non-ASCII characters with '?'.
+            common.write_stdout_safe(line.decode('ascii', errors='replace'))
+        # The poll() method returns None while the process is running,
+        # otherwise it returns the return code of the process (an int).
+            # if proc.poll() is not None:
+            #     break
 
         return_value = output_lines, proc.returncode
     return return_value

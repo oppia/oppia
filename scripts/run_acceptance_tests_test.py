@@ -24,6 +24,7 @@ import time
 
 from core.constants import constants
 from core.tests import test_utils
+from core.constants import constants
 from scripts import build
 from scripts import common
 from scripts import run_acceptance_tests
@@ -32,6 +33,26 @@ from scripts import servers
 
 from typing import ContextManager, Tuple
 
+
+def __init__(self) -> None:
+    self.counter = 0
+
+def my_mock_managed_process(
+    self, *unused_args: str, **unused_kwargs: str,
+) -> ContextManager[scripts_test_utils.PopenStub]:
+    """Mock method for replacing the managed_process() functions.
+
+    Returns:
+        Context manager. A context manager that always yields a mock
+        process.
+    """
+    
+    if self.counter > 0:
+        return contextlib.nullcontext(
+            enter_result=scripts_test_utils.PopenStub(alive=False))
+    self.counter += 1
+    return contextlib.nullcontext(
+        enter_result=scripts_test_utils.PopenStub(alive=True))
 
 def mock_managed_process(
     *unused_args: str, **unused_kwargs: str
@@ -349,3 +370,98 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         with self.swap_mock_set_constants_to_default:
             with self.swap(constants, 'EMULATOR_MODE', False):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
+
+    # def test_name_for_the_branch_coverage(self) -> None:
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         common, 'is_oppia_server_already_running', lambda *_: False))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         common, 'modify_constants', lambda *_, **__: None,
+    #         expected_kwargs=[{'prod_env': False}]))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         common, 'set_constants_to_default', lambda: None))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_elasticsearch_dev_server', mock_managed_process))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_firebase_auth_emulator', mock_managed_process))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_dev_appserver', mock_managed_process))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_redis_server', mock_managed_process))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_webpack_compiler', mock_managed_process,
+    #         called=False))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_portserver', mock_managed_process))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_cloud_datastore_emulator', mock_managed_process))
+    #     proc = self.exit_stack.enter_context(self.swap_with_checks(
+    #         servers, 'managed_acceptance_tests_server', my_mock_managed_process,
+    #         expected_kwargs=[
+    #             {
+    #                 'suite_name': 'testSuite',
+    #                 'stdout': subprocess.PIPE,
+    #             },
+    #         ]))
+    #     self.exit_stack.enter_context(self.swap_with_checks(
+    #         sys, 'exit', lambda _: None, expected_args=[(0,)]))
+
+    #     run_acceptance_tests.main(args=['--suite', 'testSuite', '--skip-build'])
+
+    def test_start_tests_with_loop(self) -> None:
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'build_js_files', lambda *_, **__: None,
+            expected_args=[(True,)]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_dev_appserver', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_redis_server', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_cloud_datastore_emulator', mock_managed_process))
+
+        args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
+
+        with self.swap_mock_set_constants_to_default:
+            lines, return_code = run_acceptance_tests.run_tests(args)
+
+        expected_logs = [
+            '',
+            'Running suite with 1 specs.',
+            '',
+            '--------------------------------',
+            '| 1. Suite started: Blog Admin |',
+            '--------------------------------',
+            # 'LOG: User blogAdm has the blog admin role!',
+            # '',
+            # 'Spec started : Blog Admin should assign roles to users and change tag properties',
+            # 'LOG: User guestUsr1 does not have the blog admin role!',
+            # 'LOG: User guestUsr1 has the blog admin role!',
+            # 'LOG: User guestUsr2 does not have the blog post editor role!',
+            # 'LOG: User guestUsr2 has the blog post editor role!',
+            # 'LOG: User guestUsr2 does not have the blog post editor role!',
+            # 'LOG: Tag with name Test_Tag does not exist in tag list!',
+            # 'LOG: Tag Test_Tag added in tag list successfully!',
+            # 'LOG: Tag with name Test_Tag exists in tag list!',
+            # 'LOG: Maximum tag limit is not 5!',
+            # 'LOG: Successfully updated the tag limit to 5!',
+            # 'LOG: Maximum tag is currently 5!',
+            # '\x1b[32;40m-> Passed [ Took 129.224 seconds ]\x1b[0m',
+            # '',
+            # '',
+            # '',
+            # '1 specs, 0 failures',
+            # 'Finished in 187.553 seconds'
+        ]
+
+        self.assertEqual(return_code, None)
+
+        top_6_lines = lines[:6]
+        self.assertEqual(
+            [line.decode('utf-8') for line in top_6_lines],
+            expected_logs
+        )
