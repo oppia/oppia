@@ -315,6 +315,9 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             non_existent_user_id, [self.TOPIC_ID_1]
         )
 
+    # Here we use object because 
+    # the mock.patch.object method is being used to patch a specific method
+    # (get_learner_goals_from_model) of the learner_goals_services module.
     def test_get_learner_goals_from_model_called(self) -> None:
         with mock.patch.object(
             learner_goals_services, 'get_learner_goals_from_model',
