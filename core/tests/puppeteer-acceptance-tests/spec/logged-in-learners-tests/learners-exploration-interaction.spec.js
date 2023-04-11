@@ -17,33 +17,30 @@
  */
 
 const userFactory = require(
-    '../puppeteer-testing-utilities/user-factory.js');
+  '../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
-'../puppeteer-testing-utilities/test-constants.js');
+  '../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged in learners', function() {
-    const ROLE_LOGGED_IN_LEARNER = 'guestUsr1';
-    let loggedInLearner = null;
-    let superAdmin = null;
+  let guestLearner = null;
+  let superAdmin = null;
 
-    beforeAll(async function() {
-        superAdmin = await userFactory.createNewSuperAdmin('superAdm');
-        loggedInLearner = await userFactory.createNewGuestUser('guestUsr1', 'guest_user1@example.com');
-    }, DEFAULT_SPEC_TIMEOUT); 
+  beforeAll(async function() {
+    superAdmin = await userFactory.createNewSuperAdmin('superAdm');
+    guestLearner = await userFactory.createNewGuestUser(
+      'guestusr1', 'guestusr1@example.com');
+  }, DEFAULT_SPEC_TIMEOUT);
 
-    it('should expect learners to retrieve explorations from community lessons and remove them',
+  it('should expect learners to retrieve explorations and remove them',
     async function() {
-        await superAdmin.createNewTestExploration();
-
-        await loggedInLearner.goto("")
+      await superAdmin.createNewTestExploration();
+      await guestLearner.addExploration();
+      await guestLearner.removeExploration();
     }, DEFAULT_SPEC_TIMEOUT);
 
-    afterAll(async function() {
-        await userFactory.closeAllBrowsers();
-    });    
+  afterAll(async function() {
+    await userFactory.closeAllBrowsers();
+  });
 });
-
-
-  
