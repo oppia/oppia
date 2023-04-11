@@ -963,7 +963,7 @@ def modify_constants(
         % subprocess.check_output(
             ['git', 'branch', '--show-current'],
             encoding='utf-8'
-        ).strip().split('\n')[0]
+        ).strip().split('\n', maxsplit=1)[0]
     )
     inplace_replace_file(
         CONSTANTS_FILE_PATH,
@@ -977,7 +977,7 @@ def modify_constants(
         % subprocess.check_output(
             ['git', 'rev-parse', '--short', 'HEAD'],
             encoding='utf-8'
-        ).strip().split('\n')[0]
+        ).strip().split('\n', maxsplit=1)[0]
     )
     inplace_replace_file(
         CONSTANTS_FILE_PATH,
