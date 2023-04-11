@@ -16,8 +16,10 @@
     <button mat-raised-button
             (click)="validateIndexAndChangeCard(displayedCardIndex+1)"
             aria-label="Next Card"
-            class="oppia-next-button e2e-test-next-button oppia-nav-button">
-      <i class="oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
+            class="oppia-next-button oppia-learner-confirm-button e2e-test-next-button oppia-nav-button oppia-autofocus"
+            oppiaFocusOn="continue-btn">
+      {{ interactionCustomizationArgs.buttonText.value.unicode }}
+      <i class="oppia-vcenter fas fa-arrow-right oppia-arrow" aria-hidden="true"></i>
     </button>
   </div>
   <div *ngIf="!hasNext">
