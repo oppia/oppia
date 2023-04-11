@@ -43,7 +43,7 @@ FeatureStages = ServerMode
 
 # Union type defined from allowed types that a platform can contain
 # for it's data types.
-PlatformDataTypes = Union[str, int, bool, list]
+PlatformDataTypes = Union[str, int, bool, List[str]]
 
 
 class DataTypes(enum.Enum):
@@ -52,7 +52,7 @@ class DataTypes(enum.Enum):
     BOOL = 'bool'
     STRING = 'string'
     NUMBER = 'number'
-    LIST_STR = 'list[str]'
+    LIST_STR = 'List[str]'
 
 
 ALLOWED_SERVER_MODES: Final = [

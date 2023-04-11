@@ -120,6 +120,8 @@ class PlatformParameterModel(base_models.VersionedModel):
     rules = datastore_services.JsonProperty(repeated=True)
     rule_schema_version = (
         datastore_services.IntegerProperty(required=True, indexed=True))
+    is_feature = (
+        datastore_services.BooleanProperty(required=True, default=False))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -137,7 +139,8 @@ class PlatformParameterModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_feature': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -145,7 +148,8 @@ class PlatformParameterModel(base_models.VersionedModel):
         cls,
         param_name: str,
         rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict],
-        rule_schema_version: int
+        rule_schema_version: int,
+        is_feature: bool = False
     ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
 
@@ -165,6 +169,7 @@ class PlatformParameterModel(base_models.VersionedModel):
                                 operator for comparison and value is the value
                                 used for comparison.
             rule_schema_version: int. The schema version for the rule dicts.
+            is_feature: bool. True, if the platform-parameter is a feature.
 
         Returns:
             PlatformParameterModel. The created PlatformParameterModel
@@ -173,4 +178,5 @@ class PlatformParameterModel(base_models.VersionedModel):
         return cls(
             id=param_name,
             rules=rule_dicts,
-            rule_schema_version=rule_schema_version)
+            rule_schema_version=rule_schema_version,
+            is_feature=is_feature)
