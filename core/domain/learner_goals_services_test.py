@@ -26,6 +26,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
+from unittest import mock
 
 from typing import Final, List
 
@@ -312,3 +313,17 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         learner_goals_services.remove_topics_from_learn_goal(
             non_existent_user_id, [self.TOPIC_ID_1]
         )
+
+    def test_get_learner_goals_from_model_called(self) -> None:
+        with mock.patch.object(
+            learner_goals_services, 'get_learner_goals_from_model',
+            wraps=learner_goals_services.get_learner_goals_from_model
+        ) as mock_get_learner_goals_from_model:
+            # Add a topic to learner goals.
+            learner_goals_services.mark_topic_to_learn(
+                self.viewer_id, self.TOPIC_ID_1)
+            # Get all topic ids to learn.
+            learner_goals_services.get_all_topic_ids_to_learn(self.viewer_id)
+
+            # Assert that the get_learner_goals_from_model is called twice.
+            self.assertEqual(mock_get_learner_goals_from_model.call_count, 2)
