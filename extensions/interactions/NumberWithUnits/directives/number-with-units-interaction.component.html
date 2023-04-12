@@ -1,6 +1,7 @@
 <form autocomplete="off" [attr.disabled]="!isValid" title="Answer submission form" role="presentation" class="form-horizontal" (submit)="submitAnswer()">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <input type="text"
+         aria-label="Answer"
          name="answer"
          [(ngModel)]="answer"
          (ngModelChange)="answerValueChanged()"
