@@ -199,7 +199,7 @@ export class ExplorationRightsService {
         this.voiceArtistNames.push(newVoiceArtistUsername);
       }, (response) => {
         this.alertsService.addWarning(
-          'Could not assign voice artist to private activity.');
+          response.error.error);
       });
   }
 
