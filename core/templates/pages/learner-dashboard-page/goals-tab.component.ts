@@ -58,7 +58,7 @@ export class GoalsTabComponent implements OnInit {
 
   // Child dropdown is undefined because initially it is in closed state using
   // the following property: {'static' = false}.
-  @ViewChild('dropdown', {'static': false}) dropdownRef: ElementRef | null;
+  @ViewChild('dropdown', {'static': false}) dropdownRef: ElementRef | undefined;
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];
@@ -200,13 +200,14 @@ export class GoalsTabComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
-    for (let i = 0; i < this.showThreeDotsDropdown.length; i++) {
-      if (!this.showThreeDotsDropdown[i]) {
+    for(let i=0;i<this.currentGoals.length;i++){
+      console.log(this.dropdownRef);
+      if (!this.dropdownRef) {
         return;
       }
       if (
-        targetElement &&
-        !this.dropdownRef.nativeElement.contains(targetElement)
+        targetElement[i] &&
+        !this.dropdownRef.nativeElement.contains(targetElement[i])
       ) {
         this.showThreeDotsDropdown[i] = false;
       }
