@@ -136,6 +136,10 @@ describe('ImageWithRegionsEditorComponent', () => {
     'should initialize editor when ngOnChanges is run with a new value only',
     fakeAsync(() => {
       expect(component.editorIsInitialized).toBe(false);
+      spyOn(component, 'imageValueChanged').and.callThrough();
+      spyOn(contextService, 'getEntityType').and.returnValue(
+        AppConstants.ENTITY_TYPE.EXPLORATION);
+      spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
       component.ngOnChanges({});
       expect(component.editorIsInitialized).toBe(false);
       component.ngOnChanges({
@@ -144,6 +148,7 @@ describe('ImageWithRegionsEditorComponent', () => {
         ),
       });
       expect(component.editorIsInitialized).toBe(true);
+      expect(component.imageValueChanged).toHaveBeenCalled();
     })
   );
 
