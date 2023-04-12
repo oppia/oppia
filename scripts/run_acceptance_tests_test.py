@@ -34,25 +34,49 @@ from scripts import servers
 from typing import ContextManager, Tuple
 
 
-def __init__(self) -> None:
-    self.counter = 0
+class mock_managed_process_for_acceptance_server_proc:
+    def __init__(self, *unused_args: str, **unused_kwargs: str) -> None:
+        self.counter = 0
 
-def mock_managed_process_for_acceptance_server_proc(
-    self, *unused_args: str, **unused_kwargs: str,
-) -> ContextManager[scripts_test_utils.PopenStub]:
-    """Mock method for replacing the managed_process() functions.
+    def mock_managed_process(self, *unused_args: str, **unused_kwargs: str
+    ) -> ContextManager[scripts_test_utils.PopenStub]:
+        """Mock method for replacing the managed_process() function for acceptance server proc.
 
-    Returns:
-        Context manager. A context manager that always yields a mock
-        process.
-    """
+        Returns:
+            Context manager. A context manager that always yields a mock
+            process.
+        """
 
-    if self.counter > 0:
+        # def poll() -> None:
+        #     if self.counter > 0:
+        #         return 0
+        #     self.counter += 1
+        #     return None
+
+        if self.counter > 0:
+            return contextlib.nullcontext(
+                enter_result=scripts_test_utils.PopenStub(alive=False))
+        self.counter += 1
         return contextlib.nullcontext(
-            enter_result=scripts_test_utils.PopenStub(alive=False))
-    self.counter += 1
-    return contextlib.nullcontext(
-        enter_result=scripts_test_utils.PopenStub(alive=True))
+            enter_result=scripts_test_utils.PopenStub(alive=True))
+
+
+# def mock_managed_process_for_acceptance_server_proc(
+#     self, *unused_args: str, **unused_kwargs: str,
+# ) -> ContextManager[scripts_test_utils.PopenStub]:
+#     """Mock method for replacing the managed_process() functions.
+
+#     Returns:
+#         Context manager. A context manager that always yields a mock
+#         process.
+#     """
+
+#     if self.counter > 0:
+#         return contextlib.nullcontext(
+#             enter_result=scripts_test_utils.PopenStub(alive=False))
+#     self.counter += 1
+#     return contextlib.nullcontext(
+#         enter_result=scripts_test_utils.PopenStub(alive=True))
 
 def mock_managed_process(
     *unused_args: str, **unused_kwargs: str
@@ -408,6 +432,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
     #     run_acceptance_tests.main(args=['--suite', 'testSuite', '--skip-build'])
 
     def test_start_tests_with_loop(self) -> None:
+        x = mock_managed_process_for_acceptance_server_proc()
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -427,7 +452,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         # args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
         proc = self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_acceptance_tests_server',
-            mock_managed_process_for_acceptance_server_proc,
+            x.mock_managed_process,
             expected_kwargs=[
                 {
                     'suite_name': 'testSuite',
@@ -436,6 +461,13 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             ]))
 
         output_lines = []
+
+        print('shivkant')
+        print('shivkant')
+        print('shivkant')
+        print('shivkant')
+        print('proc: ', proc)
+        print('x:', x.mock_managed_process)
 
         while True:
             for line in iter(proc.stdout.readline, b''):
