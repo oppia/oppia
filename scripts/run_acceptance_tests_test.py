@@ -374,42 +374,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             with self.swap(constants, 'EMULATOR_MODE', False):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
-    # def test_name_for_the_branch_coverage(self) -> None:
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         common, 'is_oppia_server_already_running', lambda *_: False))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         common, 'modify_constants', lambda *_, **__: None,
-    #         expected_kwargs=[{'prod_env': False}]))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         common, 'set_constants_to_default', lambda: None))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_elasticsearch_dev_server', mock_managed_process))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_firebase_auth_emulator', mock_managed_process))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_dev_appserver', mock_managed_process))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_redis_server', mock_managed_process))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_webpack_compiler', mock_managed_process,
-    #         called=False))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_portserver', mock_managed_process))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_cloud_datastore_emulator', mock_managed_process))
-    #     proc = self.exit_stack.enter_context(self.swap_with_checks(
-    #         servers, 'managed_acceptance_tests_server', my_mock_managed_process,
-    #         expected_kwargs=[
-    #             {
-    #                 'suite_name': 'testSuite',
-    #                 'stdout': subprocess.PIPE,
-    #             },
-    #         ]))
-    #     self.exit_stack.enter_context(self.swap_with_checks(
-    #         sys, 'exit', lambda _: None, expected_args=[(0,)]))
-
-    #     run_acceptance_tests.main(args=['--suite', 'testSuite', '--skip-build'])
-
     def test_start_tests_with_loop(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running', lambda *_: False))
@@ -427,8 +391,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_cloud_datastore_emulator', mock_managed_process))
 
-        # args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
-        proc = self.exit_stack.enter_context(self.swap_with_checks(
+        self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_acceptance_tests_server',
             mock_managed_long_lived_process,
             expected_kwargs=[
@@ -438,27 +401,9 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 },
             ]))
 
-        output_lines = []
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(0,)]))
 
-        print('shivi')
-        print('shivi')
-        print('shivi')
-        print('shivi')
-        print('proc: ', proc)
-
-        # for line in iter(proc.stdout.readline, b''):
-        #     if isinstance(line, str):
-        #         line = line.encode('utf-8')  # pragma: no cover
-        #     output_lines.append(line.rstrip())
-        
-        self.assertEqual(proc.mock_poll(), None)
-        # while True:
-        #     for line in iter(proc.stdout.readline, b''):
-        #         if isinstance(line, str):
-        #             line = line.encode('utf-8')  # pragma: no cover
-        #         output_lines.append(line.rstrip())
-
-        #         common.write_stdout_safe(line.decode('ascii', errors='replace'))
-
-        #     if proc.mock_poll() is not None:
-        #         break
+        with self.swap_mock_set_constants_to_default:
+            with self.swap(constants, 'EMULATOR_MODE', True):
+                run_acceptance_tests.main(args=['--suite', 'testSuite'])
