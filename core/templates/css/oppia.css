@@ -1390,8 +1390,8 @@ span.sort-explorations-select .sort-order {
 .oppia-save-draft-button.btn-success,
 .oppia-save-changes-button.btn-success,
 .oppia-editor-publish-button.btn-success {
-  background-color: #28a745;
-  border-color: #28a745;
+  background-color: #24883e;
+  border-color: #24883e;
   color: #fff;
 }
 .oppia-save-draft-button.btn-success:hover,
