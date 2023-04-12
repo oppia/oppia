@@ -3710,7 +3710,10 @@ class State(translation_domain.BaseTranslatableObject):
                 allowed to be unspecified.
             tagged_skill_misconception_id_required: bool. The 'tagged_skill_
                 misconception_id' is required or not.
-            strict: bool. Tells if the exploration is strict or not.
+            strict: bool. Tells if the validation is strict or not. Validation
+                should be strict for all published entities, i.e. those that
+                are viewable by a learner. It can be non-strict for entities
+                that are only viewable by lesson creators.
 
         Raises:
             ValidationError. One or more attributes of the State are invalid.
@@ -4785,24 +4788,6 @@ class State(translation_domain.BaseTranslatableObject):
             states_to_content_id,
             content_id_generator.next_content_id_index
         )
-
-    def has_content_id(self, content_id: str) -> bool:
-        """Returns whether a given content ID is available in the translatable
-        content.
-
-        Args:
-            content_id: str. The content ID that needs to be checked for the
-                availability.
-
-        Returns:
-            bool. A boolean that indicates the availability of the content ID
-            in the translatable content.
-        """
-
-        available_translate_content = (
-            self.get_translatable_contents_collection()
-            .content_id_to_translatable_content)
-        return bool(content_id in available_translate_content)
 
 
 class StateVersionHistory:

@@ -26,7 +26,6 @@ import re
 from core import feconf
 from core.constants import constants
 from core.domain import email_manager
-from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner
@@ -913,52 +912,27 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids: List[str]) -> None:
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
 
 
-def auto_reject_translation_suggestions_for_state(
-    exp_id: str,
-    state_name: str
-) -> None:
-    """Rejects all translation suggestions with target ID matching the supplied
-    exploration ID and change state name matching the supplied exploration state
-    name. These suggestions are being rejected because their corresponding
-    exploration state was deleted. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
-
-    Args:
-        exp_id: str. The exploration ID.
-        state_name: str. The exploration state name.
-    """
-    obsolete_suggestion_ids = [
-        suggestion.suggestion_id
-        for suggestion in get_translation_suggestions_in_review(exp_id)
-        if suggestion.change.state_name == state_name]
-    reject_suggestions(
-        obsolete_suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
-        suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
-
-
 def auto_reject_translation_suggestions_for_content_ids(
     exp_id: str,
-    state_name: str,
-    content_ids: Set
+    content_ids: Set[str]
 ) -> None:
     """Rejects all translation suggestions with target ID matching the supplied
-    exploration ID, change state name matching the supplied exploration state
-    name, and change content ID matching one of the supplied content IDs. These
-    suggestions are being rejected because their corresponding exploration
-    content was deleted. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
+    exploration ID and change content ID matching one of the supplied content
+    IDs. These suggestions are being rejected because their corresponding
+    exploration content was deleted. Reviewer ID is set to
+    SUGGESTION_BOT_USER_ID.
 
     Args:
         exp_id: str. The exploration ID.
-        state_name: str. The exploration state name.
-        content_ids: list(str). List of exploration content IDs.
+        content_ids: list(str). The list of exploration content IDs.
     """
     obsolete_suggestion_ids = [
         suggestion.suggestion_id
         for suggestion in get_translation_suggestions_in_review(exp_id)
-        if suggestion.change.state_name == state_name
-        and suggestion.change.content_id in content_ids]
+        if suggestion.change.content_id in content_ids]
     reject_suggestions(
         obsolete_suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
-        suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
+        constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG)
 
 
 def resubmit_rejected_suggestion(
@@ -1296,14 +1270,11 @@ def get_translation_suggestions_in_review_by_exp_ids(
     ]
 
 
-def get_suggestions_with_translatable_explorations(
+def get_suggestions_with_editable_explorations(
     suggestions: Sequence[suggestion_registry.SuggestionTranslateContent]
 ) -> Sequence[suggestion_registry.SuggestionTranslateContent]:
     """Filters the supplied suggestions for those suggestions that have
-    translatable exploration content. That is, the following are true:
-    - The suggestion's change content corresponds to an existing exploration
-    content card.
-    - The suggestion's corresponding exploration allows edits.
+    explorations that allow edits.
 
     Args:
         suggestions: list(Suggestion). List of translation suggestions to
@@ -1312,44 +1283,13 @@ def get_suggestions_with_translatable_explorations(
     Returns:
         list(Suggestion). List of filtered translation suggestions.
     """
-
-    def _has_translatable_exploration(
-        suggestion: suggestion_registry.SuggestionTranslateContent,
-        suggestion_exp_id_to_exp: Dict[str, exp_domain.Exploration]
-    ) -> bool:
-        """Returns whether the supplied suggestion corresponds to a translatable
-        exploration content card.
-
-        Args:
-            suggestion: Suggestion. Translation suggestion domain object to
-                check.
-            suggestion_exp_id_to_exp: dict(str, Exploration). Dictionary mapping
-                suggestion target exploration IDs to their corresponding
-                Exploration domain objects.
-
-        Returns:
-            bool. Whether the supplied suggestion corresponds to a translatable
-            exploration content card.
-        """
-        exploration = suggestion_exp_id_to_exp[suggestion.target_id]
-        content_id_exists = False
-
-        # Checks whether the suggestion's change content still exists in the
-        # corresponding exploration.
-        # For more details, see https://github.com/oppia/oppia/issues/14339.
-        if suggestion.change.state_name in exploration.states:
-            content_id_exists = exploration.states[
-                suggestion.change.state_name].has_content_id(
-                    suggestion.change.content_id)
-        return content_id_exists and exploration.edits_allowed
-
     suggestion_exp_ids = {
         suggestion.target_id for suggestion in suggestions}
     suggestion_exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(
         list(suggestion_exp_ids))
     return list(filter(
-        lambda suggestion: _has_translatable_exploration(
-            suggestion, suggestion_exp_id_to_exp),
+        lambda suggestion: suggestion_exp_id_to_exp[
+            suggestion.target_id].edits_allowed,
         suggestions))
 
 
