@@ -40,7 +40,7 @@ class Registry:
 
     DEFAULT_VALUE_BY_TYPE_DICT: Dict[
         platform_parameter_domain.DataTypes,
-        Union[bool, str, int]
+        Union[bool, str, int, List[str]]
     ] = {
         platform_parameter_domain.DataTypes.BOOL: False,
         platform_parameter_domain.DataTypes.NUMBER: 0,
@@ -243,7 +243,7 @@ class Registry:
     def evaluate_all_platform_parameters(
         cls,
         context: platform_parameter_domain.EvaluationContext
-    ) -> Dict[str, Union[str, bool, int]]:
+    ) -> Dict[str, Union[str, bool, int, List[str]]]:
         """Evaluate all platform parameters with the given context.
 
         Args:
@@ -350,6 +350,7 @@ class Registry:
             model_instance = config_models.PlatformParameterModel.create(
                 param.name,
                 [rule.to_dict() for rule in param.rules],
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                param.is_feature
             )
         return model_instance
