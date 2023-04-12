@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import argparse
 import contextlib
-from logging import exception
 import os
 import subprocess
 import sys

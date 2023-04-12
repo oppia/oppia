@@ -24,7 +24,6 @@ import time
 
 from core.constants import constants
 from core.tests import test_utils
-from core.constants import constants
 from scripts import build
 from scripts import common
 from scripts import run_acceptance_tests
@@ -47,15 +46,20 @@ def mock_managed_long_lived_process(
     """
     stub = scripts_test_utils.PopenStub(alive=True)
 
-    def mock_poll(self) -> Optional[int]:
-        self.poll_count += 1
-        if self.poll_count >= 10:
-            self.alive = False
-        return None if self.alive else self._return_code
+    def mock_poll(stub: scripts_test_utils.PopenStub) -> Optional[int]:
+        stub.poll_count += 1
+        if stub.poll_count >= 10:
+            stub.alive = False
+        return None if stub.alive else stub._return_code    # pylint: disable=protected-access
 
-    stub.poll = lambda: mock_poll(stub)
+    # Here we use MyPy ignore because we are assigning a None value
+    # where instance of 'PlatformParameter' is expected, and this is
+    # done to Replace the stored instance with None in order to
+    # trigger the unexpected exception during update.
+    stub.poll = lambda: mock_poll(stub)    # type: ignore[assignment]
 
     return contextlib.nullcontext(enter_result=stub)
+
 
 def mock_managed_process(
     *unused_args: str, **unused_kwargs: str
