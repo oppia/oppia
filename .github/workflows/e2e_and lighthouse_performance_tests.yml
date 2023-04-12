@@ -181,7 +181,7 @@ jobs:
         if: steps.download_artifact_1.outcome != 'failure'
         run: |
           ls -la
-          unzip build_files.zip
+          unzip -o build_files.zip
           rm build_files.zip
           echo "Files in ./:"
           ls -la .
