@@ -75,7 +75,9 @@
                     </oppia-answer-group-editor>
                   </div>
                   <div *ngIf="editabilityService.isEditable()">
-                    <button type="button" class="btn btn-danger oppia-delete-response e2e-test-delete-response" (click)="deleteAnswerGroup($event, index)">
+                    <button type="button"
+                            class="btn btn-danger oppia-delete-response e2e-test-delete-response"
+                            (click)="deleteAnswerGroup($event, index)">
                       Delete Response
                     </button>
                   </div>
@@ -138,7 +140,9 @@
         </div>
         <div class="oppia-add-response-button-container">
           <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear() && editabilityService.isEditable()">
-            <button type="button" class="btn btn-secondary oppia-add-response-button e2e-test-open-add-response-modal" (click)="openAddAnswerGroupModal()">
+            <button type="button"
+                    class="btn btn-secondary oppia-add-response-button e2e-test-open-add-response-modal"
+                    (click)="openAddAnswerGroupModal()">
               + ADD RESPONSE
             </button>
           </div>
