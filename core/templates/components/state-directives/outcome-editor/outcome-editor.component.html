@@ -264,6 +264,7 @@
     <div *ngIf="outcome">
       <input class="mr-2 e2e-test-editor-correctness-toggle"
              type="checkbox"
+             aria-label="Answer-correct"
              [disabled]="isSelfLoop(savedOutcome)"
              [(ngModel)]="outcome.labelledAsCorrect"
              (change)="onChangeCorrectnessLabel()">
