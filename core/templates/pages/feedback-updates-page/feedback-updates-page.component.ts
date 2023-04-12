@@ -275,47 +275,7 @@ getValueOfFeedbackThreadSortKey(): string {
   return this.currentFeedbackThreadsSortType;
 }
 
-onClickThread(
-    threadStatus: string, explorationId: string,
-    threadId: string, explorationTitle: string): void {
-  this.loadingFeedbacks = true;
-  let threadDataUrl = this.urlInterpolationService.interpolateUrl(
-    '/learnerdashboardthreadhandler/<threadId>', {
-      threadId: threadId
-    });
-  this.explorationTitle = explorationTitle;
-  this.feedbackThreadActive = true;
-  this.threadStatus = threadStatus;
-  this.explorationId = explorationId;
-  this.threadId = threadId;
 
-  for (let index = 0; index < this.threadSummaries.length; index++) {
-    if (this.threadSummaries[index].threadId === threadId) {
-      this.threadIndex = index;
-      let threadSummary = this.threadSummaries[index];
-      if (!threadSummary.lastMessageIsRead) {
-        this.numberOfUnreadThreads -= 1;
-      }
-      threadSummary.markTheLastTwoMessagesAsRead();
-    }
-  }
-
-  this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl)
-    .then((messageSummaryList) => {
-      let messageSummaryDicts = messageSummaryList;
-      this.messageSummaries = [];
-      for (let index = 0; index < messageSummaryDicts.length; index++) {
-        this.messageSummaries.push(
-          FeedbackMessageSummary.createFromBackendDict(
-            messageSummaryDicts[index]));
-      }
-      this.loadingFeedbacks = false;
-    });
-}
-
-showAllThreads(): void {
-  this.feedbackThreadActive = false;
-}
 
 addNewMessage(threadId: string, newMessage: string): void {
   let url = this.urlInterpolationService.interpolateUrl(
