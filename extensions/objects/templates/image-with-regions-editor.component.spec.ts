@@ -137,6 +137,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     fakeAsync(() => {
       expect(component.editorIsInitialized).toBe(false);
       spyOn(component, 'imageValueChanged').and.callThrough();
+      spyOn(contextService, 'getEntityType').and.returnValue(
+        AppConstants.ENTITY_TYPE.EXPLORATION);
+      spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
       component.ngOnChanges({});
       expect(component.editorIsInitialized).toBe(false);
       component.ngOnChanges({
