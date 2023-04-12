@@ -48,7 +48,7 @@ _PARSER.add_argument(
          'build directory and use cache slugs.',
     action='store_true')
 _PARSER.add_argument(
-    '--suite', required=False,
+    '--suite', required=True,
     help='Performs test for different suites'
          'For performing a full test, no argument is required.')
 _PARSER.add_argument(

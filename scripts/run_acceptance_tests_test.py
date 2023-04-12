@@ -31,52 +31,31 @@ from scripts import run_acceptance_tests
 from scripts import scripts_test_utils
 from scripts import servers
 
-from typing import ContextManager, Tuple
+from typing import ContextManager, Optional, Tuple
 
 
-class mock_managed_process_for_acceptance_server_proc:
-    def __init__(self, *unused_args: str, **unused_kwargs: str) -> None:
-        self.counter = 0
+def mock_managed_long_lived_process(
+    *unused_args: str, **unused_kwargs: str
+) -> ContextManager[scripts_test_utils.PopenStub]:
+    """Mock method for replacing the managed_process() functions to simulate a
+    long-lived process. This process stays alive for 10 poll() calls, and
+    then terminates thereafter.
 
-    def mock_managed_process(self, *unused_args: str, **unused_kwargs: str
-    ) -> ContextManager[scripts_test_utils.PopenStub]:
-        """Mock method for replacing the managed_process() function for acceptance server proc.
+    Returns:
+        Context manager. A context manager that always yields a mock
+        process.
+    """
+    stub = scripts_test_utils.PopenStub(alive=True)
 
-        Returns:
-            Context manager. A context manager that always yields a mock
-            process.
-        """
+    def mock_poll(self) -> Optional[int]:
+        self.poll_count += 1
+        if self.poll_count >= 10:
+            self.alive = False
+        return None if self.alive else self._return_code
 
-        # def poll() -> None:
-        #     if self.counter > 0:
-        #         return 0
-        #     self.counter += 1
-        #     return None
+    stub.poll = lambda: mock_poll(stub)
 
-        if self.counter > 0:
-            return contextlib.nullcontext(
-                enter_result=scripts_test_utils.PopenStub(alive=False))
-        self.counter += 1
-        return contextlib.nullcontext(
-            enter_result=scripts_test_utils.PopenStub(alive=True))
-
-
-# def mock_managed_process_for_acceptance_server_proc(
-#     self, *unused_args: str, **unused_kwargs: str,
-# ) -> ContextManager[scripts_test_utils.PopenStub]:
-#     """Mock method for replacing the managed_process() functions.
-
-#     Returns:
-#         Context manager. A context manager that always yields a mock
-#         process.
-#     """
-
-#     if self.counter > 0:
-#         return contextlib.nullcontext(
-#             enter_result=scripts_test_utils.PopenStub(alive=False))
-#     self.counter += 1
-#     return contextlib.nullcontext(
-#         enter_result=scripts_test_utils.PopenStub(alive=True))
+    return contextlib.nullcontext(enter_result=stub)
 
 def mock_managed_process(
     *unused_args: str, **unused_kwargs: str
@@ -432,7 +411,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
     #     run_acceptance_tests.main(args=['--suite', 'testSuite', '--skip-build'])
 
     def test_start_tests_with_loop(self) -> None:
-        x = mock_managed_process_for_acceptance_server_proc()
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -452,7 +430,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         # args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'])  # pylint: disable=line-too-long
         proc = self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_acceptance_tests_server',
-            x.mock_managed_process,
+            mock_managed_long_lived_process,
             expected_kwargs=[
                 {
                     'suite_name': 'testSuite',
@@ -462,59 +440,25 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         output_lines = []
 
-        print('shivkant')
-        print('shivkant')
-        print('shivkant')
-        print('shivkant')
+        print('shivi')
+        print('shivi')
+        print('shivi')
+        print('shivi')
         print('proc: ', proc)
-        print('x:', x.mock_managed_process)
 
-        while True:
-            for line in iter(proc.stdout.readline, b''):
-                if isinstance(line, str):
-                    line = line.encode('utf-8')  # pragma: no cover
-                output_lines.append(line.rstrip())
+        # for line in iter(proc.stdout.readline, b''):
+        #     if isinstance(line, str):
+        #         line = line.encode('utf-8')  # pragma: no cover
+        #     output_lines.append(line.rstrip())
+        
+        self.assertEqual(proc.mock_poll(), None)
+        # while True:
+        #     for line in iter(proc.stdout.readline, b''):
+        #         if isinstance(line, str):
+        #             line = line.encode('utf-8')  # pragma: no cover
+        #         output_lines.append(line.rstrip())
 
-                common.write_stdout_safe(line.decode('ascii', errors='replace'))
+        #         common.write_stdout_safe(line.decode('ascii', errors='replace'))
 
-            if proc.poll() is not None:
-                break
-        # with self.swap_mock_set_constants_to_default:
-        #     lines, return_code = run_acceptance_tests.run_tests(args)
-
-        # expected_logs = [
-        #     '',
-        #     'Running suite with 1 specs.',
-        #     '',
-        #     '--------------------------------',
-        #     '| 1. Suite started: Blog Admin |',
-        #     '--------------------------------',
-        #     # 'LOG: User blogAdm has the blog admin role!',
-        #     # '',
-        #     # 'Spec started : Blog Admin should assign roles to users and change tag properties',
-        #     # 'LOG: User guestUsr1 does not have the blog admin role!',
-        #     # 'LOG: User guestUsr1 has the blog admin role!',
-        #     # 'LOG: User guestUsr2 does not have the blog post editor role!',
-        #     # 'LOG: User guestUsr2 has the blog post editor role!',
-        #     # 'LOG: User guestUsr2 does not have the blog post editor role!',
-        #     # 'LOG: Tag with name Test_Tag does not exist in tag list!',
-        #     # 'LOG: Tag Test_Tag added in tag list successfully!',
-        #     # 'LOG: Tag with name Test_Tag exists in tag list!',
-        #     # 'LOG: Maximum tag limit is not 5!',
-        #     # 'LOG: Successfully updated the tag limit to 5!',
-        #     # 'LOG: Maximum tag is currently 5!',
-        #     # '\x1b[32;40m-> Passed [ Took 129.224 seconds ]\x1b[0m',
-        #     # '',
-        #     # '',
-        #     # '',
-        #     # '1 specs, 0 failures',
-        #     # 'Finished in 187.553 seconds'
-        # ]
-
-        # self.assertEqual(return_code, None)
-
-        # top_6_lines = lines[:6]
-        # self.assertEqual(
-        #     [line.decode('utf-8') for line in top_6_lines],
-        #     expected_logs
-        # )
+        #     if proc.mock_poll() is not None:
+        #         break
