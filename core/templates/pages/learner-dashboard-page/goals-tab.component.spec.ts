@@ -357,12 +357,13 @@ describe('Goals tab Component', () => {
         {value: document.createElement('div')});
       component.onDocumentClick(fakeClickAwayEvent);
       fixture.detectChanges();
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
       // Three dots are not shown when no goals are present.
+      component.dropdownRef = undefined;
       component.onDocumentClick(fakeClickAwayEvent);
       fixture.detectChanges();
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
     }
   });
 });
