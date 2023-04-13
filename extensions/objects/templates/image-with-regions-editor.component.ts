@@ -236,6 +236,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       return;
     }
     this.initializeEditor();
+    if (this.value) {
+      this.imageValueChanged(this.value.imagePath);
+    }
   }
 
   // Dynamically defines the CSS style for the region rectangle.
