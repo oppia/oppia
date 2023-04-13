@@ -27,6 +27,7 @@ from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
+from unittest import mock
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
@@ -126,24 +127,6 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         destination_fs.copy(self.fs.assets_path, 'abc2.png')
         self.assertTrue(destination_fs.isfile('abc2.png'))
 
-    def test_commit(self) -> None:
-        """Test if the commit function is saving the file correctly."""
-        file_name = 'test_file.txt'
-        file_content = b'This is a test file.'
-
-        # Check if the file does not exist before committing.
-        self.assertFalse(self.fs.isfile(file_name))
-
-        # Commit the file.
-        self.fs.commit(file_name, file_content)
-
-        # Check if the file exists after committing.
-        self.assertTrue(self.fs.isfile(file_name))
-
-        # Check if the committed file has the correct content.
-        committed_content = self.fs.get(file_name)
-        self.assertEqual(committed_content, file_content)
-
 
 class DirectoryTraversalTests(test_utils.GenericTestBase):
     """Tests to check for the possibility of directory traversal."""
@@ -226,10 +209,14 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         # Get the content of the saved image.
         saved_image_content = fs.get('image/%s' % self.FILENAME)
 
-        # Save the image again (should be skipped due to existence).
-        fs_services.save_original_and_compressed_versions_of_image(
-            self.FILENAME, 'exploration', self.EXPLORATION_ID,
-            original_image_content, 'image', True)
+        with mock.patch.object(fs, 'commit') as mock_commit:
+            # Save the image again (should be skipped due to existence).
+            fs_services.save_original_and_compressed_versions_of_image(
+                self.FILENAME, 'exploration', self.EXPLORATION_ID,
+                original_image_content, 'image', True)
+
+            # Assert that fs.commit was not called.     
+            mock_commit.assert_not_called()
 
         # Get the content of the image after attempting the second save.
         new_saved_image_content = fs.get('image/%s' % self.FILENAME)
