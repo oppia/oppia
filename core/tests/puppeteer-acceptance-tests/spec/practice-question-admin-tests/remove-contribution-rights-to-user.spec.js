@@ -1,52 +1,63 @@
-// created 4/12/23 Acceptance Testing for Oppia
-// Testing user story for Practice Question Admin
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 /**
  * @fileoverview Acceptance Test for Practice Question Admin
  */
 
 const userFactory = require(
-    '../puppeteer-testing-utilities/user-factory.js');
+  '../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
-    '../puppeteer-testing-utilities/test-constants.js');
+  '../puppeteer-testing-utilities/test-constants.js');
 const showMessage = require(
-    '../puppeteer-testing-utilities/show-message-utils.js');
+  '../puppeteer-testing-utilities/show-message-utils.js');
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Practice Question Reviewer', function () {
-    const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
-    const ROLE_CONTRIBUTER_DASHBOARD_ADMIN = 'contributor dashboard admin';
-    let superAdmin = null;
-    let contribDashboardAdmin = null;
+  const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
+  const ROLE_CONTRIBUTER_DASHBOARD_ADMIN = 'contributor dashboard admin';
+  let superAdmin = null;
+  let contribDashboardAdmin = null;
 
-    beforeAll(async function () {
-        superAdmin = await userFactory.createNewSuperAdmin('superAdm');
-        contribDashboardAdmin = await userFactory.createNewPracticeQuestionAdmin('contribAdm');
-    }, DEFAULT_SPEC_TIMEOUT);
+  beforeAll(async function () {
+    superAdmin = await userFactory.createNewSuperAdmin('superAdm');
+    contribDashboardAdmin = await userFactory.createNewPracticeQuestionAdmin('contribAdm');
+  }, DEFAULT_SPEC_TIMEOUT);
 
-    it('should remove question reviewer/submission rights to users',
-        async function () {
-            const testerUser1 = await userFactory.createNewGuestUser(
-                'Tester', 'admin.tester@example.com');
+  it('should remove question reviewer/submission rights to users',
+    async function () {
+      const testerUser1 = await userFactory.createNewGuestUser(
+        'Tester', 'admin.tester@example.com');
 
-            // remove question submission rights from testerUser1
-            contribDashboardAdmin.removeReviewQuestionRights('Tester');
+      // Remove question submission rights from testerUser1
+      contribDashboardAdmin.removeReviewQuestionRights('Tester');
 
-            // check if successfully updated
-            contribDashboardAdmin.expectUserToNotHaveRight('Tester', 'contributer');
+      // Check if successfully updated
+      contribDashboardAdmin.expectUserToNotHaveRight('Tester', 'contributer');
 
-            // remove question review rights from testerUser1
-            contribDashboardAdmin.removeSubmitQuestionRights('Tester');
+      // Remove question review rights from testerUser1
+      contribDashboardAdmin.removeSubmitQuestionRights('Tester');
 
-            // check if successfully updated
-            contribDashboardAdmin.expectUserToNotHaveRight('Tester', 'reviewer');
+      // Check if successfully updated
+      contribDashboardAdmin.expectUserToNotHaveRight('Tester', 'reviewer');
 
-            // see if testerUser1 can access submit question tab and review questions tab
-            testerUser1.expectNoSubmitQuestionTab();
-            testerUser1.expectNoReviewQuestionTab();
-        })
-
-    afterAll(async function () {
-        await userFactory.closeAllBrowsers();
+      // See if testerUser1 can access submit question tab and review questions tab
+      testerUser1.expectNoSubmitQuestionTab();
+      testerUser1.expectNoReviewQuestionTab();
     })
+
+  afterAll(async function () {
+    await userFactory.closeAllBrowsers();
+  })
 })
