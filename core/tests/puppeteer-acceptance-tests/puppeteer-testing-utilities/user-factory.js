@@ -112,7 +112,7 @@ let createNewGuestUser = async function (username, email) {
   return guestUser;
 };
 /**
- * The function creates a new practice question admin user and returns 
+ * The function creates a new practice question admin user and returns
  * the instance of that user.
  * @param {string} username - The username of the blog admin.
  * @returns The blog admin instance created.
@@ -132,7 +132,7 @@ let createNewPracticeQuestionAdmin = async function (username) {
   await superAdminInstance.expectUserToHaveRole(
     username, ROLE_CURRICULUM_ADMIN);
   // Contributer dashboard admin did not exist
-  // Equivalent of giving admin tranlator, question, and curriculum admin roles
+  // equivalent of giving admin tranlator, question, and curriculum admin roles
   await superAdminInstance.assignRoleToUser(
     username, ROLE_TRANSLATION_ADMIN);
   await superAdminInstance.expectUserToHaveRole(

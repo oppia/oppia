@@ -24,19 +24,19 @@ const showMessage = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Practice Question Reviewer', function () {
+describe('Practice Question Reviewer', function() {
   const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
   const ROLE_CONTRIBUTER_DASHBOARD_ADMIN = 'contributor dashboard admin';
   let superAdmin = null;
   let contribDashboardAdmin = null;
 
-  beforeAll(async function () {
+  beforeAll(async function() {
     superAdmin = await userFactory.createNewSuperAdmin('superAdm');
     contribDashboardAdmin = await userFactory.createNewPracticeQuestionAdmin('contribAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should remove question reviewer/submission rights to users',
-    async function () {
+    async function() {
       const testerUser1 = await userFactory.createNewGuestUser(
         'Tester', 'admin.tester@example.com');
 
@@ -57,7 +57,7 @@ describe('Practice Question Reviewer', function () {
       testerUser1.expectNoReviewQuestionTab();
     })
 
-  afterAll(async function () {
+  afterAll(async function() {
     await userFactory.closeAllBrowsers();
   })
 })
