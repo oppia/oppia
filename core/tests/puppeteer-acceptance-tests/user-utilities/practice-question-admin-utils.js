@@ -22,14 +22,14 @@ const testConstants = require(
 const { showMessage } = require(
   '../puppeteer-testing-utilities/show-message-utils.js');
 
-const testUserName = 'Tester';
+
 const contributerDashboardUrl = testConstants.URLs.ContributerDashboard;
-const contributerDashboardAdminUrl = testConstants.URLs.ContributerDashboardAdminUrl;
-const AdminUrl = testConstants.URLs.AdminPage;
+const contribDashAdminUrl = testConstants.URLs.ContributerDashboardAdminUrl;
+
 
 const LABEL_SUBMIT_QUESTION_RIGHT_BUTTON = 'SUBMIT_QUESTION';
 const LABEL_REVIEW_QUESTION_RIGHT_BUTTON = 'REVIEW_QUESTION';
-const LABEL_ENTER_USERNAME_BUTTON = 'Enter User Name';
+
 const LABEL_ADD_RIGHTS_BUTTON = 'Add Rights';
 const LABEL_REMOVE_RIGHTS_BUTTON = 'Remove Rights';
 
@@ -47,7 +47,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   async addSubmitQuestionRights(username) {
     await this.goto(contributerDashboardAdminUrl);
     // Type in username
-    await this.type('e2e-test-add-reviewer-form.input#label-target-form-reviewer-username', username);
+    await this.type(
+      'e2e-test-add-reviewer-form.input#label-target-form-reviewer-username', username);
     // Select submit question right
     await this.page.select(
       'select#label-target-form-review-category-select',
@@ -61,7 +62,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
    */
   async addReviewQuestionRights(username) {
     await this.goto(contributerDashboardAdminUrl);
-    await this.type('e2e-test-add-reviewer-form.input#label-target-form-reviewer-username', username);
+    await this.type(
+      'e2e-test-add-reviewer-form.input#label-target-form-reviewer-username', username);
     // Select form for correct question rights
     await this.page.select(
       'select#label-target-form-review-category-select',
@@ -77,7 +79,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
    */
   async removeSubmitQuestionRights(username) {
     await this.goto(contributerDashboardAdminUrl);
-    await this.type('e2e-test-remove-reviewer-form.input#label-target-form-reviewer-username', username);
+    await this.type(
+      'e2e-test-remove-reviewer-form.input#label-target-form-reviewer-username', username);
     await this.page.select(
       'select#label-target-form-review-category-select',
       LABEL_SUBMIT_QUESTION_RIGHT_BUTTON);
@@ -92,7 +95,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
    */
   async removeReviewQuestionRights(username) {
     await this.goto(contributerDashboardAdminUrl);
-    await this.type('e2e-test-remove-reviewer-form.input#label-target-form-reviewer-username', username);
+    await this.type(
+      'e2e-test-remove-reviewer-form.input#label-target-form-reviewer-username', username);
     await this.page.select(
       'select#label-target-form-review-category-select',
       LABEL_REVIEW_QUESTION_RIGHT_BUTTON);
@@ -124,7 +128,7 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
    */
   async expectUserToHaveContributionRight(username, role) {
     const currentURL = this.page.url();
-    await this.goto(contributerDashboardAdminUrl);
+    await this.goto(contribDashAdminUrl);
     await this.page.select(
       'select#label-target-view-reviewer-method',
       'By Username'
@@ -146,7 +150,7 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
 
   async expectUserToNotHaveRight(username, role) {
     const currentURL = this.page.url();
-    await this.goto(contributerDashboardAdminUrl);
+    await this.goto(contribDashAdminUrl);
     await this.page.select(
       'select#label-target-view-reviewer-method',
       'By Username'
@@ -167,7 +171,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   }
 
   async expectNoSubmitQuestionTab() {
-    const element = document.querySelector('[aria-label="See opportunities for adding new questions."]');
+    const element = document.querySelector(
+      '[aria-label="See opportunities for adding new questions."]');
 
     const isInvisible = element.style.display === 'none' || element.style.visibility === 'hidden' || element.offsetParent === null;
 
@@ -179,7 +184,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   }
 
   async expectNoReviewQuestionTab() {
-    const element = document.querySelector('.oppia-contributions-show-review-side-navbar-container')
+    const element = document.querySelector(
+      '.oppia-contributions-show-review-side-navbar-container')
 
     const isInvisible = element.style.display === 'none' || element.style.visibility === 'hidden' || element.offsetParent === null;
 

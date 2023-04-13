@@ -20,19 +20,14 @@ const userFactory = require(
   '../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
-const showMessage = require(
-  '../puppeteer-testing-utilities/show-message-utils.js');
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Practice Question Reviewer', function() {
-  const ROLE_CURRICULUM_ADMIN = 'curriculum admin';
-  const ROLE_CONTRIBUTER_DASHBOARD_ADMIN = 'contributor dashboard admin';
-  let superAdmin = null;
   let contribDashboardAdmin = null;
 
   beforeAll(async function() {
-    superAdmin = await userFactory.createNewSuperAdmin('superAdm');
-    contribDashboardAdmin = await userFactory.createNewPracticeQuestionAdmin('contribAdm');
+    contribDashboardAdmin = await userFactory.createNewPracticeQuestionAdmin(
+      'contribAdm');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should remove question reviewer/submission rights to users',
@@ -40,24 +35,26 @@ describe('Practice Question Reviewer', function() {
       const testerUser1 = await userFactory.createNewGuestUser(
         'Tester', 'admin.tester@example.com');
 
-      // Remove question submission rights from testerUser1
+      // Remove question submission rights from testerUser1.
       contribDashboardAdmin.removeReviewQuestionRights('Tester');
 
-      // Check if successfully updated
-      contribDashboardAdmin.expectUserToNotHaveRight('Tester', 'contributer');
+      // Check if successfully updated.
+      contribDashboardAdmin.expectUserToNotHaveRight(
+        'Tester', 'contributer');
 
-      // Remove question review rights from testerUser1
+      // Remove question review rights from testerUser1.
       contribDashboardAdmin.removeSubmitQuestionRights('Tester');
 
-      // Check if successfully updated
-      contribDashboardAdmin.expectUserToNotHaveRight('Tester', 'reviewer');
+      // Check if successfully updated.
+      contribDashboardAdmin.expectUserToNotHaveRight(
+        'Tester', 'reviewer');
 
-      // See if testerUser1 can access submit question tab and review questions tab
+      // See if testerUser1 can access submit question tab and review questions tab.
       testerUser1.expectNoSubmitQuestionTab();
       testerUser1.expectNoReviewQuestionTab();
-    })
+    });
 
   afterAll(async function() {
     await userFactory.closeAllBrowsers();
-  })
-})
+  });
+});
