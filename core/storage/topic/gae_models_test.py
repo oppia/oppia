@@ -130,6 +130,48 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID
         )
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            topic_models.TopicModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'abbreviated_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_story_references':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'additional_story_references':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_reference_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'uncategorized_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopic_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_title_fragment_for_web': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'practice_tab_is_displayed':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_ids_for_diagnostic_test':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            topic_models.TopicModel.get_export_policy(),
+            expected_dict)
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the TopicCommitLogEntryModel class."""
@@ -168,6 +210,30 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'topic-entity_id-1'
         )
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            topic_models.TopicCommitLogEntryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE, # pylint: disable=line-too-long
+            'post_commit_is_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            topic_models.TopicCommitLogEntryModel.get_export_policy(),
+            expected_dict)
 
 class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSummaryModel class."""
@@ -177,6 +243,40 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            topic_models.TopicSummaryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'additional_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_published_node_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'uncategorized_skill_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopic_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            topic_models.TopicSummaryModel.get_export_policy(),
+            expected_dict)
 
 class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
 
@@ -282,3 +382,35 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': []
         }
         self.assertEqual(user_data, expected_data)
+
+    def test_get_by_user(self) -> None:
+        self.assertEqual(len(topic_models.TopicRightsModel.get_by_user(self.MANAGER_1_ID_OLD)), 0) # pylint: disable=line-too-long
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            topic_models.TopicRightsModel.
+                get_model_association_to_user(),
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        self.assertEqual(
+            topic_models.TopicRightsModel.
+            get_field_name_mapping_to_takeout_keys(),
+            {
+                'manager_ids': 'managed_topic_ids'
+            })
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            }
+        self.assertEqual(
+            topic_models.TopicRightsModel.get_export_policy(),
+            expected_dict)
