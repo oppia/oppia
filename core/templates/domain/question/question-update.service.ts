@@ -77,7 +77,9 @@ export class QuestionUpdateService {
     return changeDict[paramName];
   }
 
-  _getNewPropertyValueFromChangeDict(changeDict: BackendChangeObject): string {
+  _getNewPropertyValueFromChangeDict(
+      changeDict: BackendChangeObject
+  ): string | string[] {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
@@ -119,7 +121,7 @@ export class QuestionUpdateService {
 
   setQuestionInapplicableSkillMisconceptionIds(
       question: Question,
-      newInapplicableSkillMisconceptionIds: string[] | string): void {
+      newInapplicableSkillMisconceptionIds: string[]): void {
     let oldInapplicableSkillMisconceptionIds = cloneDeep(
       question.getInapplicableSkillMisconceptionIds());
     this._applyPropertyChange(
@@ -128,8 +130,10 @@ export class QuestionUpdateService {
       newInapplicableSkillMisconceptionIds,
       oldInapplicableSkillMisconceptionIds,
       (changeDict: BackendChangeObject, question: Question) => {
-        let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setInapplicableSkillMisconceptionIds([languageCode]);
+        const inapplicableSkillMisconceptionIds = (
+          this._getNewPropertyValueFromChangeDict(changeDict));
+        question.setInapplicableSkillMisconceptionIds(
+          inapplicableSkillMisconceptionIds as string[]);
       }, (changeDict: BackendChangeObject, question: Question) => {
         question.setInapplicableSkillMisconceptionIds(
           oldInapplicableSkillMisconceptionIds);
