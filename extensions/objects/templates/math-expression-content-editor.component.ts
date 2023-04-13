@@ -226,8 +226,6 @@ export class MathExpressionContentEditorComponent implements OnInit {
       this.localValue = {
         label: this.value.raw_latex || '',
       };
-    }
-    if (this.value.raw_latex) {
       this.convertLatexStringToSvg(this.localValue.label);
     }
   }
