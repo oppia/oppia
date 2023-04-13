@@ -209,8 +209,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         # Get the content of the saved image.
         saved_image_content = fs.get('image/%s' % self.FILENAME)
 
-        # Here we use `object` because we need a generic base class 
-        # that can accommodate any type of object, 
+        # Here we use object because we need a generic base class
+        # that can accommodate any type of object,
         # regardless of its specific implementation.
         with mock.patch.object(fs, 'commit') as mock_commit:
             # Save the image again (should be skipped due to existence).
