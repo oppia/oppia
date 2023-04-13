@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+from unittest import mock
 
 from core import feconf
 from core import utils
@@ -27,7 +28,6 @@ from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
-from unittest import mock
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
@@ -209,13 +209,16 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         # Get the content of the saved image.
         saved_image_content = fs.get('image/%s' % self.FILENAME)
 
+        # Here we use `object` because we need a generic base class 
+        # that can accommodate any type of object, 
+        # regardless of its specific implementation.
         with mock.patch.object(fs, 'commit') as mock_commit:
             # Save the image again (should be skipped due to existence).
             fs_services.save_original_and_compressed_versions_of_image(
                 self.FILENAME, 'exploration', self.EXPLORATION_ID,
                 original_image_content, 'image', True)
 
-            # Assert that fs.commit was not called.     
+            # Assert that fs.commit was not called.
             mock_commit.assert_not_called()
 
         # Get the content of the image after attempting the second save.
