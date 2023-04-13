@@ -8,6 +8,10 @@
 #
 #    pip-compile --no-emit-index-url --output-file=requirements.txt requirements.in
 #
+--trusted-host pypi.org
+--trusted-host files.pythonhosted.org
+--trusted-host pypi.python.org
+
 apache-beam[gcp]==2.38.0
     # via -r requirements.in
 attrs==20.3.0
