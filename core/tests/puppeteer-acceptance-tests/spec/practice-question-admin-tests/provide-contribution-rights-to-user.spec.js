@@ -23,8 +23,8 @@ const testConstants = require(
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 /** This test should be done without the need of super admin, as
-* practice question admin must be able to revoke question reviewer role 
-* of other users from the contributer-dashboard-admin page 
+* practice question admin must be able to revoke question reviewer role
+* of other users from the contributer-dashboard-admin page
 * but this is not the case now, only super admin can do this.
 */
 describe('Practice Question Reviewer', function() {
@@ -55,7 +55,6 @@ describe('Practice Question Reviewer', function() {
       testerUser1.navigateToSubmitQuestionsTab();
       // Go to review questions tab.
       testerUser1.navigateToReviewQuestionsTab();
-
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {

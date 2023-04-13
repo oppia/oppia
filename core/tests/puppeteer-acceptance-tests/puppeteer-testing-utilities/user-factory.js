@@ -38,7 +38,7 @@ const ROLE_QUESTION_ADMIN = 'Question Admin';
  * @param {string} username - The username of the super admin.
  * @returns The super admin instance created.
  */
-let createNewSuperAdmin = async function (username) {
+let createNewSuperAdmin = async function(username) {
   if (superAdminInstance !== null) {
     return superAdminInstance;
   }
@@ -58,7 +58,7 @@ let createNewSuperAdmin = async function (username) {
  * @param {string} username - The username of the blog admin.
  * @returns The blog admin instance created.
  */
-let createNewBlogAdmin = async function (username) {
+let createNewBlogAdmin = async function(username) {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
@@ -80,7 +80,7 @@ let createNewBlogAdmin = async function (username) {
  * @param {string} username - The username of the blog post editor.
  * @returns The blog post editor instance created.
  */
-let createNewBlogPostEditor = async function (username) {
+let createNewBlogPostEditor = async function(username) {
   const blogAdmin = await createNewBlogAdmin('blogAdm');
 
   const blogPostEditor = new e2eBlogPostEditor();
@@ -103,7 +103,7 @@ let createNewBlogPostEditor = async function (username) {
  * @param {string} email - The email of the guest user.
  * @returns The guest user instance created.
  */
-let createNewGuestUser = async function (username, email) {
+let createNewGuestUser = async function(username, email) {
   const guestUser = new e2eGuestUser();
   await guestUser.openBrowser();
   await guestUser.signUpNewUser(username, email);
@@ -117,7 +117,7 @@ let createNewGuestUser = async function (username, email) {
  * @param {string} username - The username of the blog admin.
  * @returns The blog admin instance created.
  */
-let createNewPracticeQuestionAdmin = async function (username) {
+let createNewPracticeQuestionAdmin = async function(username) {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
@@ -132,7 +132,7 @@ let createNewPracticeQuestionAdmin = async function (username) {
   await superAdminInstance.expectUserToHaveRole(
     username, ROLE_CURRICULUM_ADMIN);
   // Contributer dashboard admin did not exist
-  // equivalent of giving admin tranlator, question, and curriculum admin roles
+  // equivalent of giving admin tranlator, question, and curriculum admin roles.
   await superAdminInstance.assignRoleToUser(
     username, ROLE_TRANSLATION_ADMIN);
   await superAdminInstance.expectUserToHaveRole(
@@ -150,7 +150,7 @@ let createNewPracticeQuestionAdmin = async function (username) {
 /**
  * The function closes all the browsers opened by different users.
  */
-let closeAllBrowsers = async function () {
+let closeAllBrowsers = async function() {
   for (let i = 0; i < activeUsers.length; i++) {
     await activeUsers[i].closeBrowser();
   }
