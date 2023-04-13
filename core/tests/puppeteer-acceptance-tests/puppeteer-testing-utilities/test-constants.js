@@ -26,7 +26,9 @@ let testConstants = {
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     AdminPage: 'http://localhost:8181/admin',
     RolesEditorTab: 'http://localhost:8181/admin#/roles',
-    logout: 'http://localhost:8181/logout'
+    logout: 'http://localhost:8181/logout',
+    ContributerDashboard: 'http://localhost:8181/contributer-dashboard',
+    ContributerDashboardAdmin: 'http://localhost:8181/contributer-dashboard-admin'
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',

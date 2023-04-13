@@ -19,7 +19,9 @@
 let e2eSuperAdmin = require('../user-utilities/super-admin-utils.js');
 let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
   '../user-utilities/blog-post-admin-utils.js');
-
+let e2ePracticeQuestionAdmin = e2eGuestUser = require(
+  '../user-utilities/practice-question-admin-utils.js');
+//const e2ePracticeQuestionAdmin = require('../user-utilities/practice-question-admin-utils.js');
 /**
  * Global user instances that are created and can be reused again.
  */
@@ -27,6 +29,10 @@ let superAdminInstance = null;
 let activeUsers = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
+const ROLE_CURRICULUM_ADMIN = 'Curriculum Admin';
+const ROLE_CONTRIBUTER_DASHBOARD_ADMIN = 'Curriculum Dashboard Admin';
+const ROLE_TRANSLATION_ADMIN = 'Translation Admin';
+const ROLE_QUESTION_ADMIN = 'Question Admin';
 
 /**
  * The function creates a new super admin user and returns the instance
@@ -34,7 +40,7 @@ const ROLE_BLOG_POST_EDITOR = 'blog post editor';
  * @param {string} username - The username of the super admin.
  * @returns The super admin instance created.
  */
-let createNewSuperAdmin = async function(username) {
+let createNewSuperAdmin = async function (username) {
   if (superAdminInstance !== null) {
     return superAdminInstance;
   }
@@ -54,7 +60,7 @@ let createNewSuperAdmin = async function(username) {
  * @param {string} username - The username of the blog admin.
  * @returns The blog admin instance created.
  */
-let createNewBlogAdmin = async function(username) {
+let createNewBlogAdmin = async function (username) {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
   }
@@ -76,7 +82,7 @@ let createNewBlogAdmin = async function(username) {
  * @param {string} username - The username of the blog post editor.
  * @returns The blog post editor instance created.
  */
-let createNewBlogPostEditor = async function(username) {
+let createNewBlogPostEditor = async function (username) {
   const blogAdmin = await createNewBlogAdmin('blogAdm');
 
   const blogPostEditor = new e2eBlogPostEditor();
@@ -99,7 +105,7 @@ let createNewBlogPostEditor = async function(username) {
  * @param {string} email - The email of the guest user.
  * @returns The guest user instance created.
  */
-let createNewGuestUser = async function(username, email) {
+let createNewGuestUser = async function (username, email) {
   const guestUser = new e2eGuestUser();
   await guestUser.openBrowser();
   await guestUser.signUpNewUser(username, email);
@@ -107,11 +113,41 @@ let createNewGuestUser = async function(username, email) {
   activeUsers.push(guestUser);
   return guestUser;
 };
+/**
+ * The function creates a new practice question admin user and returns the instance
+ * of that user.
+ * @param {string} username - The username of the blog admin.
+ * @returns The blog admin instance created.
+ */
+let createNewPracticeQuestionAdmin = async function (username) {
+  if (superAdminInstance === null) {
+    superAdminInstance = await createNewSuperAdmin('superAdm');
+  }
+
+  const practiceQuestionAdmin = new e2ePracticeQuestionAdmin();
+  await practiceQuestionAdmin.openBrowser();
+  await practiceQuestionAdmin.signUpNewUser(username, 'contributer_admin@example.com');
+
+  await superAdminInstance.assignRoleToUser(username, ROLE_CURRICULUM_ADMIN);
+  await superAdminInstance.expectUserToHaveRole(username, ROLE_CURRICULUM_ADMIN);
+  // contributer dashboard admin did not exist 
+  // equivalent of giving admin tranlator, question, and curriculum admin roles
+  //await superAdminInstance.assignRoleToUser(username, ROLE_CONTRIBUTER_DASHBOARD_ADMIN);
+  //await superAdminInstance.expectUserToHaveRole(username, ROLE_CONTRIBUTER_DASHBOARD_ADMIN);
+  await superAdminInstance.assignRoleToUser(username, ROLE_TRANSLATION_ADMIN);
+  await superAdminInstance.expectUserToHaveRole(username, ROLE_TRANSLATION_ADMIN);
+
+  await superAdminInstance.assignRoleToUser(username, ROLE_QUESTION_ADMIN);
+  await superAdminInstance.expectUserToHaveRole(username, ROLE_QUESTION_ADMIN);
+
+  activeUsers.push(practiceQuestionAdmin);
+  return practiceQuestionAdmin;
+};
 
 /**
  * The function closes all the browsers opened by different users.
  */
-let closeAllBrowsers = async function() {
+let closeAllBrowsers = async function () {
   for (let i = 0; i < activeUsers.length; i++) {
     await activeUsers[i].closeBrowser();
   }
@@ -122,5 +158,6 @@ module.exports = {
   createNewBlogAdmin,
   createNewBlogPostEditor,
   createNewGuestUser,
+  createNewPracticeQuestionAdmin,
   closeAllBrowsers
 };

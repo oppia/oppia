@@ -177,6 +177,7 @@
     "hash-wasm": "^4.4.1",
     "headroom.js": "^0.12.0",
     "howler": "^2.2.1",
+    "jasmine": "^4.6.0",
     "js-yaml": "^4.1.0",
     "leaflet": "^1.4.0",
     "lodash": "^4.17.14",
