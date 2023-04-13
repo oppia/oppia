@@ -173,6 +173,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             topic_models.TopicModel.get_export_policy(),
             expected_dict)
 
+
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the TopicCommitLogEntryModel class."""
 
@@ -235,6 +236,7 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             topic_models.TopicCommitLogEntryModel.get_export_policy(),
             expected_dict)
 
+
 class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicSummaryModel class."""
 
@@ -277,6 +279,7 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_models.TopicSummaryModel.get_export_policy(),
             expected_dict)
+
 
 class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
 
