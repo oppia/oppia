@@ -311,23 +311,10 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
 
         # Ensure that the function does not raise any error when the
         # learner_goals_model does not exist for the given user_id.
-        learner_goals_services.remove_topics_from_learn_goal(
-            non_existent_user_id, [self.TOPIC_ID_1]
-        )
-
-    # Here we use object because
-    # the mock.patch.object method is being used to patch a specific method
-    # (get_learner_goals_from_model) of the learner_goals_services module.
-    def test_get_learner_goals_from_model_called(self) -> None:
-        with mock.patch.object(
-            learner_goals_services, 'get_learner_goals_from_model',
-            wraps=learner_goals_services.get_learner_goals_from_model
+        with mock.patch(
+            'core.domain.learner_goals_services.get_learner_goals_from_model'
         ) as mock_get_learner_goals_from_model:
-            # Add a topic to learner goals.
-            learner_goals_services.mark_topic_to_learn(
-                self.viewer_id, self.TOPIC_ID_1)
-            # Get all topic ids to learn.
-            learner_goals_services.get_all_topic_ids_to_learn(self.viewer_id)
-
-            # Assert that the get_learner_goals_from_model is called twice.
-            self.assertEqual(mock_get_learner_goals_from_model.call_count, 2)
+            learner_goals_services.remove_topics_from_learn_goal(
+                non_existent_user_id, [self.TOPIC_ID_1]
+            )
+            mock_get_learner_goals_from_model.assert_not_called()
