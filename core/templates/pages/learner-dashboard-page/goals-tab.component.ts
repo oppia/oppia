@@ -205,7 +205,7 @@ export class GoalsTabComponent implements OnInit {
         return;
       }
       if (
-        targetElement[i] &&
+        targetElement &&
         !this.showThreeDotsDropdown[i]
       ) {
         this.showThreeDotsDropdown[i] = false;
