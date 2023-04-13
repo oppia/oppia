@@ -1046,7 +1046,7 @@ class ManagedProcessTests(test_utils.TestBase):
         test_file_path = os.path.join(spec_dir_path, 'test')
 
         self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
-            suite_name='test',  # pylint: disable=line-too-long
+            suite_name='test',
             stdout=subprocess.PIPE))
         self.exit_stack.close()
 

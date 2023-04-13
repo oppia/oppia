@@ -92,40 +92,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         finally:
             super().tearDown()
 
-    def test_wait_for_port_to_be_in_use_when_port_successfully_opened(
-        self
-    ) -> None:
-        num_var = 0
-
-        def mock_is_port_in_use(unused_port: int) -> bool:
-            nonlocal num_var
-            num_var += 1
-            return num_var > 10
-
-        mock_sleep = self.exit_stack.enter_context(self.swap_with_call_counter(
-            time, 'sleep'))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'is_port_in_use', mock_is_port_in_use))
-
-        common.wait_for_port_to_be_in_use(1)
-
-        self.assertEqual(num_var, 11)
-        self.assertEqual(mock_sleep.times_called, 10)
-
-    def test_wait_for_port_to_be_in_use_when_port_failed_to_open(self) -> None:
-        mock_sleep = self.exit_stack.enter_context(self.swap_with_call_counter(
-            time, 'sleep'))
-        self.exit_stack.enter_context(self.swap(
-            common, 'is_port_in_use', lambda _: False))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None))
-
-        common.wait_for_port_to_be_in_use(1)
-
-        self.assertEqual(
-            mock_sleep.times_called,
-            common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
-
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running', lambda *_: True))
@@ -209,71 +175,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             [line.decode('utf-8') for line in lines],
             ['sample', u'✓', 'output']
         )
-
-    def test_rerun_when_tests_fail_with_rerun_yes(self) -> None:
-        def mock_run_tests(unused_args: str) -> Tuple[str, int]:
-            return 'sample\noutput', 1
-
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(
-            run_acceptance_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]))
-
-        run_acceptance_tests.main(args=['--suite', 'testSuite'])
-
-    def test_no_rerun_when_tests_flake_with_rerun_no(self) -> None:
-        def mock_run_tests(unused_args: str) -> Tuple[str, int]:
-            return 'sample\noutput', 1
-
-        self.exit_stack.enter_context(self.swap(
-            run_acceptance_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_portserver', mock_managed_process))
-
-        run_acceptance_tests.main(args=['--suite', 'testSuite'])
-
-    def test_no_rerun_when_tests_flake_with_rerun_unknown(self) -> None:
-        def mock_run_tests(unused_args: str) -> Tuple[str, int]:
-            return 'sample\noutput', 1
-
-        self.exit_stack.enter_context(self.swap(
-            run_acceptance_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_portserver', mock_managed_process))
-
-        run_acceptance_tests.main(args=['--suite', 'testSuite'])
-
-    def test_no_reruns_off_ci_fail(self) -> None:
-        def mock_run_tests(unused_args: str) -> Tuple[str, int]:
-            return 'sample\noutput', 1
-
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(
-            run_acceptance_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]))
-
-        run_acceptance_tests.main(args=['--suite', 'testSuite'])
-
-    def test_no_reruns_off_ci_pass(self) -> None:
-        def mock_run_tests(unused_args: str) -> Tuple[str, int]:
-            return 'sample\noutput', 0
-
-        self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(
-            run_acceptance_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(0,)]))
-
-        run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_skip_build(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -378,7 +279,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             with self.swap(constants, 'EMULATOR_MODE', False):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
-    def test_start_tests_with_loop(self) -> None:
+    def test_start_tests_for_long_lived_process(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running', lambda *_: False))
         self.exit_stack.enter_context(self.swap_with_checks(
