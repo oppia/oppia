@@ -20,7 +20,6 @@ from __future__ import annotations
 import contextlib
 import subprocess
 import sys
-import time
 
 from core.constants import constants
 from core.tests import test_utils
@@ -30,7 +29,7 @@ from scripts import run_acceptance_tests
 from scripts import scripts_test_utils
 from scripts import servers
 
-from typing import ContextManager, Optional, Tuple
+from typing import ContextManager, Optional
 
 
 def mock_managed_long_lived_process(
