@@ -215,18 +215,6 @@ class QuestionSkillLinkHandler(
                                     'remove', 'add', 'update_difficulty'
                                 ]
                             }
-                        }, {
-                            'name': 'difficulty',
-                            'schema': {
-                                'type': 'float',
-                                'validators': [{
-                                    'id': 'is_at_least',
-                                    'min_value': 0
-                                }, {
-                                    'id': 'is_at_most',
-                                    'max_value': 1
-                                }]
-                            }
                         }]
                     }
                 }
