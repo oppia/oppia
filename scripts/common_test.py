@@ -1391,6 +1391,6 @@ class CommonTests(test_utils.GenericTestBase):
         with contextlib.ExitStack() as stack:
             stack.enter_context(self.swap_with_checks(
                 common, 'is_port_in_use',
-                lambda port: port == common.GAE_PORT_FOR_LOCAL_E2E_TESTING))
+                lambda port: port == common.GAE_PORT_FOR_E2E_TESTING))
 
             self.assertTrue(common.is_oppia_server_already_running())
