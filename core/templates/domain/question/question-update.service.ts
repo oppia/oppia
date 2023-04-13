@@ -112,8 +112,9 @@ export class QuestionUpdateService {
       question, QuestionDomainConstants.QUESTION_PROPERTY_LANGUAGE_CODE,
       newLanguageCode, oldLanguageCode,
       (changeDict: BackendChangeObject, question: Question) => {
-        let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setLanguageCode(languageCode);
+        const languageCode = this._getNewPropertyValueFromChangeDict(
+          changeDict);
+        question.setLanguageCode(languageCode as string);
       }, (changeDict: BackendChangeObject, question: Question) => {
         question.setLanguageCode(oldLanguageCode);
       });
