@@ -93,7 +93,7 @@ describe('ImageClickInputValidationService', () => {
           }]
         }
       },
-      altTest: {
+      altText: {
         value: 'test'
       },
       highlightRegionsOnHover: {
