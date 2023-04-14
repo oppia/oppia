@@ -81,13 +81,15 @@ oppia-learner-dashboard-page .oppia-svg-image {
 }
 
 .oppia-learner-dashboard-menu {
-  border-radius: 32px;
+  border: 2px solid white;
+  border-radius: 8px;
   cursor: pointer;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 18px;
+  line-height: 0.9;
   margin: 10px 0;
-  padding: 17px 20px 17px 20px;
-  background-color: #429488;
+  padding: 14px 20px;
+  
 }
 
 .oppia-learner-dashboard-menu:focus {
@@ -95,15 +97,14 @@ oppia-learner-dashboard-page .oppia-svg-image {
 }
 
 .oppia-learner-dashboard-section-active {
-  background-color: #429488 !important;
-  border-radius: 32px;
-  border: 1px solid #FFFFFF;
+  background-color: #fff !important;
+  color: rgb(40,53,147);
+  border-radius: 8px;
 
 }
 
 .oppia-learner-dashborad-menu-hover:hover {
-  border: 1px solid #FFFFFF;
-  border-radius: 32px;
+  border-radius: 8px;
 }
 
 .oppia-learner-dashboard-side-content {
