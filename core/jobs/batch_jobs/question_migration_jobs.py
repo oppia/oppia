@@ -89,8 +89,8 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
 
         Args:
             question_summary_id: str. The id of the question summary.
-            question_summary_model: QuestionSummaryModel. The question summary
-                model to update.
+            question_summary: QuestionSummary. The question summary
+                domain object.
 
         Returns:
             QuestionSummaryModel. The updated question summary model to put
@@ -205,7 +205,7 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
         Args:
             question: Question. The question domain object.
             question_summary_model: QuestionSummaryModel. The question model
-                to migrate
+                to migrate.
 
         Returns:
             Result((str, QuestionSummary), (str, Exception)). Result containing
