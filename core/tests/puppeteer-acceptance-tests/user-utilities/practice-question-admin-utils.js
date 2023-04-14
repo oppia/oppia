@@ -35,27 +35,30 @@ const LABEL_REMOVE_RIGHTS_BUTTON = 'Remove Rights';
 
 module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   /**
-   * Navigate to contributer dashboard
+   * Navigate to contributer dashboard.
    */
   async navigateToContributerDashboardPage() {
     await this.goto(contributerDashboardUrl);
   }
+
   /**
    * Function for adding submit question rights
    * @param {string} username - username of user to add rights too
    */
   async addSubmitQuestionRights(username) {
     await this.goto(contributerDashboardAdminUrl);
-    // Type in username
+    // Type in username.
     await this.type(
-      'e2e-test-add-reviewer-form.input#label-target-form-reviewer-username', username);
-    // Select submit question right
+      'e2e-test-add-reviewer-form.input#label-target-form-reviewer-username',
+      username);
+    // Select submit question right.
     await this.page.select(
       'select#label-target-form-review-category-select',
       LABEL_SUBMIT_QUESTION_RIGHT_BUTTON);
     await this.clickOn(addRightsButton);
     showMessage('Successfully added submit question rights');
   }
+
   /**
    * Function for adding review question rights
    * @param {string} username - username of user to add rights too
@@ -63,8 +66,9 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   async addReviewQuestionRights(username) {
     await this.goto(contributerDashboardAdminUrl);
     await this.type(
-      'e2e-test-add-reviewer-form.input#label-target-form-reviewer-username', username);
-    // Select form for correct question rights
+      'e2e-test-add-reviewer-form.input#label-target-form-reviewer-username',
+      username);
+    // Select form for correct question rights.
     await this.page.select(
       'select#label-target-form-review-category-select',
       LABEL_REVIEW_QUESTION_RIGHT_BUTTON);
@@ -80,7 +84,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   async removeSubmitQuestionRights(username) {
     await this.goto(contributerDashboardAdminUrl);
     await this.type(
-      'e2e-test-remove-reviewer-form.input#label-target-form-reviewer-username', username);
+      'e2e-test-remove-reviewer-form.input#label-target-form-reviewer-username',
+      username);
     await this.page.select(
       'select#label-target-form-review-category-select',
       LABEL_SUBMIT_QUESTION_RIGHT_BUTTON);
@@ -96,7 +101,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   async removeReviewQuestionRights(username) {
     await this.goto(contributerDashboardAdminUrl);
     await this.type(
-      'e2e-test-remove-reviewer-form.input#label-target-form-reviewer-username', username);
+      'e2e-test-remove-reviewer-form.input#label-target-form-reviewer-username',
+      username);
     await this.page.select(
       'select#label-target-form-review-category-select',
       LABEL_REVIEW_QUESTION_RIGHT_BUTTON);
@@ -106,7 +112,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   }
 
   /**
-  * This function navigates to the Review Questions tab in the contributer-dashbaord.
+  * This function navigates to the Review Questions tab 
+  * in the contributer-dashbaord.
   */
   async navigateToReviewQuestionsTab() {
     await this.goto(contributerDashboardUrl);
@@ -115,7 +122,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   }
 
   /**
-  * This function navigates to the Submit Questions tab in the blog-dashboard.
+  * This function navigates to the Submit Questions tab 
+  * in the blog-dashboard.
   */
   async navigateToSubmitQuestionsTab() {
     await this.goto(contributerDashboardUrl);
@@ -138,7 +146,7 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
 
     await this.page.evaluate(() => {
       tableElement = document.getElementsByClassName(`e2e-test-question-${role}`);
-      if (tableElement == 'Allowed') {
+      if (tableElement === 'Allowed') {
         return;
       }
       throw new Error(`User does not have the ${role} question right!`);
@@ -160,7 +168,7 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
 
     await this.page.evaluate(() => {
       tableElement = document.getElementsByClassName(`e2e-test-question-${role}`);
-      if (tableElement == 'Not-allowed') {
+      if (tableElement === 'Not-allowed') {
         return;
       }
       throw new Error(`User has the ${role} question right!`);
@@ -174,7 +182,16 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     const element = document.querySelector(
       '[aria-label="See opportunities for adding new questions."]');
 
-    const isInvisible = element.style.display === 'none' || element.style.visibility === 'hidden' || element.offsetParent === null;
+    const isInvisible = false;
+    if (element.style.display === 'none') {
+      isInvisible = true;
+    }
+    else if (element.style.visibility === 'hidden') {
+      isInvisible = true;
+    }
+    else if (element.offsetParent === null) {
+      isInvisible = true;
+    }
 
     if (!isInvisible) {
       throw new Error('The submit questions right has not been properly removed.');
@@ -185,14 +202,23 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
 
   async expectNoReviewQuestionTab() {
     const element = document.querySelector(
-      '.oppia-contributions-show-review-side-navbar-container')
+      '.oppia-contributions-show-review-side-navbar-container');
 
-    const isInvisible = element.style.display === 'none' || element.style.visibility === 'hidden' || element.offsetParent === null;
+    const isInvisible = false;
+    if (element.style.display === 'none') {
+      isInvisible = true;
+    }
+    else if (element.style.visibility === 'hidden') {
+      isInvisible = true;
+    }
+    else if (element.offsetParent === null) {
+      isInvisible = true;
+    }
 
     if (!isInvisible) {
       throw new Error('The review questions right has not been properly removed.');
     }
 
-    showMessage('User successfully cannot see Review Question Tab.')
+    showMessage('User successfully cannot see Review Question Tab.');
   }
-}
+};
