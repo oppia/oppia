@@ -159,13 +159,11 @@ jobs:
           ls -la oppia/third_party
         working-directory: /home/runner/work/oppia
         shell: bash
+      - uses: ./.github/actions/install-oppia-dependencies
       - name: Install chrome
         run: python -m scripts.install_chrome_for_ci
       - name: Install ffmpeg
         run: sudo apt install ffmpeg
-      - name: (Artifact re-build) Install Oppia Dependencies
-        if: steps.download_artifact_1.outcome == 'failure'
-        uses: ./.github/actions/install-oppia-dependencies
       - name: (Artifact re-build) Cache third_party/static
         if: steps.download_artifact_1.outcome == 'failure'
         uses: actions/cache@v3
