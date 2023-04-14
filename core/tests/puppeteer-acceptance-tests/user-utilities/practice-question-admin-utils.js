@@ -187,13 +187,9 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     isInvisible = false;
     if (element.style.display === 'none') {
       isInvisible = true;
-    }
-
-    else if (element.style.visibility === 'hidden') {
+    } else if (element.style.visibility === 'hidden') {
       isInvisible = true;
-    }
-
-    else if (element.offsetParent === null) {
+    } else if (element.offsetParent === null) {
       isInvisible = true;
     }
 
@@ -212,13 +208,9 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     isInvisible = false;
     if (element.style.display === 'none') {
       isInvisible = true;
-    }
-
-    else if (element.style.visibility === 'hidden') {
+    } else if (element.style.visibility === 'hidden') {
       isInvisible = true;
-    }
-
-    else if (element.offsetParent === null) {
+    } else if (element.offsetParent === null) {
       isInvisible = true;
     }
 
