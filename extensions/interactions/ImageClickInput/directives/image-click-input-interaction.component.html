@@ -52,6 +52,7 @@
 
   <div class="image-click-container" *ngIf="!isLoadingIndicatorShown && !isTryAgainShown">
     <img [src]="imageUrl"
+         [alt]="altText"
          class="oppia-image-click-img"
          (click)="onClickImage($event)"
          (mousemove)="onMousemoveImage($event)"

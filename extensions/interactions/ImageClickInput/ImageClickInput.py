@@ -60,6 +60,17 @@ class ImageClickInput(base.BaseInteraction):
         },
         'default_value': _image_and_regions_default_value,
     }, {
+        'name': 'altText',
+        'description': 'Alt text for this image',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'SubtitledUnicode'
+        },
+        'default_value': {
+            'content_id': None,
+            'unicode_str': ''
+        }
+    }, {
         'name': 'highlightRegionsOnHover',
         'description': 'Highlight regions when the learner hovers over them',
         'schema': {

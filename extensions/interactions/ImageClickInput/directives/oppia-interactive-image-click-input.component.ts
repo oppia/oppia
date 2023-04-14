@@ -55,9 +55,11 @@ interface ImagePoint {
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
   @Input() imageAndRegionsWithValue: string;
+  @Input() altTextWithValue: string;
   @Input() highlightRegionsOnHoverWithValue: string;
   @Input() lastAnswer: ImageClickAnswer;
   imageAndRegions: ImageWithRegions;
+  altText: string;
   highlightRegionsOnHover: boolean = false;
   componentSubscriptions = new Subscription();
   currentlyHoveredRegions: string[] = [];
@@ -91,6 +93,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   private _getAttrs() {
     return {
       imageAndRegionsWithValue: this.imageAndRegionsWithValue,
+      altTextWithValue: this.altTextWithValue,
       highlightRegionsOnHoverWithValue: this.highlightRegionsOnHoverWithValue
     };
   }
@@ -107,10 +110,12 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   ngOnInit(): void {
     const {
       imageAndRegions,
+      altText,
       highlightRegionsOnHover
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(
       'ImageClickInput', this._getAttrs()) as ImageClickInputCustomizationArgs;
     this.imageAndRegions = imageAndRegions.value;
+    this.altText = altText.value;
     this.highlightRegionsOnHover = highlightRegionsOnHover.value;
     this.componentSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(

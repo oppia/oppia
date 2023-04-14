@@ -218,6 +218,9 @@ export interface ImageClickInputCustomizationArgsBackendDict {
   imageAndRegions: {
     value: ImageWithRegions;
   };
+  altText: {
+    value: string;
+  };
   highlightRegionsOnHover: {
     value: boolean;
   };
@@ -225,6 +228,9 @@ export interface ImageClickInputCustomizationArgsBackendDict {
 export interface ImageClickInputCustomizationArgs {
   imageAndRegions: {
     value: ImageWithRegions;
+  };
+  altText: {
+    value: string;
   };
   highlightRegionsOnHover: {
     value: boolean;
