@@ -22,10 +22,13 @@ from core import feconf
 from core import utils
 from core.controllers import domain_objects_validator
 from core.domain import blog_services
+from core.domain import change_domain
+from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.tests import test_utils
 
-from typing import Dict, Optional, Union
+from typing import Dict, Mapping, Optional, Union
 
 
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
@@ -73,6 +76,35 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         }
         domain_objects_validator.validate_suggestion_change(
             correct_change_dict)
+
+    def test_correct_question_domain_object_do_not_raises_exception(
+            self
+        ) -> None:
+        content_id_generator: translation_domain.ContentIdGenerator = (
+                translation_domain.ContentIdGenerator())
+        question_dict: question_domain.QuestionDict = {
+            'question_state_data': self._create_valid_question_data(
+                'default_state', content_id_generator
+            ).to_dict(),
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION
+            ),
+            'linked_skill_ids': ['skill_1'],
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+            'next_content_id_index': (
+                content_id_generator.next_content_id_index),
+            'version': 44,
+            'id': '',
+        }
+        correct_change_dict: Mapping[str,
+            change_domain.AcceptableChangeDictTypes] = {
+            'cmd': 'create_new_fully_specified_question',
+            'question_dict': question_dict,
+            'skill_id': 'skill_123',
+            'skill_difficulty': 0.3
+        }
+        domain_objects_validator.validate_suggestion_change(correct_change_dict)
 
 
 class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
@@ -287,7 +319,7 @@ class ValidateEmailDashboardDataTests(test_utils.GenericTestBase):
             'created_collection': 6,
             'have_fun': 6,
             'explore': True,
-            }
+        }
         with self.assertRaisesRegex(Exception, '400 Invalid input for query.'):
             domain_objects_validator.validate_email_dashboard_data(data)
 
@@ -300,5 +332,26 @@ class ValidateEmailDashboardDataTests(test_utils.GenericTestBase):
             'edited_at_least_n_exps': True,
             'edited_fewer_than_n_exps': None,
             'created_collection': 7,
-            }
+        }
         domain_objects_validator.validate_email_dashboard_data(data)
+
+
+class ValidateSkillIdsTests(test_utils.GenericTestBase):
+    """Tests to validates validate skill ids"""
+
+    def test_invalid_skill_ids_raises_exception(self) -> None:
+        # The entire skill_ids string is invalid.
+        entirely_invalid_skill_ids: str = 'not_valid_skill_id_123'
+        with self.assertRaisesRegex(Exception, 'Invalid skill id'):
+            domain_objects_validator.validate_skill_ids(
+                    entirely_invalid_skill_ids)
+
+        # Only part of the skill_ids string is invalid.
+        partially_invalid_skill_ids: str = 'skillid12345,not_valid_skill_id_123'
+        with self.assertRaisesRegex(Exception, 'Invalid skill id'):
+            domain_objects_validator.validate_skill_ids(
+                    partially_invalid_skill_ids)
+
+    def test_valid_skill_ids_do_not_raise_exception(self) -> None:
+        valid_skill_ids: str = 'skillid12345'
+        domain_objects_validator.validate_skill_ids(valid_skill_ids)
