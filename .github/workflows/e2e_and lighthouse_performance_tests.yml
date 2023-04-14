@@ -134,12 +134,6 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-      - name: Install Oppia Dependencies
-        uses: ./.github/actions/install-oppia-dependencies
-      - name: Install chrome
-        run: python -m scripts.install_chrome_for_ci
-      - name: Install ffmpeg
-        run: sudo apt install ffmpeg
       - name: Attempt to download build files artifact
         id: download_artifact_1
         uses: actions/download-artifact@v3
@@ -147,6 +141,31 @@ jobs:
         with:
           name: build_files
           path: /home/runner/work/oppia/
+      - name: Unzip build files
+        if: steps.download_artifact_1.outcome != 'failure'
+        run: |
+          ls -la
+          unzip build_files.zip
+          rm build_files.zip
+          echo "Files in ./:"
+          ls -la .
+          echo "Files in oppia_tools:"
+          ls -la oppia_tools
+          echo "Files in oppia:"
+          ls -la oppia
+          echo "Files in build:"
+          ls -la oppia/build
+          echo "Files in third_party:"
+          ls -la oppia/third_party
+        working-directory: /home/runner/work/oppia
+        shell: bash
+      - name: Install chrome
+        run: python -m scripts.install_chrome_for_ci
+      - name: Install ffmpeg
+        run: sudo apt install ffmpeg
+      - name: (Artifact re-build) Install Oppia Dependencies
+        if: steps.download_artifact_1.outcome == 'failure'
+        uses: ./.github/actions/install-oppia-dependencies
       - name: (Artifact re-build) Cache third_party/static
         if: steps.download_artifact_1.outcome == 'failure'
         uses: actions/cache@v3
@@ -177,24 +196,6 @@ jobs:
       - name: (artifact re-build) Remove build_files.zip
         if: steps.download_artifact_1.outcome == 'failure'
         run: rm build_files.zip
-      - name: Unzip build files
-        if: steps.download_artifact_1.outcome != 'failure'
-        run: |
-          ls -la
-          unzip build_files.zip
-          rm build_files.zip
-          echo "Files in ./:"
-          ls -la .
-          echo "Files in oppia_tools:"
-          ls -la oppia_tools
-          echo "Files in oppia:"
-          ls -la oppia
-          echo "Files in build:"
-          ls -la oppia/build
-          echo "Files in third_party:"
-          ls -la oppia/third_party
-        working-directory: /home/runner/work/oppia
-        shell: bash
       - name: Run E2E Test ${{ matrix.suite }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite=${{ matrix.suite }} --prod_env
         env:
