@@ -188,15 +188,18 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     if (element.style.display === 'none') {
       isInvisible = true;
     }
+
     else if (element.style.visibility === 'hidden') {
       isInvisible = true;
     }
+
     else if (element.offsetParent === null) {
       isInvisible = true;
     }
 
     if (!isInvisible) {
-      throw new Error('The submit questions right has not been properly removed.');
+      throw new Error(
+        'The submit questions right has not been properly removed.');
     }
 
     showMessage('User successfully cannot see Submit Question Tab.');
@@ -210,9 +213,11 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     if (element.style.display === 'none') {
       isInvisible = true;
     }
+
     else if (element.style.visibility === 'hidden') {
       isInvisible = true;
     }
+
     else if (element.offsetParent === null) {
       isInvisible = true;
     }
