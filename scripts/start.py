@@ -38,7 +38,7 @@ from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from scripts import generate_sample_data # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
+# Test.
 _PARSER = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
