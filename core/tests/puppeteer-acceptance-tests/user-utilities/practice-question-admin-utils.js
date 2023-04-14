@@ -112,7 +112,7 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   }
 
   /**
-  * This function navigates to the Review Questions tab 
+  * This function navigates to the Review Questions tab
   * in the contributer-dashbaord.
   */
   async navigateToReviewQuestionsTab() {
@@ -122,7 +122,7 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
   }
 
   /**
-  * This function navigates to the Submit Questions tab 
+  * This function navigates to the Submit Questions tab
   * in the blog-dashboard.
   */
   async navigateToSubmitQuestionsTab() {
@@ -140,12 +140,13 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     await this.page.select(
       'select#label-target-view-reviewer-method',
       'By Username'
-    )
+    );
     await this.type('input#e2e-test-form-contributer-username', username);
     await this.clickOn('View Role');
 
     await this.page.evaluate(() => {
-      tableElement = document.getElementsByClassName(`e2e-test-question-${role}`);
+      tableElement = document.getElementsByClassName(
+        `e2e-test-question-${role}`);
       if (tableElement === 'Allowed') {
         return;
       }
@@ -162,12 +163,13 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     await this.page.select(
       'select#label-target-view-reviewer-method',
       'By Username'
-    )
+    );
     await this.type('input#e2e-test-form-contributer-username', username);
     await this.clickOn('View Role');
 
     await this.page.evaluate(() => {
-      tableElement = document.getElementsByClassName(`e2e-test-question-${role}`);
+      tableElement = document.getElementsByClassName(
+        `e2e-test-question-${role}`);
       if (tableElement === 'Not-allowed') {
         return;
       }
@@ -182,7 +184,7 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     const element = document.querySelector(
       '[aria-label="See opportunities for adding new questions."]');
 
-    const isInvisible = false;
+    isInvisible = false;
     if (element.style.display === 'none') {
       isInvisible = true;
     }
@@ -204,7 +206,7 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     const element = document.querySelector(
       '.oppia-contributions-show-review-side-navbar-container');
 
-    const isInvisible = false;
+    isInvisible = false;
     if (element.style.display === 'none') {
       isInvisible = true;
     }
@@ -216,7 +218,8 @@ module.exports = class e2ePracticeQuestionAdmin extends baseUser {
     }
 
     if (!isInvisible) {
-      throw new Error('The review questions right has not been properly removed.');
+      throw new Error(
+        'The review questions right has not been properly removed.');
     }
 
     showMessage('User successfully cannot see Review Question Tab.');

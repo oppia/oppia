@@ -49,7 +49,7 @@ describe('Practice Question Reviewer', function() {
       contribDashboardAdmin.expectUserToNotHaveRight(
         'Tester', 'reviewer');
 
-      // See if testerUser1 can access submit question tab 
+      // See if testerUser1 can access submit question tab
       // and review questions tab.
       testerUser1.expectNoSubmitQuestionTab();
       testerUser1.expectNoReviewQuestionTab();
