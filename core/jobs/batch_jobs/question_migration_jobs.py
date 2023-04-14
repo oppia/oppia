@@ -51,10 +51,11 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
     ) -> result.Result[Tuple[str, question_domain.QuestionSummary],
         Tuple[str, Exception]
     ]:
-        """Transform question summary model into question summary object.
+        """Transform question summary model into question summary object and
+        add a version field.
 
         Args:
-            question_summary_id: str. The id of the question summary.
+            question: Question. The question domain object.
             question_summary_model: QuestionSummaryModel. The question model
                 to migrate.
 
@@ -83,12 +84,11 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
         question_summary_id: str,
         question_summary: question_domain.QuestionSummary,
     ) -> question_models.QuestionSummaryModel:
-        """Adds version to get an updated question summary model.
+        """Provides a question summary model for the given question summary
+        object.
 
         Args:
-            question: Question. The question domain object.
-            question_summary: QuestionSummary. The question summary domain
-                object.
+            question_summary_id: str. The id of the question summary.
             question_summary_model: QuestionSummaryModel. The question summary
                 model to update.
 
@@ -199,12 +199,13 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
     ) -> result.Result[Tuple[str, question_domain.QuestionSummary],
         Tuple[str, Exception]
     ]:
-        """Transform question summary model into question summary object.
+        """Transform question summary model into question summary object and
+        add a version field.
 
         Args:
-            question_summary_id: str. The id of the question summary.
+            question: Question. The question domain object.
             question_summary_model: QuestionSummaryModel. The question model
-                to migrate.
+                to migrate
 
         Returns:
             Result((str, QuestionSummary), (str, Exception)). Result containing
