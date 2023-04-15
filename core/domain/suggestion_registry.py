@@ -1400,9 +1400,9 @@ class CommunityContributionStats:
 class TranslationContributionStatsDict(TypedDict):
     """Dictionary representing the TranslationContributionStats object."""
 
-    language_code: Optional[str]
-    contributor_user_id: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    contributor_user_id: str
+    topic_id: str
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -1418,8 +1418,8 @@ class TranslationContributionStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    language_code: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    topic_id: str
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -1436,9 +1436,9 @@ class TranslationContributionStats:
 
     def __init__(
         self,
-        language_code: Optional[str],
-        contributor_user_id: Optional[str],
-        topic_id: Optional[str],
+        language_code: str,
+        contributor_user_id: str,
+        topic_id: str,
         submitted_translations_count: int,
         submitted_translation_word_count: int,
         accepted_translations_count: int,
@@ -1461,32 +1461,6 @@ class TranslationContributionStats:
         self.rejected_translations_count = rejected_translations_count
         self.rejected_translation_word_count = rejected_translation_word_count
         self.contribution_dates = contribution_dates
-
-    @classmethod
-    def create_default(
-        cls,
-        language_code: Optional[str] = None,
-        contributor_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
-    ) -> TranslationContributionStats:
-        """Create default translation contribution stats.
-
-        Args:
-            language_code: str. The language code for which these stats
-                generated.
-            contributor_user_id: str. User ID of the contributor to which
-                these stats belong.
-            topic_id: str. ID of the topic for which the translations
-                were created.
-
-        Returns:
-            TranslationContributionStats. Default translation contribution
-            stats.
-        """
-        return cls(
-            language_code, contributor_user_id, topic_id,
-            0, 0, 0, 0, 0, 0, 0, set()
-        )
 
     def to_dict(self) -> TranslationContributionStatsDict:
         """Returns a dict representation of a TranslationContributionStats
@@ -1549,9 +1523,9 @@ class TranslationContributionStats:
 class TranslationReviewStatsDict(TypedDict):
     """Dictionary representing the TranslationReviewStats object."""
 
-    language_code: Optional[str]
-    contributor_user_id: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    contributor_user_id: str
+    topic_id: str
     reviewed_translations_count: int
     reviewed_translation_word_count: int
     accepted_translations_count: int
@@ -1566,8 +1540,8 @@ class TranslationReviewStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    language_code: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    topic_id: str
     reviewed_translations_count: int
     reviewed_translation_word_count: int
     accepted_translations_count: int
@@ -1582,9 +1556,9 @@ class TranslationReviewStats:
 
     def __init__(
         self,
-        language_code: Optional[str],
-        contributor_user_id: Optional[str],
-        topic_id: Optional[str],
+        language_code: str,
+        contributor_user_id: str,
+        topic_id: str,
         reviewed_translations_count: int,
         reviewed_translation_word_count: int,
         accepted_translations_count: int,
@@ -1605,32 +1579,6 @@ class TranslationReviewStats:
         )
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
-
-    @classmethod
-    def create_default(
-        cls,
-        language_code: Optional[str] = None,
-        reviewer_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
-    ) -> TranslationReviewStats:
-        """Create default translation review stats.
-
-        Args:
-            language_code: str. The language code for which these stats
-                generated.
-            reviewer_user_id: str. User ID of the reviewer to which
-                these stats belong.
-            topic_id: str. ID of the topic for which the translations
-                were created.
-
-        Returns:
-            TranslationContributionStats. Default translation contribution
-            stats.
-        """
-        return cls(
-            language_code, reviewer_user_id, topic_id,
-            0, 0, 0, 0, 0, datetime.datetime.now(), datetime.datetime.now()
-        )
 
     def to_dict(self) -> TranslationReviewStatsDict:
         """Returns a dict representation of a TranslationReviewStats
@@ -1685,8 +1633,8 @@ class TranslationReviewStats:
 class QuestionContributionStatsDict(TypedDict):
     """Dictionary representing the QuestionContributionStats object."""
 
-    contributor_user_id: Optional[str]
-    topic_id: Optional[str]
+    contributor_user_id: str
+    topic_id: str
     submitted_questions_count: int
     accepted_questions_count: int
     accepted_questions_without_reviewer_edits_count: int
@@ -1699,7 +1647,7 @@ class QuestionContributionStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    topic_id: Optional[str]
+    topic_id: str
     submitted_questions_count: int
     accepted_questions_count: int
     accepted_questions_without_reviewer_edits_count: int
@@ -1712,8 +1660,8 @@ class QuestionContributionStats:
 
     def __init__(
         self,
-        contributor_user_id: Optional[str],
-        topic_id: Optional[str],
+        contributor_user_id: str,
+        topic_id: str,
         submitted_questions_count: int,
         accepted_questions_count: int,
         accepted_questions_without_reviewer_edits_count: int,
@@ -1729,29 +1677,6 @@ class QuestionContributionStats:
         )
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
-
-    @classmethod
-    def create_default(
-        cls,
-        contributor_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
-    ) -> QuestionContributionStats:
-        """Create default question contribution stats.
-
-        Args:
-            contributor_user_id: str. User ID of the contributor to which
-                these stats belong.
-            topic_id: str. ID of the topic for which the translations
-                were created.
-
-        Returns:
-            QuestionContributionStats. Default question contribution
-            stats.
-        """
-        return cls(
-            contributor_user_id, topic_id,
-            0, 0, 0, datetime.datetime.now(), datetime.datetime.now()
-        )
 
     def to_dict(self) -> QuestionContributionStatsDict:
         """Returns a dict representation of a QuestionContributionStats
@@ -1799,8 +1724,8 @@ class QuestionContributionStats:
 class QuestionReviewStatsDict(TypedDict):
     """Dictionary representing the QuestionReviewStats object."""
 
-    contributor_user_id: Optional[str]
-    topic_id: Optional[str]
+    contributor_user_id: str
+    topic_id: str
     reviewed_questions_count: int
     accepted_questions_count: int
     accepted_questions_with_reviewer_edits_count: int
@@ -1813,7 +1738,7 @@ class QuestionReviewStatsFrontendDict(TypedDict):
     object for frontend.
     """
 
-    topic_id: Optional[str]
+    topic_id: str
     reviewed_questions_count: int
     accepted_questions_count: int
     accepted_questions_with_reviewer_edits_count: int
@@ -1826,8 +1751,8 @@ class QuestionReviewStats:
 
     def __init__(
         self,
-        contributor_user_id: Optional[str],
-        topic_id: Optional[str],
+        contributor_user_id: str,
+        topic_id: str,
         reviewed_questions_count: int,
         accepted_questions_count: int,
         accepted_questions_with_reviewer_edits_count: int,
@@ -1843,28 +1768,6 @@ class QuestionReviewStats:
         )
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
-
-    @classmethod
-    def create_default(
-        cls,
-        contributor_user_id: Optional[str] = None,
-        topic_id: Optional[str] = None
-    ) -> QuestionReviewStats:
-        """Create default question review stats.
-
-        Args:
-            contributor_user_id: str. User ID of the contributor to which
-                these stats belong.
-            topic_id: str. ID of the topic for which were
-                the questions created.
-
-        Returns:
-            QuestionReviewStats. Default question review stats.
-        """
-        return cls(
-            contributor_user_id, topic_id,
-            0, 0, 0, datetime.datetime.now(), datetime.datetime.now()
-        )
 
     def to_dict(self) -> QuestionReviewStatsDict:
         """Returns a dict representation of a QuestionContributionStats

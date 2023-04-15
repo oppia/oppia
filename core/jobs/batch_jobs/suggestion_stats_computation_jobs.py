@@ -245,8 +245,10 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack contribution result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
+            | 'Generate translation contribution stats objects' >> beam.MapTuple(
+                self._generate_translation_contribution_stats_objects)
             | 'Combine the contribution stats' >> (
-                beam.CombinePerKey(CombineTranslationContributionStats()))
+                beam.CombinePerKey(self._combine_translation_contribution_stats_objects))
             | 'Generate contribution models from stats' >> beam.MapTuple(
                 self._generate_translation_contribution_model)
         )
@@ -256,8 +258,11 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack review result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
+            | beam.Map(lambda x: print(f"Processing record {x}") or x)
+            | 'Generate translation review stats objects' >> beam.MapTuple(
+                self._generate_translation_review_stats_objects)
             | 'Combine the review stats' >> (
-                beam.CombinePerKey(CombineTranslationReviewStats()))
+                beam.CombinePerKey(self._combine_translation_review_stats_objects))
             | 'Generate review models from stats' >> beam.MapTuple(
                 self._generate_translation_review_model)
         )
@@ -267,8 +272,10 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack question contribution result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
+            | 'Generate question contribution stats objects' >> beam.MapTuple(
+                self._generate_question_contribution_stats_objects)
             | 'Combine the question contribution stats' >> (
-                beam.CombinePerKey(CombineQuestionContributionStats()))
+                beam.CombinePerKey(self._combine_question_contribution_stats_objects))
             | 'Generate question contribution models from stats' >> (
                 beam.MapTuple(self._generate_question_contribution_model))
         )
@@ -278,8 +285,10 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack question review result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
+            | 'Generate question review stats objects' >> beam.MapTuple(
+                self._generate_question_review_stats_objects)
             | 'Combine the question review stats' >> (
-                beam.CombinePerKey(CombineQuestionReviewStats()))
+                beam.CombinePerKey(self._combine_question_review_stats_objects))
             | 'Generate question review models from stats' >> beam.MapTuple(
                 self._generate_question_review_model)
         )
@@ -532,6 +541,220 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                     yield (key, result.Ok(question_stats_dict))
 
     @staticmethod
+    def _generate_translation_contribution_stats_objects(
+        entity_id: str,
+        stat: ContributionStatsDict
+    ) -> suggestion_registry.TranslationContributionStats:
+        language_code, contributor_user_id, topic_id = entity_id.split('.')
+        is_accepted = (
+            stat['suggestion_status'] ==
+            suggestion_models.STATUS_ACCEPTED
+        )
+        is_accepted_and_not_edited = (
+            is_accepted and not stat['edited_by_reviewer'])
+        is_rejected = (
+            stat['suggestion_status'] ==
+            suggestion_models.STATUS_REJECTED
+        )
+        word_count = stat['content_word_count']
+        suggestion_date = datetime.datetime.strptime(
+            str(stat['last_updated_date']), '%Y-%m-%d').date()
+        transformed_data = suggestion_registry.TranslationContributionStats(
+            language_code,
+            contributor_user_id,
+            topic_id,
+            1,
+            stat['content_word_count'],
+            int(is_accepted),
+            int(is_accepted_and_not_edited),
+            word_count * int(is_accepted),
+            int(is_rejected),
+            word_count * int(is_rejected),
+            {suggestion_date}
+        )
+
+        return (entity_id, transformed_data)
+
+    @staticmethod
+    def _combine_translation_contribution_stats_objects(
+        stats: Iterable[suggestion_registry.TranslationContributionStats]
+    ) -> suggestion_registry.TranslationContributionStats:
+        contribution_dates: Set[datetime.date] = set()
+        all_contribution_dates = [
+            acc.contribution_dates for acc in stats
+        ]
+        contribution_dates = contribution_dates.union(*all_contribution_dates)
+
+        return suggestion_registry.TranslationContributionStats(
+            list(stats)[0].language_code,
+            list(stats)[0].contributor_user_id,
+            list(stats)[0].topic_id,
+            sum(acc.submitted_translations_count for acc in stats),
+            sum(acc.submitted_translation_word_count for acc in stats),
+            sum(acc.accepted_translations_count for acc in stats),
+            sum(
+                acc.accepted_translations_without_reviewer_edits_count
+                for acc in stats
+            ),
+            sum(acc.accepted_translation_word_count for acc in stats),
+            sum(acc.rejected_translations_count for acc in stats),
+            sum(acc.rejected_translation_word_count for acc in stats),
+            contribution_dates
+        )
+
+    @staticmethod
+    def _generate_translation_review_stats_objects(
+        entity_id: str,
+        stat: ContributionStatsDict
+    ) -> suggestion_registry.TranslationReviewStats:
+        language_code, contributor_user_id, topic_id = entity_id.split('.')
+        is_accepted = (
+            stat['suggestion_status'] ==
+            suggestion_models.STATUS_ACCEPTED
+        )
+        is_accepted_and_edited = (
+            is_accepted and stat['edited_by_reviewer'])
+        
+        transformed_data = suggestion_registry.TranslationReviewStats(
+            language_code, contributor_user_id, topic_id, 1, stat['content_word_count'],
+            1 * is_accepted, stat['content_word_count'] * is_accepted,
+            1 * is_accepted_and_edited, stat['last_updated_date'], stat['last_updated_date']
+        )
+
+        return (entity_id, transformed_data)
+
+    @staticmethod
+    def _combine_translation_review_stats_objects(
+        stats: Iterable[suggestion_registry.TranslationReviewStats]
+    ) -> suggestion_registry.TranslationReviewStats:
+        all_first_contributed_dates = [
+            acc.first_contribution_date for acc in stats
+        ]
+        all_last_contributed_dates = [
+            acc.last_contribution_date for acc in stats
+        ]
+        all_first_contributed_dates.sort()
+        all_last_contributed_dates.sort()
+
+        return suggestion_registry.TranslationReviewStats(
+            list(stats)[0].language_code,
+            list(stats)[0].contributor_user_id,
+            list(stats)[0].topic_id,
+            sum(acc.reviewed_translations_count for acc in stats),
+            sum(acc.reviewed_translation_word_count for acc in stats),
+            sum(acc.accepted_translations_count for acc in stats),
+            sum(acc.accepted_translation_word_count for acc in stats),
+            sum(
+                acc.accepted_translations_with_reviewer_edits_count
+                for acc in stats
+            ),
+            all_first_contributed_dates[0],
+            all_last_contributed_dates[-1]
+        )
+
+    @staticmethod
+    def _generate_question_contribution_stats_objects(
+        entity_id: str,
+        stat: ContributionStatsDict
+    ) -> suggestion_registry.QuestionContributionStats:
+        contributor_user_id, topic_id = entity_id.split('.')
+        is_accepted = (
+            stat['suggestion_status'] ==
+            suggestion_models.STATUS_ACCEPTED
+        )
+        is_accepted_and_not_edited = (
+            is_accepted and not stat['edited_by_reviewer'])
+        
+        transformed_data = suggestion_registry.QuestionContributionStats(
+            contributor_user_id,
+            topic_id,
+            1,
+            int(is_accepted),
+            int(is_accepted_and_not_edited),
+            stat['last_updated_date'],
+            stat['last_updated_date']
+        )
+
+        return (entity_id, transformed_data)
+
+    @staticmethod
+    def _combine_question_contribution_stats_objects(
+        stats: Iterable[suggestion_registry.QuestionContributionStats]
+    ) -> suggestion_registry.QuestionContributionStats:
+        all_first_contributed_dates = [
+            acc.first_contribution_date for acc in stats
+        ]
+        all_last_contributed_dates = [
+            acc.last_contribution_date for acc in stats
+        ]
+        all_first_contributed_dates.sort()
+        all_last_contributed_dates.sort()
+
+        return suggestion_registry.QuestionContributionStats(
+            list(stats)[0].contributor_user_id,
+            list(stats)[0].topic_id,
+            sum(acc.submitted_questions_count for acc in stats),
+            sum(acc.accepted_questions_count for acc in stats),
+            sum(
+                acc.accepted_questions_without_reviewer_edits_count
+                for acc in stats
+            ),
+            all_first_contributed_dates[0],
+            all_last_contributed_dates[-1]
+        )
+
+    @staticmethod
+    def _generate_question_review_stats_objects(
+        entity_id: str,
+        stat: ContributionStatsDict
+    ) -> suggestion_registry.QuestionReviewStats:
+        contributor_user_id, topic_id = entity_id.split('.')
+        is_accepted = (
+            stat['suggestion_status'] ==
+            suggestion_models.STATUS_ACCEPTED
+        )
+        is_accepted_and_edited = (
+            is_accepted and stat['edited_by_reviewer'])
+        
+        transformed_data = suggestion_registry.QuestionReviewStats(
+            contributor_user_id,
+            topic_id,
+            1,
+            int(is_accepted),
+            int(is_accepted_and_edited),
+            stat['last_updated_date'],
+            stat['last_updated_date']
+        )
+
+        return (entity_id, transformed_data)
+
+    @staticmethod
+    def _combine_question_review_stats_objects(
+        stats: Iterable[suggestion_registry.QuestionReviewStats]
+    ) -> suggestion_registry.QuestionReviewStats:
+        all_first_contributed_dates = [
+            acc.first_contribution_date for acc in stats
+        ]
+        all_last_contributed_dates = [
+            acc.last_contribution_date for acc in stats
+        ]
+        all_first_contributed_dates.sort()
+        all_last_contributed_dates.sort()
+
+        return suggestion_registry.QuestionReviewStats(
+            list(stats)[0].contributor_user_id,
+            list(stats)[0].topic_id,
+            sum(acc.reviewed_questions_count for acc in stats),
+            sum(acc.accepted_questions_count for acc in stats),
+            sum(
+                acc.accepted_questions_with_reviewer_edits_count
+                for acc in stats
+            ),
+            all_first_contributed_dates[0],
+            all_last_contributed_dates[-1]
+        )
+
+    @staticmethod
     def _generate_translation_contribution_model(
         entity_id: str,
         translation: suggestion_registry.TranslationContributionStats
@@ -684,301 +907,3 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             )
             question_review_stats_model.update_timestamps()
             return question_review_stats_model
-
-
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to assume
-# that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
-# subclass 'CombineFn' (has type 'Any')), we added an ignore here.
-class CombineTranslationContributionStats(beam.CombineFn):  # type: ignore[misc]
-    """CombineFn for combining the translation contribution stats."""
-
-    def create_accumulator(
-        self
-    ) -> suggestion_registry.TranslationContributionStats:
-        return suggestion_registry.TranslationContributionStats.create_default()
-
-    def add_input(
-        self,
-        accumulator: suggestion_registry.TranslationContributionStats,
-        translation: ContributionStatsDict
-    ) -> suggestion_registry.TranslationContributionStats:
-        is_accepted = (
-            translation['suggestion_status'] ==
-            suggestion_models.STATUS_ACCEPTED
-        )
-        is_accepted_and_not_edited = (
-            is_accepted and not translation['edited_by_reviewer'])
-        is_rejected = (
-            translation['suggestion_status'] ==
-            suggestion_models.STATUS_REJECTED
-        )
-        word_count = translation['content_word_count']
-        suggestion_date = datetime.datetime.strptime(
-            str(translation['last_updated_date']), '%Y-%m-%d').date()
-        return suggestion_registry.TranslationContributionStats(
-            accumulator.language_code,
-            accumulator.contributor_user_id,
-            accumulator.topic_id,
-            accumulator.submitted_translations_count + 1,
-            accumulator.submitted_translation_word_count + word_count,
-            accumulator.accepted_translations_count + int(is_accepted),
-            (
-                accumulator.accepted_translations_without_reviewer_edits_count +
-                int(is_accepted_and_not_edited)
-            ),
-            (
-                accumulator.accepted_translation_word_count +
-                word_count * int(is_accepted)
-            ),
-            accumulator.rejected_translations_count + int(is_rejected),
-            (
-                accumulator.rejected_translation_word_count +
-                word_count * int(is_rejected)
-            ),
-            accumulator.contribution_dates | {suggestion_date}
-        )
-
-    def merge_accumulators(
-        self,
-        accumulators: Iterable[suggestion_registry.TranslationContributionStats]
-    ) -> suggestion_registry.TranslationContributionStats:
-        contribution_dates: Set[datetime.date] = set()
-        all_contribution_dates = [
-            acc.contribution_dates for acc in accumulators
-        ]
-        contribution_dates = contribution_dates.union(*all_contribution_dates)
-
-        return suggestion_registry.TranslationContributionStats(
-            list(accumulators)[0].language_code,
-            list(accumulators)[0].contributor_user_id,
-            list(accumulators)[0].topic_id,
-            sum(acc.submitted_translations_count for acc in accumulators),
-            sum(acc.submitted_translation_word_count for acc in accumulators),
-            sum(acc.accepted_translations_count for acc in accumulators),
-            sum(
-                acc.accepted_translations_without_reviewer_edits_count
-                for acc in accumulators
-            ),
-            sum(acc.accepted_translation_word_count for acc in accumulators),
-            sum(acc.rejected_translations_count for acc in accumulators),
-            sum(acc.rejected_translation_word_count for acc in accumulators),
-            contribution_dates
-        )
-
-    def extract_output(
-        self, accumulator: suggestion_registry.TranslationContributionStats
-    ) -> suggestion_registry.TranslationContributionStats:
-        return accumulator
-
-
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to assume
-# that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
-# subclass 'CombineFn' (has type 'Any')), we added an ignore here.
-class CombineTranslationReviewStats(beam.CombineFn):  # type: ignore[misc]
-    """CombineFn for combining the translation review stats."""
-
-    def create_accumulator(
-        self
-    ) -> suggestion_registry.TranslationReviewStats:
-        return suggestion_registry.TranslationReviewStats.create_default()
-
-    def add_input(
-        self,
-        accumulator: suggestion_registry.TranslationReviewStats,
-        translation: ContributionStatsDict
-    ) -> suggestion_registry.TranslationReviewStats:
-        is_accepted = (
-            translation['suggestion_status'] ==
-            suggestion_models.STATUS_ACCEPTED
-        )
-        is_accepted_and_edited = (
-            is_accepted and translation['edited_by_reviewer'])
-        word_count = translation['content_word_count']
-        return suggestion_registry.TranslationReviewStats(
-            accumulator.language_code,
-            accumulator.contributor_user_id,
-            accumulator.topic_id,
-            accumulator.reviewed_translations_count + 1,
-            accumulator.reviewed_translation_word_count + word_count,
-            accumulator.accepted_translations_count + int(is_accepted),
-            accumulator.accepted_translation_word_count + word_count * int(
-                is_accepted),
-            (
-                accumulator.accepted_translations_with_reviewer_edits_count +
-                int(is_accepted_and_edited)
-            ),
-            translation['last_updated_date'],
-            translation['last_updated_date']
-        )
-
-    def merge_accumulators(
-        self,
-        accumulators: Iterable[suggestion_registry.TranslationReviewStats]
-    ) -> suggestion_registry.TranslationReviewStats:
-        all_first_contributed_dates = [
-            acc.first_contribution_date for acc in accumulators
-        ]
-        all_last_contributed_dates = [
-            acc.last_contribution_date for acc in accumulators
-        ]
-        all_first_contributed_dates.sort()
-        all_last_contributed_dates.sort()
-
-        return suggestion_registry.TranslationReviewStats(
-            list(accumulators)[0].language_code,
-            list(accumulators)[0].contributor_user_id,
-            list(accumulators)[0].topic_id,
-            sum(acc.reviewed_translations_count for acc in accumulators),
-            sum(acc.reviewed_translation_word_count for acc in accumulators),
-            sum(acc.accepted_translations_count for acc in accumulators),
-            sum(acc.accepted_translation_word_count for acc in accumulators),
-            sum(
-                acc.accepted_translations_with_reviewer_edits_count
-                for acc in accumulators
-            ),
-            all_first_contributed_dates[0],
-            all_last_contributed_dates[-1]
-        )
-
-    def extract_output(
-        self, accumulator: suggestion_registry.TranslationContributionStats
-    ) -> suggestion_registry.TranslationContributionStats:
-        return accumulator
-
-
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to assume
-# that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
-# subclass 'CombineFn' (has type 'Any')), we added an ignore here.
-class CombineQuestionContributionStats(beam.CombineFn):  # type: ignore[misc]
-    """CombineFn for combining the question contribution stats."""
-
-    def create_accumulator(
-        self
-    ) -> suggestion_registry.QuestionContributionStats:
-        return suggestion_registry.QuestionContributionStats.create_default()
-
-    def add_input(
-        self,
-        accumulator: suggestion_registry.QuestionContributionStats,
-        question: ContributionStatsDict
-    ) -> suggestion_registry.QuestionContributionStats:
-        is_accepted = (
-            question['suggestion_status'] ==
-            suggestion_models.STATUS_ACCEPTED
-        )
-        is_accepted_and_not_edited = (
-            is_accepted and not question['edited_by_reviewer'])
-        return suggestion_registry.QuestionContributionStats(
-            accumulator.contributor_user_id,
-            accumulator.topic_id,
-            accumulator.submitted_questions_count + 1,
-            accumulator.accepted_questions_count + int(is_accepted),
-            (
-                accumulator.accepted_questions_without_reviewer_edits_count +
-                int(is_accepted_and_not_edited)
-            ),
-            question['last_updated_date'],
-            question['last_updated_date']
-        )
-
-    def merge_accumulators(
-        self,
-        accumulators: Iterable[suggestion_registry.QuestionContributionStats]
-    ) -> suggestion_registry.QuestionContributionStats:
-        all_first_contributed_dates = [
-            acc.first_contribution_date for acc in accumulators
-        ]
-        all_last_contributed_dates = [
-            acc.last_contribution_date for acc in accumulators
-        ]
-        all_first_contributed_dates.sort()
-        all_last_contributed_dates.sort()
-
-        return suggestion_registry.QuestionContributionStats(
-            list(accumulators)[0].contributor_user_id,
-            list(accumulators)[0].topic_id,
-            sum(acc.submitted_questions_count for acc in accumulators),
-            sum(acc.accepted_questions_count for acc in accumulators),
-            sum(
-                acc.accepted_questions_without_reviewer_edits_count
-                for acc in accumulators
-            ),
-            all_first_contributed_dates[0],
-            all_last_contributed_dates[-1]
-        )
-
-    def extract_output(
-        self, accumulator: suggestion_registry.QuestionContributionStats
-    ) -> suggestion_registry.QuestionContributionStats:
-        return accumulator
-
-
-# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
-# apache_beam library and absences of stubs in Typeshed, forces MyPy to assume
-# that CombineFn class is of type Any. Thus to avoid MyPy's error (Class cannot
-# subclass 'CombineFn' (has type 'Any')), we added an ignore here.
-class CombineQuestionReviewStats(beam.CombineFn):  # type: ignore[misc]
-    """CombineFn for combining the question review stats."""
-
-    def create_accumulator(
-        self
-    ) -> suggestion_registry.QuestionReviewStats:
-        return suggestion_registry.QuestionReviewStats.create_default()
-
-    def add_input(
-        self,
-        accumulator: suggestion_registry.QuestionReviewStats,
-        question: ContributionStatsDict
-    ) -> suggestion_registry.QuestionReviewStats:
-        is_accepted = (
-            question['suggestion_status'] ==
-            suggestion_models.STATUS_ACCEPTED
-        )
-        is_accepted_and_edited = (
-            is_accepted and question['edited_by_reviewer'])
-        return suggestion_registry.QuestionReviewStats(
-            accumulator.contributor_user_id,
-            accumulator.topic_id,
-            accumulator.reviewed_questions_count + 1,
-            accumulator.accepted_questions_count + int(is_accepted),
-            (
-                accumulator.accepted_questions_with_reviewer_edits_count +
-                int(is_accepted_and_edited)
-            ),
-            question['last_updated_date'],
-            question['last_updated_date']
-        )
-
-    def merge_accumulators(
-        self,
-        accumulators: Iterable[suggestion_registry.QuestionReviewStats]
-    ) -> suggestion_registry.QuestionReviewStats:
-        all_first_contributed_dates = [
-            acc.first_contribution_date for acc in accumulators
-        ]
-        all_last_contributed_dates = [
-            acc.last_contribution_date for acc in accumulators
-        ]
-        all_first_contributed_dates.sort()
-        all_last_contributed_dates.sort()
-
-        return suggestion_registry.QuestionReviewStats(
-            list(accumulators)[0].contributor_user_id,
-            list(accumulators)[0].topic_id,
-            sum(acc.reviewed_questions_count for acc in accumulators),
-            sum(acc.accepted_questions_count for acc in accumulators),
-            sum(
-                acc.accepted_questions_with_reviewer_edits_count
-                for acc in accumulators
-            ),
-            all_first_contributed_dates[0],
-            all_last_contributed_dates[-1]
-        )
-
-    def extract_output(
-        self, accumulator: suggestion_registry.QuestionReviewStats
-    ) -> suggestion_registry.QuestionReviewStats:
-        return accumulator

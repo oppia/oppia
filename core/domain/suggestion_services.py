@@ -2277,20 +2277,9 @@ def _update_translation_contribution_stats_models(
     Args:
         translation_contribution_stats: list(TranslationContributionStats).
             A list of TranslationContributionStats domain objects.
-
-    Raises:
-        Exception. Language is None.
-        Exception. Contributor user ID is None.
-        Exception. Topic ID is None.
     """
     stats_dict = {}
     for stat in translation_contribution_stats:
-        if stat.language_code is None:
-            raise Exception('Language code should not be None.')
-        if stat.contributor_user_id is None:
-            raise Exception('Contributor user ID should not be None.')
-        if stat.topic_id is None:
-            raise Exception('Topic ID should not be None.')
         stat_id = (
             suggestion_models.TranslationContributionStatsModel.construct_id(
                 stat.language_code,
@@ -2341,20 +2330,9 @@ def _update_translation_review_stats_models(
     Args:
         translation_review_stats: list(TranslationReviewStats). A list of
             TranslationReviewStats domain objects.
-
-    Raises:
-        Exception. Language is None.
-        Exception. Contributor user ID is None.
-        Exception. Topic ID is None.
     """
     stats_dict = {}
     for stat in translation_review_stats:
-        if stat.language_code is None:
-            raise Exception('Language code should not be None.')
-        if stat.contributor_user_id is None:
-            raise Exception('Contributor user ID should not be None.')
-        if stat.topic_id is None:
-            raise Exception('Topic ID should not be None.')
         stat_id = suggestion_models.TranslationReviewStatsModel.construct_id(
             stat.language_code, stat.contributor_user_id, stat.topic_id)
         stats_dict[stat_id] = stat
@@ -2400,17 +2378,9 @@ def _update_question_contribution_stats_models(
     Args:
         question_contribution_stats: list(QuestionContributionStats). A list of
             QuestionContribution domain objects.
-
-    Raises:
-        Exception. Contributor user ID is None.
-        Exception. Topic ID is None.
     """
     stats_dict = {}
     for stat in question_contribution_stats:
-        if stat.contributor_user_id is None:
-            raise Exception('Contributor user ID should not be None.')
-        if stat.topic_id is None:
-            raise Exception('Topic ID should not be None.')
         stat_id = suggestion_models.QuestionContributionStatsModel.construct_id(
             stat.contributor_user_id, stat.topic_id)
         stats_dict[stat_id] = stat
@@ -2450,17 +2420,9 @@ def _update_question_review_stats_models(
     Args:
         question_review_stats: list(QuestionReviewStats). A list of
             QuestionReviewStats domain objects.
-
-    Raises:
-        Exception. Contributor user ID is None.
-        Exception. Topic ID is None.
     """
     stats_dict = {}
     for stat in question_review_stats:
-        if stat.contributor_user_id is None:
-            raise Exception('Contributor user ID should not be None.')
-        if stat.topic_id is None:
-            raise Exception('Topic ID should not be None.')
         stat_id = suggestion_models.QuestionReviewStatsModel.construct_id(
             stat.contributor_user_id, stat.topic_id)
         stats_dict[stat_id] = stat
