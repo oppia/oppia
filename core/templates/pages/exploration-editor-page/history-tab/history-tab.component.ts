@@ -465,7 +465,16 @@ export class HistoryTabComponent
 
     this.versionChoices = [10, 15, 20];
   }
-
+  
+  isDropdownVisible = false;
+  moreActionButton(event: KeyboardEvent, dropdownButton: HTMLElement) {
+    if (event.key === 'Enter') { // enter key
+      const dropdownButtonId = dropdownButton.id;
+      const index = dropdownButtonId.substring(dropdownButtonId.lastIndexOf("-") + 1);
+      const dropdownMenuButton = document.getElementById(`dropdownMenuButton-${index}`);
+      dropdownMenuButton?.click();
+    }
+  }
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
