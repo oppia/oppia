@@ -465,7 +465,8 @@ export class HistoryTabComponent
 
     this.versionChoices = [10, 15, 20];
   }
-  isDropdownVisible = false;
+  
+  //isDropdownVisible = false;
 
   moreActionButton(event: KeyboardEvent, dropdownButton: HTMLElement): void {
     if (event.key === 'Enter') {
