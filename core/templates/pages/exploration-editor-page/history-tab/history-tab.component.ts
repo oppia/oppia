@@ -466,7 +466,7 @@ export class HistoryTabComponent
     this.versionChoices = [10, 15, 20];
   }
 
-  // Add a blank line here.
+  // More option button Functionality.
   isDropdownVisible = false;
 
   moreActionButton(event: KeyboardEvent, dropdownButton: HTMLElement): void {
