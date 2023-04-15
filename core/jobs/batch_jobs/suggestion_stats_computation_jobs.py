@@ -245,10 +245,14 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack contribution result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
-            | 'Generate translation contribution stats objects' >> beam.MapTuple(
-                self._generate_translation_contribution_stats_objects)
+            | 'Generate translation contribution stats objects' >> (
+                beam.MapTuple(
+                    self._generate_translation_contribution_stats_objects
+                )
+            )
             | 'Combine the contribution stats' >> (
-                beam.CombinePerKey(self._combine_translation_contribution_stats_objects))
+                beam.CombinePerKey(
+                    self._combine_translation_contribution_stats_objects))
             | 'Generate contribution models from stats' >> beam.MapTuple(
                 self._generate_translation_contribution_model)
         )
@@ -258,11 +262,11 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 lambda key_and_result: key_and_result[1].is_ok())
             | 'Unpack review result' >> beam.MapTuple(
                 lambda key, result: (key, result.unwrap()))
-            | beam.Map(lambda x: print(f"Processing record {x}") or x)
             | 'Generate translation review stats objects' >> beam.MapTuple(
                 self._generate_translation_review_stats_objects)
             | 'Combine the review stats' >> (
-                beam.CombinePerKey(self._combine_translation_review_stats_objects))
+                beam.CombinePerKey(
+                    self._combine_translation_review_stats_objects))
             | 'Generate review models from stats' >> beam.MapTuple(
                 self._generate_translation_review_model)
         )
@@ -275,7 +279,8 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             | 'Generate question contribution stats objects' >> beam.MapTuple(
                 self._generate_question_contribution_stats_objects)
             | 'Combine the question contribution stats' >> (
-                beam.CombinePerKey(self._combine_question_contribution_stats_objects))
+                beam.CombinePerKey(
+                    self._combine_question_contribution_stats_objects))
             | 'Generate question contribution models from stats' >> (
                 beam.MapTuple(self._generate_question_contribution_model))
         )
@@ -544,7 +549,18 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     def _generate_translation_contribution_stats_objects(
         entity_id: str,
         stat: ContributionStatsDict
-    ) -> suggestion_registry.TranslationContributionStats:
+    ) -> Tuple[str, suggestion_registry.TranslationContributionStats]:
+        """Generates translation contribution stats for each suggestion.
+
+        Args:
+            entity_id: str. The ID of the conrresponding stats model.
+            stat: ContributionStatsDict. The skill ID which the suggestion is
+                created for.
+
+        Returns:
+            tuple(str, TranslationContributionStats). Tuple of key and
+            suggestion stats object.
+        """
         language_code, contributor_user_id, topic_id = entity_id.split('.')
         is_accepted = (
             stat['suggestion_status'] ==
@@ -579,6 +595,15 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     def _combine_translation_contribution_stats_objects(
         stats: Iterable[suggestion_registry.TranslationContributionStats]
     ) -> suggestion_registry.TranslationContributionStats:
+        """Combines translation contribution stats.
+
+        Args:
+            stats: iterable(TranslationContributionStats). A collection of
+                individual stats domain objects.
+
+        Returns:
+            TranslationContributionStats. The combined domain object.
+        """
         contribution_dates: Set[datetime.date] = set()
         all_contribution_dates = [
             acc.contribution_dates for acc in stats
@@ -606,7 +631,18 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     def _generate_translation_review_stats_objects(
         entity_id: str,
         stat: ContributionStatsDict
-    ) -> suggestion_registry.TranslationReviewStats:
+    ) -> Tuple[str, suggestion_registry.TranslationReviewStats]:
+        """Generates translation review stats for each suggestion.
+
+        Args:
+            entity_id: str. The ID of the conrresponding stats model.
+            stat: ContributionStatsDict. The skill ID which the suggestion is
+                created for.
+
+        Returns:
+            tuple(str, TranslationReviewStats). Tuple of key and suggestion
+            stats object.
+        """
         language_code, contributor_user_id, topic_id = entity_id.split('.')
         is_accepted = (
             stat['suggestion_status'] ==
@@ -614,11 +650,13 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         )
         is_accepted_and_edited = (
             is_accepted and stat['edited_by_reviewer'])
-        
+
         transformed_data = suggestion_registry.TranslationReviewStats(
-            language_code, contributor_user_id, topic_id, 1, stat['content_word_count'],
+            language_code, contributor_user_id, topic_id, 1,
+            stat['content_word_count'],
             1 * is_accepted, stat['content_word_count'] * is_accepted,
-            1 * is_accepted_and_edited, stat['last_updated_date'], stat['last_updated_date']
+            1 * is_accepted_and_edited, stat['last_updated_date'],
+            stat['last_updated_date']
         )
 
         return (entity_id, transformed_data)
@@ -627,6 +665,15 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     def _combine_translation_review_stats_objects(
         stats: Iterable[suggestion_registry.TranslationReviewStats]
     ) -> suggestion_registry.TranslationReviewStats:
+        """Combines translation review stats.
+
+        Args:
+            stats: iterable(TranslationReviewStats). A collection of
+                individual stats domain objects.
+
+        Returns:
+            TranslationReviewStats. The combined domain object.
+        """
         all_first_contributed_dates = [
             acc.first_contribution_date for acc in stats
         ]
@@ -656,7 +703,18 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     def _generate_question_contribution_stats_objects(
         entity_id: str,
         stat: ContributionStatsDict
-    ) -> suggestion_registry.QuestionContributionStats:
+    ) -> Tuple[str, suggestion_registry.QuestionContributionStats]:
+        """Generates question contribution stats for each suggestion.
+
+        Args:
+            entity_id: str. The ID of the conrresponding stats model.
+            stat: ContributionStatsDict. The skill ID which the suggestion is
+                created for.
+
+        Returns:
+            tuple(str, QuestionContributionStats). Tuple of key and suggestion
+            stats object.
+        """
         contributor_user_id, topic_id = entity_id.split('.')
         is_accepted = (
             stat['suggestion_status'] ==
@@ -664,7 +722,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         )
         is_accepted_and_not_edited = (
             is_accepted and not stat['edited_by_reviewer'])
-        
+
         transformed_data = suggestion_registry.QuestionContributionStats(
             contributor_user_id,
             topic_id,
@@ -681,6 +739,15 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     def _combine_question_contribution_stats_objects(
         stats: Iterable[suggestion_registry.QuestionContributionStats]
     ) -> suggestion_registry.QuestionContributionStats:
+        """Combines question contribution stats.
+
+        Args:
+            stats: iterable(QuestionContributionStats). A collection of
+                individual stats domain objects.
+
+        Returns:
+            QuestionContributionStats. The combined domain object.
+        """
         all_first_contributed_dates = [
             acc.first_contribution_date for acc in stats
         ]
@@ -707,7 +774,18 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     def _generate_question_review_stats_objects(
         entity_id: str,
         stat: ContributionStatsDict
-    ) -> suggestion_registry.QuestionReviewStats:
+    ) -> Tuple[str, suggestion_registry.QuestionReviewStats]:
+        """Generates question review stats for each suggestion.
+
+        Args:
+            entity_id: str. The ID of the conrresponding stats model.
+            stat: ContributionStatsDict. The skill ID which the suggestion is
+                created for.
+
+        Returns:
+            tuple(str, QuestionReviewStats). Tuple of key and suggestion
+            stats object.
+        """
         contributor_user_id, topic_id = entity_id.split('.')
         is_accepted = (
             stat['suggestion_status'] ==
@@ -715,7 +793,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         )
         is_accepted_and_edited = (
             is_accepted and stat['edited_by_reviewer'])
-        
+
         transformed_data = suggestion_registry.QuestionReviewStats(
             contributor_user_id,
             topic_id,
@@ -732,6 +810,15 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
     def _combine_question_review_stats_objects(
         stats: Iterable[suggestion_registry.QuestionReviewStats]
     ) -> suggestion_registry.QuestionReviewStats:
+        """Combines question review stats.
+
+        Args:
+            stats: iterable(QuestionReviewStats). A collection of individual
+                stats domain objects.
+
+        Returns:
+            QuestionReviewStats. The combined domain object.
+        """
         all_first_contributed_dates = [
             acc.first_contribution_date for acc in stats
         ]
