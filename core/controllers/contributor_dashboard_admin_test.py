@@ -709,7 +709,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
         self.login(self.CONTRIBUTOR_EMAIL)
         stats_dict_without_topic_id = [
             suggestion_registry.TranslationContributionStats(
-                'es', self.CONTRIBUTOR_USERNAME, None, 2, 100, 1, 0, 50, 0, 0,
+                'es', self.CONTRIBUTOR_USERNAME, 'None', 2, 100, 1, 0, 50, 0, 0,
                 {
                     datetime.date.fromtimestamp(1616173836),
                     datetime.date.fromtimestamp(1616173837)
@@ -737,8 +737,8 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
 
         stats_dict_without_language_code = [
             suggestion_registry.TranslationContributionStats(
-                None, self.CONTRIBUTOR_USERNAME, 'topic_id_1', 2, 100, 1, 0, 50,
-                0, 0,
+                'None', self.CONTRIBUTOR_USERNAME, 'topic_id_1', 2, 100,
+                1, 0, 50, 0, 0,
                 {
                     datetime.date.fromtimestamp(1616173836),
                     datetime.date.fromtimestamp(1616173837)

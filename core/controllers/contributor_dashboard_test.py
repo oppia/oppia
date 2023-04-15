@@ -1854,7 +1854,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 user_id
             )
         )
-        corrupt_stats[0].topic_id = None
+        corrupt_stats[0].topic_id = 'None'
 
         swap_with_corrupt_data = self.swap_to_always_return(
             suggestion_services,
