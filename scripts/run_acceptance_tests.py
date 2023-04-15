@@ -65,7 +65,10 @@ _PARSER.add_argument(
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running():
-        sys.exit(1)
+        sys.exit("""
+        Oppia server is already running. Try shutting all the servers down
+        before running the script.
+        """)
 
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
