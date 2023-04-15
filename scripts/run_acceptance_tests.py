@@ -48,7 +48,7 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--suite', required=True,
-    help='Performs test for different suites'
+    help='Specifies the test suite to run. '
          'For performing a full test, no argument is required.')
 _PARSER.add_argument(
     '--server_log_level',
@@ -86,7 +86,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
-            port=common.GAE_PORT_FOR_LOCAL_E2E_TESTING,
+            port=common.GAE_PORT_FOR_E2E_TESTING,
             log_level=args.server_log_level,
             # Automatic restart can be disabled since we don't expect code
             # changes to happen while the acceptance tests are running.
