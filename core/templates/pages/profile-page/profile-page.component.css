@@ -101,20 +101,6 @@
   width: 90%;
 }
 
-.oppia-profile-username-large-screen {
-  display: block;
-  font-size: 130%;
-  margin-top: 20px;
-  text-align: center;
-}
-
-.oppia-profile-username-small-screen {
-  display: none;
-  font-size: 110%;
-  margin-top: 20px;
-  max-width: 30px;
-  text-align: left;
-}
 
 .oppia-profile-first-contributed {
   display: block;
@@ -251,12 +237,6 @@
     display: inline-block;
     float: left;
     margin-right: 20px;
-  }
-  .oppia-profile-username-large-screen {
-    display: none;
-  }
-  .oppia-profile-username-small-screen {
-    display: inline-block;
   }
   .oppia-profile-first-contributed {
     font-size: .6em;
