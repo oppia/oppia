@@ -467,7 +467,7 @@ export class HistoryTabComponent
   }
   isDropdownVisible = false;
 
-  moreActionButton(event: KeyboardEvent, dropdownButton: HTMLElement) {
+  moreActionButton(event: KeyboardEvent, dropdownButton: HTMLElement): void {
     if (event.key === 'Enter') {
       const dropdownButtonId = dropdownButton.id;
       const index = dropdownButtonId.substring(
@@ -477,7 +477,7 @@ export class HistoryTabComponent
       dropdownMenuButton?.click();
     }
   }
-  
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
