@@ -49,7 +49,7 @@ def mock_managed_long_lived_process(
         stub.poll_count += 1
         if stub.poll_count >= 10:
             stub.alive = False
-        return None if stub.alive else stub._return_code    # pylint: disable=protected-access
+        return None if stub.alive else stub.returncode
 
     # Here we use MyPy ignore because we are assigning a None value
     # where instance of 'PlatformParameter' is expected, and this is
