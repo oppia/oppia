@@ -49,7 +49,7 @@
         </div>
         <div class="history-table-options e2e-test-history-list-options">
           <div class="dropdown" [ngClass]="{ show: isDropdownVisible }" >
-            <div aria-label="More option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" [attr.aria-expanded]="isDropdownVisible.toString()" (keydown)="moreActionButton($event, dropdownMenuButton)" tabindex="0" #dropdownMenuButton>
+            <div aria-label="More option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" [attr.aria-expanded]="isDropdownVisible.toString()" (keydown)="moreOptionButton($event, dropdownMenuButton)" tabindex="0" #dropdownMenuButton>
               <i class="fa fa-ellipsis-v"></i>
             </div>
             <div class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
