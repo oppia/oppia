@@ -94,6 +94,11 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
             'selected_subtopic_ids=["1","2"]',
             expected_status_int=302)
 
+    def test_get_with_no_selected_subtopics_field_fails(self) -> None:
+        self.get_html_response(
+            '/learn/staging/public-topic-name/practice/session?',
+            expected_status_int=302)
+
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
@@ -161,3 +166,12 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'Extra data: line 1 column 2 (char 1)'
         )
         self.assertEqual(response['error'], error_msg)
+
+    def test_get_with_invalid_subtopic_ids_succeeds(self) -> None:
+        json_response = self.get_json(
+            '%s/staging/%s?selected_subtopic_ids=[3,4]' % (
+                feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+                'public-topic-name'))
+        self.assertEqual(json_response['topic_name'], 'public_topic_name')
+        self.assertEqual(
+            len(json_response['skill_ids_to_descriptions_map']), 0)

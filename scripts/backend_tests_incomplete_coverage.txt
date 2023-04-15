@@ -9,7 +9,6 @@ core.controllers.feedback_test
 core.controllers.learner_playlist_test
 core.controllers.library_test
 core.controllers.payload_validator_test
-core.controllers.practice_sessions_test
 core.controllers.profile_test
 core.controllers.questions_list_test
 core.controllers.reader_test
