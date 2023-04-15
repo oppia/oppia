@@ -52,9 +52,13 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
         ]
         expected_commands += [
             [
-                'pip-compile', '--no-emit-index-url', 'requirements_dev.in',
-                '--output-file', 'requirements_dev.txt',
+                'pip-compile', '--generate-hashes', '--allow-unsafe',
+                '--no-emit-index-url', 'requirements_dev.in', '--output-file',
+                'requirements_dev.txt',
             ],
-            ['pip-sync', 'requirements_dev.txt'],
+            [
+                'pip', 'install', '--require-hashes', '--no-deps',
+                'requirements_dev.txt'
+            ],
         ]
         self.assertEqual(commands, expected_commands)
