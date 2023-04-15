@@ -471,14 +471,14 @@ export class HistoryTabComponent
 
   moreActionButton(event: KeyboardEvent, dropdownButton: HTMLElement): void {
     if (event.key === 'Enter') {
-
       const dropdownButtonId = dropdownButton.id;
+
       const index = dropdownButtonId.substring(
         dropdownButtonId.lastIndexOf('-') + 1);
 
       const dropdownMenuButton = document.getElementById(
         `dropdownMenuButton-${index}`);
- 
+
       dropdownMenuButton?.click();
     }
   }
