@@ -46,7 +46,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
 
     @staticmethod
     def _update_question_summary(
-        question: question_domain.Question,
+        question_version: int,
         question_summary_model: question_models.QuestionSummaryModel
     ) -> result.Result[Tuple[str, question_domain.QuestionSummary],
         Tuple[str, Exception]
@@ -55,7 +55,8 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
         add a version field.
 
         Args:
-            question: Question. The question domain object.
+            question_version: int. The version number in the corresponding
+                question domain object.
             question_summary_model: QuestionSummaryModel. The question model
                 to migrate.
 
@@ -71,7 +72,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
                 question_summary_model
                 )
             )
-            question_summary.version = question.version
+            question_summary.version = question_version
             question_summary.validate()
         except Exception as e:
             logging.exception(e)
@@ -121,8 +122,9 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
                 ndb_io.GetModels(question_models.QuestionModel.get_all()))
             # Pylint disable is needed becasue pylint is not able to correclty
             # detect that the value is passed through the pipe.
-            | 'Add question keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda question_model: question_model.id)
+            | 'Add question keys and extract version' >> beam.Map( # pylint: disable=no-value-for-parameter
+                lambda model: (model.id, model.version)
+            )
         )
 
         question_summary_models = (
@@ -145,10 +147,10 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Reorganize the objects' >> beam.Map(lambda objects: {
-                'question': objects['question'][0],
-                'question_summary_model': objects[
-                'question_summary_model'][0],
-            })
+                    'question': objects['question'][0],
+                    'question_summary_model': objects[
+                    'question_summary_model'][0],
+                })
         )
 
         all_updated_question_summary_results = (
