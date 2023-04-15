@@ -36,9 +36,7 @@ from core.jobs.batch_jobs import suggestion_stats_computation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-import apache_beam as beam
-
-from typing import Dict, Final, List, Set, Tuple, Type, Union
+from typing import Dict, Final, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:
