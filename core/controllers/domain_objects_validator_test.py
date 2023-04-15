@@ -182,6 +182,51 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change)
 
+    def test_missing_fields_not_raises_exception(self) -> None:
+        blog_post_change_no_title = {
+            'tags': ['News', 'Learners'],
+            'thumbnail_filename': 'name.svg',
+            'content': 'hi'
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        domain_objects_validator.validate_change_dict_for_blog_post(
+            blog_post_change_no_title) # type: ignore[arg-type]
+
+        blog_post_change_no_tags = {
+            'title': 'Hello Bloggers',
+            'thumbnail_filename': 'name.svg',
+            'content': 'hi'
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        domain_objects_validator.validate_change_dict_for_blog_post(
+            blog_post_change_no_tags) # type: ignore[arg-type]
+
+        blog_post_change_no_thumbnail = {
+            'title': 'Hello Bloggers',
+            'tags': ['News', 'Learners'],
+            'content': 'hi'
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        domain_objects_validator.validate_change_dict_for_blog_post(
+            blog_post_change_no_thumbnail) # type: ignore[arg-type]
+
+        blog_post_change_no_content = {
+            'title': 'Hello Bloggers',
+            'tags': ['News', 'Learners'],
+            'thumbnail_filename': 'name.svg',
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        domain_objects_validator.validate_change_dict_for_blog_post(
+            blog_post_change_no_content) # type: ignore[arg-type]
+
     def test_valid_dict_raises_no_exception(self) -> None:
         blog_post_change: blog_services.BlogPostChangeDict = {
             'title': 'Hello Bloggers',
