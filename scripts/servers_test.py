@@ -1039,12 +1039,6 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_acceptance_test_server_with_explicit_args(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        puppeteer_acceptance_tests_dir_path = os.path.join(
-            common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
-        spec_dir_path = os.path.join(
-            puppeteer_acceptance_tests_dir_path, 'spec')
-        test_file_path = os.path.join(spec_dir_path, 'test')
-
         self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
             suite_name='test',
             stdout=subprocess.PIPE))
@@ -1054,5 +1048,4 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
-        # From suite.
-        self.assertIn(test_file_path, program_args)
+        self.assertIn('--suite test', program_args)

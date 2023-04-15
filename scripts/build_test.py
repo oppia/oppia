@@ -1157,7 +1157,7 @@ class BuildTests(test_utils.GenericTestBase):
                 build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
 
-class E2EBuildTests(test_utils.GenericTestBase):
+class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
     """Test the end to end build methods."""
 
     def setUp(self) -> None:
