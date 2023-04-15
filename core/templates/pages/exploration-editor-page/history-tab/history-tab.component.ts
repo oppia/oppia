@@ -467,6 +467,7 @@ export class HistoryTabComponent
   }
   isDropdownVisible = false;
 
+
   moreActionButton(event: KeyboardEvent, dropdownButton: HTMLElement): void {
     if (event.key === 'Enter') {
       const dropdownButtonId = dropdownButton.id;
