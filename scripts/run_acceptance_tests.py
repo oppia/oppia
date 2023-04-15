@@ -48,7 +48,7 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--suite', required=True,
-    help='Performs test for different suites'
+    help='Specifies the test suite to run. '
          'For performing a full test, no argument is required.')
 _PARSER.add_argument(
     '--server_log_level',
