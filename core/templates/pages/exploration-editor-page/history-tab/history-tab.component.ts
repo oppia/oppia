@@ -249,6 +249,20 @@ export class HistoryTabComponent
     }
   }
 
+
+  isDropdownVisible = false;
+
+  moreOptionButton(event: KeyboardEvent, dropdownButton: HTMLElement): void {
+    if (event.key === 'Enter') {
+      const dropdownButtonId = dropdownButton.id;
+      const index = dropdownButtonId.substring(
+        dropdownButtonId.lastIndexOf('-') + 1);
+      const dropdownMenuButton = document.getElementById(
+        `dropdownMenuButton-${index}`);
+      dropdownMenuButton?.click();
+    }
+  }
+
   // Function to set compared version metadata, download YAML and
   // generate diff graph and legend when selection is changed.
   changeCompareVersion(): void {
@@ -464,20 +478,6 @@ export class HistoryTabComponent
     this.endIndex = 10;
 
     this.versionChoices = [10, 15, 20];
-  }
-
-
-  isDropdownVisible = false;
-
-  moreOptionButton(event: KeyboardEvent, dropdownButton: HTMLElement): void {
-    if (event.key === 'Enter') {
-      const dropdownButtonId = dropdownButton.id;
-      const index = dropdownButtonId.substring(
-        dropdownButtonId.lastIndexOf('-') + 1);
-      const dropdownMenuButton = document.getElementById(
-        `dropdownMenuButton-${index}`);
-      dropdownMenuButton?.click();
-    }
   }
 
   ngOnDestroy(): void {
