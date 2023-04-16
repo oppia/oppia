@@ -48,8 +48,7 @@
             <picture *ngIf="profilePicturePngDataUrl">
               <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
               <source type="image/png" [srcset]="profilePicturePngDataUrl">
-              <img *ngIf="profilePictureDataUrl"
-                   [src]="profilePictureDataUrl"
+              <img [src]="profilePicturePngDataUrl"
                    class="img-thumbnail e2e-test-custom-photo"
                    alt="Profile photo picture">
             </picture>
