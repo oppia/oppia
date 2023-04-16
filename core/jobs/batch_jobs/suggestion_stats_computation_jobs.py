@@ -432,8 +432,8 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
 
         for suggestion in suggestions:
             user_id = (
-                suggestion.author_id if model == 
-                suggestion_models.TranslationContributionStatsModel 
+                suggestion.author_id if model ==
+                suggestion_models.TranslationContributionStatsModel
                 else suggestion.final_reviewer_id
             )
             key = model.construct_id(
@@ -515,8 +515,8 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 topic_id = topic.topic_id
                 for suggestion in suggestions:
                     user_id = (
-                        suggestion.author_id if model == 
-                        suggestion_models.QuestionContributionStatsModel 
+                        suggestion.author_id if model ==
+                        suggestion_models.QuestionContributionStatsModel
                         else suggestion.final_reviewer_id
                     )
                     key = model.construct_id(
