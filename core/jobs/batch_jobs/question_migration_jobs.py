@@ -45,31 +45,32 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
     """Job that adds a version field to QuestionSummary models."""
 
     @staticmethod
-    def _update_question_summary(
+    def _update_and_validate_summary_model(
         question_version: int,
         question_summary_model: question_models.QuestionSummaryModel
-    ) -> result.Result[Tuple[str, question_domain.QuestionSummary],
+    ) -> result.Result[Tuple[str, question_domain.QuestionSummaryModel],
         Tuple[str, Exception]
     ]:
-        """Transform question summary model into question summary object and
-        add a version field.
+        """Transform question summary model into question summary object,
+        add a version field and return the populated summary model.
 
         Args:
             question_version: int. The version number in the corresponding
                 question domain object.
-            question_summary_model: QuestionSummaryModel. The question model
-                to migrate.
+            question_summary_model: QuestionSummaryModel. The question summary
+                model to migrate.
 
         Returns:
-            Result((str, QuestionSummary), (str, Exception)). Result containing
-            tuple that consist of question ID and either question summary
-            object or Exception. Question summary object is returned when the
-            migration was successful and Exception is returned otherwise.
+            Result((str, QuestionSummaryModel), (str, Exception)). Result
+            containing tuple that consist of question ID and either question
+            summary model object or Exception. Question summary object is
+            returned when the migration was successful and Exception is
+            returned otherwise.
         """
         try:
             question_summary = (
                 question_services.get_question_summary_from_model(
-                question_summary_model
+                    question_summary_model
                 )
             )
             question_summary.version = question_version
@@ -78,27 +79,8 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             logging.exception(e)
             return result.Err((question_summary.id, e))
 
-        return result.Ok((question_summary.id, question_summary))
-
-    @staticmethod
-    def _populate_question_summary_models(
-        question_summary_id: str,
-        question_summary: question_domain.QuestionSummary,
-    ) -> question_models.QuestionSummaryModel:
-        """Provides a question summary model for the given question summary
-        object.
-
-        Args:
-            question_summary_id: str. The id of the question summary.
-            question_summary: QuestionSummary. The question summary
-                domain object.
-
-        Returns:
-            QuestionSummaryModel. The updated question summary model to put
-            into the datastore.
-        """
         question_summary_model = question_models.QuestionSummaryModel(
-            id=question_summary_id,
+            id=question_summary.id,
             question_model_last_updated=question_summary.last_updated,
             question_model_created_on=question_summary.created_on,
             question_content=question_summary.question_content,
@@ -107,16 +89,16 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             version=question_summary.version
         )
         question_summary_model.update_timestamps()
-        return question_summary_model
+        return result.Ok((question_summary.id, question_summary_model))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the question migration.
 
         Returns:
-            PCollection. A PCollection of results from the question
-            migration.
+            PCollection. A PCollection of results from the
+            question_id_to_version migration.
         """
-        all_question_models = (
+        all_question_versions = (
             self.pipeline
             | 'Get all non-deleted question models' >> (
                 ndb_io.GetModels(question_models.QuestionModel.get_all()))
@@ -141,24 +123,24 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
 
         question_objects = (
             {
-                'question': all_question_models,
+                'version': all_question_versions,
                 'question_summary_model': question_summary_models,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Reorganize the objects' >> beam.Map(lambda objects: {
-                    'question': objects['question'][0],
+                    'version': objects['version'][0],
                     'question_summary_model': objects[
-                    'question_summary_model'][0],
+                        'question_summary_model'][0],
                 })
         )
 
         all_updated_question_summary_results = (
             question_objects
             | 'Update question summary models' >> beam.Map(
-                lambda question_objects: self._update_question_summary(
-                    question_objects['question'],
-                    question_objects['question_summary_model']
+                lambda objects: self._update_and_validate_summary_model(
+                    objects['version'],
+                    objects['question_summary_model']
             ))
         )
 
@@ -168,19 +150,13 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults(
                     'QUESTION SUMMARY PROCESSED'))
         )
-        updated_question_summary = (
+        question_summary_models_to_put = (
             all_updated_question_summary_results
             | 'Filter oks' >> beam.Filter(
                 lambda result_item: result_item.is_ok())
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
-        )
-
-        question_summary_models_to_put = (
-            updated_question_summary
-            | 'Generate question summary models to put' >> beam.MapTuple(
-                self._populate_question_summary_models
-            )
+            | 'Remove ID' >> beam.Values() # pylint: disable=no-value-for-parameter
         )
 
         unused_put_results = (
@@ -195,39 +171,51 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
     """Job that audits PopulateQuestionSummaryVersionOneOffJob."""
 
     @staticmethod
-    def _update_question_summary(
-        question: question_domain.Question,
+    def _update_and_validate_summary_model(
+        question_version: int,
         question_summary_model: question_models.QuestionSummaryModel
-    ) -> result.Result[Tuple[str, question_domain.QuestionSummary],
+    ) -> result.Result[Tuple[str, question_domain.QuestionSummaryModel],
         Tuple[str, Exception]
     ]:
-        """Transform question summary model into question summary object and
-        add a version field.
+        """Transform question summary model into question summary object,
+        add a version field and return the populated summary model.
 
         Args:
-            question: Question. The question domain object.
-            question_summary_model: QuestionSummaryModel. The question model
-                to migrate.
+            question_version: int. The version number in the corresponding
+                question domain object.
+            question_summary_model: QuestionSummaryModel. The question summary
+                model to migrate.
 
         Returns:
-            Result((str, QuestionSummary), (str, Exception)). Result containing
-            tuple that consist of question ID and either question summary
-            object or Exception. Question summary object is returned when the
-            migration was successful and Exception is returned otherwise.
+            Result((str, QuestionSummaryModel), (str, Exception)). Result
+            containing tuple that consist of question ID and either question
+            summary model object or Exception. Question summary object is
+            returned when the migration was successful and Exception is
+            returned otherwise.
         """
         try:
             question_summary = (
                 question_services.get_question_summary_from_model(
-                question_summary_model
+                    question_summary_model
                 )
             )
-            question_summary.version = question.version
+            question_summary.version = question_version
             question_summary.validate()
         except Exception as e:
             logging.exception(e)
             return result.Err((question_summary.id, e))
 
-        return result.Ok((question_summary.id, question_summary))
+        question_summary_model = question_models.QuestionSummaryModel(
+            id=question_summary.id,
+            question_model_last_updated=question_summary.last_updated,
+            question_model_created_on=question_summary.created_on,
+            question_content=question_summary.question_content,
+            misconception_ids=question_summary.misconception_ids,
+            interaction_id=question_summary.interaction_id,
+            version=question_summary.version
+        )
+        question_summary_model.update_timestamps()
+        return result.Ok((question_summary.id, question_summary_model))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the question migration.
@@ -236,14 +224,15 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             PCollection. A PCollection of results from the question
             migration.
         """
-        all_question_models = (
+        all_question_versions = (
             self.pipeline
             | 'Get all non-deleted question models' >> (
                 ndb_io.GetModels(question_models.QuestionModel.get_all()))
             # Pylint disable is needed becasue pylint is not able to correclty
             # detect that the value is passed through the pipe.
-            | 'Add question keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda question_model: question_model.id)
+            | 'Add question keys and extract version' >> beam.Map( # pylint: disable=no-value-for-parameter
+                lambda model: (model.id, model.version)
+            )
         )
 
         question_summary_models = (
@@ -260,13 +249,13 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
 
         question_objects = (
             {
-                'question': all_question_models,
+                'version': all_question_versions,
                 'question_summary_model': question_summary_models,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Reorganize the objects' >> beam.Map(lambda objects: {
-                'question': objects['question'][0],
+                'version': objects['version'][0],
                 'question_summary_model': objects[
                 'question_summary_model'][0],
             })
@@ -275,9 +264,9 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
         all_updated_question_summary_results = (
             question_objects
             | 'Update question summary models' >> beam.Map(
-                lambda question_objects: self._update_question_summary(
-                    question_objects['question'],
-                    question_objects['question_summary_model']
+                lambda objects: self._update_and_validate_summary_model(
+                    objects['version'],
+                    objects['question_summary_model']
             ))
         )
 
