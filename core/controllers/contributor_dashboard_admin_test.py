@@ -20,8 +20,6 @@ import datetime
 
 from core import feconf
 from core.constants import constants
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
