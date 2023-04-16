@@ -206,7 +206,7 @@
   },
   "ItemSelectionInput": {
     "can_have_solution": false,
-    "show_generic_submit_button": false,
+    "show_generic_submit_button": true,
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,
@@ -626,7 +626,7 @@
   },
   "MultipleChoiceInput": {
     "can_have_solution": false,
-    "show_generic_submit_button": false,
+    "show_generic_submit_button": true,
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,

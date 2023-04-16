@@ -25,7 +25,7 @@ import { GuppyConfigurationService } from
 
 declare global {
   interface Window {
-    Guppy: Object;
+    Guppy: Guppy;
   }
 }
 
@@ -74,7 +74,7 @@ let guppyConfigurationService: GuppyConfigurationService;
 describe('GuppyConfigurationService', () => {
   beforeEach(() => {
     guppyConfigurationService = TestBed.get(GuppyConfigurationService);
-    window.Guppy = MockGuppy;
+    window.Guppy = MockGuppy as unknown as Guppy;
   });
 
   describe('Individual service', () => {
@@ -107,7 +107,7 @@ describe('GuppyConfigurationService', () => {
         }
       ).compileComponents();
       guppyConfigurationService = TestBed.get(GuppyConfigurationService);
-      window.Guppy = MockGuppy;
+      window.Guppy = MockGuppy as unknown as Guppy;
     }));
     beforeEach(() => {
       fixture = TestBed.createComponent(

@@ -73,7 +73,7 @@ export class InteractiveTextInputComponent implements OnInit {
   }
 
   private validityCheckFn() {
-    return this.answer.length > 0;
+    return true;
   }
 
   ngOnInit(): void {
@@ -109,7 +109,6 @@ export class InteractiveTextInputComponent implements OnInit {
     if (this.catchMisspellings) {
       this.schema.ui_config.catchMisspellings = this.catchMisspellings;
     }
-
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(this.answer), () => this.validityCheckFn());
   }

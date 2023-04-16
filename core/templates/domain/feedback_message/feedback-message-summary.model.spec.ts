@@ -23,13 +23,11 @@ describe('Feedback message model', () => {
   it('should create a new message', () => {
     var feedbackMessageSummary = (
       FeedbackMessageSummary.createNewMessage(
-        0, 'Sample message', 'Test user', 'profile_picture_url'));
+        0, 'Sample message', 'Test user'));
 
     expect(feedbackMessageSummary.messageId).toEqual(0);
     expect(feedbackMessageSummary.text).toEqual('Sample message');
     expect(feedbackMessageSummary.authorUsername).toEqual('Test user');
-    expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
-      'profile_picture_url');
   });
 
   it('should fetch the feedback message domain object from the backend ' +
@@ -42,7 +40,6 @@ describe('Feedback message model', () => {
       current_content_html: 'html',
       description: 'desc',
       author_username: 'User 1',
-      author_picture_data_url: 'sample_picture_url_1',
       created_on_msecs: 1000
     };
 
@@ -52,8 +49,6 @@ describe('Feedback message model', () => {
 
     expect(feedbackMessageSummary.text).toEqual('Sample text');
     expect(feedbackMessageSummary.authorUsername).toEqual('User 1');
-    expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
-      'sample_picture_url_1');
     expect(feedbackMessageSummary.createdOnMsecs).toEqual(1000);
   });
 });
