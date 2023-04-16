@@ -48,7 +48,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
     def _update_and_validate_summary_model(
         question_version: int,
         question_summary_model: question_models.QuestionSummaryModel
-    ) -> result.Result[Tuple[str, question_domain.QuestionSummaryModel],
+    ) -> result.Result[Tuple[str, question_models.QuestionSummaryModel],
         Tuple[str, Exception]
     ]:
         """Transform question summary model into question summary object,
@@ -174,7 +174,7 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
     def _update_and_validate_summary_model(
         question_version: int,
         question_summary_model: question_models.QuestionSummaryModel
-    ) -> result.Result[Tuple[str, question_domain.QuestionSummaryModel],
+    ) -> result.Result[Tuple[str, question_models.QuestionSummaryModel],
         Tuple[str, Exception]
     ]:
         """Transform question summary model into question summary object,
