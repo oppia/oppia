@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import logging
 
-from core.domain import question_domain
 from core.domain import question_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
