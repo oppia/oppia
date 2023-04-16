@@ -555,13 +555,13 @@ describe('History tab component', () => {
     , () => {
     // Arrange.
       const event = new KeyboardEvent('keydown', {
-      key: 'Enter'
+        key: 'Enter'
       });
       const dropdownButton = document.createElement('button');
       dropdownButton.id = 'dropdownButton-1';
 
       // Act.
-    component.moreOptionButton(event, dropdownButton);
+      component.moreOptionButton(event, dropdownButton);
 
       // Assert.
       expect(component.isDropdownVisible).toBe(true);
