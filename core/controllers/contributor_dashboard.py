@@ -1102,7 +1102,7 @@ def _get_client_side_stats(
         stats.to_frontend_dict() for stats in backend_stats
     ]
     topic_ids = []
-    for index, stats_dict in enumerate(stats_dicts):
+    for stats_dict in stats_dicts:
         topic_ids.append(stats_dict['topic_id'])
     topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
     topic_name_by_topic_id = {
