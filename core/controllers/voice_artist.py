@@ -226,7 +226,9 @@ class VoiceArtistManagementHandler(
         voice_artist = self.normalized_payload['username']
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
-        assert voice_artist_id is not None
+        if voice_artist_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
         rights_manager.assign_role_for_exploration(
             self.user, entity_id, voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST)
