@@ -431,22 +431,16 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             topic_id = opportunity.topic_id
 
         for suggestion in suggestions:
-            if model == suggestion_models.TranslationContributionStatsModel:
-                key = model.construct_id(
-                    suggestion.language_code,
-                    suggestion.author_id,
-                    topic_id
-                )
-            else:
-                # Here we use MyPy ignore because in earlier steps of
-                # the job, we filtered the suggestions that were
-                # reviewed. Hence the final_reviewer_id should exists
-                # and not a None type.
-                key = model.construct_id(
-                    suggestion.language_code,
-                    suggestion.final_reviewer_id, # type: ignore[arg-type]
-                    topic_id
-                )
+            user_id = (
+                suggestion.author_id if model == 
+                suggestion_models.TranslationContributionStatsModel 
+                else suggestion.final_reviewer_id
+            )
+            key = model.construct_id(
+                suggestion.language_code,
+                user_id,
+                topic_id
+            )
             try:
                 change = suggestion.change
                 # In the new translation command the content in set format is
@@ -520,22 +514,15 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 skill_id):
                 topic_id = topic.topic_id
                 for suggestion in suggestions:
-                    if model == (
-                        suggestion_models.QuestionContributionStatsModel
-                    ):
-                        key = model.construct_id(
-                            suggestion.author_id,
-                            topic_id
-                        )
-                    else:
-                        # Here we use MyPy ignore because in earlier steps of
-                        # the job, we filtered the suggestions that were
-                        # reviewed. Hence the final_reviewer_id should exists
-                        # and not a None type.
-                        key = model.construct_id(
-                            suggestion.final_reviewer_id, # type: ignore[arg-type]
-                            topic_id
-                        )
+                    user_id = (
+                        suggestion.author_id if model == 
+                        suggestion_models.QuestionContributionStatsModel 
+                        else suggestion.final_reviewer_id
+                    )
+                    key = model.construct_id(
+                        user_id,
+                        topic_id
+                    )
                     question_stats_dict = {
                         'suggestion_status': suggestion.status,
                         'edited_by_reviewer': suggestion.edited_by_reviewer,
