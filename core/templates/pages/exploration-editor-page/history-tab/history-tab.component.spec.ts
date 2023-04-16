@@ -551,20 +551,19 @@ describe('History tab component', () => {
       component.totalExplorationVersionMetadata[2]);
   }));
 
-  it(
-    'should toggle isDropdownVisible with Enter on moreOptionButton'
-    , () => {
-
+  it('should Toggle isDropdownVisible on Enter key press for moreOptionButton'
+  , () => {
+    // Arrange
     const event = new KeyboardEvent('keydown', {
       key: 'Enter'
     });
     const dropdownButton = document.createElement('button');
     dropdownButton.id = 'dropdownButton-1';
 
-    
+    // Act
     component.moreOptionButton(event, dropdownButton);
 
-
+    // Assert
     expect(component.isDropdownVisible).toBe(true);
   });
 });
