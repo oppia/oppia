@@ -202,7 +202,7 @@ export class GoalsTabComponent implements OnInit {
     const targetElement = event.target as HTMLElement;
     for (let i = 0; i < this.currentGoals.length; i++) {
       if (!this.dropdownRef) {
-      return;
+        return;
       }
       if (
         targetElement &&
