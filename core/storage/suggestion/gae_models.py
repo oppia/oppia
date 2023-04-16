@@ -31,7 +31,6 @@ if MYPY: # pragma: no cover
     # Here, 'change_domain' is imported only for type checking.
     from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     # Here, 'topic_domain' is imported only for type checking.
-    from core.domain import topic_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -780,7 +779,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         offset: int,
         user_id: str,
         sort_key: Optional[str],
-        topic_filter: Optional[List[topic_domain.Topic]] = None,
+        filter_topic_skills: Optional[List[str]] = None,
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -793,7 +792,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
             sort_key: str|None. The key to sort the suggestions by.
-            topic_filter: Topic|None. The topic to filter by.
+            filter_topic_skills: list(str)|None. A list of topic skill IDs to
+                filter the suggestions by.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -827,14 +827,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     offset += 1
 
                     included_in_topics = False
-                    if topic_filter is not None:
-                        topic_skills = topic_filter.get_all_skill_ids()
-
-                        if suggestion_model.target_id in topic_skills:
+                    if filter_topic_skills is not None:
+                        if suggestion_model.target_id in filter_topic_skills:
                             included_in_topics = True
 
                     if suggestion_model.author_id != user_id and (
-                            topic_filter is None or included_in_topics):
+                            filter_topic_skills is None or included_in_topics):
                         sorted_results.append(suggestion_model)
                         if len(sorted_results) == limit:
                             break
