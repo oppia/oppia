@@ -780,7 +780,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         offset: int,
         user_id: str,
         sort_key: Optional[str],
-        topics: Optional[List[topic_domain.Topic]] = None,
+        topic_filter: Optional[List[topic_domain.Topic]] = None,
     ) -> Tuple[Sequence[GeneralSuggestionModel], int]:
         """Fetches question suggestions that are in-review and not authored by
         the supplied user.
@@ -793,7 +793,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 user cannot review their own suggestions, suggestions authored
                 by the user will be excluded.
             sort_key: str|None. The key to sort the suggestions by.
-            topics: list(Topic)|None. The list of topics to filter by.
+            topic_filter: Topic|None. The topic to filter by.
 
         Returns:
             Tuple of (results, next_offset). Where:
@@ -827,16 +827,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     offset += 1
 
                     included_in_topics = False
-                    if topics is not None:
-                        for topic in topics:
-                            topic_skills = topic.get_all_skill_ids()
+                    if topic_filter is not None:
+                        topic_skills = topic_filter.get_all_skill_ids()
 
-                            if suggestion_model.target_id in topic_skills:
-                                included_in_topics = True
-                                break
+                        if suggestion_model.target_id in topic_skills:
+                            included_in_topics = True
 
                     if suggestion_model.author_id != user_id and (
-                            topics is None or included_in_topics):
+                            topic_filter is None or included_in_topics):
                         sorted_results.append(suggestion_model)
                         if len(sorted_results) == limit:
                             break
