@@ -550,20 +550,20 @@ describe('History tab component', () => {
     expect(component.compareVersionMetadata.laterVersion).toEqual(
       component.totalExplorationVersionMetadata[2]);
   }));
-
-  it('should Toggle isDropdownVisible on Enter key press for moreOptionButton'
-    , () => {
-    // Arrange.
-      const event = new KeyboardEvent('keydown', {
-        key: 'Enter'
-      });
-      const dropdownButton = document.createElement('button');
-      dropdownButton.id = 'dropdownButton-1';
-
-      // Act.
-      component.moreOptionButton(event, dropdownButton);
-
-      // Assert.
-      expect(component.isDropdownVisible).toBe(true);
+  
+  it('should call click on dropdown menu button when Enter key is pressed', () => {
+    // Arrange
+    const keyboardEvent = new KeyboardEvent('keydown', {
+      key: 'Enter'
     });
+    const dropdownMenuButton = document.createElement('div');
+    dropdownMenuButton.id = 'dropdownMenuButton-1';
+    spyOn(dropdownMenuButton, 'click');
+
+    // Act
+    component.moreOptionButton(keyboardEvent, dropdownMenuButton);
+
+    // Assert
+    expect(dropdownMenuButton.click).toHaveBeenCalled();
+  });
 });
