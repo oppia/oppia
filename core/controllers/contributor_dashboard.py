@@ -1103,11 +1103,6 @@ def _get_client_side_stats(
     ]
     topic_ids = []
     for index, stats_dict in enumerate(stats_dicts):
-        if stats_dict['topic_id'] is None:
-            raise Exception(
-                'No topic_id associated with stats: %s.' %
-                type(backend_stats[index]).__name__
-            )
         topic_ids.append(stats_dict['topic_id'])
     topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
     topic_name_by_topic_id = {
