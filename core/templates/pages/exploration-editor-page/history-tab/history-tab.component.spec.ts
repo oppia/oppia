@@ -550,9 +550,10 @@ describe('History tab component', () => {
     expect(component.compareVersionMetadata.laterVersion).toEqual(
       component.totalExplorationVersionMetadata[2]);
   }));
-  
-  it('should call click on dropdown menu button when Enter key is pressed', () => {
-    // Arrange
+
+  it('should call click on dropdown menu button when Enter key is pressed', 
+    () => {
+    // Arrange.
     const keyboardEvent = new KeyboardEvent('keydown', {
       key: 'Enter'
     });
@@ -560,10 +561,10 @@ describe('History tab component', () => {
     dropdownMenuButton.id = 'dropdownMenuButton-1';
     spyOn(dropdownMenuButton, 'click');
 
-    // Act
+    // Act.
     component.moreOptionButton(keyboardEvent, dropdownMenuButton);
 
-    // Assert
+    // Assert.
     expect(dropdownMenuButton.click).toHaveBeenCalled();
   });
 });
