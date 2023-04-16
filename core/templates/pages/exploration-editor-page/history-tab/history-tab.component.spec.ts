@@ -558,7 +558,7 @@ describe('History tab component', () => {
         key: 'Enter'
       });
       const dropdownMenuButton = document.createElement('div');
-      dropdownMenuButton.id = 'dropdownMenuButton-1';
+      dropdownMenuButton.id = 'dropdownMenuButton-${index}';
       spyOn(dropdownMenuButton, 'click');
 
       // Act.
