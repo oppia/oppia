@@ -436,6 +436,10 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 suggestion_models.TranslationContributionStatsModel
                 else suggestion.final_reviewer_id
             )
+            # Ruling out the possibility of None for mypy type checking.
+            # We are taking either submitter's or reviewer's ID based on the
+            # suggestion type.
+            assert user_id is not None
             key = model.construct_id(
                 suggestion.language_code,
                 user_id,
@@ -519,6 +523,10 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                         suggestion_models.QuestionContributionStatsModel
                         else suggestion.final_reviewer_id
                     )
+                    # Ruling out the possibility of None for mypy type checking.
+                    # We are taking either submitter's or reviewer's ID based
+                    # on the suggestion type.
+                    assert user_id is not None
                     key = model.construct_id(
                         user_id,
                         topic_id
