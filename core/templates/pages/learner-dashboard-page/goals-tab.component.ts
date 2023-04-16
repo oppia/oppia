@@ -199,6 +199,7 @@ export class GoalsTabComponent implements OnInit {
    */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    const targetElement = event.target as HTMLElement;
     for (let i = 0; i < currentGoals.lenght; i++) {
       if (!this.dropdownRef) {
       return;
