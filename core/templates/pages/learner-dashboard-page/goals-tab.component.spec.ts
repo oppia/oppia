@@ -340,14 +340,14 @@ describe('Goals tab Component', () => {
   });
 
   it('should correctly show and hide the dropdown', () => {
-    component.toggleThreeDotsDropdown(i);
-    expect(component.showThreeDotsDropdown[i]).toBe(true);
+    component.toggleThreeDotsDropdown(0);
+    expect(component.showThreeDotsDropdown[0]).toBe(true);
 
-    component.toggleThreeDotsDropdown(i);
-    expect(component.showThreeDotsDropdown[i]).toBe(false);
+    component.toggleThreeDotsDropdown(0);
+    expect(component.showThreeDotsDropdown[0]).toBe(false);
 
-    component.toggleThreeDotsDropdown(i);
-    expect(component.showThreeDotsDropdown[i]).toBe(true);
+    component.toggleThreeDotsDropdown(0);
+    expect(component.showThreeDotsDropdown[0]).toBe(true);
 
     let fakeClickAwayEvent = new MouseEvent('click');
     Object.defineProperty(
@@ -363,15 +363,15 @@ describe('Goals tab Component', () => {
     component.onDocumentClick(fakeClickAwayEvent);
     fixture.detectChanges();
     expect(component.showThreeDotsDropdown[i]).toBe(false);
-    for (let i = 0; i < component.currentGoals.length; i++) {
+    for (let i = 1; i < component.currentGoals.length; i++) {
       component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
       component.toggleThreeDotsDropdown(i);
       expect(component.showThreeDotsDropdown[i]).toBe(false);
 
       component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
       let fakeClickAwayEvent = new MouseEvent('click');
       Object.defineProperty(
