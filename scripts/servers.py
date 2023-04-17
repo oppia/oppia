@@ -758,7 +758,7 @@ def managed_acceptance_tests_server(
     managed_acceptance_tests_proc = managed_process(
         acceptance_tests_args,
         human_readable_name='Acceptance Tests Server',
-        shell=False,
+        shell=True,
         raise_on_nonzero_exit=False,
         stdout=stdout,
     )
