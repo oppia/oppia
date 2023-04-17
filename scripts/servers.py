@@ -755,12 +755,10 @@ def managed_acceptance_tests_server(
         '%s' % os.path.join(spec_dir_path, suite_name)
     ]
 
-    # OK to use shell=True here because we are passing string literals and
-    # constants, so there is no risk of a shell-injection attack.
     managed_acceptance_tests_proc = managed_process(
         acceptance_tests_args,
         human_readable_name='Acceptance Tests Server',
-        shell=True,
+        shell=False,
         raise_on_nonzero_exit=False,
         stdout=stdout,
     )
