@@ -45,7 +45,6 @@ def create_directory(directory_path: str) -> None:
     os.makedirs(directory_path)
 
 
-# Test.
 # This function takes a command for python as its only input.
 # It checks this input for a specific version of python and returns false
 # if it does not match the expected prefix.
