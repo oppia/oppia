@@ -134,10 +134,8 @@ def main() -> None:
     adj_list, nodes_list = make_graph()
     visit_stack: List[str] = []
     topo_sort_stack: List[str] = []
-
+    nodes_list.sort()
     for unchecked_node in nodes_list:
-        print('unchecked_node:' + str(unchecked_node))
-        print('visited_stack:' + str(visit_stack))
         if unchecked_node not in visit_stack:
             dfs(unchecked_node, topo_sort_stack, adj_list, visit_stack)
 
