@@ -550,4 +550,40 @@ describe('History tab component', () => {
     expect(component.compareVersionMetadata.laterVersion).toEqual(
       component.totalExplorationVersionMetadata[2]);
   }));
+
+  describe('moreOptionButton', () => {
+    let event: KeyboardEvent;
+    let dropdownButton: HTMLElement;
+    let spyClick: jasmine.Spy;
+  
+    beforeEach(() => {
+      event = new KeyboardEvent('keypress', { key: 'Enter' });
+      dropdownButton = document.createElement('button');
+      dropdownButton.id = 'dropdownButton-1';
+      document.body.appendChild(dropdownButton);
+      const dropdownMenuButton = document.createElement('button');
+      dropdownMenuButton.id = `dropdownMenuButton-${dropdownButton.id.split('-')[1]}`;
+      document.body.appendChild(dropdownMenuButton);
+      spyClick = spyOn(dropdownMenuButton, 'click');
+    });
+  
+    afterEach(() => {
+      document.body.removeChild(dropdownButton);
+      const dropdownMenuButton = document.getElementById(`dropdownMenuButton-${dropdownButton.id.split('-')[1]}`);
+      if (dropdownMenuButton) {
+        document.body.removeChild(dropdownMenuButton);
+      }
+    });
+  
+    it('should call click() on dropdown menu button', () => {
+      component.moreOptionButton(event, dropdownButton);
+      expect(spyClick).toHaveBeenCalled();
+    });
+  
+    it('should not call click() when keypress is not Enter', () => {
+      event = new KeyboardEvent('keypress', { key: 'Escape' });
+      component.moreOptionButton(event, dropdownButton);
+      expect(spyClick).not.toHaveBeenCalled();
+    });
+  });
 });
