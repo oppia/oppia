@@ -284,7 +284,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
 class SubtopicViewerPageTests2(test_utils.GenericTestBase):
     """Test for SubtopicViewerPage when len(topic.subtopic) = 1."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -301,7 +301,7 @@ class SubtopicViewerPageTests2(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id_1, self.topic_id))
 
-    def test_subtopic_viewer_page_with_one_subtopic(self):
+    def test_subtopic_viewer_page_with_one_subtopic(self) -> None:
         subtopic_page_services.save_subtopic_page(
             self.admin_id, self.subtopic_page_1, 'Added subtopic',
             [topic_domain.TopicChange({
