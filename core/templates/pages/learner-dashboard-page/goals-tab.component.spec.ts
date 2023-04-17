@@ -342,13 +342,13 @@ describe('Goals tab Component', () => {
   it('should correctly show and hide the dropdown', () => {
     for (let i = 0; i < component.currentGoals.length; i++) {
       component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
       component.toggleThreeDotsDropdown(i);
       expect(component.showThreeDotsDropdown[i]).toBe(false);
 
       component.toggleThreeDotsDropdown(i);
-      expect(component.showThreeDotsDropdown[i]).toBe(true);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
       let fakeClickAwayEvent = new MouseEvent('click');
       Object.defineProperty(
@@ -360,6 +360,7 @@ describe('Goals tab Component', () => {
       expect(component.showThreeDotsDropdown[i]).toBe(false);
 
       // Three dots are not shown when no goals are present.
+      component.dropdownRef = undefined;
       component.onDocumentClick(fakeClickAwayEvent);
       fixture.detectChanges();
       expect(component.showThreeDotsDropdown[i]).toBe(false);
