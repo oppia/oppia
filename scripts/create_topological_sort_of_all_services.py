@@ -136,6 +136,8 @@ def main() -> None:
     topo_sort_stack: List[str] = []
 
     for unchecked_node in nodes_list:
+        print("unchecked_node:" + str(unchecked_node))
+        print("visited_stack:" + str(visit_stack))
         if unchecked_node not in visit_stack:
             dfs(unchecked_node, topo_sort_stack, adj_list, visit_stack)
 
