@@ -40,7 +40,7 @@ const VALIDATION_STATUS_INVALID = 'INVALID';
   ]
 })
 export class SchemaBasedEditorComponent
-implements AfterViewInit, ControlValueAccessor, Validator {
+  implements AfterViewInit, ControlValueAccessor, Validator {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -52,7 +52,8 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   @Output() inputBlur = new EventEmitter();
   @Output() inputFocus = new EventEmitter();
   @Input() notRequired!: boolean;
-  onChange: (val: SchemaDefaultValue) => void = () => {};
+  @Input() iddd?: number;
+  onChange: (val: SchemaDefaultValue) => void = () => { };
   get localValue(): SchemaDefaultValue {
     return this._localValue;
   }
@@ -92,27 +93,26 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   }
 
   ngAfterViewInit(): void {
-    if (angular.element) {
-      let angularJsFormController: angular.IFormController = angular.element(
-        this.elementRef.nativeElement).controller('form');
-      // This throws "Object is possibly undefined." The type undefined
-      // comes here from NgForm dependency. We need to suppress this
-      // error because of strict type checking.
-      // @ts-ignore
-      this.form.statusChanges.subscribe((validationStatus) => {
-        if (angularJsFormController === null ||
-          angularJsFormController === undefined) {
-          return;
-        }
-        if (validationStatus === VALIDATION_STATUS_INVALID) {
-          angularJsFormController.$setValidity(
-            'schema', false, angularJsFormController);
-        } else {
-          angularJsFormController.$setValidity(
-            'schema', true, angularJsFormController);
-        }
-      });
-    }
+    let angularJsFormController: angular.IFormController | undefined = (
+      angular?.element(this.elementRef.nativeElement).controller('form'));
+    // This throws "Object is possibly undefined." The type undefined
+    // comes here from NgForm dependency. We need to suppress this
+    // error because of strict type checking.
+    // @ts-ignore
+    this.form.statusChanges.subscribe((validationStatus) => {
+      this.localValue = this._localValue;
+      if (angularJsFormController === null ||
+        angularJsFormController === undefined) {
+        return;
+      }
+      if (validationStatus === VALIDATION_STATUS_INVALID) {
+        angularJsFormController.$setValidity(
+          'schema', false, angularJsFormController);
+      } else {
+        angularJsFormController.$setValidity(
+          'schema', true, angularJsFormController);
+      }
+    });
   }
 }
 
