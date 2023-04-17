@@ -98,8 +98,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             SystemExit, """
-                Oppia server is already running. Try shutting all the servers down
-                before running the script.
+            Oppia server is already running. Try shutting all the servers down
+            before running the script.
             """):
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
