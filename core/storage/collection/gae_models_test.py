@@ -59,6 +59,36 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        export_policy = collection_models.CollectionModel.get_export_policy()
+        self.assertEqual(
+            export_policy['title'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['category'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['objective'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['language_code'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['tags'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['schema_version'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['collection_contents'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
     def test_get_collection_count(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
@@ -68,6 +98,20 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         num_collections = (
             collection_models.CollectionModel.get_collection_count())
         self.assertEqual(num_collections, 1)
+
+    def test_convert_to_valid_dict_with_valid_dict(self) -> None:
+        model_dict = {
+            'id': 'collection_id',
+            'title': 'Collection Title',
+            'description': 'Collection Description',
+            'category': 'category',
+            'version': 1,
+            'schema_version': 1,
+            'collection_contents': {'nodes': [], 'skill_ids': []},
+            'language_code': 'en',
+        }
+        result = collection_models.CollectionModel.convert_to_valid_dict(model_dict) # pylint: disable=line-too-long
+        self.assertEqual(result, model_dict)
 
     def test_reconstitute(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
@@ -223,6 +267,52 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionRightsModel.
+                get_model_association_to_user(),
+            base_models.
+            MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS)
+
+    def test_get_field_name_mapping_to_takeout_keys(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionRightsModel.
+            get_field_name_mapping_to_takeout_keys(),
+            {
+                'owner_ids': 'owned_collection_ids',
+                'editor_ids': 'editable_collection_ids',
+                'voice_artist_ids': 'voiced_collection_ids',
+                'viewer_ids': 'viewable_collection_ids'
+            }
+        )
+
+    def test_get_export_policy(self) -> None:
+        export_policy = collection_models.CollectionRightsModel.get_export_policy() # pylint: disable=line-too-long
+        self.assertEqual(
+            export_policy['owner_ids'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['editor_ids'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['voice_artist_ids'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['viewer_ids'],
+            base_models.EXPORT_POLICY.EXPORTED)
+        self.assertEqual(
+            export_policy['community_owned'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['viewable_if_private'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['status'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['first_published_msec'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self) -> None:
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
@@ -492,6 +582,18 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionCommitLogEntryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        export_policy = collection_models.CollectionCommitLogEntryModel.get_export_policy() # pylint: disable=line-too-long
+        self.assertEqual(
+            export_policy['collection_id'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
     def test_has_reference_to_user_id(self) -> None:
         commit = collection_models.CollectionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
@@ -596,6 +698,66 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        export_policy = collection_models.CollectionSummaryModel.get_export_policy() # pylint: disable=line-too-long
+        self.assertEqual(
+            export_policy['title'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['category'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['objective'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['language_code'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['tags'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['ratings'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['collection_model_last_updated'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['collection_model_created_on'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['status'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['community_owned'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['owner_ids'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['editor_ids'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['viewer_ids'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['contributor_ids'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['contributors_summary'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['version'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['node_count'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self) -> None:
         collection_models.CollectionSummaryModel(
