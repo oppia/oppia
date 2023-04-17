@@ -73,7 +73,7 @@ export class QuestionUpdateService {
 
   _getParameterFromChangeDict(
       changeDict: BackendChangeObject, paramName: string
-  ): string {
+  ): string | string[] {
     return changeDict[paramName];
   }
 
