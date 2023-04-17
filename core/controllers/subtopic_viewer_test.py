@@ -1,30 +1,14 @@
-# Copyright 2019 The Oppia Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""Tests for subtopic viewer page"""
-
 from __future__ import annotations
-
 from core import feconf
-from core.domain import state_domain
+
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.tests import test_utils
+from core.domain import user_services
 from core.domain import topic_services
 from core.domain import translation_domain
-from core.domain import user_services
-from core.tests import test_utils
+from core.domain import state_domain
 
 
 class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
@@ -279,3 +263,52 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             expected_status_int=404
         )
         self.assertIn('Could not find the page', response['error'])
+
+
+class SubtopicViewerPageTests2(test_utils.GenericTestBase):
+    def setUp(self):
+        super(SubtopicViewerPageTests2, self).setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+
+        self.signup("user@gmail.com", "test")
+        self.user_id = self.get_user_id_from_email("user@gmail.com")
+
+    def test_subtopic_viewer_page_with_one_subtopic(self):
+        self.topic_id = 'topic_id'
+
+        self.subtopic_id_1 = 1
+        self.subtopic_page_1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_1, self.topic_id))
+
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, self.subtopic_page_1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': self.subtopic_id_1,
+                'title': 'Subtopic 1',
+                'url_fragment': 'sample-fragment'
+            })]
+        )
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, "Subtopic Title", "url-frag"
+        )
+        subtopic.skill_ids = ["skill_id_1"]
+        subtopic.url_fragment = "sub-url-frag-one"
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+
+        self.login("user@gmail.com")
+
+        self.get_json(
+            '%s/staging/%s/%s' % (
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'))
