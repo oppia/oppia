@@ -4,7 +4,8 @@
   <select #select
           class="oppia-content-language-selector"
           [ngModel]="selectedLanguageCode"
-          (ngModelChange)="onSelectLanguage($event)">
+          (ngModelChange)="onSelectLanguage($event)"
+          aria-label="Website Language Select Menu">
     <option *ngFor="let language of languageOptions" [value]="language.value">{{language.displayed}}</option>
   </select>
 </div>

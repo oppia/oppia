@@ -74,7 +74,6 @@ core.domain.user_domain_test
 core.domain.user_query_domain_test
 core.domain.user_query_services_test
 core.domain.user_services_test
-core.domain.wipeout_domain_test
 core.domain.wipeout_service_test
 core.jobs.transforms.validation.base_validation_test
 core.jobs.types.base_validation_errors_test
@@ -94,6 +93,7 @@ main_test
 scripts.build_test
 scripts.common_test
 scripts.concurrent_task_utils_test
+scripts.create_topological_sort_of_all_services_test
 scripts.install_python_prod_dependencies_test
 scripts.install_third_party_test
 scripts.linters.html_linter_test
