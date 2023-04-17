@@ -1,5 +1,6 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "حول مؤسسة أوبيا",
+	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "حول مؤسسة أوبيا",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "أنشئ استكشافًا",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "عن موضوع يهمك.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "كسب نصائح",
@@ -65,6 +66,8 @@
 	"I18N_ACTION_GUIDE_FOR_TEACHERS": "دليل للمعلم",
 	"I18N_ACTION_TIPS_FOR_PARENTS": "نصائح للوالدين وأولياء الأمور",
 	"I18N_ACTION_VISIT_CLASSROOM": "زيارة غرفة الصف",
+	"I18N_ADD_NEW_SYLLABUS_CANCEL_BUTTON_TEXT": "إلغاء",
+	"I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT": "تم",
 	"I18N_ANDROID_PAGE_EMAIL_FIELD_LABEL": "عنوان البريد الإلكتروني",
 	"I18N_ATTRIBUTION_HTML_STEP_ONE": "انسخ و الصق الHTML",
 	"I18N_ATTRIBUTION_HTML_STEP_TWO": "تأكد من ظهور الرابط كـ \"<[linkText]>\"",
