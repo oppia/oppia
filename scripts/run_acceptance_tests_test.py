@@ -96,7 +96,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_portserver', mock_managed_process))
 
-        with self.assertRaisesRegex(SystemExit, '1'):
+        with self.assertRaisesRegex(SystemExit, """
+            Oppia server is already running. Try shutting all the servers down
+            before running the script.
+        """):
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
