@@ -934,7 +934,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
-            
+
         uneditable_collection_summary_model.update_timestamps()
         uneditable_collection_summary_model.put()
         collection_summary_models = (
