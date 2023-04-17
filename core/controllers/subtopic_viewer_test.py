@@ -283,6 +283,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
 
 class SubtopicViewerPageTests2(test_utils.GenericTestBase):
     """Test for SubtopicViewerPage when len(topic.subtopic) = 1."""
+    
     def setUp(self):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
