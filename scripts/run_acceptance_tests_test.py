@@ -100,7 +100,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             SystemExit, """
             Oppia server is already running. Try shutting all the servers down
             before running the script.
-            """):
+        """):
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
