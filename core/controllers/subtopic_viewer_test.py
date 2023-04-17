@@ -267,23 +267,23 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
 
 class SubtopicViewerPageTests2(test_utils.GenericTestBase):
     def setUp(self):
-        super(SubtopicViewerPageTests2, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
-        self.signup("user@gmail.com", "test")
-        self.user_id = self.get_user_id_from_email("user@gmail.com")
+        self.signup('user@gmail.com', 'test')
+        self.user_id = self.get_user_id_from_email('user@gmail.com')
 
-    def test_subtopic_viewer_page_with_one_subtopic(self):
         self.topic_id = 'topic_id'
-
         self.subtopic_id_1 = 1
+
         self.subtopic_page_1 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id_1, self.topic_id))
 
+    def test_subtopic_viewer_page_with_one_subtopic(self):
         subtopic_page_services.save_subtopic_page(
             self.admin_id, self.subtopic_page_1, 'Added subtopic',
             [topic_domain.TopicChange({
@@ -295,10 +295,10 @@ class SubtopicViewerPageTests2(test_utils.GenericTestBase):
         )
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, "Subtopic Title", "url-frag"
+            1, 'Subtopic Title', 'url-frag'
         )
-        subtopic.skill_ids = ["skill_id_1"]
-        subtopic.url_fragment = "sub-url-frag-one"
+        subtopic.skill_ids = ['skill_id_1']
+        subtopic.url_fragment = 'sub-url-frag-one'
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='name', url_fragment='name',
@@ -307,7 +307,7 @@ class SubtopicViewerPageTests2(test_utils.GenericTestBase):
             subtopics=[subtopic], next_subtopic_id=2)
         topic_services.publish_topic(self.topic_id, self.admin_id)
 
-        self.login("user@gmail.com")
+        self.login('user@gmail.com')
 
         self.get_json(
             '%s/staging/%s/%s' % (
