@@ -259,13 +259,16 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = '/questions#' + this.questionId;
   }
 
-  removeQuestionSkillLinkAsync(questionId: string, skillId: string, skill_difficulty: number): void {
+  removeQuestionSkillLinkAsync(
+      questionId: string,
+      skillId: string,
+      skillDifficulty: number): void {
     this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
       questionId, [
         {
           id: skillId,
           task: 'remove',
-          difficulty: skill_difficulty
+          difficulty: skillDifficulty
         } as SkillLinkageModificationsArray
       ]
     ).then(() => {
@@ -277,7 +280,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     });
   }
 
-  removeQuestionFromSkill(questionId: string , skill_difficulty : number): void {
+  removeQuestionFromSkill(questionId: string, skillDifficulty: number): void {
     let modalRef: NgbModalRef = this.ngbModal.
       open(RemoveQuestionSkillLinkModalComponent, {
         backdrop: 'static'
@@ -290,7 +293,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     modalRef.result.then(() => {
       this.deletedQuestionIds.push(questionId);
-      this.removeQuestionSkillLinkAsync(questionId, this.selectedSkillId , skill_difficulty);
+      this.removeQuestionSkillLinkAsync(
+        questionId,
+        this.selectedSkillId,
+        skillDifficulty);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
