@@ -26,7 +26,10 @@ oppia-search-bar .oppia-same-row-container {
 
 oppia-search-bar .oppia-navbar-button-container {
   border-radius: 0;
-  margin-top: 10px;
+  /* This is needed so that the category and language dropdowns
+  in the library/search page do not fall behind the exploration
+  summary tiles. */
+  z-index: 15;
 }
 
 .search-bar-float-left {
@@ -109,10 +112,6 @@ oppia-search-bar .oppia-input-group {
   max-width: 150px;
 }
 
-oppia-search-bar .oppia-input-group.classroom-page-input-group {
-  width: 20em;
-}
-
 .btn-text {
   color: #257d76;
   margin-left: 8px;
@@ -170,7 +169,7 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     border-top-right-radius: 10px;
     padding: 8px 11px 9px 9px;
   }
-  oppia-search-bar .oppia-input-group.classroom-page-input-group {
+  .oppia-input-group.classroom-page-input-group {
     width: 17em;
   }
   .oppia-search-bar-form .input-group .oppia-search-bar-text-input {
@@ -203,7 +202,6 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     border-radius: 10px;
     color: #fff;
     height: 40px;
-    margin-left: 50px;
     margin-top: -60px;
     max-width: none;
     padding: 8px 7px 0 6px;
@@ -274,7 +272,7 @@ oppia-search-bar .oppia-input-group.classroom-page-input-group {
     display: none;
   }
   .search-button-icon {
-    font-size: 36px;
+    font-size: 24px;
     margin: auto;
   }
 }
