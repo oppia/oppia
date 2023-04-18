@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0041.
+presubmit checks. Next message id would be C0042.
 """
 
 from __future__ import annotations
@@ -2919,6 +2919,39 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
+    """Checks if there a single blank line after function definition."""
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'space_after_function_def'
+
+    msgs = {'C0041': ('Blank line after function definition',
+                        'Blank-line-after-function-definition',
+                        'Please remove blank line after function definition')}
+
+    def visit_module(self, node):
+        """Visit a module to ensure that there is a blank line below
+        file overview docstring.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        code_list = []
+        with node.root().stream() as stream:
+            for lineno, line in enumerate(stream):
+                code_list.append(line)
+
+        for lineno,line in enumerate(code_list):
+            if b'def' in code_list[lineno]:
+                if code_list[lineno+1] == b'\n':
+                    self.add_message("Blank-line-after-function-definition", line=lineno+2, node=node)
+
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
 
@@ -2943,3 +2976,4 @@ def register(linter: lint.PyLinter) -> None:
     linter.register_checker(DisallowedFunctionsChecker(linter))
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
     linter.register_checker(DisallowedImportsChecker(linter))
+    linter.register_checker(BlankLineBelowFunctionDefChecker(linter))

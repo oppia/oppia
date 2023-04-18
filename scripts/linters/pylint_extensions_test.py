@@ -4663,3 +4663,82 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(
                 node)
+
+
+class BlankLineBelowFunctionDefCheckerTests(unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = pylint_extensions.BlankLineBelowFunctionDefChecker
+        self.checker_test_object.setup_method()
+
+    def test_function_with_blank_line_after_definition(
+        self
+    ) -> None:
+        node = astroid.extract_node(
+            """
+            def Hello():
+
+                return "Hello, World!"
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='Blank-line-after-function-definition',
+                node=node,
+                line=3
+            )
+        ):
+            self.checker_test_object.checker.visit_module(
+                node)
+
+    def test_function_with_no_blank_line_after_definition(
+        self
+    ) -> None:
+        node = astroid.extract_node(
+            """
+            def Hello():
+                return "Hello, World!"
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_module(
+                node)
+
+    def test_function_with_blank_line_after_definition_inside_another_function(
+        self,
+    ) -> None:
+        node = astroid.extract_node(
+            """
+            def outside():
+                def inside():
+
+                    return "inside"
+                if True:
+                    return inside()
+            return "outside"
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_module(
+                node)
+
+    def test_function_with_blank_line_after_definition_inside_another_function(
+        self,
+    ) -> None:
+        node = astroid.extract_node(
+            """
+            class TestClass():
+                def foo():
+
+                    return "foo"
+
+                def bar():
+                    return "bar"
+        """)
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='Blank-line-after-function-definition',
+                node=node,
+                line=4
+            )
+        ):
+            self.checker_test_object.checker.visit_module(
+                node)
