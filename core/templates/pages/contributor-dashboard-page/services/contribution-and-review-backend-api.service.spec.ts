@@ -140,9 +140,7 @@ describe('Contribution and review backend API service', () => {
           'add_question',
           AppConstants.OPPORTUNITIES_PAGE_SIZE,
           0,
-          'Date',
-          undefined,
-          undefined
+          'Date'
         );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
