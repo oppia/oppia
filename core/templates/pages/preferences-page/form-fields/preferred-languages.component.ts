@@ -16,11 +16,12 @@
  * @fileoverview Preferred languages component.
  */
 
-import { ENTER } from '@angular/cdk/keycodes';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatChipList } from '@angular/material/chips';
+import { ENTER } from '@angular/cdk/keycodes';
 import { LanguageIdAndText } from 'domain/utilities/language-util.service';
+
 
 @Component({
   selector: 'oppia-preferred-languages',
@@ -42,6 +43,19 @@ export class PreferredLanguagesComponent {
   separatorKeysCodes: number[] = [ENTER];
   formCtrl = new FormControl();
 
+  // Changes Here
+  filteredChoices: LanguageIdAndText[] = [];
+  searchQuery: string = ''; 
+
+  onInputBoxClick(): void {
+    setTimeout(() => {
+      // Reset the search query
+      this.searchQuery = '';
+      // Reset the filteredChoices array
+      this.filteredChoices = this.choices;
+    });
+  }
+  
   ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
       if (!this.validInput(value)) {
@@ -51,16 +65,18 @@ export class PreferredLanguagesComponent {
       }
     });
   }
-
+  
+  
   validInput(value: string): boolean {
     let availableLanguage = false;
-    for (let i = 0; i < this.choices.length; i++) {
-      if (this.choices[i].id === value) {
+    // Changes Here, filteredChoices instead of Choices
+    for (let i = 0; i < this.filteredChoices.length; i++) {
+      if (this.filteredChoices[i].id === value) {
         availableLanguage = true;
         break;
       }
     }
-
+  
     return availableLanguage &&
       this.preferredLanguages.indexOf(value) < 0 ? true : false;
   }
@@ -76,6 +92,9 @@ export class PreferredLanguagesComponent {
       this.preferredLanguagesChange.emit(this.preferredLanguages);
       this.languageInput.nativeElement.value = '';
     }
+
+    this.searchQuery = '';
+    this.filteredChoices = this.choices;
   }
 
   remove(fruit: string): void {
@@ -93,5 +112,14 @@ export class PreferredLanguagesComponent {
     } else {
       this.add(event.option);
     }
+  }
+  
+  //Changes Here
+  onSearchInputChange(): void {
+    // Filter the choices array based on the search query
+    this.filteredChoices = this.choices.filter(choice => {
+      return choice.text.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+             choice.id.toLowerCase().includes(this.searchQuery.toLowerCase());
+    });
   }
 }
