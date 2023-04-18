@@ -4678,8 +4678,8 @@ class BlankLineBelowFunctionDefCheckerTests(unittest.TestCase):
     ) -> None:
         node = astroid.extract_node(
             """
-            def Hello():
-
+            def Hello(): #@
+                         #@
                 return "Hello, World!"
         """)
         with self.checker_test_object.assertAddsMessages(
