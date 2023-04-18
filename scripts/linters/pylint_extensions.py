@@ -2952,11 +2952,14 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):  # type: ignore[mi
             for lineno, line in enumerate(stream):
                 code_list.append(line)
 
-        for lineno,line in enumerate(code_list):
+        for lineno, line in enumerate(code_list):
             if b'def ' in code_list[lineno]:
-                if code_list[lineno+1] == b'\n':
-                    self.add_message('Blank-line-after-function-definition',
-                    line=lineno+2, node=node)
+                if code_list[lineno + 1] == b'\n':
+                    self.add_message(
+                        'Blank-line-after-function-definition',
+                        line=lineno + 2, node=node
+                        )
+
 
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.

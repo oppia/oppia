@@ -4669,7 +4669,8 @@ class BlankLineBelowFunctionDefCheckerTests(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = pylint_extensions.BlankLineBelowFunctionDefChecker
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.BlankLineBelowFunctionDefChecker)
         self.checker_test_object.setup_method()
 
     def test_function_with_blank_line_after_definition(
