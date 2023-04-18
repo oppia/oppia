@@ -1493,6 +1493,25 @@ class Story:
         return story_contents_dict
 
     @classmethod
+    def _convert_story_contents_v5_dict_to_v6_dict(
+        cls,
+        story_id: str,
+        story_contents_dict: StoryContentsDict
+    ) -> StoryContentsDict:
+        """Dummy function to convert v5 Story Contents schema to the modern
+        v6 schema.
+
+        Args:
+            story_id: str. The unique ID of the story.
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        return story_contents_dict
+
+    @classmethod
     def update_story_contents_from_model(
         cls,
         versioned_story_contents: VersionedStoryContentsDict,
