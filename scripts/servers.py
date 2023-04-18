@@ -740,6 +740,10 @@ def managed_acceptance_tests_server(
 
     Yields:
         psutil.Process. The jasmine testing process.
+
+    Raises:
+        Exception. The suite_name is not in the list of the acceptance tests
+            suite names.
     """
     nodemodules_jasmine_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jasmine')
