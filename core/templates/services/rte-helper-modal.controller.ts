@@ -33,12 +33,11 @@ import { ServicesConstants } from 'services/services.constants';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-
 const extractVideoIdFromVideoUrl = function(videoUrl) {
   videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-  return (
-    (videoUrl[2] !== undefined) ?
-    videoUrl[2].split(/[^0-9a-z_\-]/i)[0] : videoUrl[0]);
+  return videoUrl[2] !== undefined ?
+    videoUrl[2].split(/[^0-9a-z_\-]/i)[0] :
+    videoUrl[0];
 };
 const typedCloneDeep = <T>(obj: T): T => cloneDeep(obj);
 
@@ -51,9 +50,9 @@ type ComponentSpecsType = typeof ServicesConstants.RTE_COMPONENT_SPECS;
 type ConvertStringLiteralsToString<T> = T extends string
   ? string // If T is a string, return the string type.
   : T extends object
-  // // If T is an object, map each key K of T to a new object with the same
-  // key but a value of ConvertStringLiteralsToString<T[K]>.
-  ? { [K in keyof T]: ConvertStringLiteralsToString<T[K]> }
+  ? // // If T is an object, map each key K of T to a new object with the same
+    // key but a value of ConvertStringLiteralsToString<T[K]>.
+    { [K in keyof T]: ConvertStringLiteralsToString<T[K]> }
   : T; // If T is not a string or an object, return T unchanged.
 
 // CustomizationArgsSpecsType extracts the customization_arg_specs array from
@@ -108,10 +107,9 @@ type CustomizationArgsNameAndValueArray = {
   // Finally, use [keyof ComponentSpecsType] to create a union.
 }[keyof ComponentSpecsType];
 
-
 @Component({
   selector: 'oppia-rte-helper-modal',
-  templateUrl: './rte-helper-modal.component.html'
+  templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
   @Input() customizationArgSpecs: CustomizationArgsSpecsType;
@@ -133,8 +131,8 @@ export class RteHelperModalComponent {
     private contextService: ContextService,
     private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private imageUploadHelperService: ImageUploadHelperService,
-  ) { }
+    private imageUploadHelperService: ImageUploadHelperService
+  ) {}
 
   ngOnInit(): void {
     this.focusManagerService.setFocus('tmpFocusPoint');
@@ -144,13 +142,12 @@ export class RteHelperModalComponent {
         this.currentRteIsMathExpressionEditor = true;
         const mathValueDict = {
           name: caName,
-          value: (
-            this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-              typedCloneDeep(this.attrsCustomizationArgsDict[caName]) :
-              this.customizationArgSpecs[i].default_value
-          )
+          value: this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+            typedCloneDeep(this.attrsCustomizationArgsDict[caName]) :
+            this.customizationArgSpecs[i].default_value,
         } as Extract<
-          CustomizationArgsNameAndValueArray[number], { name: typeof caName }
+          CustomizationArgsNameAndValueArray[number],
+          { name: typeof caName }
         >;
         // If the component being created or edited is math rich text component,
         // we need to pass this extra attribute svgFile to the math RTE editor.
@@ -161,23 +158,24 @@ export class RteHelperModalComponent {
         mathValueDict.value.mathExpressionSvgIsBeingProcessed = false;
         (
           this.tmpCustomizationArgs as Extract<
-            CustomizationArgsNameAndValueArray[number], { name: typeof caName }
+            CustomizationArgsNameAndValueArray[number],
+            { name: typeof caName }
           >[]
         ).push(mathValueDict);
       } else {
         const t = {
           name: caName,
-          value: (
-            this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-              angular.copy(this.attrsCustomizationArgsDict[caName]) :
-              this.customizationArgSpecs[i].default_value
-          )
+          value: this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+            angular.copy(this.attrsCustomizationArgsDict[caName]) :
+            this.customizationArgSpecs[i].default_value,
         } as Extract<
-          CustomizationArgsNameAndValueArray[number], { name: typeof caName }
+          CustomizationArgsNameAndValueArray[number],
+          { name: typeof caName }
         >;
         (
           this.tmpCustomizationArgs as Extract<
-            CustomizationArgsNameAndValueArray[number], { name: typeof caName }
+            CustomizationArgsNameAndValueArray[number],
+            { name: typeof caName }
           >[]
         ).push(t);
       }
@@ -185,12 +183,12 @@ export class RteHelperModalComponent {
     // Infer that the RTE component is a Link if it contains the `url` and
     // `text` customization arg names.
     const customizationArgNames = (
-      this.customizationArgSpecs as {name: string}[]
-    ).map(
-      x => x.name
-    );
-    if (customizationArgNames.includes('url') &&
-      customizationArgNames.includes('text')) {
+      this.customizationArgSpecs as { name: string }[]
+    ).map((x) => x.name);
+    if (
+      customizationArgNames.includes('url') &&
+      customizationArgNames.includes('text')
+    ) {
       this.currentRteIsLinkEditor = true;
     }
 
@@ -211,8 +209,8 @@ export class RteHelperModalComponent {
     }
     const formGroupControls = {};
     this.customizationArgSpecs.forEach((_, index) => {
-      formGroupControls[index] = (
-        this.fb.control(this.tmpCustomizationArgs[index].value)
+      formGroupControls[index] = this.fb.control(
+        this.tmpCustomizationArgs[index].value
       );
     });
 
@@ -253,13 +251,11 @@ export class RteHelperModalComponent {
     if (!this.currentRteIsMathExpressionEditor) {
       return false;
     } else {
-      const { value } = (
-        this.tmpCustomizationArgs[0] as Extract<
-          CustomizationArgsNameAndValueArray[number], { name: 'math_content' }
-        >);
-      return (
-        value.mathExpressionSvgIsBeingProcessed || value.raw_latex === ''
-      );
+      const { value } = this.tmpCustomizationArgs[0] as Extract<
+        CustomizationArgsNameAndValueArray[number],
+        { name: 'math_content' }
+      >;
+      return value.mathExpressionSvgIsBeingProcessed || value.raw_latex === '';
     }
   }
 
@@ -272,7 +268,8 @@ export class RteHelperModalComponent {
       return false;
     }
     const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
-      CustomizationArgsNameAndValueArray[number], { name: 'url' | 'text' }
+      CustomizationArgsNameAndValueArray[number],
+      { name: 'url' | 'text' }
     >[];
     let url: string = tmpCustomizationArgs[0].value;
     let text: string = tmpCustomizationArgs[1].value;
@@ -322,7 +319,8 @@ export class RteHelperModalComponent {
       // The tmpCustomizationArgs is guaranteed to have only one element for
       // the case of math rich text component.
       const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
-        CustomizationArgsNameAndValueArray[number], { name: 'math_content' }
+        CustomizationArgsNameAndValueArray[number],
+        { name: 'math_content' }
       >[];
       const svgFile = tmpCustomizationArgs[0].value.svgFile;
       const svgFileName = tmpCustomizationArgs[0].value.svg_filename;
@@ -330,17 +328,18 @@ export class RteHelperModalComponent {
       if (rawLatex === '' || svgFileName === '') {
         this.alertsService.addWarning(
           'The rawLatex or svgFileName for a Math expression should not ' +
-            'be empty.');
+            'be empty.'
+        );
         this.ngbActiveModal.dismiss('cancel');
         return;
       }
-      const resampledFile = (
-        this.imageUploadHelperService.convertImageDataToImageFile(svgFile));
+      const resampledFile =
+        this.imageUploadHelperService.convertImageDataToImageFile(svgFile);
 
       let maxAllowedFileSize;
       if (
-        this.contextService.getEntityType() === (
-          AppConstants.ENTITY_TYPE.BLOG_POST)
+        this.contextService.getEntityType() ===
+        AppConstants.ENTITY_TYPE.BLOG_POST
       ) {
         const ONE_MB_IN_BYTES = 1 * 1024 * 1024;
         maxAllowedFileSize = ONE_MB_IN_BYTES;
@@ -352,60 +351,76 @@ export class RteHelperModalComponent {
         this.alertsService.addInfoMessage(
           `The SVG file generated exceeds ${maxAllowedFileSize / 1024}` +
             ' KB. Please split the expression into smaller ones.' +
-            '   Example: x^2 + y^2 + z^2 can be split as \'x^2 + y^2\' ' +
-            'and \'+ z^2\'', 5000);
+            "   Example: x^2 + y^2 + z^2 can be split as 'x^2 + y^2' " +
+            "and '+ z^2'",
+          5000
+        );
         this.ngbActiveModal.dismiss('cancel');
         return;
       }
       if (
         this.contextService.getImageSaveDestination() ===
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      ) {
         this.imageLocalStorageService.saveImage(svgFileName, svgFile);
         const mathContentDict = {
           raw_latex: tmpCustomizationArgs[0].value.raw_latex,
-          svg_filename: svgFileName
+          svg_filename: svgFileName,
         };
         const caName = tmpCustomizationArgs[0].name;
         customizationArgsDict[caName] = mathContentDict;
         this.ngbActiveModal.close(customizationArgsDict);
         return;
       }
-      this.assetsBackendApiService.saveMathExpressionImage(
-        resampledFile, svgFileName, this.contextService.getEntityType(),
-        this.contextService.getEntityId()).then((response) => {
-        const mathContentDict = {
-          raw_latex: tmpCustomizationArgs[0].value.raw_latex,
-          svg_filename: response.filename
-        };
-        const caName = tmpCustomizationArgs[0].name;
-        customizationArgsDict[caName] = mathContentDict;
-        this.ngbActiveModal.close(customizationArgsDict);
-      }, (errorResponse) => {
-        this.alertsService.addWarning(
-          errorResponse.error || 'Error communicating with server.');
-        this.ngbActiveModal.dismiss('cancel');
-      });
+      this.assetsBackendApiService
+        .saveMathExpressionImage(
+          resampledFile,
+          svgFileName,
+          this.contextService.getEntityType(),
+          this.contextService.getEntityId()
+        )
+        .then(
+          (response) => {
+            const mathContentDict = {
+              raw_latex: tmpCustomizationArgs[0].value.raw_latex,
+              svg_filename: response.filename,
+            };
+            const caName = tmpCustomizationArgs[0].name;
+            customizationArgsDict[caName] = mathContentDict;
+            this.ngbActiveModal.close(customizationArgsDict);
+          },
+          (errorResponse) => {
+            this.alertsService.addWarning(
+              errorResponse.error || 'Error communicating with server.'
+            );
+            this.ngbActiveModal.dismiss('cancel');
+          }
+        );
     } else {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
         if (caName === 'video_id') {
           const temp = this.tmpCustomizationArgs[i].value;
-          customizationArgsDict[caName] = (
-            extractVideoIdFromVideoUrl(temp.toString()));
+          customizationArgsDict[caName] = extractVideoIdFromVideoUrl(
+            temp.toString()
+          );
         } else if (caName === 'text' && this.currentRteIsLinkEditor) {
           // Set the link `text` to the link `url` if the `text` is empty.
-          (customizationArgsDict as {
-            [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
-              CustomizationArgsNameAndValueArray[number]['value'];
-        })[caName] = (
+          (
+            customizationArgsDict as {
+              [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
+                CustomizationArgsNameAndValueArray[number]['value'];
+            }
+          )[caName] =
             this.tmpCustomizationArgs[i].value ||
-              this.tmpCustomizationArgs[i - 1].value);
+            this.tmpCustomizationArgs[i - 1].value;
         } else {
-          (customizationArgsDict as {
-            [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
-            CustomizationArgsNameAndValueArray[number]['value'];
-        })[caName] = (
-            (this.tmpCustomizationArgs[i]).value);
+          (
+            customizationArgsDict as {
+              [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
+                CustomizationArgsNameAndValueArray[number]['value'];
+            }
+          )[caName] = this.tmpCustomizationArgs[i].value;
         }
       }
       this.ngbActiveModal.close(customizationArgsDict);

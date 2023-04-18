@@ -16,8 +16,8 @@
  * @fileoverview Component for a schema-based editor for custom values.
  */
 
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { AfterViewInit, Component, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CustomSchema, SchemaDefaultValue } from 'services/schema-default-value.service';
 
@@ -38,7 +38,7 @@ import { CustomSchema, SchemaDefaultValue } from 'services/schema-default-value.
   ]
 })
 export class SchemaBasedCustomEditorComponent
-implements ControlValueAccessor, Validator {
+implements ControlValueAccessor, Validator, AfterViewInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -49,6 +49,7 @@ implements ControlValueAccessor, Validator {
   onChange: (_: SchemaDefaultValue) => void = () => {};
   onTouch: () => void = () => {};
   onValidatorChange: () => void = () => {};
+  @ViewChild('hybridForm') hybridForm!: NgForm;
 
   // Implemented as a part of ControlValueAccessor interface.
   registerOnTouched(fn: () => void): void {
@@ -58,6 +59,10 @@ implements ControlValueAccessor, Validator {
   // Implemented as a part of ControlValueAccessor interface.
   registerOnChange(fn: (_: SchemaDefaultValue) => void): void {
     this.onChange = fn;
+  }
+
+  registerOnValidatorChange?(fn: () => void): void {
+    this.onValidatorChange = fn;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
@@ -75,13 +80,19 @@ implements ControlValueAccessor, Validator {
     // object. However, when we move to reactive forms, that validation should
     // be moved here instead (see the Todo below).
     // TODO(#15458): Move template driven validation into code.
-    return {};
+    return this.hybridForm.valid ? null : { invalid: true };
   }
 
   updateValue(value: SchemaDefaultValue): void {
     this.localValueChange.emit(value);
     this.localValue = value;
     this.onChange(value);
+  }
+
+  ngAfterViewInit(): void {
+    this.hybridForm.statusChanges.subscribe(() => {
+      this.onValidatorChange();
+    });
   }
 }
 

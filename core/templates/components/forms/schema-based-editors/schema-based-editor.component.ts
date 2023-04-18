@@ -54,6 +54,7 @@ export class SchemaBasedEditorComponent
   @Input() notRequired!: boolean;
   @Input() iddd?: number;
   onChange: (val: SchemaDefaultValue) => void = () => { };
+  onValidatorChange: () => void = () => {};
   get localValue(): SchemaDefaultValue {
     return this._localValue;
   }
@@ -84,6 +85,10 @@ export class SchemaBasedEditorComponent
   registerOnTouched(): void {
   }
 
+  registerOnValidatorChange?(fn: () => void): void {
+    this.onValidatorChange = fn;
+  }
+
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.form) {
@@ -100,7 +105,7 @@ export class SchemaBasedEditorComponent
     // error because of strict type checking.
     // @ts-ignore
     this.form.statusChanges.subscribe((validationStatus) => {
-      this.localValue = this._localValue;
+      this.onValidatorChange();
       if (angularJsFormController === null ||
         angularJsFormController === undefined) {
         return;
