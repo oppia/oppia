@@ -310,6 +310,40 @@ describe('Translation Suggestion Review Modal Component', function() {
         'suggestion_1', 'suggestion_2']);
     });
 
+    it('should accept a suggestion noting that it was edited in its review ' +
+      'message when clicking on accept and review next suggestion button ' +
+      'after updating the suggestion without providing a review message',
+      function() {
+      component.ngOnInit();
+      expect(component.activeSuggestionId).toBe('suggestion_1');
+      expect(component.activeSuggestion).toEqual(suggestion1);
+      expect(component.reviewable).toBe(reviewable);
+      expect(component.reviewMessage).toBe('');
+
+      spyOn(
+        siteAnalyticsService,
+        'registerContributorDashboardAcceptSuggestion');
+      spyOn(contributionAndReviewService, 'reviewExplorationSuggestion')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            successCallback, errorCallback) => {
+          return Promise.resolve(successCallback(suggestionId));
+        });
+
+      component.translationUpdated = true;
+      component.acceptAndReviewNext();
+
+      expect(
+        siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.reviewExplorationSuggestion)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'accept',
+          '(Note: This suggestion was submitted with reviewer edits.)',
+          'hint section of "StateName" card', jasmine.any(Function),
+          jasmine.any(Function));
+    });
+
     it('should reject suggestion in suggestion modal service when clicking ' +
       'on reject and review next suggestion button', function() {
       component.ngOnInit();
