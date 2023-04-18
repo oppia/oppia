@@ -21,6 +21,15 @@
       </button>
     </div>
 
+    <div class="hide-xs hide-sm hide-md col-4 flex-45 mt-5">
+      <picture>
+        <source type="image/webp"
+                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(bannerImgPath))">
+        <source type="image/png"
+                [srcset]="this.getStaticImageUrl(bannerImgPath)">
+        <img alt="Volunteer page map image - Desktop view" [src]="this.getStaticImageUrl(bannerImgPath)">
+      </picture>
+    </div>
     <div class="hide-gt-md px-5">
       <picture>
         <source type="image/webp"
