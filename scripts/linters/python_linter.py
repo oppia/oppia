@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import ast
 import io
 import os
 import re
@@ -182,10 +183,71 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
                     'Python lint', False, [],
                     ['There are no Python files to lint.'])]
 
+        batch_jobs_dir: str = (
+            os.path.join(os.getcwd(), 'core', 'jobs', 'batch_jobs')
+        )
+        jobs_registry: str = (
+            os.path.join(os.getcwd(), 'core', 'jobs', 'registry.py')
+        )
+
         linter_stdout.append(self.lint_py_files())
         linter_stdout.append(self.check_import_order())
+        linter_stdout.append(check_jobs_imports(
+            batch_jobs_dir, jobs_registry)
+        )
 
         return linter_stdout
+
+
+def check_jobs_imports(
+    batch_jobs_dir: str, jobs_registry: str
+) -> concurrent_task_utils.TaskResult:
+    """This function is used to check that all `jobs.batch_jobs.*_jobs` are
+    imported in `jobs.registry`.
+
+    Args:
+        batch_jobs_dir: str. The path to the batch_jobs directory.
+        jobs_registry: str. The path to the jobs registry file.
+
+    Returns:
+        TaskResult. A TaskResult object representing the result of the lint
+        check.
+    """
+    jobs_files: List[str] = [
+        filename.split('.')[0] for filename in os.listdir(batch_jobs_dir)
+        if filename.endswith('_jobs.py')
+    ]
+
+    with open(jobs_registry, 'r', encoding='utf-8') as file:
+        contents = file.read()
+    tree = ast.parse(contents)
+
+    imports: List[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for n in node.names:
+                imports.append(n.name.split('.')[-1])
+        elif isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                imports.append(alias.name)
+
+    missing_imports: List[str] = []
+    for job_file in jobs_files:
+        if job_file not in imports:
+            missing_imports.append(job_file)
+
+    error_messages: List[str] = []
+    if missing_imports:
+        error_message = 'Following jobs should be imported in %s:\n%s' % (
+            os.path.relpath(jobs_registry), (', '.join(missing_imports))
+        )
+        error_messages.append(error_message)
+    return concurrent_task_utils.TaskResult(
+        'Check jobs imports in jobs registry',
+        bool(missing_imports),
+        error_messages,
+        error_messages
+    )
 
 
 def get_linters(

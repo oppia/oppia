@@ -27,6 +27,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import base
+from core.domain import android_services
 from core.domain import blog_services
 from core.domain import classifier_services
 from core.domain import classroom_services
@@ -937,6 +938,51 @@ def can_access_release_coordinator_page(
             'You do not have credentials to access release coordinator page.')
 
     return test_can_access_release_coordinator_page
+
+
+def can_access_translation_stats(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether user can access translation stats.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access translation stats.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_translation_stats(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user can access translation stats.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access translation stats.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
+            self.user.actions):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access translation stats.')
+
+    return test_can_access_translation_stats
 
 
 def can_manage_memcache(
@@ -3581,6 +3627,53 @@ def can_manage_rights_for_topic(
     return test_can_manage_topic_rights
 
 
+def can_access_classroom_admin_page(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether user can access classroom admin page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the classroom admin page.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_classroom_admin_page(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user is logged in and can access classroom admin page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the classroom admin page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if (
+            role_services.ACTION_ACCESS_CLASSROOM_ADMIN_PAGE in
+            self.user.actions
+        ):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access classroom admin page.')
+
+    return test_can_access_classroom_admin_page
+
+
 def can_change_topic_publication_status(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
@@ -4653,3 +4746,50 @@ def is_from_oppia_android(
         return handler(self, **kwargs)
 
     return test_is_from_oppia_android
+
+
+def is_from_oppia_android_build(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether the request was sent from Oppia Android build
+    process.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_is_from_oppia_android_build(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks whether the request was sent from Oppia Android build process.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            Exception. If the secret API key is not set.
+            UnauthorizedUserException. If incoming request is not from a valid
+                Oppia Android build request.
+        """
+        if (
+            self.request.headers.get('X-ApiKey') is None or
+            not android_services.verify_android_build_secret(
+                self.request.headers['X-ApiKey']
+            )
+        ):
+            raise self.UnauthorizedUserException(
+                'The incoming request is not a valid '
+                'Oppia Android build request.'
+            )
+        return handler(self, **kwargs)
+
+    return test_is_from_oppia_android_build

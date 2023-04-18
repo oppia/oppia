@@ -123,7 +123,8 @@ describe('Translation Modal Component', () => {
     component.contentPanel = new RteOutputDisplayComponent(
       // This throws "Argument of type 'null' is not assignable to parameter of
       // type 'ViewContainerRef'." We need to suppress this error because of
-      // the need to test validations.
+      // the need to test validations. This is because the component is not
+      // strictly typed yet.
       // @ts-ignore
       null, null, new ElementRef({offsetHeight: 200}), null);
     getUserContributionRightsDataAsyncSpy = spyOn(
@@ -320,7 +321,7 @@ describe('Translation Modal Component', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
-    it('should compute panel overlfow after the view has initialized', () => {
+    it('should compute panel overflow after the view has initialized', () => {
       spyOn(component, 'computePanelOverflowState');
 
       component.ngAfterViewInit();
@@ -328,10 +329,10 @@ describe('Translation Modal Component', () => {
       expect(component.computePanelOverflowState).toHaveBeenCalled();
     });
 
-    it('should compute editor overlfow after the view has changed', () => {
+    it('should compute editor overflow after the view has changed', () => {
       spyOn(component, 'computeTranslationEditorOverflowState');
 
-      component.ngAfterViewChecked();
+      component.ngAfterContentChecked();
 
       expect(component.computeTranslationEditorOverflowState)
         .toHaveBeenCalled();

@@ -196,9 +196,8 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             contains: (text: string) => {
               return true;
             }
-          }
-
-        }
+          },
+        } as unknown as EventTarget
       );
       spyOn(currentInteractionService, 'onSubmit').and.callThrough();
       spyOn(component, 'submitAnswer').and.callThrough();
@@ -212,8 +211,24 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       expect(component.userSelections).toEqual({
         'choice 1': true,
       });
-      expect(component.submitAnswer).toHaveBeenCalledTimes(2);
-      expect(currentInteractionService.onSubmit).toHaveBeenCalledTimes(2);
+      expect(component.submitAnswer).toHaveBeenCalledTimes(1);
+      expect(currentInteractionService.onSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should be able to call onsubmit event while submitting answer', () => {
+      component.userSelections = {
+        'choice 1': true
+      };
+      component.choices = ['choice 1', 'choice 2'];
+      component.choicesValue = [
+        SubtitledHtml.createDefault('choice 1', 'content_id_1')
+      ];
+
+      spyOn(currentInteractionService, 'onSubmit').and.callThrough();
+
+      component.submitAnswer();
+
+      expect(currentInteractionService.onSubmit).toHaveBeenCalledTimes(1);
     });
 
     it('should not submit answer when user click an option if user is using a' +
@@ -254,9 +269,8 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             contains: (text: string) => {
               return true;
             }
-          }
-
-        }
+          },
+        } as unknown as EventTarget
       );
       spyOn(currentInteractionService, 'onSubmit').and.callThrough();
       spyOn(component, 'submitAnswer').and.callThrough();

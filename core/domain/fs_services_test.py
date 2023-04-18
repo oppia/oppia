@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+from unittest import mock
 
 from core import feconf
 from core import utils
@@ -189,6 +190,44 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
         self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
+    def test_skip_upload_if_image_already_exists(self) -> None:
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            original_image_content = f.read()
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID)
+
+        # Save the image for the first time.
+        fs_services.save_original_and_compressed_versions_of_image(
+            self.FILENAME, 'exploration', self.EXPLORATION_ID,
+            original_image_content, 'image', True)
+
+        # Ensure the image is saved.
+        self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
+
+        # Get the content of the saved image.
+        saved_image_content = fs.get('image/%s' % self.FILENAME)
+
+        # Here we use object because we need a generic base class
+        # that can accommodate any type of object,
+        # regardless of its specific implementation.
+        with mock.patch.object(fs, 'commit') as mock_commit:
+            # Save the image again (should be skipped due to existence).
+            fs_services.save_original_and_compressed_versions_of_image(
+                self.FILENAME, 'exploration', self.EXPLORATION_ID,
+                original_image_content, 'image', True)
+
+            # Assert that fs.commit was not called.
+            mock_commit.assert_not_called()
+
+        # Get the content of the image after attempting the second save.
+        new_saved_image_content = fs.get('image/%s' % self.FILENAME)
+
+        # Check that the content of the image remains the same after the second
+        # save attempt.
+        self.assertEqual(saved_image_content, new_saved_image_content)
+
     def test_compress_image_on_prod_mode_with_small_image_size(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -332,3 +371,12 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
         self.assertTrue(self.fs.isfile('job_id-classifier-data.pb.xz'))
         fs_services.delete_classifier_data('exp_id', 'job_id')
         self.assertFalse(self.fs.isfile('job_id-classifier-data.pb.xz'))
+
+    def test_delete_non_existent_classifier_data(self) -> None:
+        """Test that delete_classifier_data does not raise an error when trying
+        to delete non-existent classifier data.
+        """
+        filepath = 'job_id_2-classifier-data.pb.xz'
+        self.assertFalse(self.fs.isfile(filepath))
+        fs_services.delete_classifier_data('exp_id', 'job_id_2')
+        self.assertFalse(self.fs.isfile(filepath))

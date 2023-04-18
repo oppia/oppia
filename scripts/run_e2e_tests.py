@@ -31,7 +31,6 @@ from scripts import common  # isort:skip pylint: disable=wrong-import-position, 
 
 from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
-from scripts import flake_checker  # isort:skip
 from scripts import install_third_party_libs  # isort:skip
 from scripts import servers  # isort:skip
 
@@ -198,10 +197,10 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         dev_mode = not args.prod_env
 
         if args.skip_build:
-            build.modify_constants(prod_env=args.prod_env)
+            common.modify_constants(prod_env=args.prod_env)
         else:
             build_js_files(dev_mode, source_maps=args.source_maps)
-        stack.callback(build.set_constants_to_default)
+        stack.callback(common.set_constants_to_default)
 
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
@@ -272,29 +271,7 @@ def main(args: Optional[List[str]] = None) -> None:
     parsed_args = _PARSER.parse_args(args=args)
 
     with servers.managed_portserver():
-        for attempt_num in range(1, MAX_RETRY_COUNT + 1):
-            print('***Attempt %d.***' % attempt_num)
-            output, return_code = run_tests(parsed_args)
-
-            if not flake_checker.check_if_on_ci():
-                # Don't rerun off of CI.
-                print('No reruns because not running on CI.')
-                break
-
-            if return_code == 0:
-                # Don't rerun passing tests.
-                flake_checker.report_pass(parsed_args.suite)
-                break
-
-            # Check whether we should rerun based on the instructions from the
-            # flake checker server.
-            rerun = flake_checker.check_test_flakiness(
-                output, parsed_args.suite)
-            if rerun:
-                print('Rerunning.')
-            else:
-                print('Not rerunning.')
-                break
+        _, return_code = run_tests(parsed_args)
 
     sys.exit(return_code)
 

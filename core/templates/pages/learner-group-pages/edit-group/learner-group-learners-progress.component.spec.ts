@@ -28,6 +28,7 @@ import { LearnerGroupLearnersProgressComponent } from './learner-group-learners-
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
+import { UserService } from 'services/user.service';
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
@@ -47,6 +48,7 @@ describe('LearnerGroupLearnersProgressComponent', () => {
     LearnerGroupSyllabusBackendApiService;
   let navigationService: NavigationService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
+  let userService: UserService;
 
   const sampleLearnerGroupSubtopicSummaryDict = {
     subtopic_id: 1,
@@ -90,7 +92,6 @@ describe('LearnerGroupLearnersProgressComponent', () => {
   const sampleLearnerGroupUserProgDict = {
     username: 'username2',
     progress_sharing_is_turned_on: true,
-    profile_picture_data_url: 'picture',
     stories_progress: [sampleStorySummaryBackendDict],
     subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
   };
@@ -137,9 +138,12 @@ describe('LearnerGroupLearnersProgressComponent', () => {
     storyViewerBackendApiService = TestBed.inject(
       StoryViewerBackendApiService);
     fixture = TestBed.createComponent(LearnerGroupLearnersProgressComponent);
+    userService = TestBed.inject(UserService);
     component = fixture.componentInstance;
 
     component.learnerGroup = learnerGroup;
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
+      ['default-image-url-png', 'default-image-url-webp']);
   });
 
   it('should initialize', fakeAsync(() => {
@@ -200,9 +204,14 @@ describe('LearnerGroupLearnersProgressComponent', () => {
     }
   );
 
-  it('should get user profile image data url correctly', () => {
-    const dataUrl = '%2Fimages%2Furl%2F1';
-    expect(component.getProfileImageDataUrl(dataUrl)).toBe('/images/url/1');
+  it('should get user profile image png data url correctly', () => {
+    expect(component.getProfileImagePngDataUrl('username')).toBe(
+      'default-image-url-png');
+  });
+
+  it('should get user profile image webp data url correctly', () => {
+    expect(component.getProfileImageWebpDataUrl('username')).toBe(
+      'default-image-url-webp');
   });
 
   it('should open submenu', () => {

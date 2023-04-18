@@ -2,14 +2,18 @@
   <div class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
     <div class="oppia-editor-card-body">
       <div class="state-responses-header-container oppia-mobile-collapsible-card-header">
-        <div class="state-responses-header" (click)="toggleResponseCard()">
+        <div class="state-responses-header"
+             (click)="toggleResponseCard()"
+             (keydown.enter)="toggleResponseCard()">
           <h3 class="oppia-exp-answer-card-header">Learner's Answers and Oppia's Responses</h3>
           <i class="fa fa-caret-down"
              *ngIf="!responseCardIsShown"
+             tabindex="0"
              aria-hidden="true">
           </i>
           <i class="fa fa-caret-up"
              *ngIf="responseCardIsShown"
+             tabindex="0"
              aria-hidden="true">
           </i>
         </div>
@@ -23,6 +27,7 @@
             <div [cdkDragDisabled]="activeAnswerGroupIndex === index ? true : false"
                  cdkDrag
                  *ngFor="let answerGroup of answerGroups; let index = index"
+                 role="tab"
                  [ngClass]="{'active': activeAnswerGroupIndex === index}"
                  class="oppia-sortable-rule-block oppia-prevent-selection">
 
@@ -32,7 +37,7 @@
 
               <div class="oppia-rule-header-warning-placement" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
                    ngbTooltip="{{getOutcomeTooltip(answerGroup.outcome)}}"
-                   placement="bottom">
+                   placement="auto">
                 <div class="oppia-rule-header-warning-style" >
                   ⚠
                 </div>
@@ -69,10 +74,12 @@
                                                [addState]="addState">
                     </oppia-answer-group-editor>
                   </div>
-                  <div class="btn btn-danger oppia-delete-response e2e-test-delete-response"
-                       *ngIf="editabilityService.isEditable()"
-                       (click)="deleteAnswerGroup($event, index)">
-                    Delete Response
+                  <div *ngIf="editabilityService.isEditable()">
+                    <button type="button"
+                            class="btn btn-danger oppia-delete-response e2e-test-delete-response"
+                            (click)="deleteAnswerGroup($event, index)">
+                      Delete Response
+                    </button>
                   </div>
                 </div>
               </div>
@@ -82,12 +89,14 @@
         </div>
         <div *ngIf="!suppressDefaultAnswerGroup()">
           <div class="oppia-option-list nav-stacked nav-pills" role="tablist">
-            <div class="option-list-default" [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}">
+            <div class="option-list-default"
+                 [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}"
+                 role="tab">
               <div class="oppia-rule-header-warning-placement"
                    *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome))"
                    (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
                    ngbTooltip="{{getOutcomeTooltip(defaultOutcome)}}"
-                   placement="bottom">
+                   placement="auto">
                 <div class="oppia-rule-header-warning-style" >
                   ⚠
                 </div>
@@ -131,7 +140,9 @@
         </div>
         <div class="oppia-add-response-button-container">
           <div *ngIf="editabilityService.isEditableOutsideTutorialMode() && !isCurrentInteractionLinear() && editabilityService.isEditable()">
-            <button type="button" class="btn btn-secondary oppia-add-response-button e2e-test-open-add-response-modal" (click)="openAddAnswerGroupModal()">
+            <button type="button"
+                    class="btn btn-secondary oppia-add-response-button e2e-test-open-add-response-modal"
+                    (click)="openAddAnswerGroupModal()">
               + ADD RESPONSE
             </button>
           </div>

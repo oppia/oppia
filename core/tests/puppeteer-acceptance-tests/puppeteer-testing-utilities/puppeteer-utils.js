@@ -20,6 +20,10 @@ const puppeteer = require('puppeteer');
 const testConstants = require('./test-constants.js');
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+/** We accept the empty message because this is what is sent on
+ * 'beforeunload' due to an issue with Chromium (see
+ * https://github.com/puppeteer/puppeteer/issues/3725). */
+const acceptedBrowserAlerts = ['', 'Changes that you made may not be saved.'];
 
 module.exports = class baseUser {
   constructor() {
@@ -42,13 +46,13 @@ module.exports = class baseUser {
         this.browserObject = browser;
         this.page = await browser.newPage();
         await this.page.setViewport({ width: 0, height: 0 });
-        // We are doing this generically because the on-alert behaviour needs
-        // to be defined through an event listener, and Puppeteer does not
-        // support handling these alerts on a case-by-case basis.
-        // See (https://github.com/puppeteer/puppeteer/blob/v0.12.0/docs/api.md#class-dialog)
-        // for more information.
         this.page.on('dialog', async(dialog) => {
-          await dialog.accept();
+          const alertText = dialog.message();
+          if (acceptedBrowserAlerts.includes(alertText)) {
+            await dialog.accept();
+          } else {
+            throw new Error(`Unexpected alert: ${alertText}`);
+          }
         });
       });
 
@@ -100,8 +104,11 @@ module.exports = class baseUser {
    */
   async clickOn(selector) {
     try {
+      /** Normalize-space is used to remove the extra spaces in the text.
+       * Check the documentation for the normalize-space function here :
+       * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
       const [button] = await this.page.$x(
-        `\/\/*[contains(text(), '${selector}')]`);
+        `\/\/*[contains(text(), normalize-space('${selector}'))]`);
       await button.click();
     } catch (error) {
       await this.page.waitForSelector(selector);

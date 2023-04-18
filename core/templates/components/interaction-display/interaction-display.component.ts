@@ -36,6 +36,7 @@ export class InteractionDisplayComponent {
   // This property contains the list of classes that needs to be applied to
   // parent container of the created interaction.
   @Input() classStr!: string;
+  // TODO(#13015): Remove use of unknown as a type.
   // The passed htmlData sometimes accesses property from parent scope.
   @Input() parentScope!: unknown;
 
@@ -76,6 +77,12 @@ export class InteractionDisplayComponent {
           let attributeValue = attribute.value;
 
           // Properties enclosed with [] needs to be resolved from parent scope.
+          // NOTE TO DEVELOPERS: The variables in this case are keyed by the
+          // attribute name and not the attribute value, so when passing down
+          // scoped variables (eg in codebase: lastAnswer, savedSolution) make
+          // sure the name of the attribute is the same as the local variable
+          // that it should be bound to and not the value (seems like the value
+          // is irrelevant for this usecase).
           if (/[\])}[{(]/g.test(attribute.name)) {
             if (this.parentScope) {
               attributeValue = this.parentScope[attributeNameInCamelCase];
