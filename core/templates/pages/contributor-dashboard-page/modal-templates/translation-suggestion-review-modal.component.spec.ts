@@ -313,7 +313,7 @@ describe('Translation Suggestion Review Modal Component', function() {
     it('should accept a suggestion noting that it was edited in its review ' +
       'message when clicking on accept and review next suggestion button ' +
       'after updating the suggestion without providing a review message',
-      function() {
+    function() {
       component.ngOnInit();
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
