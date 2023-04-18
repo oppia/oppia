@@ -1501,7 +1501,6 @@ class Story:
         v6 schema.
 
         Args:
-            story_id: str. The unique ID of the story.
             story_contents_dict: dict. A dict used to initialize a Story
                 Contents domain object.
 
