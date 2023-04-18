@@ -33,10 +33,10 @@
     <div class="hide-gt-md px-5">
       <picture>
         <source type="image/webp"
-                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(mapImgPath))">
+                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(bannerImgPath))">
         <source type="image/png"
-                [srcset]="this.getStaticImageUrl(mapImgPath)">
-        <img alt="Volunteer page map image - Mobile view" [src]="this.getStaticImageUrl(mapImgPath)">
+                [srcset]="this.getStaticImageUrl(bannerImgPath)">
+        <img alt="Volunteer page team image - Mobile view" [src]="this.getStaticImageUrl(bannerImgPath)">
       </picture>
     </div>
   </div>
@@ -68,7 +68,7 @@
     <h2 class="oppia-volunteer-h2 mb-5">Meet Our Volunteers</h2>
     <div class="oppia-volunteer-tabs">
       <mat-tab-group mat-stretch-tabs mat-align-tabs="center">
-        <mat-tab label="Art">
+        <mat-tab label="Art and Design">
           <div class="row pt-3">
             <div class="col oppia-volunteer-tab-description">
               <h3 class="mb-5 carousel-header">Our Impact and Responsibilities</h3>
@@ -86,12 +86,6 @@
                 Work within a community of illustrators from around the world
                 to help define illustration styles that represent the organization.
               </p>
-              <h4 class="carousel-sub-header">Support art-related needs</h4>
-              <p>
-                Collabrate with other teams in designing art for flyers, posters,
-                social media, etc.
-              </p>
-
 
             </div>
             <div class="col">
@@ -170,58 +164,6 @@
               </ngb-carousel>
 
             </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Learner Feedback">
-          <div class="row pt-3">
-            <div class="col oppia-volunteer-tab-description">
-              <h3 class="mb-5 carousel-header">Our Impact and Responsibilities</h3>
-              <p class="mb-5">
-                Oppia’s mission is to create an effective and easy-to-use learning platform for students
-                around the world to gain access to education. Our learning platform is built and maintained
-                by volunteer developers who share our mission of making education accessible to students of all backgrounds.
-              </p>
-              <h4 class="carousel-sub-header pt-5">Design New Features</h4>
-              <p>
-                Create an accessible UX (user experience) through writing and design on all platforms so that anyone can conveniently learn from
-                 Oppia’s high-quality lessons and navigate our website and application.
-              </p>
-              <h4 class="carousel-sub-header">Improve the Platform</h4>
-              <p>
-                Improve Oppia’s learning infrastructure by ensuring that it runs smoothly
-                 and smartly to better support student success and ensure students do not get stuck.
-              </p>
-              <h4 class="carousel-sub-header">Keep Oppia Running</h4>
-              <p>
-                Improve the overall performance of the Oppia platform and strengthen
-                the technical codebase.
-              </p>
-            </div>
-            <div class="col">
-
-              <ngb-carousel *ngIf="learnerFeedback.images.length > 0">
-                <ng-template *ngFor="let image of learnerFeedback.images; index as index" ngbSlide>
-                  <div class="oppia-carousel-wrapper">
-                    <picture>
-                      <source type="image/webp"
-                              [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
-                      <source type="image/png"
-                              [srcset]="this.getStaticImageUrl(image)">
-                      <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
-                    </picture>
-                  </div>
-                  <div class="carousel-caption">
-                    <p> {{ learnerFeedback.caption[index].content }} </p>
-                    <div class="oppia-volunteer-name">
-                      <p><b> {{ learnerFeedback.caption[index].name }} </b></p>
-                      <p><i> {{ learnerFeedback.caption[index].type }} </i></p>
-                    </div>
-                  </div>
-                </ng-template>
-              </ngb-carousel>
-
-            </div>
-
           </div>
         </mat-tab>
         <mat-tab label="Lesson Creation">
@@ -383,7 +325,7 @@
     </div>
   </div>
 
-  <div class="oppia-volunteer-footer">
+  <div class="oppia-volunteer-footer" [ngStyle]="{ 'background-image': 'url(' + getStaticImageUrl(footerImgPath) + ')' }">
     <p>
       If you're interested in helping out, let us know your
       skills and interests and a lead will reach out to you shortly!
@@ -597,7 +539,6 @@
   }
 
   .oppia-volunteer-footer {
-    background-color: #edf6f6;
     font-size: 1.3em;
     padding: 3em 25% 1em 25%;
     text-align: center;
