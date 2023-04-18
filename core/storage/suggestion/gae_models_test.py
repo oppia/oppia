@@ -22,7 +22,6 @@ import datetime
 
 from core import feconf
 from core.constants import constants
-from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -961,9 +960,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, 'author_4',
             'reviewer_2', self.change_cmd, 'category1',
             suggestion_2_id, self.question_language_code)
-        topic = topic_domain.Topic.create_default_topic(
-            'topic_id', 'Name', 'abbrev', 'description', 'fragm')
-        topic.uncategorized_skill_ids = [skill_2_id]
 
         results, _ = (
             suggestion_models.GeneralSuggestionModel
@@ -983,7 +979,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 user_id=user_id,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                topics=[topic]))
+                filter_topic_skills=[skill_2_id]))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
