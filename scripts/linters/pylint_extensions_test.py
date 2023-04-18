@@ -2680,7 +2680,6 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 # Some other content of module two.
 
                 def test_foo(arg: str) -> str:
-
                 def foo(exp_id: str) -> str:  # type: ignore[arg-type]
                     return 'hi' #@
                 """
@@ -3273,7 +3272,6 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 # Some other content of module two.
 
                 def test_foo(arg: str) -> str:
-
                 def foo(exp_id: str) -> object:
                     return 'hi' #@
                 """
@@ -3311,7 +3309,6 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 # Some other content of module one.
 
                 def test_foo(arg: str) -> str:
-
                 def foo(exp_id: str) -> object:
                     return 'hi' #@
                 """
@@ -4442,7 +4439,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_schema_handlers_without_request_args_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
@@ -4463,7 +4459,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 schemaless_class_node)
 
     def test_schema_handlers_without_url_path_args_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
@@ -4485,7 +4480,6 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 schemaless_class_node)
 
     def test_handlers_with_valid_schema_do_not_raise_error(self) -> None:
-
         schemaless_class_node = astroid.extract_node(
             """
             class BaseHandler():
@@ -4710,8 +4704,8 @@ class BlankLineBelowFunctionDefCheckerTests(unittest.TestCase):
         node = astroid.extract_node(
             """
             class TestClass():
-                def fun_one():
-
+                def fun_one(): #@
+                               #@
                     return "Hello, World!"
 
                 def fun_two():
