@@ -2925,15 +2925,20 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
-class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
+class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Checks if there a single blank line after function definition."""
+
     __implements__ = interfaces.IAstroidChecker
 
     name = 'space_after_function_def'
 
-    msgs = {'C0041': ('Blank line after function definition',
-                        'Blank-line-after-function-definition',
-                        'Please remove blank line after function definition')}
+    msgs = {
+        'C0041': (
+            'Blank line after function definition',
+            'Blank-line-after-function-definition',
+            'Please remove blank line after function definition',
+        ),
+    }
 
     def visit_module(self, node):
         """Visit a module to ensure that there is a blank line below
@@ -2950,7 +2955,7 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
         for lineno,line in enumerate(code_list):
             if b'def ' in code_list[lineno]:
                 if code_list[lineno+1] == b'\n':
-                    self.add_message("Blank-line-after-function-definition",
+                    self.add_message('Blank-line-after-function-definition',
                     line=lineno+2, node=node)
 
 def register(linter: lint.PyLinter) -> None:
