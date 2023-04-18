@@ -11,7 +11,7 @@
         &emsp;Auto Saving ...
       </span>
     </div>
-    <div class="navbar-icons">
+    <ul class="navbar-icons">
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
         <a href="#"
@@ -135,7 +135,7 @@
           <i class="fas fa-question-circle navbar-tab-icon"></i>
         </a>
       </li>
-    </div>
+    </ul>
   </div>
   <div *ngIf="explorationEditorPageHasInitialized && editabilityService.isLockedByAdmin()" class="exploration-locked-for-editing-banner">
     This exploration is currently locked to new edits. Please contact an admin for assistance.
