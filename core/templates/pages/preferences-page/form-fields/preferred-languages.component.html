@@ -2,12 +2,12 @@
   <mat-label class="text-capitalize">
     {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
   </mat-label>
-  <mat-chip-list #chipList aria-label="Preferred Exploration Languages">
+  <mat-chip-list #chipList aria-label="Preferred exploration Languages">
     <mat-chip *ngFor="let language of preferredLanguages"
               [selectable]="selectable"
               [removable]="removable"
               (removed)="remove(language)">
-      <ng-container *ngFor="let choice of choices" >
+      <ng-container *ngFor="let choice of choices">
         <ng-container *ngIf="choice.id === language">
           {{ choice.text }}
         </ng-container>
@@ -21,7 +21,9 @@
             [matChipInputFor]="chipList"
             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
             (matChipInputTokenEnd)="add($event)"
-            [(ngModel)]="searchQuery" (ngModelChange)="onSearchInputChange($event)" (click)="onInputBoxClick()">
+            [(ngModel)]="searchQuery" 
+            (ngModelChange)="onSearchInputChange($event)" 
+            (click)="onInputBoxClick()">
   </mat-chip-list>
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
     <mat-option *ngFor="let choice of filteredChoices" [value]="choice.id">
