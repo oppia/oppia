@@ -1495,7 +1495,6 @@ class Story:
     @classmethod
     def _convert_story_contents_v5_dict_to_v6_dict(
         cls,
-        story_id: str,
         story_contents_dict: StoryContentsDict
     ) -> StoryContentsDict:
         """Dummy function to convert v5 Story Contents schema to the modern
