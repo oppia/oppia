@@ -1832,7 +1832,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 limit=constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                topics=None
+                filter_topic_skills=None
             ))
 
         # Expect that the results correspond to question suggestions.
