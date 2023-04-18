@@ -93,8 +93,8 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
-    this.bannerImgPath = '/volunteer/banner_background.png';
-    this.footerImgPath = '/volunteer/footer_background.png';
+    this.bannerImgPath = '/volunteer/banner-background.png';
+    this.footerImgPath = '/volunteer/footer-background.png';
 
     this.art = {
       images: [
