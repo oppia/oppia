@@ -4660,7 +4660,7 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
 
 
 class BlankLineBelowFunctionDefCheckerTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (

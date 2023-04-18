@@ -2940,7 +2940,7 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):  # type: ignore[mi
         ),
     }
 
-    def visit_module(self, node):
+    def visit_module(self, node) -> None:
         """Visit a module to ensure that there is a blank line below
         file overview docstring.
 
