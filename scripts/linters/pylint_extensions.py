@@ -2931,7 +2931,7 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):  # type: ignore[mi
     __implements__ = interfaces.IAstroidChecker
 
     name = 'space_after_function_def'
-
+    priority = -1
     msgs = {
         'C0041': (
             'Blank line after function definition',

@@ -4704,35 +4704,18 @@ class BlankLineBelowFunctionDefCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_module(
                 node)
 
-    def test_function_with_blank_line_after_definition_inside_another_function(
-        self,
-    ) -> None:
-        node = astroid.extract_node(
-            """
-            def outside():
-                def inside():
-
-                    return "inside"
-                if True:
-                    return inside()
-            return "outside"
-        """)
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node)
-
-    def test_function_with_blank_line_after_definition_inside_another_function(
+    def test_method_with_blank_line_after_definition(
         self,
     ) -> None:
         node = astroid.extract_node(
             """
             class TestClass():
-                def foo():
+                def fun_one():
 
-                    return "foo"
+                    return "Hello, World!"
 
-                def bar():
-                    return "bar"
+                def fun_two():
+                    return "Hello, World!"
         """)
         with self.checker_test_object.assertAddsMessages(
             testutils.Message(
