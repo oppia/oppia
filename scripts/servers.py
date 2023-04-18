@@ -730,7 +730,8 @@ def managed_acceptance_tests_server(
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the acceptance tests
-    server gracefully.
+    server gracefully. If the suite_name is not in the list of the
+    acceptance tests suite names, then raises an exception.
 
     Args:
         suite_name: str. The suite name whose tests should be run.
@@ -759,7 +760,7 @@ def managed_acceptance_tests_server(
         raise Exception('Invalid suite name: %s' % suite_name)
 
     # OK to use shell=True here because we are passing string literals,
-    # and verifying that the passed suite-name are within the list of 
+    # and verifying that the passed suite-name are within the list of
     # the suites we have, so there is no risk of a shell-injection attack.
     managed_acceptance_tests_proc = managed_process(
         acceptance_tests_args,

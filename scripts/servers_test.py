@@ -1038,7 +1038,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_acceptance_test_server_with_explicit_args(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        test_file_path = 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js'
+        test_file_path = 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js' # pylint: disable=line-too-long
 
         self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
             suite_name=test_file_path,
@@ -1052,10 +1052,11 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn(test_file_path, program_args)
 
     def test_managed_acceptance_test_server_with_invalid_suite(self) -> None:
-        suite_name = "invalid_suite"
+        suite_name = 'invalid_suite'
 
         expected_regexp = 'Invalid suite name: %s' % suite_name
         with self.assertRaisesRegex(Exception, expected_regexp):
-            self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
-                suite_name=suite_name,
-                stdout=subprocess.PIPE))
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name=suite_name,
+                    stdout=subprocess.PIPE))
