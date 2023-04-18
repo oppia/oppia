@@ -755,6 +755,12 @@ def managed_acceptance_tests_server(
         '%s' % os.path.join(spec_dir_path, suite_name)
     ]
 
+    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+        raise Exception('Invalid suite name: %s' % suite_name)
+
+    # OK to use shell=True here because we are passing string literals,
+    # and verifying that the passed suite-name are within the list of 
+    # the suites we have, so there is no risk of a shell-injection attack.
     managed_acceptance_tests_proc = managed_process(
         acceptance_tests_args,
         human_readable_name='Acceptance Tests Server',
