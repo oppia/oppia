@@ -302,6 +302,10 @@ export class RteHelperModalComponent {
   }
 
   save(): void {
+    for (let index in this.customizationArgsForm.value) {
+      this.tmpCustomizationArgs[index].value = (
+        this.customizationArgsForm.value[index]);
+    }
     this.externalRteSaveService.onExternalRteSave.emit();
 
     const customizationArgsDict: {
