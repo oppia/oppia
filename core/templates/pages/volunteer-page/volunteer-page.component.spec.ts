@@ -71,8 +71,10 @@ describe('Volunteer page', () => {
     spyOn(translateService.onLangChange, 'subscribe');
     component.ngOnInit();
 
-    expect(component.mapImgPath).toBe(
-      '/volunteer/map.png');
+    expect(component.bannerImgPath).toBe(
+      '/volunteer/banner-background.png');
+    expect(component.footerImgPath).toBe(
+      '/volunteer/footer-background.png');
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   });
 
