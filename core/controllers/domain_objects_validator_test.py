@@ -29,6 +29,7 @@ from core.domain import change_domain
 from core.domain import improvements_domain
 from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import stats_domain
 from core.domain import translation_domain
 from core.tests import test_utils
 
@@ -445,6 +446,149 @@ class ValidarteTaskEntriesTests(test_utils.GenericTestBase):
         task_entry_no_entity_version = copy.deepcopy(self.task_entry_dict)
         domain_objects_validator.validate_task_entries(
                 task_entry_no_entity_version)
+
+
+class ValidateAggregatedStatsTests(test_utils.GenericTestBase):
+    """Tests for validate aggregated stats tests.
+
+    The tests here are copied from core.domain.stats_domain_test in
+    SessionStateStatsTests class, because validate_aggregated_stats simply
+    forwards its argument to SessionStateStats.validate_aggregated_stats_dict,
+    which is already tested in SessionStateStatsTests.
+    """
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[typeddict-item] is used
+    # to test that num_starts must be in aggregated stats dict.
+    def test_aggregated_stats_validation_when_session_property_is_missing(
+            self
+        ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = { # type: ignore[typeddict-item]
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'num_starts not in aggregated stats dict.'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[typeddict-item] is used
+    # to test that num_actual_starts must be an int.
+    def test_aggregated_stats_validation_when_session_property_type_is_invalid(
+        self
+    ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = {
+            'num_starts': 1,
+            'num_actual_starts': 'invalid_type', # type: ignore[typeddict-item]
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected num_actual_starts to be an int, received invalid_type'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
+
+    def test_aggregated_stats_validation_when_state_property_type_is_missing(
+        self
+    ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'total_answers_count not in state stats mapping of Home in '
+            'aggregated stats dict.'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[dict-item] is used to
+    # test that first_hit_count must be an int.
+    def test_aggregated_stats_validation_when_state_property_type_is_invalid(
+        self
+    ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 'invalid_count', # type: ignore[dict-item]
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected first_hit_count to be an int, received invalid_count'
+        ):
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats)
+
+    def test_aggregated_stats_validation_when_fully_valid(
+        self
+    ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        self.assertEqual(
+            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+                sessions_state_stats
+            ),
+            sessions_state_stats
+        )
 
 
 class ValidateSkillIdsTests(test_utils.GenericTestBase):
