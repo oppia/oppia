@@ -722,3 +722,57 @@ def managed_webdriverio_server(
             yield proc
     finally:
         del os.environ['MOBILE']
+
+
+@contextlib.contextmanager
+def managed_acceptance_tests_server(
+    suite_name: str,
+    stdout: int = subprocess.PIPE,
+) -> Iterator[psutil.Process]:
+    """Returns context manager to start/stop the acceptance tests
+    server gracefully. If the suite_name is not in the list of the
+    acceptance tests suite names, then raises an exception.
+
+    Args:
+        suite_name: str. The suite name whose tests should be run.
+        stdout: int. This parameter specifies the executed program's standard
+            output file handle.
+
+    Yields:
+        psutil.Process. The jasmine testing process.
+
+    Raises:
+        Exception. The suite_name is not in the list of the acceptance tests
+            suite names.
+    """
+    nodemodules_jasmine_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jasmine')
+    puppeteer_acceptance_tests_dir_path = os.path.join(
+        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+    spec_dir_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'spec')
+    jasmine_config_file_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'jasmine.json')
+
+    acceptance_tests_args = [
+        nodemodules_jasmine_bin_path,
+        '--config="%s"' % jasmine_config_file_path,
+        '%s' % os.path.join(spec_dir_path, suite_name)
+    ]
+
+    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+        raise Exception('Invalid suite name: %s' % suite_name)
+
+    # OK to use shell=True here because we are passing string literals,
+    # and verifying that the passed suite-name are within the list of
+    # the suites we have, so there is no risk of a shell-injection attack.
+    managed_acceptance_tests_proc = managed_process(
+        acceptance_tests_args,
+        human_readable_name='Acceptance Tests Server',
+        shell=True,
+        raise_on_nonzero_exit=False,
+        stdout=stdout,
+    )
+
+    with managed_acceptance_tests_proc as proc:
+        yield proc

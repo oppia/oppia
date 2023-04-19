@@ -85,9 +85,9 @@ let createNewBlogPostEditor = async function(username) {
     username, 'blog_post_editor@example.com');
 
   await blogAdmin.assignUserToRoleFromBlogAdminPage(
-    'blogPostEditor', 'BLOG_POST_EDITOR');
+    username, 'BLOG_POST_EDITOR');
   await superAdminInstance.expectUserToHaveRole(
-    'blogPostEditor', ROLE_BLOG_POST_EDITOR);
+    username, ROLE_BLOG_POST_EDITOR);
 
   activeUsers.push(blogPostEditor);
   return blogPostEditor;

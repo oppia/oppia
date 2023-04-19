@@ -20,13 +20,13 @@ const path = require('path');
 
 let testConstants = {
   URLs: {
-    home: 'http://localhost:8181/',
-    BlogDashboard: 'http://localhost:8181/blog-dashboard',
-    BlogAdmin: 'http://localhost:8181/blog-admin',
-    CreatorDashboard: 'http://localhost:8181/creator-dashboard',
-    AdminPage: 'http://localhost:8181/admin',
-    RolesEditorTab: 'http://localhost:8181/admin#/roles',
-    logout: 'http://localhost:8181/logout'
+    home: 'http://localhost:9001/',
+    BlogDashboard: 'http://localhost:9001/blog-dashboard',
+    BlogAdmin: 'http://localhost:9001/blog-admin',
+    CreatorDashboard: 'http://localhost:9001/creator-dashboard',
+    AdminPage: 'http://localhost:9001/admin',
+    RolesEditorTab: 'http://localhost:9001/admin#/roles',
+    logout: 'http://localhost:9001/logout'
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',

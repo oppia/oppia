@@ -23,7 +23,11 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
  * 'beforeunload' due to an issue with Chromium (see
  * https://github.com/puppeteer/puppeteer/issues/3725). */
-const acceptedBrowserAlerts = ['', 'Changes that you made may not be saved.'];
+const acceptedBrowserAlerts = [
+  '',
+  'Changes that you made may not be saved.',
+  'This action is irreversible. Are you sure?'
+];
 
 module.exports = class baseUser {
   constructor() {
@@ -40,6 +44,10 @@ module.exports = class baseUser {
   async openBrowser() {
     await puppeteer
       .launch({
+        /** TODO(#17761): Right now some acceptance tests are failing on
+         * headless mode. As per the expected behavior we need to make sure
+         * every test passes on both modes. */
+        headless: false,
         args: ['--start-fullscreen', '--use-fake-ui-for-media-stream']
       })
       .then(async(browser) => {
