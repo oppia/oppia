@@ -3046,10 +3046,20 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_ADD_QUESTION),
                 'target_type': feconf.ENTITY_TYPE_SKILL,
-                'target_id': self.SKILL_ID,
+                'target_id': 'skill_id_333',
                 'target_version_at_submission': 1,
                 'change': self.translate_question_change,
                 'description': 'Add new question to skill'
+            }, csrf_token=csrf_token)
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': self.SKILL_ID,
+                'target_version_at_submission': 1,
+                'change': self.translate_question_change,
+                'description': 'Add another new question to skill'
             }, csrf_token=csrf_token)
 
         self.logout()
@@ -3125,7 +3135,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE
             })
-        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['suggestions']), 2)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
             suggestion['change'], self.translate_question_change)
@@ -3156,9 +3166,30 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                             'explanations': ['Explanation 3']
                         }
                     ]
-                }
+                },
+                'skill_id_333': None
             }
         )
+
+    def test_skill_handler_returns_data_filtered_by_topic(self) -> None:
+        response = self.get_json(
+            '/getreviewablesuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'topic'
+            })
+        self.assertEqual(len(response['suggestions']), 1)
+
+        response = self.get_json(
+            '/getreviewablesuggestions/skill/add_question', {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                'topic_name': 'All'
+            })
+        self.assertEqual(len(response['suggestions']), 2)
+
 
     def test_topic_question_handler_returns_no_data(self) -> None:
         response = self.get_json(
