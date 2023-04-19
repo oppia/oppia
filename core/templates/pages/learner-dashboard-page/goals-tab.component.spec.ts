@@ -360,6 +360,7 @@ describe('Goals tab Component', () => {
       expect(component.showThreeDotsDropdown[i]).toBe(true);
 
       // Three dots are not shown when no goals are present.
+      component.dropdownRef = undefined;
       component.onDocumentClick(fakeClickAwayEvent);
       fixture.detectChanges();
       expect(component.showThreeDotsDropdown[i]).toBe(true);
