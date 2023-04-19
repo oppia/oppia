@@ -124,6 +124,7 @@ export class ConversationSkinComponent {
   isInPreviewMode: boolean;
   isIframed: boolean;
   hasFullyLoaded = false;
+  progressReminderIsShown = false;
   recommendedExplorationSummaries = [];
   answerIsCorrect = false;
   nextCard;
@@ -310,6 +311,15 @@ export class ConversationSkinComponent {
           })
       );
     }
+
+    this.directiveSubscriptions.add(
+      this.explorationPlayerStateService.onProgressModalOpen.subscribe(
+        () => {
+          this.progressReminderIsShown = true;
+          this.hasFullyLoaded = true;
+        }
+      )
+    );
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
@@ -1147,7 +1157,10 @@ export class ConversationSkinComponent {
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
-    this.hasFullyLoaded = true;
+    if (!this.CHECKPOINTS_FEATURE_IS_ENABLED ||
+      (this.CHECKPOINTS_FEATURE_IS_ENABLED && this.progressReminderIsShown)) {
+      this.hasFullyLoaded = true;
+    }
 
     // If the exploration is embedded, use the url language code
     // as site language. If the url language code is not supported

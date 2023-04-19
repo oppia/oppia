@@ -34,6 +34,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { UserService } from 'services/user.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
@@ -100,6 +101,7 @@ export class ExplorationFooterComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService,
+    private explorationPlayerStateService: ExplorationPlayerStateService,
     private userService: UserService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
@@ -242,6 +244,7 @@ export class ExplorationFooterComponent {
   }
 
   openProgressReminderModal(): void {
+    this.explorationPlayerStateService.onProgressModalOpen.emit();
     let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
       windowClass: 'oppia-progress-reminder-modal'
     });
