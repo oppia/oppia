@@ -3190,7 +3190,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             })
         self.assertEqual(len(response['suggestions']), 2)
 
-
     def test_topic_question_handler_returns_no_data(self) -> None:
         response = self.get_json(
             '/getreviewablesuggestions/topic/add_question', {
