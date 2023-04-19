@@ -1,4 +1,4 @@
-# Copyright 2019 The Oppia Authors. All Rights Reserved.
+# Copyright 2023 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python execution for running e2e tests."""
+"""Python execution for running acceptance tests."""
 
 from __future__ import annotations
 
@@ -22,66 +22,34 @@ import os
 import subprocess
 import sys
 
+from core.constants import constants
+from scripts import build
+from scripts import common
+from scripts import servers
+
 from typing import Final, List, Optional, Tuple
-
-# TODO(#15567): This can be removed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
-
-from core.constants import constants  # isort:skip
-from scripts import build  # isort:skip
-from scripts import install_third_party_libs  # isort:skip
-from scripts import servers  # isort:skip
-
-MAX_RETRY_COUNT: Final = 3
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
-   python -m scripts.run_e2e_tests
+   python -m scripts.run_acceptance_tests
 
 The root folder MUST be named 'oppia'.
-
-NOTE: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
-single test or test suite.
 """)
 
-_PARSER.add_argument(
-    '--skip-install',
-    help='If true, skips installing dependencies. The default value is false.',
-    action='store_true')
 _PARSER.add_argument(
     '--skip-build',
     help='If true, skips building files. The default value is false.',
     action='store_true')
-_PARSER.add_argument(
-    '--sharding-instances', type=int, default=3,
-    help='Sets the number of parallel browsers to open while sharding. '
-         'Sharding must be disabled (either by passing in false to --sharding '
-         'or 1 to --sharding-instances) if running any tests in isolation '
-         '(fit or fdescribe).')
 _PARSER.add_argument(
     '--prod_env',
     help='Run the tests in prod mode. Static resources are served from '
          'build directory and use cache slugs.',
     action='store_true')
 _PARSER.add_argument(
-    '--suite', default='full',
-    help='Performs test for different suites, here suites are the '
-         'name of the test files present in core/tests/webdriverio_desktop/ '
-         'and core/test/webdriverio/ dirs. e.g. for the file '
-         'core/tests/webdriverio/accessibility.js use --suite=accessibility. '
+    '--suite', required=True,
+    help='Specifies the test suite to run. '
          'For performing a full test, no argument is required.')
-_PARSER.add_argument(
-    '--chrome_driver_version',
-    help='Uses the specified version of the chrome driver')
-_PARSER.add_argument(
-    '--debug_mode',
-    help='Runs the webdriverio test in debugging mode. Follow the instruction '
-         'provided in following URL to run e2e tests in debugging mode: '
-         'https://webdriver.io/docs/debugging/',
-    action='store_true')
 _PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
@@ -92,33 +60,16 @@ _PARSER.add_argument(
     '--source_maps',
     help='Build webpack with source maps.',
     action='store_true')
-_PARSER.add_argument(
-    '--mobile',
-    help='Run e2e test in mobile viewport.',
-    action='store_true')
-
-
-MOBILE_SUITES = [
-    'contributorDashboard'
-]
-
-
-def install_third_party_libraries(skip_install: bool) -> None:
-    """Run the installation script.
-
-    Args:
-        skip_install: bool. Whether to skip running the installation script.
-    """
-    if not skip_install:
-        install_third_party_libs.main()
 
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
-    """Run the scripts to start end-to-end tests."""
+    """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running():
-        sys.exit(1)
-
-    install_third_party_libraries(args.skip_install)
+        sys.exit(
+            """
+            Oppia server is already running. Try shutting all the servers down
+            before running the script.
+        """)
 
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
@@ -142,7 +93,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             port=common.GAE_PORT_FOR_E2E_TESTING,
             log_level=args.server_log_level,
             # Automatic restart can be disabled since we don't expect code
-            # changes to happen while the e2e tests are running.
+            # changes to happen while the acceptance tests are running.
             automatic_restart=False,
             skip_sdk_update_check=True,
             env={
@@ -150,26 +101,11 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        if (args.mobile) and (args.suite not in MOBILE_SUITES):
-            print(
-                f'The {args.suite} suite should not be run ' +
-                'in the mobile viewport'
-                )
-            sys.exit(1)
+        proc = stack.enter_context(servers.managed_acceptance_tests_server(
+            suite_name=args.suite,
+            stdout=subprocess.PIPE))
 
-        proc = stack.enter_context(servers.managed_webdriverio_server(
-                suite_name=args.suite,
-                dev_mode=dev_mode,
-                debug_mode=args.debug_mode,
-                chrome_version=args.chrome_driver_version,
-                sharding_instances=args.sharding_instances,
-                mobile=args.mobile,
-                stdout=subprocess.PIPE))
-
-        print(
-            'Servers have come up.\n'
-            'Note: You can view screenshots of failed tests '
-            'in ../webdriverio-screenshots/')
+        print('Servers have come up.\n')
 
         output_lines = []
         while True:
@@ -194,7 +130,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
 
 def main(args: Optional[List[str]] = None) -> None:
-    """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
+    """Run acceptance tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
     with servers.managed_portserver():
