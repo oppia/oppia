@@ -129,7 +129,7 @@ def make_graph() -> Tuple[Dict[str, List[str]], List[str]]:
 
 def main() -> None:
     """Prints the topological order of the services based on the
-    dependencies. Test3.
+    dependencies. Test4.
     """
     adj_list, nodes_list = make_graph()
     visit_stack: List[str] = []
