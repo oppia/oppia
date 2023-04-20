@@ -152,6 +152,13 @@ export class InputResponsePairComponent {
   togglePopover(): void {
     this.popover.toggle();
   }
+
+  shouldShowLoadingDots(): boolean {
+    if (!this.data.oppiaResponse && this.isCurrentCardAtEndOfTranscript()) {
+      return true;
+    }
+    return false;
+  }
 }
 
 angular.module('oppia').directive('oppiaInputResponsePair',

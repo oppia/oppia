@@ -30,43 +30,9 @@ oppia-input-response-pair .oppia-popover {
   overflow-y: scroll;
 }
 
-.conversation-skin-feedback-dot-one,
-.conversation-skin-feedback-dot-two,
-.conversation-skin-feedback-dot-three {
-  background-color: #666;
-  display: inline-block;
-  height: 2px;
-  width: 2px;
-}
-
-.conversation-skin-feedback-dot-one {
-  -webkit-animation: dot 1.0s infinite;
-  -moz-animation: dot 1.0s infinite;
-  animation: dot 1.0s infinite;
-  -webkit-animation-delay: 0.0s;
-  -moz-animation-delay: 0.0s;
-  animation-delay: 0.0s;
-  opacity: 0;
-}
-
-.conversation-skin-feedback-dot-two {
-  -webkit-animation: dot 1.0s infinite;
-  -moz-animation: dot 1.0s infinite;
-  animation: dot 1.0s infinite;
-  -webkit-animation-delay: 0.2s;
-  -moz-animation-delay: 0.2s;
-  animation-delay: 0.2s;
-  opacity: 0;
-}
-
-.conversation-skin-feedback-dot-three {
-  -webkit-animation: dot 1.0s infinite;
-  -moz-animation: dot 1.0s infinite;
-  animation: dot 1.0s infinite;
-  -webkit-animation-delay: 0.4s;
-  -moz-animation-delay: 0.4s;
-  animation-delay: 0.4s;
-  opacity: 0;
+.conversation-skin-feedback-dots {
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .conversation-skin-oppia-feedback.ng-enter {

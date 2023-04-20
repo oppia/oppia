@@ -40,11 +40,8 @@
   <img class="conversation-skin-oppia-avatar rounded-circle"
        [src]="oppiaAvatarImageUrl"
        alt="">
-  <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
-       class="e2e-test-input-response-loading-dots">
-    <div class="conversation-skin-feedback-dot-one"></div>
-    <div class="conversation-skin-feedback-dot-two"></div>
-    <div class="conversation-skin-feedback-dot-three"></div>
+  <div class="conversation-skin-feedback-dots" *ngIf="shouldShowLoadingDots()">
+    <loading-dots></loading-dots>
   </div>
   <span id="getInputResponsePairId()"></span>
   <div dir="auto">

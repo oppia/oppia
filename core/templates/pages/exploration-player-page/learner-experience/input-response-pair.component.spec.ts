@@ -292,4 +292,48 @@ describe('InputResponsePairComponent', () => {
     number = '-12.3';
     expect(component.convertAnswerToLocalFormat(number)).toEqual('-12.3');
   });
+
+  it('should show loading dots when Oppia response null and last card', () => {
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
+    component.data = {
+      learnerInput: '',
+      oppiaResponse: null,
+      isHint: true
+    };
+
+    expect(component.shouldShowLoadingDots()).toBeTrue();
+  });
+
+  it('should not show loading dots w/ null response and not last card', () => {
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
+    component.data = {
+      learnerInput: '',
+      oppiaResponse: null,
+      isHint: true
+    };
+
+    expect(component.shouldShowLoadingDots()).toBeFalse();
+  });
+
+  it('should not show loading dots w/ response and not last card', () => {
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
+    component.data = {
+      learnerInput: '',
+      oppiaResponse: 'response',
+      isHint: true
+    };
+
+    expect(component.shouldShowLoadingDots()).toBeFalse();
+  });
+
+  it('should not show loading dots w/ response and last card', () => {
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
+    component.data = {
+      learnerInput: '',
+      oppiaResponse: 'response',
+      isHint: true
+    };
+
+    expect(component.shouldShowLoadingDots()).toBeFalse();
+  });
 });
