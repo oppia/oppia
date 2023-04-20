@@ -62,7 +62,7 @@
       </svg>
 
       <g *ngFor="let button of buttons; let idx = index">
-        <rect attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
+        <rect tabindex="0" attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
               width="140"
               height="30"
               x="10"
@@ -74,7 +74,8 @@
               (mouseleave)="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
               [style.fill]="'white'"
               [style.stroke]="'black'"
-              style.strokeWidth="{{state.currentMode == button.mode ? '3' : '1'}}">
+              style.strokeWidth="{{state.currentMode == button.mode ? '3' : '1'}}"
+              [attr.aria-label]="button.description | translate">
         </rect>
         <text *ngIf="!isLanguageRTL()" class="oppia-graph-button-label unselectable-text unclickable-text" x="18" attr.y="{{32 + 50 * idx}}">
           {{button.text}}
