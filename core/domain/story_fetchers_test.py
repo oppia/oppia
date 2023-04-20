@@ -143,7 +143,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         story_fetchers._migrate_story_contents_to_latest_schema( # pylint: disable=protected-access
                 versioned_story_contents, story_id
         )
-        versioned_story_contents['schema_version'] = 6
+        versioned_story_contents['schema_version'] = 7
         with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d story schemas at '
