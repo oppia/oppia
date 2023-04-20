@@ -17,9 +17,9 @@
  */
 
 const userFactory = require(
-  '../puppeteer-testing-utilities/user-factory.js');
+  '../../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
+  '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
