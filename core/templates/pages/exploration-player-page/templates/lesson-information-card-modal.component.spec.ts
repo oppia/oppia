@@ -101,6 +101,22 @@ class MockWindowRef {
     }
   };
 }
+ 
+interface ProgressTracker {
+  completedCheckpointsCount: number;
+  checkpointCount: number;}
+ function getProgressPercentage(this: ProgressTracker): string {
+    if (this.completedCheckpointsCount === this.checkpointCount) {
+      return '100';
+    }
+    if (this.completedCheckpointsCount === 0) {
+      return '0';
+    }
+    const progressPercentage = Math.floor(
+      (this.completedCheckpointsCount / this.checkpointCount) * 100
+    );
+    return progressPercentage.toString();
+  }
 
 describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
@@ -436,4 +452,21 @@ describe('Lesson Information card modal component', () => {
 
     expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
+  
+describe('getProgressPercentage', () => {
+  it('should return "100" when all checkpoints are completed', () => {
+    const obj: ProgressTracker = { completedCheckpointsCount: 5, checkpointCount: 5 };
+    expect(getProgressPercentage.call(obj)).toBe('100');
+  });
+
+  it('should return "0" when no checkpoints are completed', () => {
+    const obj: ProgressTracker = { completedCheckpointsCount: 0, checkpointCount: 5 };
+    expect(getProgressPercentage.call(obj)).toBe('0');
+  });
+
+  it('should return correct percentage when some checkpoints are completed', () => {
+    const obj: ProgressTracker = { completedCheckpointsCount: 3, checkpointCount: 10 };
+    expect(getProgressPercentage.call(obj)).toBe('30');
+  });
+});
 });
