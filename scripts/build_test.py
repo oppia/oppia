@@ -25,13 +25,14 @@ import io
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import threading
 
 from core import utils
 from core.tests import test_utils
 
-from typing import Deque, Dict, Iterator, List, Tuple, Union
+from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
 
 from . import build
 from . import common
@@ -56,6 +57,19 @@ INVALID_OUTPUT_FILEPATH = os.path.join(
     TEST_DIR, INVALID_FILENAME)
 
 EMPTY_DIR = os.path.join(TEST_DIR, 'empty', '')
+
+
+def mock_managed_process(
+    *unused_args: str, **unused_kwargs: str
+) -> ContextManager[scripts_test_utils.PopenStub]:
+    """Mock method for replacing the managed_process() functions.
+
+    Returns:
+        Context manager. A context manager that always yields a mock
+        process.
+    """
+    return contextlib.nullcontext(
+        enter_result=scripts_test_utils.PopenStub(alive=False))
 
 
 class BuildTests(test_utils.GenericTestBase):
@@ -1141,3 +1155,117 @@ class BuildTests(test_utils.GenericTestBase):
                 AssertionError, 'webpack_bundles should be non-empty.'
             ):
                 build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
+
+
+class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
+    """Test the end to end build methods."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exit_stack = contextlib.ExitStack()
+
+    def tearDown(self) -> None:
+        try:
+            self.exit_stack.close()
+        finally:
+            super().tearDown()
+
+    def test_run_webpack_compilation_success(self) -> None:
+        old_os_path_isdir = os.path.isdir
+
+        def mock_os_path_isdir(path: str) -> bool:
+            if path == 'webpack_bundles':
+                return True
+            return old_os_path_isdir(path)
+
+        # The webpack compilation processes will be called 4 times as mock_isdir
+        # will return true after 4 calls.
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webpack_compiler', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'isdir', mock_os_path_isdir))
+
+        build.run_webpack_compilation()
+
+    def test_run_webpack_compilation_failed(self) -> None:
+        old_os_path_isdir = os.path.isdir
+
+        def mock_os_path_isdir(path: str) -> bool:
+            if path == 'webpack_bundles':
+                return False
+            return old_os_path_isdir(path)
+
+        # The webpack compilation processes will be called five times.
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webpack_compiler', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'isdir', mock_os_path_isdir))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,)]))
+
+        build.run_webpack_compilation()
+
+    def test_build_js_files_in_dev_mode_with_hash_file_exists(self) -> None:
+        old_os_path_isdir = os.path.isdir
+
+        def mock_os_path_isdir(path: str) -> bool:
+            if path == 'webpack_bundles':
+                return True
+            return old_os_path_isdir(path)
+
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_webpack_compiler', mock_managed_process))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'main', lambda *_, **__: None,
+            expected_kwargs=[{'args': []}]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'isdir', mock_os_path_isdir))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, called=False))
+
+        build.build_js_files(True)
+
+    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
+        return_code = 2
+        self.exit_stack.enter_context(self.swap_to_always_raise(
+            servers, 'managed_webpack_compiler',
+            error=subprocess.CalledProcessError(return_code, [])))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'main', lambda *_, **__: None,
+            expected_kwargs=[{'args': []}]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(return_code,)]))
+
+        build.build_js_files(True)
+
+    def test_build_js_files_in_prod_mode(self) -> None:
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'run_cmd', lambda *_: None, called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'main', lambda *_, **__: None,
+            expected_kwargs=[{'args': ['--prod_env']}]))
+
+        build.build_js_files(False)
+
+    def test_build_js_files_in_prod_mode_with_source_maps(self) -> None:
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'run_cmd', lambda *_: None, called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'main', lambda *_, **__: None,
+            expected_kwargs=[{'args': ['--prod_env', '--source_maps']}]))
+
+        build.build_js_files(False, source_maps=True)
+
+    def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'run_cmd', lambda *_: None, called=False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'main', lambda *_, **__: None,
+            expected_kwargs=[{'args': []}]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            build, 'run_webpack_compilation', lambda **_: None,
+            expected_kwargs=[{'source_maps': True}]))
+
+        build.build_js_files(True, source_maps=True)
