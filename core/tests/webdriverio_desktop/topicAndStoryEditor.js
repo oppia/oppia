@@ -172,8 +172,7 @@ describe('Topic editor functionality', function() {
   });
 });
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Chapter editor functionality', function() {
+describe('Chapter editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
