@@ -101,22 +101,23 @@ class MockWindowRef {
     }
   };
 }
- 
+
 interface ProgressTracker {
   completedCheckpointsCount: number;
   checkpointCount: number;}
- function getProgressPercentage(this: ProgressTracker): string {
-    if (this.completedCheckpointsCount === this.checkpointCount) {
-      return '100';
-    }
-    if (this.completedCheckpointsCount === 0) {
-      return '0';
-    }
-    const progressPercentage = Math.floor(
-      (this.completedCheckpointsCount / this.checkpointCount) * 100
-    );
-    return progressPercentage.toString();
-  }
+
+  function getProgressPercentage(this: ProgressTracker): string {
+if (this.completedCheckpointsCount === this.checkpointCount) {
+  return '100';
+}
+if (this.completedCheckpointsCount === 0) {
+  return '0';
+}
+const progressPercentage = Math.floor(
+  (this.completedCheckpointsCount / this.checkpointCount) * 100
+);
+return progressPercentage.toString();
+}
 
 describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
