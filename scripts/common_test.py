@@ -1269,6 +1269,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_chrome_bin_setup_with_error(self) -> None:
         print_arr = []
+
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
@@ -1376,3 +1377,20 @@ class CommonTests(test_utils.GenericTestBase):
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
         constants_temp_file.close()
         feconf_temp_file.close()
+
+    def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(self.swap_to_always_return(
+                common, 'is_port_in_use', value=False))
+
+            self.assertFalse(common.is_oppia_server_already_running())
+
+    def test_is_oppia_server_already_running_when_a_port_is_open(
+        self
+    ) -> None:
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(self.swap_with_checks(
+                common, 'is_port_in_use',
+                lambda port: port == common.GAE_PORT_FOR_E2E_TESTING))
+
+            self.assertTrue(common.is_oppia_server_already_running())
