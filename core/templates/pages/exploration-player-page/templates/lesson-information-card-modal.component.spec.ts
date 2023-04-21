@@ -454,20 +454,43 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
   
-describe('getProgressPercentage', () => {
-  it('should return "100" when all checkpoints are completed', () => {
-    const obj: ProgressTracker = { completedCheckpointsCount: 5, checkpointCount: 5 };
-    expect(getProgressPercentage.call(obj)).toBe('100');
+  describe('LessonInformationCardModalComponent', () => {
+    let component: LessonInformationCardModalComponent;
+    let fixture: ComponentFixture<LessonInformationCardModalComponent>;
+  
+    beforeEach(async () => {
+      await TestBed.configureTestingModule({
+        declarations: [ LessonInformationCardModalComponent ],
+        providers: [ NgbActiveModal ]
+      })
+      .compileComponents();
+    });
+  
+    beforeEach(() => {
+      fixture = TestBed.createComponent(LessonInformationCardModalComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+  
+    it('should return 0% progress when no checkpoints are completed', () => {
+      component.completedCheckpointsCount = 0;
+      component.checkpointCount = 5;
+      const progressPercentage = component.getProgressPercentage();
+      expect(progressPercentage).toBe('0');
+    });
+  
+    it('should return 100% progress when all checkpoints are completed', () => {
+      component.completedCheckpointsCount = 5;
+      component.checkpointCount = 5;
+      const progressPercentage = component.getProgressPercentage();
+      expect(progressPercentage).toBe('100');
+    });
+  
+    it('should be correct percentage with some checkpoints are completed', () => {
+      component.completedCheckpointsCount = 2;
+      component.checkpointCount = 5;
+      const progressPercentage = component.getProgressPercentage();
+      expect(progressPercentage).toBe('40');
+    });
   });
-
-  it('should return "0" when no checkpoints are completed', () => {
-    const obj: ProgressTracker = { completedCheckpointsCount: 0, checkpointCount: 5 };
-    expect(getProgressPercentage.call(obj)).toBe('0');
-  });
-
-  it('should return correct percentage when some checkpoints are completed', () => {
-    const obj: ProgressTracker = { completedCheckpointsCount: 3, checkpointCount: 10 };
-    expect(getProgressPercentage.call(obj)).toBe('30');
-  });
-});
 });
