@@ -66,6 +66,16 @@ export class NewChapterTitleModalComponent implements OnInit {
     this.init();
   }
 
+  addStoryNodeWithData(): void {
+    this.storyUpdateService.addStoryNode(this.story, this.title);
+    this.storyUpdateService.setStoryNodeTitle(
+      this.story, this.nodeId, this.title);
+    this.storyUpdateService.setStoryNodeThumbnailFilename(
+      this.story, this.nodeId, this.editableThumbnailFilename);
+    this.storyUpdateService.setStoryNodeThumbnailBgColor(
+      this.story, this.nodeId, this.editableThumbnailBgColor);
+  }
+
   init(): void {
     this.title = '';
     this.explorationId = '';
@@ -79,7 +89,6 @@ export class NewChapterTitleModalComponent implements OnInit {
     this.story = this.storyEditorStateService.getStory();
     this.nodeId = this.story.getStoryContents().getNextNodeId();
     this.editableThumbnailBgColor = '';
-    this.storyUpdateService.addStoryNode(this.story, this.title);
     this.correctnessFeedbackDisabled = false;
     this.categoryIsDefault = true;
     this.statesWithRestrictedInteractions = [];
@@ -87,24 +96,14 @@ export class NewChapterTitleModalComponent implements OnInit {
   }
 
   updateThumbnailFilename(newThumbnailFilename: string): void {
-    this.storyUpdateService.setStoryNodeThumbnailFilename(
-      this.story, this.nodeId, newThumbnailFilename);
     this.editableThumbnailFilename = newThumbnailFilename;
   }
 
   updateThumbnailBgColor(newThumbnailBgColor: string): void {
-    this.storyUpdateService.setStoryNodeThumbnailBgColor(
-      this.story, this.nodeId, newThumbnailBgColor);
     this.editableThumbnailBgColor = newThumbnailBgColor;
   }
 
-  updateTitle(): void {
-    this.storyUpdateService.setStoryNodeTitle(
-      this.story, this.nodeId, this.title);
-  }
-
   cancel(): void {
-    this.storyUpdateService.deleteStoryNode(this.story, this.nodeId);
     this.ngbActiveModal.dismiss();
   }
 
@@ -120,6 +119,7 @@ export class NewChapterTitleModalComponent implements OnInit {
     }
     this.storyUpdateService.setStoryNodeExplorationId(
       this.story, this.nodeId, this.explorationId);
+
     this.ngbActiveModal.close();
   }
 
@@ -204,7 +204,7 @@ export class NewChapterTitleModalComponent implements OnInit {
     }
     this.invalidExpId = false;
 
-    this.updateTitle();
+    this.addStoryNodeWithData();
     this.updateExplorationId();
   }
 }

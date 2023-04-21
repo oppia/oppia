@@ -163,12 +163,6 @@ describe('Create New Chapter Modal Component', () => {
       expect(storyUpdateSpy).toHaveBeenCalled();
     });
 
-  it('should update the title', () => {
-    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNodeTitle');
-    component.updateTitle();
-    expect(storyUpdateSpy).toHaveBeenCalled();
-  });
-
   it('should check if chapter is valid when it has title, exploration id and' +
     ' thumbnail file', () => {
     expect(component.isValid()).toEqual(false);
@@ -385,11 +379,9 @@ describe('Create New Chapter Modal Component', () => {
         curatedExplorationValidationService,
         'getStatesWithInvalidMultipleChoices').and.resolveTo([]);
       const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
-      const updateTitleSpy = spyOn(component, 'updateTitle');
       component.saveAsync();
       flushMicrotasks();
 
-      expect(updateTitleSpy).toHaveBeenCalled();
       expect(updateExplorationIdSpy).toHaveBeenCalled();
     }));
 
