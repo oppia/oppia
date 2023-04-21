@@ -25,8 +25,8 @@ import { NumericExpressionInputValidationService } from
   'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Rule } from
+  'domain/exploration/rule.model';
 import { NumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { SubtitledUnicode } from
@@ -42,8 +42,7 @@ describe('NumericExpressionInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: NumericExpressionInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -54,7 +53,6 @@ describe('NumericExpressionInputValidationService', () => {
     validatorService = TestBed.inject(NumericExpressionInputValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -79,14 +77,14 @@ describe('NumericExpressionInputValidationService', () => {
       }
     };
 
-    isEquivalentTo = rof.createFromBackendDict({
+    isEquivalentTo = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '3^2'
       }
     }, 'NumericExpressionInput');
 
-    matchesExactlyWith = rof.createFromBackendDict({
+    matchesExactlyWith = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '3 * 3'
@@ -110,18 +108,19 @@ describe('NumericExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
-      ' is preceded by an \'IsEquivalentTo\' rule with a matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by an \'IsEquivalentTo\' answer ' +
+      'with a matching input.'
     }]);
 
 
-    let isEquivalentTo1 = rof.createFromBackendDict({
+    let isEquivalentTo1 = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '(4+5)^2'
       }
     }, 'NumericExpressionInput');
-    let isEquivalentTo2 = rof.createFromBackendDict({
+    let isEquivalentTo2 = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '81'
@@ -135,18 +134,19 @@ describe('NumericExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
-      ' is preceded by an \'IsEquivalentTo\' rule with a matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by an \'IsEquivalentTo\' answer ' +
+      'with a matching input.'
     }]);
 
 
-    let matchesExactlyWith1 = rof.createFromBackendDict({
+    let matchesExactlyWith1 = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '3^2 - 1'
       }
     }, 'NumericExpressionInput');
-    let matchesExactlyWith2 = rof.createFromBackendDict({
+    let matchesExactlyWith2 = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '3^2 - 1'
@@ -160,8 +160,9 @@ describe('NumericExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because it' +
-      ' is preceded by a \'MatchesExactlyWith\' rule with a matching input.'
+      message: 'Learner answer 2 from Oppia response 1 will never be ' +
+      'matched because it is preceded by a \'MatchesExactlyWith\' answer ' +
+      'with a matching input.'
     }]);
   });
 
@@ -172,13 +173,13 @@ describe('NumericExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
 
-    matchesExactlyWith = rof.createFromBackendDict({
+    matchesExactlyWith = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '2 * 3'
       }
     }, 'NumericExpressionInput');
-    isEquivalentTo = rof.createFromBackendDict({
+    isEquivalentTo = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '2 + 3'
@@ -194,7 +195,7 @@ describe('NumericExpressionInputValidationService', () => {
 
   it('should warn if there are inputs with unsupported functions', function() {
     answerGroups[0].rules = [
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: '2+log(3)'
@@ -208,8 +209,9 @@ describe('NumericExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
-        'Input for rule 1 from answer group 1 uses these function(s) that ' +
-        'aren\'t supported: [log] The supported functions are: [sqrt,abs]')
+        'Input for learner answer 1 from Oppia response 1 uses these ' +
+        'function(s) that aren\'t supported: [log] ' +
+        'The supported functions are: [sqrt,abs]')
     }]);
   });
 });
