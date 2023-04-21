@@ -102,23 +102,6 @@ class MockWindowRef {
   };
 }
 
-interface ProgressTracker {
-  completedCheckpointsCount: number;
-  checkpointCount: number;}
-
-function getProgressPercentage(this: ProgressTracker): string {
-  if (this.completedCheckpointsCount === this.checkpointCount) {
-    return '100';
-  }
-  if (this.completedCheckpointsCount === 0) {
-    return '0';
-  }
-  const progressPercentage = Math.floor(
-    (this.completedCheckpointsCount / this.checkpointCount) * 100
-  );
-  return progressPercentage.toString();
-}
-
 describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
   let componentInstance: LessonInformationCardModalComponent;
@@ -460,7 +443,7 @@ describe('Lesson Information card modal component', () => {
 
     beforeEach(async() => {
       await TestBed.configureTestingModule({
-        declarations:[LessonInformationCardModalComponent],
+        declarations: [LessonInformationCardModalComponent],
         providers: [NgbActiveModal]
       })
         .compileComponents();
@@ -485,7 +468,7 @@ describe('Lesson Information card modal component', () => {
       const progressPercentage = component.getProgressPercentage();
       expect(progressPercentage).toBe('100');
     });
-  
+
     it('should be correct percentage with checkpoints are completed', () => {
       component.completedCheckpointsCount = 2;
       component.checkpointCount = 5;
