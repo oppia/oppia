@@ -201,7 +201,8 @@ export class GoalsTabComponent implements OnInit {
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
     for (let i = 0; i < this.currentGoals.length; i++) {
-      if (this.showThreeDotsDropdown[i]) {
+      if (targetElement &&
+          this.showThreeDotsDropdown[i]) {
         this.showThreeDotsDropdown[i] = false;
       }
     }
