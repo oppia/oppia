@@ -332,7 +332,10 @@ describe('Chapter editor functionality', function() {
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
       await storyEditorPage.addAcquiredSkill(dummySkills[0]);
       await storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
-      await storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
+      await storyEditorPage.saveStory('Save');
+
+      await storyEditorPage.navigateToChapterWithName('Chapter 2');
+      await storyEditorPage.addPrerequisiteSkill(dummySkills[0]);
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(1);
       await storyEditorPage.saveStory('Save');
     });
