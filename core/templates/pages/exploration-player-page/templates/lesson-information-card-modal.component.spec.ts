@@ -453,32 +453,32 @@ describe('Lesson Information card modal component', () => {
 
     expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
-  
+
   describe('LessonInformationCardModalComponent', () => {
     let component: LessonInformationCardModalComponent;
     let fixture: ComponentFixture<LessonInformationCardModalComponent>;
-  
-    beforeEach(async () => {
+
+    beforeEach(async() => {
       await TestBed.configureTestingModule({
-        declarations: [ LessonInformationCardModalComponent ],
-        providers: [ NgbActiveModal ]
+        declarations:[LessonInformationCardModalComponent],
+        providers: [NgbActiveModal]
       })
-      .compileComponents();
+        .compileComponents();
     });
-  
+
     beforeEach(() => {
       fixture = TestBed.createComponent(LessonInformationCardModalComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
     });
-  
+
     it('should return 0% progress when no checkpoints are completed', () => {
       component.completedCheckpointsCount = 0;
       component.checkpointCount = 5;
       const progressPercentage = component.getProgressPercentage();
       expect(progressPercentage).toBe('0');
     });
-  
+
     it('should return 100% progress when all checkpoints are completed', () => {
       component.completedCheckpointsCount = 5;
       component.checkpointCount = 5;
@@ -486,7 +486,7 @@ describe('Lesson Information card modal component', () => {
       expect(progressPercentage).toBe('100');
     });
   
-    it('should be correct percentage with some checkpoints are completed', () => {
+    it('should be correct percentage with checkpoints are completed', () => {
       component.completedCheckpointsCount = 2;
       component.checkpointCount = 5;
       const progressPercentage = component.getProgressPercentage();
