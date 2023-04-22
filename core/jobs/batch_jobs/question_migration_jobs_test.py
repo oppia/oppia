@@ -219,6 +219,34 @@ class PopulateQuestionSummaryVersionOneOffJobTests(job_test_utils.JobTestBase):
             unmigrated_question_model.version
         )
 
+    def test_broken_summary_raises_error(self) -> None:
+        unmigrated_question_model = self.create_model(
+            question_models.QuestionModel,
+            id=self.QUESTION_1_ID,
+            question_state_data=self.question_state_dict,
+            language_code='en',
+            version=-5,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=45)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        unmigrated_question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+        question = question_services.get_question_by_id(self.QUESTION_1_ID)
+        question_summary = question_services.compute_summary_of_question(
+            question
+        )
+        question_services.save_question_summary(question_summary)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr='QUESTION SUMMARY PROCESSED ERROR: \"(\'question_1_id\''
+                ', ValidationError(\'Expected version to be non-negative, '
+                'received -4\'))": 1'),
+        ])
+
 
 class AuditPopulateQuestionSummaryVersionOneOffJobTests(
     job_test_utils.JobTestBase):
@@ -386,4 +414,32 @@ class AuditPopulateQuestionSummaryVersionOneOffJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='QUESTION SUMMARY PROCESSED SUCCESS: 1'),
+        ])
+
+    def test_broken_summary_raises_error(self) -> None:
+        unmigrated_question_model = self.create_model(
+            question_models.QuestionModel,
+            id=self.QUESTION_1_ID,
+            question_state_data=self.question_state_dict,
+            language_code='en',
+            version=-5,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=45)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        unmigrated_question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+        question = question_services.get_question_by_id(self.QUESTION_1_ID)
+        question_summary = question_services.compute_summary_of_question(
+            question
+        )
+        question_services.save_question_summary(question_summary)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr='QUESTION SUMMARY PROCESSED ERROR: \"(\'question_1_id\''
+                ', ValidationError(\'Expected version to be non-negative, '
+                'received -4\'))": 1'),
         ])
