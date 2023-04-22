@@ -61,7 +61,6 @@ export class PreferredLanguagesComponent {
     });
   }
   
-  
   validInput(value: string): boolean {
     let availableLanguage = false;
     // Changes Here, filteredChoices instead of Choices
@@ -108,8 +107,7 @@ export class PreferredLanguagesComponent {
       this.add(event.option);
     }
   }
-  
-  //Changes Here
+
   onSearchInputChange(): void {
     // Filter the choices array based on the search query
     this.filteredChoices = this.choices.filter(choice => {
