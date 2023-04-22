@@ -502,10 +502,10 @@
   }
 }
 
-@media screen and (max-width: 355px) {
+@media screen and (max-width: 307px) {
   oppia-top-navigation-bar .oppia-navbar-profile {
     float: right;
-    margin-top: -58px;
+    margin-top: -56px;
   }
 }
 
