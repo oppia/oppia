@@ -438,19 +438,7 @@ describe('Lesson Information card modal component', () => {
   });
 
   describe('LessonInformationCardModalComponent', () => {
-    let component: LessonInformationCardModalComponent;
-    let fixture: ComponentFixture<LessonInformationCardModalComponent>;
-
-    beforeEach(async() => {
-      await TestBed.configureTestingModule({
-        declarations: [LessonInformationCardModalComponent],
-        providers: [NgbActiveModal]
-      }).compileComponents();
-
-      fixture = TestBed.createComponent(LessonInformationCardModalComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
+    let component: LessonInformationCardModalComponent;   
 
     it('should return 0% progress when no checkpoints are completed', () => {
       component.completedCheckpointsCount = 0;
