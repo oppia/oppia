@@ -446,6 +446,10 @@ describe('Lesson Information card modal component', () => {
         declarations: [LessonInformationCardModalComponent],
         providers: [NgbActiveModal]
       }).compileComponents();
+
+      fixture = TestBed.createComponent(LessonInformationCardModalComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
     });
 
     it('should return 0% progress when no checkpoints are completed', () => {
