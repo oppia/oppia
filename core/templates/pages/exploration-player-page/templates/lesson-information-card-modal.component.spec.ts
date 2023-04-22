@@ -106,6 +106,7 @@ describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
   let componentInstance: LessonInformationCardModalComponent;
   let mockWindowRef: MockWindowRef;
+  let component: LessonInformationCardModalComponent;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let dateTimeFormatService: DateTimeFormatService;
   let ratingComputationService: RatingComputationService;
@@ -159,6 +160,7 @@ describe('Lesson Information card modal component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LessonInformationCardModalComponent);
     componentInstance = fixture.componentInstance;
+    component = new LessonInformationCardModalComponent();
 
     componentInstance.expInfo = {
       category: expCategory,
@@ -437,28 +439,25 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
 
-  describe('LessonInformationCardModalComponent', () => {
-    let component: LessonInformationCardModalComponent;
 
-    it('should return 0% progress when no checkpoints are completed', () => {
-      component.completedCheckpointsCount = 0;
-      component.checkpointCount = 5;
-      const progressPercentage = component.getProgressPercentage();
-      expect(progressPercentage).toBe('0');
-    });
+  it('should return 0% progress when no checkpoints are completed', () => {
+    component.completedCheckpointsCount = 0;
+    component.checkpointCount = 5;
+    const progressPercentage = component.getProgressPercentage();
+    expect(progressPercentage).toBe('0');
+  });
 
-    it('should return 100% progress when all checkpoints are completed', () => {
-      component.completedCheckpointsCount = 5;
-      component.checkpointCount = 5;
-      const progressPercentage = component.getProgressPercentage();
-      expect(progressPercentage).toBe('100');
-    });
+  it('should return 100% progress when all checkpoints are completed', () => {
+    component.completedCheckpointsCount = 5;
+    component.checkpointCount = 5;
+    const progressPercentage = component.getProgressPercentage();
+    expect(progressPercentage).toBe('100');
+  });
 
-    it('should be correct percentage with checkpoints are completed', () => {
-      component.completedCheckpointsCount = 2;
-      component.checkpointCount = 5;
-      const progressPercentage = component.getProgressPercentage();
-      expect(progressPercentage).toBe('40');
-    });
+  it('should be correct percentage with checkpoints are completed', () => {
+    component.completedCheckpointsCount = 2;
+    component.checkpointCount = 5;
+    const progressPercentage = component.getProgressPercentage();
+    expect(progressPercentage).toBe('40');
   });
 });
