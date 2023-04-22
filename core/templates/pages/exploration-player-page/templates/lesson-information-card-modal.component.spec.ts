@@ -448,12 +448,6 @@ describe('Lesson Information card modal component', () => {
       }).compileComponents();
     });
 
-    beforeEach(() => {
-      fixture = TestBed.createComponent(LessonInformationCardModalComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
     it('should return 0% progress when no checkpoints are completed', () => {
       component.completedCheckpointsCount = 0;
       component.checkpointCount = 5;
