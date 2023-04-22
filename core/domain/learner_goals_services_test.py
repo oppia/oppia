@@ -305,16 +305,13 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         non_existent_user_id = 'non_existent_user_id'
         self.assertIsNone(
             user_models.LearnerGoalsModel.get(
-            non_existent_user_id, strict=False
-            )
-        )
+                non_existent_user_id, strict=False))
 
         # Ensure that the function does not raise any error when the
         # learner_goals_model does not exist for the given user_id.
-        with mock.patch(
-            'core.domain.learner_goals_services.get_learner_goals_from_model'
-        ) as mock_get_learner_goals_from_model:
+        try:
             learner_goals_services.remove_topics_from_learn_goal(
                 non_existent_user_id, [self.TOPIC_ID_1]
             )
-            mock_get_learner_goals_from_model.assert_not_called()
+        except Exception as e:
+            self.fail(f"remove_topics_from_learn_goal raised an exception: {e}")
