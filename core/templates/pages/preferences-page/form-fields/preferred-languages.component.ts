@@ -63,7 +63,6 @@ export class PreferredLanguagesComponent {
   
   validInput(value: string): boolean {
     let availableLanguage = false;
-    // Changes Here, filteredChoices instead of Choices
     for (let i = 0; i < this.filteredChoices.length; i++) {
       if (this.filteredChoices[i].id === value) {
         availableLanguage = true;
