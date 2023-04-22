@@ -446,7 +446,9 @@ describe('Lesson Information card modal component', () => {
         declarations: [LessonInformationCardModalComponent],
         providers: [NgbActiveModal]
       }).compileComponents();
+    });
 
+    beforeEach(() => {
       fixture = TestBed.createComponent(LessonInformationCardModalComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
