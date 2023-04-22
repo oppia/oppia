@@ -82,7 +82,8 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 
   /** Returns a promise that never resolves or rejects. */
   async signInWithRedirectAsync(): Promise<void> {
-    return this.angularFireAuth.signInWithRedirect(this.provider);
+    this.angularFireAuth.signInWithPopup(this.provider);
+    return;
   }
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
