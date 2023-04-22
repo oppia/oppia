@@ -62,7 +62,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
         Returns:
             Result((str, QuestionSummaryModel), (str, Exception)). Result
             containing tuple that consist of question ID and either question
-            summary model object or Exception. Question summary object is
+            summary model object or Exception. Question summary model is
             returned when the migration was successful and Exception is
             returned otherwise.
         """
@@ -88,14 +88,15 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             version=question_summary.version
         )
         question_summary_model.update_timestamps()
-        return result.Ok((question_summary.id, question_summary_model))
+        return result.Ok((question_summary_model))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of results from the question migration.
+        """Returns a PCollection of results from the question summary
+        migration.
 
         Returns:
             PCollection. A PCollection of results from the
-            question_id_to_version migration.
+            question summary migration.
         """
         all_question_versions = (
             self.pipeline
@@ -120,7 +121,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
                 lambda question_summary_model: question_summary_model.id)
         )
 
-        question_objects = (
+        all_updated_question_summary_results = (
             {
                 'version': all_question_versions,
                 'question_summary_model': question_summary_models,
@@ -132,10 +133,6 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
                     'question_summary_model': objects[
                         'question_summary_model'][0],
                 })
-        )
-
-        all_updated_question_summary_results = (
-            question_objects
             | 'Update question summary models' >> beam.Map(
                 lambda objects: self._update_and_validate_summary_model(
                     objects['version'],
@@ -155,7 +152,6 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
                 lambda result_item: result_item.is_ok())
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
-            | 'Remove ID' >> beam.Values() # pylint: disable=no-value-for-parameter
         )
 
         unused_put_results = (

@@ -2138,7 +2138,7 @@ class QuestionSummary:
                 the question model is created.
             question_model_last_updated: datetime.datetime. Date and time
                 when the question model was last updated.
-            version: int. The version of the question.
+            version: int. The current version of the question.
         """
         self.id = question_id
         self.question_content = html_cleaner.clean(question_content)
