@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 from core import feconf
 from core.constants import constants
 from core.domain import learner_goals_services
@@ -314,4 +312,4 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
                 non_existent_user_id, [self.TOPIC_ID_1]
             )
         except Exception as e:
-            self.fail(f"remove_topics_from_learn_goal raised an exception: {e}")
+            self.fail(f'remove_topics_from_learn_goal raised an exception: {e}')
