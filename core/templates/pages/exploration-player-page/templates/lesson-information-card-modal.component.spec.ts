@@ -438,7 +438,7 @@ describe('Lesson Information card modal component', () => {
   });
 
   describe('LessonInformationCardModalComponent', () => {
-   let component: LessonInformationCardModalComponent;   
+    let component: LessonInformationCardModalComponent;
 
     it('should return 0% progress when no checkpoints are completed', () => {
       component.completedCheckpointsCount = 0;
