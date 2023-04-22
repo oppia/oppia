@@ -160,8 +160,6 @@ describe('Lesson Information card modal component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LessonInformationCardModalComponent);
     componentInstance = fixture.componentInstance;
-    component = new LessonInformationCardModalComponent();
-
     componentInstance.expInfo = {
       category: expCategory,
       community_owned: true,
