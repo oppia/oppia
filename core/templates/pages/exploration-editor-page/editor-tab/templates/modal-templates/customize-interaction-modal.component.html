@@ -28,9 +28,11 @@
           <div>
             <div *ngFor="let interactionId of category.interaction_ids"
                  (click)="onChangeInteractionId(interactionId)"
+                 (keydown.enter)="onChangeInteractionId(interactionId)"
                  class="oppia-interaction-tile e2e-test-interaction-tile-{{ interactionId }}"
                  [ngbPopover]="getDescription(interactionId)"
                  placement="bottom"
+                 tabindex="0"
                  triggers="mouseenter:mouseleave">
               <button class="oppia-interaction-card">
                 <img [src]="getInteractionThumbnailImageUrl(interactionId)">
