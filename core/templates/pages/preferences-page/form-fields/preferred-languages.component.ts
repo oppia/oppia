@@ -16,12 +16,11 @@
  * @fileoverview Preferred languages component.
  */
 
+import { ENTER } from '@angular/cdk/keycodes';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatChipList } from '@angular/material/chips';
-import { ENTER } from '@angular/cdk/keycodes';
 import { LanguageIdAndText } from 'domain/utilities/language-util.service';
-
 
 @Component({
   selector: 'oppia-preferred-languages',
@@ -42,16 +41,12 @@ export class PreferredLanguagesComponent {
   removable = true;
   separatorKeysCodes: number[] = [ENTER];
   formCtrl = new FormControl();
-
-  // Changes Here
   filteredChoices: LanguageIdAndText[] = [];
   searchQuery: string = ''; 
 
   onInputBoxClick(): void {
     setTimeout(() => {
-      // Reset the search query
       this.searchQuery = '';
-      // Reset the filteredChoices array
       this.filteredChoices = this.choices;
     });
   }
