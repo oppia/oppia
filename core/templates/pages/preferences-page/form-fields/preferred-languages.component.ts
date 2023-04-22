@@ -109,7 +109,6 @@ export class PreferredLanguagesComponent {
   }
 
   onSearchInputChange(): void {
-    // Filter the choices array based on the search query
     this.filteredChoices = this.choices.filter(choice => {
       return choice.text.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
              choice.id.toLowerCase().includes(this.searchQuery.toLowerCase());
