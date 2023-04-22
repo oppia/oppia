@@ -130,7 +130,7 @@ def open_file(
     # to Union[BinaryIO, TextIO].
     file = cast(
         Union[BinaryIO, TextIO],
-        open(filename, mode, encoding=encoding, newline=newline)
+        open(filename, mode, encoding=encoding, newline=newline)  # pylint: disable=consider-using-with
     )
     return file
 
