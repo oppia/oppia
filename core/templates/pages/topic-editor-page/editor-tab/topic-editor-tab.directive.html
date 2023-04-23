@@ -111,7 +111,7 @@
               <textarea type="text"
                         class="form-control topic-description e2e-test-topic-page-title-fragment-field"
                         [(ngModel)]="editablePageTitleFragmentForWeb"
-                        [maxlength]="MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB"
+                        [maxlength]="maxWebTitleFrag"
                         (blur)="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
                         [disabled]="!topicRights.canEditTopic()"
                         aria-label="Page Title Fragment"
@@ -120,7 +120,7 @@
               <span class="oppia-input-box-subtitle">
                 <em>
                   Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn {{ editableName }} | Add, Subtract, Multiply and Divide | Oppia".
-                  It should be at least {{ MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB }} and at most {{ MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB }} characters.
+                  It should be at least {{ minWebTitleFrag }} and at most {{ maxWebTitleFrag }} characters.
                 </em>
               </span>
             </div>

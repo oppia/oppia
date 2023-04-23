@@ -92,6 +92,11 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   uncategorizedEditOptionsIndex: number;
   subtopicEditOptionsAreShown: number;
   skillOptionDialogueBox: boolean = true;
+  MAX_CHARS_IN_TOPIC_NAME: number;
+  MAX_CHARS_IN_TOPIC_DESCRIPTION: number;
+  maxWebTitleFrag: number;
+  minWebTitleFrag: number;
+  MAX_CHARS_IN_META_TAG_CONTENT: number;
 
   constructor(
     private contextService: ContextService,
