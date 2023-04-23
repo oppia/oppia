@@ -122,6 +122,18 @@ describe('Create New Chapter Modal Component', () => {
     component.ngOnInit();
   });
 
+  it('should add story node with data', () => {
+    let storyUpdateSpyThumbnailBgColor = spyOn(
+      storyUpdateService, 'setStoryNodeThumbnailBgColor');
+    let storyUpdateSpyThumbnailFilename = spyOn(
+      storyUpdateService, 'setStoryNodeThumbnailFilename');
+
+    component.addStoryNodeWithData();
+
+    expect(storyUpdateSpyThumbnailBgColor).toHaveBeenCalled();
+    expect(storyUpdateSpyThumbnailFilename).toHaveBeenCalled();
+  });
+
   it('should initialize component properties after controller is initialized',
     () => {
       expect(component.nodeTitles).toEqual(nodeTitles);
@@ -140,27 +152,15 @@ describe('Create New Chapter Modal Component', () => {
 
   it('should update thumbnail filename when changing thumbnail file',
     () => {
-      let storyUpdateSpy = spyOn(
-        storyUpdateService, 'setStoryNodeThumbnailFilename');
       component.updateThumbnailFilename('abc');
-      expect(storyUpdateSpy).toHaveBeenCalled();
       expect(component.editableThumbnailFilename).toEqual('abc');
     });
 
   it('should update thumbnail bg color when changing thumbnail color',
     () => {
-      let storyUpdateSpy = spyOn(
-        storyUpdateService, 'setStoryNodeThumbnailBgColor');
       component.updateThumbnailBgColor('abc');
-      expect(storyUpdateSpy).toHaveBeenCalled();
-      expect(component.editableThumbnailBgColor).toEqual('abc');
-    });
-
-  it('should delete the story node when closing the modal',
-    () => {
-      let storyUpdateSpy = spyOn(storyUpdateService, 'deleteStoryNode');
       component.cancel();
-      expect(storyUpdateSpy).toHaveBeenCalled();
+      expect(component.editableThumbnailBgColor).toEqual('abc');
     });
 
   it('should check if chapter is valid when it has title, exploration id and' +
@@ -234,11 +234,6 @@ describe('Create New Chapter Modal Component', () => {
     ]);
     expect(component.invalidExpId).toEqual(true);
   });
-
-  it('should close the modal when saving a chapter with a valid exploration id',
-    () => {
-      component.updateExplorationId();
-    });
 
   it('should set story node exploration id when updating exploration id',
     () => {
