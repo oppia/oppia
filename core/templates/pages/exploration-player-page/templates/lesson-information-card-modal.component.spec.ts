@@ -452,7 +452,7 @@ describe('Lesson Information card modal component', () => {
     expect(progressPercentage).toBe('100');
   });
 
-  it('should be correct percentage with checkpoints are completed', () => {
+  it('should return the correct percentage of completed checkpoints', () => {
     component.completedCheckpointsCount = 2;
     component.checkpointCount = 5;
     const progressPercentage = component.getProgressPercentage();
