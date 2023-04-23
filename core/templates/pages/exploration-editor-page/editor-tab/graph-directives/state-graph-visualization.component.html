@@ -32,6 +32,7 @@ with the same id on the page. -->
                     [attr.style]="node.style"
                     (click)="sendOnClickFunctionData(node.id)"
                     [attr.aria-label]="'Switch to ' + getNodeTitle(node) + 'Card'">
+                    role="button"
               </rect>
               <title>{{getNodeTitle(node)}}</title>
               <text text-anchor="middle" [attr.x]="node.xLabel" [attr.y]="node.yLabel">
@@ -50,6 +51,7 @@ with the same id on the page. -->
                       [attr.transform]="getHighlightTransform(node.x0, node.y0)"
                       [attr.style]="'fill: yellow; z-index: 10000;'"
                       [attr.aria-label]="getNodeErrorMessage(node.label)">
+                      role="button"
                 </rect>
                 <text fill="firebrick" text-anchor="middle" [attr.x]="node.x0 + 11"
                       [attr.y]="node.y0 + 9"
@@ -65,6 +67,7 @@ with the same id on the page. -->
                       class="clickable oppia-node-delete"
                       (click)="onNodeDeletionClick(node.id)"
                       [attr.aria-label]="'Delete' + getNodeTitle(node) + 'card'">
+                      role="button"
                 </rect>
                 <text [attr.dx]="node.x0 + node.width" [attr.dy]="node.y0" text-anchor="right">
                   x
