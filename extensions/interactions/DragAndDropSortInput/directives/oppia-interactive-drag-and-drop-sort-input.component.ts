@@ -16,7 +16,7 @@
  * @fileoverview Component for the DragAndDropSortInput interaction.
  */
 
-import { Component, Input, OnInit, ElementRef, AfterViewInit, QueryList, ViewChildren, Renderer2 } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CdkDragDrop, CdkDragExit, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DragAndDropSortInputCustomizationArgs } from 'interactions/customization-args-defs';
@@ -29,7 +29,7 @@ import { InteractionAnswer } from 'interactions/answer-defs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { DragAndDropAnswer } from 'interactions/answer-defs';
 
-import { DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, UP_ARROW } from "@angular/cdk/keycodes";
+import { DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW, UP_ARROW } from '@angular/cdk/keycodes';
 import { Subscription } from 'rxjs';
 
 
@@ -59,7 +59,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   activeItem: number;
   listSubscription: Subscription;
 
-  @ViewChildren("listItem") listItems: QueryList<ElementRef>;
+  @ViewChildren('listItem') listItems: QueryList<ElementRef>;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -68,22 +68,17 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService) {}
 
-  // write ngoninit that will be executed when the component loads, and logs the current element in focus
-  ngAfterViewInit() {
-    document.addEventListener('focus', () => {
-      console.log('focused element:', document.activeElement);
-    }, true);
-
+  ngAfterViewInit():void {
     this.listSubscription = this.listItems.changes.subscribe((_) => {
       this.setFocus();
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy():void {
     this.listSubscription.unsubscribe();
   }
 
-  setFocus() {
+  setFocus(): void {
     this.listItems.toArray()[this.activeItem].nativeElement.focus();
   }
 
@@ -174,24 +169,24 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     moveItemInArray(
       this.singleItemInSamePositionArray,
       event.previousIndex, event.currentIndex);
-      this.activeItem = event.currentIndex;
-      this.setFocus();
+    this.activeItem = event.currentIndex;
+    this.setFocus();
   }
 
-  handleKeyDown(event: KeyboardEvent, currentIndex: number) {
+  handleKeyDown(event: KeyboardEvent, currentIndex: number): void {
     let newIndex = currentIndex;
     if (event.keyCode === DOWN_ARROW || event.keyCode === RIGHT_ARROW) {
       newIndex += 1;
-      moveItemInArray(this.singleItemInSamePositionArray, currentIndex, newIndex);
+      moveItemInArray(this.singleItemInSamePositionArray, 
+        currentIndex, newIndex);
     }
     if (event.keyCode === UP_ARROW || event.keyCode === LEFT_ARROW) {
       newIndex -= 1;
-      moveItemInArray(this.singleItemInSamePositionArray, currentIndex, newIndex);
+      moveItemInArray(this.singleItemInSamePositionArray, 
+        currentIndex, newIndex);
     }
     this.activeItem = newIndex;
     this.setFocus();
-    console.log('key down');
-    
   }
 
   hideElement(event: CdkDragExit<string[]>): void {
