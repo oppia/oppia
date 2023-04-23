@@ -96,9 +96,8 @@ def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
         filename: string. The name of the tar file.
     """
     common.url_retrieve(url_to_retrieve, filename)
-    tar = tarfile.open(name=filename)
-    tar.extractall(path=common.OPPIA_TOOLS_DIR)
-    tar.close()
+    with tarfile.open(name=filename) as tar:
+        tar.extractall(path=common.OPPIA_TOOLS_DIR)
     rename_yarn_folder(filename, common.OPPIA_TOOLS_DIR)
     os.remove(filename)
 

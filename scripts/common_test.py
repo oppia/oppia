@@ -657,13 +657,13 @@ class CommonTests(test_utils.GenericTestBase):
     def test_permissions_of_file(self) -> None:
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
-        temp_file = tempfile.NamedTemporaryFile(dir=temp_dirpath)
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(temp_file, 'name', 'temp_file')
-        temp_file_path = os.path.join(temp_dirpath, 'temp_file')
-        with utils.open_file(temp_file_path, 'w') as f:
-            f.write('content')
+        with tempfile.NamedTemporaryFile(dir=temp_dirpath) as temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(temp_file, 'name', 'temp_file')
+            temp_file_path = os.path.join(temp_dirpath, 'temp_file')
+            with utils.open_file(temp_file_path, 'w') as f:
+                f.write('content')
 
         common.recursive_chown(root_temp_dir, os.getuid(), -1)
         common.recursive_chmod(root_temp_dir, 0o744)
@@ -727,16 +727,14 @@ class CommonTests(test_utils.GenericTestBase):
             """Mocks subprocess.check_call() to create a temporary file instead
             of the actual npm library.
             """
-            temp_file = tempfile.NamedTemporaryFile()
-            # Here MyPy assumes that the 'name' attribute is read-only.
-            # In order to silence the MyPy complaints `setattr` is used to set
-            # the attribute.
-            setattr(temp_file, 'name', 'temp_file')
-            with utils.open_file('temp_file', 'w') as f:
-                f.write('content')
+            with tempfile.NamedTemporaryFile() as temp_file:
+                # Here MyPy assumes that the 'name' attribute is read-only.
+                # In order to silence the MyPy complaints `setattr` is used.
+                setattr(temp_file, 'name', 'temp_file')
+                with utils.open_file('temp_file', 'w') as f:
+                    f.write('content')
 
-            self.assertTrue(os.path.exists('temp_file'))
-            temp_file.close()
+                self.assertTrue(os.path.exists('temp_file'))
             if os.path.isfile('temp_file'):
                 # Occasionally this temp file is not deleted.
                 os.remove('temp_file')
@@ -1289,23 +1287,23 @@ class CommonTests(test_utils.GenericTestBase):
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
-        constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write('export = {\n')
-            tmp.write('  "DEV_MODE": true,\n')
-            tmp.write('  "EMULATOR_MODE": false,\n')
-            tmp.write('};')
+        with tempfile.NamedTemporaryFile() as constants_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": true,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('};')
 
-        feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+        with tempfile.NamedTemporaryFile() as feconf_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(feconf_temp_file, 'name', mock_feconf_path)
+            with utils.open_file(mock_feconf_path, 'w') as tmp:
+                tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
         with constants_path_swap, feconf_path_swap:
             common.modify_constants(prod_env=True, maintenance_mode=False)
@@ -1344,39 +1342,38 @@ class CommonTests(test_utils.GenericTestBase):
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
-        constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write('export = {\n')
-            tmp.write('  "DEV_MODE": false,\n')
-            tmp.write('  "EMULATOR_MODE": false,\n')
-            tmp.write('};')
+        with tempfile.NamedTemporaryFile() as constants_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": false,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('};')
 
-        feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
-        self.contextManager.__exit__(None, None, None)
-        with constants_path_swap, feconf_path_swap:
-            common.set_constants_to_default()
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
-        constants_temp_file.close()
-        feconf_temp_file.close()
+        with tempfile.NamedTemporaryFile() as feconf_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(feconf_temp_file, 'name', mock_feconf_path)
+            with utils.open_file(mock_feconf_path, 'w') as tmp:
+                tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
+            self.contextManager.__exit__(None, None, None)
+            with constants_path_swap, feconf_path_swap:
+                common.set_constants_to_default()
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+            constants_temp_file.close()
 
     def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
         with contextlib.ExitStack() as stack:

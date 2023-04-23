@@ -517,20 +517,22 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         py_actual_text = (
             'ConverterMapping,\nLine ending with '
             '"ConverterMapping",\nOther Line\n')
-        temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
-        with utils.open_file(temp_py_config_file, 'w') as f:
-            f.write(py_actual_text)
+        with tempfile.NamedTemporaryFile(prefix='py') as temp_pq_file:
+            with utils.open_file(temp_pq_file.name, 'w') as f:
+                f.write(py_actual_text)
 
         pq_actual_text = (
             'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
-        temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
-        with utils.open_file(temp_pq_config_file, 'w') as f:
-            f.write(pq_actual_text)
+        with tempfile.NamedTemporaryFile(prefix='pq') as temp_pq_file:
+            with utils.open_file(temp_pq_file.name, 'w') as f:
+                f.write(pq_actual_text)
 
-        with check_call_swap, self.Popen_swap:
-            with install_third_party_main_swap, setup_main_swap:
-                with setup_gae_main_swap, pre_commit_hook_main_swap:
-                    with pre_push_hook_main_swap, tweak_yarn_executable_swap:
-                        with os_name_swap:
-                            install_third_party_libs.main()
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+            with check_call_swap, self.Popen_swap:
+                with install_third_party_main_swap, setup_main_swap:
+                    with setup_gae_main_swap, pre_commit_hook_main_swap:
+                        with pre_push_hook_main_swap:
+                            with tweak_yarn_executable_swap:
+                                with os_name_swap:
+                                    install_third_party_libs.main()
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)

@@ -171,43 +171,24 @@ class ReformatXmlToYamlTests(test_utils.GenericTestBase):
 class ExtendIndexYamlTests(test_utils.GenericTestBase):
     """Class for testing the extend_index_yaml script."""
 
-    def setUp(self) -> None:
-        super().setUp()
-        self.index_yaml_file = tempfile.NamedTemporaryFile()
-        self.web_inf_index_xml_file = tempfile.NamedTemporaryFile()
-        self.index_yaml_file_name = self.index_yaml_file.name
-        self.web_inf_index_xml_file_name = self.web_inf_index_xml_file.name
-        self.index_yaml_swap = self.swap(
-            extend_index_yaml, 'INDEX_YAML_PATH',
-            self.index_yaml_file.name)
-        self.web_inf_index_xml_swap = self.swap(
-            extend_index_yaml, 'WEB_INF_INDEX_XML_PATH',
-            self.web_inf_index_xml_file.name)
-        self.open_index_yaml_r = open(
-            self.index_yaml_file.name, 'r', encoding='utf-8')
-        self.open_index_yaml_w = open(
-            self.index_yaml_file.name, 'w', encoding='utf-8')
-        self.open_web_inf_index_xml = open(
-            self.web_inf_index_xml_file.name, 'a', encoding='utf-8')
-
     def _run_test_for_extend_index_yaml(
         self, index_yaml: str, web_inf_index_xml: str, expected_index_yaml: str
     ) -> None:
         """Run tests for extend_index_yaml script."""
-        with self.index_yaml_swap, self.web_inf_index_xml_swap:
-            with self.open_index_yaml_w as f:
-                f.write(index_yaml)
-            with self.open_web_inf_index_xml as f:
-                f.write(web_inf_index_xml)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            self.swap(extend_index_yaml, 'INDEX_YAML_PATH', filename)
+            self.swap(extend_index_yaml, 'WEB_INF_INDEX_XML_PATH', filename)
+            with open(
+                filename, 'w', encoding='utf-8') as open_index_yaml_w:
+                open_index_yaml_w.write(index_yaml)
+            with open(
+                filename, 'a', encoding='utf-8') as open_web_inf_index_xml:
+                open_web_inf_index_xml.write(web_inf_index_xml)
             extend_index_yaml.main()
-            with self.open_index_yaml_r as f:
-                actual_index_yaml = f.read()
-            self.assertEqual(actual_index_yaml, expected_index_yaml)
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        self.index_yaml_file.close()
-        self.web_inf_index_xml_file.close()
+            with open(filename, 'r', encoding='utf-8') as open_index_yaml_r:
+                actual_index_yaml = open_index_yaml_r.read()
+                self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_with_changes(self) -> None:
         index_yaml = """indexes:

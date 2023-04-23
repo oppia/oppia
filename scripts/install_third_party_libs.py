@@ -140,15 +140,15 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
     for path in proto_files_paths:
         command = [
             buf_path, 'generate', path]
-        process = subprocess.Popen(
+        with subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            env=proto_env)
-        stdout, stderr = process.communicate()
-        if process.returncode == 0:
-            print(stdout)
-        else:
-            print(stderr)
-            raise Exception('Error compiling proto files at %s' % path)
+            env=proto_env) as process:
+            stdout, stderr = process.communicate()
+            if process.returncode == 0:
+                print(stdout)
+            else:
+                print(stderr)
+                raise Exception('Error compiling proto files at %s' % path)
 
     # Since there is no simple configuration for imports when using protobuf to
     # generate Python files we need to manually fix the imports.

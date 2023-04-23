@@ -111,10 +111,10 @@ class SetupGaeTests(test_utils.GenericTestBase):
             if path == common.GOOGLE_CLOUD_SDK_HOME:
                 return False
             return True
-        temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        def mock_open(name: str) -> tarfile.TarFile:  # pylint: disable=unused-argument
-            self.check_function_calls['open_is_called'] = True
-            return temp_file
+        with tarfile.open(name=MOCK_TMP_UNTAR_PATH) as temp_file:
+            def mock_open(name: str) -> tarfile.TarFile:  # pylint: disable=unused-argument
+                self.check_function_calls['open_is_called'] = True
+                return temp_file
         def mock_extractall(unused_self: str, path: str) -> None:  # pylint: disable=unused-argument
             self.check_function_calls['extractall_is_called'] = True
         def mock_close(unused_self: str) -> None:

@@ -47,99 +47,96 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_break_after_hanging_indent = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""self.post_json('/ml/\\trainedclassifierhandler',
-                self.payload, expect_errors=True, expected_status_int=401)
-                if (a > 1 and
-                        b > 2):
-                """)
-        node_break_after_hanging_indent.file = filename
-        node_break_after_hanging_indent.path = filename
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""self.post_json('/ml/\\trainedclassifierhandler',
+                    self.payload, expect_errors=True, expected_status_int=401)
+                    if (a > 1 and
+                            b > 2):
+                    """)
+            node_break_after_hanging_indent.file = filename
+            node_break_after_hanging_indent.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_break_after_hanging_indent))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_break_after_hanging_indent))
 
-        message = testutils.Message(
-            msg_id='no-break-after-hanging-indent', line=1)
+            message = testutils.Message(
+                msg_id='no-break-after-hanging-indent', line=1)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_no_break_after_hanging_indentation_with_comment(self) -> None:
         node_break_after_hanging_indent = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""self.post_json('/ml/\\trainedclassifierhandler',
-                self.payload, expect_errors=True, expected_status_int=401)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""self.post_json('/ml/\\trainedclassifierhandler',
+                    self.payload, expect_errors=True, expected_status_int=401)
 
-                if (a > 1 and
-                        b > 2):  # pylint: disable=invalid-name
-                """)
-        node_break_after_hanging_indent.file = filename
-        node_break_after_hanging_indent.path = filename
+                    if (a > 1 and
+                            b > 2):  # pylint: disable=invalid-name
+                    """)
+            node_break_after_hanging_indent.file = filename
+            node_break_after_hanging_indent.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_break_after_hanging_indent))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_break_after_hanging_indent))
 
-        message = testutils.Message(
-            msg_id='no-break-after-hanging-indent', line=1)
+            message = testutils.Message(
+                msg_id='no-break-after-hanging-indent', line=1)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_break_after_hanging_indentation(self) -> None:
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""\"\"\"Some multiline
-                docstring.
-                \"\"\"
-                # Load JSON.
-                master_translation_dict = json.loads(
-               pylint_utils.get_file_contents(os.path.join(
-                os.getcwd(), 'assets', 'i18n', 'en.json')))
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""\"\"\"Some multiline
+                    docstring.
+                    \"\"\"
+                    # Load JSON.
+                    master_translation_dict = json.loads(
+                   pylint_utils.get_file_contents(os.path.join(
+                    os.getcwd(), 'assets', 'i18n', 'en.json')))
+                    """)
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_no_error_message))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_with_no_error_message))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_hanging_indentation_with_a_comment_after_bracket(self) -> None:
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""self.post_json(  # Random comment
-                '(',
-                self.payload, expect_errors=True, expected_status_int=401)""")
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""self.post_json(  # Random comment
+                    '(',
+                    self.payload,
+                    expect_errors=True, expected_status_int=401)""")
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_no_error_message))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_with_no_error_message))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_hanging_indentation_with_a_comment_after_two_or_more_bracket(
         self
@@ -148,21 +145,21 @@ class HangingIndentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""self.post_json(func(  # Random comment
-                '(',
-                self.payload, expect_errors=True, expected_status_int=401))""")
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""self.post_json(func(  # Random comment
+                    '(',
+                    self.payload,
+                    expect_errors=True, expected_status_int=401))""")
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_no_error_message))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_with_no_error_message))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_hanging_indentation_with_a_comment_after_square_bracket(
         self
@@ -171,52 +168,50 @@ class HangingIndentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""self.post_json([  # Random comment
-                '(',
-                '', '', ''])""")
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""self.post_json([  # Random comment
+                    '(',
+                    '', '', ''])""")
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_no_error_message))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_with_no_error_message))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_hanging_indentation_with_a_if_statement_before(self) -> None:
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                if 5 > 7:
-                    self.post_json([
-                    '(',
-                    '', '', ''])
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    if 5 > 7:
+                        self.post_json([
+                        '(',
+                        '', '', ''])
 
-                def func(arg1,
-                    arg2, arg3):
-                    a = 2 / 2""")
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+                    def func(arg1,
+                        arg2, arg3):
+                        a = 2 / 2""")
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_no_error_message))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_with_no_error_message))
 
-        message = testutils.Message(
-            msg_id='no-break-after-hanging-indent',
-            line=7)
+            message = testutils.Message(
+                msg_id='no-break-after-hanging-indent',
+                line=7)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
 
 class DocstringParameterCheckerTests(unittest.TestCase):
@@ -232,244 +227,235 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_no_newline_below_class_docstring = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        a = 1 + 2
-                """)
-        node_no_newline_below_class_docstring.file = filename
-        node_no_newline_below_class_docstring.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(dummy_class):
+                            \"\"\"This is a docstring.\"\"\"
+                            a = 1 + 2
+                    """)
+            node_no_newline_below_class_docstring.file = filename
+            node_no_newline_below_class_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_no_newline_below_class_docstring)
+            self.checker_test_object.checker.visit_classdef(
+                node_no_newline_below_class_docstring)
 
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_no_newline_below_class_docstring)
+            message = testutils.Message(
+                msg_id='newline-below-class-docstring',
+                node=node_no_newline_below_class_docstring)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_excessive_newline_below_class_docstring(self) -> None:
         node_excessive_newline_below_class_docstring = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(dummy_class):
+                            \"\"\"This is a docstring.\"\"\"
 
 
-                        a = 1 + 2
-                """)
-        node_excessive_newline_below_class_docstring.file = filename
-        node_excessive_newline_below_class_docstring.path = filename
+                            a = 1 + 2
+                    """)
+            node_excessive_newline_below_class_docstring.file = filename
+            node_excessive_newline_below_class_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_excessive_newline_below_class_docstring)
+            self.checker_test_object.checker.visit_classdef(
+                node_excessive_newline_below_class_docstring)
 
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_excessive_newline_below_class_docstring)
+            message = testutils.Message(
+                msg_id='newline-below-class-docstring',
+                node=node_excessive_newline_below_class_docstring)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_inline_comment_after_class_docstring(self) -> None:
         node_inline_comment_after_class_docstring = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        # This is a comment.
-                        def func():
-                            a = 1 + 2
-                """)
-        node_inline_comment_after_class_docstring.file = filename
-        node_inline_comment_after_class_docstring.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(dummy_class):
+                            \"\"\"This is a docstring.\"\"\"
+                            # This is a comment.
+                            def func():
+                                a = 1 + 2
+                    """)
+            node_inline_comment_after_class_docstring.file = filename
+            node_inline_comment_after_class_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_inline_comment_after_class_docstring)
+            self.checker_test_object.checker.visit_classdef(
+                node_inline_comment_after_class_docstring)
 
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_inline_comment_after_class_docstring)
+            message = testutils.Message(
+                msg_id='newline-below-class-docstring',
+                node=node_inline_comment_after_class_docstring)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_multiline_class_argument_with_incorrect_style(self) -> None:
         node_multiline_class_argument_with_incorrect_style = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(
-                            dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        a = 1 + 2
-                """)
-        node_multiline_class_argument_with_incorrect_style.file = filename
-        node_multiline_class_argument_with_incorrect_style.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(
+                                dummy_class):
+                            \"\"\"This is a docstring.\"\"\"
+                            a = 1 + 2
+                    """)
+            node_multiline_class_argument_with_incorrect_style.file = filename
+            node_multiline_class_argument_with_incorrect_style.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_multiline_class_argument_with_incorrect_style)
+            self.checker_test_object.checker.visit_classdef(
+                node_multiline_class_argument_with_incorrect_style)
 
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_multiline_class_argument_with_incorrect_style)
+            message = testutils.Message(
+                msg_id='newline-below-class-docstring',
+                node=node_multiline_class_argument_with_incorrect_style)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_multiline_class_argument_with_correct_style(self) -> None:
         node_multiline_class_argument_with_correct_style = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(
-                            dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(
+                                dummy_class):
+                            \"\"\"This is a docstring.\"\"\"
 
-                        a = 1 + 2
-                """)
-        node_multiline_class_argument_with_correct_style.file = filename
-        node_multiline_class_argument_with_correct_style.path = filename
+                            a = 1 + 2
+                    """)
+            node_multiline_class_argument_with_correct_style.file = filename
+            node_multiline_class_argument_with_correct_style.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_multiline_class_argument_with_correct_style)
+            self.checker_test_object.checker.visit_classdef(
+                node_multiline_class_argument_with_correct_style)
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_single_newline_below_class_docstring(self) -> None:
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a multiline docstring.\"\"\"
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(dummy_class):
+                            \"\"\"This is a multiline docstring.\"\"\"
 
-                        a = 1 + 2
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+                            a = 1 + 2
+                    """)
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_with_no_error_message)
+            self.checker_test_object.checker.visit_classdef(
+                node_with_no_error_message)
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_class_with_no_docstring(self) -> None:
         node_class_with_no_docstring = astroid.scoped_nodes.Module(
             name='test',
             doc=None)
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        a = 1 + 2
-                """)
-        node_class_with_no_docstring.file = filename
-        node_class_with_no_docstring.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(dummy_class):
+                            a = 1 + 2
+                    """)
+            node_class_with_no_docstring.file = filename
+            node_class_with_no_docstring.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_class_with_no_docstring)
+            self.checker_test_object.checker.visit_classdef(
+                node_class_with_no_docstring)
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_newline_before_docstring_with_correct_style(self) -> None:
         node_newline_before_docstring_with_correct_style = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(dummy_class):
 
-                        \"\"\"This is a multiline docstring.\"\"\"
+                            \"\"\"This is a multiline docstring.\"\"\"
 
-                        a = 1 + 2
-                """)
-        node_newline_before_docstring_with_correct_style.file = filename
-        node_newline_before_docstring_with_correct_style.path = filename
+                            a = 1 + 2
+                    """)
+            node_newline_before_docstring_with_correct_style.file = filename
+            node_newline_before_docstring_with_correct_style.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_newline_before_docstring_with_correct_style)
+            self.checker_test_object.checker.visit_classdef(
+                node_newline_before_docstring_with_correct_style)
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_newline_before_docstring_with_incorrect_style(self) -> None:
         node_newline_before_docstring_with_incorrect_style = (
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        class ClassName(dummy_class):
 
-                        \"\"\"This is a multiline docstring.\"\"\"
-                        a = 1 + 2
-                """)
-        node_newline_before_docstring_with_incorrect_style.file = filename
-        node_newline_before_docstring_with_incorrect_style.path = filename
+                            \"\"\"This is a multiline docstring.\"\"\"
+                            a = 1 + 2
+                    """)
+            node_newline_before_docstring_with_incorrect_style.file = filename
+            node_newline_before_docstring_with_incorrect_style.path = filename
 
-        self.checker_test_object.checker.visit_classdef(
-            node_newline_before_docstring_with_incorrect_style)
+            self.checker_test_object.checker.visit_classdef(
+                node_newline_before_docstring_with_incorrect_style)
 
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_newline_before_docstring_with_incorrect_style)
+            message = testutils.Message(
+                msg_id='newline-below-class-docstring',
+                node=node_newline_before_docstring_with_incorrect_style)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_malformed_args_section(self) -> None:
         node_malformed_args_section = astroid.extract_node(
@@ -1831,37 +1817,36 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
             pylint_extensions.BackslashContinuationChecker)
         checker_test_object.setup_method()
         node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
-                """'cde'\\\n"""             # pylint: disable=backslash-continuation
-                """'xyz'
-                message2 = 'abc\\\\'
-                message3 = (
-                    'abc\\\\'
-                    'xyz\\\\'
-                )
-                """)
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""message1 = 'abc'\\\n""" # pylint: disable=backslash-continuation
+                    """'cde'\\\n"""             # pylint: disable=backslash-continuation
+                    """'xyz'
+                    message2 = 'abc\\\\'
+                    message3 = (
+                        'abc\\\\'
+                        'xyz\\\\'
+                    )
+                    """)
 
-        node.file = filename
-        node.path = filename
+            node.file = filename
+            node.path = filename
 
-        checker_test_object.checker.process_module(node)
+            checker_test_object.checker.process_module(node)
 
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='backslash-continuation',
-                line=1
-            ),
-            testutils.Message(
-                msg_id='backslash-continuation',
-                line=2
-            ),
-        ):
-            temp_file.close()
+            checker_test_object.assertAddsMessages(
+                testutils.Message(
+                    msg_id='backslash-continuation',
+                    line=1
+                ),
+                testutils.Message(
+                    msg_id='backslash-continuation',
+                    line=2
+                ),
+            )
 
 
 class FunctionArgsOrderCheckerTests(unittest.TestCase):
@@ -2191,62 +2176,61 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         node_missing_newline_at_eof = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""c = 'something dummy'
-                """)
-        node_missing_newline_at_eof.file = filename
-        node_missing_newline_at_eof.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""c = 'something dummy'
+                    """)
+            node_missing_newline_at_eof.file = filename
+            node_missing_newline_at_eof.path = filename
 
-        checker_test_object.checker.process_module(node_missing_newline_at_eof)
+            checker_test_object.checker.process_module(
+                node_missing_newline_at_eof)
 
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='newline-at-eof',
-                line=2
-            ),
-        ):
-            temp_file.close()
+            checker_test_object.assertAddsMessages(
+                testutils.Message(
+                    msg_id='newline-at-eof',
+                    line=2
+                ),
+            )
 
         node_single_char_file = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(u"""1""")
-        node_single_char_file.file = filename
-        node_single_char_file.path = filename
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(u"""1""")
+            node_single_char_file.file = filename
+            node_single_char_file.path = filename
 
-        checker_test_object.checker.process_module(node_single_char_file)
+            checker_test_object.checker.process_module(node_single_char_file)
 
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='only-one-character',
-                line=1
-            ),
-        ):
-            temp_file.close()
+            checker_test_object.assertAddsMessages(
+                testutils.Message(
+                    msg_id='only-one-character',
+                    line=1
+                ),
+            )
 
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
 
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(u"""x = 'something dummy'""")
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(u"""x = 'something dummy'""")
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_with_no_error_message)
+            checker_test_object.checker.process_module(
+                node_with_no_error_message)
 
-        with checker_test_object.assertNoMessages():
-            temp_file.close()
+            checker_test_object.assertNoMessages()
 
 
 class TypeIgnoreCommentCheckerTests(unittest.TestCase):
@@ -2281,60 +2265,58 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                suggestion.change.new_value = (  # type: ignore[attr-defined]
-                    new_content
-                ) #@
-                """
-            )
-        node_function_with_type_ignore_only.file = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    suggestion.change.new_value = (  # type: ignore[attr-defined]
+                        new_content
+                    ) #@
+                    """
+                )
+            node_function_with_type_ignore_only.file = filename
 
-        message = testutils.Message(
-            msg_id='mypy-ignore-used',
-            line=2,
-            node=node_function_with_type_ignore_only
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_function_with_type_ignore_only
+            message = testutils.Message(
+                msg_id='mypy-ignore-used',
+                line=2,
+                node=node_function_with_type_ignore_only
             )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_function_with_type_ignore_only
+                )
 
     def test_raises_error_if_prohibited_error_code_is_used(self) -> None:
         node_with_prohibited_error_code = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                suggestion.change.new_value = (  # type: ignore[some-new-ignore]
-                    new_content
-                ) #@
-                """
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    suggestion.change.new_value = (  # type: ignore[some-new-ignore]
+                        new_content
+                    ) #@
+                    """
+                )
+            node_with_prohibited_error_code.file = filename
+
+            message = testutils.Message(
+                msg_id='prohibited-type-ignore-used',
+                line=2,
+                node=node_with_prohibited_error_code,
+                args=('some-new-ignore',)
             )
-        node_with_prohibited_error_code.file = filename
 
-        message = testutils.Message(
-            msg_id='prohibited-type-ignore-used',
-            line=2,
-            node=node_with_prohibited_error_code,
-            args=('some-new-ignore',)
-        )
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_prohibited_error_code
-            )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_prohibited_error_code
+                )
 
         node_with_prohibited_type_ignore_error_code = (
             astroid.scoped_nodes.Module(
@@ -2342,40 +2324,39 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use MyPy ignore because ...
-                suggestion.change.new_value = (  # type: ignore[attr-defined]
-                    new_content
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use MyPy ignore because ...
+                    suggestion.change.new_value = (  # type: ignore[attr-defined]
+                        new_content
+                    )
+
+                    suggestion.change.new_value = (  # type: ignore[truthy-bool]
+                        new_content
+                    )
+
+                    # Here we use MyPy ignore because ...
+                    func_only_accept_str('hi')  # type: ignore[attr-defined]
+
+                    #@
+                    """
                 )
+            node_with_prohibited_type_ignore_error_code.file = filename
 
-                suggestion.change.new_value = (  # type: ignore[truthy-bool]
-                    new_content
+            message = testutils.Message(
+                msg_id='prohibited-type-ignore-used',
+                line=7,
+                node=node_with_prohibited_type_ignore_error_code,
+                args=('truthy-bool',)
+            )
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_prohibited_type_ignore_error_code
                 )
-
-                # Here we use MyPy ignore because ...
-                func_only_accept_str('hi')  # type: ignore[attr-defined]
-
-                #@
-                """
-            )
-        node_with_prohibited_type_ignore_error_code.file = filename
-
-        message = testutils.Message(
-            msg_id='prohibited-type-ignore-used',
-            line=7,
-            node=node_with_prohibited_type_ignore_error_code,
-            args=('truthy-bool',)
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_prohibited_type_ignore_error_code
-            )
-        temp_file.close()
 
     def test_raises_error_if_prohibited_error_code_is_used_in_combined_form(
         self
@@ -2386,31 +2367,30 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                suggestion.change.new_value = (  # type: ignore[arg-type, no-untyped-call, truthy-bool] pylint: disable=line-too-long
-                    new_content
-                ) #@
-                """
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    suggestion.change.new_value = (  # type: ignore[arg-type, no-untyped-call, truthy-bool] pylint: disable=line-too-long
+                        new_content
+                    ) #@
+                    """
+                )
+            node_with_prohibited_error_code_in_combined_form.file = filename
+
+            message = testutils.Message(
+                msg_id='prohibited-type-ignore-used',
+                line=2,
+                node=node_with_prohibited_error_code_in_combined_form,
+                args=('truthy-bool',)
             )
-        node_with_prohibited_error_code_in_combined_form.file = filename
 
-        message = testutils.Message(
-            msg_id='prohibited-type-ignore-used',
-            line=2,
-            node=node_with_prohibited_error_code_in_combined_form,
-            args=('truthy-bool',)
-        )
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_prohibited_error_code_in_combined_form
-            )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_prohibited_error_code_in_combined_form
+                )
 
         node_with_multiple_prohibited_error_code_in_combined_form = (
             astroid.scoped_nodes.Module(
@@ -2418,32 +2398,31 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                suggestion.change.new_value = (  # type: ignore[return-none, no-untyped-call, truthy-bool] pylint: disable=line-too-long
-                    new_content
-                ) #@
-                """
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    suggestion.change.new_value = (  # type: ignore[return-none, no-untyped-call, truthy-bool] pylint: disable=line-too-long
+                        new_content
+                    ) #@
+                    """
+                )
+            node_with_multiple_prohibited_error_code_in_combined_form.file = (
+                filename)
+
+            message = testutils.Message(
+                msg_id='prohibited-type-ignore-used',
+                line=2,
+                node=node_with_multiple_prohibited_error_code_in_combined_form,
+                args=('return-none', 'truthy-bool')
             )
-        node_with_multiple_prohibited_error_code_in_combined_form.file = (
-            filename)
 
-        message = testutils.Message(
-            msg_id='prohibited-type-ignore-used',
-            line=2,
-            node=node_with_multiple_prohibited_error_code_in_combined_form,
-            args=('return-none', 'truthy-bool')
-        )
-
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_multiple_prohibited_error_code_in_combined_form
-            )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_multiple_prohibited_error_code_in_combined_form
+                )
 
     def test_extra_type_ignore_comment_used_in_a_module_raises_error(
         self
@@ -2452,203 +2431,198 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use MyPy ignore because ...
-                suggestion.change.new_value = (   # type: ignore[attr-defined]
-                    new_content
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use MyPy ignore because ...
+                    suggestion.change.new_value = (   # type: ignore[attr-defined]
+                        new_content
+                    )
+
+                    # Here we use MyPy ignore because ...
+                    suggestion.change.new_value = (
+                        new_content
+                    )
+
+                    # Here we use MyPy ignore because ...
+                    func_only_accept_str('hi')   # type: ignore[attr-defined]
+
+                    # Here we use MyPy ignore because ...
+                    suggestion.change.new_value = (
+                        new_content
+                    )
+                    #@
+                    """
                 )
+            node_function_with_extra_comment.file = filename
 
-                # Here we use MyPy ignore because ...
-                suggestion.change.new_value = (
-                    new_content
-                )
-
-                # Here we use MyPy ignore because ...
-                func_only_accept_str('hi')   # type: ignore[attr-defined]
-
-                # Here we use MyPy ignore because ...
-                suggestion.change.new_value = (
-                    new_content
-                )
-                #@
-                """
+            message1 = testutils.Message(
+                msg_id='redundant-type-comment',
+                line=7,
+                node=node_function_with_extra_comment
             )
-        node_function_with_extra_comment.file = filename
-
-        message1 = testutils.Message(
-            msg_id='redundant-type-comment',
-            line=7,
-            node=node_function_with_extra_comment
-        )
-        message2 = testutils.Message(
-            msg_id='redundant-type-comment',
-            line=15,
-            node=node_function_with_extra_comment
-        )
-        with self.checker_test_object.assertAddsMessages(message1, message2):
-            self.checker_test_object.checker.visit_module(
-                node_function_with_extra_comment
+            message2 = testutils.Message(
+                msg_id='redundant-type-comment',
+                line=15,
+                node=node_function_with_extra_comment
             )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(
+                message1, message2):
+                self.checker_test_object.checker.visit_module(
+                    node_function_with_extra_comment
+                )
 
         node_function_with_extra_comment2 = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use MyPy ignore because ...
-                suggestion.change.new_value = (   # type: ignore[attr-defined]
-                    new_content
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use MyPy ignore because ...
+                    suggestion.change.new_value = (   # type: ignore[attr-defined]
+                        new_content
+                    )
+
+                    # Here we use MyPy ignore because ...
+                    suggestion.change.new_value = (
+                        new_content
+                    )
+
+                    # Here we use MyPy ignore because ...
+                    func_only_accept_str('hi')   # type: ignore[attr-defined]
+                    #@
+                    """
                 )
+            node_function_with_extra_comment2.file = filename
 
-                # Here we use MyPy ignore because ...
-                suggestion.change.new_value = (
-                    new_content
+            message = testutils.Message(
+                msg_id='redundant-type-comment',
+                line=7,
+                node=node_function_with_extra_comment2
+            )
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_function_with_extra_comment2
                 )
-
-                # Here we use MyPy ignore because ...
-                func_only_accept_str('hi')   # type: ignore[attr-defined]
-                #@
-                """
-            )
-        node_function_with_extra_comment2.file = filename
-
-        message = testutils.Message(
-            msg_id='redundant-type-comment',
-            line=7,
-            node=node_function_with_extra_comment2
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_function_with_extra_comment2
-            )
-        temp_file.close()
 
     def test_raises_error_if_type_ignore_is_in_second_place(self) -> None:
         node_with_type_ignore = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                suggestion.change.new_value = (  # pylint: disable=line-too-long type: ignore[attr-defined]
-                    new_content
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    suggestion.change.new_value = (  # pylint: disable=line-too-long type: ignore[attr-defined]
+                        new_content
+                    )
+                    #@
+                    """
                 )
-                #@
-                """
-            )
-        node_with_type_ignore.file = filename
+            node_with_type_ignore.file = filename
 
-        message = testutils.Message(
-            msg_id='mypy-ignore-used',
-            line=2,
-            node=node_with_type_ignore
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_type_ignore
+            message = testutils.Message(
+                msg_id='mypy-ignore-used',
+                line=2,
+                node=node_with_type_ignore
             )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_type_ignore
+                )
 
     def test_type_ignores_with_comments_should_not_raises_error(self) -> None:
         node_with_type_ignore_in_single_form = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use MyPy ignore because attributes on BaseChange
-                # class are defined dynamically.
-                suggestion.change.new_value = (  # type: ignore[attr-defined]
-                    new_content
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use MyPy ignore because attributes on BaseChange
+                    # class are defined dynamically.
+                    suggestion.change.new_value = (  # type: ignore[attr-defined]
+                        new_content
+                    )
+
+                    # Here we use MyPy ignore because this function is can only
+                    # str values but here we are providing integer which causes
+                    # MyPy to throw an error. Thus to avoid the error, we used
+                    # ignore here.
+                    func_only_accept_str(1234)  # type: ignore[arg-type] #@
+                    """
                 )
+            node_with_type_ignore_in_single_form.file = filename
 
-                # Here we use MyPy ignore because this function is can only
-                # str values but here we are providing integer which causes
-                # MyPy to throw an error. Thus to avoid the error, we used
-                # ignore here.
-                func_only_accept_str(1234)  # type: ignore[arg-type] #@
-                """
-            )
-        node_with_type_ignore_in_single_form.file = filename
-
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_type_ignore_in_single_form
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_type_ignore_in_single_form
+                )
 
         node_with_type_ignore_in_combined_form = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use MyPy ignore because ...
-                suggestion.change.new_value = (  # type: ignore[attr-defined, list-item]
-                    new_content
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use MyPy ignore because ...
+                    suggestion.change.new_value = (  # type: ignore[attr-defined, list-item]
+                        new_content
+                    )
+
+                    # Here we use MyPy ignore because ...
+                    func_only_accept_str(1234)  # type: ignore[arg-type]
+                    #@
+                    """
                 )
+            node_with_type_ignore_in_combined_form.file = filename
 
-                # Here we use MyPy ignore because ...
-                func_only_accept_str(1234)  # type: ignore[arg-type]
-                #@
-                """
-            )
-        node_with_type_ignore_in_combined_form.file = filename
-
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_type_ignore_in_combined_form
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_type_ignore_in_combined_form
+                )
 
     def test_untyped_call_type_ignores_should_not_raise_error(self) -> None:
         node_function = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use MyPy ignore because attributes on BaseChange
-                # class are defined dynamically.
-                suggestion.change.new_value = (  # type: ignore[attr-defined]
-                    new_content
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use MyPy ignore because attributes on BaseChange
+                    # class are defined dynamically.
+                    suggestion.change.new_value = (  # type: ignore[attr-defined]
+                        new_content
+                    )
+
+                    func_only_accept_str(1234)  # type: ignore[no-untyped-call] #@
+                    """
                 )
+            node_function.file = filename
 
-                func_only_accept_str(1234)  # type: ignore[no-untyped-call] #@
-                """
-            )
-        node_function.file = filename
-
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(node_function)
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(node_function)
 
     def test_raises_error_if_gap_in_ignore_and_comment_is_more_than_fifteen(
         self
@@ -2659,90 +2633,88 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use MyPy ignore because stubs of protobuf are not
-                # available yet.
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use MyPy ignore because stubs of protobuf are not
+                    # available yet.
 
-                variable_one: str = '123'
-                variable_two: str = '1234'
-                # Some other content of module one.
+                    variable_one: str = '123'
+                    variable_two: str = '1234'
+                    # Some other content of module one.
 
-                # Line 1 content.
-                # Line 2 content.
-                # Line 3 content.
-                # Line 4 content.
+                    # Line 1 content.
+                    # Line 2 content.
+                    # Line 3 content.
+                    # Line 4 content.
 
-                # Some other content of module two.
+                    # Some other content of module two.
 
-                def test_foo(arg: str) -> str:
+                    def test_foo(arg: str) -> str:
 
-                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
-                    return 'hi' #@
-                """
+                    def foo(exp_id: str) -> str:  # type: ignore[arg-type]
+                        return 'hi' #@
+                    """
+                )
+            node_with_ignore_and_more_than_fifteen_gap.file = filename
+
+            message1 = testutils.Message(
+                msg_id='mypy-ignore-used',
+                line=18,
+                node=node_with_ignore_and_more_than_fifteen_gap
             )
-        node_with_ignore_and_more_than_fifteen_gap.file = filename
-
-        message1 = testutils.Message(
-            msg_id='mypy-ignore-used',
-            line=18,
-            node=node_with_ignore_and_more_than_fifteen_gap
-        )
-        message2 = testutils.Message(
-            msg_id='redundant-type-comment',
-            line=2,
-            node=node_with_ignore_and_more_than_fifteen_gap
-        )
-        with self.checker_test_object.assertAddsMessages(
-            message1, message2
-        ):
-            self.checker_test_object.checker.visit_module(
-                node_with_ignore_and_more_than_fifteen_gap
+            message2 = testutils.Message(
+                msg_id='redundant-type-comment',
+                line=2,
+                node=node_with_ignore_and_more_than_fifteen_gap
             )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(
+                message1, message2
+            ):
+                self.checker_test_object.checker.visit_module(
+                    node_with_ignore_and_more_than_fifteen_gap
+                )
 
     def test_generic_type_ignore_raises_pylint_error(self) -> None:
         node_with_generic_type_ignore = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
-                # are not available yet.
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # TODO(#sll): Here we use MyPy ignore because stubs
+                    # of protobuf are not available yet.
 
-                def foo(exp_id: str) -> str:  # type: ignore
-                    return 'hi' #@
-                """
+                    def foo(exp_id: str) -> str:  # type: ignore
+                        return 'hi' #@
+                    """
+                )
+            node_with_generic_type_ignore.file = filename
+
+            message1 = testutils.Message(
+                msg_id='generic-mypy-ignore-used',
+                line=5,
+                node=node_with_generic_type_ignore
             )
-        node_with_generic_type_ignore.file = filename
-
-        message1 = testutils.Message(
-            msg_id='generic-mypy-ignore-used',
-            line=5,
-            node=node_with_generic_type_ignore
-        )
-        message2 = testutils.Message(
-            msg_id='redundant-type-comment',
-            line=2,
-            node=node_with_generic_type_ignore
-        )
-
-        with self.checker_test_object.assertAddsMessages(
-            message1, message2
-        ):
-            self.checker_test_object.checker.visit_module(
-                node_with_generic_type_ignore
+            message2 = testutils.Message(
+                msg_id='redundant-type-comment',
+                line=2,
+                node=node_with_generic_type_ignore
             )
-        temp_file.close()
+
+            with self.checker_test_object.assertAddsMessages(
+                message1, message2
+            ):
+                self.checker_test_object.checker.visit_module(
+                    node_with_generic_type_ignore
+                )
 
         node_with_both_generic_and_non_generic_type_ignores = (
             astroid.scoped_nodes.Module(
@@ -2750,65 +2722,63 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
-                # are not available yet.
-                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
-                    return 'hi' #@
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # TODO(#sll): Here we use MyPy ignore because stubs
+                    # of protobuf are not available yet.
+                    def foo(exp_id: str) -> str:  # type: ignore[arg-type]
+                        return 'hi' #@
 
-                def foo(exp_id: str) -> str:  # type: ignore
-                    return 'hi' #@
+                    def foo(exp_id: str) -> str:  # type: ignore
+                        return 'hi' #@
 
-                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
-                # are not available yet.
-                def foo(exp_id: str) -> str:  # type: ignore[misc]
-                    return 'hi' #@
-                """
+                    # TODO(#sll): Here we use MyPy ignore because stubs
+                    # of protobuf are not available yet.
+                    def foo(exp_id: str) -> str:  # type: ignore[misc]
+                        return 'hi' #@
+                    """
+                )
+            node_with_both_generic_and_non_generic_type_ignores.file = filename
+
+            message1 = testutils.Message(
+                msg_id='generic-mypy-ignore-used',
+                line=7,
+                node=node_with_both_generic_and_non_generic_type_ignores
             )
-        node_with_both_generic_and_non_generic_type_ignores.file = filename
 
-        message1 = testutils.Message(
-            msg_id='generic-mypy-ignore-used',
-            line=7,
-            node=node_with_both_generic_and_non_generic_type_ignores
-        )
-
-        with self.checker_test_object.assertAddsMessages(message1):
-            self.checker_test_object.checker.visit_module(
-                node_with_both_generic_and_non_generic_type_ignores
-            )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message1):
+                self.checker_test_object.checker.visit_module(
+                    node_with_both_generic_and_non_generic_type_ignores
+                )
 
     def test_raises_no_error_if_todo_is_present_initially(self) -> None:
         node_with_ignore_having_todo = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
-                # are not available yet.
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # TODO(#sll): Here we use MyPy ignore because stubs
+                    # of protobuf are not available yet.
 
-                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
-                    return 'hi' #@
-                """
-            )
-        node_with_ignore_having_todo.file = filename
+                    def foo(exp_id: str) -> str:  # type: ignore[arg-type]
+                        return 'hi' #@
+                    """
+                )
+            node_with_ignore_having_todo.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_ignore_having_todo
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_ignore_having_todo
+                )
 
 
 class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
@@ -2828,77 +2798,77 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                schema_dict: Dict[str, Any] = {
-                    'key': 'value'
-                } #@
-                """
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    schema_dict: Dict[str, Any] = {
+                        'key': 'value'
+                    } #@
+                    """
+                )
+            node_with_any_type.file = filename
+
+            message = testutils.Message(
+                msg_id='any-type-used',
+                line=2,
+                node=node_with_any_type
             )
-        node_with_any_type.file = filename
-
-        message = testutils.Message(
-            msg_id='any-type-used',
-            line=2,
-            node=node_with_any_type
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(node_with_any_type)
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_any_type)
 
         # Checking for object class.
         node_with_object_type = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                func(proto_buff_stuff: object) #@
-                """
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    func(proto_buff_stuff: object) #@
+                    """
+                )
+            node_with_object_type.file = filename
+
+            message = testutils.Message(
+                msg_id='object-class-used',
+                line=2,
+                node=node_with_object_type
             )
-        node_with_object_type.file = filename
-
-        message = testutils.Message(
-            msg_id='object-class-used',
-            line=2,
-            node=node_with_object_type
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(node_with_object_type)
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_object_type)
 
         # Checking for cast method.
         node_with_cast_method = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                func(cast(str, change.new_value)) #@
-                """
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    func(cast(str, change.new_value)) #@
+                    """
+                )
+            node_with_cast_method.file = filename
+
+            message = testutils.Message(
+                msg_id='cast-func-used',
+                line=2,
+                node=node_with_cast_method
             )
-        node_with_cast_method.file = filename
-
-        message = testutils.Message(
-            msg_id='cast-func-used',
-            line=2,
-            node=node_with_cast_method
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(node_with_cast_method)
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_cast_method)
 
     def test_raises_error_if_exceptional_types_are_combined_in_module(
         self
@@ -2907,55 +2877,54 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                schema_dict: Dict[str, Any] = {
-                    'key': 'value'
-                }
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    schema_dict: Dict[str, Any] = {
+                        'key': 'value'
+                    }
 
-                def func(proto_buff_stuff: object) -> None:
-                    pass
+                    def func(proto_buff_stuff: object) -> None:
+                        pass
 
-                # Some other contents of the module.
+                    # Some other contents of the module.
 
-                # Here we use object because to test the linters.
-                new_object: object = 'strong hi'
+                    # Here we use object because to test the linters.
+                    new_object: object = 'strong hi'
 
-                # We are not considering this case.
-                var = object()
-                new_string = 'hi'
+                    # We are not considering this case.
+                    var = object()
+                    new_string = 'hi'
 
-                change_value = cast(str, change.new_value) #@
-                """
+                    change_value = cast(str, change.new_value) #@
+                    """
+                )
+            node_with_combined_types.file = filename
+
+            message1 = testutils.Message(
+                msg_id='any-type-used',
+                line=2,
+                node=node_with_combined_types
             )
-        node_with_combined_types.file = filename
-
-        message1 = testutils.Message(
-            msg_id='any-type-used',
-            line=2,
-            node=node_with_combined_types
-        )
-        message2 = testutils.Message(
-            msg_id='object-class-used',
-            line=6,
-            node=node_with_combined_types
-        )
-        message3 = testutils.Message(
-            msg_id='cast-func-used',
-            line=18,
-            node=node_with_combined_types
-        )
-        with self.checker_test_object.assertAddsMessages(
-            message1, message3, message2
-        ):
-            self.checker_test_object.checker.visit_module(
-                node_with_combined_types
+            message2 = testutils.Message(
+                msg_id='object-class-used',
+                line=6,
+                node=node_with_combined_types
             )
-        temp_file.close()
+            message3 = testutils.Message(
+                msg_id='cast-func-used',
+                line=18,
+                node=node_with_combined_types
+            )
+            with self.checker_test_object.assertAddsMessages(
+                message1, message3, message2
+            ):
+                self.checker_test_object.checker.visit_module(
+                    node_with_combined_types
+                )
 
     def test_raises_error_if_any_type_used_in_function_signature(
         self
@@ -2964,144 +2933,139 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                def foo(*args: Any) -> None:
-                    pass #@
-                """
-            )
-        node_with_any_type_arg.file = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    def foo(*args: Any) -> None:
+                        pass #@
+                    """
+                )
+            node_with_any_type_arg.file = filename
 
-        message = testutils.Message(
-            msg_id='any-type-used',
-            line=2,
-            node=node_with_any_type_arg
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_any_type_arg
+            message = testutils.Message(
+                msg_id='any-type-used',
+                line=2,
+                node=node_with_any_type_arg
             )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_any_type_arg
+                )
 
         node_with_any_type_return = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                def foo(*args: str) -> Any:
-                    pass #@
-                """
-            )
-        node_with_any_type_return.file = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    def foo(*args: str) -> Any:
+                        pass #@
+                    """
+                )
+            node_with_any_type_return.file = filename
 
-        message = testutils.Message(
-            msg_id='any-type-used',
-            line=2,
-            node=node_with_any_type_return
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_any_type_return
+            message = testutils.Message(
+                msg_id='any-type-used',
+                line=2,
+                node=node_with_any_type_return
             )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_any_type_return
+                )
 
         node_with_any_type_return_and_args = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                def foo(*args: Any) -> Any:
-                    pass #@
-                """
-            )
-        node_with_any_type_return_and_args.file = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    def foo(*args: Any) -> Any:
+                        pass #@
+                    """
+                )
+            node_with_any_type_return_and_args.file = filename
 
-        message = testutils.Message(
-            msg_id='any-type-used',
-            line=2,
-            node=node_with_any_type_return_and_args
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_any_type_return_and_args
+            message = testutils.Message(
+                msg_id='any-type-used',
+                line=2,
+                node=node_with_any_type_return_and_args
             )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_any_type_return_and_args
+                )
 
         node_with_multiple_any_type_functions = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                def foo(*args: Any) -> Any:
-                    pass
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    def foo(*args: Any) -> Any:
+                        pass
 
-                def foo1(arg1: str) -> int:
-                    pass
+                    def foo1(arg1: str) -> int:
+                        pass
 
-                def foo2(*args: str) -> Any:
-                    pass #@
-                """
+                    def foo2(*args: str) -> Any:
+                        pass #@
+                    """
+                )
+            node_with_multiple_any_type_functions.file = filename
+
+            message = testutils.Message(
+                msg_id='any-type-used',
+                line=2,
+                node=node_with_multiple_any_type_functions
             )
-        node_with_multiple_any_type_functions.file = filename
-
-        message = testutils.Message(
-            msg_id='any-type-used',
-            line=2,
-            node=node_with_multiple_any_type_functions
-        )
-        message2 = testutils.Message(
-            msg_id='any-type-used',
-            line=8,
-            node=node_with_multiple_any_type_functions
-        )
-        with self.checker_test_object.assertAddsMessages(
-            message, message2
-        ):
-            self.checker_test_object.checker.visit_module(
-                node_with_multiple_any_type_functions
+            message2 = testutils.Message(
+                msg_id='any-type-used',
+                line=8,
+                node=node_with_multiple_any_type_functions
             )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(
+                message, message2
+            ):
+                self.checker_test_object.checker.visit_module(
+                    node_with_multiple_any_type_functions
+                )
 
     def test_any_and_cast_will_not_raise_error_in_import(self) -> None:
         node_with_any_and_cast_imported = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                from typing import Any, cast #@
-                """
-            )
-        node_with_any_and_cast_imported.file = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    from typing import Any, cast #@
+                    """
+                )
+            node_with_any_and_cast_imported.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_any_and_cast_imported
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_any_and_cast_imported
+                )
 
         node_with_any_and_cast_in_multi_line_import = (
             astroid.scoped_nodes.Module(
@@ -3109,24 +3073,23 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                from typing import (
-                    Any, Dict, List, Optional, cast
-                ) #@
-                """
-            )
-        node_with_any_and_cast_in_multi_line_import.file = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    from typing import (
+                        Any, Dict, List, Optional, cast
+                    ) #@
+                    """
+                )
+            node_with_any_and_cast_in_multi_line_import.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_any_and_cast_in_multi_line_import
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_any_and_cast_in_multi_line_import
+                )
 
     def test_exceptional_types_with_comments_should_not_raise_error(
         self
@@ -3135,86 +3098,84 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                from typing import Any
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    from typing import Any
 
-                # Here we use type Any because, this function can take
-                # any argument.
-                def foo(arg1: Any) -> None
-                    pass
+                    # Here we use type Any because, this function can take
+                    # any argument.
+                    def foo(arg1: Any) -> None
+                        pass
 
-                # Some other contents of the Module.
-                new_var: str = 'hi'
+                    # Some other contents of the Module.
+                    new_var: str = 'hi'
 
-                # Here we use type Any because, schema dicts can accept
-                # any value.
-                schema_dict: Dict[str, Any] = {
-                    'key': 'value'
-                }
+                    # Here we use type Any because, schema dicts can accept
+                    # any value.
+                    schema_dict: Dict[str, Any] = {
+                        'key': 'value'
+                    }
 
-                def foo1(arg2: str) -> None
-                    # Here we use type Any because, new_value can accept any
-                    # value.
-                    new_value: Any = 'hi' #@
-                """
-            )
-        node_with_any_type_and_comment.file = filename
+                    def foo1(arg2: str) -> None
+                        # Here we use type Any because, new_value can accept any
+                        # value.
+                        new_value: Any = 'hi' #@
+                    """
+                )
+            node_with_any_type_and_comment.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_any_type_and_comment
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_any_type_and_comment
+                )
 
         node_with_cast_method_and_comment = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                from typing import Any, cast
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    from typing import Any, cast
 
-                # Here we use type Any because, this function can take
-                # any argument.
-                def foo(arg1: Any) -> None
-                    pass
+                    # Here we use type Any because, this function can take
+                    # any argument.
+                    def foo(arg1: Any) -> None
+                        pass
 
-                # Here we use cast because we are narrowing down the object
-                # to string object.
-                new_var: str = cast(str, object())
+                    # Here we use cast because we are narrowing down the object
+                    # to string object.
+                    new_var: str = cast(str, object())
 
-                # Here we use type Any because, schema dicts can accept
-                # any value.
-                schema_dict: Dict[str, Any] = {
-                    'key': 'value'
-                }
+                    # Here we use type Any because, schema dicts can accept
+                    # any value.
+                    schema_dict: Dict[str, Any] = {
+                        'key': 'value'
+                    }
 
-                # Here we use object because stubs of protobuf are not
-                # available yet. So, instead of Any we used object here.
-                def save_classifier_data(
-                    exp_id: str,
-                    job_id: str,
-                    classifier_data_proto: object
-                ) -> None:
-                    pass #@
-                """
-            )
-        node_with_cast_method_and_comment.file = filename
+                    # Here we use object because stubs of protobuf are not
+                    # available yet. So, instead of Any we used object here.
+                    def save_classifier_data(
+                        exp_id: str,
+                        job_id: str,
+                        classifier_data_proto: object
+                    ) -> None:
+                        pass #@
+                    """
+                )
+            node_with_cast_method_and_comment.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_cast_method_and_comment
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_cast_method_and_comment
+                )
 
     def test_no_error_raised_if_objects_are_present_with_comment(
         self
@@ -3223,25 +3184,24 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use object because stubs of protobuf are not
-                # available yet. So, instead of Any we used object here.
-                def foo(exp_id: object) -> object:
-                    return 'hi' #@
-                """
-            )
-        node_with_multiple_objects_in_func.file = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use object because stubs of protobuf are not
+                    # available yet. So, instead of Any we used object here.
+                    def foo(exp_id: object) -> object:
+                        return 'hi' #@
+                    """
+                )
+            node_with_multiple_objects_in_func.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_multiple_objects_in_func
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_multiple_objects_in_func
+                )
 
     def test_raises_error_if_gap_between_type_and_comment_is_more_than_fifteen(
         self
@@ -3252,44 +3212,43 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use object because stubs of protobuf are not
-                # available yet. So, instead of Any we used object here.
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use object because stubs of protobuf are not
+                    # available yet. So, instead of Any we used object here.
 
-                variable_one: str = '123'
-                variable_two: str = '1234'
-                # Some other content of module one.
+                    variable_one: str = '123'
+                    variable_two: str = '1234'
+                    # Some other content of module one.
 
-                # Line 1 content.
-                # Line 2 content.
-                # Line 3 content.
-                # Line 4 content.
+                    # Line 1 content.
+                    # Line 2 content.
+                    # Line 3 content.
+                    # Line 4 content.
 
-                # Some other content of module two.
+                    # Some other content of module two.
 
-                def test_foo(arg: str) -> str:
+                    def test_foo(arg: str) -> str:
 
-                def foo(exp_id: str) -> object:
-                    return 'hi' #@
-                """
+                    def foo(exp_id: str) -> object:
+                        return 'hi' #@
+                    """
+                )
+            node_with_object_and_more_than_expected_gap.file = filename
+
+            message = testutils.Message(
+                msg_id='object-class-used',
+                line=18,
+                node=node_with_object_and_more_than_expected_gap
             )
-        node_with_object_and_more_than_expected_gap.file = filename
-
-        message = testutils.Message(
-            msg_id='object-class-used',
-            line=18,
-            node=node_with_object_and_more_than_expected_gap
-        )
-        with self.checker_test_object.assertAddsMessages(message):
-            self.checker_test_object.checker.visit_module(
-                node_with_object_and_more_than_expected_gap
-            )
-        temp_file.close()
+            with self.checker_test_object.assertAddsMessages(message):
+                self.checker_test_object.checker.visit_module(
+                    node_with_object_and_more_than_expected_gap
+                )
 
         node_with_object_and_less_than_fifteen_gap = (
             astroid.scoped_nodes.Module(
@@ -3297,32 +3256,31 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use object because stubs of protobuf are not
-                # available yet. So, instead of Any we used object here.
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # Here we use object because stubs of protobuf are not
+                    # available yet. So, instead of Any we used object here.
 
-                variable_one: str = '123'
-                variable_two: str = '1234'
-                # Some other content of module one.
+                    variable_one: str = '123'
+                    variable_two: str = '1234'
+                    # Some other content of module one.
 
-                def test_foo(arg: str) -> str:
+                    def test_foo(arg: str) -> str:
 
-                def foo(exp_id: str) -> object:
-                    return 'hi' #@
-                """
-            )
-        node_with_object_and_less_than_fifteen_gap.file = filename
+                    def foo(exp_id: str) -> object:
+                        return 'hi' #@
+                    """
+                )
+            node_with_object_and_less_than_fifteen_gap.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_object_and_less_than_fifteen_gap
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_object_and_less_than_fifteen_gap
+                )
 
     def test_no_error_raised_if_objects_are_present_with_todo_comment(
         self
@@ -3331,26 +3289,25 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # TODO(#sll): Here we use object because stubs of protobuf
-                # are not available yet. So, instead of Any we used object
-                # here.
-                def foo(exp_id: object) -> object:
-                    return 'hi' #@
-                """
-            )
-        node_with_object_and_todo_comment.file = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    # TODO(#sll): Here we use object because stubs of protobuf
+                    # are not available yet. So, instead of Any we used object
+                    # here.
+                    def foo(exp_id: object) -> object:
+                        return 'hi' #@
+                    """
+                )
+            node_with_object_and_todo_comment.file = filename
 
-        with self.checker_test_object.assertNoMessages():
-            self.checker_test_object.checker.visit_module(
-                node_with_object_and_todo_comment
-            )
-        temp_file.close()
+            with self.checker_test_object.assertNoMessages():
+                self.checker_test_object.checker.visit_module(
+                    node_with_object_and_todo_comment
+                )
 
 
 class SingleLineCommentCheckerTests(unittest.TestCase):
@@ -3366,122 +3323,118 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_invalid_punctuation = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# This is a multiline
-                # comment/
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""# This is a multiline
+                    # comment/
 
-                # Comment.
-                """)
-        node_invalid_punctuation.file = filename
-        node_invalid_punctuation.path = filename
+                    # Comment.
+                    """)
+            node_invalid_punctuation.file = filename
+            node_invalid_punctuation.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_invalid_punctuation))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_invalid_punctuation))
 
-        message = testutils.Message(
-            msg_id='invalid-punctuation-used',
-            line=2)
+            message = testutils.Message(
+                msg_id='invalid-punctuation-used',
+                line=2)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_no_space_at_beginning(self) -> None:
         node_no_space_at_beginning = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""#Something.
-                """)
-        node_no_space_at_beginning.file = filename
-        node_no_space_at_beginning.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""#Something.
+                    """)
+            node_no_space_at_beginning.file = filename
+            node_no_space_at_beginning.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_no_space_at_beginning))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_no_space_at_beginning))
 
-        message = testutils.Message(
-            msg_id='no-space-at-beginning',
-            line=1)
+            message = testutils.Message(
+                msg_id='no-space-at-beginning',
+                line=1)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_no_capital_letter_at_beginning(self) -> None:
         node_no_capital_letter_at_beginning = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# coding: utf-8
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""# coding: utf-8
 
-                    # something.
-                """)
-        node_no_capital_letter_at_beginning.file = filename
-        node_no_capital_letter_at_beginning.path = filename
+                        # something.
+                    """)
+            node_no_capital_letter_at_beginning.file = filename
+            node_no_capital_letter_at_beginning.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_no_capital_letter_at_beginning))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(
+                   node_no_capital_letter_at_beginning))
 
-        message = testutils.Message(
-            msg_id='no-capital-letter-at-beginning',
-            line=3)
+            message = testutils.Message(
+                msg_id='no-capital-letter-at-beginning',
+                line=3)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_comment_with_excluded_phrase(self) -> None:
         node_comment_with_excluded_phrase = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# coding: utf-8
-                # pylint: disable
-                a = 1 + 2  # pylint: disable
-                """)
-        node_comment_with_excluded_phrase.file = filename
-        node_comment_with_excluded_phrase.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""# coding: utf-8
+                    # pylint: disable
+                    a = 1 + 2  # pylint: disable
+                    """)
+            node_comment_with_excluded_phrase.file = filename
+            node_comment_with_excluded_phrase.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_comment_with_excluded_phrase))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_comment_with_excluded_phrase))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_inline_comment_with_allowed_pragma_raises_no_error(self) -> None:
         node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""a = 1 + 2  # type: ignore[some-rule]
-                """)
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""a = 1 + 2  # type: ignore[some-rule]
+                    """)
 
-        node_inline_comment_with_allowed_pragma.file = filename
-        node_inline_comment_with_allowed_pragma.path = filename
+            node_inline_comment_with_allowed_pragma.file = filename
+            node_inline_comment_with_allowed_pragma.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(
-               node_inline_comment_with_allowed_pragma))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(
+                   node_inline_comment_with_allowed_pragma))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_inline_comment_with_multiple_allowed_pragmas_raises_no_error(
         self
@@ -3489,162 +3442,155 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
-                """)
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""a = 1 + 2  # isort:skip # pylint: ignore[some-rule]
+                    """)
 
-        node_inline_comment_with_allowed_pragma.file = filename
-        node_inline_comment_with_allowed_pragma.path = filename
+            node_inline_comment_with_allowed_pragma.file = filename
+            node_inline_comment_with_allowed_pragma.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(
-               node_inline_comment_with_allowed_pragma))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(
+                   node_inline_comment_with_allowed_pragma))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_inline_comment_with_invalid_pragma_raises_error(self) -> None:
         node_inline_comment_with_invalid_pragma = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""a = 1 + 2  # not_a_valid_pragma
-                """)
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""a = 1 + 2  # not_a_valid_pragma
+                    """)
 
-        node_inline_comment_with_invalid_pragma.file = filename
-        node_inline_comment_with_invalid_pragma.path = filename
+            node_inline_comment_with_invalid_pragma.file = filename
+            node_inline_comment_with_invalid_pragma.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(
-               node_inline_comment_with_invalid_pragma))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(
+                   node_inline_comment_with_invalid_pragma))
 
-        message = testutils.Message(
-            msg_id='no-allowed-inline-pragma',
-            line=1)
+            message = testutils.Message(
+                msg_id='no-allowed-inline-pragma',
+                line=1)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_variable_name_in_comment(self) -> None:
         node_variable_name_in_comment = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# coding: utf-8
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""# coding: utf-8
 
-                # variable_name is used.
-                """)
-        node_variable_name_in_comment.file = filename
-        node_variable_name_in_comment.path = filename
+                    # variable_name is used.
+                    """)
+            node_variable_name_in_comment.file = filename
+            node_variable_name_in_comment.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_variable_name_in_comment))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_variable_name_in_comment))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_comment_with_version_info(self) -> None:
         node_comment_with_version_info = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# coding: utf-8
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""# coding: utf-8
 
-                # v2 is used.
-                """)
-        node_comment_with_version_info.file = filename
-        node_comment_with_version_info.path = filename
+                    # v2 is used.
+                    """)
+            node_comment_with_version_info.file = filename
+            node_comment_with_version_info.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_comment_with_version_info))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_comment_with_version_info))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_data_type_in_comment(self) -> None:
         node_data_type_in_comment = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# coding: utf-8
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""# coding: utf-8
 
-                # str. variable is type of str.
-                """)
-        node_data_type_in_comment.file = filename
-        node_data_type_in_comment.path = filename
+                    # str. variable is type of str.
+                    """)
+            node_data_type_in_comment.file = filename
+            node_data_type_in_comment.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_data_type_in_comment))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_data_type_in_comment))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_comment_inside_docstring(self) -> None:
         node_comment_inside_docstring = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# coding: utf-8
-                    \"\"\"# str. variable is type of str.\"\"\"
-                    \"\"\"# str. variable is type
-                    of str.\"\"\"
-                """)
-        node_comment_inside_docstring.file = filename
-        node_comment_inside_docstring.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""# coding: utf-8
+                        \"\"\"# str. variable is type of str.\"\"\"
+                        \"\"\"# str. variable is type
+                        of str.\"\"\"
+                    """)
+            node_comment_inside_docstring.file = filename
+            node_comment_inside_docstring.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_comment_inside_docstring))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_comment_inside_docstring))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_well_formed_comment(self) -> None:
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# coding: utf-8
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""# coding: utf-8
 
-                # Multi
-                # line
-                # comment.
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+                    # Multi
+                    # line
+                    # comment.
+                    """)
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_no_error_message))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_with_no_error_message))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
 
 class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
@@ -3660,60 +3606,58 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_no_empty_line_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"
-                    import something
-                    import random
-                """)
-        node_no_empty_line_below_fileoverview.file = filename
-        node_no_empty_line_below_fileoverview.path = filename
-        node_no_empty_line_below_fileoverview.fromlineno = 2
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        \"\"\" this file does something \"\"\"
+                        import something
+                        import random
+                    """)
+            node_no_empty_line_below_fileoverview.file = filename
+            node_no_empty_line_below_fileoverview.path = filename
+            node_no_empty_line_below_fileoverview.fromlineno = 2
 
-        self.checker_test_object.checker.visit_module(
-            node_no_empty_line_below_fileoverview)
+            self.checker_test_object.checker.visit_module(
+                node_no_empty_line_below_fileoverview)
 
-        message = testutils.Message(
-            msg_id='no-empty-line-provided-below-fileoverview',
-            node=node_no_empty_line_below_fileoverview)
+            message = testutils.Message(
+                msg_id='no-empty-line-provided-below-fileoverview',
+                node=node_no_empty_line_below_fileoverview)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_extra_empty_lines_below_fileoverview(self) -> None:
         node_extra_empty_lines_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
 
-                    \"\"\" this file does something \"\"\"
+                        \"\"\" this file does something \"\"\"
 
 
-                    import something
-                    from something import random
-                """)
-        node_extra_empty_lines_below_fileoverview.file = filename
-        node_extra_empty_lines_below_fileoverview.path = filename
-        node_extra_empty_lines_below_fileoverview.fromlineno = 2
+                        import something
+                        from something import random
+                    """)
+            node_extra_empty_lines_below_fileoverview.file = filename
+            node_extra_empty_lines_below_fileoverview.path = filename
+            node_extra_empty_lines_below_fileoverview.fromlineno = 2
 
-        self.checker_test_object.checker.visit_module(
-            node_extra_empty_lines_below_fileoverview)
+            self.checker_test_object.checker.visit_module(
+                node_extra_empty_lines_below_fileoverview)
 
-        message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided',
-            node=node_extra_empty_lines_below_fileoverview)
+            message = testutils.Message(
+                msg_id='only-a-single-empty-line-should-be-provided',
+                node=node_extra_empty_lines_below_fileoverview)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_extra_empty_lines_below_fileoverview_with_unicode_characters(
         self
@@ -3721,31 +3665,30 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_extra_empty_lines_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    #this comment has a unicode character \u2713
-                    \"\"\" this file does \u2715 something \"\"\"
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        #this comment has a unicode character \u2713
+                        \"\"\" this file does \u2715 something \"\"\"
 
 
-                    from something import random
-                """)
-        node_extra_empty_lines_below_fileoverview.file = filename
-        node_extra_empty_lines_below_fileoverview.path = filename
-        node_extra_empty_lines_below_fileoverview.fromlineno = 3
+                        from something import random
+                    """)
+            node_extra_empty_lines_below_fileoverview.file = filename
+            node_extra_empty_lines_below_fileoverview.path = filename
+            node_extra_empty_lines_below_fileoverview.fromlineno = 3
 
-        self.checker_test_object.checker.visit_module(
-            node_extra_empty_lines_below_fileoverview)
+            self.checker_test_object.checker.visit_module(
+                node_extra_empty_lines_below_fileoverview)
 
-        message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided',
-            node=node_extra_empty_lines_below_fileoverview)
+            message = testutils.Message(
+                msg_id='only-a-single-empty-line-should-be-provided',
+                node=node_extra_empty_lines_below_fileoverview)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_no_empty_line_below_fileoverview_with_unicode_characters(
         self
@@ -3753,102 +3696,98 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_no_empty_line_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    #this comment has a unicode character \u2713
-                    \"\"\" this file does \u2715 something \"\"\"
-                    import something
-                    import random
-                """)
-        node_no_empty_line_below_fileoverview.file = filename
-        node_no_empty_line_below_fileoverview.path = filename
-        node_no_empty_line_below_fileoverview.fromlineno = 3
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        #this comment has a unicode character \u2713
+                        \"\"\" this file does \u2715 something \"\"\"
+                        import something
+                        import random
+                    """)
+            node_no_empty_line_below_fileoverview.file = filename
+            node_no_empty_line_below_fileoverview.path = filename
+            node_no_empty_line_below_fileoverview.fromlineno = 3
 
-        self.checker_test_object.checker.visit_module(
-            node_no_empty_line_below_fileoverview)
+            self.checker_test_object.checker.visit_module(
+                node_no_empty_line_below_fileoverview)
 
-        message = testutils.Message(
-            msg_id='no-empty-line-provided-below-fileoverview',
-            node=node_no_empty_line_below_fileoverview)
+            message = testutils.Message(
+                msg_id='no-empty-line-provided-below-fileoverview',
+                node=node_no_empty_line_below_fileoverview)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_single_new_line_below_file_overview(self) -> None:
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        \"\"\" this file does something \"\"\"
 
-                    import something
-                    import random
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-        node_with_no_error_message.fromlineno = 2
+                        import something
+                        import random
+                    """)
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
+            node_with_no_error_message.fromlineno = 2
 
-        self.checker_test_object.checker.visit_module(
-            node_with_no_error_message)
+            self.checker_test_object.checker.visit_module(
+                node_with_no_error_message)
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_file_with_no_file_overview(self) -> None:
         node_file_with_no_file_overview = astroid.scoped_nodes.Module(
             name='test',
             doc=None)
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    import something
-                    import random
-                """)
-        node_file_with_no_file_overview.file = filename
-        node_file_with_no_file_overview.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        import something
+                        import random
+                    """)
+            node_file_with_no_file_overview.file = filename
+            node_file_with_no_file_overview.path = filename
 
-        self.checker_test_object.checker.visit_module(
-            node_file_with_no_file_overview)
+            self.checker_test_object.checker.visit_module(
+                node_file_with_no_file_overview)
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_file_overview_at_end_of_file(self) -> None:
         node_file_overview_at_end_of_file = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"   """)
-        node_file_overview_at_end_of_file.file = filename
-        node_file_overview_at_end_of_file.path = filename
-        node_file_overview_at_end_of_file.fromlineno = 2
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        \"\"\" this file does something \"\"\"   """)
+            node_file_overview_at_end_of_file.file = filename
+            node_file_overview_at_end_of_file.path = filename
+            node_file_overview_at_end_of_file.fromlineno = 2
 
-        self.checker_test_object.checker.visit_module(
-            node_file_overview_at_end_of_file)
+            self.checker_test_object.checker.visit_module(
+                node_file_overview_at_end_of_file)
 
-        message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided',
-            node=node_file_overview_at_end_of_file)
+            message = testutils.Message(
+                msg_id='only-a-single-empty-line-should-be-provided',
+                node=node_file_overview_at_end_of_file)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
 
 class SingleLinePragmaCheckerTests(unittest.TestCase):
@@ -3864,148 +3803,145 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         node_pragma_for_multiline = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    # pylint: disable=invalid-name
-                    def funcName():
-                        \"\"\" # pylint: disable=test-purpose\"\"\"
-                        pass
-                    # pylint: enable=invalid-name
-                """)
-        node_pragma_for_multiline.file = filename
-        node_pragma_for_multiline.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        # pylint: disable=invalid-name
+                        def funcName():
+                            \"\"\" # pylint: disable=test-purpose\"\"\"
+                            pass
+                        # pylint: enable=invalid-name
+                    """)
+            node_pragma_for_multiline.file = filename
+            node_pragma_for_multiline.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_pragma_for_multiline))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_pragma_for_multiline))
 
-        message1 = testutils.Message(
-            msg_id='single-line-pragma',
-            line=2)
+            message1 = testutils.Message(
+                msg_id='single-line-pragma',
+                line=2)
 
-        message2 = testutils.Message(
-            msg_id='single-line-pragma',
-            line=6)
+            message2 = testutils.Message(
+                msg_id='single-line-pragma',
+                line=6)
 
-        with self.checker_test_object.assertAddsMessages(
-            message1, message2):
-            temp_file.close()
+            with self.checker_test_object.assertAddsMessages(
+                message1, message2):
+                temp_file.close()
 
     def test_enable_single_line_pragma_for_multiline(self) -> None:
         node_enable_single_line_pragma_for_multiline = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    # pylint: disable=single-line-pragma
-                    def func():
-                        \"\"\"
-                        # pylint: disable=testing-purpose
-                        \"\"\"
-                        pass
-                    # pylint: enable=single-line-pragma
-                """)
-        node_enable_single_line_pragma_for_multiline.file = filename
-        node_enable_single_line_pragma_for_multiline.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        # pylint: disable=single-line-pragma
+                        def func():
+                            \"\"\"
+                            # pylint: disable=testing-purpose
+                            \"\"\"
+                            pass
+                        # pylint: enable=single-line-pragma
+                    """)
+            node_enable_single_line_pragma_for_multiline.file = filename
+            node_enable_single_line_pragma_for_multiline.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(
-               node_enable_single_line_pragma_for_multiline))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(
+                   node_enable_single_line_pragma_for_multiline))
 
-        message = testutils.Message(
-            msg_id='single-line-pragma',
-            line=2)
+            message = testutils.Message(
+                msg_id='single-line-pragma',
+                line=2)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_enable_single_line_pragma_with_invalid_name(self) -> None:
         node_enable_single_line_pragma_with_invalid_name = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    # pylint: disable=invalid-name, single-line-pragma
-                    def funcName():
-                        \"\"\"
-                        # pylint: disable=testing-purpose
-                        \"\"\"
-                        pass
-                    # pylint: enable=invalid_name, single-line-pragma
-                """)
-        node_enable_single_line_pragma_with_invalid_name.file = filename
-        node_enable_single_line_pragma_with_invalid_name.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        # pylint: disable=invalid-name, single-line-pragma
+                        def funcName():
+                            \"\"\"
+                            # pylint: disable=testing-purpose
+                            \"\"\"
+                            pass
+                        # pylint: enable=invalid_name, single-line-pragma
+                    """)
+            node_enable_single_line_pragma_with_invalid_name.file = filename
+            node_enable_single_line_pragma_with_invalid_name.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(
-                node_enable_single_line_pragma_with_invalid_name))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(
+                    node_enable_single_line_pragma_with_invalid_name))
 
-        message = testutils.Message(
-            msg_id='single-line-pragma',
-            line=2)
+            message = testutils.Message(
+                msg_id='single-line-pragma',
+                line=2)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
     def test_single_line_pylint_pragma(self) -> None:
         node_with_no_error_message = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    def funcName():  # pylint: disable=single-line-pragma
-                        pass
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        def funcName():  # pylint: disable=single-line-pragma
+                            pass
+                    """)
+            node_with_no_error_message.file = filename
+            node_with_no_error_message.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_no_error_message))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_with_no_error_message))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
     def test_no_and_extra_space_before_pylint(self) -> None:
         node_no_and_extra_space_before_pylint = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    # pylint:disable=single-line-pragma
-                    def func():
-                        \"\"\"
-                        # pylint: disable=testing-purpose
-                        \"\"\"
-                        pass
-                    # pylint:     enable=single-line-pragma
-                """)
-        node_no_and_extra_space_before_pylint.file = filename
-        node_no_and_extra_space_before_pylint.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                        # pylint:disable=single-line-pragma
+                        def func():
+                            \"\"\"
+                            # pylint: disable=testing-purpose
+                            \"\"\"
+                            pass
+                        # pylint:     enable=single-line-pragma
+                    """)
+            node_no_and_extra_space_before_pylint.file = filename
+            node_no_and_extra_space_before_pylint.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_no_and_extra_space_before_pylint))
+            self.checker_test_object.checker.process_tokens(
+                pylint_utils.tokenize_module(
+                    node_no_and_extra_space_before_pylint))
 
-        message = testutils.Message(
-            msg_id='single-line-pragma',
-            line=2)
+            message = testutils.Message(
+                msg_id='single-line-pragma',
+                line=2)
 
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
+            self.checker_test_object.assertAddsMessages(message)
 
 
 class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
@@ -4021,111 +3957,110 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         node_no_space_after_keyword = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                if(False):
-                    pass
-                elif(True):
-                    pass
-                while(True):
-                    pass
-                yield(1)
-                return True if(True) else False
-                """)
-        node_no_space_after_keyword.file = filename
-        node_no_space_after_keyword.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    if(False):
+                        pass
+                    elif(True):
+                        pass
+                    while(True):
+                        pass
+                    yield(1)
+                    return True if(True) else False
+                    """)
+            node_no_space_after_keyword.file = filename
+            node_no_space_after_keyword.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_no_space_after_keyword))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_no_space_after_keyword))
 
-        if_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('if'), line=2)
-        elif_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('elif'), line=4)
-        while_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('while'), line=6)
-        yield_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('yield'), line=8)
-        if_exp_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('if'), line=9)
+            if_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('if'), line=2)
+            elif_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('elif'), line=4)
+            while_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('while'), line=6)
+            yield_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('yield'), line=8)
+            if_exp_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('if'), line=9)
 
-        with self.checker_test_object.assertAddsMessages(
-            if_message, elif_message, while_message, yield_message,
-            if_exp_message):
-            temp_file.close()
+            with self.checker_test_object.assertAddsMessages(
+                if_message, elif_message, while_message, yield_message,
+                if_exp_message):
+                temp_file.close()
 
     def test_multiple_spaces_after_keyword(self) -> None:
         node_multiple_spaces_after_keyword = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                if  False:
-                    pass
-                elif  True:
-                    pass
-                while  True:
-                    pass
-                yield  1
-                return True if  True else False
-                """)
-        node_multiple_spaces_after_keyword.file = filename
-        node_multiple_spaces_after_keyword.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    if  False:
+                        pass
+                    elif  True:
+                        pass
+                    while  True:
+                        pass
+                    yield  1
+                    return True if  True else False
+                    """)
+            node_multiple_spaces_after_keyword.file = filename
+            node_multiple_spaces_after_keyword.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_multiple_spaces_after_keyword))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_multiple_spaces_after_keyword))
 
-        if_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('if'), line=2)
-        elif_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('elif'), line=4)
-        while_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('while'), line=6)
-        yield_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('yield'), line=8)
-        if_exp_message = testutils.Message(
-            msg_id='single-space-after-keyword', args=('if'), line=9)
+            if_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('if'), line=2)
+            elif_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('elif'), line=4)
+            while_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('while'), line=6)
+            yield_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('yield'), line=8)
+            if_exp_message = testutils.Message(
+                msg_id='single-space-after-keyword', args=('if'), line=9)
 
-        with self.checker_test_object.assertAddsMessages(
-            if_message, elif_message, while_message, yield_message,
-            if_exp_message):
-            temp_file.close()
+            with self.checker_test_object.assertAddsMessages(
+                if_message, elif_message, while_message, yield_message,
+                if_exp_message):
+                temp_file.close()
 
     def test_single_space_after_keyword(self) -> None:
         node_single_space_after_keyword = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        with tempfile.NamedTemporaryFile() as temp_file:
+            filename = temp_file.name
 
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                if False:
-                    pass
-                elif True:
-                    pass
-                while True:
-                    pass
-                yield 1
-                return True if True else False
-                """)
-        node_single_space_after_keyword.file = filename
-        node_single_space_after_keyword.path = filename
+            with utils.open_file(filename, 'w') as tmp:
+                tmp.write(
+                    u"""
+                    if False:
+                        pass
+                    elif True:
+                        pass
+                    while True:
+                        pass
+                    yield 1
+                    return True if True else False
+                    """)
+            node_single_space_after_keyword.file = filename
+            node_single_space_after_keyword.path = filename
 
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_single_space_after_keyword))
+            self.checker_test_object.checker.process_tokens(
+               pylint_utils.tokenize_module(node_single_space_after_keyword))
 
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.assertNoMessages()
 
 
 class InequalityWithNoneCheckerTests(unittest.TestCase):

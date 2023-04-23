@@ -142,10 +142,10 @@ def compile_all_ts_files() -> None:
     """
     cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
         './tsconfig-lint.json', COMPILED_TYPESCRIPT_TMP_PATH)
-    proc = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-
-    _, encoded_stderr = proc.communicate()
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+    ) as proc:
+        _, encoded_stderr = proc.communicate()
     stderr = encoded_stderr.decode('utf-8')
 
     if stderr:
@@ -554,10 +554,9 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
 
         eslint_cmd_args = [node_path, eslint_path, '--quiet']
         proc_args = eslint_cmd_args + files_to_lint
-        proc = subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+        with subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as proc:
+            encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
         # Standard and error output is in bytes, we need to decode the line to
         # print it.
         linter_stdout = encoded_linter_stdout.decode('utf-8')

@@ -601,14 +601,14 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_directory_tree(TEST_DIR)
 
     def test_re_build_recently_changed_files_at_dev_dir(self) -> None:
-        temp_file = tempfile.NamedTemporaryFile()
-        temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(temp_file, 'name', temp_file_name)
-        with utils.open_file(
-            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
-            tmp.write(u'Some content.')
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(temp_file, 'name', temp_file_name)
+            with utils.open_file(
+                '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
+                tmp.write(u'Some content.')
 
         extensions_dirnames_to_dirpaths = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
@@ -708,22 +708,22 @@ class BuildTests(test_utils.GenericTestBase):
             ['FIREBASE_AUTH_EMULATOR_HOST']
         )
 
-        app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
-            tmp.write('version: default')
+        with tempfile.NamedTemporaryFile() as app_dev_yaml_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(
+                app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
+            with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+                tmp.write('Some content in mock_app_dev.yaml\n')
+                tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+                tmp.write('version: default')
 
-        app_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
-        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
-            tmp.write(u'Initial content in mock_app.yaml')
+        with tempfile.NamedTemporaryFile() as app_yaml_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
+            with utils.open_file(mock_yaml_filepath, 'w') as tmp:
+                tmp.write(u'Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
@@ -755,22 +755,22 @@ class BuildTests(test_utils.GenericTestBase):
             ['DATASTORE_HOST']
         )
 
-        app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
-            tmp.write('version: default')
+        with tempfile.NamedTemporaryFile() as app_dev_yaml_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(
+                app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
+            with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+                tmp.write('Some content in mock_app_dev.yaml\n')
+                tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+                tmp.write('version: default')
 
-        app_yaml_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
-        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
-            tmp.write('Initial content in mock_app.yaml')
+        with tempfile.NamedTemporaryFile() as app_yaml_temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
+            with utils.open_file(mock_yaml_filepath, 'w') as tmp:
+                tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
@@ -793,13 +793,13 @@ class BuildTests(test_utils.GenericTestBase):
         """Test safe_delete_file with both existent and non-existent
         filepath.
         """
-        temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(temp_file, 'name', 'some_file.txt')
-        with utils.open_file('some_file.txt', 'w') as tmp:
-            tmp.write(u'Some content.')
-        self.assertTrue(os.path.isfile('some_file.txt'))
+        with tempfile.NamedTemporaryFile() as temp_file:
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used.
+            setattr(temp_file, 'name', 'some_file.txt')
+            with utils.open_file('some_file.txt', 'w') as tmp:
+                tmp.write(u'Some content.')
+            self.assertTrue(os.path.isfile('some_file.txt'))
 
         build.safe_delete_file('some_file.txt')
         self.assertFalse(os.path.isfile('some_file.txt'))

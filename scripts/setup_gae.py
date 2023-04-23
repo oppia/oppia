@@ -66,11 +66,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             print('Error downloading Google Cloud SDK. Exiting.')
             raise Exception('Error downloading Google Cloud SDK.') from e
         print('Download complete. Installing Google Cloud SDK...')
-        tar = tarfile.open(name='gcloud-sdk.tar.gz')
-        tar.extractall(
-            path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-364.0.0/'))
-        tar.close()
+        with tarfile.open(name='gcloud-sdk.tar.gz') as tar:
+            tar.extractall(
+                path=os.path.join(
+                    common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-364.0.0/'))
 
         os.remove('gcloud-sdk.tar.gz')
 

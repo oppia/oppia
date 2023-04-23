@@ -105,10 +105,10 @@ def install_hook() -> None:
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    return out, err
+    with subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as task:
+        out, err = task.communicate()
+        return out, err
 
 
 def does_diff_include_package_lock_file() -> bool:
