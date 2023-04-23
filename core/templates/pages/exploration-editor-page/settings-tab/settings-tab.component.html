@@ -309,7 +309,7 @@
       </div>
       <div class="oppia-mobile-collapsible-card-content" *ngIf="rolesCardIsShown">
         <div *ngIf="canModifyRoles" [hidden]="isRolesFormOpen" class="oppia-edit-roles-btn-container">
-          <span (click)="openEditRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-roles">
+          <span tabindex="0" (click)="openEditRolesForm()" (keydown.enter)="openEditRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-roles">
             EDIT
           </span>
         </div>
@@ -413,7 +413,7 @@
             No voice artists are assigned to this exploration.
           </div>
           <div *ngIf="canManageVoiceArtist" [hidden]="isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
-            <span (click)="openVoiceoverRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-voice-artist-roles">
+            <span tabindex="0" (keydown.enter)="openVoiceoverRolesForm()" (click)="openVoiceoverRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-voice-artist-roles">
               EDIT
             </span>
           </div>
