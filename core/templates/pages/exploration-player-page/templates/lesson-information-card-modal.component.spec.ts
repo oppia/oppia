@@ -159,6 +159,7 @@ describe('Lesson Information card modal component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LessonInformationCardModalComponent);
     componentInstance = fixture.componentInstance;
+
     componentInstance.expInfo = {
       category: expCategory,
       community_owned: true,
@@ -436,7 +437,6 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
 
-
   describe('ProgressBar', () => {
     let progressBar;
 
@@ -457,5 +457,4 @@ describe('Lesson Information card modal component', () => {
       progressBar.completedCheckpointsCount = 2;
       expect(progressBar.getProgressPercentage()).toEqual('40');
     });
-  });
 });
