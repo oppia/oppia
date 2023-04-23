@@ -85,9 +85,9 @@ describe('Login Page', () => {
     return pending;
   };
 
-  const spyOnSignInWithRedirectAsync = () => {
+  const spyOnsignInWithPopupAsync = () => {
     const pending = new PendingPromise<void>();
-    authService.signInWithRedirectAsync.and.returnValue(pending.promise);
+    authService.signInWithPopupAsync.and.returnValue(pending.promise);
     return pending;
   };
 
@@ -103,7 +103,7 @@ describe('Login Page', () => {
     ]);
     authService = jasmine.createSpyObj<AuthService>('AuthService', {
       handleRedirectResultAsync: Promise.resolve(false),
-      signInWithRedirectAsync: Promise.resolve(),
+      signInWithPopupAsync: Promise.resolve(),
       signInWithEmail: Promise.resolve(),
     });
     loaderService = jasmine.createSpyObj<LoaderService>('LoaderService', [
@@ -305,12 +305,12 @@ describe('Login Page', () => {
 
       loginPageComponent.ngOnInit();
 
-      expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
+      expect(authService.signInWithPopupAsync).not.toHaveBeenCalled();
 
       redirectResultPromise.resolve(false);
       flushMicrotasks();
 
-      expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
+      expect(authService.signInWithPopupAsync).toHaveBeenCalled();
 
       flush();
     }));
@@ -331,14 +331,14 @@ describe('Login Page', () => {
 
     it('should redirect to home page when sign in with redirect fails',
       fakeAsync(() => {
-        const signInWithRedirectAsyncPromise = spyOnSignInWithRedirectAsync();
+        const signInWithPopupAsyncPromise = spyOnsignInWithPopupAsync();
 
         loginPageComponent.ngOnInit();
         flushMicrotasks();
 
         expect(windowRef.location).toBeNull();
 
-        signInWithRedirectAsyncPromise.reject(
+        signInWithPopupAsyncPromise.reject(
           {code: 'auth/unknown-error', message: '?'});
 
         flush();

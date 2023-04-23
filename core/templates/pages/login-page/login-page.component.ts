@@ -77,7 +77,7 @@ export class LoginPageComponent implements OnInit {
       }
 
       try {
-        await this.authService.signInWithRedirectAsync();
+        await this.authService.signInWithPopupAsync();
       // We use unknown type because we are unsure of the type of error
       // that was thrown. Since the catch block cannot identify the
       // specific type of error, we are unable to further optimise the
