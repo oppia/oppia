@@ -457,4 +457,5 @@ describe('Lesson Information card modal component', () => {
       progressBar.completedCheckpointsCount = 2;
       expect(progressBar.getProgressPercentage()).toEqual('40');
     });
+  }); 
 });
