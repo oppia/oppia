@@ -106,7 +106,6 @@ describe('Lesson Information card modal component', () => {
   let fixture: ComponentFixture<LessonInformationCardModalComponent>;
   let componentInstance: LessonInformationCardModalComponent;
   let mockWindowRef: MockWindowRef;
-  let component: LessonInformationCardModalComponent;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let dateTimeFormatService: DateTimeFormatService;
   let ratingComputationService: RatingComputationService;
@@ -440,21 +439,21 @@ describe('Lesson Information card modal component', () => {
 
   describe('ProgressBar', () => {
     let progressBar;
-      
+
     beforeEach(() => {
       progressBar = new progressBar(5);
     });
-  
+
     it('should return "0" when no checkpoints have been completed', () => {
       expect(progressBar.getProgressPercentage()).toEqual('0');
     });
-  
+
     it('should return "100" when all checkpoints have been completed', () => {
       progressBar.completedCheckpointsCount = 5;
       expect(progressBar.getProgressPercentage()).toEqual('100');
     });
-  
-    it('should return the correct percentage when  have been completed', () => {
+
+    it('should return the correct percentage when have been completed', () => {
       progressBar.completedCheckpointsCount = 2;
       expect(progressBar.getProgressPercentage()).toEqual('40');
     });
