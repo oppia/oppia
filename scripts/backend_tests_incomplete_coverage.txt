@@ -38,7 +38,6 @@ core.domain.exp_domain_test
 core.domain.exp_services_test
 core.domain.feedback_domain_test
 core.domain.feedback_services_test
-core.domain.fs_services_test
 core.domain.html_cleaner_test
 core.domain.html_validation_service_test
 core.domain.interaction_registry_test
@@ -93,7 +92,6 @@ main_test
 scripts.build_test
 scripts.common_test
 scripts.concurrent_task_utils_test
-scripts.create_topological_sort_of_all_services_test
 scripts.install_python_prod_dependencies_test
 scripts.install_third_party_test
 scripts.linters.html_linter_test
