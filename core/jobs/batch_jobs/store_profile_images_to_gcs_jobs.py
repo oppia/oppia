@@ -190,7 +190,7 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
         image.save(output, 'webp')
         webp_binary = output.getvalue()
         return utils.convert_image_binary_to_data_url(webp_binary, 'webp')
-    
+
     def _check_profile_pictures_on_gcs(
         self, user_model: user_models.UserSettingsModel
     ) -> Tuple[bool, str, str]:
