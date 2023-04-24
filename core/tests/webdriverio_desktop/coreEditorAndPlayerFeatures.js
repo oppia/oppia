@@ -454,6 +454,28 @@ describe('Core exploration functionality', function() {
     await action.click('Test interaction button', testInteractionButton);
     var saveInteractionBtn = $('.e2e-test-save-interaction');
     await action.click('Save interaction button', saveInteractionBtn);
+
+    // ImagClickInput can also be re-customized. Therefore, on re-clicking,
+    // a modal opens displaying the image that was selected. The user expects
+    // the right image to be displayed, and then saves the interaction.
+    await explorationEditorMainTab.deleteInteraction();
+    var addInteractionButton = $('.e2e-test-open-add-interaction-modal');
+    await action.click('Add Interaction button', addInteractionButton);
+    var imgClickInputTile = $('.e2e-test-interaction-tile-ImageClickInput');
+    await action.click('Image Click Input Tile', imgClickInputTile);
+    var uploadBtn = $('.e2e-test-upload-image');
+    await workflow.uploadImage(uploadBtn, '../data/img.png', false);
+    var useImageBtn = $('.e2e-test-use-image');
+    await action.click('Use Image Button', useImageBtn);
+    var svgElem = $('.e2e-test-svg');
+    await svgElem.moveTo(0, 0);
+    await svgElem.dragAndDrop({x: 1, y: 1});
+    await action.click('Save Interaction Button', saveInteractionBtn);
+    var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
+    await action.click('Close Add Response Button', closeAddResponseButton);
+    await action.click('Test interaction button', testInteractionButton);
+    await expect(svgElem).toBeDisplayed();
+    await action.click('Save Interaction Button', saveInteractionBtn);
   });
 
   it('should correctly display contents, rule parameters, feedback' +
