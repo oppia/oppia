@@ -64,8 +64,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Run end-to-end tests.
     print('Running end-to-end tests')
-    with subprocess.Popen('bash scripts/run_e2e_tests.sh', shell=True):
-        pass
+    subprocess.Popen('bash scripts/run_e2e_tests.sh', shell=True)  # pylint: disable=consider-using-with
     print('SUCCESS    All frontend, backend and end-to-end tests passed!')
 
 

@@ -154,40 +154,40 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             # The value of `process.stdout` should not be None since we passed
             # the `stdout=subprocess.PIPE` argument to `Popen`.
             assert task.stdout is not None
-        # Prevents the wget command from running multiple times.
-        combined_spec_file_started_downloading = False
-        # This variable will be used to define the wget command to download
-        # the combined-test.spec.js file.
-        download_task_return_code = None
-        # Reads and prints realtime output from the subprocess until it
-        # terminates.
-        while True:
-            line = task.stdout.readline()
-            # No more output from the subprocess, and the subprocess has ended.
-            if len(line) == 0 and task.poll() is not None:
-                break
-            # Suppressing the karma web-server logs.
-            if line and not '[web-server]:' in line.decode('utf-8'):
-                # Standard output is in bytes, we need to decode
-                # the line to print it.
-                print(line.decode('utf-8'), end='')
-                output_lines.append(line)
-            # Download the combined-tests.js file from the web-server.
-            if ('Executed' in line.decode('utf-8') and
-                not combined_spec_file_started_downloading and
-                parsed_args.download_combined_frontend_spec_file):
-                with subprocess.Popen(
-                    ['wget',
-                    'http://localhost:9876/base/core/templates/' +
-                    'combined-tests.spec.js',
-                    '-P',
-                    os.path.join('../karma_coverage_reports')]
-                ) as download_task:
-                    # Wait for the wget command to download the
-                    # combined-tests.spec.js file to complete.
-                    download_task.wait()
-                    download_task_return_code = download_task.returncode
-                    combined_spec_file_started_downloading = True
+            # Prevents the wget command from running multiple times.
+            combined_spec_file_started_downloading = False
+            # This variable will be used to define the wget command to download
+            # the combined-test.spec.js file.
+            download_task_return_code = None
+            # Reads and prints realtime output from the subprocess until it
+            # terminates.
+            while True:
+                line = task.stdout.readline()
+                # No more output from the subprocess, and the subprocess has ended.
+                if len(line) == 0 and task.poll() is not None:
+                    break
+                # Suppressing the karma web-server logs.
+                if line and not '[web-server]:' in line.decode('utf-8'):
+                    # Standard output is in bytes, we need to decode
+                    # the line to print it.
+                    print(line.decode('utf-8'), end='')
+                    output_lines.append(line)
+                # Download the combined-tests.js file from the web-server.
+                if ('Executed' in line.decode('utf-8') and
+                    not combined_spec_file_started_downloading and
+                    parsed_args.download_combined_frontend_spec_file):
+                    with subprocess.Popen(
+                        ['wget',
+                        'http://localhost:9876/base/core/templates/' +
+                        'combined-tests.spec.js',
+                        '-P',
+                        os.path.join('../karma_coverage_reports')]
+                    ) as download_task:
+                        # Wait for the wget command to download the
+                        # combined-tests.spec.js file to complete.
+                        download_task.wait()
+                        download_task_return_code = download_task.returncode
+                        combined_spec_file_started_downloading = True
         # Standard output is in bytes, we need to decode the line to print it.
         concatenated_output = ''.join(
             line.decode('utf-8') for line in output_lines)

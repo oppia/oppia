@@ -41,40 +41,40 @@ class SetupTests(test_utils.GenericTestBase):
         with open('dummy_requirements.txt', 'w', encoding='utf-8') as f:
             f.write(packages)
 
-        dummy_file_object = open('dummy_requirements.txt', encoding='utf-8')
+        with open(
+            'dummy_requirements.txt', encoding='utf-8') as dummy_file_object:
 
-        swap_open = self.swap_with_checks(
-            builtins, 'open',
-            lambda *unused_args, **unused_kwargs: dummy_file_object,
-            expected_args=(('requirements.txt',),))
+            swap_open = self.swap_with_checks(
+                builtins, 'open',
+                lambda *unused_args, **unused_kwargs: dummy_file_object,
+                expected_args=(('requirements.txt',),))
 
-        required_packages = packages.split('\n')[:-1]
+            required_packages = packages.split('\n')[:-1]
 
-        swap_setup = self.swap_with_checks(
-            setuptools, 'setup', lambda **unused_kwargs: None,
-            expected_args=(),
-            expected_kwargs=[{
-                'name': 'oppia-beam-job',
-                'version': feconf.OPPIA_VERSION,
-                'description': 'Oppia Apache Beam package',
-                'install_requires': required_packages,
-                'packages': setuptools.find_packages(),
-                'include_package_data': True,
-            }])
+            swap_setup = self.swap_with_checks(
+                setuptools, 'setup', lambda **unused_kwargs: None,
+                expected_args=(),
+                expected_kwargs=[{
+                    'name': 'oppia-beam-job',
+                    'version': feconf.OPPIA_VERSION,
+                    'description': 'Oppia Apache Beam package',
+                    'install_requires': required_packages,
+                    'packages': setuptools.find_packages(),
+                    'include_package_data': True,
+                }])
 
-        dummy_path = [
-            path for path in sys.path
-            if common.GOOGLE_CLOUD_SDK_HOME not in path
-        ]
+            dummy_path = [
+                path for path in sys.path
+                if common.GOOGLE_CLOUD_SDK_HOME not in path
+            ]
 
-        swap_path = self.swap(sys, 'path', dummy_path)
+            swap_path = self.swap(sys, 'path', dummy_path)
 
-        with swap_setup, swap_path, swap_open:
-            # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to
-            # sys.path when we run backend tests. We use a swap as we
-            # need to remove these dirs to import setup.
-            import setup # pylint: disable=syntax-error
-            setup.main()
+            with swap_setup, swap_path, swap_open:
+                # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to
+                # sys.path when we run backend tests. We use a swap as we
+                # need to remove these dirs to import setup.
+                import setup # pylint: disable=syntax-error
+                setup.main()
 
-        dummy_file_object.close()
         os.remove('dummy_requirements.txt')
