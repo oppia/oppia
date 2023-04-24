@@ -36,7 +36,7 @@ from urllib import request as urlrequest
 from core import constants
 from scripts import servers
 
-from typing import Dict, Generator, List, Optional, Union
+from typing import Dict, Final, Generator, List, Optional, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -209,6 +209,19 @@ CHROME_PATHS = [
     '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
     # Mac OS.
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+]
+
+ACCEPTANCE_TESTS_SUITE_NAMES = [
+    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
+    'blog-editor-tests/check-blog-editor-unable-to-publish-' +
+    'duplicate-blog-post.spec.js'
+]
+
+GAE_PORT_FOR_E2E_TESTING: Final = 9001
+ELASTICSEARCH_SERVER_PORT: Final = 9200
+PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
+    GAE_PORT_FOR_E2E_TESTING,
+    ELASTICSEARCH_SERVER_PORT,
 ]
 
 
@@ -957,3 +970,20 @@ def modify_constants(
         enable_maintenance_mode_variable,
         expected_number_of_replacements=1
     )
+
+
+def is_oppia_server_already_running() -> bool:
+    """Check if the ports are taken by any other processes. If any one of
+    them is taken, it may indicate there is already one Oppia instance running.
+
+    Returns:
+        bool. Whether there is a running Oppia instance.
+    """
+    for port in PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING:
+        if is_port_in_use(port):
+            print(
+                'There is already a server running on localhost:%s. '
+                'Please terminate it before running the end-to-end tests. '
+                'Exiting.' % port)
+            return True
+    return False
