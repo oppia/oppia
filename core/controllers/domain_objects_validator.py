@@ -130,9 +130,6 @@ def validate_change_dict_for_blog_post(
     if 'thumbnail_filename' in change_dict:
         blog_domain.BlogPost.require_valid_thumbnail_filename(
             change_dict['thumbnail_filename'])
-    else:
-        raise base.BaseHandler.InvalidInputException(
-                'No thumbnail_filename provided')
     if 'tags' in change_dict:
         blog_domain.BlogPost.require_valid_tags(
             change_dict['tags'], False)
@@ -147,8 +144,6 @@ def validate_change_dict_for_blog_post(
         ):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
-    else:
-        raise base.BaseHandler.InvalidInputException('No tags provided')
     if 'content' not in change_dict:
         raise base.BaseHandler.InvalidInputException('No content provided')
     # The method returns a dict containing blog post properties, they are used
