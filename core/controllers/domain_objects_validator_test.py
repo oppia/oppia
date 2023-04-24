@@ -481,7 +481,7 @@ class ValidateAggregatedStatsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'num_starts not in aggregated stats dict.'
         ):
-            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+            domain_objects_validator.validate_aggregated_stats(
                 sessions_state_stats)
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -509,7 +509,7 @@ class ValidateAggregatedStatsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected num_actual_starts to be an int, received invalid_type'
         ):
-            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+            domain_objects_validator.validate_aggregated_stats(
                 sessions_state_stats)
 
     def test_aggregated_stats_validation_when_state_property_type_is_missing(
@@ -534,7 +534,7 @@ class ValidateAggregatedStatsTests(test_utils.GenericTestBase):
             'total_answers_count not in state stats mapping of Home in '
             'aggregated stats dict.'
         ):
-            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+            domain_objects_validator.validate_aggregated_stats(
                 sessions_state_stats)
 
     # TODO(#13528): Here we use MyPy ignore because we remove this test after
@@ -562,7 +562,7 @@ class ValidateAggregatedStatsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected first_hit_count to be an int, received invalid_count'
         ):
-            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+            domain_objects_validator.validate_aggregated_stats(
                 sessions_state_stats)
 
     def test_aggregated_stats_validation_when_fully_valid(
@@ -584,7 +584,7 @@ class ValidateAggregatedStatsTests(test_utils.GenericTestBase):
             }
         }
         self.assertEqual(
-            stats_domain.SessionStateStats.validate_aggregated_stats_dict(
+            domain_objects_validator.validate_aggregated_stats(
                 sessions_state_stats
             ),
             sessions_state_stats
