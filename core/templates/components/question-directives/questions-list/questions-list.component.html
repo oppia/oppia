@@ -72,7 +72,7 @@
                     matTooltipClass="oppia-mat-tooltip-list">
                     ⚠️
               </span>
-              <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId());$event.stopPropagation();"
+              <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(),questionSummaryForOneSkill.getSkillDifficulty());$event.stopPropagation();"
                     class="link-off-icon">
                 <i class="fas fa-trash"></i>
               </span>
