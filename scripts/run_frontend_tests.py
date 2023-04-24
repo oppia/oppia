@@ -163,7 +163,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             # terminates.
             while True:
                 line = task.stdout.readline()
-                # No more output from the subprocess, and the subprocess has ended.
+                # No more output from the subprocess, and it has ended.
                 if len(line) == 0 and task.poll() is not None:
                     break
                 # Suppressing the karma web-server logs.
