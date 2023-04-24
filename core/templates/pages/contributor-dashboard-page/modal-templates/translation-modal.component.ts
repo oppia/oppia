@@ -500,7 +500,8 @@ export class TranslationModalComponent {
     if (!this.isSetOfStringDataFormat()) {
       const domParser = new DOMParser();
       const originalElements = domParser.parseFromString(
-        this.textToTranslate as string, 'text/html');
+        this.contentPanel.elementRef.nativeElement.outerHTML as string,
+        'text/html');
       const translatedElements = domParser.parseFromString(
         this.activeWrittenTranslation as string, 'text/html');
 
