@@ -602,6 +602,9 @@ URLS = [
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
     get_redirect_route(
+        r'/feature_flags', release_coordinator.FeatureFlagsHandler),
+
+    get_redirect_route(
         '/checkpoints_feature_status_handler',
         reader.CheckpointsFeatureStatusHandler),
     get_redirect_route(

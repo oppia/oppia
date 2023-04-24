@@ -66,8 +66,8 @@ export class AdminNavbarComponent implements OnInit {
     return this.adminRouterService.isConfigTabOpen();
   }
 
-  isFeaturesTabOpen(): boolean {
-    return this.adminRouterService.isFeaturesTabOpen();
+  isPlatformParamsTabOpen(): boolean {
+    return this.adminRouterService.isPlatformParamsTabOpen();
   }
 
   isRolesTabOpen(): boolean {

@@ -23,12 +23,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
 import { AdminFeaturesTabConstants } from
-  'pages/admin-page/features-tab/admin-features-tab.constants';
+  'pages/release-coordinator-page/features-tab/admin-features-tab.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminDataService } from
-  'pages/admin-page/services/admin-data.service';
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureDummyBackendApiService } from
@@ -134,16 +130,13 @@ export class AdminFeaturesTabComponent implements OnInit {
 
   constructor(
     private windowRef: WindowRef,
-    private adminDataService: AdminDataService,
-    private adminTaskManager: AdminTaskManagerService,
     private apiService: PlatformFeatureAdminBackendApiService,
     private featureService: PlatformFeatureService,
     private dummyApiService: PlatformFeatureDummyBackendApiService,
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
-    const data = await this.adminDataService.getDataAsync();
-
+    const data = await this.apiService.getFeatureFlags();
     this.featureFlags = data.featureFlags;
 
     this.featureFlagNameToBackupMap = new Map(
@@ -201,9 +194,6 @@ export class AdminFeaturesTabComponent implements OnInit {
       this.windowRef.nativeWindow.alert(issues.join('\n'));
       return;
     }
-    if (this.adminTaskManager.isTaskRunning()) {
-      return;
-    }
     const commitMessage = this.windowRef.nativeWindow.prompt(
       'This action is irreversible. If you insist to proceed, please enter ' +
       'the commit message for the update',
@@ -214,8 +204,6 @@ export class AdminFeaturesTabComponent implements OnInit {
     }
 
     try {
-      this.adminTaskManager.startTask();
-
       await this.apiService.updateFeatureFlag(
         feature.name, commitMessage, feature.rules);
 
@@ -236,8 +224,6 @@ export class AdminFeaturesTabComponent implements OnInit {
       } else {
         throw new Error('Unexpected error response.');
       }
-    } finally {
-      this.adminTaskManager.finishTask();
     }
   }
 

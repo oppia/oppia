@@ -71,10 +71,12 @@ export class AdminRouterService {
   }
 
   /**
-   * @returns {boolean} Whether the features tab is open.
+   * @returns {boolean} Whether the platform_parameters tab is open.
    */
-  isFeaturesTabOpen(): boolean {
-    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.FEATURES;
+  isPlatformParamsTabOpen(): boolean {
+    return (
+      this.currentTabHash ===
+      AdminPageConstants.ADMIN_TAB_URLS.PLATFORM_PARAMETERS);
   }
 
   /**

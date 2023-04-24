@@ -44,6 +44,7 @@ import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-
 import { ReleaseCoordinatorPageRoutingModule } from './release-coordinator-page-routing.module';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AdminFeaturesTabComponent } from 'pages/release-coordinator-page/features-tab/admin-features-tab.component';
 
 @NgModule({
   imports: [
@@ -78,6 +79,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     ReleaseCoordinatorPageRootComponent,
     StartNewBeamJobDialogComponent,
     ViewBeamJobOutputDialogComponent,
+    AdminFeaturesTabComponent
   ],
   entryComponents: [
     CancelBeamJobDialogComponent,

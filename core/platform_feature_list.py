@@ -59,7 +59,8 @@ PROD_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.ANDROID_BETA_LANDING_PAGE,
     params.ParamNames.BLOG_PAGES,
     params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
-    params.ParamNames.DIAGNOSTIC_TEST
+    params.ParamNames.DIAGNOSTIC_TEST,
+    params.ParamNames.IMPROVEMENTS_TAB
 ]
 
 # Names of features that should not be used anymore, e.g. features that are

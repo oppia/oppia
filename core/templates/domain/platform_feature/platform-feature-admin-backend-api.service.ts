@@ -26,6 +26,18 @@ import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
 import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';
+import {
+  PlatformParameter,
+  PlatformParameterBackendDict
+} from 'domain/platform_feature/platform-parameter.model';
+
+export interface FeatureFlagsDicts {
+  'feature_flags': PlatformParameterBackendDict[];
+}
+
+export interface FeatureFlagsResponse {
+  featureFlags: PlatformParameter[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,11 +47,27 @@ export class PlatformFeatureAdminBackendApiService {
     private http: HttpClient,
   ) {}
 
+  async getFeatureFlags(): Promise<FeatureFlagsResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<FeatureFlagsDicts>(
+        '/feature_flags').toPromise().then(response => {
+        resolve({
+          featureFlags: response.feature_flags.map(
+            dict => PlatformParameter.createFromBackendDict(
+              dict)
+          )
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
   async updateFeatureFlag(
       name: string, message: string, newRules: PlatformParameterRule[]):
       Promise<void> {
     await this.http.post(
-      AdminPageConstants.ADMIN_HANDLER_URL,
+      '/feature_flags',
       {
         action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_RULES_ACTION,
         feature_name: name,

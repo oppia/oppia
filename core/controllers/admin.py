@@ -41,6 +41,7 @@ from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_registry as registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -139,7 +140,7 @@ class AdminHandler(
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
-                        'update_feature_flag_rules',
+                        'update_platform_parameter_rules',
                         'rollback_exploration_to_safe_state'
                     ]
                 },
@@ -198,7 +199,7 @@ class AdminHandler(
                 },
                 'default_value': None
             },
-            'feature_name': {
+            'platform_param_name': {
                 'schema': {
                     'type': 'basestring'
                 },
@@ -238,7 +239,9 @@ class AdminHandler(
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
-        feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
+        platform_params_dicts = (
+            feature_services.
+            get_all_platform_parameters_except_feature_flag_dicts())
 
         config_properties = config_domain.Registry.get_config_property_schemas()
         # Removes promo-bar related configs as promo-bar is handled by
@@ -261,7 +264,7 @@ class AdminHandler(
             'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
-            'feature_flags': feature_flag_dicts,
+            'platform_params_dicts': platform_params_dicts,
         })
 
     @acl_decorators.can_access_admin_page
@@ -384,31 +387,32 @@ class AdminHandler(
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the
                 # schema, a Bad Request error will be thrown. Hence, 'action'
-                # must be 'update_feature_flag_rules' if this branch is
+                # must be 'update_platform_parameter_rules' if this branch is
                 # executed.
-                assert action == 'update_feature_flag_rules'
-                feature_name = self.normalized_payload.get('feature_name')
-                if feature_name is None:
+                assert action == 'update_platform_parameter_rules'
+                platform_param_name = self.normalized_payload.get(
+                    'platform_param_name')
+                if platform_param_name is None:
                     raise Exception(
-                        'The \'feature_name\' must be provided when the action'
-                        ' is update_feature_flag_rules.'
+                        'The \'platform_param_name\' must be provided when the'
+                        ' action is update_platform_parameter_rules.'
                     )
                 new_rules = self.normalized_payload.get('new_rules')
                 if new_rules is None:
                     raise Exception(
                         'The \'new_rules\' must be provided when the action'
-                        ' is update_feature_flag_rules.'
+                        ' is update_platform_parameter_rules.'
                     )
                 commit_message = self.normalized_payload.get('commit_message')
                 if commit_message is None:
                     raise Exception(
                         'The \'commit_message\' must be provided when the '
-                        'action is update_feature_flag_rules.'
+                        'action is update_platform_parameter_rules.'
                     )
 
                 try:
-                    feature_services.update_feature_flag_rules(
-                        feature_name, self.user_id, commit_message,
+                    registry.Registry.update_platform_parameter(
+                        platform_param_name, self.user_id, commit_message,
                         new_rules)
                 except (
                         utils.ValidationError,
@@ -418,7 +422,7 @@ class AdminHandler(
                 new_rule_dicts = [rules.to_dict() for rules in new_rules]
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
-                    '%s.' % (self.user_id, feature_name, new_rule_dicts))
+                    '%s.' % (self.user_id, platform_param_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)

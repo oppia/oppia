@@ -39,6 +39,7 @@ class ParamNames(enum.Enum):
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
+    IMPROVEMENTS_TAB = 'improvements_tab'
 
 
 # Platform parameters should all be defined below.
@@ -90,3 +91,11 @@ Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
     platform_parameter_domain.FeatureStages.PROD)
+
+
+Registry.create_feature_flag(
+    ParamNames.IMPROVEMENTS_TAB,
+    'This flag enables Improvements-Tab for creators in the '
+    'exploration editor.',
+    platform_parameter_domain.FeatureStages.PROD
+)
