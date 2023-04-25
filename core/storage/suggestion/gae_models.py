@@ -30,7 +30,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'change_domain' is imported only for type checking.
     from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
-    # Here, 'topic_domain' is imported only for type checking.
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
