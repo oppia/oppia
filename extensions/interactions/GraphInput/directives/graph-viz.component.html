@@ -38,7 +38,7 @@
       <svg viewBox="0 0 90 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
         <text>{{canEditOptions}}</text>
         <ng-container *ngIf="canEditOptions">
-          <g *ngFor="let button of graphOptions; let idx = index">
+          <g *ngFor="let button of graphOptions; let idx = index" tabindex="0">
             <rect *ngIf="graph"
                   attr.class="{{button.text.toLowerCase()}}"
                   width="70"
@@ -61,8 +61,8 @@
         </ng-container>
       </svg>
 
-      <g *ngFor="let button of buttons; let idx = index">
-        <rect tabindex="0" attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
+      <g *ngFor="let button of buttons; let idx = index" tabindex="0">
+        <rect attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
               width="140"
               height="30"
               x="10"
@@ -98,7 +98,7 @@
             [attr.y2]="state.mouseY"
             [ngStyle]="{'stroke': 'black', 'stroke-width': EDGE_WIDTH}">
       </line>
-      <g *ngFor="let edge of graph?.edges; let idx = index">
+      <g *ngFor="let edge of graph?.edges; let idx = index" tabindex="0">
         <line class="e2e-test-graph-edge"
               (click)="onClickEdge(idx)"
               (mouseenter)="state.hoveredEdge = idx"
