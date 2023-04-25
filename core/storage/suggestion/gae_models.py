@@ -825,13 +825,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 for suggestion_model in suggestion_models:
                     offset += 1
 
-                    included_in_topics = False
-                    if skill_ids_to_filter_by is not None:
-                        if suggestion_model.target_id in skill_ids_to_filter_by:
-                            included_in_topics = True
-
-                    if suggestion_model.author_id != user_id and (
-                            skill_ids_to_filter_by is None or included_in_topics):
+                    if suggestion_model.author_id != user_id:
+                        if skill_ids_to_filter_by is not None and suggestion_model.target_id not in skill_ids_to_filter_by:
+                            continue
                         sorted_results.append(suggestion_model)
                         if len(sorted_results) == limit:
                             break
