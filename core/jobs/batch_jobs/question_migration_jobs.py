@@ -24,6 +24,7 @@ from core.domain import question_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
+from core.jobs.transforms import results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -88,7 +89,7 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             version=question_summary.version
         )
         question_summary_model.update_timestamps()
-        return result.Ok((question_summary_model))
+        return result.Ok((question_summary_model.id, question_summary_model))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the question summary
@@ -146,12 +147,18 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults(
                     'QUESTION SUMMARY PROCESSED'))
         )
-        question_summary_models_to_put = (
+
+        filtered_question_summary_models = (
             all_updated_question_summary_results
-            | 'Filter oks' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
+            | 'Filter migration results' >> (
+                results_transforms.DrainResultsOnError())
+        )
+
+        question_summary_models_to_put = (
+            filtered_question_summary_models
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
+            | 'Remove ID' >> beam.Values() # pylint: disable=no-value-for-parameter
         )
 
         unused_put_results = (
