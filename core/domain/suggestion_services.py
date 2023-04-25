@@ -1113,7 +1113,7 @@ def get_reviewable_question_suggestions_by_offset(
             results matching the query.
         sort_key: str|None. The key to sort the suggestions by.
         skill_ids_to_filter_by: list(str)|None. A list of topic skill IDs to
-            filter the suggestions by.
+            filter the suggestions by. If None, no filtering is done.
 
     Returns:
         Tuple of (results, next_offset). Where:

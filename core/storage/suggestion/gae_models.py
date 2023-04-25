@@ -792,7 +792,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 by the user will be excluded.
             sort_key: str|None. The key to sort the suggestions by.
             skill_ids_to_filter_by: list(str)|None. A list of topic skill IDs to
-                filter the suggestions by.
+                filter the suggestions by. If None, no filtering is done.
 
         Returns:
             Tuple of (results, next_offset). Where:
