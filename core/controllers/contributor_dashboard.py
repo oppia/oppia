@@ -362,7 +362,9 @@ class ReviewableOpportunitiesHandler(
         # 3. Get the reviewable translation suggestion target IDs for the user.
         # 4. Get story exploration nodes in order, filtering for explorations
         # that have in review translation suggestions.
-        if topic_name is None or topic_name == constants.TOPIC_SENTINEL_NAME_ALL:
+        if (
+                topic_name is None
+                or topic_name == constants.TOPIC_SENTINEL_NAME_ALL):
             topics = topic_fetchers.get_all_topics()
         else:
             topic = topic_fetchers.get_topic_by_name(topic_name)
