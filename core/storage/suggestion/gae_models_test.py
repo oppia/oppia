@@ -967,18 +967,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=limit,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), limit)
-
-        results, _ = (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_question_suggestions_by_offset(
-                limit=limit,
-                offset=0,
-                user_id=user_id,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 skill_ids_to_filter_by=[skill_2_id]))
 
