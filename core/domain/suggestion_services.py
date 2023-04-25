@@ -1101,7 +1101,7 @@ def get_reviewable_question_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
-    filter_topic_skills: Optional[List[str]]
+    skill_ids_to_filter_by: Optional[List[str]]
 ) -> Tuple[List[suggestion_registry.SuggestionAddQuestion], int]:
     """Returns a list of question suggestions which the user
        can review.
@@ -1112,7 +1112,7 @@ def get_reviewable_question_suggestions_by_offset(
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
         sort_key: str|None. The key to sort the suggestions by.
-        filter_topic_skills: list(str)|None. A list of topic skill IDs to
+        skill_ids_to_filter_by: list(str)|None. A list of topic skill IDs to
             filter the suggestions by.
 
     Returns:
@@ -1125,7 +1125,7 @@ def get_reviewable_question_suggestions_by_offset(
     suggestions, next_offset = (
         suggestion_models.GeneralSuggestionModel
         .get_in_review_question_suggestions_by_offset(
-            limit, offset, user_id, sort_key, filter_topic_skills))
+            limit, offset, user_id, sort_key, skill_ids_to_filter_by))
 
     question_suggestions = []
     for suggestion_model in suggestions:

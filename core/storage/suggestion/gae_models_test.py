@@ -979,7 +979,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 user_id=user_id,
                 sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
-                filter_topic_skills=[skill_2_id]))
+                skill_ids_to_filter_by=[skill_2_id]))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), 1)
