@@ -1196,7 +1196,7 @@ textarea {
 
 .oppia-dashboard-aggregated-stats .stats-card {
   border-right: 1px solid #bbb;
-  margin: 10px 0;
+  margin: 10px 0 !important;
   padding-left: 35px;
   width: 50%;
 }
