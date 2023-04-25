@@ -429,6 +429,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'Expected at least one answer group to have a correct answer')
 
+        state.interaction.default_outcome.dest_if_really_stuck = None
+        state.interaction.default_outcome.labelled_as_correct = False
+        state.interaction.default_outcome.refresher_exploration_id = 'Not None'
+        self._assert_question_domain_validation_error(
+            'refresher_exploration_id should be None for '
+            'Question default outcome.')
+
     def test_strict_validation_for_answer_groups(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as True for interaction with answer group.
@@ -497,6 +504,34 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination for the '
             'stuck learner as None.')
+
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': 'not None',
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': rule_spec_input_test_dict
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            })
+        ]
+
+        self._assert_question_domain_validation_error(
+            'refresher_exploration_id should be None for Question outcome.')
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong

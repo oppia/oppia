@@ -292,9 +292,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     var editable = document.querySelectorAll('.oppia-rte-resizer');
     var resize = () => {
-      for (var i = 0; i < editable.length; i++) {
-        (editable[i] as HTMLElement).style.width = '100%';
-      }
+      // TODO(#12882): Remove the use of jQuery.
+      $('.oppia-rte-resizer').css({
+        width: '100%'
+      });
     };
     for (let i of Object.keys(editable)) {
       (editable[i] as HTMLElement).onchange = () => {
@@ -392,32 +393,26 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       // Remove the loading text.
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
       // Set the css and icons for each toolbar button.
-      const buttonSelectors = names.map((name) => `.cke_button__oppia${name}`);
-      const buttons = Array.from(
-        document.querySelectorAll(buttonSelectors.join()));
-      buttons.forEach((button, index) => {
-        if (button instanceof HTMLElement) {
-          var icon = icons[index];
-          button.style.backgroundImage = `url("/extensions${icon}")`;
-          button.style.backgroundPosition = 'center';
-          button.style.backgroundRepeat = 'no-repeat';
-          button.style.height = '24px';
-          button.style.width = '24px';
-          button.style.padding = '0px';
-        }
+      names.forEach((name, index) => {
+        var icon = icons[index];
+        // TODO(#12882): Remove the use of jQuery.
+        $('.cke_button__oppia' + name)
+          .css('background-image', 'url("/extensions' + icon + '")')
+          .css('background-position', 'center')
+          .css('background-repeat', 'no-repeat')
+          .css('height', '24px')
+          .css('width', '24px')
+          .css('padding', '0px 0px');
       });
 
-      var ckeSeparators = Array.from(
-        document.querySelectorAll('.cke_toolbar_separator'));
-      ckeSeparators.forEach((separator) => {
-        separator.setAttribute('style', 'height:22px');
-      });
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_toolbar_separator')
+        .css('height', '22px');
 
-      var ckeButtonIcons = Array.from(
-        document.querySelectorAll('.cke_button_icon'));
-      ckeButtonIcons.forEach((buttonIcon) => {
-        buttonIcon.setAttribute('style', 'height:24px;width:24px');
-      });
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_button_icon')
+        .css('height', '24px')
+        .css('width', '24px');
 
       var changeComboPanel = () => {
         // TODO(#12882): Remove the use of jQuery.
@@ -437,22 +432,19 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           setTimeout(() => changeComboPanel(), 25);
         });
 
-      const comboOpens = Array.from(
-        document.querySelectorAll('.cke_combo_open'));
-      comboOpens.forEach((comboOpen) => {
-        comboOpen.setAttribute('style', 'margin-left:-20px;margin-top:2px');
-      });
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_combo_open')
+        .css('margin-left', '-20px')
+        .css('margin-top', '2px');
 
-      const ckeComboTexts = Array.from(
-        document.querySelectorAll('.cke_combo_text'));
-      ckeComboTexts.forEach((comboText) => {
-        comboText.setAttribute('style', 'padding:2px 5px 0px');
-      });
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_combo_text')
+        .css('padding', '2px 5px 0px');
 
       if (!this.headersEnabled) {
-        const ckeFormatCombo = document
-          .querySelector('.cke_combo__format') as HTMLElement;
-        ckeFormatCombo.setAttribute('style', 'display:none');
+        // TODO(#12882): Remove the use of jQuery.
+        $('.cke_combo__format')
+          .css('display', 'none');
       }
 
       if (!this.internetConnectivityService.isOnline()) {

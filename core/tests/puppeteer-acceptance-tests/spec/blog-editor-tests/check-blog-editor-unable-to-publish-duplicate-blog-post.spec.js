@@ -17,9 +17,9 @@
  */
 
 const userFactory = require(
-  '../puppeteer-testing-utilities/user-factory.js');
+  '../../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
+  '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const duplicateBlogPostWarning = ' Blog Post with the' +
@@ -49,34 +49,6 @@ describe('Blog Editor', function() {
 
       await blogPostEditor.expectUserUnableToPublishBlogPost(
         duplicateBlogPostWarning);
-    }, DEFAULT_SPEC_TIMEOUT);
-
-  it('should create draft and delete draft blog post',
-    async function() {
-      await blogPostEditor.navigateToBlogDashboardPage();
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-      await blogPostEditor.createDraftBlogPostWithTitle('Test-Blog');
-
-      await blogPostEditor.expectNumberOfBlogPostsToBe(1);
-      await blogPostEditor.expectDraftBlogPostWithTitleToBePresent('Test-Blog');
-
-      await blogPostEditor.deleteDraftBlogPostWithTitle('Test-Blog');
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-    }, DEFAULT_SPEC_TIMEOUT);
-
-  it('should publish blog post and delete published blog post',
-    async function() {
-      await blogPostEditor.navigateToBlogDashboardPage();
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-      await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
-
-      await blogPostEditor.navigateToPublishTab();
-      await blogPostEditor.expectNumberOfBlogPostsToBe(1);
-      await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
-        'Test-Blog');
-
-      await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
