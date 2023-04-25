@@ -3186,7 +3186,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'limit': constants.OPPORTUNITIES_PAGE_SIZE,
                 'offset': 0,
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
-                'topic_name': 'All'
+                'topic_name': constants.TOPIC_SENTINEL_NAME_ALL
             })
         self.assertEqual(len(response['suggestions']), 2)
 
