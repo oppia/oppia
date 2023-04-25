@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  <div class="why-volunteer">
+  <div class="oppia-section-why-volunteer">
     <div class="container text-center">
       <h2 class="section-heading mb-5">Why Volunteer with Us?</h2>
       <div class="row mt-4">
@@ -325,7 +325,10 @@
     </div>
   </div>
 
-  <div class="oppia-volunteer-footer" [ngStyle]="{ 'background-image': 'url(' + getStaticImageUrl(footerImgPath) + ')' }">
+  <div class="oppia-volunteer-footer"
+  [style.background-image]="'url(' + getStaticImageUrl(getWebpExtendedName(footerImgPath)) + '), url(' + getStaticImageUrl(footerImgPath) + ')'"
+  [style.background-position]="'center center'"
+  [style.background-size]="'cover'">
     <p>
       If you're interested in helping out, let us know your
       skills and interests and a lead will reach out to you shortly!
@@ -384,26 +387,26 @@
   }
 
   /* Why Volunter */
-  .why-volunteer {
+  .oppia-section-why-volunteer {
     padding: 2em;
   }
 
-  .why-volunteer .container {
+  .oppia-section-why-volunteer .container {
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 1.3em;
     margin: 3em;
     min-width: 90%;
   }
 
-  .why-volunteer i {
+  .oppia-section-why-volunteer i {
     color: #00645c;
   }
 
-  .why-volunteer .row {
+  .oppia-section-why-volunteer .row {
     margin-top: 4.5em;
   }
 
-  .why-volunteer p {
+  .oppia-section-why-volunteer p {
     color: #000;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 0.9em;
@@ -412,7 +415,7 @@
     text-align: center;
   }
 
-  .why-volunteer h3 {
+  .oppia-section-why-volunteer h3 {
     color: #00645c;
     font-weight: normal;
   }
