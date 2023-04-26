@@ -512,12 +512,6 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'Always ask learners for answer details. For testing -- do not use',
     False)
 
-# TODO(#15682): Implement user checkpoints feature flag using feature-gating
-# service.
-CHECKPOINTS_FEATURE_IS_ENABLED = ConfigProperty(
-    'checkpoints_feature_is_enabled', BOOL_SCHEMA,
-    'Enable checkpoints feature.', False)
-
 LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
     'learner_groups_are_enabled', BOOL_SCHEMA,
     'Enable learner groups feature', False)

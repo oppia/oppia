@@ -83,24 +83,6 @@ export class ReadOnlyExplorationBackendApiService {
     private urlService: UrlService
   ) {}
 
-  _fetchCheckpointsFeatureIsEnabledStatus(
-      successCallback: (value: boolean) => void,
-      errorCallback: (reason: string) => void): void {
-    const checkpointsFeatureIsEnabledStatusHandlerUrl = (
-      '/checkpoints_feature_status_handler');
-
-    this.http.get<CheckpointsFeatureStatusBackendDict>(
-      checkpointsFeatureIsEnabledStatusHandlerUrl).toPromise().then(data => {
-      if (successCallback) {
-        successCallback(data.checkpoints_feature_is_enabled);
-      }
-    }, errorResponse => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
-    });
-  }
-
   private async _fetchExplorationAsync(
       explorationId: string,
       version: number | null,
@@ -257,15 +239,6 @@ export class ReadOnlyExplorationBackendApiService {
    */
   clearExplorationCache(): void {
     this._explorationCache = {};
-  }
-
-  /**
-   * Retrieves status of the checkpoints feature flag from the backend.
-   */
-  async fetchCheckpointsFeatureIsEnabledStatus(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._fetchCheckpointsFeatureIsEnabledStatus(resolve, reject);
-    });
   }
 
   /**
