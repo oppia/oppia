@@ -23,8 +23,8 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
-    Dict, Final, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
-    Union)
+    Dict, Final, FrozenSet, List, Literal, Mapping, Optional, Sequence, Tuple,
+    TypedDict, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -816,6 +816,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
             sorted_results: List[GeneralSuggestionModel] = []
             num_suggestions_per_fetch = 1000
 
+            # Convert the list to a frozenset to speed up the filtering.
+            skill_ids_set: Optional[FrozenSet[str]] = None
+            if skill_ids_to_filter_by is not None:
+                skill_ids_set = frozenset(skill_ids_to_filter_by)
+
             while len(sorted_results) < limit:
                 suggestion_models: Sequence[GeneralSuggestionModel] = (
                     suggestion_query.fetch(
@@ -827,9 +832,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
                     if suggestion_model.author_id != user_id:
                         if (
-                                skill_ids_to_filter_by is not None
+                                skill_ids_set is not None
                                 and suggestion_model.target_id
-                                not in skill_ids_to_filter_by):
+                                not in skill_ids_set):
                             continue
                         sorted_results.append(suggestion_model)
                         if len(sorted_results) == limit:
