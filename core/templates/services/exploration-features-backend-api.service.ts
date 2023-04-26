@@ -27,12 +27,10 @@ import { UrlInterpolationService } from
 
 interface ExplorationFeaturesBackendDict {
   'is_exploration_whitelisted': boolean;
-  'always_ask_learners_for_answer_details': boolean;
 }
 
 export interface ExplorationFeatures {
   isExplorationWhitelisted: boolean;
-  alwaysAskLearnersForAnswerDetails: boolean;
 }
 
 @Injectable({
@@ -51,9 +49,7 @@ export class ExplorationFeaturesBackendApiService {
         {exploration_id: explorationId}
       ) as string
     ).toPromise().then(response => ({
-      isExplorationWhitelisted: response.is_exploration_whitelisted,
-      alwaysAskLearnersForAnswerDetails: (
-        response.always_ask_learners_for_answer_details),
+      isExplorationWhitelisted: response.is_exploration_whitelisted
     }), errorResponse => {
       throw new Error(errorResponse.error.error);
     });

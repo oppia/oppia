@@ -1375,27 +1375,11 @@ describe('Conversation skin component', () => {
       .toHaveBeenCalled();
   });
 
-  it('should always ask learner for answer details', () => {
-    spyOn(explorationEngineService, 'getAlwaysAskLearnerForAnswerDetails')
-      .and.returnValues(true, false);
-
-    expect(componentInstance.alwaysAskLearnerForAnswerDetails()).toBeTrue();
-    expect(componentInstance.alwaysAskLearnerForAnswerDetails()).toBeFalse();
-  });
-
-  it('should get can ask learner for answer info', () => {
-    spyOn(learnerAnswerInfoService, 'getCanAskLearnerForAnswerInfo')
-      .and.returnValues(true, false);
-
-    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBeTrue();
-    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBeFalse();
-  });
-
   it('should initialize learner answer info service', () => {
     spyOn(learnerAnswerInfoService, 'initLearnerAnswerInfoService');
 
     componentInstance.initLearnerAnswerInfoService(
-      null, null, null, null, false);
+      null, null, null, null);
 
     expect(learnerAnswerInfoService.initLearnerAnswerInfoService)
       .toHaveBeenCalled();
@@ -1983,11 +1967,8 @@ describe('Conversation skin component', () => {
       .and.returnValues(false, false, false, true);
     spyOn(componentInstance, 'initLearnerAnswerInfoService');
     spyOn(explorationEngineService, 'getState');
-    spyOn(componentInstance, 'alwaysAskLearnerForAnswerDetails');
     spyOn(numberAttemptsService, 'submitAttempt');
     spyOn(playerTranscriptService, 'addNewInput');
-    spyOn(componentInstance, 'getCanAskLearnerForAnswerInfo').and.returnValues(
-      true, false);
     spyOn(playerTranscriptService, 'addNewResponse');
     spyOn(learnerAnswerInfoService, 'getSolicitAnswerDetailsQuestion');
     spyOn(playerPositionService.onHelpCardAvailable, 'emit');

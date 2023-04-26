@@ -507,11 +507,6 @@ IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
     'Exposes the Improvements Tab for creators in the exploration editor.',
     False)
 
-ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
-    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
-    'Always ask learners for answer details. For testing -- do not use',
-    False)
-
 LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
     'learner_groups_are_enabled', BOOL_SCHEMA,
     'Enable learner groups feature', False)

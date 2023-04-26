@@ -363,8 +363,7 @@ describe('Exploration engine service ', () => {
     };
 
     explorationFeatures = {
-      isExplorationWhitelisted: true,
-      alwaysAskLearnersForAnswerDetails: true
+      isExplorationWhitelisted: true
     };
   });
 
@@ -692,17 +691,9 @@ describe('Exploration engine service ', () => {
     spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
       .and.returnValue(Promise.resolve(explorationFeatures));
 
-    // Here default value is set to false.
-    expect(explorationEngineService.getAlwaysAskLearnerForAnswerDetails())
-      .toBe(false);
-
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], [], initSuccessCb);
     tick();
-
-    const answerDetails = (
-      explorationEngineService.getAlwaysAskLearnerForAnswerDetails());
-    expect(answerDetails).toBe(true);
   }));
 
   it('should return default exploration id', () => {

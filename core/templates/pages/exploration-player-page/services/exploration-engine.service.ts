@@ -57,7 +57,6 @@ export class ExplorationEngineService {
   );
 
   answerIsBeingProcessed: boolean = false;
-  alwaysAskLearnersForAnswerDetails: boolean = false;
   exploration: Exploration;
 
   // This list may contain duplicates. A state name is added to it each time
@@ -290,15 +289,6 @@ export class ExplorationEngineService {
       labelForFocusTarget, null);
   }
 
-  checkAlwaysAskLearnersForAnswerDetails(): void {
-    this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
-      this._explorationId
-    ).then((featuresData) => {
-      this.alwaysAskLearnersForAnswerDetails = (
-        featuresData.alwaysAskLearnersForAnswerDetails);
-    });
-  }
-
   // This should only be used in editor preview mode. It sets the
   // exploration data from what's currently specified in the editor, and
   // also initializes the parameters to empty strings.
@@ -367,7 +357,6 @@ export class ExplorationEngineService {
       this.imagePreloaderService.init(this.exploration);
       this.imagePreloaderService.kickOffImagePreloader(
         this.exploration.getInitialState().name);
-      this.checkAlwaysAskLearnersForAnswerDetails();
       this._loadInitialState(successCallback);
     }
 
@@ -610,10 +599,6 @@ export class ExplorationEngineService {
 
   isAnswerBeingProcessed(): boolean {
     return this.answerIsBeingProcessed;
-  }
-
-  getAlwaysAskLearnerForAnswerDetails(): boolean {
-    return this.alwaysAskLearnersForAnswerDetails;
   }
 
   get onUpdateActiveStateIfInEditor(): EventEmitter<string> {

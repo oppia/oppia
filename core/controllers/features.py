@@ -55,7 +55,5 @@ class ExplorationFeaturesHandler(
             config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
         self.render_json({
             'is_exploration_whitelisted':
-                exploration_id in whitelisted_exploration_ids_for_playthroughs,
-            'always_ask_learners_for_answer_details':
-                config_domain.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
+                exploration_id in whitelisted_exploration_ids_for_playthroughs
         })

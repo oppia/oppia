@@ -127,7 +127,6 @@ export class TutorCardComponent {
   interactionInstructions!: string | null;
   contentAudioTranslations!: BindableVoiceovers;
   isIframed!: boolean;
-  getCanAskLearnerForAnswerInfo!: () => boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
@@ -193,8 +192,6 @@ export class TutorCardComponent {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
     this.getUserInfoAsync();
     this.isIframed = this.urlService.isIframed();
-    this.getCanAskLearnerForAnswerInfo = (
-      this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo);
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService
         .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
