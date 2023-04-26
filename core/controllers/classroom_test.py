@@ -207,28 +207,6 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             expected_status_int=404)
 
 
-class ClassroomPromosStatusHandlerTests(BaseClassroomControllerTests):
-    """Unit test for ClassroomPromosStatusHandler."""
-
-    def test_get_request_returns_correct_status(self) -> None:
-        self.set_config_property(
-            config_domain.CLASSROOM_PROMOS_ARE_ENABLED, False)
-
-        response = self.get_json('/classroom_promos_status_handler')
-        self.assertEqual(
-            response, {
-                'classroom_promos_are_enabled': False
-            })
-
-        self.set_config_property(
-            config_domain.CLASSROOM_PROMOS_ARE_ENABLED, True)
-        response = self.get_json('/classroom_promos_status_handler')
-        self.assertEqual(
-            response, {
-                'classroom_promos_are_enabled': True,
-            })
-
-
 class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
