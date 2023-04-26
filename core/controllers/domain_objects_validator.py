@@ -125,8 +125,6 @@ def validate_change_dict_for_blog_post(
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title(
             change_dict['title'], True)
-    else:
-        raise base.BaseHandler.InvalidInputException('No title provided')
     if 'thumbnail_filename' in change_dict:
         blog_domain.BlogPost.require_valid_thumbnail_filename(
             change_dict['thumbnail_filename'])
@@ -144,8 +142,6 @@ def validate_change_dict_for_blog_post(
         ):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
-    if 'content' not in change_dict:
-        raise base.BaseHandler.InvalidInputException('No content provided')
     # The method returns a dict containing blog post properties, they are used
     # to update blog posts in the domain layer. This dict does not correspond
     # to any domain class so we are validating the fields of change_dict
