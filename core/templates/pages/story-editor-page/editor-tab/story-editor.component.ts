@@ -40,7 +40,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'oppia-story-editor',
-  templateUrl: './story-editor.directive.html'
+  templateUrl: './story-editor.component.html'
 })
 export class StoryEditorComponent implements OnInit, OnDestroy {
   story: Story;

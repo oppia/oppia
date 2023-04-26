@@ -69,6 +69,10 @@ export class StoryUpdateService {
     private _localStorageService: LocalStorageService
   ) {}
 
+  get onStoryChapterUpdateEventEmitter(): EventEmitter<void> {
+    return this._storyChapterUpdateEventEmitter;
+  }
+
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // story.

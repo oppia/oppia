@@ -35,7 +35,7 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
 
 @Component({
   selector: 'oppia-story-node-editor',
-  templateUrl: './story-node-editor.directive.html'
+  templateUrl: './story-node-editor.component.html'
 })
 export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   @Input() nodeId: string;

@@ -24,7 +24,7 @@ import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
-import { StoryEditorComponent } from './story-editor.directive';
+import { StoryEditorComponent } from './story-editor.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { Story } from 'domain/story/story.model';

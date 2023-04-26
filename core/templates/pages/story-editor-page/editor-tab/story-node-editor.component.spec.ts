@@ -29,7 +29,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { CuratedExplorationValidationService } from '../../../domain/exploration/curated-exploration-validation.service';
 import { WindowDimensionsService } from '../../../services/contextual/window-dimensions.service';
-import { StoryNodeEditorComponent } from './story-node-editor.directive';
+import { StoryNodeEditorComponent } from './story-node-editor.component';
 import { EditableStoryBackendApiService } from '../../../domain/story/editable-story-backend-api.service';
 import { SkillBackendApiService } from '../../../domain/skill/skill-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from '../../../domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
