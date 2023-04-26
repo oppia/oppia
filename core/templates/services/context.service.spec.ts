@@ -1,4 +1,3 @@
-/* eslint-disable oppia/no-test-blockers */
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -263,7 +262,7 @@ describe('Context service', () => {
       });
   });
 
-  fdescribe('behavior in the story editor view', () => {
+  describe('behavior in the story editor view', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
