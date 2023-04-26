@@ -275,7 +275,7 @@
                 <div class="subtopic-name-header subtopic-name-card-header" (click)="toggleSubtopicCard(subtopicIndex)">
                   <span class="clickable-item" (click)="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
                     <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
-                    <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
+                    <span class="e2e-test-subtopic test-subtopic-spacing-text">{{ subtopic.getTitle() }}</span>
                   </span>
                   <div class="subtopic-edit-options-container edit-options-container">
                     <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
@@ -471,6 +471,10 @@
   </div>
 </div>
 <style>
+  .test-subtopic-spacing-text {
+    margin-left: 10px;
+  }
+
   .topic-editor thumbnail-uploader {
     margin-bottom: 15px;
   }
@@ -634,6 +638,7 @@
 
   .topic-editor .add-subtopic-btn {
     width: 140px;
+    margin-right: 12px;
   }
 
   .topic-editor .add-skill-btn {
