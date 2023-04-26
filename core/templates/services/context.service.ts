@@ -193,24 +193,35 @@ export class ContextService {
 
   getEntityId(): string {
     if (ContextService.customEntityContext !== null) {
+      console.error('Custom entity context found: ' + (
+        ContextService.customEntityContext.getId()));
       return ContextService.customEntityContext.getId();
     }
+    console.error('Begin split.');
     let pathnameArray = this.urlService.getPathname().split('/');
+    console.error('End split.');
     let hashValues = this.urlService.getHash().split('#');
+    console.error('For loop started.');
     for (let i = 0; i < pathnameArray.length; i++) {
+      console.error(pathnameArray[i]);
       if (pathnameArray[i] === 'embed') {
+        console.error('Embed found.');
         return decodeURI(pathnameArray[i + 2]);
       }
       if (hashValues.length === 3 && hashValues[1] === '/questions') {
+        console.error('Question found.');
         return decodeURI(hashValues[2]);
       }
       if (pathnameArray[i] === 'blog-dashboard') {
+        console.error('Blog dashboard found.');
         return decodeURI(this.urlService.getBlogPostIdFromUrl());
       }
       if (pathnameArray[i] === 'blog') {
+        console.error('Blog found.');
         return this.blogPostPageService.blogPostId;
       }
     }
+    console.error('For loop exited without returning.');
     return decodeURI(pathnameArray[2]);
   }
 
