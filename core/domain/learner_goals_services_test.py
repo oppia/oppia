@@ -305,11 +305,13 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             user_models.LearnerGoalsModel.get(
                 non_existent_user_id, strict=False))
 
-        # Ensure that the function does not raise any error when the
-        # learner_goals_model does not exist for the given user_id.
-        try:
-            learner_goals_services.remove_topics_from_learn_goal(
-                non_existent_user_id, [self.TOPIC_ID_1]
-            )
-        except Exception as e:
-            self.fail(f'remove_topics_from_learn_goal raised an exception: {e}')
+        # Call the function directly. It should not result in an error.
+        # If an error occurs, the test case will fail automatically.
+        learner_goals_services.remove_topics_from_learn_goal(
+            non_existent_user_id, [self.TOPIC_ID_1])
+
+        # Check the state of learner_goals to make sure nothing unexpected
+        # has happened.
+        learner_goals = learner_goals_services.get_all_topic_ids_to_learn(
+            non_existent_user_id)
+        self.assertEqual(learner_goals, [])
