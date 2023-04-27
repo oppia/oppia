@@ -1397,20 +1397,6 @@ class Skill:
             html_validation_service.fix_incorrectly_encoded_chars)
 
     @classmethod
-    def _convert_skill_contents_v4_dict_to_v5_dict(
-        cls, skill_contents_dict: SkillContentsDict
-    ) -> SkillContentsDict:
-        """Dummy function to convert v4 skill contents to the v5 schema.
-
-        Args:
-            skill_contents_dict: dict. The v3 skill_contents_dict.
-
-        Returns:
-            dict. The converted skill_contents_dict.
-        """
-        return skill_contents_dict
-
-    @classmethod
     def update_skill_contents_from_model(
         cls,
         versioned_skill_contents: VersionedSkillContentsDict,

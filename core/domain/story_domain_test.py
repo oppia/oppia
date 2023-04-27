@@ -1064,9 +1064,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             version_dict['story_contents']['nodes'][0][
                 'thumbnail_size_in_bytes'])
-        story_domain.Story.update_story_contents_from_model(
-            version_dict, 5, 'node_1')
-        self.assertEqual(version_dict['schema_version'], 6)
 
     def test_story_info_update(self) -> None:
         topic_id = utils.generate_random_string(12)
