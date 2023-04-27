@@ -340,30 +340,29 @@ describe('Goals tab Component', () => {
   });
 
   it('should correctly show and hide the dropdown', () => {
-    expect(component.showThreeDotsDropdown).toBe(false);
+    for (let i = 0; i < component.currentGoals.length; i++) {
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(true);
 
-    component.toggleThreeDotsDropdown();
-    expect(component.showThreeDotsDropdown).toBe(true);
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
-    component.toggleThreeDotsDropdown();
-    expect(component.showThreeDotsDropdown).toBe(false);
+      component.toggleThreeDotsDropdown(i);
+      expect(component.showThreeDotsDropdown[i]).toBe(true);
 
-    component.toggleThreeDotsDropdown();
-    expect(component.showThreeDotsDropdown).toBe(true);
+      let fakeClickAwayEvent = new MouseEvent('click');
+      Object.defineProperty(
+        fakeClickAwayEvent,
+        'target',
+        {value: document.createElement('div')});
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
 
-    let fakeClickAwayEvent = new MouseEvent('click');
-    Object.defineProperty(
-      fakeClickAwayEvent,
-      'target',
-      {value: document.createElement('div')});
-    component.onDocumentClick(fakeClickAwayEvent);
-    fixture.detectChanges();
-    expect(component.showThreeDotsDropdown).toBe(false);
-
-    // Three dots are not shown when no goals are present.
-    component.dropdownRef = undefined;
-    component.onDocumentClick(fakeClickAwayEvent);
-    fixture.detectChanges();
-    expect(component.showThreeDotsDropdown).toBe(false);
+      // Three dots are not shown when no goals are present.
+      component.onDocumentClick(fakeClickAwayEvent);
+      fixture.detectChanges();
+      expect(component.showThreeDotsDropdown[i]).toBe(false);
+    }
   });
 });
