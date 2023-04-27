@@ -88,6 +88,7 @@ import { AdminFeaturesTabComponent } from 'pages/release-coordinator-page/featur
     ReleaseCoordinatorPageRootComponent,
     StartNewBeamJobDialogComponent,
     ViewBeamJobOutputDialogComponent,
+    AdminFeaturesTabComponent
   ]
 })
 export class ReleaseCoordinatorPageModule {}
