@@ -483,8 +483,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.questionsListService.getQuestionSummariesAsync(
           this.selectedSkillId, true, true
         );
-        this.questionIsBeingSaved = false;
         this.editorIsOpen = false;
+        this.questionIsBeingSaved = false;
         this.alertsService.addSuccessMessage(
           'Question created successfully.');
         this._initTab(true);
@@ -492,7 +492,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     } else {
       if (this.questionUndoRedoService.hasChanges()) {
         if (commitMessage) {
-          this.questionIsBeingSaved = true;
           this.editableQuestionBackendApiService.updateQuestionAsync(
             this.questionId, String(this.question.getVersion()), commitMessage,
             this.questionUndoRedoService
@@ -507,14 +506,14 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             }, (error) => {
               this.alertsService.addWarning(
                 error || 'There was an error saving the question.');
-              this.questionIsBeingSaved = false;
               this.editorIsOpen = false;
+              this.questionIsBeingSaved = false;
             });
         } else {
           this.alertsService.addWarning(
             'Please provide a valid commit message.');
-          this.questionIsBeingSaved = false;
           this.editorIsOpen = false;
+          this.questionIsBeingSaved = false;
         }
       }
     }
@@ -570,6 +569,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   saveQuestion(): void {
+    this.questionIsBeingSaved = true;
     this.contextService.resetImageSaveDestination();
     this.windowRef.nativeWindow.location.hash = null;
     if (this.questionIsBeingUpdated) {
