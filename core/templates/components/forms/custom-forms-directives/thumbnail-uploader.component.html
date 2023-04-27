@@ -2,9 +2,10 @@
   <div>
     <div class="oppia-editable-section float-left" title="Change Thumbnail"
          [ngStyle]="{background: bgColor}">
-      <div class="oppia-click-to-start-editing e2e-test-photo-button"
+      <div tabindex="0" class="oppia-click-to-start-editing e2e-test-photo-button"
            (click)="showEditThumbnailModal()"
-           aria-label="upload or edit thumbnail">
+           aria-label="upload or edit thumbnail"
+           (keydown.enter)="showEditThumbnailModal()">
       </div>
       <i class="fas fa-pen oppia-editor-edit-icon oppia-pencil-icon" [hidden]="disabled">
       </i>

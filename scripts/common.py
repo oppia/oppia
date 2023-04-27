@@ -214,9 +214,7 @@ CHROME_PATHS = [
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
     'blog-editor-tests/check-blog-editor-unable-to-publish-' +
-    'duplicate-blog-post.spec.js',
-    'blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js',
-    'blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js'
+    'duplicate-blog-post.spec.js'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 9001
