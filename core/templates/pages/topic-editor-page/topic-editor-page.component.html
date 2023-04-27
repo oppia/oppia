@@ -12,17 +12,21 @@
         <a ngbTooltip="Main Editor"
            placement="bottom"
            class="nav-link navbar-tab"
-           tabindex="0">
+           tabindex="0"
+           aria-label="Main Editor"
+           (keydown.enter)="selectMainTab()">
           <i class="fas fa-pen navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': isMainEditorTabSelected() }">
           </i>
         </a>
-        <div ngbDropdownToggle
+        <div ngbDropdownAnchor
              [hidden]="!getTotalWarningsCount()"
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
              (mouseover)="warningsAreShown=true"
              (mouseleave)="hideWarnings()"
-             (click)="selectMainTab()">
+             (click)="selectMainTab()"
+             tabindex="0"
+             [attr.aria-label]="getTotalWarningsCount() + ' Warnings'">
           <span class="oppia-editor-warnings-count">
             {{ getTotalWarningsCount() }}
           </span>
@@ -30,12 +34,12 @@
               *ngIf="warningsAreShown"
               class="dropdown-menu topic-warning-container oppia-editor-warnings-box">
             <span class="oppia-editor-warnings-header">Warnings</span>
-            <li class="oppia-editor-warnings-text"
+            <li class="oppia-editor-warnings-text oppia-editor-wrapped-warning-text"
                 *ngFor="let issue of validationIssues">
               <hr class="oppia-editor-warnings-separator">
               {{ issue }}
             </li>
-            <li class="oppia-editor-warnings-text"
+            <li class="oppia-editor-warnings-text oppia-editor-wrapped-warning-text"
                 *ngFor="let issue of prepublishValidationIssues">
               <hr class="oppia-editor-warnings-separator">
               {{ issue }}
@@ -51,7 +55,9 @@
         <a class="nav-link  navbar-tab e2e-test-questions-tab-button"
            ngbTooltip="Questions Editor"
            placement="bottom"
-           aria-label="Question editor">
+           aria-label="Question editor"
+           tabindex="0"
+           (keydown.enter)="selectQuestionsTab()">
           <i class="fas fa-book-open navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'questions'}">
           </i>
@@ -64,7 +70,9 @@
         <a class="nav-link navbar-tab"
            ngbTooltip="Preview"
            placement="bottom"
-           tabindex="0">
+           tabindex="0"
+           aria-label="Preview button"
+           (keydown.enter)="openTopicViewer()">
           <i class="fas fa-play navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': isInPreviewTab()}">
           </i>
@@ -129,6 +137,7 @@
     font-size: 12px;
   }
   .oppia-editor-warnings-box {
+    background: #fcf8e3;
     cursor: default;
     max-width: none;
   }
@@ -141,6 +150,14 @@
   }
   .topic-warning-container {
     display: block;
+  }
+  .oppia-editor-wrapped-warning-text {
+    font-weight: normal;
+    white-space: normal;
+  }
+  /* The following style is added to avoid arrow icon added by ngbDropdown component. */
+  .oppia-editor-warnings-indicator::after {
+    display: none;
   }
 
   @media screen and (max-width: 768px) {
