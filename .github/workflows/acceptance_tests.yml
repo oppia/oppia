@@ -68,6 +68,84 @@ jobs:
         suite:
           - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
           - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
@@ -116,7 +194,7 @@ jobs:
         shell: bash
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Run Acceptance Test ${{ matrix.suite }}
-        run: for run in {1..50}; xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env; done
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
       - name: Uploading webpack bundles as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
