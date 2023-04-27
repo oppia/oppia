@@ -60,8 +60,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
         'feature_name', 'update message', newRules
       ).then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(
-        AdminPageConstants.ADMIN_HANDLER_URL);
+      const req = httpTestingController.expectOne('/feature_flags');
       req.flush({});
       expect(req.request.method).toEqual('POST');
 
@@ -87,8 +86,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       'feature_name', 'update message', newRules
     ).then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(
-      AdminPageConstants.ADMIN_HANDLER_URL);
+    const req = httpTestingController.expectOne('/feature_flags');
     req.error(new ErrorEvent('Error'));
 
     flushMicrotasks();
