@@ -25,7 +25,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { AdminFeaturesTabComponent } from
-  'pages/admin-page/features-tab/admin-features-tab.component';
+  'pages/release-coordinator-page/features-tab/admin-features-tab.component';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
@@ -100,7 +100,7 @@ describe('Admin page feature tab', function() {
     mockConfirmResult = val => confirmResult = val;
     mockPromptResult = msg => promptResult = msg;
 
-    spyOn(adminDataService, 'getDataAsync').and.resolveTo({
+    spyOn(featureApiService, 'getDataAsync').and.resolveTo({
       featureFlags: [
         PlatformParameter.createFromBackendDict({
           data_type: 'bool',
