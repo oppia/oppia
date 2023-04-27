@@ -128,7 +128,6 @@ class FeatureFlagsHandler(
         assert self.normalized_payload is not None
         action = self.normalized_payload.get('action')
         try:
-            result = {}
             # The handler schema defines the possible values of 'action'.
             # If 'action' has a value other than those defined in the
             # schema, a Bad Request error will be thrown. Hence, 'action'
@@ -154,6 +153,7 @@ class FeatureFlagsHandler(
                     'action is update_feature_flag_rules.'
                 )
 
+            assert self.user_id is not None
             try:
                 feature_services.update_feature_flag_rules(
                     feature_name, self.user_id, commit_message,
@@ -167,7 +167,6 @@ class FeatureFlagsHandler(
             logging.info(
                 '[RELEASE-COORDINATOR] %s updated feature %s with new rules: '
                 '%s.' % (self.user_id, feature_name, new_rule_dicts))
-            self.render_json(result)
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)
             self.render_json({'error': str(e)})

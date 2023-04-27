@@ -112,7 +112,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     config_property_id: Optional[str]
     data: Optional[str]
     topic_id: Optional[str]
-    feature_name: Optional[str]
+    platform_param_name: Optional[str]
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
