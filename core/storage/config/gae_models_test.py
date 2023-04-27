@@ -238,7 +238,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_feature_flag': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
             config_models.PlatformParameterModel.get_export_policy(),
