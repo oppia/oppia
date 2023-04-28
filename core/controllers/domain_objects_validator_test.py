@@ -86,7 +86,8 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
             self
         ) -> None:
         content_id_generator: translation_domain.ContentIdGenerator = (
-                translation_domain.ContentIdGenerator())
+                translation_domain.ContentIdGenerator()
+        )
         question_dict: question_domain.QuestionDict = {
             'question_state_data': self._create_valid_question_data(
                 'default_state', content_id_generator
@@ -403,7 +404,8 @@ class ValidarteTaskEntriesTests(test_utils.GenericTestBase):
             constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
             constants.TASK_STATUS_RESOLVED, self.owner_id,
-            self.mock_date).to_dict()
+            self.mock_date
+       ).to_dict()
 
     def _test_missing_field(self, field: str) -> None:
         """Check if `domain_objects_validator.validate_task_entries` raises
