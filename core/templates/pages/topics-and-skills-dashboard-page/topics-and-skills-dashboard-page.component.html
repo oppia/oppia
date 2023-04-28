@@ -143,8 +143,9 @@
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
-            <div *ngIf="activeTab === TAB_NAME_TOPICS && userCanCreateTopic"
+            <div tabindex="0" *ngIf="activeTab === TAB_NAME_TOPICS && userCanCreateTopic"
                  (click)="createTopic()"
+                 (keydown.enter)="createTopic()"
                  class="e2e-test-create-topic-button create-topic-button oppia-autofocus"
                  oppiaFocusOn="createTopicBtn">
               <i class="fa fa-plus-circle"></i>
