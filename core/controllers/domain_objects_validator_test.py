@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import copy
 import datetime
 import os
 
@@ -419,15 +418,15 @@ class ValidarteTaskEntriesTests(test_utils.GenericTestBase):
             Exception. If the validation does not raise an exception with
                 the message "No [field name] provided".
         """
-        task_entry_no_entity_version = copy.deepcopy(self.task_entry_dict)
+        task_entry_without_field = self.task_entry_dict
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        task_entry_no_entity_version.pop(field) # type: ignore[misc]
+        task_entry_without_field.pop(field) # type: ignore[misc]
 
         with self.assertRaisesRegex(Exception, 'No %s provided' % field):
             domain_objects_validator.validate_task_entries(
-                    task_entry_no_entity_version)
+                    task_entry_without_field)
 
     def test_missing_entity_version_raises_exception(self) -> None:
         self._test_missing_field('entity_version')
@@ -442,7 +441,7 @@ class ValidarteTaskEntriesTests(test_utils.GenericTestBase):
         self._test_missing_field('status')
 
     def test_valid_dict_raises_no_exception(self) -> None:
-        task_entry_no_entity_version = copy.deepcopy(self.task_entry_dict)
+        task_entry_no_entity_version = self.task_entry_dict
         domain_objects_validator.validate_task_entries(
                 task_entry_no_entity_version)
 
