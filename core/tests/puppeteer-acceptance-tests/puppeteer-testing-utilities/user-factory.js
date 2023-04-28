@@ -19,6 +19,7 @@
 let e2eSuperAdmin = require('../user-utilities/super-admin-utils.js');
 let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
   '../user-utilities/blog-post-admin-utils.js');
+let e2eTranslationAdmin = require('../user-utilities/translation-admin-utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
@@ -27,6 +28,7 @@ let superAdminInstance = null;
 let activeUsers = [];
 const ROLE_BLOG_ADMIN = 'blog admin';
 const ROLE_BLOG_POST_EDITOR = 'blog post editor';
+const ROLE_TRANSLATION_ADMIN = 'translation admin';
 
 /**
  * The function creates a new super admin user and returns the instance
@@ -108,6 +110,22 @@ let createNewGuestUser = async function(username, email) {
   return guestUser;
 };
 
+let createNewTranslationAdmin = async function(username, email) {
+  if (superAdminInstance === null) {
+    superAdminInstance = await createNewSuperAdmin('superAdm');
+  }
+
+  const translationAdmin = new e2eTranslationAdmin();
+  await translationAdmin.openBrowser();
+  await translationAdmin.signUpNewUser(username, 'translation_admin@example.com');
+
+  await superAdminInstance.assignRoleToUser(username, ROLE_TRANSLATION_ADMIN);
+  await superAdminInstance.expectUserToHaveRole(username, ROLE_TRANSLATION_ADMIN);
+
+  activeUsers.push(translationAdmin);
+  return translationAdmin;
+}
+
 /**
  * The function closes all the browsers opened by different users.
  */
@@ -122,5 +140,6 @@ module.exports = {
   createNewBlogAdmin,
   createNewBlogPostEditor,
   createNewGuestUser,
+  createNewTranslationAdmin,
   closeAllBrowsers
 };
