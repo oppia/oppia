@@ -99,10 +99,11 @@
           <!-- TODO(all): Add card at end of the row that, when clicked, does showFullResultsPage(group.categories)" -->
           <div *ngIf="!libraryWindowIsNarrow" class="oppia-carousel-box">
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
-                    (click)="scroll(idx, true)"
-                    *ngIf="leftmostCardIndices[idx] != 0">
-              <i class="fas fal fa-angle-left"></i>
-            </button>
+            (click)="scroll(idx, false)"
+            [hidden]="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[idx]"
+            aria-hidden="true">
+            <i class="fas fal fa-angle-right"></i>
+           </button>
             <div class="oppia-library-carousel-scroller" *ngIf="leftmostCardIndices[idx] == 0" aria-hidden="true">
             </div>
 
@@ -142,11 +143,10 @@
             </div>
 
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
-                    (click)="scroll(idx, false)"
-                    [hidden]="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[idx]"
-                    aria-hidden="true">
-              <i class="fas fal fa-angle-right"></i>
-            </button>
+            (click)="scroll(idx, true)"
+            *ngIf="leftmostCardIndices[idx] != 0">
+            <i class="fas fal fa-angle-left"></i>
+           </button>
             <div class="oppia-library-carousel-scroller"
                  *ngIf="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]">
             </div>

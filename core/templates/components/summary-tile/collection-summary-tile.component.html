@@ -10,7 +10,6 @@
           [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
     <a [href]="getCollectionLink()" class="thumbnail">
       <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
-        <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
         <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
         <h3 class="activity-title e2e-test-collection-summary-tile-title">
           {{ getCollectionTitle || defaultEmptyTitle }}
