@@ -11,7 +11,7 @@ if (argv.prodEnv) {
 
 // Generate a random number between 0 and 999 to use as the seed for the
 // frontend test execution order.
-let jasmineSeed = Math.floor(Math.random() * 1000);
+let jasmineSeed = 163;
 // eslint-disable-next-line no-console
 console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 

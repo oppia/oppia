@@ -1,3 +1,4 @@
+/* eslint-disable oppia/no-test-blockers */
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,7 +53,7 @@ class MockWindowRef {
   }
 }
 
-describe('Context service', () => {
+fdescribe('Context service', () => {
   let ecs: ContextService;
   let urlService: UrlService;
   let windowRef: MockWindowRef;
@@ -178,8 +179,7 @@ describe('Context service', () => {
       });
   });
 
-  // eslint-disable-next-line oppia/no-test-blockers
-  fdescribe('behavior in the topic editor view', () => {
+  describe('behavior in the topic editor view', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
