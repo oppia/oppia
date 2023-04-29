@@ -49,10 +49,15 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-# TODO(#15927): This job needs to be kept in sync with AuditSkillMigrationJob
-# and later we will unify these jobs together.
-class MigrateSkillJob(base_jobs.JobBase):
-    """Job that migrates skill models."""
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
+class MigrateSkillModels(beam.PTransform):# type: ignore[misc]
+    """Transform that gets all Skill models, performs migration and filters
+    any error results.
+    """
 
     @staticmethod
     def _migrate_skill(
@@ -88,8 +93,8 @@ class MigrateSkillJob(base_jobs.JobBase):
 
         Args:
             skill_id: str. The id of the skill.
-            skill_model: SkillModel. The skill for which to generate
-                the change objects.
+            skill_model: SkillModel. The skill for which to generate the change
+                objects.
 
         Yields:
             (str, SkillChange). Tuple containing skill ID and skill change
@@ -127,85 +132,24 @@ class MigrateSkillJob(base_jobs.JobBase):
             })
             yield (skill_id, skill_change)
 
-    @staticmethod
-    def _update_skill(
-        skill_model: skill_models.SkillModel,
-        migrated_skill: skill_domain.Skill,
-        skill_changes: Sequence[skill_domain.SkillChange]
-    ) -> Sequence[base_models.BaseModel]:
-        """Generates newly updated skill models.
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
+        beam.PCollection[base_models.BaseModel],
+        beam.PCollection[job_run_result.JobRunResult]
+    ]:
+        """Migrate skill objects and flush the input in case of errors.
 
         Args:
-            skill_model: SkillModel. The skill which should be updated.
-            migrated_skill: Skill. The migrated skill domain object.
-            skill_changes: sequence(SkillChange). The skill changes to apply.
+            pipeline: Pipeline. Input beam pipeline.
 
         Returns:
-            sequence(BaseModel). Sequence of models which should be put into
-            the datastore.
-        """
-        updated_skill_model = (
-            skill_services.populate_skill_model_fields(
-                skill_model, migrated_skill))
-        commit_message = (
-            'Update skill content schema version to %d and '
-            'skill misconceptions schema version to %d and '
-            'skill rubrics schema version to %d.'
-        ) % (
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_RUBRIC_SCHEMA_VERSION
-        )
-        change_dicts = [change.to_dict() for change in skill_changes]
-        with datastore_services.get_ndb_context():
-            models_to_put = updated_skill_model.compute_models_to_commit(
-                feconf.MIGRATION_BOT_USERNAME,
-                feconf.COMMIT_TYPE_EDIT,
-                commit_message,
-                change_dicts,
-                additional_models={}
-            )
-        models_to_put_values = []
-        for model in models_to_put.values():
-            # Here, we are narrowing down the type from object to BaseModel.
-            assert isinstance(model, base_models.BaseModel)
-            models_to_put_values.append(model)
-        datastore_services.update_timestamps_multi(models_to_put_values)
-        return models_to_put_values
-
-    @staticmethod
-    def _update_skill_summary(
-        migrated_skill: skill_domain.Skill,
-        skill_summary_model: skill_models.SkillSummaryModel
-    ) -> skill_models.SkillSummaryModel:
-        """Generates newly updated skill summary model.
-
-        Args:
-            migrated_skill: Skill. The migrated skill domain object.
-            skill_summary_model: SkillSummaryModel. The skill summary model
-                to update.
-
-        Returns:
-            SkillSummaryModel. The updated skill summary model to put into
-            the datastore.
-        """
-        skill_summary = skill_services.compute_summary_of_skill(migrated_skill)
-        skill_summary.version += 1
-        updated_skill_summary_model = (
-            skill_services.populate_skill_summary_model_fields(
-                skill_summary_model, skill_summary
-            )
-        )
-        return updated_skill_summary_model
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of results from the skill migration.
-
-        Returns:
-            PCollection. A PCollection of results from the skill migration.
+            (PCollection, PCollection). Tuple containing
+            PCollection of models which should be put into the datastore and
+            a PCollection of results from the skill migration.
         """
         unmigrated_skill_models = (
-            self.pipeline
+            pipeline
             | 'Get all non-deleted skill models' >> (
                 ndb_io.GetModels(skill_models.SkillModel.get_all()))
             # Pylint disable is needed because pylint is not able to correctly
@@ -214,7 +158,7 @@ class MigrateSkillJob(base_jobs.JobBase):
                 lambda skill_model: skill_model.id)
         )
         skill_summary_models = (
-            self.pipeline
+            pipeline
             | 'Get all non-deleted skill summary models' >> (
                 ndb_io.GetModels(skill_models.SkillSummaryModel.get_all()))
             # Pylint disable is needed because pylint is not able to correctly
@@ -295,6 +239,102 @@ class MigrateSkillJob(base_jobs.JobBase):
                     'SKILL MIGRATED'))
         )
 
+        job_run_results = (
+            migrated_skill_job_run_results,
+            already_migrated_job_run_results,
+            skill_objects_list_job_run_results
+        ) | 'Flatten job run results' >> beam.Flatten()
+
+        return transformed_skill_objects_list, job_run_results
+
+
+class MigrateSkillJob(base_jobs.JobBase):
+    """Job that migrates skill models."""
+
+    @staticmethod
+    def _update_skill(
+        skill_model: skill_models.SkillModel,
+        migrated_skill: skill_domain.Skill,
+        skill_changes: Sequence[skill_domain.SkillChange]
+    ) -> Sequence[base_models.BaseModel]:
+        """Generates newly updated skill models.
+
+        Args:
+            skill_model: SkillModel. The skill which should be updated.
+            migrated_skill: Skill. The migrated skill domain object.
+            skill_changes: sequence(SkillChange). The skill changes to apply.
+
+        Returns:
+            sequence(BaseModel). Sequence of models which should be put into
+            the datastore.
+        """
+        updated_skill_model = (
+            skill_services.populate_skill_model_fields(
+                skill_model, migrated_skill))
+        commit_message = (
+            'Update skill content schema version to %d and '
+            'skill misconceptions schema version to %d and '
+            'skill rubrics schema version to %d.'
+        ) % (
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+        )
+        change_dicts = [change.to_dict() for change in skill_changes]
+        with datastore_services.get_ndb_context():
+            models_to_put = updated_skill_model.compute_models_to_commit(
+                feconf.MIGRATION_BOT_USERNAME,
+                feconf.COMMIT_TYPE_EDIT,
+                commit_message,
+                change_dicts,
+                additional_models={}
+            )
+        models_to_put_values = []
+        for model in models_to_put.values():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model, base_models.BaseModel)
+            models_to_put_values.append(model)
+        datastore_services.update_timestamps_multi(models_to_put_values)
+        return models_to_put_values
+
+    @staticmethod
+    def _update_skill_summary(
+        migrated_skill: skill_domain.Skill,
+        skill_summary_model: skill_models.SkillSummaryModel
+    ) -> skill_models.SkillSummaryModel:
+        """Generates newly updated skill summary model.
+
+        Args:
+            migrated_skill: Skill. The migrated skill domain object.
+            skill_summary_model: SkillSummaryModel. The skill summary model to
+                update.
+
+        Returns:
+            SkillSummaryModel. The updated skill summary model to put into
+            the datastore.
+        """
+        skill_summary = skill_services.compute_summary_of_skill(migrated_skill)
+        skill_summary.version += 1
+        updated_skill_summary_model = (
+            skill_services.populate_skill_summary_model_fields(
+                skill_summary_model, skill_summary
+            )
+        )
+        return updated_skill_summary_model
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the skill migration.
+
+        Returns:
+            PCollection. A PCollection of results from the skill migration.
+        """
+        transformed_skill_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results' >> (
+                MigrateSkillModels()
+            )
+        )
+
         skill_models_to_put = (
             transformed_skill_objects_list
             | 'Generate skill models to put' >> beam.FlatMap(
@@ -320,11 +360,24 @@ class MigrateSkillJob(base_jobs.JobBase):
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return (
-            (
-                migrated_skill_job_run_results,
-                already_migrated_job_run_results,
-                skill_objects_list_job_run_results
+        return job_run_results
+
+
+class AuditSkillMigrationJob(base_jobs.JobBase):
+    """Job that audits migrated Skill models."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the audit of skill migration.
+
+        Returns:
+            PCollection. A PCollection of results from the skill migration.
+        """
+
+        unused_transformed_skill_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results' >> (
+                MigrateSkillModels()
             )
-            | beam.Flatten()
         )
+
+        return job_run_results

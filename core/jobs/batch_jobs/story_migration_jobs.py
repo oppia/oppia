@@ -52,10 +52,15 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-# TODO(#15927): This job needs to be kept in sync with AuditStoryMigrationJob
-# and later we will unify these jobs together.
-class MigrateStoryJob(base_jobs.JobBase):
-    """Job that migrates story models."""
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
+class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
+    """Transform that gets all Story models, performs migration and filters any
+    error results.
+    """
 
     @staticmethod
     def _migrate_story(
@@ -70,8 +75,8 @@ class MigrateStoryJob(base_jobs.JobBase):
         Args:
             story_id: str. The id of the story.
             story_model: StoryModel. The story model to migrate.
-            topic_id_to_topic: dict(str, Topic). The mapping from topic ID
-                to topic.
+            topic_id_to_topic: dict(str, Topic). The mapping from topic ID to
+                topic.
 
         Returns:
             Result((str, Story), (str, Exception)). Result containing tuple that
@@ -104,8 +109,8 @@ class MigrateStoryJob(base_jobs.JobBase):
 
         Args:
             story_id: str. The id of the story.
-            story_model: StoryModel. The story for which to generate
-                the change objects.
+            story_model: StoryModel. The story for which to generate the change
+                objects.
 
         Yields:
             (str, StoryChange). Tuple containing story ID and story change
@@ -120,77 +125,24 @@ class MigrateStoryJob(base_jobs.JobBase):
             })
             yield (story_id, story_change)
 
-    @staticmethod
-    def _update_story(
-        story_model: story_models.StoryModel,
-        migrated_story: story_domain.Story,
-        story_change: story_domain.StoryChange
-    ) -> Sequence[base_models.BaseModel]:
-        """Generates newly updated story models.
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
+        beam.PCollection[base_models.BaseModel],
+        beam.PCollection[job_run_result.JobRunResult]
+    ]:
+        """Migrate story objects and flush the input in case of errors.
 
         Args:
-            story_model: StoryModel. The story which should be updated.
-            migrated_story: Story. The migrated story domain object.
-            story_change: StoryChange. The story change to apply.
+            pipeline: Pipeline. Input beam pipeline.
 
         Returns:
-            sequence(BaseModel). Sequence of models which should be put into
-            the datastore.
+            (PCollection, PCollection). Tuple containing
+            PCollection of models which should be put into the datastore and
+            a PCollection of results from the story migration.
         """
-        updated_story_model = story_services.populate_story_model_fields(
-            story_model, migrated_story)
-        change_dicts = [story_change.to_dict()]
-        with datastore_services.get_ndb_context():
-            models_to_put = updated_story_model.compute_models_to_commit(
-                feconf.MIGRATION_BOT_USERNAME,
-                feconf.COMMIT_TYPE_EDIT,
-                'Update story contents schema version to %d.' % (
-                    feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
-                change_dicts,
-                additional_models={}
-            )
-        models_to_put_values = []
-        for model in models_to_put.values():
-            # Here, we are narrowing down the type from object to BaseModel.
-            assert isinstance(model, base_models.BaseModel)
-            models_to_put_values.append(model)
-        datastore_services.update_timestamps_multi(models_to_put_values)
-        return models_to_put_values
-
-    @staticmethod
-    def _update_story_summary(
-        migrated_story: story_domain.Story,
-        story_summary_model: story_models.StorySummaryModel
-    ) -> story_models.StorySummaryModel:
-        """Generates newly updated story summary model.
-
-        Args:
-            migrated_story: Story. The migrated story domain object.
-            story_summary_model: StorySummaryModel. The story summary model
-                to update.
-
-        Returns:
-            StorySummaryModel. The updated story summary model to put into
-            the datastore.
-        """
-        story_summary = story_services.compute_summary_of_story(migrated_story)
-        story_summary.version += 1
-        updated_story_summary_model = (
-            story_services.populate_story_summary_model_fields(
-                story_summary_model, story_summary
-            )
-        )
-        return updated_story_summary_model
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of results from the story migration.
-
-        Returns:
-            PCollection. A PCollection of results from the story migration.
-        """
-
         unmigrated_story_models = (
-            self.pipeline
+            pipeline
             | 'Get all non-deleted story models' >> (
                 ndb_io.GetModels(story_models.StoryModel.get_all()))
             # Pylint disable is needed because pylint is not able to correctly
@@ -199,7 +151,7 @@ class MigrateStoryJob(base_jobs.JobBase):
                 lambda story_model: story_model.id)
         )
         story_summary_models = (
-            self.pipeline
+            pipeline
             | 'Get all non-deleted story summary models' >> (
                 ndb_io.GetModels(story_models.StorySummaryModel.get_all()))
             # Pylint disable is needed because pylint is not able to correctly
@@ -289,6 +241,95 @@ class MigrateStoryJob(base_jobs.JobBase):
                     'STORY MIGRATED'))
         )
 
+        job_run_results = (
+            migrated_story_job_run_results,
+            already_migrated_job_run_results,
+            story_objects_list_job_run_results
+        ) | 'Flatten job run results' >> beam.Flatten()
+
+        return transformed_story_objects_list, job_run_results
+
+
+# TODO(#15927): This job needs to be kept in sync with AuditStoryMigrationJob
+# and later we will unify these jobs together.
+class MigrateStoryJob(base_jobs.JobBase):
+    """Job that migrates story models."""
+
+    @staticmethod
+    def _update_story(
+        story_model: story_models.StoryModel,
+        migrated_story: story_domain.Story,
+        story_change: story_domain.StoryChange
+    ) -> Sequence[base_models.BaseModel]:
+        """Generates newly updated story models.
+
+        Args:
+            story_model: StoryModel. The story which should be updated.
+            migrated_story: Story. The migrated story domain object.
+            story_change: StoryChange. The story change to apply.
+
+        Returns:
+            sequence(BaseModel). Sequence of models which should be put into
+            the datastore.
+        """
+        updated_story_model = story_services.populate_story_model_fields(
+            story_model, migrated_story)
+        change_dicts = [story_change.to_dict()]
+        with datastore_services.get_ndb_context():
+            models_to_put = updated_story_model.compute_models_to_commit(
+                feconf.MIGRATION_BOT_USERNAME,
+                feconf.COMMIT_TYPE_EDIT,
+                'Update story contents schema version to %d.' % (
+                    feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+                change_dicts,
+                additional_models={}
+            )
+        models_to_put_values = []
+        for model in models_to_put.values():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model, base_models.BaseModel)
+            models_to_put_values.append(model)
+        datastore_services.update_timestamps_multi(models_to_put_values)
+        return models_to_put_values
+
+    @staticmethod
+    def _update_story_summary(
+        migrated_story: story_domain.Story,
+        story_summary_model: story_models.StorySummaryModel
+    ) -> story_models.StorySummaryModel:
+        """Generates newly updated story summary model.
+
+        Args:
+            migrated_story: Story. The migrated story domain object.
+            story_summary_model: StorySummaryModel. The story summary model to
+                update.
+
+        Returns:
+            StorySummaryModel. The updated story summary model to put into the
+            datastore.
+        """
+        story_summary = story_services.compute_summary_of_story(migrated_story)
+        story_summary.version += 1
+        updated_story_summary_model = (
+            story_services.populate_story_summary_model_fields(
+                story_summary_model, story_summary
+            )
+        )
+        return updated_story_summary_model
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the story migration.
+
+        Returns:
+            PCollection. A PCollection of results from the story migration.
+        """
+        transformed_story_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results' >> (
+                MigrateStoryModels()
+            )
+        )
+
         story_models_to_put = (
             transformed_story_objects_list
             | 'Generate story models to put' >> beam.FlatMap(
@@ -314,11 +355,24 @@ class MigrateStoryJob(base_jobs.JobBase):
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return (
-            (
-                migrated_story_job_run_results,
-                already_migrated_job_run_results,
-                story_objects_list_job_run_results
+        return job_run_results
+
+
+class AuditStoryMigrationJob(base_jobs.JobBase):
+    """Job that audits migrated Story models."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the audit of story migration.
+
+        Returns:
+            PCollection. A PCollection of results from the story migration.
+        """
+
+        unused_transformed_story_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results' >> (
+                MigrateStoryModels()
             )
-            | beam.Flatten()
         )
+
+        return job_run_results
