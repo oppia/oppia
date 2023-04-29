@@ -203,7 +203,7 @@ export class ContextService {
     let hashValues = this.urlService.getHash().split('#');
     console.error('For loop started.');
     for (let i = 0; i < pathnameArray.length; i++) {
-      console.error(pathnameArray[i]);
+      console.error('pathnameArray i=' + i + ' ' + pathnameArray[i]);
       if (pathnameArray[i] === 'embed') {
         console.error('Embed found.');
         return decodeURI(pathnameArray[i + 2]);
@@ -220,6 +220,7 @@ export class ContextService {
         console.error('Blog found.');
         return this.blogPostPageService.blogPostId;
       }
+      console.error('For loop i=' + i + ' exited.');
     }
     console.error('For loop exited without returning.');
     return decodeURI(pathnameArray[2]);

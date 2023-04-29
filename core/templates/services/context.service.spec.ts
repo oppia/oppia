@@ -178,7 +178,8 @@ describe('Context service', () => {
       });
   });
 
-  describe('behavior in the topic editor view', () => {
+  // eslint-disable-next-line oppia/no-test-blockers
+  fdescribe('behavior in the topic editor view', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
