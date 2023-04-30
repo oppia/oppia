@@ -470,7 +470,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.scoped_nodes.FunctionDef. Node for a function or
                 method definition in the AST.
         """
-        node_doc = docstrings_checker.docstringify(node.doc)
+        node_doc = docstrings_checker.docstringify(node.doc_node)
         self.check_functiondef_params(node, node_doc)
         self.check_functiondef_returns(node, node_doc)
         self.check_functiondef_yields(node, node_doc)
