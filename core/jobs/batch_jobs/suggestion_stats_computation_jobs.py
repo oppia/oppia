@@ -61,7 +61,7 @@ class ContributionStatsDict(TypedDict):
 
     suggestion_status: str
     edited_by_reviewer: bool
-    content_word_count: int
+    word_count: int
     last_updated_date: datetime.date
 
 
@@ -420,7 +420,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 suggestion_status: str. What is the status of the suggestion.
                 edited_by_reviewer: bool. Whether the suggestion was edited by
                     the reviewer.
-                content_word_count: int. The word count of the content of
+                word_count: int. The word count of the content of
                     the suggestion.
                 last_updated_date: str. When was the suggestion last updated.
                 created_date: str. When was the suggestion created.
@@ -436,51 +436,49 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 suggestion_models.TranslationContributionStatsModel
                 else suggestion.final_reviewer_id
             )
-            # Ruling out the possibility of None for mypy type checking.
-            # We are taking either submitter's or reviewer's ID based on the
-            # suggestion type.
-            assert user_id is not None
-            key = model.construct_id(
-                suggestion.language_code,
-                user_id,
-                topic_id
-            )
-            try:
-                change = suggestion.change
-                # In the new translation command the content in set format is
-                # a list, content in unicode and html format is a string.
-                # This code normalizes the content to the list type so that
-                # we can easily count words.
-                if (
-                        change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
-                        translation_domain.TranslatableContentFormat
-                        .is_data_format_list(change.data_format)
-                ):
-                    content_items: Union[
-                        str, List[str]
-                    ] = change.translation_html
-                else:
-                    content_items = [change.translation_html]
 
-                content_word_count = 0
-                for item in content_items:
-                    # Count the number of words in the original content,
-                    # ignoring any HTML tags and attributes.
-                    content_plain_text = html_cleaner.strip_html_tags(item)
-                    content_word_count += len(content_plain_text.split())
-
-                translation_contribution_stats_dict = {
-                    'suggestion_status': suggestion.status,
-                    'edited_by_reviewer': suggestion.edited_by_reviewer,
-                    'content_word_count': content_word_count,
-                    'last_updated_date': (
-                        suggestion.last_updated.date())
-                }
-                yield (key, result.Ok(translation_contribution_stats_dict))
-            except Exception as e:
-                yield (
-                    key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
+            if user_id is not None:
+                key = model.construct_id(
+                    suggestion.language_code,
+                    user_id,
+                    topic_id
                 )
+                try:
+                    change = suggestion.change
+                    # In the new translation command the content in set format is
+                    # a list, content in unicode and html format is a string.
+                    # This code normalizes the content to the list type so that
+                    # we can easily count words.
+                    if (
+                            change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
+                            translation_domain.TranslatableContentFormat
+                            .is_data_format_list(change.data_format)
+                    ):
+                        content_items: Union[
+                            str, List[str]
+                        ] = change.translation_html
+                    else:
+                        content_items = [change.translation_html]
+
+                    word_count = 0
+                    for item in content_items:
+                        # Count the number of words in the original content,
+                        # ignoring any HTML tags and attributes.
+                        content_plain_text = html_cleaner.strip_html_tags(item)
+                        word_count += len(content_plain_text.split())
+
+                    translation_contribution_stats_dict = {
+                        'suggestion_status': suggestion.status,
+                        'edited_by_reviewer': suggestion.edited_by_reviewer,
+                        'word_count': word_count,
+                        'last_updated_date': (
+                            suggestion.last_updated.date())
+                    }
+                    yield (key, result.Ok(translation_contribution_stats_dict))
+                except Exception as e:
+                    yield (
+                        key, result.Err('%s: %s' % (suggestion.suggestion_id, e))
+                    )
 
     @staticmethod
     def _generate_question_stats(
@@ -508,7 +506,7 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                 suggestion_status: str. What is the status of the suggestion.
                 edited_by_reviewer: bool. Whether the suggestion was edited by
                     the reviewer.
-                content_word_count: int. The word count of the content of
+                word_count: int. The word count of the content of
                     the suggestion.
                 last_updated_date: str. When was the suggestion last updated.
                 created_date: str. When was the suggestion created.
@@ -523,22 +521,20 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
                         suggestion_models.QuestionContributionStatsModel
                         else suggestion.final_reviewer_id
                     )
-                    # Ruling out the possibility of None for mypy type checking.
-                    # We are taking either submitter's or reviewer's ID based
-                    # on the suggestion type.
-                    assert user_id is not None
-                    key = model.construct_id(
-                        user_id,
-                        topic_id
-                    )
-                    question_stats_dict = {
-                        'suggestion_status': suggestion.status,
-                        'edited_by_reviewer': suggestion.edited_by_reviewer,
-                        'content_word_count': 0,
-                        'last_updated_date': (
-                            suggestion.last_updated.date())
-                    }
-                    yield (key, result.Ok(question_stats_dict))
+
+                    if user_id is not None:
+                        key = model.construct_id(
+                            user_id,
+                            topic_id
+                        )
+                        question_stats_dict = {
+                            'suggestion_status': suggestion.status,
+                            'edited_by_reviewer': suggestion.edited_by_reviewer,
+                            'word_count': 0,
+                            'last_updated_date': (
+                                suggestion.last_updated.date())
+                        }
+                        yield (key, result.Ok(question_stats_dict))
 
     @staticmethod
     def _generate_translation_contribution_stats_objects(
@@ -567,21 +563,22 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             stat['suggestion_status'] ==
             suggestion_models.STATUS_REJECTED
         )
-        word_count = stat['content_word_count']
+        word_count = stat['word_count']
         suggestion_date = datetime.datetime.strptime(
             str(stat['last_updated_date']), '%Y-%m-%d').date()
         transformed_data = suggestion_registry.TranslationContributionStats(
-            language_code,
-            contributor_user_id,
-            topic_id,
-            1,
-            stat['content_word_count'],
-            int(is_accepted),
-            int(is_accepted_and_not_edited),
-            word_count * int(is_accepted),
-            int(is_rejected),
-            word_count * int(is_rejected),
-            {suggestion_date}
+            language_code=language_code,
+            contributor_user_id=contributor_user_id,
+            topic_id=topic_id,
+            submitted_translations_count=1,
+            submitted_translation_word_count=stat['word_count'],
+            accepted_translations_count=int(is_accepted),
+            accepted_translations_without_reviewer_edits_count=int(
+                is_accepted_and_not_edited),
+            accepted_translation_word_count=word_count * int(is_accepted),
+            rejected_translations_count=int(is_rejected),
+            rejected_translation_word_count=word_count * int(is_rejected),
+            contribution_dates={suggestion_date}
         )
 
         return (entity_id, transformed_data)
@@ -601,25 +598,31 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
         """
         contribution_dates: Set[datetime.date] = set()
         all_contribution_dates = [
-            acc.contribution_dates for acc in stats
+            stat.contribution_dates for stat in stats
         ]
         contribution_dates = contribution_dates.union(*all_contribution_dates)
 
         return suggestion_registry.TranslationContributionStats(
-            list(stats)[0].language_code,
-            list(stats)[0].contributor_user_id,
-            list(stats)[0].topic_id,
-            sum(acc.submitted_translations_count for acc in stats),
-            sum(acc.submitted_translation_word_count for acc in stats),
-            sum(acc.accepted_translations_count for acc in stats),
-            sum(
-                acc.accepted_translations_without_reviewer_edits_count
-                for acc in stats
+            language_code=list(stats)[0].language_code,
+            contributor_user_id=list(stats)[0].contributor_user_id,
+            topic_id=list(stats)[0].topic_id,
+            submitted_translations_count=sum(
+                stat.submitted_translations_count for stat in stats),
+            submitted_translation_word_count=sum(
+                stat.submitted_translation_word_count for stat in stats),
+            accepted_translations_count=sum(
+                stat.accepted_translations_count for stat in stats),
+            accepted_translations_without_reviewer_edits_count=sum(
+                stat.accepted_translations_without_reviewer_edits_count
+                for stat in stats
             ),
-            sum(acc.accepted_translation_word_count for acc in stats),
-            sum(acc.rejected_translations_count for acc in stats),
-            sum(acc.rejected_translation_word_count for acc in stats),
-            contribution_dates
+            accepted_translation_word_count=sum(
+                stat.accepted_translation_word_count for stat in stats),
+            rejected_translations_count=sum(
+                stat.rejected_translations_count for stat in stats),
+            rejected_translation_word_count=sum(
+                stat.rejected_translation_word_count for stat in stats),
+            contribution_dates=contribution_dates
         )
 
     @staticmethod
@@ -647,11 +650,19 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             is_accepted and stat['edited_by_reviewer'])
 
         transformed_data = suggestion_registry.TranslationReviewStats(
-            language_code, contributor_user_id, topic_id, 1,
-            stat['content_word_count'],
-            1 * is_accepted, stat['content_word_count'] * is_accepted,
-            1 * is_accepted_and_edited, stat['last_updated_date'],
-            stat['last_updated_date']
+            language_code=language_code,
+            contributor_user_id=contributor_user_id,
+            topic_id=topic_id,
+            reviewed_translations_count=1,
+            reviewed_translation_word_count=stat['word_count'],
+            accepted_translations_count=(
+                1 * is_accepted),
+            accepted_translation_word_count=(
+                stat['word_count'] * is_accepted),
+            accepted_translations_with_reviewer_edits_count=(
+                1 * is_accepted_and_edited),
+            first_contribution_date=stat['last_updated_date'],
+            last_contribution_date=stat['last_updated_date']
         )
 
         return (entity_id, transformed_data)
@@ -670,28 +681,32 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             TranslationReviewStats. The combined domain object.
         """
         all_first_contributed_dates = [
-            acc.first_contribution_date for acc in stats
+            stat.first_contribution_date for stat in stats
         ]
         all_last_contributed_dates = [
-            acc.last_contribution_date for acc in stats
+            stat.last_contribution_date for stat in stats
         ]
         all_first_contributed_dates.sort()
         all_last_contributed_dates.sort()
 
         return suggestion_registry.TranslationReviewStats(
-            list(stats)[0].language_code,
-            list(stats)[0].contributor_user_id,
-            list(stats)[0].topic_id,
-            sum(acc.reviewed_translations_count for acc in stats),
-            sum(acc.reviewed_translation_word_count for acc in stats),
-            sum(acc.accepted_translations_count for acc in stats),
-            sum(acc.accepted_translation_word_count for acc in stats),
-            sum(
-                acc.accepted_translations_with_reviewer_edits_count
-                for acc in stats
+            language_code=list(stats)[0].language_code,
+            contributor_user_id=list(stats)[0].contributor_user_id,
+            topic_id=list(stats)[0].topic_id,
+            reviewed_translations_count=sum(
+                stat.reviewed_translations_count for stat in stats),
+            reviewed_translation_word_count=sum(
+                stat.reviewed_translation_word_count for stat in stats),
+            accepted_translations_count=sum(
+                stat.accepted_translations_count for stat in stats),
+            accepted_translation_word_count=sum(
+                stat.accepted_translation_word_count for stat in stats),
+            accepted_translations_with_reviewer_edits_count=sum(
+                stat.accepted_translations_with_reviewer_edits_count
+                for stat in stats
             ),
-            all_first_contributed_dates[0],
-            all_last_contributed_dates[-1]
+            first_contribution_date=all_first_contributed_dates[0],
+            last_contribution_date=all_last_contributed_dates[-1]
         )
 
     @staticmethod
@@ -719,13 +734,14 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             is_accepted and not stat['edited_by_reviewer'])
 
         transformed_data = suggestion_registry.QuestionContributionStats(
-            contributor_user_id,
-            topic_id,
-            1,
-            int(is_accepted),
-            int(is_accepted_and_not_edited),
-            stat['last_updated_date'],
-            stat['last_updated_date']
+            contributor_user_id=contributor_user_id,
+            topic_id=topic_id,
+            submitted_questions_count=1,
+            accepted_questions_count=int(is_accepted),
+            accepted_questions_without_reviewer_edits_count=int(
+                is_accepted_and_not_edited),
+            first_contribution_date=stat['last_updated_date'],
+            last_contribution_date=stat['last_updated_date']
         )
 
         return (entity_id, transformed_data)
@@ -744,25 +760,27 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             QuestionContributionStats. The combined domain object.
         """
         all_first_contributed_dates = [
-            acc.first_contribution_date for acc in stats
+            stat.first_contribution_date for stat in stats
         ]
         all_last_contributed_dates = [
-            acc.last_contribution_date for acc in stats
+            stat.last_contribution_date for stat in stats
         ]
         all_first_contributed_dates.sort()
         all_last_contributed_dates.sort()
 
         return suggestion_registry.QuestionContributionStats(
-            list(stats)[0].contributor_user_id,
-            list(stats)[0].topic_id,
-            sum(acc.submitted_questions_count for acc in stats),
-            sum(acc.accepted_questions_count for acc in stats),
-            sum(
-                acc.accepted_questions_without_reviewer_edits_count
-                for acc in stats
+            contributor_user_id=list(stats)[0].contributor_user_id,
+            topic_id=list(stats)[0].topic_id,
+            submitted_questions_count=sum(
+                stat.submitted_questions_count for stat in stats),
+            accepted_questions_count=sum(
+                stat.accepted_questions_count for stat in stats),
+            accepted_questions_without_reviewer_edits_count=sum(
+                stat.accepted_questions_without_reviewer_edits_count
+                for stat in stats
             ),
-            all_first_contributed_dates[0],
-            all_last_contributed_dates[-1]
+            first_contribution_date=all_first_contributed_dates[0],
+            last_contribution_date=all_last_contributed_dates[-1]
         )
 
     @staticmethod
@@ -790,13 +808,14 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             is_accepted and stat['edited_by_reviewer'])
 
         transformed_data = suggestion_registry.QuestionReviewStats(
-            contributor_user_id,
-            topic_id,
-            1,
-            int(is_accepted),
-            int(is_accepted_and_edited),
-            stat['last_updated_date'],
-            stat['last_updated_date']
+            contributor_user_id=contributor_user_id,
+            topic_id=topic_id,
+            reviewed_questions_count=1,
+            accepted_questions_count=int(is_accepted),
+            accepted_questions_with_reviewer_edits_count=int(
+                is_accepted_and_edited),
+            first_contribution_date=stat['last_updated_date'],
+            last_contribution_date=stat['last_updated_date']
         )
 
         return (entity_id, transformed_data)
@@ -815,25 +834,27 @@ class GenerateContributionStatsJob(base_jobs.JobBase):
             QuestionReviewStats. The combined domain object.
         """
         all_first_contributed_dates = [
-            acc.first_contribution_date for acc in stats
+            stat.first_contribution_date for stat in stats
         ]
         all_last_contributed_dates = [
-            acc.last_contribution_date for acc in stats
+            stat.last_contribution_date for stat in stats
         ]
         all_first_contributed_dates.sort()
         all_last_contributed_dates.sort()
 
         return suggestion_registry.QuestionReviewStats(
-            list(stats)[0].contributor_user_id,
-            list(stats)[0].topic_id,
-            sum(acc.reviewed_questions_count for acc in stats),
-            sum(acc.accepted_questions_count for acc in stats),
-            sum(
-                acc.accepted_questions_with_reviewer_edits_count
-                for acc in stats
+            contributor_user_id=list(stats)[0].contributor_user_id,
+            topic_id=list(stats)[0].topic_id,
+            reviewed_questions_count=sum(
+                stat.reviewed_questions_count for stat in stats),
+            accepted_questions_count=sum(
+                stat.accepted_questions_count for stat in stats),
+            accepted_questions_with_reviewer_edits_count=sum(
+                stat.accepted_questions_with_reviewer_edits_count
+                for stat in stats
             ),
-            all_first_contributed_dates[0],
-            all_last_contributed_dates[-1]
+            first_contribution_date=all_first_contributed_dates[0],
+            last_contribution_date=all_last_contributed_dates[-1]
         )
 
     @staticmethod

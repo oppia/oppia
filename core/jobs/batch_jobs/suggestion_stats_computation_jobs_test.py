@@ -359,7 +359,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             [datetime.datetime.utcnow().date()]
         )
 
-    def test_creates_translation_stats_model_from_one_accepted_suggestion(
+    def test_creates_translation_stats_models_from_one_accepted_suggestion(
         self
     ) -> None:
         suggestion_model = self.create_model(
@@ -444,6 +444,270 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         self.assertEqual(
             translation_review_stats_model.accepted_translation_word_count, 3)
+        self.assertEqual(
+            translation_review_stats_model.first_contribution_date,
+            datetime.datetime.utcnow().date()
+        )
+        self.assertEqual(
+            translation_review_stats_model.last_contribution_date,
+            datetime.datetime.utcnow().date()
+        )
+
+    def test_creates_translation_stats_models_from_two_accepted_suggestions(
+        self
+    ) -> None:
+        first_suggestion_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
+                'data_format': 'unicode'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_ACCEPTED,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1,
+            final_reviewer_id='reviewer1'
+        )
+        first_suggestion_model.update_timestamps()
+        first_suggestion_model.put()
+
+        second_suggestion_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
+                'data_format': 'unicode'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_ACCEPTED,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1,
+            final_reviewer_id='reviewer1'
+        )
+        second_suggestion_model.update_timestamps()
+        second_suggestion_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS: 1'),
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+        ])
+
+        translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_1, ''))
+        translation_review_stats_model = (
+            suggestion_models.TranslationReviewStatsModel.get(
+                self.LANG_1, 'reviewer1', ''))
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_stats_model is not None
+        assert translation_review_stats_model is not None
+
+        self.assertEqual(translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+        self.assertEqual(translation_stats_model.topic_id, '')
+        self.assertEqual(
+            translation_stats_model.submitted_translations_count, 2)
+        self.assertEqual(
+            translation_stats_model.submitted_translation_word_count, 6)
+        self.assertEqual(translation_stats_model.accepted_translations_count, 2)
+        self.assertEqual(
+            translation_stats_model
+            .accepted_translations_without_reviewer_edits_count,
+            2
+        )
+        self.assertEqual(
+            translation_stats_model.accepted_translation_word_count, 6)
+        self.assertEqual(translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            translation_stats_model.rejected_translation_word_count, 0)
+        self.assertItemsEqual(
+            translation_stats_model.contribution_dates,
+            [datetime.datetime.utcnow().date()]
+        )
+
+        self.assertEqual(
+            translation_review_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            translation_review_stats_model.reviewer_user_id, 'reviewer1')
+        self.assertEqual(translation_review_stats_model.topic_id, '')
+        self.assertEqual(
+            translation_review_stats_model.reviewed_translations_count, 2)
+        self.assertEqual(
+            translation_review_stats_model.reviewed_translation_word_count, 6)
+        self.assertEqual(
+            translation_review_stats_model.accepted_translations_count, 2)
+        self.assertEqual(
+            translation_review_stats_model
+            .accepted_translations_with_reviewer_edits_count,
+            0
+        )
+        self.assertEqual(
+            translation_review_stats_model.accepted_translation_word_count, 6)
+        self.assertEqual(
+            translation_review_stats_model.first_contribution_date,
+            datetime.datetime.utcnow().date()
+        )
+        self.assertEqual(
+            translation_review_stats_model.last_contribution_date,
+            datetime.datetime.utcnow().date()
+        )
+
+    def test_creates_multiple_stats_models_from_multiple_users(
+        self
+    ) -> None:
+        first_suggestion_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_1,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
+                'data_format': 'unicode'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_ACCEPTED,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1,
+            final_reviewer_id='reviewer1'
+        )
+        first_suggestion_model.update_timestamps()
+        first_suggestion_model.put()
+
+        second_suggestion_model = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            author_id=self.VALID_USER_ID_2,
+            change_cmd={
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'state',
+                'content_id': 'content_id',
+                'language_code': 'lang',
+                'content_html': '111 222 333',
+                'translation_html': '111 222 333',
+                'data_format': 'unicode'
+            },
+            score_category='irelevant',
+            status=suggestion_models.STATUS_ACCEPTED,
+            target_type='exploration',
+            target_id=self.EXP_1_ID,
+            target_version_at_submission=0,
+            language_code=self.LANG_1,
+            final_reviewer_id='reviewer1'
+        )
+        second_suggestion_model.update_timestamps()
+        second_suggestion_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='SUCCESS: 2'),
+            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+        ])
+
+        first_translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_1, ''))
+        second_translation_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANG_1, self.VALID_USER_ID_2, ''))
+        translation_review_stats_model = (
+            suggestion_models.TranslationReviewStatsModel.get(
+                self.LANG_1, 'reviewer1', ''))
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert first_translation_stats_model is not None
+        assert second_translation_stats_model is not None
+        assert translation_review_stats_model is not None
+
+        self.assertEqual(first_translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            first_translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+        self.assertEqual(first_translation_stats_model.topic_id, '')
+        self.assertEqual(
+            first_translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(
+            first_translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(first_translation_stats_model.accepted_translations_count, 1)
+        self.assertEqual(
+            first_translation_stats_model
+            .accepted_translations_without_reviewer_edits_count,
+            1
+        )
+        self.assertEqual(
+            first_translation_stats_model.accepted_translation_word_count, 3)
+        self.assertEqual(first_translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            first_translation_stats_model.rejected_translation_word_count, 0)
+        self.assertItemsEqual(
+            first_translation_stats_model.contribution_dates,
+            [datetime.datetime.utcnow().date()]
+        )
+
+        self.assertEqual(second_translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            second_translation_stats_model.contributor_user_id, self.VALID_USER_ID_2)
+        self.assertEqual(second_translation_stats_model.topic_id, '')
+        self.assertEqual(
+            second_translation_stats_model.submitted_translations_count, 1)
+        self.assertEqual(
+            second_translation_stats_model.submitted_translation_word_count, 3)
+        self.assertEqual(second_translation_stats_model.accepted_translations_count, 1)
+        self.assertEqual(
+            second_translation_stats_model
+            .accepted_translations_without_reviewer_edits_count,
+            1
+        )
+        self.assertEqual(
+            second_translation_stats_model.accepted_translation_word_count, 3)
+        self.assertEqual(second_translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            second_translation_stats_model.rejected_translation_word_count, 0)
+        self.assertItemsEqual(
+            second_translation_stats_model.contribution_dates,
+            [datetime.datetime.utcnow().date()]
+        )
+
+        self.assertEqual(
+            translation_review_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            translation_review_stats_model.reviewer_user_id, 'reviewer1')
+        self.assertEqual(translation_review_stats_model.topic_id, '')
+        self.assertEqual(
+            translation_review_stats_model.reviewed_translations_count, 2)
+        self.assertEqual(
+            translation_review_stats_model.reviewed_translation_word_count, 6)
+        self.assertEqual(
+            translation_review_stats_model.accepted_translations_count, 2)
+        self.assertEqual(
+            translation_review_stats_model
+            .accepted_translations_with_reviewer_edits_count,
+            0
+        )
+        self.assertEqual(
+            translation_review_stats_model.accepted_translation_word_count, 6)
         self.assertEqual(
             translation_review_stats_model.first_contribution_date,
             datetime.datetime.utcnow().date()
@@ -621,7 +885,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
 
         return topic_id
 
-    def test_creates_question_stats_model_from_one_accepted_suggestion(
+    def test_creates_question_stats_models_from_one_accepted_suggestion(
         self
     ) -> None:
         topic_id = self._create_question()
