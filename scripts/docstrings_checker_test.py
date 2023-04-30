@@ -284,12 +284,17 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         self.assertEqual(exceptions, set(['Exception']))
 
     def test_docstringify_with_valid_docstring(self) -> None:
-        valid_docstring = """Docstring that is correctly formated
-            according to the Google Python Style Guide.
+        valid_docstring = astroid.extract_node(
+            """
+        def func():
+            '''Docstring that is correctly formated
+                according to the Google Python Style Guide.
 
             Args:
                 test_value: bool. Just a test argument.
-            """
+            '''
+            pass
+            """).doc_node
         is_valid = isinstance(
             docstrings_checker.docstringify(valid_docstring),
             docstrings_checker.GoogleDocstring)
@@ -297,9 +302,14 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         self.assertEqual(is_valid, True)
 
     def test_docstringify_with_invalid_docstring(self) -> None:
-        invalid_docstring = """Docstring that is incorrectly
-            formated according to the Google Python Style Guide.
+        invalid_docstring = astroid.extract_node(
             """
+        def func():
+            '''Docstring that is incorrectly formated
+                according to the Google Python Style Guide.
+            '''
+            pass
+            """).doc_node
         is_valid = isinstance(
             docstrings_checker.docstringify(invalid_docstring),
             docstrings_checker.GoogleDocstring)
