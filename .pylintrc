@@ -152,6 +152,8 @@ disable=abstract-method,
         # broken by putting imports inside functions so they aren't
         # executed upon module import.
         cyclic-import,
+        broad-exception-raised,
+        unnecessary-lambda-assignment,
 
 [REPORTS]
 
