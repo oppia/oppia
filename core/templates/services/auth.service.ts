@@ -88,12 +88,12 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
     this.provider.setCustomParameters({prompt: 'select_account'});
   }
 
-  /** Returns a promise that never resolves or rejects. */
   async signInWithPopupAsync(): Promise<void> {
-    this.angularFireAuth.signInWithPopup(this.provider);
+    await this.angularFireAuth.signInWithPopup(this.provider);
     return;
   }
 
+  /** Returns a promise that never resolves or rejects. */
   async signInWithRedirectAsync(): Promise<void> {
     return this.angularFireAuth.signInWithRedirect(this.provider);
   }

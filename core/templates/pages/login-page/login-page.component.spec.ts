@@ -315,7 +315,8 @@ describe('Login Page', () => {
       flush();
     }));
 
-    it('should redirect to auth service when not logged in', fakeAsync(() => {
+    it('should redirect to signInWithRedirectAsync service when not' +
+    'logged in and SigninWithPopUp is disabled', fakeAsync(() => {
       mockPlatformFeatureService.status.SigninWithPopUp.isEnabled = false;
 
       const redirectResultPromise = spyOnHandleRedirectResultAsync();
@@ -328,6 +329,24 @@ describe('Login Page', () => {
       flushMicrotasks();
 
       expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
+
+      flush();
+    }));
+
+    it('should redirect to signInWithPopupAsync service when not' +
+    'logged in and SigninWithPopUp is enabled', fakeAsync(() => {
+      mockPlatformFeatureService.status.SigninWithPopUp.isEnabled = false;
+
+      const redirectResultPromise = spyOnHandleRedirectResultAsync();
+
+      loginPageComponent.ngOnInit();
+
+      expect(authService.signInWithPopupAsync).not.toHaveBeenCalled();
+
+      redirectResultPromise.resolve(false);
+      flushMicrotasks();
+
+      expect(authService.signInWithPopupAsync).toHaveBeenCalled();
 
       flush();
     }));
