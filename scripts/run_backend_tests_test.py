@@ -189,8 +189,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         with open(
             'dummy_exclusion_list.txt',
-            'r', encoding='utf-8') as dummy_file_object:
-
+            'r', encoding='utf-8'
+        ) as dummy_file_object:
             swap_open = self.swap_with_checks(
                 builtins, 'open',
                 lambda *unused_args, **unused_kwargs: dummy_file_object,

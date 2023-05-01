@@ -102,7 +102,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         """Test that error is produced if stdout is not empty."""
         with subprocess.Popen(
             ['echo', 'test'],
-            stdout=subprocess.PIPE, encoding='utf-8') as process:
+            stdout=subprocess.PIPE, encoding='utf-8'
+        ) as process:
             def mock_popen_for_errors(
                 unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
             ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object

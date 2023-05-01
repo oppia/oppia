@@ -42,8 +42,8 @@ class SetupTests(test_utils.GenericTestBase):
             f.write(packages)
 
         with open(
-            'dummy_requirements.txt', encoding='utf-8') as dummy_file_object:
-
+            'dummy_requirements.txt', encoding='utf-8'
+        ) as dummy_file_object:
             swap_open = self.swap_with_checks(
                 builtins, 'open',
                 lambda *unused_args, **unused_kwargs: dummy_file_object,

@@ -36,7 +36,8 @@ def main() -> None:
 
     with subprocess.Popen(
         proc_args,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE) as proc:
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as proc:
         encoded_tests_stdout, encoded_tests_stderr = proc.communicate()
     # Standard and error output is in bytes, we need to decode the line to
     # print it.

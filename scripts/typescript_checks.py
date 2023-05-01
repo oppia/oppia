@@ -329,8 +329,8 @@ def compile_temp_strict_tsconfig(
 
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
     with subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, encoding='utf-8') as process:
-
+        cmd, stdout=subprocess.PIPE, encoding='utf-8'
+    ) as process:
         # The value of `process.stdout` should not be None since we passed
         # the `stdout=subprocess.PIPE` argument to `Popen`.
         assert process.stdout is not None
@@ -381,8 +381,8 @@ def compile_and_check_typescript(config_path: str) -> None:
     print('Compiling and testing typescript...')
     cmd = ['./node_modules/typescript/bin/tsc', '--project', config_path]
     with subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, encoding='utf-8') as process:
-
+        cmd, stdout=subprocess.PIPE, encoding='utf-8'
+    ) as process:
         # The value of `process.stdout` should not be None since we passed
         # the `stdout=subprocess.PIPE` argument to `Popen`.
         assert process.stdout is not None

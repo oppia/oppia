@@ -146,7 +146,8 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
             '--upgrade'
         ]
     with subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as process:
         output = process.communicate()
         if b'can\'t combine user with prefix' in output[1]:
             uextention_text = ['--user', '--prefix=', '--system']
@@ -200,7 +201,8 @@ def main(args: Optional[List[str]] = None) -> int:
     with subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, env=env) as process:
+        stderr=subprocess.PIPE, env=env
+    ) as process:
         stdout, stderr = process.communicate()
         # Standard and error output is in bytes, we need to decode the line to
         # print it.

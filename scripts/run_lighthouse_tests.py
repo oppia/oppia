@@ -82,7 +82,8 @@ def run_lighthouse_puppeteer_script() -> None:
 
     with subprocess.Popen(
         bash_command,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as process:
         stdout, stderr = process.communicate()
         if process.returncode == 0:
             print(stdout)
@@ -163,7 +164,8 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
 
     with subprocess.Popen(
         bash_command,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as process:
         stdout, stderr = process.communicate()
         if process.returncode == 0:
             print('Lighthouse checks completed successfully.')

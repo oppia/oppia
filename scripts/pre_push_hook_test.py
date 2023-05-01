@@ -135,13 +135,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_get_remote_name_without_errors(self) -> None:
         with subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE) as process_for_remote:
+            stderr=subprocess.PIPE
+        ) as process_for_remote:
             with subprocess.Popen(
                 [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE) as process_for_upstream_url:
+                stderr=subprocess.PIPE
+            ) as process_for_upstream_url:
                 with subprocess.Popen(
                     [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE) as process_for_origin_url:
+                    stderr=subprocess.PIPE
+                ) as process_for_origin_url:
                     def mock_popen(
                         cmd_tokens: List[bytes],
                         stdout: int, stderr: int  # pylint: disable=unused-argument
@@ -162,7 +165,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             return (b'test', b'test_oppia_error')
         with subprocess.Popen(
             [b'echo', b'test'],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as process:
             # Here we use MyPy ignore because here we are assigning a value
             # to the 'communicate' method, and according to MyPy, assignment
             # to a method is not allowed.
@@ -181,11 +185,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
             return ('test', 'test_oppia_error')
         with subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE) as process_for_remote:
+            stderr=subprocess.PIPE
+        ) as process_for_remote:
             with subprocess.Popen(
                 [b'echo', b'test'],
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE) as process_for_remote_url:
+                stderr=subprocess.PIPE
+            ) as process_for_remote_url:
                 def mock_popen(
                     cmd_tokens: List[bytes],
                     stdout: int, stderr: int  # pylint: disable=unused-argument
@@ -207,13 +213,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_get_remote_name_with_no_remote_set(self) -> None:
         with subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE) as process_for_remote:
+            stderr=subprocess.PIPE
+        ) as process_for_remote:
             with subprocess.Popen(
                 [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE) as process_for_upstream_url:
+                stderr=subprocess.PIPE
+            ) as process_for_upstream_url:
                 with subprocess.Popen(
                     [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE) as process_for_origin_url:
+                    stderr=subprocess.PIPE
+                ) as process_for_origin_url:
                     def mock_popen(
                         cmd_tokens: List[bytes],
                         stdout: int, stderr: int  # pylint: disable=unused-argument
@@ -241,13 +250,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_get_remote_name_with_multiple_remotes_set(self) -> None:
         with subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE) as process_for_remote:
+            stderr=subprocess.PIPE
+        ) as process_for_remote:
             with subprocess.Popen(
                 [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE) as process_for_upstream_url:
+                stderr=subprocess.PIPE
+            ) as process_for_upstream_url:
                 with subprocess.Popen(
                     [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE) as process_for_origin_url:
+                    stderr=subprocess.PIPE
+                ) as process_for_origin_url:
                     def mock_popen(
                         cmd_tokens: List[bytes],
                         stdout: int, stderr: int  # pylint: disable=unused-argument

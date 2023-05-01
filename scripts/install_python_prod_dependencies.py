@@ -486,7 +486,8 @@ def _run_pip_command(cmd_parts: List[str]) -> None:
     command = [sys.executable, '-m', 'pip'] + cmd_parts
     with subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        encoding='utf-8') as process:
+        encoding='utf-8'
+    ) as process:
         stdout, stderr = process.communicate()
         if process.returncode == 0:
             print(stdout)

@@ -45,7 +45,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
     def test_checks_fail_when_a_backend_file_lacks_associated_test_file(
             self) -> None:
         with tempfile.TemporaryDirectory(
-            prefix=os.getcwd() + '/core/') as tempdir:
+            prefix=os.getcwd() + '/core/'
+        ) as tempdir:
             backend_file = os.path.join(tempdir, 'backend_file.py')
             frontend_file = os.path.join(tempdir, 'frontend_file.ts')
 
@@ -69,7 +70,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
     def test_pass_when_file_in_exclusion_list_lacks_associated_test(
             self) -> None:
         with tempfile.TemporaryDirectory(
-            prefix=os.getcwd() + '/core/') as tempdir:
+            prefix=os.getcwd() + '/core/'
+        ) as tempdir:
             backend_file = os.path.join(tempdir, 'backend_file.py')
             with open(backend_file, 'w', encoding='utf8') as f:
                 f.write('Example code')
@@ -89,7 +91,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
     def test_checks_pass_when_all_backend_files_have_an_associated_test_file(
             self) -> None:
         with tempfile.TemporaryDirectory(
-            prefix=os.getcwd() + '/core/') as tempdir:
+            prefix=os.getcwd() + '/core/'
+        ) as tempdir:
             backend_file = os.path.join(tempdir, 'backend_file.py')
             backend_test_file = os.path.join(
                 tempdir, 'backend_file_test.py')

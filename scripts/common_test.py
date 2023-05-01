@@ -689,7 +689,6 @@ class CommonTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     os.stat(os.path.join(root, filename)).st_uid, os.getuid())
 
-        temp_file.close()
         shutil.rmtree(root_temp_dir)
 
     def test_print_each_string_after_two_new_lines(self) -> None:
@@ -1321,7 +1320,8 @@ class CommonTests(test_utils.GenericTestBase):
 
             common.modify_constants(prod_env=False, maintenance_mode=True)
             with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
+                mock_constants_path, 'r'
+            ) as constants_file:
                 self.assertEqual(
                     constants_file.read(),
                     'export = {\n'
@@ -1331,9 +1331,6 @@ class CommonTests(test_utils.GenericTestBase):
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
-
-        constants_temp_file.close()
-        feconf_temp_file.close()
 
     def test_set_constants_to_default(self) -> None:
         mock_constants_path = 'mock_app_dev.yaml'
@@ -1363,7 +1360,8 @@ class CommonTests(test_utils.GenericTestBase):
             with constants_path_swap, feconf_path_swap:
                 common.set_constants_to_default()
                 with utils.open_file(
-                    mock_constants_path, 'r') as constants_file:
+                    mock_constants_path, 'r'
+                ) as constants_file:
                     self.assertEqual(
                         constants_file.read(),
                         'export = {\n'
@@ -1373,7 +1371,6 @@ class CommonTests(test_utils.GenericTestBase):
                 with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                     self.assertEqual(
                         feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
-            constants_temp_file.close()
 
     def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
         with contextlib.ExitStack() as stack:

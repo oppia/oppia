@@ -188,7 +188,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
             extend_index_yaml.main()
             with open(filename, 'r', encoding='utf-8') as open_index_yaml_r:
                 actual_index_yaml = open_index_yaml_r.read()
-                self.assertEqual(actual_index_yaml, expected_index_yaml)
+            self.assertEqual(actual_index_yaml, expected_index_yaml)
 
     def test_extend_index_yaml_with_changes(self) -> None:
         index_yaml = """indexes:

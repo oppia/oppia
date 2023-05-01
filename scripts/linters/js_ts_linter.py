@@ -555,7 +555,8 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
         eslint_cmd_args = [node_path, eslint_path, '--quiet']
         proc_args = eslint_cmd_args + files_to_lint
         with subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as proc:
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as proc:
             encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
         # Standard and error output is in bytes, we need to decode the line to
         # print it.

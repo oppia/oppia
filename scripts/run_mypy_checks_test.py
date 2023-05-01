@@ -64,7 +64,8 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         with subprocess.Popen(
             ['echo', 'test'],
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE) as process_success:
+            stderr=subprocess.PIPE
+        ) as process_success:
             def mock_popen_success(
                 unused_cmd: str,
                 stdout: Optional[str] = None,  # pylint: disable=unused-argument
@@ -77,7 +78,8 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         with subprocess.Popen(
             ['test'],
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE) as process_failure:
+            stderr=subprocess.PIPE
+        ) as process_failure:
             def mock_popen_failure(
                 unused_cmd: str,
                 stdout: Optional[str] = None,  # pylint: disable=unused-argument
@@ -209,7 +211,8 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         with self.popen_swap_success:
             with subprocess.Popen(
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE],
-                stdout=subprocess.PIPE) as process:
+                stdout=subprocess.PIPE
+            ) as process:
                 output = process.communicate()
                 self.assertEqual(output[0], b'test\n')
 
@@ -217,7 +220,8 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         with self.popen_swap_failure:
             with subprocess.Popen(
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE],
-                stdout=subprocess.PIPE) as process:
+                stdout=subprocess.PIPE
+            ) as process:
                 output = process.communicate()
                 self.assertEqual(output[0], b'')
 

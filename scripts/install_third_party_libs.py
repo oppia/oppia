@@ -141,8 +141,8 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
         command = [
             buf_path, 'generate', path]
         with subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            env=proto_env) as process:
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=proto_env
+        ) as process:
             stdout, stderr = process.communicate()
             if process.returncode == 0:
                 print(stdout)

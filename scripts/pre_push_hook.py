@@ -119,7 +119,8 @@ class ChangedBranch:
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     """Starts subprocess and returns (stdout, stderr)."""
     with subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as task:
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ) as task:
         out, err = task.communicate()
         return out, err
 
@@ -140,7 +141,8 @@ def get_remote_name() -> Optional[bytes]:
     with subprocess.Popen(
         get_remotes_name_cmd,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE) as task:
+        stderr=subprocess.PIPE
+    ) as task:
         out, err = task.communicate()
     remotes = out[:-1].split(b'\n')
     if not err:
@@ -149,7 +151,8 @@ def get_remote_name() -> Optional[bytes]:
                 b'git config --get remote.%s.url' % remote).split()
             with subprocess.Popen(
                 get_remotes_url_cmd, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE) as task:
+                stderr=subprocess.PIPE
+            ) as task:
                 remote_url, err = task.communicate()
                 if not err:
                     if remote_url.endswith(b'oppia/oppia.git\n'):
