@@ -39,6 +39,7 @@ describe('Auth service', function() {
       'getRedirectResult',
       'signInWithEmailAndPassword',
       'signInWithPopup',
+      'signInWithRedirect',
       'signOut',
     ]);
     authBackendApiService = jasmine.createSpyObj<AuthBackendApiService>({
@@ -102,6 +103,14 @@ describe('Auth service', function() {
       await expectAsync(
         new AuthService(
           null, authBackendApiService).signInWithPopupAsync()
+      ).toBeRejectedWithError('AngularFireAuth is not available');
+    });
+
+  it('should throw if signInWithRedirectAsync is called without angular fire',
+    async() => {
+      await expectAsync(
+        new AuthService(
+          null, authBackendApiService).signInWithRedirectAsync()
       ).toBeRejectedWithError('AngularFireAuth is not available');
     });
 
@@ -184,6 +193,14 @@ describe('Auth service', function() {
       expect(angularFireAuth.signInWithPopup).toHaveBeenCalled();
     });
 
+    it('should delegate to AngularFireAuth.signInWithRedirect', async() => {
+      angularFireAuth.signInWithRedirect.and.resolveTo();
+
+      await expectAsync(authService.signInWithRedirectAsync()).toBeResolvedTo();
+
+      expect(angularFireAuth.signInWithRedirect).toHaveBeenCalled();
+    });
+
     it('should delegate to AngularFireAuth.getRedirectResult', async() => {
       angularFireAuth.getRedirectResult.and.resolveTo(creds);
 
@@ -226,6 +243,13 @@ describe('Auth service', function() {
         .toBeResolvedTo();
 
       expect(angularFireAuth.signInWithPopup).not.toHaveBeenCalled();
+    });
+
+    it('should not delegate to signInWithRedirectAsync', async() => {
+      await expectAsync(authService.signInWithRedirectAsync())
+        .toBeResolvedTo();
+
+      expect(angularFireAuth.signInWithRedirect).not.toHaveBeenCalled();
     });
 
     it('should not delegate to handleRedirectResultAsync', async() => {

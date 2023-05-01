@@ -27,6 +27,7 @@ import { AuthService } from 'services/auth.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 @Component({
   selector: 'login-page',
@@ -39,6 +40,7 @@ export class LoginPageComponent implements OnInit {
   constructor(
       private alertsService: AlertsService, private authService: AuthService,
       private loaderService: LoaderService, private userService: UserService,
+      private platformFeatureService: PlatformFeatureService,
       private windowRef: WindowRef) {}
 
   get emulatorModeIsEnabled(): boolean {
@@ -76,14 +78,26 @@ export class LoginPageComponent implements OnInit {
         return;
       }
 
-      try {
-        await this.authService.signInWithPopupAsync();
-      // We use unknown type because we are unsure of the type of error
-      // that was thrown. Since the catch block cannot identify the
-      // specific type of error, we are unable to further optimise the
-      // code by introducing more types of errors.
-      } catch (error: unknown) {
-        this.onSignInError(error as firebase.auth.Error);
+      if (this.platformFeatureService.status.SigninWithPopUp.isEnabled) {
+        try {
+          await this.authService.signInWithPopupAsync();
+          // We use unknown type because we are unsure of the type of error
+          // that was thrown. Since the catch block cannot identify the
+          // specific type of error, we are unable to further optimise the
+          // code by introducing more types of errors.
+        } catch (error: unknown) {
+          this.onSignInError(error as firebase.auth.Error);
+        }
+      } else {
+        try {
+          await this.authService.signInWithRedirectAsync();
+        // We use unknown type because we are unsure of the type of error
+        // that was thrown. Since the catch block cannot identify the
+        // specific type of error, we are unable to further optimise the
+        // code by introducing more types of errors.
+        } catch (error: unknown) {
+          this.onSignInError(error as firebase.auth.Error);
+        }
       }
     },
     error => {

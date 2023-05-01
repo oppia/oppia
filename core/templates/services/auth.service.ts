@@ -32,6 +32,7 @@ abstract class AuthServiceImpl {
     firebase.auth.UserCredential | null
   >;
   abstract signInWithPopupAsync(): Promise<void>;
+  abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
 
@@ -39,6 +40,10 @@ class NullAuthServiceImpl extends AuthServiceImpl {
   private error = new Error('AngularFireAuth is not available');
 
   async signInWithPopupAsync(): Promise<void> {
+    throw this.error;
+  }
+
+  async signInWithRedirectAsync(): Promise<void> {
     throw this.error;
   }
 
@@ -57,6 +62,9 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   }
 
   async signInWithPopupAsync(): Promise<void> {
+  }
+
+  async signInWithRedirectAsync(): Promise<void> {
   }
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null> {
@@ -84,6 +92,10 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
   async signInWithPopupAsync(): Promise<void> {
     this.angularFireAuth.signInWithPopup(this.provider);
     return;
+  }
+
+  async signInWithRedirectAsync(): Promise<void> {
+    return this.angularFireAuth.signInWithRedirect(this.provider);
   }
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
@@ -188,6 +200,10 @@ export class AuthService {
 
   async signInWithPopupAsync(): Promise<void> {
     return this.authServiceImpl.signInWithPopupAsync();
+  }
+
+  async signInWithRedirectAsync(): Promise<void> {
+    return this.authServiceImpl.signInWithRedirectAsync();
   }
 
   async signOutAsync(): Promise<void> {

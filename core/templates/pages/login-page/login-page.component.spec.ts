@@ -30,6 +30,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { LoginPageComponent } from './login-page.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockWindowRef {
   constructor(
@@ -48,6 +49,14 @@ class MockWindowRef {
       }
     };
   }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    SigninWithPopUp: {
+      isEnabled: false
+    }
+  };
 }
 
 class PendingPromise<T = void> {
@@ -78,6 +87,7 @@ describe('Login Page', () => {
 
   let loginPageComponent: LoginPageComponent;
   let fixture: ComponentFixture<LoginPageComponent>;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   const spyOnHandleRedirectResultAsync = () => {
     const pending = new PendingPromise<boolean>();
@@ -85,9 +95,9 @@ describe('Login Page', () => {
     return pending;
   };
 
-  const spyOnsignInWithPopupAsync = () => {
+  const spyOnsignInWithRedirectAsync = () => {
     const pending = new PendingPromise<void>();
-    authService.signInWithPopupAsync.and.returnValue(pending.promise);
+    authService.signInWithRedirectAsync.and.returnValue(pending.promise);
     return pending;
   };
 
@@ -104,6 +114,7 @@ describe('Login Page', () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', {
       handleRedirectResultAsync: Promise.resolve(false),
       signInWithPopupAsync: Promise.resolve(),
+      signInWithRedirectAsync: Promise.resolve(),
       signInWithEmail: Promise.resolve(),
     });
     loaderService = jasmine.createSpyObj<LoaderService>('LoaderService', [
@@ -131,6 +142,10 @@ describe('Login Page', () => {
         { provide: LoaderService, useValue: loaderService },
         { provide: UserService, useValue: userService },
         { provide: WindowRef, useValue: windowRef },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
+        }
       ],
     }).compileComponents();
 
@@ -301,16 +316,18 @@ describe('Login Page', () => {
     }));
 
     it('should redirect to auth service when not logged in', fakeAsync(() => {
+      mockPlatformFeatureService.status.SigninWithPopUp.isEnabled = false;
+
       const redirectResultPromise = spyOnHandleRedirectResultAsync();
 
       loginPageComponent.ngOnInit();
 
-      expect(authService.signInWithPopupAsync).not.toHaveBeenCalled();
+      expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
 
       redirectResultPromise.resolve(false);
       flushMicrotasks();
 
-      expect(authService.signInWithPopupAsync).toHaveBeenCalled();
+      expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
 
       flush();
     }));
@@ -331,14 +348,14 @@ describe('Login Page', () => {
 
     it('should redirect to home page when sign in with redirect fails',
       fakeAsync(() => {
-        const signInWithPopupAsyncPromise = spyOnsignInWithPopupAsync();
+        const signInWithRedirectAsyncPromise = spyOnsignInWithRedirectAsync();
 
         loginPageComponent.ngOnInit();
         flushMicrotasks();
 
         expect(windowRef.location).toBeNull();
 
-        signInWithPopupAsyncPromise.reject(
+        signInWithRedirectAsyncPromise.reject(
           {code: 'auth/unknown-error', message: '?'});
 
         flush();
