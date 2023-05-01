@@ -12,7 +12,9 @@
         <a ngbTooltip="Main Editor"
            placement="bottom"
            class="nav-link navbar-tab"
-           tabindex="0">
+           tabindex="0"
+           aria-label="Main Editor"
+           (keydown.enter)="selectMainTab()">
           <i class="fas fa-pen navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': isMainEditorTabSelected() }">
           </i>
@@ -22,7 +24,9 @@
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
              (mouseover)="warningsAreShown=true"
              (mouseleave)="hideWarnings()"
-             (click)="selectMainTab()">
+             (click)="selectMainTab()"
+             tabindex="0"
+             [attr.aria-label]="getTotalWarningsCount() + ' Warnings'">
           <span class="oppia-editor-warnings-count">
             {{ getTotalWarningsCount() }}
           </span>
@@ -51,7 +55,9 @@
         <a class="nav-link  navbar-tab e2e-test-questions-tab-button"
            ngbTooltip="Questions Editor"
            placement="bottom"
-           aria-label="Question editor">
+           aria-label="Question editor"
+           tabindex="0"
+           (keydown.enter)="selectQuestionsTab()">
           <i class="fas fa-book-open navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'questions'}">
           </i>
@@ -64,7 +70,9 @@
         <a class="nav-link navbar-tab"
            ngbTooltip="Preview"
            placement="bottom"
-           tabindex="0">
+           tabindex="0"
+           aria-label="Preview button"
+           (keydown.enter)="openTopicViewer()">
           <i class="fas fa-play navbar-tab-icon"
              [ngClass]="{'navbar-tab-active-icon': isInPreviewTab()}">
           </i>
