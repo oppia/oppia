@@ -5,7 +5,7 @@
 
   <div class="modal-body">
     <!-- Provide a sink to move the focus into while the modal loads. -->
-    <input *ngIf="modalIsLoading" type="text" [oppiaFocusOn]="tmpFocusPoint" />
+    <input *ngIf="modalIsLoading" type="text" [oppiaFocusOn]="tmpFocusPoint">
     <form *ngIf="customizationArgsForm" [formGroup]="customizationArgsForm">
       <div *ngFor="let customizationArgSpec of customizationArgSpecs;let ind = index"
            class="oppia-customization-arg-editor">
@@ -28,30 +28,25 @@
            class="btn btn-danger e2e-test-delete-button"
            value="Delete"
            *ngIf="!defaultRTEComponent"
-           (click)="delete()"
-    />
+           (click)="delete()">
     <input class="btn btn-secondary e2e-test-cancel-rich-text-editor"
            value="Cancel"
-           (click)="cancel()"
-    />
+           (click)="cancel()">
     <input *ngIf="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor"
            class="btn btn-success e2e-test-close-rich-text-component-editor"
            value="Done"
            (click)="save()"
-           [disabled]="!customizationArgsForm.valid"
-    />
+           [disabled]="!customizationArgsForm.valid">
     <input *ngIf="currentRteIsLinkEditor"
            class="btn btn-success e2e-test-close-rich-text-component-editor"
            value="Done"
            (click)="save()"
-           [disabled]="!customizationArgsForm.valid || disableSaveButtonForLinkRte()"
-    />
+           [disabled]="!customizationArgsForm.valid || disableSaveButtonForLinkRte()">
     <input *ngIf="currentRteIsMathExpressionEditor"
            class="btn btn-success e2e-test-close-rich-text-component-editor"
            value="Done"
            (click)="save()"
-           [disabled]="!customizationArgsForm.valid || disableSaveButtonForMathRte()"
-    />
+           [disabled]="!customizationArgsForm.valid || disableSaveButtonForMathRte()">
   </div>
 </div>
 <style>

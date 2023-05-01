@@ -61,7 +61,7 @@ implements ControlValueAccessor, Validator, AfterViewInit {
     this.onChange = fn;
   }
 
-  registerOnValidatorChange?(fn: () => void): void {
+  registerOnValidatorChange(fn: () => void): void {
     this.onValidatorChange = fn;
   }
 
@@ -74,7 +74,7 @@ implements ControlValueAccessor, Validator, AfterViewInit {
   }
 
   // Implemented as a part of Validator interface.
-  validate(control: AbstractControl): ValidationErrors {
+  validate(control: AbstractControl): ValidationErrors | null {
     // Currently, the validation for this component is handled by the
     // apply-validation directive, so this method returns an empty
     // object. However, when we move to reactive forms, that validation should
@@ -90,7 +90,7 @@ implements ControlValueAccessor, Validator, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.hybridForm.statusChanges.subscribe(() => {
+    this.hybridForm.statusChanges?.subscribe(() => {
       this.onValidatorChange();
     });
   }

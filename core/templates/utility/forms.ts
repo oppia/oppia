@@ -1,0 +1,1 @@
+export const VALIDATION_STATUS_INVALID = 'INVALID';

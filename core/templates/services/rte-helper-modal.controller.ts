@@ -163,7 +163,7 @@ export class RteHelperModalComponent {
           >[]
         ).push(mathValueDict);
       } else {
-        const t = {
+        const tmpCustomizationArg = {
           name: caName,
           value: this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
             angular.copy(this.attrsCustomizationArgsDict[caName]) :
@@ -177,7 +177,7 @@ export class RteHelperModalComponent {
             CustomizationArgsNameAndValueArray[number],
             { name: typeof caName }
           >[]
-        ).push(t);
+        ).push(tmpCustomizationArg);
       }
     }
     // Infer that the RTE component is a Link if it contains the `url` and

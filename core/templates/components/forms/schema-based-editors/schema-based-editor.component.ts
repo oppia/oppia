@@ -20,8 +20,7 @@ import { Input, Output, EventEmitter, Component, forwardRef, AfterViewInit, View
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors, NgForm } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Schema, SchemaDefaultValue } from 'services/schema-default-value.service';
-
-const VALIDATION_STATUS_INVALID = 'INVALID';
+import { VALIDATION_STATUS_INVALID } from 'utility/forms';
 
 @Component({
   selector: 'schema-based-editor',
@@ -52,7 +51,6 @@ export class SchemaBasedEditorComponent
   @Output() inputBlur = new EventEmitter();
   @Output() inputFocus = new EventEmitter();
   @Input() notRequired!: boolean;
-  @Input() iddd?: number;
   onChange: (val: SchemaDefaultValue) => void = () => { };
   onValidatorChange: () => void = () => {};
   get localValue(): SchemaDefaultValue {
@@ -85,7 +83,7 @@ export class SchemaBasedEditorComponent
   registerOnTouched(): void {
   }
 
-  registerOnValidatorChange?(fn: () => void): void {
+  registerOnValidatorChange(fn: () => void): void {
     this.onValidatorChange = fn;
   }
 
@@ -100,11 +98,7 @@ export class SchemaBasedEditorComponent
   ngAfterViewInit(): void {
     let angularJsFormController: angular.IFormController | undefined = (
       angular?.element(this.elementRef.nativeElement).controller('form'));
-    // This throws "Object is possibly undefined." The type undefined
-    // comes here from NgForm dependency. We need to suppress this
-    // error because of strict type checking.
-    // @ts-ignore
-    this.form.statusChanges.subscribe((validationStatus) => {
+    this.form.statusChanges?.subscribe((validationStatus) => {
       this.onValidatorChange();
       if (angularJsFormController === null ||
         angularJsFormController === undefined) {

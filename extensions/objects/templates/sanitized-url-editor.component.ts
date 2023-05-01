@@ -20,8 +20,8 @@ import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, Outpu
 import { NgForm } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SchemaDefaultValue } from 'services/schema-default-value.service';
+import { VALIDATION_STATUS_INVALID } from 'utility/forms';
 
-const VALIDATION_STATUS_INVALID = 'INVALID';
 interface SanitizedUrlSchema {
   type: string;
   validators: [
@@ -83,7 +83,7 @@ export class SanitizedUrlEditorComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.form.statusChanges.subscribe((validationStatus) => {
+    this.form.statusChanges?.subscribe((validationStatus) => {
       if (validationStatus === VALIDATION_STATUS_INVALID) {
         this.validityChange.emit({validUrl: false});
       } else {

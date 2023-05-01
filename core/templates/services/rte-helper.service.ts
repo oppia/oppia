@@ -66,13 +66,7 @@ export class RteHelperService {
         reason: boolean | 'cancel') => void): void {
     document.execCommand('enableObjectResizing', false);
     const modalRef = this.modalService.open(RteHelperModalComponent, {
-      backdrop: 'static',
-      // The 'windowClass' & 'backdropClass' options may be removed once
-      // this service is migrated to Angular and NgbModal is used instead of
-      // uibModal. Currently, these custom classes are used for correctly
-      // stacking AngularJS modals on top of Angular modals.
-      windowClass: 'oppia-customization-arg-editor-modal',
-      backdropClass: 'oppia-customization-arg-editor-modal',
+      backdrop: 'static'
     });
     modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
     modalRef.componentInstance.attrsCustomizationArgsDict = (
