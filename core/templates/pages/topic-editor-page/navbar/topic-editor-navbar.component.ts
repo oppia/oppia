@@ -19,7 +19,7 @@
 import { Subscription } from 'rxjs';
 import { TopicEditorSendMailComponent } from '../modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from '../modal-templates/topic-editor-save-modal.component';
-import { Component } from '@angular/core';
+import { AfterContentChecked, Component, OnDestroy, OnInit } from '@angular/core';
 import { TopicEditorStateService } from '../services/topic-editor-state.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
@@ -38,7 +38,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   selector: 'oppia-topic-editor-navbar',
   templateUrl: './topic-editor-navbar.component.html'
 })
-export class TopicEditorNavbarComponent {
+export class TopicEditorNavbarComponent implements OnInit,
+  OnDestroy, AfterContentChecked {
   validationIssues: string[];
   topic: Topic;
   prepublishValidationIssues: string[];
@@ -52,6 +53,9 @@ export class TopicEditorNavbarComponent {
   warningsAreShown: boolean;
   navigationChoices: string[];
   activeTab: string;
+  changeListLength: number;
+  topicIsSaveable: boolean;
+  totalWarningsCount: number;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
@@ -147,6 +151,15 @@ export class TopicEditorNavbarComponent {
             this.prepublishValidationIssues.length === 0
       )
     );
+  }
+
+  isWarningTooltipDisabled(): boolean {
+    return this.isTopicSaveable() || this.getTotalWarningsCount() === 0;
+  }
+
+  getAllTopicWarnings(): string {
+    return this.validationIssues.concat(
+    ).concat(this.prepublishValidationIssues).join('\n');
   }
 
   toggleDiscardChangeButton(): void {
@@ -254,11 +267,17 @@ export class TopicEditorNavbarComponent {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       ));
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       ));
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
@@ -267,16 +286,24 @@ export class TopicEditorNavbarComponent {
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicSkillIds = this.topic.getSkillIds();
     this.discardChangesButtonIsShown = false;
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
-        () => this._validateTopic()
+        () => {
+          this.topic = this.topicEditorStateService.getTopic();
+          this._validateTopic();
+        }
       )
     );
+  }
+
+  ngAfterContentChecked(): void {
+    this.changeListLength = this.getChangeListLength();
+    this.topicIsSaveable = this.isTopicSaveable();
+    this.totalWarningsCount = this.getTotalWarningsCount();
   }
 
   ngOnDestroy(): void {

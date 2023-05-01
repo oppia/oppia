@@ -37,7 +37,7 @@ import { StateCustomizationArgsService } from '../state-editor-properties-servic
 import { AlertsService } from 'services/alerts.service';
 import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/rule.model';
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -427,7 +427,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   saveActiveAnswerGroupDestIfStuck(updatedOutcome: Outcome): void {
     this.responsesService.updateActiveAnswerGroup({
       destIfReallyStuck: updatedOutcome.destIfReallyStuck,
-    } as unknown as AnswerGroup, (newAnswerGroups) => {
+    } as typeof updatedOutcome, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });

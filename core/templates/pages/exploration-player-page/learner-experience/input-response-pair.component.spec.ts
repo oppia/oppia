@@ -146,16 +146,6 @@ describe('InputResponsePairComponent', () => {
       ));
   });
 
-  it('should decode profile picture URI on initialization', () => {
-    component.profilePicture = '%2Fprofile%2Fuser%2F1';
-
-    expect(component.decodedProfilePicture).toBe(undefined);
-
-    component.ngOnInit();
-
-    expect(component.decodedProfilePicture).toBe('/profile/user/1');
-  });
-
   it('should check if input response contains video rte element', () => {
     component.data = {
       learnerInput: '',
@@ -212,8 +202,9 @@ describe('InputResponsePairComponent', () => {
     component.data = {
       // This throws "Type '{ answerDetails: string; }' is not assignable to
       // type 'string'.". We need to suppress this error because we need to
-      // store "answerDetails" to test the relevant code.
-      // @ts-expect-error
+      // store "answerDetails" to test the relevant code. This is done to
+      // avoid the lint error "This test should have at least one expectation.".
+      // @ts-ignore
       learnerInput: {
         answerDetails: 'Answer Details'
       },

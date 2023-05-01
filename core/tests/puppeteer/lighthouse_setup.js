@@ -28,7 +28,6 @@ const TOPIC_AND_SKILLS_DASHBOARD_URL = 'http://127.0.0.1:8181/topics-and-skills-
 const networkIdle = 'networkidle0';
 
 var explorationEditorUrl = 'Exploration editor not loaded';
-var collectionEditorUrl = 'Collection editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 var storyEditorUrl = 'Story editor not loaded';
@@ -42,9 +41,6 @@ var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.e2e-test-create-activity';
 var dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
-
-var createCollectionButtonSelector = '.e2e-test-create-collection';
-var addExplorationInput = '.e2e-test-add-exploration-input';
 
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
 var topicNameField = '.e2e-test-new-topic-name-field';
@@ -63,7 +59,8 @@ var createStoryButtonSelector = '.e2e-test-create-story-button';
 var storyNameField = '.e2e-test-new-story-title-field';
 var storyUrlFragmentField = '.e2e-test-new-story-url-fragment-field';
 var storyDescriptionField = '.e2e-test-new-story-description-field';
-var storyThumbnailButton = '.e2e-test-photo-button';
+var storyThumbnailButton = (
+  'oppia-create-new-story-modal .e2e-test-photo-button');
 var storyUploadButton = '.e2e-test-photo-upload-input';
 var storyPhotoSubmit = '.e2e-test-photo-upload-submit';
 var confirmStoryCreationButton =
@@ -155,27 +152,6 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(
       dismissWelcomeModalSelector, {visible: true});
     explorationEditorUrl = await page.url();
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-    process.exit(1);
-  }
-};
-
-const getCollectionEditorUrl = async function(browser, page) {
-  try {
-    // Load in Collection
-    // eslint-disable-next-line dot-notation
-    await page.goto(
-      CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
-    await page.waitForSelector(createButtonSelector, {visible: true});
-    await page.click(createButtonSelector);
-    await page.waitForSelector(
-      createCollectionButtonSelector, {visible: true});
-    await page.click(createCollectionButtonSelector);
-    await page.waitForSelector(
-      addExplorationInput, {visible: true});
-    collectionEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -306,7 +282,6 @@ const main = async function() {
   await getExplorationEditorUrl(browser, page);
 
   await setRole(browser, page, 'COLLECTION_EDITOR');
-  await getCollectionEditorUrl(browser, page);
 
   await setRole(browser, page, 'ADMIN');
   await getTopicEditorUrl(browser, page);
@@ -315,7 +290,6 @@ const main = async function() {
   await process.stdout.write(
     [
       explorationEditorUrl,
-      collectionEditorUrl,
       topicEditorUrl,
       storyEditorUrl,
       skillEditorUrl,

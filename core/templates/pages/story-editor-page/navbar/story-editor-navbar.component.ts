@@ -20,7 +20,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
-import { Story } from 'domain/story/StoryObjectFactory';
+import { Story } from 'domain/story/story.model';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
@@ -184,9 +184,6 @@ export class StoryEditorNavbarComponent implements OnInit {
     modalRef.result.then((commitMessage) => {
       this.storyEditorStateService.saveStory(
         commitMessage, () => {
-        // The type of errorMessage is unknown because error messages
-        // can be of type anything. For example, it can be a string
-        // or an object.
         }, (errorMessage: string) => {
           this.alertsService.addInfoMessage(errorMessage, 5000);
         }

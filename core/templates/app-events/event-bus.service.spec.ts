@@ -57,17 +57,17 @@ describe('Event Bus Group', () => {
 
   it('should throw uncaught errors', waitForAsync(() => {
     spyOn(Subject.prototype, 'subscribe').and.callFake(
+      // This throws "Argument of type '(f: PartialObserver<void> |
+      // ((value: string) => void)) => Subscription' is not assignable
+      // to parameter of type '{ (observer?: PartialObserver<any> |
+      // undefined): Subscription; (next: null | undefined, error: null |
+      // undefined, complete: () => void): Subscription; (next: null |
+      // undefined, error: (error: any) => void, complete?: (() => void) |
+      // undefined): Subscription; (next: (value: any) => void, error: null |
+      // undefined, complet...'.". We need to suppress this error because of
+      // strict type checking.
+      // @ts-ignore
       (f) => {
-        // This throws "Argument of type '(f: PartialObserver<void> |
-        // ((value: string) => void)) => Subscription' is not assignable
-        // to parameter of type '{ (observer?: PartialObserver<any> |
-        // undefined): Subscription; (next: null | undefined, error: null |
-        // undefined, complete: () => void): Subscription; (next: null |
-        // undefined, error: (error: any) => void, complete?: (() => void) |
-        // undefined): Subscription; (next: (value: any) => void, error: null |
-        // undefined, complet...'.". We need to suppress this error because of
-        // strict type checking.
-        // @ts-ignore
         expect(() => f()).toThrowError('Error in event bus\nRandom Error');
         return new Subscription();
       }
@@ -82,13 +82,13 @@ describe('Event Bus Group', () => {
   it('should throw uncaught errors that are not Error type', waitForAsync(
     () => {
       spyOn(Subject.prototype, 'subscribe').and.callFake(
+        // This throws "This expression is not callable. Not all constituents
+        // of type 'PartialObserver<any> | ((value: any) => void) |
+        // ((value: any) => void)' are callable. Type 'NextObserver<any>'
+        // has no call signatures". We need to suppress this error because of
+        // strict type checking.
+        // @ts-ignore
         (f) => {
-          // This throws "This expression is not callable. Not all constituents
-          // of type 'PartialObserver<any> | ((value: any) => void) |
-          // ((value: any) => void)' are callable. Type 'NextObserver<any>'
-          // has no call signatures". We need to suppress this error because of
-          // strict type checking.
-          // @ts-ignore
           // The eslint error is suppressed since we need to test if
           // just a string was thrown.
           // eslint-disable-next-line oppia/no-to-throw

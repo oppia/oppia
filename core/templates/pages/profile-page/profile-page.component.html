@@ -15,14 +15,13 @@
               </div>
             </div>
           </a>
-          <img *ngIf="profileIsOfCurrentUser"
-               [src]="profilePictureDataUrl"
-               class="oppia-profile-picture-fullsize e2e-test-profile-current-user-photo"
-               alt="">
-          <img *ngIf="!profileIsOfCurrentUser"
-               [src]="profilePictureDataUrl"
-               class="oppia-profile-picture-fullsize e2e-test-profile-other-user-photo"
-               alt="">
+          <picture>
+            <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+            <source type="image/png" [srcset]="profilePicturePngDataUrl">
+            <img [src]="profilePicturePngDataUrl"
+                 class="oppia-profile-picture-fullsize e2e-test-profile-user-photo"
+                 alt="User profile picture">
+          </picture>
         </div>
       </div>
 
