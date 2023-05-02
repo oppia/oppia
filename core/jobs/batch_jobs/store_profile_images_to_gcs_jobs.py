@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import io
+import logging
 
 from core import utils
 from core.domain import user_services
@@ -32,9 +33,18 @@ from core.platform import models
 from PIL import Image
 import apache_beam as beam
 
+from typing import Tuple
+
 MYPY = False
 if MYPY:  # pragma: no cover
+    from mypy_imports import app_identity_services
+    from mypy_imports import storage_services
     from mypy_imports import user_models
+
+storage_services = models.Registry.import_storage_services()
+app_identity_services = models.Registry.import_app_identity_services()
+
+BUCKET = app_identity_services.get_gcs_resource_bucket_name()
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
@@ -181,6 +191,40 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
         webp_binary = output.getvalue()
         return utils.convert_image_binary_to_data_url(webp_binary, 'webp')
 
+    def _check_profile_pictures_on_gcs(
+        self, user_model: user_models.UserSettingsModel
+    ) -> Tuple[bool, str, str]:
+        """Check whether the users with valid username and None stored in
+        the profile_picture_data_url field have valid profile-pictures
+        stored on GCS.
+
+        Args:
+            user_model: user_models.UserSettingsModel. The user model.
+
+        Returns:
+            Tuple[bool, str, str]. The tuple containing bool, str and str values
+            where bool represent that if the images are stored on GCS,
+            the first str represent the error or success logs and second
+            str is the username of the user.
+        """
+        try:
+            filepath_png = (
+                f'user/{user_model.username}/assets/profile_picture.png')
+            filepath_webp = (
+                f'user/{user_model.username}/assets/profile_picture.webp')
+            unused_gcs_png_image = storage_services.get(BUCKET, filepath_png)
+            unused_gcs_webp_image = storage_services.get(BUCKET, filepath_webp)
+            return (
+                True,
+                'Both versions of image are available on GCS.',
+                user_model.username
+            )
+        except Exception as e:
+            logging.exception('Error accessing images -- ', exc_info=e)
+            return (
+                False, 'Images are not available on GCS', user_model.username
+            )
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         users_with_valid_username = (
             self.pipeline
@@ -190,8 +234,40 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
                 lambda model: model.username is not None)
         )
 
+        users_without_profile_data_in_models = (
+            users_with_valid_username
+            | 'Filter users with None profile-pictures' >> beam.Filter(
+                lambda model: model.profile_picture_data_url is None)
+            | 'Check if profile-pictures are present on GCS' >> beam.Map(
+                self._check_profile_pictures_on_gcs)
+        )
+
+        report_users_with_profiles_on_gcs = (
+            users_without_profile_data_in_models
+            | 'Filter users having profile pictures stored on GCS'
+            >> beam.Filter(lambda data: data[0] is True)
+            | 'Report the count of users with profile-pics on GCS'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'USERS WITH NONE PROFILE PICTURES ON MODEL BUT VALID ON GCS')
+        )
+
+        report_users_with_profiles_not_on_gcs = (
+            users_without_profile_data_in_models
+            | 'Filter users with profile pictures not stored on GCS'
+            >> beam.Filter(lambda data: data[0] is False)
+            | 'Report the errors occur while accessing profile-pics on GCS'
+            >> beam.Map(lambda data: (
+                job_run_result.JobRunResult.as_stderr(
+                    'The user having username %s, have the following error log '
+                    '-- %s' % (data[2], data[1])
+                )
+            ))
+        )
+
         username_with_profile_data = (
             users_with_valid_username
+            | 'Filter users with not None profile-pictures' >> beam.Filter(
+                lambda model: model.profile_picture_data_url is not None)
             | 'Map username and data url' >> beam.Map(
                 lambda model: (
                     model.username,
@@ -202,6 +278,9 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
         # Audit png images.
         audit_png_profile_pictures = (
             users_with_valid_username
+            | 'Filter users with not None profile-pictures -- png'
+            >> beam.Filter(
+                lambda model: model.profile_picture_data_url is not None)
             | 'Map with username for png' >> beam.Map(
                 lambda model: model.username)
             | 'Map with filename for png' >> beam.Map(
@@ -258,6 +337,9 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
         # Audit webp images.
         audit_webp_profile_pictures = (
             users_with_valid_username
+            | 'Filter users with not None profile-pictures -- webp'
+            >> beam.Filter(
+                lambda model: model.profile_picture_data_url is not None)
             | 'Map with username for webp' >> beam.Map(
                 lambda model: model.username)
             | 'Map with filename for webp' >> beam.Map(
@@ -319,6 +401,8 @@ class AuditProfilePictureFromGCSJob(base_jobs.JobBase):
 
         return (
             (
+                report_users_with_profiles_on_gcs,
+                report_users_with_profiles_not_on_gcs,
                 report_mismatched_png_images_on_gcs_and_model,
                 total_mismatched_png_images,
                 png_images_iterated_on_gcs,
