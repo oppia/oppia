@@ -643,15 +643,19 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         assert second_translation_stats_model is not None
         assert translation_review_stats_model is not None
 
-        self.assertEqual(first_translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            first_translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
+            first_translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            first_translation_stats_model.contributor_user_id,
+            self.VALID_USER_ID_1
+        )
         self.assertEqual(first_translation_stats_model.topic_id, '')
         self.assertEqual(
             first_translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
             first_translation_stats_model.submitted_translation_word_count, 3)
-        self.assertEqual(first_translation_stats_model.accepted_translations_count, 1)
+        self.assertEqual(
+            first_translation_stats_model.accepted_translations_count, 1)
         self.assertEqual(
             first_translation_stats_model
             .accepted_translations_without_reviewer_edits_count,
@@ -659,7 +663,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         self.assertEqual(
             first_translation_stats_model.accepted_translation_word_count, 3)
-        self.assertEqual(first_translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            first_translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             first_translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
@@ -667,15 +672,19 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             [datetime.datetime.utcnow().date()]
         )
 
-        self.assertEqual(second_translation_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            second_translation_stats_model.contributor_user_id, self.VALID_USER_ID_2)
+            second_translation_stats_model.language_code, self.LANG_1)
+        self.assertEqual(
+            second_translation_stats_model.contributor_user_id,
+            self.VALID_USER_ID_2
+        )
         self.assertEqual(second_translation_stats_model.topic_id, '')
         self.assertEqual(
             second_translation_stats_model.submitted_translations_count, 1)
         self.assertEqual(
             second_translation_stats_model.submitted_translation_word_count, 3)
-        self.assertEqual(second_translation_stats_model.accepted_translations_count, 1)
+        self.assertEqual(
+            second_translation_stats_model.accepted_translations_count, 1)
         self.assertEqual(
             second_translation_stats_model
             .accepted_translations_without_reviewer_edits_count,
@@ -683,7 +692,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         self.assertEqual(
             second_translation_stats_model.accepted_translation_word_count, 3)
-        self.assertEqual(second_translation_stats_model.rejected_translations_count, 0)
+        self.assertEqual(
+            second_translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             second_translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
