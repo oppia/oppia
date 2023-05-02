@@ -26,9 +26,6 @@ handlers:
   static_files: assets/sitemap.xml
   upload: assets/sitemap.xml
   secure: always
-- url: /mapreduce/pipeline/images
-  static_dir: third_party/gae-mapreduce-1.9.22.0/mapreduce/lib/pipeline/ui/images
-  secure: always
 - url: /build
   static_dir: build
   secure: always
