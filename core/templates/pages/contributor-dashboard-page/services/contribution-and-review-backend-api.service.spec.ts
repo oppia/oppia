@@ -134,6 +134,9 @@ describe('Contribution and review backend API service', () => {
       req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
+      // TODO(#18113): Code improvement: Remove the use of undefined in
+      // function calls in contribution-and-review-backend-api.service.ts
+      // and in this file.
       expect(carbas.fetchReviewableSuggestionsAsync)
         .toHaveBeenCalledWith(
           'skill',
