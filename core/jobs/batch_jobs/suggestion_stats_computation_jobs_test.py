@@ -475,7 +475,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             target_id=self.EXP_1_ID,
             target_version_at_submission=0,
             language_code=self.LANG_1,
-            final_reviewer_id='reviewer1'
+            final_reviewer_id=None
         )
         first_suggestion_model.update_timestamps()
         first_suggestion_model.put()
@@ -499,7 +499,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             target_id=self.EXP_1_ID,
             target_version_at_submission=0,
             language_code=self.LANG_1,
-            final_reviewer_id='reviewer1'
+            final_reviewer_id=None
         )
         second_suggestion_model.update_timestamps()
         second_suggestion_model.put()
@@ -514,7 +514,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
                 self.LANG_1, self.VALID_USER_ID_1, ''))
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANG_1, 'reviewer1', ''))
+                self.LANG_1, feconf.SUGGESTION_BOT_USER_ID, ''))
 
         # Ruling out the possibility of None for mypy type checking.
         assert translation_stats_model is not None
@@ -547,7 +547,8 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(
             translation_review_stats_model.language_code, self.LANG_1)
         self.assertEqual(
-            translation_review_stats_model.reviewer_user_id, 'reviewer1')
+            translation_review_stats_model.reviewer_user_id,
+            feconf.SUGGESTION_BOT_USER_ID)
         self.assertEqual(translation_review_stats_model.topic_id, '')
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count, 2)
@@ -880,7 +881,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             feconf.ENTITY_TYPE_SKILL,
             skill_id, 1,
             suggestion_models.STATUS_ACCEPTED, 'author_1',
-            'reviewer_1', suggestion_change, 'category1',
+            None, suggestion_change, 'category1',
             suggestion_1_id, 'en')
 
         return topic_id
@@ -900,7 +901,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
                 'author_1'))
         question_review_stats_models = (
             suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
-                'reviewer_1'))
+                feconf.SUGGESTION_BOT_USER_ID))
 
         self.assertEqual(
             len(question_stats_models), 1
@@ -937,7 +938,9 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
 
         self.assertEqual(
-            question_review_stats_model.reviewer_user_id, 'reviewer_1')
+            question_review_stats_model.reviewer_user_id,
+            feconf.SUGGESTION_BOT_USER_ID
+        )
         self.assertEqual(question_review_stats_model.topic_id, topic_id)
         self.assertEqual(
             question_review_stats_model.reviewed_questions_count, 1)
