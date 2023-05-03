@@ -38,9 +38,7 @@ body:
     id: occurrences
     attributes:
       label: Occurrences
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      description: How many times has this flake occurred? Please provide a link to the flake report and the date of the occurence.
     validations:
       required: true
   - type: input
