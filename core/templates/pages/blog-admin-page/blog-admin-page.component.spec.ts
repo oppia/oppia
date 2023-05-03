@@ -196,7 +196,7 @@ describe('Blog Admin Page component ', () => {
         component.formData.updateRole.newRole = 'BLOG_ADMIN';
         component.formData.updateRole.username = 'username';
         spyOn(blogAdminBackendApiService, 'updateUserRoleAsync')
-          .and.returnValue(Promise.reject('Roles contains duplicate values.'));
+          .and.returnValue(Promise.reject('The user currently has this role'));
         spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
         component.submitUpdateRoleForm(component.formData.updateRole);
 
@@ -206,7 +206,7 @@ describe('Blog Admin Page component ', () => {
         flushMicrotasks();
 
         expect(component.statusMessage).toBe(
-          'User username is already assigned as BLOG_ADMIN');
+          'The user currently has this role');
         expect(finishTaskSpy).toHaveBeenCalled();
       }));
 

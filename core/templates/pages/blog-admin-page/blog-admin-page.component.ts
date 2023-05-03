@@ -119,10 +119,6 @@ export class BlogAdminPageComponent implements OnInit {
         formResponse.newRole);
       this.refreshFormData();
     }, errorResponse => {
-      if (errorResponse.includes('duplicate')) {
-        errorResponse = 'User ' + formResponse.username + ' is already' +
-        ' assigned as ' + formResponse.newRole;
-      }
       this.statusMessage = errorResponse;
     });
     this.adminTaskManagerService.finishTask();
