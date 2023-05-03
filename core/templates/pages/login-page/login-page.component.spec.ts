@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the login page.
  */
 
-import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -107,7 +107,7 @@ describe('Login Page', () => {
     return pending;
   };
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     alertsService = jasmine.createSpyObj<AlertsService>('AlertsService', [
       'addWarning',
     ]);
@@ -144,14 +144,14 @@ describe('Login Page', () => {
         { provide: WindowRef, useValue: windowRef },
         {
           provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService
+          useValue: mockPlatformFeatureService
         }
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginPageComponent);
     loginPageComponent = fixture.componentInstance;
-  });
+  }));
 
   it('should be in emulator mode by default', () => {
     expect(loginPageComponent.emulatorModeIsEnabled).toBeTrue();
@@ -335,7 +335,7 @@ describe('Login Page', () => {
 
     it('should redirect to signInWithPopupAsync service when not' +
     'logged in and SigninWithPopUp is enabled', fakeAsync(() => {
-      mockPlatformFeatureService.status.SigninWithPopUp.isEnabled = false;
+      mockPlatformFeatureService.status.SigninWithPopUp.isEnabled = true;
 
       const redirectResultPromise = spyOnHandleRedirectResultAsync();
 

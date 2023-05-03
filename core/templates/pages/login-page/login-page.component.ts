@@ -78,7 +78,9 @@ export class LoginPageComponent implements OnInit {
         return;
       }
 
-      if (this.platformFeatureService.status.SigninWithPopUp.isEnabled) {
+      if (
+        this.platformFeatureService.status.SigninWithPopUp.isEnabled
+      ) {
         try {
           await this.authService.signInWithPopupAsync();
           // We use unknown type because we are unsure of the type of error
