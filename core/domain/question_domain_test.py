@@ -2420,6 +2420,12 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'Expected version to be non-negative, received -2'):
             self.observed_object.validate()
 
+        self.observed_object.version = 'invalid'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be int, received invalid'):
+            self.observed_object.validate()
+
 
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Question Skill Link Domain object."""
