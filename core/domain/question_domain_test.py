@@ -2420,7 +2420,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'Expected version to be non-negative, received -2'):
             self.observed_object.validate()
 
-        self.observed_object.version = 'invalid'
+        # Ignore type of version to test invalid type.
+        self.observed_object.version = 'invalid' # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected version to be int, received invalid'):
