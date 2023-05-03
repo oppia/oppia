@@ -215,6 +215,7 @@ export class ExplorationFooterComponent {
     this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
 
     if (this.completedCheckpointsCount === 0) {
+      this.explorationPlayerStateService.onShowProgressModal.emit();
       return;
     }
 
@@ -244,10 +245,10 @@ export class ExplorationFooterComponent {
   }
 
   openProgressReminderModal(): void {
-    this.explorationPlayerStateService.onProgressModalOpen.emit();
     let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
       windowClass: 'oppia-progress-reminder-modal'
     });
+    this.explorationPlayerStateService.onShowProgressModal.emit();
 
     let displayedCardIndex = (
       this.playerPositionService.getDisplayedCardIndex()

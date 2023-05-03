@@ -1312,8 +1312,7 @@ describe('Conversation skin component', () => {
     spyOn(urlService, 'isIframed').and.returnValue(false);
 
     componentInstance.ngOnInit();
-    explorationPlayerStateService.onProgressModalOpen.emit();
-    expect(componentInstance.progressReminderIsShown).toBe(true);
+    explorationPlayerStateService.onShowProgressModal.emit();
     expect(componentInstance.hasFullyLoaded).toBe(true);
   });
 

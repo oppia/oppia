@@ -124,7 +124,6 @@ export class ConversationSkinComponent {
   isInPreviewMode: boolean;
   isIframed: boolean;
   hasFullyLoaded = false;
-  progressReminderIsShown = false;
   recommendedExplorationSummaries = [];
   answerIsCorrect = false;
   nextCard;
@@ -313,9 +312,8 @@ export class ConversationSkinComponent {
     }
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onProgressModalOpen.subscribe(
+      this.explorationPlayerStateService.onShowProgressModal.subscribe(
         () => {
-          this.progressReminderIsShown = true;
           this.hasFullyLoaded = true;
         }
       )
@@ -1157,8 +1155,7 @@ export class ConversationSkinComponent {
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
-    if (!this.CHECKPOINTS_FEATURE_IS_ENABLED ||
-      (this.CHECKPOINTS_FEATURE_IS_ENABLED && this.progressReminderIsShown)) {
+    if (!this.CHECKPOINTS_FEATURE_IS_ENABLED) {
       this.hasFullyLoaded = true;
     }
 
