@@ -1,0 +1,51 @@
+name: CI Flake report
+description: Create a report to help us improve
+title: "[Flake]: "
+labels: [triage needed, bug]
+body:
+  - type: dropdown
+    id: ci-test-type
+    attributes:
+      label: CI Test Type
+      description: In which CI test did this Flake occur?
+      options:
+        - Frontend
+        - E2E
+        - Acceptance
+        - Backend
+        - Backend associated test file check
+        - Lighthouse CI performance
+        - Lighthouse CI accessibility tests
+        - Other
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Stacktrace
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional Information
+      description: Add any other context about the flake here.
+    validations:
+      required: false
+  - type: textarea
+    id: occurrences
+    attributes:
+      label: Occurrences
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Debuggin document link
+      description: Please paste the Debug Doc sharing link here. Make sure that the sharing settings are set to "Anyone with the link can comment".
+    validations:
+      required: false
