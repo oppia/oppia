@@ -114,6 +114,7 @@ describe('Voiceover upload features', function() {
       await explorationEditorTranslationTab.stopAudioRecord();
       await explorationEditorTranslationTab.confirmAudioRecord();
       await explorationEditorTranslationTab.playAudioRecord();
+      //refresh create flake?
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
 
@@ -134,6 +135,7 @@ describe('Voiceover upload features', function() {
         '../../../data/explorations/audio_test/assets/audio/' +
         'test_audio_1_en.mp3');
       await explorationEditorTranslationTab.saveAudioRecord();
+      browser.debug()
       await explorationEditorTranslationTab.playAudioRecord();
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
