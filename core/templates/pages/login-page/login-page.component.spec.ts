@@ -77,7 +77,7 @@ class PendingPromise<T = void> {
   }
 }
 
-fdescribe('Login Page', () => {
+describe('Login Page', () => {
   let alertsService: jasmine.SpyObj<AlertsService>;
   let authService: jasmine.SpyObj<AuthService>;
   let loaderService: jasmine.SpyObj<LoaderService>;
