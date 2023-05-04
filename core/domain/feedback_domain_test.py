@@ -119,8 +119,8 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 
 
 class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
-
-    """Unit tests for the FullyQualifiedMessageIdentifier class."""
+    """Unit tests for the FullyQualifiedMessageIdentifier class and 
+    FeedbackAnalyticsDomainUnitTests class."""
 
     def test_initialization(self) -> None:
         qualified_message = feedback_domain.FullyQualifiedMessageIdentifier(
@@ -130,17 +130,17 @@ class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
         self.assertEqual(qualified_message.thread_id, 'thread_id')
         self.assertEqual(qualified_message.message_id, 123)
 
+    def test_feedback_analytics_domain_unit_tests(self) -> None:
+        EXP_ID = 'exp0'
 
-class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
-    EXP_ID = 'exp0'
-
-    def test_to_dict(self) -> None:
         expected_thread_analytics = feedback_domain.FeedbackAnalytics(
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, 2)
+            feconf.ENTITY_TYPE_EXPLORATION, EXP_ID, 1, 2)
         self.assertDictEqual(expected_thread_analytics.to_dict(), {
             'num_open_threads': 1,
             'num_total_threads': 2
         })
+
+
 
 
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
@@ -150,6 +150,9 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         self.exp_id = 'exp'
         self.message_id = 10
         self.thread_id = 'exp.thread'
+        self.viewer_email = 'viewer@example.com'
+        self.signup(self.viewer_email, 'viewer')
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
 
     def test_to_dict(self) -> None:
         expected_feedback_message_reference: (
@@ -170,37 +173,29 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
             observed_feedback_message_reference.to_dict(),
             expected_feedback_message_reference)
 
+    def test_feedback_thread_summary_domain(self) -> None:
+        STATUS = 'open'
+        LAST_MESSAGE = 'last message'
+        AUTHOR_LAST_MESSAGE = 'author last message'
+        AUTHOR_SECOND_LAST_MESSAGE = ''
+        EXPLORATION_TITLE = 'title'
+        EXPLORATION_ID = 'id'
+        THREAD_ID = 'ok'
 
-class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
-    STATUS = 'open'
-    LAST_MESSAGE = 'last message'
-    AUTHOR_LAST_MESSAGE = 'author last message'
-    AUTHOR_SECOND_LAST_MESSAGE = ''
-    EXPLORATION_TITLE = 'title'
-    EXPLORATION_ID = 'id'
-    THREAD_ID = 'ok'
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.thread_id = 'exp.thread'
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-    def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_feedback_thread_summary = {
-            'status': self.STATUS,
+            'status': STATUS,
             'original_author_id': self.viewer_id,
             'last_updated_msecs': utils.get_time_in_millisecs(fake_date),
-            'last_message_text': self.LAST_MESSAGE,
+            'last_message_text': LAST_MESSAGE,
             'total_message_count': 1,
             'last_message_is_read': True,
             'second_last_message_is_read': True,
-            'author_last_message': self.AUTHOR_LAST_MESSAGE,
-            'author_second_last_message': self.AUTHOR_SECOND_LAST_MESSAGE,
-            'exploration_title': self.EXPLORATION_TITLE,
-            'exploration_id': self.EXPLORATION_ID,
-            'thread_id': self.THREAD_ID,
+            'author_last_message': AUTHOR_LAST_MESSAGE,
+            'author_second_last_message': AUTHOR_SECOND_LAST_MESSAGE,
+            'exploration_title': EXPLORATION_TITLE,
+            'exploration_id': EXPLORATION_ID,
+            'thread_id': THREAD_ID,
         }
 
         observed_thread = feedback_domain.FeedbackThreadSummary(
@@ -222,3 +217,4 @@ class FeedbackThreadSummaryDomainTests(test_utils.GenericTestBase):
             expected_feedback_thread_summary,
             observed_thread.to_dict()
         )
+
