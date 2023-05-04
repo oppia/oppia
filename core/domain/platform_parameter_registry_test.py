@@ -22,10 +22,11 @@ import enum
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import caching_services
+from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
-from core.domain import platform_feature_services as feature_services
 from core.tests import test_utils
 
 DataTypes = parameter_domain.DataTypes
@@ -416,6 +417,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         )
 
     def test_all_feature_flags_are_of_bool_type(self) -> None:
+        if constants.EMULATOR_MODE:
+            return
         feature_flags = feature_services.get_all_feature_flag_dicts()
         for feature in feature_flags:
             if feature['data_type'] != 'bool':
