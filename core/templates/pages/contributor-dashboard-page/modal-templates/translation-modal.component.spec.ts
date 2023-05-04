@@ -615,7 +615,8 @@ describe('Translation Modal Component', () => {
 
     describe('when alt text is not changed in copied images', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
+        component.contentPanel.elementRef.nativeElement.outerHTML = '<oppia' +
+          'noninteractive-image alt-with-' +
           'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
           '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
           ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
@@ -636,7 +637,8 @@ describe('Translation Modal Component', () => {
 
     describe('when caption is not changed in copied images', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
+        component.contentPanel.elementRef.nativeElement.outerHTML = '<oppia' +
+          '-noninteractive-image alt-with-' +
           'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
           '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
           ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
