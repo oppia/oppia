@@ -277,7 +277,7 @@ describe('Sign up page component', () => {
 
   it('should submit prerequisites form and save analytics', fakeAsync(() => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
-      return_url: 'creator-dashboard'
+      return_url: 'contributor-dashboard'
     });
     spyOn(signupPageBackendApiService, 'updateUsernameAsync')
       .and.returnValue(Promise.resolve({
