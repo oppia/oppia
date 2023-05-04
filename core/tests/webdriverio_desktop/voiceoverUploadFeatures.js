@@ -114,7 +114,7 @@ describe('Voiceover upload features', function() {
       await explorationEditorTranslationTab.stopAudioRecord();
       await explorationEditorTranslationTab.confirmAudioRecord();
       await explorationEditorTranslationTab.playAudioRecord();
-      // Refresh create flake2.
+      // Refresh create flake3.
       await browser.refresh();
       await explorationEditorTranslationTab.playAudioRecord();
 
