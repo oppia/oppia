@@ -119,7 +119,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 
 
 class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
-    """Unit tests for the FullyQualifiedMessageIdentifier class and 
+    """Unit tests for the FullyQualifiedMessageIdentifier class and
     FeedbackAnalyticsDomainUnitTests class."""
 
     def test_initialization(self) -> None:
@@ -131,16 +131,14 @@ class TestFullyQualifiedMessageIdentifier(test_utils.GenericTestBase):
         self.assertEqual(qualified_message.message_id, 123)
 
     def test_feedback_analytics_domain_unit_tests(self) -> None:
-        EXP_ID = 'exp0'
+        exp_id = 'exp0'
 
         expected_thread_analytics = feedback_domain.FeedbackAnalytics(
-            feconf.ENTITY_TYPE_EXPLORATION, EXP_ID, 1, 2)
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id, 1, 2)
         self.assertDictEqual(expected_thread_analytics.to_dict(), {
             'num_open_threads': 1,
             'num_total_threads': 2
         })
-
-
 
 
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
@@ -174,28 +172,28 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
             expected_feedback_message_reference)
 
     def test_feedback_thread_summary_domain(self) -> None:
-        STATUS = 'open'
-        LAST_MESSAGE = 'last message'
-        AUTHOR_LAST_MESSAGE = 'author last message'
-        AUTHOR_SECOND_LAST_MESSAGE = ''
-        EXPLORATION_TITLE = 'title'
-        EXPLORATION_ID = 'id'
-        THREAD_ID = 'ok'
+        status = 'open'
+        last_message = 'last message'
+        author_last_message = 'author last message'
+        author_second_last_message = ''
+        exploration_title = 'title'
+        exploration_id = 'id'
+        thread_id = 'ok'
 
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_feedback_thread_summary = {
-            'status': STATUS,
+            'status': status,
             'original_author_id': self.viewer_id,
             'last_updated_msecs': utils.get_time_in_millisecs(fake_date),
-            'last_message_text': LAST_MESSAGE,
+            'last_message_text': last_message,
             'total_message_count': 1,
             'last_message_is_read': True,
             'second_last_message_is_read': True,
-            'author_last_message': AUTHOR_LAST_MESSAGE,
-            'author_second_last_message': AUTHOR_SECOND_LAST_MESSAGE,
-            'exploration_title': EXPLORATION_TITLE,
-            'exploration_id': EXPLORATION_ID,
-            'thread_id': THREAD_ID,
+            'author_last_message': author_last_message,
+            'author_second_last_message': author_second_last_message,
+            'exploration_title': exploration_title,
+            'exploration_id': exploration_id,
+            'thread_id': thread_id,
         }
 
         observed_thread = feedback_domain.FeedbackThreadSummary(
@@ -217,4 +215,3 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
             expected_feedback_thread_summary,
             observed_thread.to_dict()
         )
-
