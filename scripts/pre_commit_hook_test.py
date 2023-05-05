@@ -226,17 +226,15 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             'pre-commit hook file is now executable!' in self.print_arr)
 
     def test_start_subprocess_for_result(self) -> None:
-        with subprocess.Popen(
-            ['echo', 'test'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        ) as process:
-            def mock_popen(  # pylint: disable=unused-argument
+        process = subprocess.Popen(  # pylint: disable=consider-using-with
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        def mock_popen(  # pylint: disable=unused-argument
                 unused_cmd_tokens: List[str],
                 stdout: int = subprocess.PIPE,
                 stderr: int = subprocess.PIPE
-            ) -> psutil.Popen:
-                return process
+        ) -> psutil.Popen:
+            return process
 
         with self.swap(subprocess, 'Popen', mock_popen):
             self.assertEqual(

@@ -65,7 +65,8 @@ class HangingIndentCheckerTests(unittest.TestCase):
             message = testutils.Message(
                 msg_id='no-break-after-hanging-indent', line=1)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_no_break_after_hanging_indentation_with_comment(self) -> None:
         node_break_after_hanging_indent = astroid.scoped_nodes.Module(
@@ -90,7 +91,8 @@ class HangingIndentCheckerTests(unittest.TestCase):
             message = testutils.Message(
                 msg_id='no-break-after-hanging-indent', line=1)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_break_after_hanging_indentation(self) -> None:
         node_with_no_error_message = astroid.scoped_nodes.Module(
@@ -211,7 +213,8 @@ class HangingIndentCheckerTests(unittest.TestCase):
                 msg_id='no-break-after-hanging-indent',
                 line=7)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
 
 class DocstringParameterCheckerTests(unittest.TestCase):
@@ -247,7 +250,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 msg_id='newline-below-class-docstring',
                 node=node_no_newline_below_class_docstring)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_excessive_newline_below_class_docstring(self) -> None:
         node_excessive_newline_below_class_docstring = (
@@ -276,7 +280,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 msg_id='newline-below-class-docstring',
                 node=node_excessive_newline_below_class_docstring)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_inline_comment_after_class_docstring(self) -> None:
         node_inline_comment_after_class_docstring = (
@@ -305,7 +310,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 msg_id='newline-below-class-docstring',
                 node=node_inline_comment_after_class_docstring)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_multiline_class_argument_with_incorrect_style(self) -> None:
         node_multiline_class_argument_with_incorrect_style = (
@@ -333,7 +339,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 msg_id='newline-below-class-docstring',
                 node=node_multiline_class_argument_with_incorrect_style)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_multiline_class_argument_with_correct_style(self) -> None:
         node_multiline_class_argument_with_correct_style = (
@@ -455,7 +462,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 msg_id='newline-below-class-docstring',
                 node=node_newline_before_docstring_with_incorrect_style)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_malformed_args_section(self) -> None:
         node_malformed_args_section = astroid.extract_node(
@@ -3343,7 +3351,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
                 msg_id='invalid-punctuation-used',
                 line=2)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_no_space_at_beginning(self) -> None:
         node_no_space_at_beginning = astroid.scoped_nodes.Module(
@@ -3366,7 +3375,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
                 msg_id='no-space-at-beginning',
                 line=1)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_no_capital_letter_at_beginning(self) -> None:
         node_no_capital_letter_at_beginning = astroid.scoped_nodes.Module(
@@ -3392,7 +3402,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
                 msg_id='no-capital-letter-at-beginning',
                 line=3)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_comment_with_excluded_phrase(self) -> None:
         node_comment_with_excluded_phrase = astroid.scoped_nodes.Module(
@@ -3482,7 +3493,8 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
                 msg_id='no-allowed-inline-pragma',
                 line=1)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_variable_name_in_comment(self) -> None:
         node_variable_name_in_comment = astroid.scoped_nodes.Module(
@@ -3627,7 +3639,8 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 msg_id='no-empty-line-provided-below-fileoverview',
                 node=node_no_empty_line_below_fileoverview)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_extra_empty_lines_below_fileoverview(self) -> None:
         node_extra_empty_lines_below_fileoverview = astroid.scoped_nodes.Module(
@@ -3657,7 +3670,8 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 msg_id='only-a-single-empty-line-should-be-provided',
                 node=node_extra_empty_lines_below_fileoverview)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_extra_empty_lines_below_fileoverview_with_unicode_characters(
         self
@@ -3688,7 +3702,8 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 msg_id='only-a-single-empty-line-should-be-provided',
                 node=node_extra_empty_lines_below_fileoverview)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_no_empty_line_below_fileoverview_with_unicode_characters(
         self
@@ -3718,7 +3733,8 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 msg_id='no-empty-line-provided-below-fileoverview',
                 node=node_no_empty_line_below_fileoverview)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_single_new_line_below_file_overview(self) -> None:
         node_with_no_error_message = astroid.scoped_nodes.Module(
@@ -3787,7 +3803,8 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
                 msg_id='only-a-single-empty-line-should-be-provided',
                 node=node_file_overview_at_end_of_file)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
 
 class SingleLinePragmaCheckerTests(unittest.TestCase):
@@ -3829,9 +3846,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
                 msg_id='single-line-pragma',
                 line=6)
 
-            with self.checker_test_object.assertAddsMessages(
-                message1, message2):
-                temp_file.close()
+            self.checker_test_object.assertAddsMessages(message1, message2)
 
     def test_enable_single_line_pragma_for_multiline(self) -> None:
         node_enable_single_line_pragma_for_multiline = (
@@ -3861,7 +3876,8 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
                 msg_id='single-line-pragma',
                 line=2)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_enable_single_line_pragma_with_invalid_name(self) -> None:
         node_enable_single_line_pragma_with_invalid_name = (
@@ -3891,7 +3907,8 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
                 msg_id='single-line-pragma',
                 line=2)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
     def test_single_line_pylint_pragma(self) -> None:
         node_with_no_error_message = (
@@ -3941,7 +3958,8 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
                 msg_id='single-line-pragma',
                 line=2)
 
-            self.checker_test_object.assertAddsMessages(message)
+            with self.checker_test_object.assertAddsMessages(message):
+                pass
 
 
 class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
@@ -3992,7 +4010,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
             with self.checker_test_object.assertAddsMessages(
                 if_message, elif_message, while_message, yield_message,
                 if_exp_message):
-                temp_file.close()
+                pass
 
     def test_multiple_spaces_after_keyword(self) -> None:
         node_multiple_spaces_after_keyword = astroid.scoped_nodes.Module(
@@ -4033,7 +4051,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
             with self.checker_test_object.assertAddsMessages(
                 if_message, elif_message, while_message, yield_message,
                 if_exp_message):
-                temp_file.close()
+                pass
 
     def test_single_space_after_keyword(self) -> None:
         node_single_space_after_keyword = astroid.scoped_nodes.Module(

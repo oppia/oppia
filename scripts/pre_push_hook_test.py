@@ -40,15 +40,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        with subprocess.Popen(
-            ['echo', 'test'],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
-            def mock_popen(  # pylint: disable=unused-argument
-                unused_cmd_tokens: List[str],
-                stdout: int = subprocess.PIPE,
-                stderr: int = subprocess.PIPE
-            ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
-                return process
+        process = subprocess.Popen(  # pylint: disable=consider-using-with
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        def mock_popen(  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str],
+            stdout: int = subprocess.PIPE,
+            stderr: int = subprocess.PIPE
+        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
+            return process
         def mock_get_remote_name() -> bytes:
             return b'remote'
         def mock_get_refs() -> List[str]:
