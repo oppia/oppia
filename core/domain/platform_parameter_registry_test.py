@@ -423,4 +423,4 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         for feature in feature_flags:
             if feature['data_type'] != 'bool':
                 raise utils.ValidationError(
-                    'Feature flag "%s" is not of type bool' %(feature['name']))
+                    'Feature flag "%s" is not of type bool' % (feature['name']))
