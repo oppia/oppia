@@ -196,7 +196,7 @@ describe('Blog Admin Page component ', () => {
         component.formData.updateRole.newRole = 'BLOG_ADMIN';
         component.formData.updateRole.username = 'username';
         spyOn(blogAdminBackendApiService, 'updateUserRoleAsync')
-          .and.returnValue(Promise.reject('Internal Server Error.'));
+          .and.returnValue(Promise.reject('The user already has this role.'));
         spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
         component.submitUpdateRoleForm(component.formData.updateRole);
 
@@ -206,7 +206,7 @@ describe('Blog Admin Page component ', () => {
         flushMicrotasks();
 
         expect(component.statusMessage).toBe(
-          'Server error: Internal Server Error.');
+          'The user already has this role.');
         expect(finishTaskSpy).toHaveBeenCalled();
       }));
 
