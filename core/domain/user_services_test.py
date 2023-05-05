@@ -1317,8 +1317,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_roles_from_id(user_id), [
                 feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_BLOG_POST_EDITOR])
 
-        error_msg = 'The user already has this role.'
-        with self.assertRaisesRegex(Exception, error_msg):
+        expected_error_msg = 'The user already has this role.'
+        with self.assertRaisesRegex(Exception, expected_error_msg):
             user_services.add_user_role(
                 user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
 
