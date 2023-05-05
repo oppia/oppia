@@ -53,7 +53,10 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             yield
         finally:
             if had_attribute:
-                setattr(sys, 'real_prefix', original)
+                # Pylint doesn't recognize that if we reach this part of the
+                # code, then had_attribute is True, which means that we did set
+                # `original` above.
+                setattr(sys, 'real_prefix', original)  # pylint: disable=used-before-assignment
             else:
                 delattr(sys, 'real_prefix')
 

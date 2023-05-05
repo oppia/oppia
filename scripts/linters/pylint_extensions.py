@@ -422,7 +422,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
     priority = -2
 
     constructor_names = {'__init__', '__new__'}
-    not_needed_param_in_docstring = {'self', 'cls'}
+    not_needed_param_in_docstring = {'self', 'cls', 'mcs'}
     docstring_sections = {'Raises:', 'Returns:', 'Yields:'}
 
     # Docstring section headers split up into arguments, returns, yields

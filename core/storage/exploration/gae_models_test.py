@@ -447,7 +447,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     def test_revert_to_version_with_all_viewer_ids_field_successful(
         self
     ) -> None:
-        broken_dict = dict(**self.original_dict)
+        broken_dict = {**self.original_dict}
         broken_dict['all_viewer_ids'] = [
             self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]
 
@@ -473,7 +473,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_invalid_status_is_successful(self) -> None:
-        broken_dict = dict(**self.original_dict)
+        broken_dict = {**self.original_dict}
         broken_dict['status'] = 'publicized'
 
         snapshot_model = (

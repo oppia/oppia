@@ -6469,10 +6469,8 @@ class ExplorationChangeMergeVerifier:
                         change_is_mergeable = True
             elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
                 change_is_mergeable = (
-                    exp_at_change_list_version.__getattribute__(
-                        change.property_name) ==
-                    current_exploration.__getattribute__(
-                        change.property_name))
+                    getattr(exp_at_change_list_version, change.property_name)
+                    == getattr(current_exploration, change.property_name))
 
             if change_is_mergeable:
                 changes_are_mergeable = True

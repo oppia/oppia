@@ -45,13 +45,17 @@ module-rgx=[A-Za-z_][A-Za-z0-9_]*$
 # not require a docstring.
 no-docstring-rgx=test_[a-z_]*|[A-Za-z]*Tests|Mock[A-Za-z]*|mock_[a-z_]*|setUp|tearDown|__.*__
 
+# We allow more flexible type names than pylint normally allows. We allow
+# CamelCased types, with an optional underscore prefix.
+typevar-rgx=_?([A-Z][a-z0-9]+)+
+
 [DESIGN]
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods=0
 
 # List of builtin function names that should not be used, separated by a comma
-bad-functions=apply,input
+bad-functions=apply
 
 [FORMAT]
 

@@ -33,9 +33,9 @@ class MockJobMetaclass(base_jobs.JobMetaclass):
     _JOB_REGISTRY: Dict[str, Type[base_jobs.JobBase]] = {}
 
     @classmethod
-    def clear(cls) -> None:
+    def clear(mcs) -> None:
         """Clears the registry of jobs."""
-        cls._JOB_REGISTRY.clear()
+        mcs._JOB_REGISTRY.clear()
 
 
 class JobMetaclassTests(test_utils.TestBase):

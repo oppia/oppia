@@ -285,7 +285,7 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         with raise_swap:
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
-                    stdout=('EXPLORATION MODELS TRAVERSED SUCCESS: 1')),
+                    stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'),
                 job_run_result.JobRunResult(
                     stderr=(
                         'GENERATED TRANSLATIONS ERROR: "(\'exp1\', '
@@ -397,7 +397,7 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
         with raise_swap:
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
-                    stdout=('EXPLORATION MODELS TRAVERSED SUCCESS: 1')),
+                    stdout='EXPLORATION MODELS TRAVERSED SUCCESS: 1'),
                 job_run_result.JobRunResult(
                     stderr=(
                         'GENERATED TRANSLATIONS ERROR: "(\'exp1\', '

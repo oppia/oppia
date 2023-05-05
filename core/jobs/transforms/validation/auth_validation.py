@@ -30,7 +30,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import auth_models
     from mypy_imports import datastore_services
 
-(auth_models,) = (models.Registry.import_models([models.Names.AUTH]))
+(auth_models,) = models.Registry.import_models([models.Names.AUTH])
 
 datastore_services = models.Registry.import_datastore_services()
 

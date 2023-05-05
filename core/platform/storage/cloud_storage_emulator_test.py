@@ -109,7 +109,7 @@ class BlobUnitTests(test_utils.TestBase):
         orig_blob = (
             cloud_storage_emulator.EmulatorBlob('name', 'string', 'image/png'))
         self.assertEqual(
-            orig_blob.__repr__(),
+            repr(orig_blob),
             'EmulatorBlob(name=name, content_type=image/png)'
         )
 

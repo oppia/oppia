@@ -2397,7 +2397,7 @@ version: 1
             """Overrides isinstance() behavior."""
 
             @classmethod
-            def __instancecheck__(cls, instance: datetime.datetime) -> bool:
+            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
                 return isinstance(instance, old_datetime)
 
         class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
