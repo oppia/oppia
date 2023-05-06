@@ -132,6 +132,15 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
             profile_picture_data_url=INVALID_IMAGE
         )
 
+        self.user_4 = self.create_model(
+            user_models.UserSettingsModel,
+            id='test_id_4',
+            email='test_4@example.com',
+            username='test_4',
+            roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
+            profile_picture_data_url=None
+        )
+
     def _get_webp_binary_data(self, png_binary: bytes) -> bytes:
         """Convert png binary data to webp binary data."""
         output = io.BytesIO()
@@ -251,5 +260,26 @@ class AuditProfilePictureFromGCSJobTests(job_test_utils.JobTestBase):
                     'The user having username test_1, has incompatible webp '
                     'image on GCS and png in the model.'
                 )
+            )
+        ])
+
+    def test_model_having_none_profile_picture_and_none_on_gcs_logs_error(
+        self) -> None:
+        self.put_multi([self.user_4])
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stderr='The user having username test_4, have the following '
+                'error log -- Images are not available on GCS'
+            )
+        ])
+
+    def test_model_having_none_profile_picture_and_valid_on_gcs_confirmation(
+        self) -> None:
+        self.put_multi([self.user_4])
+        self._push_file_to_gcs('test_4', VALID_IMAGE)
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='USERS WITH NONE PROFILE PICTURES ON MODEL BUT '
+                'VALID ON GCS SUCCESS: 1'
             )
         ])
