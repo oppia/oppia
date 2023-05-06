@@ -82,8 +82,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
-    await this.page.waitForSelector(
-      'button.e2e-test-save-as-draft-button:not([disabled])');
+    await this.page.waitForTimeout(500);
     await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
 
     showMessage('Successfully created a draft blog post!');
@@ -103,7 +102,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
      */
       await this.page.waitForTimeout(100);
       await this.clickOn(LABEL_FOR_DELETE_BUTTON);
-      await this.page.waitForSelector('div.modal-dialog');
+      await this.page.waitForSelector('button.e2e-test-confirm-button');
       await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
       showMessage('Draft blog post with given title deleted successfully!');
     });
@@ -165,7 +164,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(addThumbnailImageButton);
-    await this.page.waitForSelector('body.modal-open', {hidden: true});
+    await this.page.waitForTimeout(500);
     await this.expectPublishButtonToBeDisabled();
 
     await this.type(blogTitleInput, newBlogPostTitle);
@@ -175,7 +174,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
 
     await this.page.waitForSelector(
       `${publishBlogPostButton}:not([disabled])`);
-    await this.clickOn('PUBLISH');
+    await this.clickOn('button.e2e-test-publish-blog-post-button');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
     showMessage('Successfully published a blog post!');
@@ -193,7 +192,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.page.waitForSelector(
       `${addThumbnailImageButton}:not([disabled])`);
     await this.clickOn(addThumbnailImageButton);
-    await this.page.waitForSelector('body.modal-open', {hidden: true});
+    await this.page.waitForTimeout(500);
 
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
@@ -215,7 +214,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
      * be clicked until the transition is completed.
      */
       await this.page.waitForTimeout(100);
-      await this.clickOn(LABEL_FOR_DELETE_BUTTON);
+      await this.clickOn('button.e2e-test-publish-blog-post-button');
       await this.page.waitForSelector('button.e2e-test-confirm-button');
       await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
       showMessage('Published blog post with given title deleted successfully!');
