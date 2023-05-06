@@ -27,7 +27,7 @@ from typing import List, Optional
 
 
 INSTALLATION_TOOL_VERSIONS = {
-    'pip': '23.1',
+    'pip': '23.1.2',
     'pip-tools': '6.13.0',
     'setuptools': '67.7.1',
 }
