@@ -301,47 +301,62 @@ describe('Story node editor component', () => {
   it('should call StoryUpdate service to set story thumbnail filename',
     () => {
       let storySpy = spyOn(storyUpdateService, 'setStoryNodeThumbnailFilename');
+
       component.updateThumbnailFilename('new_file.png');
+
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to set story thumbnail filename',
     () => {
       let storySpy = spyOn(storyUpdateService, 'setStoryNodeThumbnailBgColor');
+
       component.updateThumbnailBgColor('#333');
+
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to finalize story node outline',
     () => {
       let storySpy = spyOn(storyUpdateService, 'unfinalizeStoryNodeOutline');
+
       component.unfinalizeOutline();
+
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to finalize story node outline',
     () => {
       let storySpy = spyOn(storyUpdateService, 'finalizeStoryNodeOutline');
+
       component.finalizeOutline();
+
       expect(storySpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service to update outline', () => {
     let storySpy = spyOn(storyUpdateService, 'setStoryNodeOutline');
+
     component.updateOutline('New outline');
+
     expect(storySpy).toHaveBeenCalled();
   });
 
   it('should call StoryUpdate service to update description', () => {
     let storySpy = spyOn(storyUpdateService, 'setStoryNodeDescription');
+
     component.updateDescription('New description');
+
     expect(storySpy).toHaveBeenCalled();
   });
 
   it('should open and close node title editor', () => {
     component.openNodeTitleEditor();
+
     expect(component.nodeTitleEditorIsShown).toEqual(true);
+
     component.closeNodeTitleEditor();
+
     expect(component.nodeTitleEditorIsShown).toEqual(false);
   });
 
@@ -353,7 +368,9 @@ describe('Story node editor component', () => {
           result: Promise.resolve('success')
         }) as NgbModalRef;
     });
+
     component.addPrerequisiteSkillId();
+
     expect(modalSpy).toHaveBeenCalled();
   });
 
@@ -412,7 +429,6 @@ describe('Story node editor component', () => {
       });
     let alertsSpy = spyOn(alertsService, 'addInfoMessage')
       .and.returnValue(null);
-
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return (
           {
@@ -431,52 +447,65 @@ describe('Story node editor component', () => {
   it('should toggle chapter outline', fakeAsync(() => {
     component.chapterOutlineIsShown = false;
     component.toggleChapterOutline();
+
     tick();
+
     expect(component.chapterOutlineIsShown).toEqual(true);
   }));
 
   it('should toggle acquired skills list', () => {
     component.acquiredSkillIsShown = false;
     component.toggleAcquiredSkillsList();
+
     expect(component.acquiredSkillIsShown).toEqual(true);
 
     component.toggleAcquiredSkillsList();
+
     expect(component.acquiredSkillIsShown).toEqual(false);
   });
 
   it('should toggle chapter card', () => {
     component.mainChapterCardIsShown = true;
     component.toggleChapterCard();
+
     expect(component.mainChapterCardIsShown).toEqual(false);
 
     component.toggleChapterCard();
+
     expect(component.mainChapterCardIsShown).toEqual(true);
   });
 
   it('should toggle chapter todo card', () => {
     component.chapterTodoCardIsShown = false;
     component.toggleChapterTodoCard();
+
     expect(component.chapterTodoCardIsShown).toEqual(true);
 
     component.toggleChapterTodoCard();
+
     expect(component.chapterTodoCardIsShown).toEqual(false);
   });
 
   it('should toggle exploration input buttons', () => {
     component.explorationInputButtonsAreShown = false;
+
     component.toggleExplorationInputButtons();
+
     expect(component.explorationInputButtonsAreShown).toEqual(true);
 
     component.toggleExplorationInputButtons();
+
     expect(component.explorationInputButtonsAreShown).toEqual(false);
   });
 
   it('should toggle chapter outline buttons', () => {
     component.chapterOutlineButtonsAreShown = false;
     component.toggleChapterOutlineButtons();
+
     expect(component.chapterOutlineButtonsAreShown).toEqual(true);
 
     component.toggleChapterOutlineButtons();
+
     expect(component.chapterOutlineButtonsAreShown).toEqual(false);
 
     component.chapterOutlineButtonsAreShown = false;
@@ -612,10 +641,11 @@ describe('Story node editor component', () => {
 
   it('should focus on story node after recalculation of available node',
     fakeAsync(() => {
+      spyOn(component, '_recalculateAvailableNodes').and.callThrough();
+
       component.nodeId = 'node1';
       component.storyNodeIds = ['node1', 'node_2', 'working', 'duty'];
       component.destinationNodeIds = ['node_2'];
-
       component.story = {
         getStoryContents: () => {
           return {
@@ -637,5 +667,7 @@ describe('Story node editor component', () => {
 
       mockEventEmitterLast.emit();
       tick();
+
+      expect(component._recalculateAvailableNodes).toHaveBeenCalled();
     }));
 });
