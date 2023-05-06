@@ -120,7 +120,7 @@ class PlatformParameterModel(base_models.VersionedModel):
     rules = datastore_services.JsonProperty(repeated=True)
     rule_schema_version = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-    is_feature_flag = (
+    used_as_feature_flag = (
         datastore_services.BooleanProperty(required=True, default=False))
 
     @staticmethod
@@ -140,7 +140,7 @@ class PlatformParameterModel(base_models.VersionedModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'is_feature_flag': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'used_as_feature_flag': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -149,7 +149,7 @@ class PlatformParameterModel(base_models.VersionedModel):
         param_name: str,
         rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict],
         rule_schema_version: int,
-        is_feature_flag: bool = False
+        used_as_feature_flag: bool = False
     ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
 
@@ -169,7 +169,8 @@ class PlatformParameterModel(base_models.VersionedModel):
                                 operator for comparison and value is the value
                                 used for comparison.
             rule_schema_version: int. The schema version for the rule dicts.
-            is_feature_flag: bool. True, if the platform-parameter is a feature.
+            used_as_feature_flag: bool. True, if the platform-parameter is
+                a feature.
 
         Returns:
             PlatformParameterModel. The created PlatformParameterModel
@@ -179,4 +180,4 @@ class PlatformParameterModel(base_models.VersionedModel):
             id=param_name,
             rules=rule_dicts,
             rule_schema_version=rule_schema_version,
-            is_feature_flag=is_feature_flag)
+            used_as_feature_flag=used_as_feature_flag)

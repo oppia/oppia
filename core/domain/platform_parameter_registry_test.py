@@ -420,6 +420,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         if constants.EMULATOR_MODE:
             return
         feature_flags = feature_services.get_all_feature_flag_dicts()
+        assert len(feature_flags) != 0
         for feature in feature_flags:
             if feature['data_type'] != 'bool':
                 raise utils.ValidationError(
