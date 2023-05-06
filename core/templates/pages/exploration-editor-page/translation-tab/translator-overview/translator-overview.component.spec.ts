@@ -58,18 +58,7 @@ describe('Translator Overview component', () => {
   let focusManagerService: FocusManagerService;
   let routerService: RouterService;
   let entityTranslationsService: EntityTranslationsService;
-
-  class MockUserExplorationPermissionsService {
-    static getPermissionsAsync() {
-      return Promise.resolve({
-        canVoiceover: true
-      });
-    }
-
-    fetchPermissionsAsync() {
-      return Promise.resolve();
-    }
-  }
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -83,11 +72,7 @@ describe('Translator Overview component', () => {
           provide: NgbModal,
           useClass: MockNgbModal
         },
-        WindowRef,
-        {
-          provide: UserExplorationPermissionsService,
-          useClass: MockUserExplorationPermissionsService
-        }
+        WindowRef
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -111,6 +96,8 @@ describe('Translator Overview component', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     routerService = TestBed.inject(RouterService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    userExplorationPermissionsService = TestBed.inject(
+      UserExplorationPermissionsService);
 
     spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
       .returnValue(true);
@@ -139,7 +126,7 @@ describe('Translator Overview component', () => {
 
   it('should initialize component properties after controller is initialized',
     () => {
-      spyOn(MockUserExplorationPermissionsService, 'getPermissionsAsync').and
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue(Promise.resolve({
           canVoiceover: true
         }));
@@ -161,7 +148,7 @@ describe('Translator Overview component', () => {
 
   it('should change to voiceover active mode when changing translation tab',
     fakeAsync(() => {
-      spyOn(MockUserExplorationPermissionsService, 'getPermissionsAsync').and
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue(Promise.resolve({
           canVoiceover: true
         }));
@@ -181,7 +168,7 @@ describe('Translator Overview component', () => {
 
   it('should change to translation active mode when changing translation tab',
     fakeAsync(() => {
-      spyOn(MockUserExplorationPermissionsService, 'getPermissionsAsync').and
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue(Promise.resolve({
           canVoiceover: true
         }));
@@ -203,7 +190,7 @@ describe('Translator Overview component', () => {
 
   it('should change translation language when translation tab is not busy',
     fakeAsync(() => {
-      spyOn(MockUserExplorationPermissionsService, 'getPermissionsAsync').and
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue(Promise.resolve({
           canVoiceover: true
         }));
@@ -220,7 +207,7 @@ describe('Translator Overview component', () => {
 
   it('should not change translation language when translation tab is busy',
     fakeAsync(() => {
-      spyOn(MockUserExplorationPermissionsService, 'getPermissionsAsync').and
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue(Promise.resolve({
           canVoiceover: true
         }));
@@ -241,7 +228,7 @@ describe('Translator Overview component', () => {
 
   it('should get translation bar progress data when there are more' +
     ' than 1 item to be translated', () => {
-    spyOn(MockUserExplorationPermissionsService, 'getPermissionsAsync').and
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue(Promise.resolve({
         canVoiceover: true
       }));
@@ -256,7 +243,7 @@ describe('Translator Overview component', () => {
 
   it('should get translation bar progress data when there is 1 item to be' +
     ' translated', () => {
-    spyOn(MockUserExplorationPermissionsService, 'getPermissionsAsync').and
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue(Promise.resolve({
         canVoiceover: true
       }));
@@ -271,7 +258,7 @@ describe('Translator Overview component', () => {
 
   it('should apply autofocus to history tab element when tab is switched',
     fakeAsync(() => {
-      spyOn(MockUserExplorationPermissionsService, 'getPermissionsAsync').and
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue(Promise.resolve({
           canVoiceover: true
         }));
