@@ -23,7 +23,7 @@
       <div class="oppia-rule-details-header oppia-editable-section">
         <div class="oppia-rule-preview oppia-transition-200">
           <div class="oppia-click-to-start-editing" (click)="openFeedbackEditor()">
-            <i class="fa fa-pen oppia-editor-edit-icon e2e-test-open-feedback-editor" title="Edit Feedback">&#xE254;</i>
+            <i class="fa fa-pen oppia-editor-edit-icon e2e-test-open-feedback-editor" (keydown.enter)="openFeedbackEditor()" aria-label="edit button" tabindex="0" title="Edit Feedback">&#xE254;</i>
           </div>
           <strong>Oppia tells the learner...</strong>
           <div class="position-relative">
@@ -59,10 +59,11 @@
   </form>
 
   <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
-    <input class="e2e-test-editor-correctness-toggle mr-2"
+    <input id="labelledAsCorrect"
+           class="e2e-test-editor-correctness-toggle mr-2"
            type="checkbox"
            [(ngModel)]="tmpOutcome.labelledAsCorrect">
-    <strong>The answers in this group are correct</strong>
+    <strong><label for="labelledAsCorrect">The answers in this group are correct</label></strong>
   </div>
 
   <oppia-question-misconception-editor *ngIf="questionModeEnabled"
