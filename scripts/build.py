@@ -1393,6 +1393,7 @@ def generate_python_package() -> None:
         subprocess.check_call('python setup.py -q sdist -d build', shell=True)
         print('Oppia package build completed.')
     finally:
+        install_python_dev_dependencies.install_installation_tools()
         install_third_party_libs.main()
         print('Dev dependencies reinstalled')
 
