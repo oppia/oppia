@@ -37,13 +37,10 @@ const blogAdminUrl = testConstants.URLs.BlogAdmin;
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 const blogPostThumbnailImage = testConstants.images.blogPostThumbnailImage;
+const doneButton = 'button.oppia-save-state-item-button';
+const confirmButton = 'button.e2e-test-confirm-button';
 
-const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
-const LABEL_FOR_DONE_BUTTON = 'DONE';
-const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
-const LABEL_FOR_DELETE_BUTTON = 'Delete';
-const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
 const LABEL_FOR_ADD_ELEMENT_BUTTON = 'Add element';
 
 module.exports = class e2eBlogPostAdmin extends baseUser {
@@ -54,7 +51,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.type(blogAuthorBioField, 'Dummy-User-Bio');
     await this.page.waitForSelector(
       'button.e2e-test-save-author-details-button:not([disabled])');
-    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
+    await this.clickOn('button.e2e-test-save-author-details-button');
   }
 
   /**
@@ -77,13 +74,13 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
      * be clicked until the transition is completed.
      */
     await this.page.waitForTimeout(500);
-    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
+    await this.clickOn('button.create-new-blog-post-button');
     await this.type(blogTitleInput, draftBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+    await this.clickOn(doneButton);
     await this.page.waitForTimeout(500);
-    await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
+    await this.clickOn('button.e2e-test-save-as-draft-button');
 
     showMessage('Successfully created a draft blog post!');
     await this.goto(blogDashboardUrl);
@@ -101,9 +98,9 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
      * be clicked until the transition is completed.
      */
       await this.page.waitForTimeout(100);
-      await this.clickOn(LABEL_FOR_DELETE_BUTTON);
+      await this.clickOn('button.e2e-test-delete-blog-post-button');
       await this.page.waitForSelector('button.e2e-test-confirm-button');
-      await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
+      await this.clickOn(confirmButton);
       showMessage('Draft blog post with given title deleted successfully!');
     });
     await this.page.evaluate(async({draftBlogPostTitle}) => {
@@ -154,7 +151,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
      * be clicked until the transition is completed.
      */
     await this.page.waitForTimeout(500);
-    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
+    await this.clickOn('button.create-new-blog-post-button');
 
     await this.expectPublishButtonToBeDisabled();
     await this.clickOn('button.mat-button-toggle-button');
@@ -170,13 +167,13 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+    await this.clickOn(doneButton);
 
     await this.page.waitForSelector(
       `${publishBlogPostButton}:not([disabled])`);
     await this.clickOn('button.e2e-test-publish-blog-post-button');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
-    await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
+    await this.clickOn(confirmButton);
     showMessage('Successfully published a blog post!');
   }
 
@@ -197,7 +194,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content - duplicate');
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+    await this.clickOn(doneButton);
   }
 
   /**
@@ -216,7 +213,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       await this.page.waitForTimeout(500);
       await this.clickOn('button.e2e-test-publish-blog-post-button');
       await this.page.waitForSelector('button.e2e-test-confirm-button');
-      await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
+      await this.clickOn(confirmButton);
       showMessage('Published blog post with given title deleted successfully!');
     });
     await this.page.evaluate(async(blogPostTitle) => {
