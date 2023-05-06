@@ -209,7 +209,7 @@ describe('Story Editor Component having two story nodes', () => {
     expect(storyUpdateService.rearrangeNodeInStory).toHaveBeenCalled();
   }));
 
-  it('should init the controller', () => {
+  it('should display topicname on main story card', () => {
     expect(component.storyPreviewCardIsShown).toEqual(false);
     expect(component.mainStoryCardIsShown).toEqual(true);
     expect(component.getTopicName()).toEqual('addition');
@@ -217,20 +217,27 @@ describe('Story Editor Component having two story nodes', () => {
 
   it('should toggle story preview card', () => {
     component.storyPreviewCardIsShown = false;
+
     component.togglePreview();
+
     expect(component.mainStoryCardIsShown).toEqual(true);
   });
 
   it('should toggle chapter edit options', () => {
     component.toggleChapterEditOptions(10);
+
     expect(component.selectedChapterIndex).toEqual(10);
+
     component.toggleChapterEditOptions(10);
+
     expect(component.selectedChapterIndex).toEqual(-1);
   });
 
   it('should toggle chapter lists', () => {
     component.chaptersListIsShown = false;
+
     component.toggleChapterLists();
+
     expect(component.chaptersListIsShown).toEqual(true);
 
     component.toggleChapterLists();
@@ -239,19 +246,25 @@ describe('Story Editor Component having two story nodes', () => {
 
   it('should toggle main story card', () => {
     component.mainStoryCardIsShown = false;
+
     component.toggleStoryEditorCard();
+
     expect(component.mainStoryCardIsShown).toEqual(true);
 
     component.toggleStoryEditorCard();
+
     expect(component.mainStoryCardIsShown).toEqual(false);
   });
 
   it('should open and close notes editor', () => {
     component.notesEditorIsShown = false;
+
     component.openNotesEditor();
+
     expect(component.notesEditorIsShown).toEqual(true);
 
     component.closeNotesEditor();
+
     expect(component.notesEditorIsShown).toEqual(false);
   });
 
@@ -262,19 +275,25 @@ describe('Story Editor Component having two story nodes', () => {
 
   it('should call StoryUpdate to update story title', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryTitle');
+
     component.updateStoryTitle('title99');
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should call StoryUpdate to update story thumbnail filename', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setThumbnailFilename');
+
     component.updateStoryThumbnailFilename('abcd');
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should call StoryUpdate to update story thumbnail bg color', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setThumbnailBgColor');
+
     component.updateStoryThumbnailBgColor('abcd');
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
@@ -287,7 +306,9 @@ describe('Story Editor Component having two story nodes', () => {
       ' being deleted',
   () => {
     let modalSpy = spyOn(ngbModal, 'open');
+
     component.deleteNode('node_2');
+
     expect(modalSpy).not.toHaveBeenCalled();
   });
 
@@ -333,7 +354,6 @@ describe('Story Editor Component having two story nodes', () => {
           nodeTitles: null;
         };
       }
-
       let sampleStoryBackendObject = {
         id: 'sample_story_id',
         title: 'Story title',
@@ -365,12 +385,9 @@ describe('Story Editor Component having two story nodes', () => {
         url_fragment: 'url',
         meta_tag_content: 'meta'
       };
-
       spyOn(component, '_initEditor').and.stub();
       component.story = Story.createFromBackendDict(
         sampleStoryBackendObject);
-
-      tick();
       let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockComponentInstance,
@@ -391,7 +408,6 @@ describe('Story Editor Component having two story nodes', () => {
           nodeTitles: null;
         };
       }
-
       let storySpy = spyOn(storyUpdateService, 'addDestinationNodeIdToNode');
       let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
         componentInstance: MockComponentInstance,
@@ -407,19 +423,25 @@ describe('Story Editor Component having two story nodes', () => {
 
   it('should call storyUpdateService to update story notes', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNotes');
+
     component.updateNotes('Updated the story notes');
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should call storyUpdateService to update story notes', () => {
     let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryMetaTagContent');
+
     component.updateStoryMetaTagContent('storyone');
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should call not update url fragment if it is unchanged', () => {
     component.storyUrlFragmentExists = true;
+
     component.updateStoryUrlFragment('story_title');
+
     expect(component.storyUrlFragmentExists).toEqual(false);
   });
 
@@ -428,14 +450,18 @@ describe('Story Editor Component having two story nodes', () => {
       storyEditorStateService,
       'updateExistenceOfStoryUrlFragment').and.callFake(
       (urlFragment, callback) => callback());
+
     component.updateStoryUrlFragment('story_second');
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should set story url fragment', () => {
     let storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryUrlFragment');
+
     component.updateStoryUrlFragment('');
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
@@ -443,7 +469,9 @@ describe('Story Editor Component having two story nodes', () => {
     () => {
       let navigationSpy = spyOn(
         storyEditorNavigationService, 'navigateToChapterEditorWithId');
+
       component.navigateToChapterWithId('chapter_1', 0);
+
       expect(navigationSpy).toHaveBeenCalled();
     });
 
@@ -458,7 +486,9 @@ describe('Story Editor Component having two story nodes', () => {
   it('should update the story description', () => {
     let storyUpdateSpy = spyOn(
       storyUpdateService, 'setStoryDescription');
+
     component.updateStoryDescription('New skill description');
+
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
@@ -470,7 +500,9 @@ describe('Story Editor Component having two story nodes', () => {
         result: Promise.resolve()
       }) as NgbModalRef;
     });
+
     component.returnToTopicEditorPage();
+
     expect(modalSpy).toHaveBeenCalled();
   });
 
@@ -493,7 +525,9 @@ describe('Story Editor Component having two story nodes', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       open: jasmine.createSpy('open', () => {})
     });
+
     component.returnToTopicEditorPage();
+
     expect(windowRef.nativeWindow.open).toHaveBeenCalled();
   });
 

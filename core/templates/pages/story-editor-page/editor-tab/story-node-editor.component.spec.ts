@@ -130,6 +130,7 @@ describe('Story node editor component', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
+
   beforeEach(() => {
     fixture = TestBed.createComponent(StoryNodeEditorComponent);
     component = fixture.componentInstance;
@@ -225,6 +226,7 @@ describe('Story node editor component', () => {
 
   it('should init the controller', () => {
     component.viewNodeEditor('node_1');
+
     expect(component.chapterPreviewCardIsShown).toEqual(false);
     expect(component.mainChapterCardIsShown).toEqual(true);
     expect(component.explorationInputButtonsAreShown).toEqual(false);
@@ -259,6 +261,7 @@ describe('Story node editor component', () => {
 
   it('should check if exploration can be saved', () => {
     component.checkCanSaveExpId();
+
     expect(component.expIdCanBeSaved).toEqual(true);
   });
 
@@ -266,13 +269,17 @@ describe('Story node editor component', () => {
     () => {
       let skillSpy = spyOn(
         storyUpdateService, 'removePrerequisiteSkillIdFromNode');
+
       component.removePrerequisiteSkillId('skill_3');
+
       expect(skillSpy).toHaveBeenCalled();
     });
 
   it('should call StoryUpdate service remove acquired skill id', () => {
     let skillSpy = spyOn(storyUpdateService, 'removeAcquiredSkillIdFromNode');
+
     component.removeAcquiredSkillId('node_1');
+
     expect(skillSpy).toHaveBeenCalled();
   });
 
