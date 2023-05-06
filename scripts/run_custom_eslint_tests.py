@@ -34,11 +34,10 @@ def main() -> None:
     filepath = 'scripts/linters/custom_eslint_checks/rules/'
     proc_args = [node_path, nyc_path, mocha_path, filepath]
 
-    with subprocess.Popen(
-        proc_args,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    ) as proc:
-        encoded_tests_stdout, encoded_tests_stderr = proc.communicate()
+    proc = subprocess.Popen(  # pylint: disable=consider-using-with
+        proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    encoded_tests_stdout, encoded_tests_stderr = proc.communicate()
     # Standard and error output is in bytes, we need to decode the line to
     # print it.
     tests_stdout = encoded_tests_stdout.decode('utf-8')
