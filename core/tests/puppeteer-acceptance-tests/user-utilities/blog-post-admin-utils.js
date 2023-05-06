@@ -213,7 +213,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
      * using its selector as it is instantly loaded in the DOM but cannot
      * be clicked until the transition is completed.
      */
-      await this.page.waitForTimeout(100);
+      await this.page.waitForTimeout(500);
       await this.clickOn('button.e2e-test-publish-blog-post-button');
       await this.page.waitForSelector('button.e2e-test-confirm-button');
       await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
