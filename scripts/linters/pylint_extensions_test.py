@@ -2478,7 +2478,8 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 node=node_function_with_extra_comment
             )
             with self.checker_test_object.assertAddsMessages(
-                message1, message2):
+                message1, message2
+            ):
                 self.checker_test_object.checker.visit_module(
                     node_function_with_extra_comment
                 )
