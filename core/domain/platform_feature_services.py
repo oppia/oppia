@@ -103,10 +103,10 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
         list(dict). A list containing the dict mappings of all fields of the
         platform parameters.
     """
-    all_platform_parameters = (
+    all_platform_parameter_names = (
         registry.Registry.get_all_platform_parameter_names())
     platform_params_except_feature_flags = [
-        plat_param for plat_param in all_platform_parameters
+        plat_param for plat_param in all_platform_parameter_names
         if plat_param not in ALL_FEATURES_NAMES_SET
     ]
     return [
