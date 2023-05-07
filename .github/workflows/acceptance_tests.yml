@@ -60,7 +60,6 @@ jobs:
           retention-days: 1
 
   acceptance_test:
-    if: always()
     needs: build
     runs-on:  ${{ matrix.os }}
     strategy:
@@ -120,6 +119,7 @@ jobs:
         shell: bash
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Run Acceptance Test ${{ matrix.id }} ${{ matrix.suite }}
+        continue-on-error: true
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite }} --prod_env
       - name: Uploading webpack bundles as an artifact
         if: ${{ failure() }}

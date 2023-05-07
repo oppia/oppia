@@ -205,6 +205,11 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   async deletePublishedBlogPostWithTitle(blogPostTitle) {
     await this.clickOn('PUBLISHED');
     await this.page.exposeFunction('deletePublishedBlogPost', async() => {
+      /** Giving explicit timeout because we need to wait for small
+      * transition to complete. We cannot wait for the next element to click
+      * using its selector as it is instantly loaded in the DOM but cannot
+      * be clicked until the transition is completed. */
+      await this.page.waitForTimeout(500);
       await this.clickOn(publishBlogPostButton);
       await this.page.waitForSelector('button.e2e-test-confirm-button');
       await this.clickOn(confirmButton);
@@ -219,11 +224,6 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
         if (publishedBlogPostTitle === blogPostTitle) {
           allPublishedBlogPosts[i].getElementsByClassName(
             'e2e-test-blog-post-edit-box')[0].click();
-          /** Giving explicit timeout because we need to wait for small
-          * transition to complete. We cannot wait for the next element to click
-          * using its selector as it is instantly loaded in the DOM but cannot
-          * be clicked until the transition is completed. */
-          await this.page.waitForTimeout(500);
           await window.deletePublishedBlogPost();
           return;
         }
