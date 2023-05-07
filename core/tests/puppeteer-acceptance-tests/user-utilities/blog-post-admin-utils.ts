@@ -43,7 +43,7 @@ const confirmButton = 'button.e2e-test-confirm-button';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
 const LABEL_FOR_ADD_ELEMENT_BUTTON = 'Add element';
 
-module.exports = class e2eBlogPostAdmin extends baseUser {
+class e2eBlogPostAdmin extends baseUser {
   /**
    * Function for adding blog post author bio in blog dashboard.
    */
@@ -98,7 +98,8 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
      * be clicked until the transition is completed.
      */
       await this.page.waitForTimeout(100);
-      await this.clickOn('Delete');
+      await this.clickOn('button.e2e-test-delete-blog-post-button');
+      await this.page.waitForSelector('button.e2e-test-confirm-button');
       await this.clickOn(confirmButton);
       showMessage('Draft blog post with given title deleted successfully!');
     });
@@ -111,7 +112,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
         if (draftBlogPostTitle === checkDraftBlogPostTitle) {
           allDraftBlogPosts[i].getElementsByClassName(
             'e2e-test-blog-post-edit-box')[0].click();
-          await window.deleteDraftBlogPost();
+          await (window).deleteDraftBlogPost();
           return;
         }
       }
@@ -121,11 +122,11 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
    * This function checks if the Publish button is disabled.
    */
-  async expectPublishButtonToBeDisabled() {
+  async expectPublishButtonToBeDisabled(): Promise<void> {
     await this.page.waitForSelector(publishBlogPostButton);
     await this.page.evaluate(() => {
-      const publishedButtonIsDisabled = document.getElementsByClassName(
-        'e2e-test-publish-blog-post-button')[0].disabled;
+      const publishedButtonIsDisabled = (document.getElementsByClassName(
+        'e2e-test-publish-blog-post-button')[0] as HTMLButtonElement).disabled;
       if (!publishedButtonIsDisabled) {
         throw new Error(
           'Published button is not disabled when the blog post data is not' +
@@ -142,7 +143,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * @param {string} newBlogPostTitle - The title of the blog post
    * to be published.
    */
-  async publishNewBlogPostWithTitle(newBlogPostTitle) {
+  async publishNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
     await this.addUserBioInBlogDashboard();
     /** Giving explicit timeout because we need to wait for small
      * transition to complete. We cannot wait for the next element to click
@@ -180,7 +181,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function creates a new blog post with the given title.
    * @param {string} newBlogPostTitle - The title of the blog post.
    */
-  async createNewBlogPostWithTitle(newBlogPostTitle) {
+  async createNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
     await this.clickOn('NEW POST');
     await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(thumbnailPhotoBox);
@@ -201,7 +202,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * @param {string} blogPostTitle - The title of the published blog post
    * to be deleted.
    */
-  async deletePublishedBlogPostWithTitle(blogPostTitle) {
+  async deletePublishedBlogPostWithTitle(blogPostTitle: string): Promise<void> {
     await this.clickOn('PUBLISHED');
     await this.page.exposeFunction('deletePublishedBlogPost', async() => {
       /** Giving explicit timeout because we need to wait for small
@@ -209,7 +210,8 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       * using its selector as it is instantly loaded in the DOM but cannot
       * be clicked until the transition is completed. */
       await this.page.waitForTimeout(500);
-      await this.clickOn('Delete');
+      await this.clickOn(publishBlogPostButton);
+      await this.page.waitForSelector('button.e2e-test-confirm-button');
       await this.clickOn(confirmButton);
       showMessage('Published blog post with given title deleted successfully!');
     });
@@ -217,11 +219,12 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       const allPublishedBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
       for (let i = 0; i < allPublishedBlogPosts.length; i++) {
-        let publishedBlogPostTitle = allPublishedBlogPosts[i].
-          getElementsByClassName('e2e-test-blog-post-title')[0].innerText;
+        let publishedBlogPostTitle = (allPublishedBlogPosts[i].
+          getElementsByClassName(
+            'e2e-test-blog-post-title')[0] as HTMLElement).innerText;
         if (publishedBlogPostTitle === blogPostTitle) {
-          allPublishedBlogPosts[i].getElementsByClassName(
-            'e2e-test-blog-post-edit-box')[0].click();
+          (allPublishedBlogPosts[i].getElementsByClassName(
+            'e2e-test-blog-post-edit-box')[0] as HTMLElement).click();
           await window.deletePublishedBlogPost();
           return;
         }
@@ -232,7 +235,8 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
    * This function checks that the user is unable to publish a blog post.
    */
-  async expectUserUnableToPublishBlogPost(expectedWarningMessage) {
+  async expectUserUnableToPublishBlogPost(
+      expectedWarningMessage: string): Promise<void> {
     const toastMessageBox = await this.page.$(
       'div.e2e-test-toast-warning-message');
     const toastMessageWarning = await this.page.evaluate(
@@ -260,7 +264,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks the number of the blog posts in the blog dashboard.
    * @param {number} number - The number of the blog posts.
    */
-  async expectNumberOfBlogPostsToBe(number) {
+  async expectNumberOfBlogPostsToBe(number: number): Promise<void> {
     await this.page.evaluate(async(number) => {
       const allBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
@@ -276,7 +280,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
    * This function navigates to the Published tab in the blog-dashbaord.
    */
-  async navigateToPublishTab() {
+  async navigateToPublishTab(): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
     showMessage('Navigated to publish tab.');
@@ -286,15 +290,16 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks a draft blog post to be created with the given title.
    * @param {string} checkDraftBlogPostByTitle - The title of draft blog post.
    */
-  async expectDraftBlogPostWithTitleToBePresent(checkDraftBlogPostByTitle) {
+  async expectDraftBlogPostWithTitleToBePresent(
+      checkDraftBlogPostByTitle: string): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.page.evaluate(async(checkDraftBlogPostByTitle) => {
       const allDraftBlogPosts = document.getElementsByClassName(
         'blog-dashboard-tile-content');
       let count = 0;
       for (let i = 0; i < allDraftBlogPosts.length; i++) {
-        let draftBlogPostTitle = allDraftBlogPosts[i].getElementsByClassName(
-          'e2e-test-blog-post-title')[0].innerText;
+        let draftBlogPostTitle = (allDraftBlogPosts[i].getElementsByClassName(
+          'e2e-test-blog-post-title')[0] as HTMLElement).innerText;
         if (draftBlogPostTitle === checkDraftBlogPostByTitle) {
           count++;
         }
@@ -317,7 +322,8 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks if the blog post with given title is published.
    * @param {string} blogPostTitle - The title of the blog post.
    */
-  async expectPublishedBlogPostWithTitleToBePresent(blogPostTitle) {
+  async expectPublishedBlogPostWithTitleToBePresent(
+      blogPostTitle: string): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
     await this.page.evaluate(async(blogPostTitle) => {
@@ -325,8 +331,9 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
         'blog-dashboard-tile-content');
       let count = 0;
       for (let i = 0; i < allPublishedBlogPosts.length; i++) {
-        let publishedBlogPostTitle = allPublishedBlogPosts[i].
-          getElementsByClassName('e2e-test-blog-post-title')[0].innerText;
+        let publishedBlogPostTitle = (allPublishedBlogPosts[i].
+          getElementsByClassName(
+            'e2e-test-blog-post-title')[0] as HTMLElement).innerText;
         if (publishedBlogPostTitle === blogPostTitle) {
           count++;
         }
@@ -346,7 +353,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
    * This function checks if the blog dashboard is not accessible by the user.
    */
-  async expectBlogDashboardAccessToBeUnauthorized() {
+  async expectBlogDashboardAccessToBeUnauthorized(): Promise<void> {
     await this.goto(blogDashboardUrl);
     try {
       await this.page.waitForSelector(unauthErrorContainer);
@@ -360,7 +367,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
   /**
    * This function checks if the blog dashboard is accessible by the user.
    */
-  async expectBlogDashboardAccessToBeAuthorized() {
+  async expectBlogDashboardAccessToBeAuthorized(): Promise<void> {
     /** Here we are trying to check if the blog dashboard is accessible to the
      * guest user after giving the blog admin role to it. There is a
      * modal dialog box asking for the user name and bio for the users
@@ -379,7 +386,8 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * @param {string} username - The username of the user.
    * @param {string} role - The role of the user.
    */
-  async assignUserToRoleFromBlogAdminPage(username, role) {
+  async assignUserToRoleFromBlogAdminPage(
+      username: string, role: string): Promise<void> {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
@@ -390,7 +398,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function removes blog editor role from the users.
    * @param {string} username - The username of the user.
    */
-  async removeBlogEditorRoleFromUsername(username) {
+  async removeBlogEditorRoleFromUsername(username: string): Promise<void> {
     await this.goto(blogAdminUrl);
     await this.type(blogEditorUsernameInput, username);
     await this.clickOn('button.oppia-blog-admin-remove-blog-editor-button');
@@ -400,11 +408,11 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks if the tag name exists in the blog taglist.
    * @param {string} tagName - The name of the tag.
    */
-  async expectTagToNotExistInBlogTags(tagName) {
+  async expectTagToNotExistInBlogTags(tagName: string): Promise<void> {
     await this.page.evaluate(async(tagName) => {
       const tagList = document.getElementsByClassName('form-control');
       for (let i = 0; i < tagList.length; i++) {
-        if (tagList[i].value === tagName) {
+        if ((tagList[i] as HTMLInputElement).value === tagName) {
           throw new Error(`Tag ${tagName} already exists in tag list!`);
         }
       }
@@ -416,12 +424,12 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function adds a new tag in the blog taglist.
    * @param {string} tagName - The name of the tag.
    */
-  async addNewBlogTag(tagName) {
+  async addNewBlogTag(tagName: string): Promise<void> {
     await this.clickOn(LABEL_FOR_ADD_ELEMENT_BUTTON);
     await this.page.waitForTimeout(100);
     await this.page.evaluate((tagName) => {
       const tagList = document.getElementsByClassName('form-control');
-      tagList[tagList.length - 1].value = tagName;
+      (tagList[tagList.length - 1] as HTMLInputElement).value = tagName;
     }, tagName);
     await this.clickOn(LABEL_FOR_SAVE_BUTTON);
     showMessage(`Tag ${tagName} added in tag list successfully!`);
@@ -431,11 +439,11 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks tag exists in the blog taglists.
    * @param {string} tagName - The name of the tag.
    */
-  async expectTagToExistInBlogTags(tagName) {
+  async expectTagToExistInBlogTags(tagName: string): Promise<void> {
     await this.page.evaluate(async(tagName) => {
       const tagList = document.getElementsByClassName('form-control');
       for (let i = 0; i < tagList.length; i++) {
-        if (tagList[i].value === tagName) {
+        if ((tagList[i] as HTMLInputElement).value === tagName) {
           return;
         }
       }
@@ -448,7 +456,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function changes the blog tags limit.
    * @param {number} limit - The limit of the blog tags.
    */
-  async setMaximumTagLimitTo(limit) {
+  async setMaximumTagLimitTo(limit: string): Promise<void> {
     // These steps are for deleting the existing value in the input field.
     const tagInputField = await this.page.$(maximumTagLimitInput);
     await tagInputField.click({ clickCount: 3 });
@@ -464,7 +472,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks if the tag limit is not equal to.
    * @param {number} limit - The limit of the blog tags.
    */
-  async expectMaximumTagLimitNotToBe(limit) {
+  async expectMaximumTagLimitNotToBe(limit: string): Promise<void> {
     await this.page.evaluate(async(limit) => {
       const tagLimit = document.getElementById('mat-input-0').value;
       if (tagLimit.value === limit) {
@@ -478,7 +486,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
    * This function checks if the tag limit is equal to.
    * @param {number} limit - The limit of the blog tags.
    */
-  async expectMaximumTagLimitToBe(limit) {
+  async expectMaximumTagLimitToBe(limit: string): Promise<void> {
     await this.page.evaluate(async(limit) => {
       const tagLimit = document.getElementById('mat-input-0').value;
       if (tagLimit.value !== limit) {
@@ -487,4 +495,6 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
     });
     showMessage(`Maximum tag is currently ${limit}!`);
   }
-};
+}
+
+export default e2eBlogPostAdmin;
