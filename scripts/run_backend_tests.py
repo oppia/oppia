@@ -146,27 +146,28 @@ def run_shell_cmd(
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
-    with subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env) as p:
-        last_stdout_bytes, last_stderr_bytes = p.communicate()
-        # Standard and error output is in bytes, we need to decode them to be
-        # compatible with rest of the code. Sometimes we get invalid bytes,
-        # in which case we replace them with U+FFFD.
-        last_stdout_str = last_stdout_bytes.decode('utf-8', 'replace')
-        last_stderr_str = last_stderr_bytes.decode('utf-8', 'replace')
-        last_stdout = last_stdout_str.split('\n')
+    p = subprocess.Popen(  # pylint: disable=consider-using-with
+        exe, stdout=stdout, stderr=stderr, env=env)
+    last_stdout_bytes, last_stderr_bytes = p.communicate()
+    # Standard and error output is in bytes, we need to decode them to be
+    # compatible with rest of the code. Sometimes we get invalid bytes, in which
+    # case we replace them with U+FFFD.
+    last_stdout_str = last_stdout_bytes.decode('utf-8', 'replace')
+    last_stderr_str = last_stderr_bytes.decode('utf-8', 'replace')
+    last_stdout = last_stdout_str.split('\n')
 
-        if LOG_LINE_PREFIX in last_stdout_str:
-            concurrent_task_utils.log('')
-            for line in last_stdout:
-                if line.startswith(LOG_LINE_PREFIX):
-                    concurrent_task_utils.log(
-                        'INFO: %s' % line[len(LOG_LINE_PREFIX):])
-            concurrent_task_utils.log('')
+    if LOG_LINE_PREFIX in last_stdout_str:
+        concurrent_task_utils.log('')
+        for line in last_stdout:
+            if line.startswith(LOG_LINE_PREFIX):
+                concurrent_task_utils.log(
+                    'INFO: %s' % line[len(LOG_LINE_PREFIX):])
+        concurrent_task_utils.log('')
 
-        result = '%s%s' % (last_stdout_str, last_stderr_str)
+    result = '%s%s' % (last_stdout_str, last_stderr_str)
 
-        if p.returncode != 0:
-            raise Exception('Error %s\n%s' % (p.returncode, result))
+    if p.returncode != 0:
+        raise Exception('Error %s\n%s' % (p.returncode, result))
 
     return result
 

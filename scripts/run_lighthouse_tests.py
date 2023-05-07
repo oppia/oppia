@@ -80,30 +80,28 @@ def run_lighthouse_puppeteer_script() -> None:
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
 
-    with subprocess.Popen(
-        bash_command,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    ) as process:
-        stdout, stderr = process.communicate()
-        if process.returncode == 0:
-            print(stdout)
-            for line in stdout.split(b'\n'):
-                # Standard output is in bytes, we need to decode the line to
-                # print it.
-                export_url(line.decode('utf-8'))
-            print('Puppeteer script completed successfully.')
-        else:
-            print('Return code: %s' % process.returncode)
-            print('OUTPUT:')
+    process = subprocess.Popen(  # pylint: disable=consider-using-with
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        print(stdout)
+        for line in stdout.split(b'\n'):
             # Standard output is in bytes, we need to decode the line to
             # print it.
-            print(stdout.decode('utf-8'))
-            print('ERROR:')
-            # Error output is in bytes, we need to decode the line to
-            # print it.
-            print(stderr.decode('utf-8'))
-            print('Puppeteer script failed. More details can be found above.')
-            sys.exit(1)
+            export_url(line.decode('utf-8'))
+        print('Puppeteer script completed successfully.')
+    else:
+        print('Return code: %s' % process.returncode)
+        print('OUTPUT:')
+        # Standard output is in bytes, we need to decode the line to
+        # print it.
+        print(stdout.decode('utf-8'))
+        print('ERROR:')
+        # Error output is in bytes, we need to decode the line to
+        # print it.
+        print(stderr.decode('utf-8'))
+        print('Puppeteer script failed. More details can be found above.')
+        sys.exit(1)
 
 
 def run_webpack_compilation() -> None:
@@ -162,25 +160,23 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
         '--max-old-space-size=4096'
     ]
 
-    with subprocess.Popen(
-        bash_command,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    ) as process:
-        stdout, stderr = process.communicate()
-        if process.returncode == 0:
-            print('Lighthouse checks completed successfully.')
-        else:
-            print('Return code: %s' % process.returncode)
-            print('OUTPUT:')
-            # Standard output is in bytes, we need to decode the line to
-            # print it.
-            print(stdout.decode('utf-8'))
-            print('ERROR:')
-            # Error output is in bytes, we need to decode the line to
-            # print it.
-            print(stderr.decode('utf-8'))
-            print('Lighthouse checks failed. More details can be found above.')
-            sys.exit(1)
+    process = subprocess.Popen(  # pylint: disable=consider-using-with
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        print('Lighthouse checks completed successfully.')
+    else:
+        print('Return code: %s' % process.returncode)
+        print('OUTPUT:')
+        # Standard output is in bytes, we need to decode the line to
+        # print it.
+        print(stdout.decode('utf-8'))
+        print('ERROR:')
+        # Error output is in bytes, we need to decode the line to
+        # print it.
+        print(stderr.decode('utf-8'))
+        print('Lighthouse checks failed. More details can be found above.')
+        sys.exit(1)
 
 
 def main(args: Optional[List[str]] = None) -> None:
