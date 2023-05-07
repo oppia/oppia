@@ -60,6 +60,7 @@ jobs:
           retention-days: 1
 
   acceptance_test:
+    if: always()
     needs: build
     runs-on:  ${{ matrix.os }}
     strategy:
