@@ -22,11 +22,15 @@ jobs:
         with:
           python-version: '3.8.15'
           architecture: 'x64'
-      - uses: DubeySandeep/pending-review-notification@v1
-        with:
-          team-slug: oppia-codeowners
-          repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
-          review-turnaround-hours: 48
+      - name: Install dependencies
+        run: pip install -r src_graphql/requirements.txt
+        shell: bash
+      - name: Add path to enviornment
+        run: echo "PYTHONPATH=${{ github.action_path }}" >> $GITHUB_PATH; echo $GITHUB_PATH
+        shell: bash
+      - name: Send notification
+        run:
+          python3 -m src_graphql.index --repo=${{ github.repository }} --token=${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }} --max-wait-hours=48 --verbose
       - name: Report if failed
         if: ${{ failure() }}
         uses: ./.github/actions/send-webhook-notification

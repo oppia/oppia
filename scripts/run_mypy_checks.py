@@ -39,7 +39,8 @@ EXCLUDED_DIRECTORIES: Final = [
     # ignored while type checking, because these files are only
     # used as resources for the tests.
     'core/tests/build_sources/',
-    'core/tests/data/'
+    'core/tests/data/',
+    'src_graphql/'
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
