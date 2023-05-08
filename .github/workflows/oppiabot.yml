@@ -1,0 +1,27 @@
+name: Oppiabot
+
+on:
+  merge_group:
+    types: [checks_requested]
+  issues:
+    types:
+      - labeled
+  pull_request_target:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  oppiabot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/merge
+      - name: Github Actions from Oppiabot
+        uses: oppia/oppiabot@1.4.0
+        with:
+          repo-token: ${{secrets.GITHUB_TOKEN}}
+        env:
+          SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
+          SHEETS_CRED: ${{ secrets.SHEETS_CRED }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
