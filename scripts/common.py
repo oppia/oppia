@@ -982,7 +982,7 @@ def modify_constants(
         '"BRANCH_NAME": "%s"'
         % (
             subprocess.check_output(
-                ['git', 'branch', '--show-current'],
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
                 encoding='utf-8'
             ).strip().split('\n', maxsplit=1)[0]
             if version_info_must_be_set else ''
