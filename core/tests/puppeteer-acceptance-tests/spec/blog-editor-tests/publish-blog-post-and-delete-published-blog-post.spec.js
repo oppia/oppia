@@ -35,14 +35,14 @@ describe('Blog Editor', function() {
     async function() {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-      await blogPostEditor.publishNewBlogPostWithTitle('Test-Blog');
+      await blogPostEditor.publishNewBlogPostWithTitle('TestBlog');
 
       await blogPostEditor.navigateToPublishTab();
       await blogPostEditor.expectNumberOfBlogPostsToBe(1);
       await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
-        'Test-Blog');
+        'TestBlog');
 
-      await blogPostEditor.deletePublishedBlogPostWithTitle('Test-Blog');
+      await blogPostEditor.deletePublishedBlogPostWithTitle('TestBlog');
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
     }, DEFAULT_SPEC_TIMEOUT);
 
