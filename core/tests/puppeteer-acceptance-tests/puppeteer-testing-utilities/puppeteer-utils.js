@@ -132,6 +132,7 @@ module.exports = class baseUser {
   async type(selector, text) {
     await this.page.waitForSelector(selector);
     await this.page.type(selector, text);
+    await this.page.waitForTimeout(500);
   }
 
   /**

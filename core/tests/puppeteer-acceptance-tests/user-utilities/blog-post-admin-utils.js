@@ -99,6 +99,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
      */
       await this.page.waitForTimeout(100);
       await this.clickOn('Delete');
+      await this.waitForSelector(confirmButton);
       await this.clickOn(confirmButton);
       showMessage('Draft blog post with given title deleted successfully!');
     });
@@ -210,6 +211,7 @@ module.exports = class e2eBlogPostAdmin extends baseUser {
       * be clicked until the transition is completed. */
       await this.page.waitForTimeout(500);
       await this.clickOn('Delete');
+      await this.waitForSelector(confirmButton);
       await this.clickOn(confirmButton);
       showMessage('Published blog post with given title deleted successfully!');
     });
