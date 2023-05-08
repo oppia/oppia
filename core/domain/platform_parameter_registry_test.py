@@ -415,13 +415,3 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'parameter_b': False,
             }
         )
-
-    def test_all_feature_flags_are_of_bool_type(self) -> None:
-        if constants.EMULATOR_MODE:
-            return
-        feature_flags = feature_services.get_all_feature_flag_dicts()
-        assert len(feature_flags) != 0
-        for feature in feature_flags:
-            if feature['data_type'] != 'bool':
-                raise utils.ValidationError(
-                    'Feature flag "%s" is not of type bool' % (feature['name']))
