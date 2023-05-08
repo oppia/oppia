@@ -49,7 +49,8 @@
            [ngbTooltip]="'Translations'"
            placement="bottom"
            tabindex="0"
-           aria-label="Exploration Translation Button">
+           aria-label="Exploration Translation Button"
+           (keydown.enter)="!connectedToInternet || editabilityService.isLockedByAdmin() || selectTranslationTab()">
           <i class="fas fa-microphone navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'translation'}"></i>
         </a>
       </li>
@@ -60,7 +61,8 @@
            [ngbTooltip]="'Preview'"
            placement="bottom"
            tabindex="0"
-           aria-label="Exploration Preview Button">
+           aria-label="Exploration Preview Button"
+           (keydown.enter)="!connectedToInternet || selectPreviewTab()">
           <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}"></i>
         </a>
       </li>
@@ -71,7 +73,8 @@
            [ngbTooltip]="'Settings'"
            placement="bottom"
            tabindex="0"
-           aria-label="Exploration Setting Button">
+           aria-label="Exploration Setting Button"
+           (keydown.enter)="!connectedToInternet || selectSettingsTab()">
           <i class="fas fa-cog navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'settings'}"></i>
         </a>
       </li>
@@ -82,7 +85,8 @@
            [ngbTooltip]="'Statistics'"
            placement="bottom"
            tabindex="0"
-           aria-label="Exploration Statistics Button">
+           aria-label="Exploration Statistics Button"
+           (keydown.enter)="!connectedToInternet || selectStatsTab()">
           <i class="fas fa-poll navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'stats'}"></i>
         </a>
       </li>
@@ -93,7 +97,8 @@
            [ngbTooltip]="'Improvements'"
            placement="bottom"
            tabindex="0"
-           aria-label="Exploration Improvement Button">
+           aria-label="Exploration Improvement Button"
+           (keydown.enter)="!connectedToInternet || selectImprovementsTab()">
           <i class="material-icons navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'improvements'}">trending_up</i>
         </a>
       </li>
@@ -104,7 +109,8 @@
            [ngbTooltip]="'History'"
            placement="bottom"
            tabindex="0"
-           aria-label="Exploration History Button">
+           aria-label="Exploration History Button"
+           (keydown.enter)="!connectedToInternet || selectHistoryTab()">
           <i class="fas fa-clock navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'history'}"></i>
         </a>
       </li>
@@ -115,7 +121,8 @@
            [ngbTooltip]="'Feedback'"
            placement="bottom"
            tabindex="0"
-           aria-label="Exploration Feedback Button">
+           aria-label="Exploration Feedback Button"
+           (keydown.enter)="!connectedToInternet || selectFeedbackTab()">
           <i class="fas fa-comment-alt navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'feedback'}"></i>
         </a>
         <div [hidden]="!(getOpenThreadsCount())" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
@@ -129,6 +136,8 @@
           [ngbTooltip]="'Help does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a href="#"
            [ngbTooltip]="'Help'"
+           tabindex="0"
+           (keydown.enter)="!connectedToInternet || showUserHelpModal()"
            placement="bottom"
            class="nav-link oppia-editor-navbar-tab-anchor"
            aria-label="Exploration Help Button">
