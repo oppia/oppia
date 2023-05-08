@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 import collections
-import datetime as dt
+import datetime
 import logging
 
 from src_graphql import github_domain
@@ -109,9 +109,12 @@ def get_prs_assigned_to_reviewers(
                 continue
             for reviewer in pull_request.assignees:
                 pending_review_time = (
-                    dt.datetime.now(dt.timezone.utc) - reviewer.timestamp)
+                    datetime.datetime.now(datetime.timezone.utc) -
+                    reviewer.timestamp)
                 if (reviewer.name != pull_request.author) and (
-                        pending_review_time >= dt.timedelta(hours=wait_hours)):
+                        pending_review_time >=
+                        datetime.timedelta(hours=wait_hours)
+                    ):
                     reviewer_to_assigned_prs[reviewer.name].append(pull_request)
     return reviewer_to_assigned_prs
 

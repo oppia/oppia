@@ -119,8 +119,6 @@ def main(args: Optional[List[str]]=None) -> Literal[0]:
 
     reviewer_to_assigned_prs = github_services.get_prs_assigned_to_reviewers(
         org_name, repo, max_wait_hours)
-    org_name = 'SD-13'
-    repo = 'review-notification-bot'
     for reviewer_name, prs in reviewer_to_assigned_prs.items():
         send_notification(reviewer_name, prs, org_name, repo, test_mode)
 
