@@ -75,7 +75,7 @@ export class ExplorationPlayerStateService {
   private _playerStateChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
 
-  private _showProgressModalEventEmitter: EventEmitter<boolean> = (
+  private _playerProgressModalShownEventEmitter: EventEmitter<boolean> = (
     new EventEmitter<boolean>());
 
   constructor(
@@ -472,7 +472,7 @@ export class ExplorationPlayerStateService {
   }
 
   get onShowProgressModal(): EventEmitter<boolean> {
-    return this._showProgressModalEventEmitter;
+    return this._playerProgressModalShownEventEmitter;
   }
 }
 
