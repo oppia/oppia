@@ -30,7 +30,8 @@ export enum FeatureNames {
   AndroidBetaLandingPage = 'android_beta_landing_page',
   BlogPages = 'blog_pages',
   DiagnosticTest = 'diagnostic_test',
-  Improvements_tab = 'improvements_tab'
+  ImprovementsTab = 'improvements_tab',
+  LearnerGroups = 'learner_groups'
 }
 
 export interface FeatureStatusSummaryBackendDict {

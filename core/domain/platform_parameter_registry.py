@@ -40,12 +40,11 @@ class Registry:
 
     DEFAULT_VALUE_BY_TYPE_DICT: Dict[
         platform_parameter_domain.DataTypes,
-        Union[bool, str, int, List[str]]
+        Union[bool, str, int, float]
     ] = {
         platform_parameter_domain.DataTypes.BOOL: False,
         platform_parameter_domain.DataTypes.NUMBER: 0,
-        platform_parameter_domain.DataTypes.STRING: '',
-        platform_parameter_domain.DataTypes.LIST_STR: [],
+        platform_parameter_domain.DataTypes.STRING: ''
     }
 
     # The keys of parameter_registry are the property names, and the values
@@ -61,6 +60,7 @@ class Registry:
         name: enum.Enum,
         description: str,
         data_type: platform_parameter_domain.DataTypes,
+        default: Optional[Union[bool, int, str, float]] = None,
         is_feature: bool = False,
         feature_stage: Optional[platform_parameter_domain.FeatureStages] = None
     ) -> platform_parameter_domain.PlatformParameter:
@@ -82,7 +82,8 @@ class Registry:
             Exception. The data type is not supported.
         """
         if data_type in cls.DEFAULT_VALUE_BY_TYPE_DICT:
-            default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]
+            if not default:
+                default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]
         else:
             allowed_data_types = [
                 data_type_enum.value
@@ -243,7 +244,7 @@ class Registry:
     def evaluate_all_platform_parameters(
         cls,
         context: platform_parameter_domain.EvaluationContext
-    ) -> Dict[str, Union[str, bool, int, List[str]]]:
+    ) -> Dict[str, Union[str, bool, int, float]]:
         """Evaluate all platform parameters with the given context.
 
         Args:
