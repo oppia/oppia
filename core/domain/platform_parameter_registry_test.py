@@ -22,9 +22,7 @@ import enum
 
 from core import feconf
 from core import utils
-from core.constants import constants
 from core.domain import caching_services
-from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils

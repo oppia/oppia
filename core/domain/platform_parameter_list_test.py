@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-from core import utils
 from core.domain import platform_feature_services as feature_services
-from core.domain import platform_parameter_registry as registry
 from core.domain import platform_parameter_list as params
 from core.tests import test_utils
 

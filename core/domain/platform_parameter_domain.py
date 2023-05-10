@@ -716,7 +716,7 @@ class PlatformParameter:
     ) = {
         DataTypes.BOOL.value: lambda x: isinstance(x, bool),
         DataTypes.STRING.value: lambda x: isinstance(x, str),
-        DataTypes.NUMBER.value: lambda x: isinstance(x, (float, int))
+        DataTypes.NUMBER.value: lambda x: isinstance(x, (float, int)),
     }
 
     PARAMETER_NAME_REGEXP: Final = r'^[A-Za-z0-9_]{1,100}$'
