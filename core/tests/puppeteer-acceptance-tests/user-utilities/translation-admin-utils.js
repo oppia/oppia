@@ -13,28 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Blog Admin users utility file.
+ * @fileoverview Translation admin users utility file.
  */
 
 const baseUser = require(
   '../puppeteer-testing-utilities/puppeteer-utils.js');
 const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
-const { showMessage } = require(
-  '../puppeteer-testing-utilities/show-message-utils.js');
-const { timeout } = require('d3');
-const ContributorDashboardAdminUrl = testConstants.URLs.ContributorDashboardAdmin;
+const ContributorDashboardAdminUrl =
+  testConstants.URLs.ContributorDashboardAdmin;
 
-const contributionRightCategoryReviewTranslation = 'translation';
-const contributorUsernameInputField = 'input.e2e-test-form-contributor-username';
-const contributonRightsSelectDropdown = 'select#label-target-form-add-category-select'
-const contributonRightsLanguageDropdown = 'select.e2e-test-form-language-select'
-const contributionRightsSubmitButton = 'button.e2e-test-contribution-rights-form-submit-button'
-const reviewLanguage = 'span.e2e-test-translation-reviewer-language'
-
+const translationRightValue = 'string:translation';
+const contributorUsernameInputField =
+  'input.e2e-test-form-contributor-username';
+const contributonRightsSelectDropdown =
+  'select#label-target-form-add-category-select';
+const contributonRightsLanguageDropdown =
+  'select.e2e-test-form-language-select';
+const contributionRightsSubmitButton =
+  'button.e2e-test-contribution-rights-form-submit-button';
 
 module.exports = class TranslationAdmin extends baseUser {
-
   /**
    * Function for navigating to the blog dashboard page.
    */
@@ -42,15 +41,16 @@ module.exports = class TranslationAdmin extends baseUser {
     await this.goto(ContributorDashboardAdminUrl);
   }
 
-  async assignTranslationRights(
-    username, language) {
-
-    await this.select(contributonRightsSelectDropdown, 
-        "string:translation");
-
+  /**
+   * Function for assigning a translation right to a user.
+   * @param {string} username - the username of the user.
+   * @param {string} language - the language the user can translate.
+   */
+  async assignTranslationRights(username, language) {
+    await this.select(contributonRightsSelectDropdown, translationRightValue);
     await this.type(contributorUsernameInputField, username);
     await this.clickOn(contributorUsernameInputField);
     await this.select(contributonRightsLanguageDropdown, language);
     await this.clickOn(contributionRightsSubmitButton);
-  };
+  }
 };

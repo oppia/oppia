@@ -13,36 +13,37 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Translation Admins.
+ * @fileoverview Acceptance Test for translation admins to assign translation
+ * rights to users.
  */
 
 const userFactory = require(
-    '../../puppeteer-testing-utilities/user-factory.js');
+  '../../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
-    '../../puppeteer-testing-utilities/test-constants.js');
+  '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Translation Admin', function () {
-    const ROLE_TRANSLATION_ADMIN = 'translation admin';
-    const ROLE_TRANSLATOR = 'translator';
-    let translationAdmin = null;
+describe('Translation Admin', function() {
+  let translationAdmin = null;
 
-    beforeAll(async function () {
-        superAdmin = await userFactory.createNewSuperAdmin('superAdm');
-        translationAdmin = await userFactory.createNewTranslationAdmin('translationAdm');
+  beforeAll(async function() {
+    translationAdmin =
+      await userFactory.createNewTranslationAdmin('translationAdm');
+  }, DEFAULT_SPEC_TIMEOUT);
+
+  it('should be able to revoke translation rights from user.',
+    async function() {
+      const translatorSpanish = await userFactory.createNewGuestUser(
+        'translatorSpanish', 'translatorSpanish@example.com');
+      translatorSpanish.closeBrowser();
+
+      await translationAdmin.navigateToContributorDashboardAdminPage();
+      await translationAdmin.assignTranslationRights(
+        'translatorSpanish', 'string:es');
     }, DEFAULT_SPEC_TIMEOUT);
 
-    it('should be able to revoke translation rights from user.',
-        async function () {
-            const translatorSpanish = await userFactory.createNewGuestUser(
-                'translatorSpanish', 'translatorSpanish@example.com');
-
-            await translationAdmin.navigateToContributorDashboardAdminPage();
-            await translationAdmin.assignTranslationRights('translatorSpanish', 'string:es');
-        }, DEFAULT_SPEC_TIMEOUT);
-
-    afterAll(async function () {
-        await userFactory.closeAllBrowsers();
-    });
+  afterAll(async function() {
+    await userFactory.closeAllBrowsers();
+  });
 });

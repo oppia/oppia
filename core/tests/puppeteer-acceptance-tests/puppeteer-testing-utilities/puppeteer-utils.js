@@ -135,9 +135,9 @@ module.exports = class baseUser {
   }
 
   /**
-   * This function types the text in the input field using its CSS selector.
+   * This selects a value in a dropdown.
    * @param {string} selector - The CSS selector of the input field.
-   * @param {string} option - The options to be selected.
+   * @param {string} option - The option to be selected.
    */
   async select(selector, option) {
     await this.page.waitForSelector(selector);

@@ -110,6 +110,12 @@ let createNewGuestUser = async function(username, email) {
   return guestUser;
 };
 
+/**
+ * Function to create a user with the translation admin role.
+ * @param {string} username - the username of the translation admin.
+ * @param {string} email - the email of the user.
+ * @returns the instance of the translation admin. 
+ */
 let createNewTranslationAdmin = async function(username, email) {
   if (superAdminInstance === null) {
     superAdminInstance = await createNewSuperAdmin('superAdm');
@@ -117,10 +123,14 @@ let createNewTranslationAdmin = async function(username, email) {
 
   const translationAdmin = new e2eTranslationAdmin();
   await translationAdmin.openBrowser();
-  await translationAdmin.signUpNewUser(username, 'translation_admin@example.com');
+  await translationAdmin.signUpNewUser(
+    username,
+    'translation_admin@example.com');
 
-  await superAdminInstance.assignRoleToUser(username, ROLE_TRANSLATION_ADMIN);
-  await superAdminInstance.expectUserToHaveRole(username, ROLE_TRANSLATION_ADMIN);
+  await superAdminInstance.assignRoleToUser(
+    username, ROLE_TRANSLATION_ADMIN);
+  await superAdminInstance.expectUserToHaveRole(
+    username, ROLE_TRANSLATION_ADMIN);
 
   activeUsers.push(translationAdmin);
   return translationAdmin;
