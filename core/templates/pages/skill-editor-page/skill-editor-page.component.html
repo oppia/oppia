@@ -39,8 +39,7 @@
               [ngClass]="{'navbar-tab-active': getActiveTabName() === 'questions'}"
               (click)="selectQuestionsTab()">
             <a ngbTooltip="Questions"
-               placement="bottom"
-               aria-label="Questions">
+               placement="bottom">
               <i class="fas fa-book-open navbar-tab-icon"
                 [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'questions'}">
               </i>
@@ -51,8 +50,7 @@
               (click)="selectPreviewTab()" >
             <a class="nav-link"
                ngbTooltip="Preview"
-               placement="bottom"
-               aria-label="Preview">
+               placement="bottom">
               <i class="fas fa-play navbar-tab-icon"
                 [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}">
               </i>
