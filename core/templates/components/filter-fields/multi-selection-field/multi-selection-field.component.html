@@ -6,7 +6,7 @@
               [removable]="removable"
               [attr.aria-selected]="selection === selected ? 'true' : 'false'"
               (removed)="remove(selection)">
-      {{ selection }} 
+      {{ selection }}
       <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
     </mat-chip>
     <input [placeholder]="placeholder"
