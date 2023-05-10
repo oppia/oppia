@@ -460,8 +460,8 @@ describe('Lesson Information card modal component', () => {
 
   it('should round down to the nearest whole number', () => {
     componentInstance.completedCheckpointsCount = 2;
-    componentInstance.checkpointCount = 5;
+    componentInstance.checkpointCount = 7;
 
-    expect(componentInstance.getProgressPercentage()).toEqual('40');
+    expect(componentInstance.getProgressPercentage()).toEqual('28');
   });
 });
