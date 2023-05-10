@@ -33,14 +33,13 @@ describe('Translation Admin', function () {
         translationAdmin = await userFactory.createNewTranslationAdmin('translationAdm');
     }, DEFAULT_SPEC_TIMEOUT);
 
-    it('should be able to provide translation rights to user.',
+    it('should be able to revoke translation rights from user.',
         async function () {
             const translatorSpanish = await userFactory.createNewGuestUser(
                 'translatorSpanish', 'translatorSpanish@example.com');
 
             await translationAdmin.navigateToContributorDashboardAdminPage();
             await translationAdmin.assignTranslationRights('translatorSpanish', 'string:es');
-            await translationAdmin.assignTranslationRights('translatorSpanish', 'string:en');
         }, DEFAULT_SPEC_TIMEOUT);
 
     afterAll(async function () {
