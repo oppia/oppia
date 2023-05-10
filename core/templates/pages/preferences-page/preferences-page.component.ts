@@ -121,6 +121,7 @@ export class PreferencesPageComponent {
   }
 
   saveUserBio(userBio: string): void {
+    if (userBio === this.userBio) { return; }
     this._saveDataItem('user_bio', userBio);
   }
 
