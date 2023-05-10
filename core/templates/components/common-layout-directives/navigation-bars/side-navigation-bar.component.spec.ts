@@ -164,7 +164,7 @@ describe('Side Navigation Bar Component', () => {
       Promise.resolve('contributor'));
     spyOn(sidebarStatusService, 'closeSidebar');
 
-    componentInstance.currentUrl = '/learner-dashboard'; 
+    componentInstance.currentUrl = '/learner-dashboard';
     componentInstance.navigateToDefaultDashboard();
     tick();
 
@@ -178,7 +178,7 @@ describe('Side Navigation Bar Component', () => {
     spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
       Promise.resolve('creator'));
     spyOn(sidebarStatusService, 'closeSidebar');
-    
+
     componentInstance.currentUrl = '/creator-dashboard';
     componentInstance.navigateToDefaultDashboard();
     tick();

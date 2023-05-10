@@ -309,7 +309,7 @@ describe('Sign up page component', () => {
       default_dashboard: 'contributor',
       username: 'username'
     };
-  
+
     componentInstance.hasUsername = false;
     componentInstance.showEmailPreferencesForm = true;
 

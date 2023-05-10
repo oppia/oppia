@@ -61,7 +61,7 @@ export class SideNavigationBarComponent {
     private userService: UserService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef 
+    private windowRef: WindowRef
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -110,7 +110,7 @@ export class SideNavigationBarComponent {
       (preferredDashboard) => {
         if (this.currentUrl === '/' + preferredDashboard + '-dashboard') {
           this.sidebarStatusService.closeSidebar();
-	  return;
+          return;
         }
         this.windowRef.nativeWindow.location.href = '/';
       });
