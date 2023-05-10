@@ -40,12 +40,11 @@ class Registry:
 
     DEFAULT_VALUE_BY_TYPE_DICT: Dict[
         platform_parameter_domain.DataTypes,
-        Union[bool, str, int, List[str]]
+        Union[bool, str, int]
     ] = {
         platform_parameter_domain.DataTypes.BOOL: False,
         platform_parameter_domain.DataTypes.NUMBER: 0,
-        platform_parameter_domain.DataTypes.STRING: '',
-        platform_parameter_domain.DataTypes.LIST_STR: [],
+        platform_parameter_domain.DataTypes.STRING: ''
     }
 
     # The keys of parameter_registry are the property names, and the values
@@ -243,7 +242,7 @@ class Registry:
     def evaluate_all_platform_parameters(
         cls,
         context: platform_parameter_domain.EvaluationContext
-    ) -> Dict[str, Union[str, bool, int, List[str]]]:
+    ) -> Dict[str, Union[str, bool, int]]:
         """Evaluate all platform parameters with the given context.
 
         Args:
