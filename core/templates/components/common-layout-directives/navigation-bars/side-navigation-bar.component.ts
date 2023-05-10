@@ -61,7 +61,7 @@ export class SideNavigationBarComponent {
     private userService: UserService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef 
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -105,12 +105,15 @@ export class SideNavigationBarComponent {
     });
   }
 
-  navigateToLearnerDashboard(): void {
-    if (this.currentUrl === '/learner-dashboard') {
-      this.sidebarStatusService.closeSidebar();
-      return;
-    }
-    this.windowRef.nativeWindow.location.href = '/learner-dashboard';
+  navigateToDefaultDashboard(): void {
+    this.userService.getUserPreferredDashboardAsync().then(
+      (preferredDashboard) => {
+        if (this.currentUrl === '/' + preferredDashboard + '-dashboard') {
+          this.sidebarStatusService.closeSidebar();
+	  return;
+        }
+        this.windowRef.nativeWindow.location.href = '/';
+      });
   }
 
   stopclickfurther(event: Event): void {
