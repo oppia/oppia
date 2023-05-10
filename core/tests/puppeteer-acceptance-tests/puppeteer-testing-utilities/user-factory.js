@@ -19,7 +19,8 @@
 let e2eSuperAdmin = require('../user-utilities/super-admin-utils.js');
 let e2eBlogAdmin = e2eBlogPostEditor = e2eGuestUser = require(
   '../user-utilities/blog-post-admin-utils.js');
-let e2eTranslationAdmin = require('../user-utilities/translation-admin-utils.js');
+let e2eTranslationAdmin = require(
+  '../user-utilities/translation-admin-utils.js');
 
 /**
  * Global user instances that are created and can be reused again.
@@ -114,7 +115,7 @@ let createNewGuestUser = async function(username, email) {
  * Function to create a user with the translation admin role.
  * @param {string} username - the username of the translation admin.
  * @param {string} email - the email of the user.
- * @returns the instance of the translation admin. 
+ * @returns the instance of the translation admin.
  */
 let createNewTranslationAdmin = async function(username, email) {
   if (superAdminInstance === null) {
@@ -134,7 +135,7 @@ let createNewTranslationAdmin = async function(username, email) {
 
   activeUsers.push(translationAdmin);
   return translationAdmin;
-}
+};
 
 /**
  * The function closes all the browsers opened by different users.
