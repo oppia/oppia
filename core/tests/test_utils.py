@@ -1213,8 +1213,8 @@ class TestBase(unittest.TestCase):
         """Checks that the given item passes default validation.
 
         Args:
-            item. Any. The object to validate.
-            error_substring. str. The regex to match string representation
+            item: Any. The object to validate.
+            error_substring: str. The regex to match string representation
             of the raised exception.
         """
         with self.assertRaisesRegex(utils.ValidationError, error_substring):
@@ -1225,7 +1225,7 @@ class TestBase(unittest.TestCase):
         that calls the test.
 
         Args:
-            line. str. The log line.
+            line: str. The log line.
         """
         # We are using the b' prefix as all the stdouts are in bytes.
         print(b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
@@ -1248,15 +1248,17 @@ class TestBase(unittest.TestCase):
         earlier in the same list.
 
         Args:
-            param_dict. Dict[str, str]. The old param dict.
-            param_changes. List[ParamChange]. The param changes to use for the update.
-            exp_param_specs: Dict[str, ParamChange]. The expected param specifications.
+            param_dict: Dict[str, str]. The old param dict.
+            param_changes: List[ParamChange]. The param changes to use for
+            the update.
+            exp_param_specs: Dict[str, ParamChange]. The expected param
+            specifications.
 
         Returns:
             dict. The updated param dict.
 
         Raises:
-            Exception: Parameter not found.
+            Exception. Parameter not found.
         """
         new_param_dict = copy.deepcopy(param_dict)
         for param_change in param_changes:
@@ -2881,10 +2883,10 @@ version: 1
         """Get a JSON response, transformed to a Python object.
 
         Args:
-            url. str. The url to make a request for.
-            params. Dict[str, Any]. The arguments to be sent over.
-            expected_status_int. int. The expetected response status.
-            headers. Dict[str, str]. The headers used in the request.
+            url: str. The url to make a request for.
+            params: Dict[str, Any]. The arguments to be sent over.
+            expected_status_int: int. The expetected response status.
+            headers: Dict[str, str]. The headers used in the request.
 
         Returns:
             Any. A python object.
@@ -3090,13 +3092,13 @@ version: 1
         specified; return the received object.
 
         Args:
-           url. str. The url to post an object to.
-           payload. Dict[str. str]. The dictionary which needs to be sent.
-           headers. Dict[str, str]. The headers set in the request.
-           csrf_token. str. The csrf token to identify the user.
-           expect_errors. bool. Whether errors are expected.
-           expected_status_int. int. The expected status code. Will be
-           200 if not specified.
+            url: str. The url to post an object to.
+            payload: Dict[str. str]. The dictionary which needs to be sent.
+            headers: Dict[str, str]. The headers set in the request.
+            csrf_token: str. The csrf token to identify the user.
+            expect_errors: bool. Whether errors are expected.
+            expected_status_int: int. The expected status code. Will be 200 if
+            not specified.
 
         Returns:
            webtest.TestApp. The respose of the post task request.
