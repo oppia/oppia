@@ -117,4 +117,3 @@ class UnsubscribeHandler(
         subscription_services.unsubscribe_from_creator(
             self.user_id, creator_id)
         self.render_json(self.values)
-
