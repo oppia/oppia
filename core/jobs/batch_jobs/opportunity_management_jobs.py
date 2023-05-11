@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import itertools
+import logging
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -341,9 +342,12 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
         with datastore_services.get_ndb_context():
             for story in stories:
                 for exp_id in story.story_contents.get_all_linked_exp_ids():
-                    exploration_opportunity_summary_list.append(
-                        opportunity_services.create_exp_opportunity_summary(
-                            topic, story, exps_dict[exp_id]))
+                    try:
+                        exploration_opportunity_summary_list.append(
+                            opportunity_services.create_exp_opportunity_summary(
+                                topic, story, exps_dict[exp_id]))
+                    except Exception as e:
+                        logging.exception(e)
 
             for opportunity in exploration_opportunity_summary_list:
                 model = (
