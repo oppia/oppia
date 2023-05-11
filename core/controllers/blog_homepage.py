@@ -363,7 +363,7 @@ class AuthorsPageHandler(
             author_username: str. The username of the author.
 
         Raises:
-            exception. No user settings found for the given author_username.
+            Exception. No user settings found for the given author_username.
         """
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])

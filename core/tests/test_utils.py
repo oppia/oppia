@@ -1214,8 +1214,8 @@ class TestBase(unittest.TestCase):
 
         Args:
             item: Any. The object to validate.
-            error_substring: str. The regex to match string representation of
-            the raised exception.
+            error_substring: str. The regex to match string representation
+            of the raised exception.
         """
         with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
