@@ -100,7 +100,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
 
     def test_all_feature_flags_are_of_bool_type(self) -> None:
         feature_flags = feature_services.get_all_feature_flag_dicts()
-        assert len(feature_flags) != 0
+        self.assertGreater(len(feature_flags), 0)
         for feature in feature_flags:
             self.assertEqual(
                 feature['data_type'],
