@@ -33,12 +33,6 @@ import { ServicesConstants } from 'services/services.constants';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-const extractVideoIdFromVideoUrl = function(videoUrl) {
-  videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-  return videoUrl[2] !== undefined ?
-    videoUrl[2].split(/[^0-9a-z_\-]/i)[0] :
-    videoUrl[0];
-};
 const typedCloneDeep = <T>(obj: T): T => cloneDeep(obj);
 
 type ComponentSpecsType = typeof ServicesConstants.RTE_COMPONENT_SPECS;
@@ -140,6 +134,14 @@ export class RteHelperModalComponent {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
         this.currentRteIsMathExpressionEditor = true;
+        // Typescript is not able to infer the correct type of mathValueDict.
+        // Hence we manually typecast it to the correct type. When we use
+        // typeof caName, it returns a string literal type which is
+        // 'math_content'. This helps it narrow down the type of dict to the
+        // one corresponding to math content. (i.e. properties like svgFile, etc
+        // )
+        // TODO(#18219): Remove the typecast once Typescript is able to infer
+        // the correct type.
         const mathValueDict = {
           name: caName,
           value: this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
@@ -163,6 +165,10 @@ export class RteHelperModalComponent {
           >[]
         ).push(mathValueDict);
       } else {
+        // Typescript ends up inferring the union type to be never instead of
+        // the correct type. Hence we manually typecast it to the correct type.
+        // TODO(#18219): Remove the typecast once Typescript is able to infer
+        // the correct type.
         const tmpCustomizationArg = {
           name: caName,
           value: this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
@@ -181,7 +187,9 @@ export class RteHelperModalComponent {
       }
     }
     // Infer that the RTE component is a Link if it contains the `url` and
-    // `text` customization arg names.
+    // `text` customization arg names
+    // TODO(#18219): Remove the typecast once Typescript is able to infer
+    // the correct type..
     const customizationArgNames = (
       this.customizationArgSpecs as { name: string }[]
     ).map((x) => x.name);
@@ -251,6 +259,8 @@ export class RteHelperModalComponent {
     if (!this.currentRteIsMathExpressionEditor) {
       return false;
     } else {
+      // We know that this is a math rich text component. Hence we can make the
+      // the type more specific.
       const { value } = this.tmpCustomizationArgs[0] as Extract<
         CustomizationArgsNameAndValueArray[number],
         { name: 'math_content' }
@@ -267,6 +277,8 @@ export class RteHelperModalComponent {
     if (!this.currentRteIsLinkEditor) {
       return false;
     }
+    // We know that this is a link rich text component. Hence we can make the
+    // the type more specific.
     const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
       CustomizationArgsNameAndValueArray[number],
       { name: 'url' | 'text' }
@@ -322,6 +334,8 @@ export class RteHelperModalComponent {
     if (this.currentRteIsMathExpressionEditor) {
       // The tmpCustomizationArgs is guaranteed to have only one element for
       // the case of math rich text component.
+      // We know that this is a math rich text component. Hence we can make the
+      // the type more specific.
       const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
         CustomizationArgsNameAndValueArray[number],
         { name: 'math_content' }
@@ -405,7 +419,7 @@ export class RteHelperModalComponent {
         const caName = this.tmpCustomizationArgs[i].name;
         if (caName === 'video_id') {
           const temp = this.tmpCustomizationArgs[i].value;
-          customizationArgsDict[caName] = extractVideoIdFromVideoUrl(
+          customizationArgsDict[caName] = this.extractVideoIdFromVideoUrl(
             temp.toString()
           );
         } else if (caName === 'text' && this.currentRteIsLinkEditor) {
@@ -429,5 +443,12 @@ export class RteHelperModalComponent {
       }
       this.ngbActiveModal.close(customizationArgsDict);
     }
+  }
+
+  extractVideoIdFromVideoUrl(url: string): string {
+    const videoUrl = url.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+    return videoUrl[2] !== undefined ?
+      videoUrl[2].split(/[^0-9a-z_\-]/i)[0] :
+      videoUrl[0];
   }
 }
