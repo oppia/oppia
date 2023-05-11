@@ -268,7 +268,7 @@ class BlogPostHandler(
         """Populates the data on the blog dashboard editor page.
 
         Args:
-            blog_post_id. str. The ID of the blog post.
+            blog_post_id: str. The ID of the blog post.
         """
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
@@ -309,7 +309,7 @@ class BlogPostHandler(
         """Updates properties of the given blog post.
 
         Args:
-            blog_post_id. str. The ID of the blog post.
+            blog_post_id: str. The ID of the blog post.
         """
         assert self.normalized_payload is not None
         blog_post_rights = (
@@ -336,7 +336,7 @@ class BlogPostHandler(
         """Stores thumbnail of the blog post in the datastore.
 
         Args:
-            blog_post_id. str. The ID of the blog post.
+            blog_post_id: str. The ID of the blog post.
         """
         assert self.normalized_request is not None
         assert self.normalized_payload is not None
@@ -364,7 +364,7 @@ class BlogPostHandler(
         """Handles Delete requests.
 
         Args:
-            blog_post_id. str. The ID of the blog post.
+            blog_post_id: str. The ID of the blog post.
         """
         blog_services.delete_blog_post(blog_post_id)
         self.render_json(self.values)
@@ -426,7 +426,7 @@ class BlogPostTitleHandler(
         a blog post with the same title exists.
 
         Args:
-            blog_post_id. str. The ID of the blog post.
+            blog_post_id: str. The ID of the blog post.
         """
         assert self.normalized_request is not None
         title = self.normalized_request['title']
