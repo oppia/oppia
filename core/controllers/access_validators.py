@@ -115,7 +115,7 @@ class ProfileExistsValidationHandler(
         """Validates access to profile page.
 
         Args:
-                username. str. The username of the user.
+                username: str. The username of the user.
         """
 
         user_settings = user_services.get_user_settings_from_username(
@@ -170,7 +170,7 @@ class ViewLearnerGroupPageAccessValidationHandler(
         """Handles GET requests.
 
         Args:
-            learner_group_id. str. The learner group ID.
+                learner_group_id: str. The learner group ID.
         """
         assert self.user_id is not None
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
@@ -269,7 +269,7 @@ class BlogAuthorProfilePageAccessValidationHandler(
         """Handles GET requests.
 
         Args:
-            author_username. str. The author username.
+                author_username: str. The author username.
         """
         author_settings = (
             user_services.get_user_settings_from_username(author_username))
