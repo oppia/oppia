@@ -115,7 +115,7 @@ class ProfileExistsValidationHandler(
         """Validates access to profile page.
 
         Args:
-            username. str. The username of the user.
+                username. str. The username of the user.
         """
 
         user_settings = user_services.get_user_settings_from_username(
