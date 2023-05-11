@@ -37,6 +37,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import skill_models
     from mypy_imports import story_models
     from mypy_imports import topic_models
+    from mypy_imports import translation_models
 
 (
     exp_models,
@@ -44,14 +45,16 @@ if MYPY: # pragma: no cover
     story_models,
     topic_models,
     skill_models,
-    question_models
+    question_models,
+    translation_models
 ) = models.Registry.import_models([
     models.Names.EXPLORATION,
     models.Names.OPPORTUNITY,
     models.Names.STORY,
     models.Names.TOPIC,
     models.Names.SKILL,
-    models.Names.QUESTION
+    models.Names.QUESTION,
+    models.Names.TRANSLATION
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -496,7 +499,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='GENERATED OPPORTUNITIES COUNT SUCCESS: 1'
+            ),
         ])
 
         opportunity_model = (
@@ -516,6 +522,62 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
             opportunity_model.language_codes_needing_voice_artists, ['cs'])
+
+    def test_generation_job_returns_correct_translation_counts(self) -> None:
+        # Precheck.
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
+
+        # Add a translation.
+        translation_model = self.create_model(
+            translation_models.EntityTranslationsModel,
+            entity_id=self.EXP_1_ID,
+            entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
+            entity_version=0,
+            language_code='hi',
+            translations={
+                '123': {
+                    'content_value': 'Hello world!',
+                    'needs_update': False,
+                    'content_format': 'html'
+                }
+            }
+        )
+        translation_model.update_timestamps()
+        datastore_services.put_multi([
+            translation_model
+        ])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='GENERATED OPPORTUNITIES COUNT SUCCESS: 1'
+            ),
+        ])
+
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.EXP_1_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert opportunity_model is not None
+        self.assertEqual(opportunity_model.topic_id, self.TOPIC_1_ID)
+        self.assertEqual(opportunity_model.topic_name, 'topic title')
+        self.assertEqual(opportunity_model.story_id, self.STORY_1_ID)
+        self.assertEqual(opportunity_model.story_title, 'story title')
+        self.assertEqual(opportunity_model.chapter_title, 'node title')
+        self.assertEqual(opportunity_model.content_count, 1)
+        # Remove lesson language 'cs' and fully translated language 'hi'.
+        self.assertItemsEqual(
+            opportunity_model.incomplete_translation_language_codes,
+            {
+                l['id']
+                for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs', 'hi'})
+        self.assertEqual(opportunity_model.translation_counts, {'hi': 1})
+        # Add fully translated language 'hi'.
+        self.assertItemsEqual(
+            opportunity_model.language_codes_needing_voice_artists,
+            ['cs', 'hi'])
 
     def test_generation_job_returns_multiple_opportunities_for_one_topic(
         self
@@ -582,7 +644,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='GENERATED OPPORTUNITIES COUNT SUCCESS: 2'
+            ),
         ])
 
         all_opportunity_models = list(
@@ -662,7 +727,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
+            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='GENERATED OPPORTUNITIES COUNT SUCCESS: 1'
+            ),
         ])
 
         all_opportunity_models = list(
@@ -701,8 +769,8 @@ class GenerateExplorationOpportunitySummariesJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stderr=(
-                'ERROR: "Failed to regenerate opportunities for topic id: '
-                'topic_1_id, missing_exp_with_ids: [], '
+                'TOPIC PROCESSED ERROR: "Failed to regenerate opportunities '
+                'for topic id: topic_1_id, missing_exp_with_ids: [], '
                 'missing_story_with_ids: [\'missing_id\']": 1'
             ))
         ])
@@ -752,9 +820,9 @@ class GenerateExplorationOpportunitySummariesJobTests(
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stderr=(
-                'ERROR: "Failed to regenerate opportunities for topic id: '
-                'topic_1_id, missing_exp_with_ids: [\'missing_id\'], '
-                'missing_story_with_ids: []": 1'
+                'TOPIC PROCESSED ERROR: "Failed to regenerate opportunities '
+                'for topic id: topic_1_id, missing_exp_with_ids: '
+                '[\'missing_id\'], missing_story_with_ids: []": 1'
             ))
         ])
 
@@ -844,7 +912,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(len(all_opportunity_models), 0)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 2')
+            job_run_result.JobRunResult(stdout='TOPIC PROCESSED SUCCESS: 2'),
+            job_run_result.JobRunResult(
+                stdout='GENERATED OPPORTUNITIES COUNT SUCCESS: 2'
+            ),
         ])
 
         all_opportunity_models = list(

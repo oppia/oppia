@@ -288,7 +288,8 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             translatable_object.get_all_contents_which_need_translations(
                 entity_translations).values())
 
-        expected_list_of_contents_which_need_translataion = [
+        expected_list_of_contents_which_need_translation = [
+            '<p>10000</p>',
             'My name is jhon.',
             'My name is Nikhil.'
         ]
@@ -297,7 +298,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             for translatable_content in contents_which_need_translation
         ]
         self.assertItemsEqual(
-            expected_list_of_contents_which_need_translataion,
+            expected_list_of_contents_which_need_translation,
             list_of_contents_which_need_translataion)
 
     def test_are_translations_displayable_with_all_translations(self) -> None:

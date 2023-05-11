@@ -356,9 +356,6 @@ class BaseTranslatableObject:
             if content_value == '':
                 continue
 
-            if isinstance(content_value, str) and content_value.isnumeric():
-                continue
-
             if (
                 translatable_content.content_id not in
                 entity_translation.translations
