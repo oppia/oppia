@@ -419,7 +419,7 @@ class ExplorationRightsHandler(
         """Updates the editing rights for the given exploration.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -1011,7 +1011,7 @@ class ExplorationStatisticsHandler(
         """Handles GET requests.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -1400,7 +1400,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles PUT requests for draft updation.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         # Raise an Exception if the draft change list fails non-strict
         # validation.
@@ -1470,7 +1470,7 @@ class StateAnswerStatisticsHandler(
         """Handles GET requests.
 
         Args:
-            unused_exploration_id. str. The unused exploration ID.
+            unused_exploration_id: str. The unused exploration ID.
         """
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'answers': {}, 'interaction_ids': {}})

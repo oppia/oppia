@@ -682,8 +682,8 @@ class TopicPublishSendMailHandler(
     def put(self, topic_id: str) -> None:
         """Returns the TopicRights object of a topic.
 
-           Args:
-               topic_id: str. The ID of the topic.
+        Args:
+            topic_id: str. The ID of the topic.
         """
         assert self.normalized_payload is not None
         topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
@@ -744,7 +744,7 @@ class TopicPublishHandler(
         """Publishes or unpublishes a topic.
 
         Args:
-           topic_id: str. The ID of the topic.
+            topic_id: str. The ID of the topic.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None

@@ -143,7 +143,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             story_id: str. The story ID.
             node_id: str. The node ID.
             completed_node_ids: List[str]. Completed node IDs
-            ordered_node: List[StoryNode]. List of odered nodes.
+            ordered_nodes: List[StoryNode]. List of odered nodes.
 
         Returns:
             Tuple. A tuple of lists.

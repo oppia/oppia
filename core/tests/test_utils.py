@@ -1214,8 +1214,8 @@ class TestBase(unittest.TestCase):
 
         Args:
             item: Any. The object to validate.
-            error_substring: str. The regex to match string representation
-            of the raised exception.
+            error_substring: str. The regex to match string representation of
+            the raised exception.
         """
         with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
@@ -1248,10 +1248,10 @@ class TestBase(unittest.TestCase):
         earlier in the same list.
 
         Args:
-            param_dict: Dict[str, str]. The old param dict.
-            param_changes: List[ParamChange]. The param changes to use for
+            param_dict: dict[str, str]. The old param dict.
+            param_changes: list[ParamChange]. The param changes to use for
             the update.
-            exp_param_specs: Dict[str, ParamChange]. The expected param
+            exp_param_specs: dict[str, ParamChange]. The expected param
             specifications.
 
         Returns:
@@ -2855,7 +2855,7 @@ version: 1
             expect_errors: bool. Whether errors are expected.
 
         Returns:
-            Any. The python object
+            Any. The python object.
         """
         if expect_errors:
             self.assertTrue(json_response.status_int >= 400)
@@ -3101,7 +3101,7 @@ version: 1
             not specified.
 
         Returns:
-           webtest.TestApp. The respose of the post task request.
+            webtest.TestApp. The respose of the post task request.
         """
         if csrf_token:
             payload['csrf_token'] = csrf_token
