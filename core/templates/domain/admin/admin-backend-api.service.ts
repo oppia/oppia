@@ -144,7 +144,7 @@ export interface AdminPageData {
   viewableRoles: string[];
   humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
-  platformParams: PlatformParameter[];
+  platformParameters: PlatformParameter[];
 }
 
 @Injectable({
@@ -170,7 +170,7 @@ export class AdminBackendApiService {
           viewableRoles: response.viewable_roles,
           topicSummaries: response.topic_summaries.map(
             CreatorTopicSummary.createFromBackendDict),
-            platformParams: response.platform_params_dicts.map(
+            platformParameters: response.platform_params_dicts.map(
             dict => PlatformParameter.createFromBackendDict(
               dict)
           )

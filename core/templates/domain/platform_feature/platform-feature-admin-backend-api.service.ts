@@ -76,6 +76,22 @@ export class PlatformFeatureAdminBackendApiService {
       }
     ).toPromise();
   }
+
+  async updatePlatformParameter(
+      name: string, message: string, newRules: PlatformParameterRule[]):
+      Promise<void> {
+    await this.http.post(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      {
+        action: (
+          PlatformFeatureDomainConstants.
+          UPDATE_PLATFORM_PARAMETER_RULES_ACTION),
+        feature_name: name,
+        commit_message: message,
+        new_rules: newRules.map(rule => rule.toBackendDict())
+      }
+    ).toPromise();
+  }
 }
 
 angular.module('oppia').factory(
