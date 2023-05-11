@@ -249,7 +249,11 @@ class BlogPostDataHandler(
 
     @acl_decorators.open_access
     def get(self, blog_post_url: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            blog_post_url. str. The URL of the blog post.
+        """
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
             raise self.PageNotFoundException(
@@ -353,7 +357,11 @@ class AuthorsPageHandler(
 
     @acl_decorators.open_access
     def get(self, author_username: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            author_username. str. The username of the author.
+        """
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
 

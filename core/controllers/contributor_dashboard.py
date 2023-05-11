@@ -1006,7 +1006,12 @@ class ContributorCertificateHandler(
     def get(
         self, username: str, suggestion_type: str
     ) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            username. str. A user's username.
+            suggestion_type. str. The suggestion type.
+        """
         assert self.normalized_request is not None
         from_date = self.normalized_request['from_date']
         to_date = self.normalized_request['to_date']
@@ -1047,7 +1052,11 @@ class ContributorAllStatsSummariesHandler(
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            username. str. A user's username.
+        """
         user_id = user_services.get_user_id_from_username(username)
         # Here we are sure that user_id will never be None, because
         # we are already handling the None case of user_id in

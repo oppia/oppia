@@ -137,7 +137,17 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         completed_node_ids: List[str],
         ordered_nodes: List[story_domain.StoryNode]
     ) -> Tuple[List[str], Optional[str], List[str]]:
-        """Records node completion."""
+        """Records node completion.
+
+        Args:
+            story_id. str. The story ID.
+            node_id. str. The node ID.
+            completed_node_ids. List[str]. Completed node IDs
+            ordered_nodes. List[StoryNode]. List of odered nodes.
+
+        Returns:
+            Tuple. A tuple of lists.
+        """
         assert self.user_id is not None
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException
@@ -171,7 +181,12 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def get(self, story_id: str, node_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            story_id. str. The story ID.
+            node_id. str. The node ID.
+        """
         (
             _, _, classroom_url_fragment, topic_url_fragment,
             story_url_fragment, node_id) = self.request.path.split('/')
@@ -217,6 +232,12 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def post(self, story_id: str, node_id: str) -> None:
+        """Hanldes POST requests.
+
+        Args:
+            story_id. str. The story ID.
+            node_id. str. The node ID.
+        """
         assert self.user_id is not None
         story = story_fetchers.get_story_by_id(story_id)
         if story is None:

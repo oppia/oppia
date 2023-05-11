@@ -90,7 +90,11 @@ class AudioUploadHandler(
 
     @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id: str) -> None:
-        """Saves an audio file uploaded by a content creator."""
+        """Saves an audio file uploaded by a content creator.
+
+        Args:
+            exploration_id. str. The exploration ID.
+        """
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
 
@@ -221,7 +225,12 @@ class VoiceArtistManagementHandler(
 
     @acl_decorators.can_add_voice_artist
     def post(self, unused_entity_type: str, entity_id: str) -> None:
-        """Handles Post requests."""
+        """Handles Post requests.
+
+        Args:
+            unused_entity_type. str. The unused entity type.
+            entity_id. str. The entity ID.
+        """
         assert self.normalized_payload is not None
         voice_artist = self.normalized_payload['username']
         voice_artist_id = user_services.get_user_id_from_username(
@@ -237,7 +246,12 @@ class VoiceArtistManagementHandler(
 
     @acl_decorators.can_remove_voice_artist
     def delete(self, unused_entity_type: str, entity_id: str) -> None:
-        """Handles Delete requests."""
+        """Handles Delete requests.
+
+        Args:
+            unused_entity_type. str. The unused entity type.
+            entity_id. str. The entity ID.
+        """
         assert self.normalized_request is not None
         voice_artist = self.normalized_request['voice_artist']
         voice_artist_id = user_services.get_user_id_from_username(

@@ -113,6 +113,7 @@ class PracticeSessionsPageDataHandler(
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name: str) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.

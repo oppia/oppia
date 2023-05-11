@@ -63,6 +63,7 @@ class ClassroomAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         classroom_url_fragment = self.normalized_request[
             'classroom_url_fragment'
@@ -89,6 +90,7 @@ class ManageOwnAccountValidationHandler(
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
+        """Handles GET requests."""
         pass
 
 
@@ -110,7 +112,11 @@ class ProfileExistsValidationHandler(
 
     @acl_decorators.open_access
     def get(self, username: str) -> None:
-        """Validates access to profile page."""
+        """Validates access to profile page.
+
+        Args:
+            username. str. The username of the user.
+        """
 
         user_settings = user_services.get_user_settings_from_username(
             username)
@@ -161,7 +167,11 @@ class ViewLearnerGroupPageAccessValidationHandler(
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            learner_group_id. str. The learner group ID.
+        """
         assert self.user_id is not None
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
@@ -221,6 +231,7 @@ class BlogPostPageAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         blog_post_url_fragment = self.normalized_request[
             'blog_post_url_fragment']
@@ -255,6 +266,11 @@ class BlogAuthorProfilePageAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self, author_username: str) -> None:
+        """Handles GET requests.
+
+        Args:
+            author_username. str. The author username.
+        """
         author_settings = (
             user_services.get_user_settings_from_username(author_username))
 

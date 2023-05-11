@@ -1178,6 +1178,7 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Handles GET requests."""
         assert self.user_id is not None
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
@@ -1244,6 +1245,7 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Handles PUT requests."""
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         role = self.normalized_payload['role']
@@ -1265,6 +1267,7 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Handles DELETE requests."""
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
         # particular TypedDict that was defined according to the schemas.
@@ -1331,6 +1334,7 @@ class TopicManagerRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Handles PUT requests."""
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         action = self.normalized_payload['action']
@@ -1416,6 +1420,7 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Handles PUT requests."""
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -1430,6 +1435,7 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Handles DELETE requests."""
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -1488,6 +1494,7 @@ class AdminSuperAdminPrivilegesHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Handles PUT requests."""
         assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
@@ -1503,6 +1510,7 @@ class AdminSuperAdminPrivilegesHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Handles DELETE requests."""
         assert self.normalized_request is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
@@ -1532,6 +1540,7 @@ class AdminTopicsCsvFileDownloader(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Handles GET requests."""
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv()
         )
@@ -1591,6 +1600,7 @@ class DataExtractionQueryHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         exp_id = self.normalized_request['exp_id']
         exp_version = self.normalized_request['exp_version']
@@ -1640,6 +1650,7 @@ class SendDummyMailToAdminHandler(
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
+        """Handles POST requests."""
         username = self.username
         assert username is not None
         if feconf.CAN_SEND_EMAILS:
@@ -1687,6 +1698,7 @@ class UpdateUsernameHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Handles PUT requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         old_username = self.normalized_payload['old_username']
@@ -1748,6 +1760,7 @@ class NumberOfDeletionRequestsHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Handles GET requests."""
         self.render_json({
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
@@ -1783,6 +1796,7 @@ class VerifyUserModelsDeletedHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         user_id = self.normalized_request['user_id']
 
@@ -1825,6 +1839,7 @@ class DeleteUserHandler(
 
     @acl_decorators.can_delete_any_user
     def delete(self) -> None:
+        """Handles DELETE requests."""
         assert self.normalized_request is not None
         user_id = self.normalized_request['user_id']
         username = self.normalized_request['username']
@@ -1889,6 +1904,7 @@ class UpdateBlogPostHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Handles PUT requests."""
         assert self.normalized_payload is not None
         blog_post_id = self.normalized_payload['blog_post_id']
         author_username = self.normalized_payload['author_username']

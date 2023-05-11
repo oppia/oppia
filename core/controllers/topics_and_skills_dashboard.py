@@ -225,7 +225,11 @@ class TopicAssignmentsHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            skill_id. str. The skill ID.
+        """
         topic_assignments = skill_services.get_all_topic_assignments_for_skill(
             skill_id)
         topic_assignment_dicts = [
@@ -552,6 +556,7 @@ class NewSkillHandler(
 
     @acl_decorators.can_create_skill
     def post(self) -> None:
+        """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         description = self.normalized_payload['description']
@@ -724,6 +729,7 @@ class TopicIdToDiagnosticTestSkillIdsHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request[
             'comma_separated_topic_ids']

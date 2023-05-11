@@ -65,6 +65,7 @@ class LearnerGoalsHandler(
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
     def post(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
+       """Handles POST requests."""
         assert self.user_id is not None
         belongs_to_learnt_list = False
         goals_limit_exceeded = False

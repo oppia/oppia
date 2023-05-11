@@ -281,7 +281,7 @@ class EditableSkillDataHandler(
 
     @acl_decorators.can_delete_skill
     def delete(self, skill_id: str) -> None:
-        """Handles Delete requests."""
+        """Handles DELETE requests."""
         assert self.user_id is not None
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
 

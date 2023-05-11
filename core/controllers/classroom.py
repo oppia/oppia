@@ -64,7 +64,11 @@ class ClassroomDataHandler(
 
     @acl_decorators.does_classroom_exist
     def get(self, classroom_url_fragment: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            classroom_url_fragment. str. THe classroom URL fragment.
+        """
 
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
@@ -245,7 +249,11 @@ class ClassroomHandler(
 
     @acl_decorators.open_access
     def get(self, classroom_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            classroom_id. str. The ID of the classroom.
+        """
         classroom = classroom_config_services.get_classroom_by_id(
             classroom_id, strict=False)
         if classroom is None:
@@ -259,7 +267,11 @@ class ClassroomHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def put(self, classroom_id: str) -> None:
-        """Updates properties of a given classroom."""
+        """Updates properties of a given classroom.
+
+        Args:
+            classroom_id. str. The ID of the classroom.
+        """
         assert self.normalized_payload is not None
         classroom = self.normalized_payload['classroom_dict']
         if classroom_id != classroom.classroom_id:
@@ -273,7 +285,11 @@ class ClassroomHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def delete(self, classroom_id: str) -> None:
-        """Deletes classroom from the classroom admin page."""
+        """Deletes classroom from the classroom admin page.
+
+        Args:
+            classroom_id. str. The ID of the classroom.
+        """
         classroom_config_services.delete_classroom(classroom_id)
         self.render_json(self.values)
 
@@ -294,7 +310,11 @@ class ClassroomUrlFragmentHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self, classroom_url_fragment: str) -> None:
-        """Get request to check whether a classroom with given exists."""
+        """Get request to check whether a classroom with given exists.
+
+        Args:
+            classroom_url_fragment. str. The classroom URL fragment.
+        """
         classroom_url_fragment_exists = False
         if classroom_config_services.get_classroom_by_url_fragment(
                 classroom_url_fragment):
