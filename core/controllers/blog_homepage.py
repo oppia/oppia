@@ -252,7 +252,7 @@ class BlogPostDataHandler(
         """Handles GET requests.
 
         Args:
-            blog_post_url. str. The URL of the blog post.
+            blog_post_url: str. The URL of the blog post.
         """
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
@@ -360,7 +360,10 @@ class AuthorsPageHandler(
         """Handles GET requests.
 
         Args:
-            author_username. str. The username of the author.
+            author_username: str. The username of the author.
+
+        Raises:
+            exception. No user settings found for the given author_username.
         """
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])

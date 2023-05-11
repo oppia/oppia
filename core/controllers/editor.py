@@ -89,7 +89,7 @@ class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Handles GET requests.
 
         Args:
-            unused_exploration_id. str. The unused exploration ID.
+            unused_exploration_id: str. The unused exploration ID.
         """
 
         self.render_template('exploration-editor-page.mainpage.html')
@@ -173,7 +173,7 @@ class ExplorationHandler(
         """Gets the data for the exploration overview page.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
@@ -219,7 +219,7 @@ class ExplorationHandler(
         """Updates properties of the given exploration.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -275,7 +275,7 @@ class ExplorationHandler(
         """Deletes the given exploration.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
 
         assert self.user_id is not None
@@ -312,7 +312,7 @@ class UserExplorationPermissionsHandler(
         """Gets the user permissions for an exploration.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
@@ -481,7 +481,7 @@ class ExplorationRightsHandler(
         """Deletes user roles from the exploration.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
@@ -557,7 +557,7 @@ class ExplorationStatusHandler(
         """Handles PUT requests.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.normalized_payload is not None
         make_public = self.normalized_payload['make_public']
@@ -612,7 +612,7 @@ class ExplorationModeratorRightsHandler(
         owners.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -773,7 +773,7 @@ class ExplorationFileDownloader(
         """Handles GET requests.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.normalized_request is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -853,7 +853,7 @@ class StateYamlHandler(
         """Handles POST requests.
 
         Args:
-            unused_exploration_id. str. The unused exploration ID.
+            unused_exploration_id: str. The unused exploration ID.
         """
         assert self.normalized_payload is not None
         state_dict = self.normalized_payload['state_dict']
@@ -883,7 +883,7 @@ class ExplorationSnapshotsHandler(
         """Handles GET requests.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
 
         snapshots = exp_services.get_exploration_snapshots_metadata(
@@ -927,8 +927,8 @@ class ExplorationCheckRevertValidHandler(
         """Handles GET requests.
 
         Args:
-            exploration_id. str. The exploration ID.
-            version. int. The version of an exploration.
+            exploration_id: str. The exploration ID.
+            version: int. The version of an exploration.
         """
         info = exp_services.get_exploration_validation_error(
             exploration_id, version)
@@ -973,7 +973,7 @@ class ExplorationRevertHandler(
         """Handles POST requests.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -1043,8 +1043,8 @@ class StateInteractionStatsHandler(
         """Handles GET requests.
 
         Args:
-            exploration_id. str. The exploration ID.
-            state_name. str. The state name.
+            exploration_id: str. The exploration ID.
+            state_name: str. The state name.
         """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -1094,7 +1094,7 @@ class FetchIssuesHandler(
         """Handles GET requests.
 
         Args:
-            exp_id. str. The exploration ID.
+            exp_id: str. The exploration ID.
         """
         assert self.normalized_request is not None
         exp_version = self.normalized_request['exp_version']
@@ -1137,8 +1137,8 @@ class FetchPlaythroughHandler(
         """Handles GET requests.
 
         Args:
-            unused_exploration_id. str. The unused exploration ID.
-            playthrough_id. str. The playthrough ID.
+            unused_exploration_id: str. The unused exploration ID.
+            playthrough_id: str. The playthrough ID.
         """
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         if playthrough is None:
@@ -1194,7 +1194,7 @@ class ResolveIssueHandler(
         """Handles POST requests.
 
         Args:
-            exp_id. str. The exploration ID.
+            exp_id: str. The exploration ID.
         """
         assert self.normalized_payload is not None
         exp_issue_object = self.normalized_payload.get('exp_issue_object')
@@ -1301,8 +1301,8 @@ class ImageUploadHandler(
         """Saves an image uploaded by a content creator.
 
         Args:
-            entity_type. str. The entity type.
-            entity_id. str. The ID of the entity.
+            entity_type: str. The entity type.
+            entity_id: str. The ID of the entity.
         """
 
         assert self.normalized_payload is not None
@@ -1445,7 +1445,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles POST request for discarding draft changes.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.user_id is not None
         exp_services.discard_draft(exploration_id, self.user_id)
@@ -1494,7 +1494,7 @@ class TopUnresolvedAnswersHandler(
         """Handles GET requests for unresolved answers.
 
         Args:
-            unused_exploration_id. str. The unused exploration ID.
+            unused_exploration_id: str. The unused exploration ID.
         """
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'unresolved_answers': []})
@@ -1537,7 +1537,7 @@ class ExplorationEditsAllowedHandler(
         """Handles PUT request to set whether exploration can be edited.
 
         Args:
-            exploration_id. str. The ID of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
         exp_services.set_exploration_edits_allowed(
@@ -1602,8 +1602,8 @@ class LearnerAnswerInfoHandler(
         exploration state.
 
         Args:
-            entity_type. str. The entity type.
-            entity_id. str. The ID of the entity.
+            entity_type: str. The entity type.
+            entity_id: str. The ID of the entity.
         """
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
@@ -1663,8 +1663,8 @@ class LearnerAnswerInfoHandler(
         """Deletes the learner answer info by the given id.
 
         Args:
-            entity_type. str. The entity type.
-            entity_id. str. The ID of the entity.
+            entity_type: str. The entity type.
+            entity_id: str. The ID of the entity.
         """
 
         assert self.normalized_request is not None

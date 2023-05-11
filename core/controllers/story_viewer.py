@@ -140,10 +140,10 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Records node completion.
 
         Args:
-            story_id. str. The story ID.
-            node_id. str. The node ID.
-            completed_node_ids. List[str]. Completed node IDs
-            ordered_nodes. List[StoryNode]. List of odered nodes.
+            story_id: str. The story ID.
+            node_id: str. The node ID.
+            completed_node_ids: List[str]. Completed node IDs
+            ordered_node: List[StoryNode]. List of odered nodes.
 
         Returns:
             Tuple. A tuple of lists.
@@ -184,8 +184,8 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Handles GET requests.
 
         Args:
-            story_id. str. The story ID.
-            node_id. str. The node ID.
+            story_id: str. The story ID.
+            node_id: str. The node ID.
         """
         (
             _, _, classroom_url_fragment, topic_url_fragment,
@@ -235,8 +235,8 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Hanldes POST requests.
 
         Args:
-            story_id. str. The story ID.
-            node_id. str. The node ID.
+            story_id: str. The story ID.
+            node_id: str. The node ID.
         """
         assert self.user_id is not None
         story = story_fetchers.get_story_by_id(story_id)

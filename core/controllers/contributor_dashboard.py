@@ -1009,8 +1009,8 @@ class ContributorCertificateHandler(
         """Handles GET requests.
 
         Args:
-            username. str. A user's username.
-            suggestion_type. str. The suggestion type.
+            username: str. A user's username.
+            suggestion_type: str. The suggestion type.
         """
         assert self.normalized_request is not None
         from_date = self.normalized_request['from_date']
@@ -1055,7 +1055,7 @@ class ContributorAllStatsSummariesHandler(
         """Handles GET requests.
 
         Args:
-            username. str. A user's username.
+            username: str. A user's username.
         """
         user_id = user_services.get_user_id_from_username(username)
         # Here we are sure that user_id will never be None, because

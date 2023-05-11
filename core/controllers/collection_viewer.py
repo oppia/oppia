@@ -63,7 +63,7 @@ class CollectionDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Populates the data on the individual collection page.
 
         Args:
-            collection_id. str. Collection id.
+            collection_id: str. Collection id.
         """
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(

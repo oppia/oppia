@@ -130,7 +130,7 @@ class EditableCollectionDataHandler(
         """Populates the data on the individual collection page.
 
         Args:
-            collection_id. str. The ID of the collection.
+            collection_id: str. The ID of the collection.
         """
 
         collection_dict = (
@@ -149,7 +149,7 @@ class EditableCollectionDataHandler(
         """Updates properties of the given collection.
 
         Args:
-            collection_id. str. The ID of the collection.
+            collection_id: str. The ID of the collection.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -267,7 +267,7 @@ class CollectionPublishHandler(
         """Publishes the given collection.
 
         Args:
-            collection_id. str. The ID of the collection.
+            collection_id: str. The ID of the collection.
         """
         assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(
@@ -339,7 +339,7 @@ class CollectionUnpublishHandler(
         """Unpublishes the given collection.
 
         Args:
-            collection_id. str. The ID of the collection.
+            collection_id: str. The ID of the collection.
         """
         assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(collection_id)

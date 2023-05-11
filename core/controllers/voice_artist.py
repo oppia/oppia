@@ -93,7 +93,7 @@ class AudioUploadHandler(
         """Saves an audio file uploaded by a content creator.
 
         Args:
-            exploration_id. str. The exploration ID.
+            exploration_id: str. The exploration ID.
         """
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
@@ -228,8 +228,8 @@ class VoiceArtistManagementHandler(
         """Handles Post requests.
 
         Args:
-            unused_entity_type. str. The unused entity type.
-            entity_id. str. The entity ID.
+            unused_entity_type: str. The unused entity type.
+            entity_id: str. The entity ID.
         """
         assert self.normalized_payload is not None
         voice_artist = self.normalized_payload['username']
@@ -249,8 +249,8 @@ class VoiceArtistManagementHandler(
         """Handles Delete requests.
 
         Args:
-            unused_entity_type. str. The unused entity type.
-            entity_id. str. The entity ID.
+            unused_entity_type: str. The unused entity type.
+            entity_id: str. The entity ID.
         """
         assert self.normalized_request is not None
         voice_artist = self.normalized_request['voice_artist']

@@ -228,7 +228,7 @@ class TopicAssignmentsHandler(
         """Handles GET requests.
 
         Args:
-            skill_id. str. The skill ID.
+            skill_id: str. The skill ID.
         """
         topic_assignments = skill_services.get_all_topic_assignments_for_skill(
             skill_id)

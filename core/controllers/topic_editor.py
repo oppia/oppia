@@ -290,7 +290,7 @@ class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Handles GET requests.
 
         Args:
-            topic_id. str. The ID of the topic.
+            topic_id: str. The ID of the topic.
         """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
@@ -334,8 +334,8 @@ class EditableSubtopicPageDataHandler(
         """Handles GET requests.
 
         Args:
-            topic_id. str. The ID of the topic.
-            subtopic_id. str. The ID of the subtopic.
+            topic_id: str. The ID of the topic.
+            subtopic_id: str. The ID of the subtopic.
         """
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id, strict=False)
@@ -419,8 +419,8 @@ class EditableTopicDataHandler(
         version.
 
         Args:
-            version_from_payload. int. The payload version.
-            topic_version. int. The topic version.
+            version_from_payload: int. The payload version.
+            topic_version: int. The topic version.
         """
 
         if version_from_payload != topic_version:
@@ -434,7 +434,7 @@ class EditableTopicDataHandler(
         """Populates the data on the individual topic page.
 
         Args:
-            topic_id. str. The ID of the topic.
+            topic_id: str. The ID of the topic.
         """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
@@ -508,7 +508,7 @@ class EditableTopicDataHandler(
         includes editing its html data as of now).
 
         Args:
-            topic_id. str. The ID of the topic.
+            topic_id: str. The ID of the topic.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -576,7 +576,7 @@ class EditableTopicDataHandler(
         """Handles Delete requests.
 
         Args:
-            topic_id. str. The ID of the topic.
+            topic_id: str. The ID of the topic.
         """
         assert self.user_id is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -612,7 +612,7 @@ class TopicRightsHandler(
         """Returns the TopicRights object of a topic.
 
         Args:
-            topic_id. str. The ID of the topic.
+            topic_id: str. The ID of the topic.
         """
         assert self.user_id is not None
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
@@ -683,7 +683,7 @@ class TopicPublishSendMailHandler(
         """Returns the TopicRights object of a topic.
 
            Args:
-               topic_id. str. The ID of the topic.
+               topic_id: str. The ID of the topic.
         """
         assert self.normalized_payload is not None
         topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
@@ -744,7 +744,7 @@ class TopicPublishHandler(
         """Publishes or unpublishes a topic.
 
         Args:
-           topic_id. str. The ID of the topic.
+           topic_id: str. The ID of the topic.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -783,7 +783,7 @@ class TopicUrlFragmentHandler(
         a topic with the same url fragment exists.
 
         Args:
-            topic_url_fragment. str. The topic url fragment.
+            topic_url_fragment: str. The topic url fragment.
         """
         self.values.update({
             'topic_url_fragment_exists': (
@@ -818,7 +818,7 @@ class TopicNameHandler(
         a topic with the same name exists.
 
         Args:
-            topic_name. str. The topic name.
+            topic_name: str. The topic name.
         """
         self.values.update({
             'topic_name_exists': (

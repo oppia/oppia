@@ -64,7 +64,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Handles GET requests.
 
         Args:
-            topic_name. str. The topic name.
+            topic_name: str. The topic name.
         """
 
         topic = topic_fetchers.get_topic_by_name(topic_name)

@@ -111,7 +111,7 @@ class DiagnosticTestQuestionsHandler(
         """Handled GET requests.
 
         Args:
-            topic_id. str. The ID of the topic.
+            topic_id: str. The ID of the topic.
         """
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
