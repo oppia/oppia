@@ -1248,11 +1248,9 @@ class TestBase(unittest.TestCase):
         earlier in the same list.
 
         Args:
-            param_dict: dict[str, str]. The old param dict.
-            param_changes: list[ParamChange]. The param changes to use for
-            the update.
-            exp_param_specs: dict[str, ParamChange]. The expected param
-            specifications.
+            param_dict: dict. The old param dict.
+            param_changes: list. The param changes to use for the update.
+            exp_param_specs: dict. The expected param specifications.
 
         Returns:
             dict. The updated param dict.
