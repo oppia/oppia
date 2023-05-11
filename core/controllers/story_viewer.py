@@ -137,17 +137,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         completed_node_ids: List[str],
         ordered_nodes: List[story_domain.StoryNode]
     ) -> Tuple[List[str], Optional[str], List[str]]:
-        """Records node completion.
-
-        Args:
-            story_id: str. The story ID.
-            node_id: str. The node ID.
-            completed_node_ids: list. The completed node IDs
-            ordered_nodes: list. The list of odered nodes.
-
-        Returns:
-            Tuple. A tuple of lists.
-        """
+        """Records node completion."""
         assert self.user_id is not None
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException

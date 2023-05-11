@@ -1210,13 +1210,7 @@ class TestBase(unittest.TestCase):
     def _assert_validation_error(
         self, item: Any, error_substring: str
     ) -> None:
-        """Checks that the given item passes default validation.
-
-        Args:
-            item: Any. The object to validate.
-            error_substring: str. The regex to match string representation
-            of the raised exception.
-        """
+        """Checks that the given item passes default validation."""
         with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
 
@@ -3091,12 +3085,11 @@ version: 1
 
         Args:
             url: str. The url to post an object to.
-            payload: Dict[str. str]. The dictionary which needs to be sent.
-            headers: Dict[str, str]. The headers set in the request.
+            payload: dict. The dictionary which needs to be sent.
+            headers: dict. The headers set in the request.
             csrf_token: str. The csrf token to identify the user.
             expect_errors: bool. Whether errors are expected.
-            expected_status_int: int. The expected status code. Will be 200 if
-            not specified.
+            expected_status_int: int. The expected status code.
 
         Returns:
             webtest.TestApp. The respose of the post task request.

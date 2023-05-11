@@ -58,7 +58,7 @@ class SubscribeHandler(
 
     @acl_decorators.can_subscribe_to_users
     def post(self) -> None:
-        """Handles POST requests.""""
+        """Handles POST requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         creator_username = self.normalized_payload['creator_username']
@@ -117,5 +117,4 @@ class UnsubscribeHandler(
         subscription_services.unsubscribe_from_creator(
             self.user_id, creator_id)
         self.render_json(self.values)
-
 
