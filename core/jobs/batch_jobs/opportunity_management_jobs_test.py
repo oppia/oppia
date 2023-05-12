@@ -18,8 +18,11 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.constants import constants
+from core.domain import opportunity_services
 from core.domain import state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import opportunity_management_jobs
@@ -578,6 +581,30 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertItemsEqual(
             opportunity_model.language_codes_needing_voice_artists,
             ['cs', 'hi'])
+
+    def test_generation_job_create_opportunity_exception_logs_exception(
+        self
+    ) -> None:
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            exception_message = 'Validation error'
+            with self.swap_to_always_raise(
+                opportunity_services,
+                'create_exp_opportunity_summary',
+                Exception(exception_message)
+            ):
+                self.assert_job_output_is([
+                    job_run_result.JobRunResult(
+                        stdout='TOPIC PROCESSED SUCCESS: 1'),
+                ])
+                self.assertEqual(len(logs), 1)
+                # Ignore the stack trace in the log.
+                self.assertEqual(
+                    logs[0][:len(exception_message)],
+                    exception_message)
+
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 0)
 
     def test_generation_job_returns_multiple_opportunities_for_one_topic(
         self
