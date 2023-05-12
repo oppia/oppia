@@ -428,7 +428,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                 exps_dict=exps_dict)
         )
 
-        opportunity_models = (
+        opportunity_summary_models = (
             opportunities_per_topic_results
             | 'Filter the results with SUCCESS status' >> beam.Filter(
                 lambda result: result.is_ok())
@@ -449,14 +449,14 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
         )
 
         generated_opportunities_count_job_run_results = (
-            opportunity_models
+            opportunity_summary_models
             | 'Generated opportunity count' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'GENERATED OPPORTUNITIES COUNT'))
         )
 
         unused_put_results = (
-            opportunity_models
+            opportunity_summary_models
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
