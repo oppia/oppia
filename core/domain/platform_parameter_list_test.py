@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_list as params
 from core.tests import test_utils
 
@@ -96,3 +97,15 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
             unexpected_names,
             msg='Unexpected platform parameters: %s.' % list(unexpected_names)
         )
+
+    def test_all_feature_flags_are_of_bool_type(self) -> None:
+        feature_flags = feature_services.get_all_feature_flag_dicts()
+        self.assertGreater(len(feature_flags), 0)
+        for feature in feature_flags:
+            self.assertEqual(
+                feature['data_type'],
+                'bool',
+                'We expect all the feature-flags to be of type boolean '
+                'but "%s" feature-flag is of type "%s".' % (
+                    feature['name'], feature['data_type'])
+            )
