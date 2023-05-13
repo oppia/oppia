@@ -2558,11 +2558,11 @@ div#ng-curtain {
   color: #fff;
 }
 .oppia-editor-warnings-count {
+  display: flex;
+  justify-content: center;
   margin-bottom: -3px;
   padding-left: 0.5px;
-  display: flex;
   padding-top: 3px;
-  justify-content: center;
   text-align: center;
 }
 
