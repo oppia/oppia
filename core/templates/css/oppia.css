@@ -2560,8 +2560,8 @@ div#ng-curtain {
 .oppia-editor-warnings-count {
   margin-bottom: -3px;
   padding-left: 0.5px;
-  padding-top: 3px;
   display: flex;
+  padding-top: 3px;
   justify-content: center;
   text-align: center;
 }
