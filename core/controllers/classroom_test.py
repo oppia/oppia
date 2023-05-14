@@ -106,28 +106,17 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         public_topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
+        self.logout()
 
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
             'name': 'math',
             'topic_ids': [topic_id_1, topic_id_2, topic_id_3],
             'course_details': 'Course details for classroom.',
             'topic_list_intro': 'Topics covered for classroom',
             'url_fragment': 'math',
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
-            }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
-        self.logout()
-
-        json_response = self.get_json(
-            '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
+        }]):
+            json_response = self.get_json(
+                '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
         topic_summary_dict = (
             topic_fetchers.get_topic_summary_by_id(topic_id_2).to_dict()
         )

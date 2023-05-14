@@ -1076,8 +1076,7 @@ class AdminHandler(
                     topic_id_5
                 ],
             }]
-            config_services.set_property(
-                self.user_id, 'classroom_pages_data', classroom_pages_data)
+            constants.CLASSROOM_PAGES_DATA = classroom_pages_data
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 

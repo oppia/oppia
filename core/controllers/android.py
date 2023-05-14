@@ -196,7 +196,7 @@ class AndroidActivityHandler(base.BaseHandler[
                         'Version cannot be specified for classroom')
                 matching_classroom_fragment = [
                     classroom['url_fragment']
-                    for classroom in config_domain.CLASSROOM_PAGES_DATA.value
+                    for classroom in constants.CLASSROOM_PAGES_DATA
                     if classroom['name'] == activity_data['id']
                 ][0]
                 activities[activity_data['id']] = (

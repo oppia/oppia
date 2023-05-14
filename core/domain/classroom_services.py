@@ -38,7 +38,7 @@ def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     Returns:
         str. Returns the classroom url fragment for a topic.
     """
-    for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
+    for classroom_dict in constants.CLASSROOM_PAGES_DATA:
         if topic_id in classroom_dict['topic_ids']:
             # As config_property in config domain is set to Any, we need type
             # casting to return a string value.
@@ -62,7 +62,7 @@ def get_classroom_by_url_fragment(
         Classroom|None. Returns the classroom domain object if found, else
         returns None.
     """
-    for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
+    for classroom_dict in constants.CLASSROOM_PAGES_DATA:
         if classroom_url_fragment == classroom_dict['url_fragment']:
             return classroom_domain.Classroom(
                 classroom_dict['name'],

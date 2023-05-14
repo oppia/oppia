@@ -35,15 +35,14 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def test_can_get_classroom_by_url_fragment(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
-        config_services.set_property(
-            self.user_id_admin, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [topic_id],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
-        classroom = classroom_services.get_classroom_by_url_fragment('math')
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]):
+            classroom = classroom_services.get_classroom_by_url_fragment('math')
         assert classroom is not None
         self.assertEqual(classroom.name, 'math')
         self.assertEqual(classroom.url_fragment, 'math')
@@ -55,32 +54,30 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def test_get_classroom_url_fragment_for_topic_id(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
-        config_services.set_property(
-            self.user_id_admin, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math-one',
-                'topic_ids': [topic_id],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
-        classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
-                topic_id))
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
+            'name': 'math',
+            'url_fragment': 'math-one',
+            'topic_ids': [topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]):
+            classroom_url_fragment = (
+                classroom_services.get_classroom_url_fragment_for_topic_id(
+                    topic_id))
         self.assertEqual(classroom_url_fragment, 'math-one')
 
     def test_return_default_if_associated_classroom_is_not_found(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
-        config_services.set_property(
-            self.user_id_admin, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math-two',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
-        classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
-                topic_id))
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
+            'name': 'math',
+            'url_fragment': 'math-two',
+            'topic_ids': [],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]):
+            classroom_url_fragment = (
+                classroom_services.get_classroom_url_fragment_for_topic_id(
+                    topic_id))
         self.assertNotEqual(classroom_url_fragment, 'math-two')
         self.assertEqual(
             classroom_url_fragment,

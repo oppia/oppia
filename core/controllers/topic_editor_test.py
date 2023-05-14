@@ -91,25 +91,13 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
+        self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
             'name': 'math',
             'url_fragment': 'math',
             'topic_ids': [self.topic_id],
             'course_details': '',
             'topic_list_intro': ''
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
-            }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
-        self.logout()
+        }])
 
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):

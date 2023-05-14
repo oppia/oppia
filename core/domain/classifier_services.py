@@ -23,8 +23,8 @@ import hmac
 import logging
 
 from core import feconf
+from core.constants import constants
 from core.domain import classifier_domain
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_services
@@ -36,7 +36,10 @@ from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
+    from mypy_imports import secrets_services
     from proto_files import text_classifier_pb2
+
+secrets_services = models.Registry.import_secrets_services()
 
 (classifier_models,) = models.Registry.import_models([models.Names.CLASSIFIER])
 
@@ -94,7 +97,14 @@ def verify_signature(
         bool. Whether the incoming request is valid.
     """
     secret = None
-    for val in config_domain.VMID_SHARED_SECRET_KEY_MAPPING.value:
+    vmid_shared_secret_key_mapping = secrets_services.get_secret(
+        'VMID_SHARED_SECRET_KEY_MAPPING')
+    if vmid_shared_secret_key_mapping is None and constants.DEV_MODE:
+        vmid_shared_secret_key_mapping = [{
+            'vm_id': feconf.DEFAULT_VM_ID,
+            'shared_secret_key': feconf.DEFAULT_VM_SHARED_SECRET
+        }]
+    for val in vmid_shared_secret_key_mapping:
         if val['vm_id'] == oppia_ml_auth_info.vm_id:
             secret = val['shared_secret_key'].encode('utf-8')
             break

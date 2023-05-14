@@ -101,13 +101,6 @@ describe('Admin backend api service', () => {
   let adminDataObject: AdminPageData;
   let configPropertyValues = {
     always_ask_learners_for_answer_details: false,
-    classroom_pages_data: {
-      course_details: 'fds',
-      name: 'mathfas',
-      topic_ids: [],
-      topic_list_intro: 'fsd',
-      url_fragment: 'mathfsad',
-    },
     classroom_promos_are_enabled: false,
     contributor_dashboard_is_enabled: true,
     contributor_dashboard_reviewer_emails_is_enabled: true,
@@ -133,10 +126,6 @@ describe('Admin backend api service', () => {
       html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
     },
     unpublish_exploration_email_html_body: 'test',
-    vmid_shared_secret_key_mapping: {
-      shared_secret_key: 'aafd1a2b3c4e',
-      vm_id: 'fds'
-    },
     whitelisted_exploration_ids_for_playthroughs: [
       'umPkawp0L1M0-', 'oswa1m5Q3jK41']
   };

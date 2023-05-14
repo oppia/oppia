@@ -120,12 +120,10 @@ def initialize_android_test_data() -> str:
             translation_models.MachineTranslationModel.get_all().fetch())
 
         # Remove the topic from classroom pages if it's present.
-        classrooms_property = config_domain.CLASSROOM_PAGES_DATA
-        classrooms = classrooms_property.value
+        classrooms = constants.CLASSROOM_PAGES_DATA
         for classroom in classrooms:
             classroom['topic_ids'].remove(topic.id)
-        config_services.set_property(
-            user_id, classrooms_property.name, classrooms)
+        constants.CLASSROOM_PAGES_DATA = classrooms
 
     # Generate new Structure id for topic, story, skill and question.
     topic_id = topic_fetchers.get_new_topic_id()
@@ -578,11 +576,10 @@ def initialize_android_test_data() -> str:
             )
 
     # Add the new topic to all available classrooms.
-    classrooms_property = config_domain.CLASSROOM_PAGES_DATA
-    classrooms = classrooms_property.value
+    classrooms = constants.CLASSROOM_PAGES_DATA
     for classroom in classrooms:
         classroom['topic_ids'].append(topic_id)
-    config_services.set_property(user_id, classrooms_property.name, classrooms)
+    constants.CLASSROOM_PAGES_DATA = classrooms
 
     return topic_id
 

@@ -229,24 +229,14 @@ class SampleDataInitializer:
         topic_ids = [
             topic_summary_dict['id'] for topic_summary_dict in
             topic_summary_dicts]
-
-        params = {
-            'payload': json.dumps({
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    'classroom_pages_data': [{
-                        'name': classroom_name,
-                        'url_fragment': classroom_url_fragment,
-                        'course_details': '',
-                        'topic_list_intro': '',
-                        'topic_ids': topic_ids
-                    }]
-                }
-            }),
-            'csrf_token': self.csrf_token
-        }
-
-        self._make_request('POST', '/adminhandler', params=params)
+        
+        constants.CLASSROOM_PAGES_DATA = [{
+            'name': classroom_name,
+            'url_fragment': classroom_url_fragment,
+            'course_details': '',
+            'topic_list_intro': '',
+            'topic_ids': topic_ids
+        }]
 
     def _make_request(
         self,

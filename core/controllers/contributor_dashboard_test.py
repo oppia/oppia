@@ -118,16 +118,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.create_story_for_translation_opportunity(
             self.owner_id, self.admin_id, 'story_id_2', self.topic_id_1, '2')
 
-        # Add skill opportunity topic to a classroom.
-        config_services.set_property(
-            self.admin_id, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math-one',
-                'topic_ids': [self.topic_id],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
-
         self.expected_skill_opportunity_dict_0 = {
             'id': self.skill_id_0,
             'skill_description': 'skill_description',
@@ -195,9 +185,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             params={}, expected_status_int=404)
 
     def test_get_skill_opportunity_data(self) -> None:
-        response = self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={})
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
+            'name': 'math',
+            'url_fragment': 'math-one',
+            'topic_ids': [self.topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]):
+            response = self.get_json(
+                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={})
         self.assertEqual(
             response['opportunities'], [
                 self.expected_skill_opportunity_dict_0,
@@ -208,9 +205,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
         self
     ) -> None:
-        config_services.revert_property(
-            self.admin_id, 'classroom_pages_data')
-
         response = self.get_json(
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
             params={})
@@ -249,46 +243,51 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_pagination(self) -> None:
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={})
-            self.assertEqual(len(response['opportunities']), 1)
-            self.assertEqual(
-                response['opportunities'],
-                [self.expected_skill_opportunity_dict_0])
-            self.assertTrue(response['more'])
-            self.assertIsInstance(response['next_cursor'], str)
+        classroom_pages_data = [{
+            'name': 'math',
+            'url_fragment': 'math-one',
+            'topic_ids': [self.topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', classroom_pages_data):
+            with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+                response = self.get_json(
+                    '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                    params={})
+                self.assertEqual(len(response['opportunities']), 1)
+                self.assertEqual(
+                    response['opportunities'],
+                    [self.expected_skill_opportunity_dict_0])
+                self.assertTrue(response['more'])
+                self.assertIsInstance(response['next_cursor'], str)
 
-            next_cursor = response['next_cursor']
-            next_response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'cursor': next_cursor})
+                next_cursor = response['next_cursor']
+                next_response = self.get_json(
+                    '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                    params={'cursor': next_cursor})
 
-            self.assertEqual(len(next_response['opportunities']), 1)
-            self.assertEqual(
-                next_response['opportunities'],
-                [self.expected_skill_opportunity_dict_1])
-            self.assertTrue(next_response['more'])
-            self.assertIsInstance(next_response['next_cursor'], str)
+                self.assertEqual(len(next_response['opportunities']), 1)
+                self.assertEqual(
+                    next_response['opportunities'],
+                    [self.expected_skill_opportunity_dict_1])
+                self.assertTrue(next_response['more'])
+                self.assertIsInstance(next_response['next_cursor'], str)
 
-            next_cursor = next_response['next_cursor']
-            next_response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'cursor': next_cursor})
+                next_cursor = next_response['next_cursor']
+                next_response = self.get_json(
+                    '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                    params={'cursor': next_cursor})
 
-            # Skill 2 is not part of a Classroom topic and so its corresponding
-            # opportunity is not returned.
-            self.assertEqual(len(next_response['opportunities']), 0)
-            self.assertFalse(next_response['more'])
-            self.assertIsInstance(next_response['next_cursor'], str)
+                # Skill 2 is not part of a Classroom topic and so its
+                # corresponding opportunity is not returned.
+                self.assertEqual(len(next_response['opportunities']), 0)
+                self.assertFalse(next_response['more'])
+                self.assertIsInstance(next_response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_pagination_multiple_fetches(
         self
     ) -> None:
-        # Unassign topic 0 from the classroom.
-        config_services.revert_property(self.admin_id, 'classroom_pages_data')
-
         # Create a new topic.
         topic_id = '9'
         topic_name = 'topic9'
@@ -300,49 +299,47 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self._publish_valid_topic(
             topic, [skill_id_3, skill_id_4, skill_id_5])
 
-        # Add new topic to a classroom.
-        config_services.set_property(
-            self.admin_id, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math-one',
-                'topic_ids': [topic_id],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
-
         # Opportunities with IDs skill_id_0, skill_id_1, skill_id_2 will be
         # fetched first. Since skill_id_0, skill_id_1, skill_id_2 are not linked
         # to a classroom, another fetch will be made to retrieve skill_id_3,
         # skill_id_4, skill_id_5 to fulfill the page size.
-        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
-            response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={})
-            self.assertEqual(len(response['opportunities']), 3)
-            self.assertEqual(
-                response['opportunities'],
-                [
-                    {
-                        'id': skill_id_3,
-                        'skill_description': 'skill_description',
-                        'question_count': 0,
-                        'topic_name': topic_name
-                    },
-                    {
-                        'id': skill_id_4,
-                        'skill_description': 'skill_description',
-                        'question_count': 0,
-                        'topic_name': topic_name
-                    },
-                    {
-                        'id': skill_id_5,
-                        'skill_description': 'skill_description',
-                        'question_count': 0,
-                        'topic_name': topic_name
-                    }
-                ])
-            self.assertFalse(response['more'])
-            self.assertIsInstance(response['next_cursor'], str)
+        classroom_pages_data = [{
+            'name': 'math',
+            'url_fragment': 'math-one',
+            'topic_ids': [topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', classroom_pages_data):
+            with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
+                response = self.get_json(
+                    '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                    params={})
+        self.assertEqual(len(response['opportunities']), 3)
+        self.assertEqual(
+            response['opportunities'],
+            [
+                {
+                    'id': skill_id_3,
+                    'skill_description': 'skill_description',
+                    'question_count': 0,
+                    'topic_name': topic_name
+                },
+                {
+                    'id': skill_id_4,
+                    'skill_description': 'skill_description',
+                    'question_count': 0,
+                    'topic_name': topic_name
+                },
+                {
+                    'id': skill_id_5,
+                    'skill_description': 'skill_description',
+                    'question_count': 0,
+                    'topic_name': topic_name
+                }
+            ])
+        self.assertFalse(response['more'])
+        self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunity_data_pagination(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):

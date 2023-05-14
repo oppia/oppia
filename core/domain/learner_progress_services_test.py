@@ -1600,82 +1600,67 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
     def test_get_all_and_untracked_topic_ids(self) -> None:
-        # Add topics to config_domain.
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
             'name': 'math',
             'url_fragment': 'math',
             'topic_ids': [self.TOPIC_ID_0, self.TOPIC_ID_1],
             'course_details': '',
             'topic_list_intro': ''
-        }]
+        }]):
+            self.login(self.USER_EMAIL)
+            partially_learnt_topic_ids = (
+                learner_progress_services.get_all_partially_learnt_topic_ids(
+                    self.user_id))
+            learnt_topic_ids = (
+                learner_progress_services.get_all_learnt_topic_ids(
+                    self.user_id))
+            topic_ids_to_learn = (
+                learner_goals_services.get_all_topic_ids_to_learn(
+                    self.user_id))
+            all_topics, untracked_topics = (
+                learner_progress_services.get_all_and_untracked_topic_ids_for_user(
+                    partially_learnt_topic_ids, learnt_topic_ids,
+                    topic_ids_to_learn))
+            self.assertEqual(len(all_topics), 2)
+            self.assertEqual(len(untracked_topics), 2)
 
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
-            }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
-        self.logout()
+            # Mark one topic as partially learnt.
+            learner_progress_services.record_topic_started(
+                self.user_id, self.TOPIC_ID_0)
+            partially_learnt_topic_ids = (
+                learner_progress_services.get_all_partially_learnt_topic_ids(
+                    self.user_id))
+            learnt_topic_ids = (
+                learner_progress_services.get_all_learnt_topic_ids(
+                    self.user_id))
+            topic_ids_to_learn = (
+                learner_goals_services.get_all_topic_ids_to_learn(
+                    self.user_id))
+            all_topics, untracked_topics = (
+                learner_progress_services.get_all_and_untracked_topic_ids_for_user(
+                    partially_learnt_topic_ids, learnt_topic_ids,
+                    topic_ids_to_learn))
+            self.assertEqual(len(all_topics), 2)
+            self.assertEqual(len(untracked_topics), 1)
 
-        self.login(self.USER_EMAIL)
-        partially_learnt_topic_ids = (
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.user_id))
-        learnt_topic_ids = (
-            learner_progress_services.get_all_learnt_topic_ids(
-                self.user_id))
-        topic_ids_to_learn = (
-            learner_goals_services.get_all_topic_ids_to_learn(
-                self.user_id))
-        all_topics, untracked_topics = (
-            learner_progress_services.get_all_and_untracked_topic_ids_for_user(
-                partially_learnt_topic_ids, learnt_topic_ids,
-                topic_ids_to_learn))
-        self.assertEqual(len(all_topics), 2)
-        self.assertEqual(len(untracked_topics), 2)
-
-        # Mark one topic as partially learnt.
-        learner_progress_services.record_topic_started(
-            self.user_id, self.TOPIC_ID_0)
-        partially_learnt_topic_ids = (
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.user_id))
-        learnt_topic_ids = (
-            learner_progress_services.get_all_learnt_topic_ids(
-                self.user_id))
-        topic_ids_to_learn = (
-            learner_goals_services.get_all_topic_ids_to_learn(
-                self.user_id))
-        all_topics, untracked_topics = (
-            learner_progress_services.get_all_and_untracked_topic_ids_for_user(
-                partially_learnt_topic_ids, learnt_topic_ids,
-                topic_ids_to_learn))
-        self.assertEqual(len(all_topics), 2)
-        self.assertEqual(len(untracked_topics), 1)
-
-        # Mark one topic as learnt.
-        learner_progress_services.mark_topic_as_learnt(
-            self.user_id, self.TOPIC_ID_1)
-        partially_learnt_topic_ids = (
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.user_id))
-        learnt_topic_ids = (
-            learner_progress_services.get_all_learnt_topic_ids(
-                self.user_id))
-        topic_ids_to_learn = (
-            learner_goals_services.get_all_topic_ids_to_learn(
-                self.user_id))
-        all_topics, untracked_topics = (
-            learner_progress_services.get_all_and_untracked_topic_ids_for_user(
-                partially_learnt_topic_ids, learnt_topic_ids,
-                topic_ids_to_learn))
-        self.assertEqual(len(all_topics), 2)
-        self.assertEqual(len(untracked_topics), 0)
+            # Mark one topic as learnt.
+            learner_progress_services.mark_topic_as_learnt(
+                self.user_id, self.TOPIC_ID_1)
+            partially_learnt_topic_ids = (
+                learner_progress_services.get_all_partially_learnt_topic_ids(
+                    self.user_id))
+            learnt_topic_ids = (
+                learner_progress_services.get_all_learnt_topic_ids(
+                    self.user_id))
+            topic_ids_to_learn = (
+                learner_goals_services.get_all_topic_ids_to_learn(
+                    self.user_id))
+            all_topics, untracked_topics = (
+                learner_progress_services.get_all_and_untracked_topic_ids_for_user(
+                    partially_learnt_topic_ids, learnt_topic_ids,
+                    topic_ids_to_learn))
+            self.assertEqual(len(all_topics), 2)
+            self.assertEqual(len(untracked_topics), 0)
 
     def test_unpublishing_incomplete_collection_filters_it_out(self) -> None:
         # Add collections to the incomplete list.
@@ -2124,28 +2109,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activity_ids.collection_playlist_ids, [self.COL_ID_3])
 
     def test_get_all_activity_progress(self) -> None:
-        # Add topics to config_domain.
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [self.TOPIC_ID_3],
-            'course_details': '',
-            'topic_list_intro': ''
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
-            }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
-        self.logout()
-
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
@@ -2187,9 +2150,16 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         collection_progress = (
             learner_progress_services.get_collection_progress(
                 self.user_id))
-        topics_and_stories_progress = (
-            learner_progress_services.get_topics_and_stories_progress(
-                self.user_id))
+        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.TOPIC_ID_3],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]):
+            topics_and_stories_progress = (
+                learner_progress_services.get_topics_and_stories_progress(
+                    self.user_id))
 
         incomplete_exp_summaries = (
             exploration_progress[0].incomplete_exp_summaries)

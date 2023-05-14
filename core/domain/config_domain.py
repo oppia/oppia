@@ -96,75 +96,6 @@ SET_OF_STRINGS_SCHEMA = {
     }],
 }
 
-SET_OF_CLASSROOM_DICTS_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_LIST,
-    'items': {
-        'type': schema_utils.SCHEMA_TYPE_DICT,
-        'properties': [{
-            'name': 'name',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }, {
-            'name': 'url_fragment',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE,
-                'validators': [{
-                    'id': 'is_url_fragment',
-                }, {
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
-                }]
-            },
-        }, {
-            'name': 'course_details',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE,
-                'ui_config': {
-                    'rows': 8,
-                }
-            }
-        }, {
-            'name': 'topic_list_intro',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE,
-                'ui_config': {
-                    'rows': 5,
-                }
-            }
-        }, {
-            'name': 'topic_ids',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_LIST,
-                'items': {
-                    'type': schema_utils.SCHEMA_TYPE_UNICODE,
-                },
-                'validators': [{
-                    'id': 'is_uniquified',
-                }]
-            }
-        }]
-    }
-}
-
-VMID_SHARED_SECRET_KEY_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_LIST,
-    'items': {
-        'type': schema_utils.SCHEMA_TYPE_DICT,
-        'properties': [{
-            'name': 'vm_id',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }, {
-            'name': 'shared_secret_key',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }]
-    }
-}
-
 BOOL_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_BOOL
 }
@@ -468,14 +399,6 @@ PROMO_BAR_MESSAGE = ConfigProperty(
     'promo_bar_message', UNICODE_SCHEMA,
     'The message to show to all users if the promo bar is enabled', '')
 
-VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
-    'vmid_shared_secret_key_mapping', VMID_SHARED_SECRET_KEY_SCHEMA,
-    'VMID and shared secret key corresponding to that VM',
-    [{
-        'vm_id': feconf.DEFAULT_VM_ID,
-        'shared_secret_key': feconf.DEFAULT_VM_SHARED_SECRET
-    }])
-
 WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
     'whitelisted_exploration_ids_for_playthroughs',
     SET_OF_STRINGS_SCHEMA,
@@ -483,20 +406,6 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
         'umPkwp0L1M0-', 'MjZzEVOG47_1', '9trAQhj6uUC2', 'rfX8jNkPnA-1',
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
-
-# Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
-# to add that classroom to learner group syllabus filter whenever a new
-# classroom is added.
-CLASSROOM_PAGES_DATA = ConfigProperty(
-    'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
-    'The details for each classroom page.', [{
-        'name': 'math',
-        'url_fragment': 'math',
-        'topic_ids': [],
-        'course_details': '',
-        'topic_list_intro': ''
-    }]
-)
 
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
