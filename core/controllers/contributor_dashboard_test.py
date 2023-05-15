@@ -1403,13 +1403,8 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
         new_value = [
             {'language_code': 'en', 'explanation': 'Partnership with ABC'}
         ]
-        config_services.set_property(
-            'admin',
-            'featured_translation_languages',
-            new_value
-        )
-
-        response = self.get_json('/retrivefeaturedtranslationlanguages')
+        with self.swap(constants, 'FEATURED_TRANSLATION_LANGUAGES', new_value):
+            response = self.get_json('/retrivefeaturedtranslationlanguages')
         self.assertEqual(
             response,
             {'featured_translation_languages': new_value}

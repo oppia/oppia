@@ -764,7 +764,7 @@ class UserContributionRightsDataHandler(
 class FeaturedTranslationLanguagesHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Provides featured translation languages set in admin config."""
+    """Provides featured translation languages."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -775,7 +775,7 @@ class FeaturedTranslationLanguagesHandler(
         """Handles GET requests."""
         self.render_json({
             'featured_translation_languages':
-                config_domain.FEATURED_TRANSLATION_LANGUAGES.value
+                constants.FEATURED_TRANSLATION_LANGUAGES
         })
 
 

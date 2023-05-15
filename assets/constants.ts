@@ -40,6 +40,8 @@ export default {
     "topic_list_intro": ""
   }],
 
+  "FEATURED_TRANSLATION_LANGUAGES": [],
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",

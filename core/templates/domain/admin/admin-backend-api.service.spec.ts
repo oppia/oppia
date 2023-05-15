@@ -107,7 +107,6 @@ describe('Admin backend api service', () => {
     email_footer: 'fsdf',
     email_sender_name: 'Site Admin',
     enable_admin_notifications_for_reviewer_shortage: false,
-    featured_translation_languages: [],
     high_bounce_rate_task_minimum_exploration_starts: 1001,
     high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.2,
     high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.2,
