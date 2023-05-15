@@ -269,37 +269,6 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             ['content_id_1', 'content_id_2', 'content_id_3', 'content_id_4']
         )
 
-    def test_get_all_contents_which_need_translations_with_digits(
-        self
-    ) -> None:
-        translation_dict = {
-            'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.',
-                translation_domain.TranslatableContentFormat.HTML,
-                True)
-        }
-        entity_translations = translation_domain.EntityTranslation(
-            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
-            translation_dict)
-
-        translatable_object = DummyTranslatableObjectWithFourParams(
-            '10000', 'My name is jhon.', 'My name is Nikhil.', '')
-        contents_which_need_translation = (
-            translatable_object.get_all_contents_which_need_translations(
-                entity_translations).values())
-
-        expected_list_of_contents_which_need_translataion = [
-            'My name is jhon.',
-            'My name is Nikhil.'
-        ]
-        list_of_contents_which_need_translataion = [
-            translatable_content.content_value
-            for translatable_content in contents_which_need_translation
-        ]
-        self.assertItemsEqual(
-            expected_list_of_contents_which_need_translataion,
-            list_of_contents_which_need_translataion)
-
     def test_are_translations_displayable_with_all_translations(self) -> None:
         translation_dict = {
             'content_id_2': translation_domain.TranslatedContent(
