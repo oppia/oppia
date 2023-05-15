@@ -229,7 +229,6 @@ class SampleDataInitializer:
         topic_ids = [
             topic_summary_dict['id'] for topic_summary_dict in
             topic_summary_dicts]
-        
         constants.CLASSROOM_PAGES_DATA = [{
             'name': classroom_name,
             'url_fragment': classroom_url_fragment,
