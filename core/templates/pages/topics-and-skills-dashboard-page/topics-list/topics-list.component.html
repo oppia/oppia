@@ -68,7 +68,7 @@
       <td class="text-center topic-list-status">
         <span class="topic-list-status-text" *ngIf="topic.isPublished"> Published </span>
         <span class="topic-list-status-text" *ngIf="!topic.isPublished"> Not Published </span>
-        <p class="fas fa-ellipsis-v topic-edit-box-icon e2e-test-topic-edit-box" (click)="changeEditOptions(topic.id)" attr.aria-label="Topic edit"></p>
+        <button class="fas fa-ellipsis-v  topic-edit-box-icon e2e-test-topic-edit-box" role="button" (click)="changeEditOptions(topic.id)" aria-label="Topic edit"></button>
         <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
           <a class="topic-edit-options-edit e2e-test-edit-topic-button" [href]="getTopicEditorUrl(topic.id)">
             <i class="fa fa-pen"></i>
@@ -103,7 +103,7 @@
             </div>
           </div>
           <div class="topic-item-options">
-            <p class="fas fa-ellipsis-v topic-edit-box-icon" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></p>
+            <button class="fas fa-ellipsis-v topic-edit-box-icon" role="button" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></button>
             <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
               <a class="topic-edit-options-edit" [href]="getTopicEditorUrl(topic.id)">
                 <i class="fa fa-pen"></i>

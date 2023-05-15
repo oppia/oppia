@@ -15,6 +15,11 @@
   color: #fff;
 }
 
+.oppia-footer-container a:focus {
+  outline: 2px solid #fff;
+  text-decoration: underline;
+}
+
 .oppia-footer-container h3 {
   color: #fff;
   font-size: 1em;

@@ -71,3 +71,18 @@
 .oppia-form-text {
   font-size: smaller;
 }
+.preferences-page-tab-focus:focus-visible {
+  outline: 2px solid #0060df;
+  text-decoration: underline;
+}
+a.delete-btn, 
+a.delete-btn:hover, 
+a.delete-btn:visited,
+a.delete-btn:active,
+a.export-btn, 
+a.export-btn:hover, 
+a.export-btn:visited,
+a.export-btn:active {
+  color: #fff;
+  text-decoration: none;
+}
