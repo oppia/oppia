@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from core.constants import constants
 from core.domain import classroom_domain
-from core.domain import config_domain
 
 from typing import Optional
 

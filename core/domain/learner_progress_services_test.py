@@ -23,7 +23,6 @@ import datetime
 from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_goals_services
@@ -1618,7 +1617,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 learner_goals_services.get_all_topic_ids_to_learn(
                     self.user_id))
             all_topics, untracked_topics = (
-                learner_progress_services.get_all_and_untracked_topic_ids_for_user(
+                learner_progress_services.
+                get_all_and_untracked_topic_ids_for_user(
                     partially_learnt_topic_ids, learnt_topic_ids,
                     topic_ids_to_learn))
             self.assertEqual(len(all_topics), 2)
@@ -1637,7 +1637,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 learner_goals_services.get_all_topic_ids_to_learn(
                     self.user_id))
             all_topics, untracked_topics = (
-                learner_progress_services.get_all_and_untracked_topic_ids_for_user(
+                learner_progress_services.
+                get_all_and_untracked_topic_ids_for_user(
                     partially_learnt_topic_ids, learnt_topic_ids,
                     topic_ids_to_learn))
             self.assertEqual(len(all_topics), 2)
@@ -1656,7 +1657,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 learner_goals_services.get_all_topic_ids_to_learn(
                     self.user_id))
             all_topics, untracked_topics = (
-                learner_progress_services.get_all_and_untracked_topic_ids_for_user(
+                learner_progress_services.
+                get_all_and_untracked_topic_ids_for_user(
                     partially_learnt_topic_ids, learnt_topic_ids,
                     topic_ids_to_learn))
             self.assertEqual(len(all_topics), 2)

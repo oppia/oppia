@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core import schema_utils
-from core.constants import constants
 from core.domain import change_domain
 
 from typing import (

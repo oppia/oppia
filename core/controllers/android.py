@@ -25,7 +25,6 @@ from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import classroom_domain
 from core.domain import classroom_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import skill_domain

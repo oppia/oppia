@@ -22,7 +22,6 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import config_services
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers

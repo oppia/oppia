@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from core.constants import constants
 from core.domain import classroom_services
-from core.domain import config_services
 from core.domain import topic_fetchers
 from core.tests import test_utils
 

@@ -25,7 +25,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_domain
 from core.domain import blog_services
-from core.domain import config_domain
 from core.domain import user_services
 
 from typing import Dict, Final, List, Optional, Tuple, TypedDict

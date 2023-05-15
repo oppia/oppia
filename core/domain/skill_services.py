@@ -23,7 +23,6 @@ import logging
 from core import feconf
 from core.constants import constants
 from core.domain import caching_services
-from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import role_services

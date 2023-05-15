@@ -27,7 +27,6 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
-from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services

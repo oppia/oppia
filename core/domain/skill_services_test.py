@@ -20,7 +20,6 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_services
 from core.domain import question_domain
 from core.domain import skill_domain
 from core.domain import skill_fetchers

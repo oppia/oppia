@@ -29,7 +29,6 @@ from core.controllers import incoming_app_feedback_report
 from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services

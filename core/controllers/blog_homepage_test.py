@@ -20,7 +20,6 @@ import logging
 from core import feconf
 from core.constants import constants
 from core.domain import blog_services
-from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
 
