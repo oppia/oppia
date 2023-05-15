@@ -283,7 +283,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             translation_dict)
 
         translatable_object = DummyTranslatableObjectWithFourParams(
-            '<p>10000</p>', 'My name is jhon.', 'My name is Nikhil.', '')
+            '10000', 'My name is jhon.', 'My name is Nikhil.', '')
         contents_which_need_translation = (
             translatable_object.get_all_contents_which_need_translations(
                 entity_translations).values())

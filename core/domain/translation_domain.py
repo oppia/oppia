@@ -27,7 +27,6 @@ from core.constants import constants
 from typing import Dict, List, Optional, Union
 from typing_extensions import Final, TypedDict
 
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 
@@ -345,13 +344,6 @@ class BaseTranslatableObject:
 
         for translatable_content in translatable_content_list:
             content_value = translatable_content.content_value
-            if translatable_content.content_type == (
-                ContentType.CUSTOMIZATION_ARG
-            ) and translatable_content.content_format == (
-                TranslatableContentFormat.HTML
-            ):
-                assert isinstance(content_value, str)
-                content_value = html_cleaner.strip_html_tags(content_value)
 
             if content_value == '':
                 continue
