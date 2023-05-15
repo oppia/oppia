@@ -122,7 +122,9 @@ class UserSettingsModel(base_models.BaseModel):
         choices=[
             constants.DASHBOARD_TYPE_LEARNER,
             constants.DASHBOARD_TYPE_CREATOR,
-            constants.DASHBOARD_TYPE_CONTRIBUTOR])
+            constants.DASHBOARD_TYPE_CONTRIBUTOR
+        ]
+    )
     # The preferred dashboard display preference.
     creator_dashboard_display_pref = datastore_services.StringProperty(
         default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
