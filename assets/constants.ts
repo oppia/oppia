@@ -42,6 +42,11 @@ export default {
 
   "FEATURED_TRANSLATION_LANGUAGES": [],
 
+  "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
+    "News", "International", "Educators", "Learners", "Community",
+    "Partnerships", "Volunteer", "Stories", "Languages", "New features",
+    "New lessons", "Software development", "Content"],
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",

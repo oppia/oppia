@@ -19,6 +19,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
@@ -99,7 +100,7 @@ class BlogAdminHandler(
         config_properties = config_domain.Registry.get_config_property_schemas()
         config_prop_for_blog_admin = {
             'list_of_default_tags_for_blog_post': (
-                config_properties['list_of_default_tags_for_blog_post']),
+                constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST),
             'max_number_of_tags_assigned_to_blog_post': (
                 config_properties['max_number_of_tags_assigned_to_blog_post'])
         }

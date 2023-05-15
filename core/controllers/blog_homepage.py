@@ -212,9 +212,7 @@ class BlogHomepageDataHandler(
                 blog_services
                 .get_total_number_of_published_blog_post_summaries()
             )
-            list_of_default_tags = config_domain.Registry.get_config_property(
-                'list_of_default_tags_for_blog_post', strict=True
-            ).value
+            list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
             self.values.update({
                 'no_of_blog_post_summaries': (
                     number_of_published_blog_post_summaries),
@@ -472,9 +470,7 @@ class BlogPostSearchHandler(
         )
         blog_post_summary_dicts = (
             _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
-        list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post', strict=True
-        ).value
+        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
         self.values.update({
             'blog_post_summaries_list': blog_post_summary_dicts,
