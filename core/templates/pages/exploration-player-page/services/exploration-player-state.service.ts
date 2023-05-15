@@ -75,6 +75,9 @@ export class ExplorationPlayerStateService {
   private _playerStateChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
 
+  private _playerProgressModalShownEventEmitter: EventEmitter<boolean> = (
+    new EventEmitter<boolean>());
+
   constructor(
     private contextService: ContextService,
     private editableExplorationBackendApiService:
@@ -466,6 +469,10 @@ export class ExplorationPlayerStateService {
 
   get onOppiaFeedbackAvailable(): EventEmitter<void> {
     return this._oppiaFeedbackAvailableEventEmitter;
+  }
+
+  get onShowProgressModal(): EventEmitter<boolean> {
+    return this._playerProgressModalShownEventEmitter;
   }
 }
 
