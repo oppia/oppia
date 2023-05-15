@@ -363,7 +363,7 @@ describe('Exploration engine service ', () => {
     };
 
     explorationFeatures = {
-      isExplorationWhitelisted: true,
+      isExplorationCurated: true,
       alwaysAskLearnersForAnswerDetails: true
     };
   });

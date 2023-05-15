@@ -56,7 +56,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertTrue(json_response['is_exploration_whitelisted'])
+        self.assertTrue(json_response['is_exploration_curated'])
 
     def test_can_not_record_playthroughs_with_empty_whitelist(self) -> None:
         config_value: List[str] = []
@@ -67,7 +67,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertFalse(json_response['is_exploration_whitelisted'])
+        self.assertFalse(json_response['is_exploration_curated'])
 
     def test_can_not_record_playthroughs_for_exploration_not_in_whitelist(
         self
@@ -78,4 +78,4 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
 
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertFalse(json_response['is_exploration_whitelisted'])
+        self.assertFalse(json_response['is_exploration_curated'])

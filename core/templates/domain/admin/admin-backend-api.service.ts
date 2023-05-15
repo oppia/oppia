@@ -109,7 +109,6 @@ export interface ConfigPropertyValues {
   'record_playthrough_probability': number;
   'signup_email_content': SignupEmailContent;
   'unpublish_exploration_email_html_body': string;
-  'whitelisted_exploration_ids_for_playthroughs': string[];
 }
 
 export interface AdminPageDataBackendDict {

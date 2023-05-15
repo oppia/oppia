@@ -399,14 +399,6 @@ PROMO_BAR_MESSAGE = ConfigProperty(
     'promo_bar_message', UNICODE_SCHEMA,
     'The message to show to all users if the promo bar is enabled', '')
 
-WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
-    'whitelisted_exploration_ids_for_playthroughs',
-    SET_OF_STRINGS_SCHEMA,
-    'The set of exploration IDs for recording playthrough issues', [
-        'umPkwp0L1M0-', 'MjZzEVOG47_1', '9trAQhj6uUC2', 'rfX8jNkPnA-1',
-        '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
-        'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
-
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
@@ -478,16 +470,6 @@ MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'The maximum number of tags that can be selected to categorize the blog'
     ' post',
     10
-)
-
-LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST = ConfigProperty(
-    'list_of_default_tags_for_blog_post',
-    SET_OF_STRINGS_SCHEMA,
-    'The list of tags available to a blog post editor for categorizing the blog'
-    ' post.',
-    ['News', 'International', 'Educators', 'Learners', 'Community',
-     'Partnerships', 'Volunteer', 'Stories', 'Languages', 'New features',
-     'New lessons', 'Software development', 'Content']
 )
 
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(

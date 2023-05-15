@@ -124,9 +124,7 @@ describe('Admin backend api service', () => {
       subject: 'THIS IS A PLACEHOLDER.',
       html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
     },
-    unpublish_exploration_email_html_body: 'test',
-    whitelisted_exploration_ids_for_playthroughs: [
-      'umPkawp0L1M0-', 'oswa1m5Q3jK41']
+    unpublish_exploration_email_html_body: 'test'
   };
 
   beforeEach(() => {

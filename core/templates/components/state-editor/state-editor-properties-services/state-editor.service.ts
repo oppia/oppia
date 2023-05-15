@@ -155,7 +155,7 @@ export class StateEditorService {
     this.activeStateName = newActiveStateName;
   }
 
-  isExplorationWhitelisted(): boolean {
+  isExplorationCurated(): boolean {
     return this.explorationIsWhitelisted;
   }
 
