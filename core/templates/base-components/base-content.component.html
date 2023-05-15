@@ -12,8 +12,7 @@
 
 <main>
   <div *ngIf="iframed">
-    <div tabindex="0"
-         aria-label="Oppia Main Content"
+    <div aria-label="Oppia Main Content"
          id="oppia-main-content"
          class="e2e-test-main-content">
       <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
@@ -61,6 +60,7 @@
             <div class="navbar-mobile-container" *ngIf="isBottomNavbarShown()">
               <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options-base"
                  (click)="toggleMobileNavOptions()"
+                 role="button"
                  aria-label="Mobile navbar options">
               </i>
               <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
@@ -69,7 +69,7 @@
                 </div>
               </div>
             </div>
-            <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content"
+            <div aria-label="Oppia Main Content" id="oppia-main-content"
                  class="e2e-test-main-content">
               <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
               <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
