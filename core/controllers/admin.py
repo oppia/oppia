@@ -1178,7 +1178,9 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests to retrieve information about users based on
+        different filter criteria.
+        """
         assert self.user_id is not None
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
@@ -1422,7 +1424,7 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        """Handles PUT requests."""
+        """Handles PUT requests to mark a user as banned by their username."""
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
