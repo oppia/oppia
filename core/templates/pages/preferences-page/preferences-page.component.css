@@ -58,7 +58,7 @@
 .oppia-editor-profile-edit-icon {
   font-size: 15px;
   opacity: 0.4;
-  padding: 3px 5px 3px 5px;
+  padding: 2px 4px 2px 4px;
   position: relative;
   -webkit-transition: all 200ms;
   transition: all 200ms;
@@ -70,8 +70,8 @@
 }
 
 .oppia-editor-edit-btn-pos {
-  left: -5px;
-  top: 125px;
+  right: -8px;
+  top: -8px;
 }
 
 .oppia-checkbox {
