@@ -5081,7 +5081,7 @@ export default {
     "decimal_separator": ","
   }, {
     "code": "ha",
-    "description": "Halshen Hausa (Hausa)",
+    "description": "Harshen Hausa (Hausa)",
     "direction": "ltr",
     "decimal_separator": "."
   }, {
@@ -5479,7 +5479,7 @@ export default {
     "direction": "ltr"
   }, {
     "id": "ha",
-    "description": "Halshen Hausa (Hausa)",
+    "description": "Harshen Hausa (Hausa)",
     "relatedLanguages": ["ha"],
     "direction": "ltr"
   }, {
