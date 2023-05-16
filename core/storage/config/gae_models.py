@@ -148,8 +148,7 @@ class PlatformParameterModel(base_models.VersionedModel):
         cls,
         param_name: str,
         rule_dicts: List[platform_parameter_domain.PlatformParameterRuleDict],
-        rule_schema_version: int,
-        is_feature_flag: bool = False
+        rule_schema_version: int
     ) -> PlatformParameterModel:
         """Creates a PlatformParameterModel instance.
 
@@ -169,7 +168,6 @@ class PlatformParameterModel(base_models.VersionedModel):
                                 operator for comparison and value is the value
                                 used for comparison.
             rule_schema_version: int. The schema version for the rule dicts.
-            is_feature_flag: bool. True, if the platform-parameter is a feature.
 
         Returns:
             PlatformParameterModel. The created PlatformParameterModel
@@ -178,5 +176,4 @@ class PlatformParameterModel(base_models.VersionedModel):
         return cls(
             id=param_name,
             rules=rule_dicts,
-            rule_schema_version=rule_schema_version,
-            is_feature_flag=is_feature_flag)
+            rule_schema_version=rule_schema_version)
