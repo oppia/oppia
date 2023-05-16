@@ -21,7 +21,7 @@
 
 .oppia-lesson-info-card .oppia-exploration-description {
   color: #333;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: normal;
   margin-top: 20px;
   padding-bottom: 10px;
@@ -91,7 +91,7 @@
   margin-right: -50%;
   position: absolute;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -87%);
   width: 120px;
 }
 
