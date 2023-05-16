@@ -634,14 +634,6 @@ class EntityTranslation:
         self.translations[content_id] = TranslatedContent(
             content_value, content_format, needs_update)
 
-    def get_translation_count(self) -> int:
-        """Returs the number of updated translations avialable."""
-        return len([
-            translated_content
-            for translated_content in self.translations.values()
-            if not translated_content.needs_update
-        ])
-
     def remove_translations(self, content_ids: List[str]) -> None:
         """Remove translations for the given list of content Ids.
 
