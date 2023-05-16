@@ -195,6 +195,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   }
 
   updateLocalValue(newValue: string): void {
+    this.localValue.label = newValue;
     this.value.mathExpressionSvgIsBeingProcessed = true;
     this.value.raw_latex = newValue;
     this.valueChanged.emit(this.value);

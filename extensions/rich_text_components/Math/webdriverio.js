@@ -26,8 +26,6 @@ var customizeComponent = async function(modal, rawLatex) {
   await (objects.MathExpressionContentEditor(
     modal.$('<math-expression-content-editor>')
   ).setValue(rawLatex));
-  const done = modal.$('.e2e-test-close-rich-text-component-editor');
-  done.click();
 };
 
 // This function is used to convert the escaped Json to unescaped object.
