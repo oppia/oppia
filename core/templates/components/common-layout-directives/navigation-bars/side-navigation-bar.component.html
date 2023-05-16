@@ -220,7 +220,8 @@
   <ul>
     <li class="oppia-sidebar-rows" *ngIf="userIsLoggedIn">
       <button (click)="navigateToLearnerDashboard(); stopclickfurther($event)"
-              class="text-uppercase">
+              class="text-uppercase"
+              tabindex="-1">
         <span >{{ 'I18N_SIDEBAR_HOME' | translate }}</span>
       </button>
     </li>
@@ -276,7 +277,7 @@
         </div>
       </div>
       <div [hidden]="!learnSubmenuIsShown" class="oppia-community-library-section">
-        <a href="/community-library" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" class="e2e-mobile-test-library-link">
+        <a href="/community-library" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" tabindex="-1" class="e2e-mobile-test-library-link">
           <p class="oppia-sidebar-learn-subtext mb-2">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY_DESCRIPTION' | translate }}</p>
           <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY' | translate }}</span>
           <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
@@ -287,6 +288,7 @@
     <li [ngClass]="{'active': currentUrl === '/about'}" class="oppia-sidebar-rows">
       <a href="/about"
          [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
+         tabindex="-1"
          class="e2e-mobile-test-about-link text-uppercase">
         <span >{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
       </a>
@@ -333,6 +335,7 @@
     <li [ngClass]="{'active': currentUrl === '/about-foundation'}" class="oppia-sidebar-rows">
       <a href="/about-foundation"
          [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
+         tabindex="-1"
          class="e2e-mobile-test-about-link text-uppercase">
         <span >{{ 'I18N_SIDEBAR_ABOUT_OPPIA_FOUNDATION' | translate }}</span>
       </a>
@@ -341,6 +344,7 @@
     <li [ngClass]="{'active': currentUrl === '/donate'}" class="oppia-sidebar-rows">
       <a href="/donate"
          [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+         tabindex="-1"
          class="e2e-mobile-test-donate-link text-uppercase">
         <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
       </a>
