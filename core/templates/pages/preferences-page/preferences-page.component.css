@@ -60,8 +60,8 @@
   opacity: 0.4;
   padding: 3px 5px 3px 5px;
   position: relative;
-  transition: all 200ms;
   -webkit-transition: all 200ms;
+  transition: all 200ms;
 }
 
 .oppia-editable-section .oppia-editor-profile-edit-icon:focus,
