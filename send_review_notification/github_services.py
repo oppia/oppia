@@ -20,7 +20,7 @@ import collections
 import datetime
 import logging
 
-from src_graphql import github_domain
+from send_review_notification import github_domain
 
 from dateutil import parser
 import requests
@@ -36,7 +36,7 @@ CREATE_DISCUSSION_URL_TEMPLATE = (
 
 
 def init_service(token: Optional[str]=None) -> None:
-    """Intialize service with the given token."""
+    """Initialize service with the given token."""
     if token is None:
         raise Exception('Must provide Github Personal Access Token.')
 
@@ -46,21 +46,24 @@ def init_service(token: Optional[str]=None) -> None:
 
 # Here we use type Any because.
 def check_token(func: Callable[..., Any]) -> Callable[..., Any]:
-    """A decorator to check whether the service is intialized with the token."""
+    """A decorator to check whether the service is initialized with
+    the token.
+    """
+
     # Here we use type Any because.
     def execute_if_token_initialized(*args: Any, **kwargs: Any) -> Any:
-        """Executes the given function if the token is intialized."""
+        """Executes the given function if the token is initialized."""
         if _TOKEN is None:
             raise Exception(
-                'Intialize the service with '
-                'gtihub_services.init_service(TOKEN).')
+                'Initialize the service with '
+                'github_services.init_service(TOKEN).')
         return func(*args, **kwargs)
 
     return execute_if_token_initialized
 
 
 def _get_request_headers() -> Dict[str, str]:
-    """Retunrs the request hearders for github-request."""
+    """Returns the request headers for github-request."""
     return {
         'Accept': 'application/vnd.github.v3+json',
         'Authorization': f'token {_TOKEN}'
@@ -73,7 +76,7 @@ def get_prs_assigned_to_reviewers(
     repository: str,
     wait_hours: int
 ) -> DefaultDict[str, List[github_domain.PullRequest]]:
-    """Fetchs all the PRs on the given repository and retuens a list of PRs
+    """Fetches all the PRs on the given repository and returns a list of PRs
     assigned to reviewers.
     """
 
@@ -140,7 +143,7 @@ def update_assignee_timestamp(
     repository: str,
     pr_list: List[github_domain.PullRequest]
 ) -> None:
-    """Fetchs PR timeline and updates assignment timestamp."""
+    """Fetches PR timeline and updates assignment timestamp."""
     for pull_request in pr_list:
         pr_number = pull_request.number
         activity_url = ISSUE_TIMELINE_URL_TEMPLATE.format(

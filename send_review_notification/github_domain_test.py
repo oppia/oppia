@@ -19,20 +19,20 @@ from __future__ import annotations
 import datetime as dt
 import unittest
 
-from src_graphql import github_domain
+from send_review_notification import github_domain
 
 
 class AssigneeDomainUnitTest(unittest.TestCase):
     """Assignee class test."""
 
-    def test_constructor_creats_object(self) -> None:
+    def test_constructor_creates_object(self) -> None:
         obj = github_domain.Assignee('username', timestamp=dt.datetime(1, 1, 1))
 
         self.assertIsInstance(obj, github_domain.Assignee)
         self.assertEqual(obj.name, 'username')
         self.assertEqual(obj.timestamp, dt.datetime(1, 1, 1))
 
-    def test_constructor_without_timestamp_creats_object_with_default_value(
+    def test_constructor_without_timestamp_creates_object_with_default_value(
         self
     ) -> None:
         obj = github_domain.Assignee('username')
@@ -52,7 +52,7 @@ class AssigneeDomainUnitTest(unittest.TestCase):
 class PullRequestDomainUnitTest(unittest.TestCase):
     """PullRequest class test."""
 
-    def test_constructor_creats_object_with_correct_value(self) -> None:
+    def test_constructor_creates_object_with_correct_value(self) -> None:
         reviewers = [
             github_domain.Assignee('username', timestamp=dt.datetime(1, 1, 1))]
         pull_request = github_domain.PullRequest(

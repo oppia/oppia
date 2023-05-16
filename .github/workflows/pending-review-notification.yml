@@ -23,14 +23,11 @@ jobs:
           python-version: '3.8.15'
           architecture: 'x64'
       - name: Install dependencies
-        run: pip install -r src_graphql/requirements.txt
-        shell: bash
-      - name: Add path to enviornment
-        run: echo "PYTHONPATH=${{ github.action_path }}" >> $GITHUB_PATH; echo $GITHUB_PATH
+        run: pip install -r send_review_notification/requirements.txt
         shell: bash
       - name: Send notification
         run:
-          python3 -m src_graphql.index --repo=${{ github.repository }} --token=${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }} --max-wait-hours=48 --verbose
+          python -m send_review_notification.index --repo=${{ github.repository }} --token=${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }} --max-wait-hours=48 --verbose
       - name: Report if failed
         if: ${{ failure() }}
         uses: ./.github/actions/send-webhook-notification

@@ -193,7 +193,7 @@
 /scripts/linters/pylint_extensions*.py @oppia/dev-workflow-reviewers
 /scripts/linters/python_linter*.py @oppia/dev-workflow-reviewers
 /ubuntu_dockerfile @oppia/dev-workflow-reviewers
-/src_graphql/* @oppia/dev-workflow-reviewers
+/send_review_notification/* @oppia/dev-workflow-reviewers
 
 
 # Exploration project.

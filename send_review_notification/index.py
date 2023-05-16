@@ -21,8 +21,8 @@ import logging
 import os
 import re
 
-from src_graphql import github_domain
-from src_graphql import github_services
+from send_review_notification import github_domain
+from send_review_notification import github_services
 
 from typing import List, Literal, Optional
 

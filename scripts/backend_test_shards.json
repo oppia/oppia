@@ -1,9 +1,9 @@
 {
     "1": [
         "core.jobs.transforms.job_result_transforms_test",
-        "src_graphql.index_test",
-        "src_graphql.github_domain_test",
-        "src_graphql.github_services_test",
+        "send_review_notification.index_test",
+        "send_review_notification.github_domain_test",
+        "send_review_notification.github_services_test",
         "scripts.linters.pre_commit_linter_test",
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",

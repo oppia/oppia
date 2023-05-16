@@ -30,7 +30,7 @@ class Assignee:
     def __init__(
         self,
         name: str,
-        timestamp: datetime.datetime =DEFAULT_TIMESTAMP
+        timestamp: datetime.datetime = DEFAULT_TIMESTAMP
     ) -> None:
         self.name = name
         self.timestamp = timestamp
@@ -40,7 +40,7 @@ class Assignee:
         self.timestamp = timestamp
 
     def get_readable_waiting_time(self) -> str:
-        """"Returns redable wating time on review."""
+        """"Returns readable waiting time on review."""
         delta = datetime.datetime.now(datetime.timezone.utc) - self.timestamp
         days = delta.days
         hours, _ = divmod(delta.seconds, 3600)
@@ -82,7 +82,7 @@ class PullRequest:
             len(self.assignees) == 1 and self.assignees[0].name == self.author)
 
     def get_assignee(self, user: str) -> Optional[Assignee]:
-        """Retuns the assignee object for the given user if exist."""
+        """Returns the assignee object for the given user if exist."""
         assignee = next(filter(lambda x: x.name == user, self.assignees), None)
         return assignee
 
