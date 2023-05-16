@@ -1,22 +1,16 @@
 <div class="volunteer-page e2e-test-volunteer-page">
   <div class="row oppia-volunteer-banner p-5">
     <div class="oppia-volunteer-banner-content flex-gt-md-45">
-      <h1 class="oppia-volunteer-h1">
-        Join Us
-      </h1>
-      <h2 class="oppia-volunteer-h2">
-        a vibrant, global team
-      </h2>
+      <h1 class="oppia-volunteer-h1" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_1_HEADING' | translate"></h1>
+      <h2 class="oppia-volunteer-h2" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_1_SUB_HEADING' | translate"></h2>
       <div class="oppia-volunteer-content">
-        <p>
-          Help improve access to education for millions of students. It doesn&rsquo;t matter where you come from, what language you speak, or how young or old you are - all are welcome!
-        </p>
+        <p [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_1_CONTENT' | translate"></p>
       </div>
       <button class="btn volunteer-btn">
         <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
            target="_blank"
            rel="noopener">
-          APPLY TO VOLUNTEER
+           {{ 'I18N_VOLUNTEER_PAGE_ACTION_APPLY' | translate }}
         </a>
       </button>
     </div>
@@ -43,22 +37,22 @@
 
   <div class="oppia-section-why-volunteer">
     <div class="container text-center">
-      <h2 class="section-heading mb-5">Why Volunteer with Us?</h2>
+      <h2 class="section-heading mb-5" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_2_HEADING' | translate" ></h2>
       <div class="row mt-4">
         <div class="col-md-4">
           <i class="fa fa-suitcase fa-2x m-3"></i>
-          <h3 class="font-weight-light">Vibrant Community</h3>
-          <p class="mt-5">Join a lively, diverse network of volunteers from all around the world.</p>
+          <h3 class="font-weight-light" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_2_SUB_HEADING_1' | translate"></h3>
+          <p class="mt-5" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_2_SUB_HEADING_1_CONTENT' | translate"></p>
         </div>
         <div class="col-md-4">
           <i class="fa fa-users fa-2x m-3"></i>
-          <h3 class="font-weight-light">Gain Skills</h3>
-          <p class="mt-5">Collaborate alongside peers to develop your skills through contributing to a meaningful, open-source project.</p>
+          <h3 class="font-weight-light" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_2_SUB_HEADING_2' | translate"></h3>
+          <p class="mt-5" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_2_SUB_HEADING_2_CONTENT' | translate"></p>
         </div>
         <div class="col-md-4">
           <i class="fa fa-award fa-2x m-3"></i>
-          <h3 class="font-weight-light">Meaningful Projects</h3>
-          <p class="mt-5">Your work directly helps underserved students around the world gain access to free, high-quality education.</p>
+          <h3 class="font-weight-light" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_2_SUB_HEADING_3' | translate"></h3>
+          <p class="mt-5" [innerHTML]="'I18N_VOLUNTEER_PAGE_SECTION_2_SUB_HEADING_3_CONTENT' | translate"></p>
         </div>
       </div>
     </div>
@@ -329,16 +323,13 @@
        [style.background-image]="'url(' + getStaticImageUrl(getWebpExtendedName(footerImgPath)) + '), url(' + getStaticImageUrl(footerImgPath) + ')'"
        [style.background-position]="'center center'"
        [style.background-size]="'cover'">
-    <p>
-      If you're interested in helping out, let us know your
-      skills and interests and a lead will reach out to you shortly!
-    </p>
+    <p [innerHTML]="'I18N_VOLUNTEER_PAGE_FOOTER_CONTENT' | translate"></p>
 
     <button class="btn">
       <a href="https://forms.gle/rhFYoLLSFr3JEZHy8"
          target="_blank"
          rel="noopener">
-        APPLY TO VOLUNTEER
+         {{ 'I18N_VOLUNTEER_PAGE_ACTION_APPLY' | translate }}
       </a>
     </button>
   </div>
