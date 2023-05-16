@@ -22,7 +22,8 @@
 
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import { AlertsService } from 'services/alerts.service';
 import { ExternalRteSaveService } from 'services/external-rte-save.service';
@@ -54,6 +55,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   @Input() alwaysEditable: boolean = false;
   @Input() value!: MathExpression;
   @Output() valueChanged = new EventEmitter();
+  private debouncedUpdate$: Subject<string> = new Subject();
   numberOfElementsInQueue!: number;
   svgString!: string;
   placeholderText = '\\frac{x}{y}';
@@ -103,7 +105,13 @@ export class MathExpressionContentEditorComponent implements OnInit {
         }
       })
     );
-
+    this.directiveSubscriptions.add(
+      this.debouncedUpdate$.pipe(
+        debounceTime(300)
+      ).subscribe((newValue) => {
+        this.updateLocalValue(newValue);
+      })
+    );
     if (!this.alwaysEditable) {
       this.closeEditor();
     }
