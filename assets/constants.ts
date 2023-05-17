@@ -51,6 +51,7 @@ export default {
   "LIBRARY_MOBILE_TILE_WIDTH_PX": 350,
   "DASHBOARD_TYPE_CREATOR": "creator",
   "DASHBOARD_TYPE_LEARNER": "learner",
+  "DASHBOARD_TYPE_CONTRIBUTOR": "contributor",
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
@@ -5080,7 +5081,7 @@ export default {
     "decimal_separator": ","
   }, {
     "code": "ha",
-    "description": "Halshen Hausa (Hausa)",
+    "description": "Harshen Hausa (Hausa)",
     "direction": "ltr",
     "decimal_separator": "."
   }, {
@@ -5478,7 +5479,7 @@ export default {
     "direction": "ltr"
   }, {
     "id": "ha",
-    "description": "Halshen Hausa (Hausa)",
+    "description": "Harshen Hausa (Hausa)",
     "relatedLanguages": ["ha"],
     "direction": "ltr"
   }, {

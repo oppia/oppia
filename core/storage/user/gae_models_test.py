@@ -101,7 +101,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             last_logged_in=self.GENERIC_DATE,
             last_created_an_exploration=self.GENERIC_DATE,
             last_edited_an_exploration=self.GENERIC_DATE,
-            profile_picture_data_url=self.GENERIC_IMAGE_URL,
             default_dashboard='learner',
             creator_dashboard_display_pref='card',
             user_bio=self.GENERIC_USER_BIO,
@@ -152,8 +151,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
                 'display_alias': base_models.EXPORT_POLICY.EXPORTED,
                 'user_bio': base_models.EXPORT_POLICY.EXPORTED,
-                'profile_picture_data_url':
-                    base_models.EXPORT_POLICY.EXPORTED,
                 'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
                 'preferred_language_codes':
                     base_models.EXPORT_POLICY.EXPORTED,
@@ -296,7 +293,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'last_logged_in_msec': None,
             'last_edited_an_exploration_msec': None,
             'last_created_an_exploration_msec': None,
-            'profile_picture_data_url': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': None,
@@ -328,7 +324,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'last_logged_in_msec': self.GENERIC_EPOCH,
             'last_edited_an_exploration_msec': self.GENERIC_EPOCH,
             'last_created_an_exploration_msec': self.GENERIC_EPOCH,
-            'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': self.GENERIC_USER_BIO,
