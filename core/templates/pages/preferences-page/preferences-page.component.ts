@@ -72,6 +72,7 @@ export class PreferencesPageComponent {
   SITE_LANGUAGE_CHOICES!: typeof AppConstants.SUPPORTED_SITE_LANGUAGES;
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
+  DASHBOARD_TYPE_CONTRIBUTOR = AppConstants.DASHBOARD_TYPE_CONTRIBUTOR;
   subjectInterestsChangeAtLeastOnce: boolean = false;
   exportingData: boolean = false;
   hasPageLoaded: boolean = false;

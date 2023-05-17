@@ -150,6 +150,12 @@ describe('Preferences', function() {
       await preferencesPage.selectCreatorDashboard();
       await general.goToHomePage();
       await waitFor.urlToBe('http://localhost:9001/creator-dashboard');
+
+      await preferencesPage.get();
+      await preferencesPage.selectContributorDashboard();
+      await general.goToHomePage();
+      await waitFor.urlToBe('http://localhost:9001/contributor-dashboard');
+
       await preferencesPage.get();
       await preferencesPage.selectLearnerDashboard();
       await general.goToHomePage();

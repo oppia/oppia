@@ -25,6 +25,7 @@ var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
   var creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+  var contributorDashboardRadio = $('.e2e-test-contributor-dashboard-radio');
   var customProfilePhoto = $('.e2e-test-custom-photo');
   var deleteAccountButton = $('.e2e-test-delete-account-button');
   var editorRoleEmailsCheckbox = $('.e2e-test-editor-role-email-checkbox');
@@ -203,6 +204,12 @@ var PreferencesPage = function() {
     await action.click(
       'Creator Dashboard radio', creatorDashboardRadio);
     await saveNewChanges('Creator Dashboard Option');
+  };
+
+  this.selectContributorDashboard = async function() {
+    await action.click(
+      'Contributor Dashboard radio', contributorDashboardRadio);
+    await saveNewChanges('Contributor Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {

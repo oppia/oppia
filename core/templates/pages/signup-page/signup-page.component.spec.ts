@@ -293,6 +293,35 @@ describe('Sign up page component', () => {
     expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
   }));
 
+  it('should submit prerequisites form with user\'s preferred default ' +
+    'dashboard', fakeAsync(() => {
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      return_url: 'contributor-dashboard'
+    });
+    spyOn(signupPageBackendApiService, 'updateUsernameAsync').and.returnValue(
+      Promise.resolve({
+        bulk_email_signup_message_should_be_shown: true
+      }));
+
+    const sentRequestParams = {
+      agreed_to_terms: true,
+      can_receive_email_updates: false,
+      default_dashboard: 'contributor',
+      username: 'username'
+    };
+
+    componentInstance.hasUsername = false;
+    componentInstance.showEmailPreferencesForm = true;
+
+    componentInstance.submitPrerequisitesForm(
+      sentRequestParams.agreed_to_terms,
+      sentRequestParams.username, 'no');
+    tick();
+
+    expect(signupPageBackendApiService.updateUsernameAsync)
+      .toHaveBeenCalledWith(sentRequestParams);
+  }));
+
   it('should throw error if canReceiveEmailUpdates param is not valid', () => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
       return_url: 'creator-dashboard'
