@@ -34,10 +34,6 @@
               <div class="row">
                 <div class="col-2"><b>If Matched:</b></div>
                 <div class="col-10">
-                  <!-- <select [(ngModel)]="rule.valueWhenMatched" class="e2e-test-value-selector">
-                    <option [ngValue]="true">Enabled</option>
-                    <option [ngValue]="false">Disabled</option>
-                  </select> -->
                   <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType)" [(ngModel)]="rule.valueWhenMatched">
                   </schema-based-editor>
                 </div>

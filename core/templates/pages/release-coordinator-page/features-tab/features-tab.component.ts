@@ -23,7 +23,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
 import { AdminFeaturesTabConstants } from
-  'pages/release-coordinator-page/features-tab/admin-features-tab.constants';
+  'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -43,10 +43,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 type FilterType = keyof typeof PlatformParameterFilterType;
 
 @Component({
-  selector: 'admin-features-tab',
-  templateUrl: './admin-features-tab.component.html'
+  selector: 'features-tab',
+  templateUrl: './features-tab.component.html'
 })
-export class AdminFeaturesTabComponent implements OnInit {
+export class FeaturesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
 
   readonly availableFilterTypes: PlatformParameterFilterType[] = Object
@@ -328,4 +328,4 @@ export class AdminFeaturesTabComponent implements OnInit {
 
 angular.module('oppia').directive(
   'adminFeaturesTab', downgradeComponent(
-    {component: AdminFeaturesTabComponent}));
+    {component: FeaturesTabComponent}));

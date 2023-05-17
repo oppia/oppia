@@ -5,7 +5,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
 import { AdminFeaturesTabConstants } from
-  'pages/release-coordinator-page/features-tab/admin-features-tab.constants';
+  'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
@@ -31,7 +31,7 @@ interface PlatformSchema {
 type FilterType = keyof typeof PlatformParameterFilterType;
 
 @Component({
-  selector: 'admin-platform-parameters-tab',
+  selector: 'oppia-admin-platform-parameters-tab',
   templateUrl: './admin-platform-parameters-tab.component.html'
 })
 export class AdminPlatformParametersTabComponent implements OnInit {
@@ -131,8 +131,13 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     })
   }
 
-  getPlatformParamSchema(type: string): PlatformSchema {
-    return {'type': type};
+  getPlatformParamSchema(dataType: string): PlatformSchema {
+    if (dataType === 'string') {
+      return {type: 'unicode'};
+    } else if (dataType === 'number') {
+      return {type: 'float'};
+    }
+    return {type: dataType};
   }
 
   addNewRuleToTop(param: PlatformParameter): void {

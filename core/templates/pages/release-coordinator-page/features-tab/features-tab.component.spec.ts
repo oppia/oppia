@@ -24,7 +24,7 @@ import { FormsModule } from '@angular/forms';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AdminPageData } from 'domain/admin/admin-backend-api.service';
-import { AdminFeaturesTabComponent } from
+import { FeaturesTabComponent } from
   'pages/release-coordinator-page/features-tab/admin-features-tab.component';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
@@ -57,8 +57,8 @@ class MockPlatformFeatureService {
 }
 
 describe('Admin page feature tab', function() {
-  let component: AdminFeaturesTabComponent;
-  let fixture: ComponentFixture<AdminFeaturesTabComponent>;
+  let component: FeaturesTabComponent;
+  let fixture: ComponentFixture<FeaturesTabComponent>;
   let adminDataService: AdminDataService;
   let featureApiService: PlatformFeatureAdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
@@ -73,7 +73,7 @@ describe('Admin page feature tab', function() {
     TestBed
       .configureTestingModule({
         imports: [FormsModule, HttpClientTestingModule],
-        declarations: [AdminFeaturesTabComponent],
+        declarations: [FeaturesTabComponent],
         providers: [
           {
             provide: PlatformFeatureService,
@@ -83,7 +83,7 @@ describe('Admin page feature tab', function() {
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(AdminFeaturesTabComponent);
+    fixture = TestBed.createComponent(FeaturesTabComponent);
     component = fixture.componentInstance;
     adminDataService = TestBed.get(AdminDataService);
     featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
