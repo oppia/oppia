@@ -1132,9 +1132,6 @@ export class ConversationSkinComponent {
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
-    if (!this.CHECKPOINTS_FEATURE_IS_ENABLED) {
-      this.hasFullyLoaded = true;
-    }
 
     // If the exploration is embedded, use the url language code
     // as site language. If the url language code is not supported

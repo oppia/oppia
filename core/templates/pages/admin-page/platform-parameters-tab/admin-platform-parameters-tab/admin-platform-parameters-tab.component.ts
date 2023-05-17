@@ -13,8 +13,6 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureDummyBackendApiService } from
-  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import {
   PlatformParameterFilterType,
@@ -26,12 +24,15 @@ import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
+interface PlatformSchema {
+  'type': string;
+}
+
 type FilterType = keyof typeof PlatformParameterFilterType;
 
 @Component({
   selector: 'admin-platform-parameters-tab',
-  templateUrl: './admin-platform-parameters-tab.component.html',
-  styleUrls: ['./admin-platform-parameters-tab.component.scss']
+  templateUrl: './admin-platform-parameters-tab.component.html'
 })
 export class AdminPlatformParametersTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
@@ -128,6 +129,10 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       filters: [this.defaultNewFilter.toBackendDict()],
       value_when_matched: param.defaultValue
     })
+  }
+
+  getPlatformParamSchema(type: string): PlatformSchema {
+    return {'type': type};
   }
 
   addNewRuleToTop(param: PlatformParameter): void {

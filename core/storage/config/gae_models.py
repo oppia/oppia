@@ -120,8 +120,6 @@ class PlatformParameterModel(base_models.VersionedModel):
     rules = datastore_services.JsonProperty(repeated=True)
     rule_schema_version = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-    is_feature_flag = (
-        datastore_services.BooleanProperty(required=True, default=False))
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -139,8 +137,7 @@ class PlatformParameterModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'is_feature_flag': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
