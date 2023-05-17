@@ -66,8 +66,8 @@ from core.jobs.batch_jobs import (                                   # pylint: d
       exp_version_history_computation_job)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     rejecting_suggestion_for_invalid_content_ids_jobs)
-from core.jobs.batch_jobs import user_settings_profile_picture_jobs  # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import store_profile_images_to_gcs_jobs    # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
+    remove_profile_picture_data_url_field_jobs)
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
