@@ -24,7 +24,7 @@ module.exports = function(config) {
       // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
-      '/node_modules/angular/angular.js',
+      'third_party/static/angularjs-1.8.2/angular.js',  // temporarily changing this to third_party/static/
       'core/templates/karma.module.ts',
       'node_modules/angular-mocks/angular-mocks.js',
       '/node_modules/lamejs/worker-example/worker-realtime.js',
