@@ -25,6 +25,7 @@ from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import classroom_domain
 from core.domain import classroom_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import skill_domain
@@ -195,7 +196,7 @@ class AndroidActivityHandler(base.BaseHandler[
                         'Version cannot be specified for classroom')
                 matching_classroom_fragment = [
                     classroom['url_fragment']
-                    for classroom in constants.CLASSROOM_PAGES_DATA
+                    for classroom in config_domain.CLASSROOM_PAGES_DATA.value
                     if classroom['name'] == activity_data['id']
                 ][0]
                 activities[activity_data['id']] = (

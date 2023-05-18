@@ -27,6 +27,7 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
+from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -105,7 +106,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
                             self.user, topic_rights)
                     )
 
-        all_classrooms_dict = constants.CLASSROOM_PAGES_DATA
+        all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
         all_classroom_names = [
             classroom['name'] for classroom in all_classrooms_dict]
 

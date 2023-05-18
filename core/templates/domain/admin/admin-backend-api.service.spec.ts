@@ -101,6 +101,13 @@ describe('Admin backend api service', () => {
   let adminDataObject: AdminPageData;
   let configPropertyValues = {
     always_ask_learners_for_answer_details: false,
+    classroom_pages_data: {
+      course_details: 'fds',
+      name: 'mathfas',
+      topic_ids: [],
+      topic_list_intro: 'fsd',
+      url_fragment: 'mathfsad',
+    },
     classroom_promos_are_enabled: false,
     contributor_dashboard_is_enabled: true,
     contributor_dashboard_reviewer_emails_is_enabled: true,

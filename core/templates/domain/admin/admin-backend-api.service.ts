@@ -75,6 +75,14 @@ export interface SignupEmailContent {
   'subject': string;
 }
 
+export interface ClassroomPageData {
+  'name': string;
+  'topic_ids': string[];
+  'course_details': string;
+  'url_fragment': string;
+  'topic_list_intro': string;
+}
+
 export interface VmidSharedSecretKeyMapping {
   'shared_secret_key': string;
   'vm_id': string;
@@ -88,6 +96,7 @@ export interface ConfigProperty {
 
 export interface ConfigPropertyValues {
   'always_ask_learners_for_answer_details': boolean;
+  'classroom_pages_data': ClassroomPageData;
   'classroom_promos_are_enabled': boolean;
   'contributor_dashboard_is_enabled': boolean;
   'contributor_dashboard_reviewer_emails_is_enabled': boolean;

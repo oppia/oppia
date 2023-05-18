@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core import schema_utils
+from core.constants import constants
 from core.domain import change_domain
 
 from typing import (
@@ -92,6 +93,57 @@ SET_OF_STRINGS_SCHEMA = {
     'validators': [{
         'id': 'is_uniquified',
     }],
+}
+
+SET_OF_CLASSROOM_DICTS_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_LIST,
+    'items': {
+        'type': schema_utils.SCHEMA_TYPE_DICT,
+        'properties': [{
+            'name': 'name',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
+            }
+        }, {
+            'name': 'url_fragment',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
+                'validators': [{
+                    'id': 'is_url_fragment',
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
+            },
+        }, {
+            'name': 'course_details',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
+                'ui_config': {
+                    'rows': 8,
+                }
+            }
+        }, {
+            'name': 'topic_list_intro',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
+                'ui_config': {
+                    'rows': 5,
+                }
+            }
+        }, {
+            'name': 'topic_ids',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_LIST,
+                'items': {
+                    'type': schema_utils.SCHEMA_TYPE_UNICODE,
+                },
+                'validators': [{
+                    'id': 'is_uniquified',
+                }]
+            }
+        }]
+    }
 }
 
 BOOL_SCHEMA = {
@@ -396,6 +448,20 @@ PROMO_BAR_ENABLED = ConfigProperty(
 PROMO_BAR_MESSAGE = ConfigProperty(
     'promo_bar_message', UNICODE_SCHEMA,
     'The message to show to all users if the promo bar is enabled', '')
+
+# Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
+# to add that classroom to learner group syllabus filter whenever a new
+# classroom is added.
+CLASSROOM_PAGES_DATA = ConfigProperty(
+    'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
+    'The details for each classroom page.', [{
+        'name': 'math',
+        'url_fragment': 'math',
+        'topic_ids': [],
+        'course_details': '',
+        'topic_list_intro': ''
+    }]
+)
 
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,

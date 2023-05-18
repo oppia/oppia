@@ -21,6 +21,7 @@ import datetime
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -247,17 +248,28 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
         topic_services.publish_story(
             self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
-
-        self.login(self.VIEWER_EMAIL)
-        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
             'name': 'math',
             'url_fragment': 'math',
             'topic_ids': [self.TOPIC_ID_1],
             'course_details': '',
             'topic_list_intro': ''
-        }]):
-            response = self.get_json(
-                feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['all_topics_list']), 1)
         self.assertEqual(
             response['all_topics_list'][0]['id'], self.TOPIC_ID_1)
@@ -282,17 +294,28 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
         topic_services.publish_story(
             self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
-
-        self.login(self.VIEWER_EMAIL)
-        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
             'name': 'math',
             'url_fragment': 'math',
             'topic_ids': [self.TOPIC_ID_1],
             'course_details': '',
             'topic_list_intro': ''
-        }]):
-            response = self.get_json(
-                feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
         self.assertEqual(len(response['untracked_topics']), 1)
         self.logout()
 
@@ -518,26 +541,39 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
-        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
             'name': 'math',
             'url_fragment': 'math',
             'topic_ids': [self.TOPIC_ID_1],
             'course_details': '',
             'topic_list_intro': ''
-        }]):
-            self.login(self.VIEWER_EMAIL)
+        }]
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
 
-            self.assertEqual(
-                self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)
-                    ['completed_chapters_count'], 0)
+        self.login(self.VIEWER_EMAIL)
 
-            story_services.record_completed_node_in_story_context(
-                self.viewer_id, self.STORY_ID_1, 'node_1')
+        self.assertEqual(
+            self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)
+                ['completed_chapters_count'], 0)
 
-            self.assertEqual(
-                self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)
-                    ['completed_chapters_count'], 1)
-            self.logout()
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID_1, 'node_1')
+
+        self.assertEqual(
+            self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)
+                ['completed_chapters_count'], 1)
+        self.logout()
 
 
 class LearnerDashboardCollectionsProgressHandlerTests(

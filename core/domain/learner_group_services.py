@@ -279,7 +279,7 @@ def get_matching_learner_group_syllabus_to_add(
         group_story_ids = learner_group_model.story_ids
 
     matching_topic_ids: List[str] = []
-    all_classrooms_dict = constants.CLASSROOM_PAGES_DATA
+    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
 
     matching_subtopics_dicts: List[
         subtopic_page_domain.SubtopicPageSummaryDict] = []

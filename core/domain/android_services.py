@@ -24,6 +24,8 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import config_domain
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -118,10 +120,12 @@ def initialize_android_test_data() -> str:
             translation_models.MachineTranslationModel.get_all().fetch())
 
         # Remove the topic from classroom pages if it's present.
-        classrooms = constants.CLASSROOM_PAGES_DATA
+        classrooms_property = config_domain.CLASSROOM_PAGES_DATA
+        classrooms = classrooms_property.value
         for classroom in classrooms:
             classroom['topic_ids'].remove(topic.id)
-        constants.CLASSROOM_PAGES_DATA = classrooms
+        config_services.set_property(
+            user_id, classrooms_property.name, classrooms)
 
     # Generate new Structure id for topic, story, skill and question.
     topic_id = topic_fetchers.get_new_topic_id()
@@ -574,10 +578,11 @@ def initialize_android_test_data() -> str:
             )
 
     # Add the new topic to all available classrooms.
-    classrooms = constants.CLASSROOM_PAGES_DATA
+    classrooms_property = config_domain.CLASSROOM_PAGES_DATA
+    classrooms = classrooms_property.value
     for classroom in classrooms:
         classroom['topic_ids'].append(topic_id)
-    constants.CLASSROOM_PAGES_DATA = classrooms
+    config_services.set_property(user_id, classrooms_property.name, classrooms)
 
     return topic_id
 

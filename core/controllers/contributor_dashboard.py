@@ -190,7 +190,7 @@ class ContributionOpportunitiesHandler(
         # We want to focus attention on lessons that are part of a classroom.
         # See issue #12221.
         classroom_topic_ids = []
-        for classroom_dict in constants.CLASSROOM_PAGES_DATA:
+        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
             classroom_topic_ids.extend(classroom_dict['topic_ids'])
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.

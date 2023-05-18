@@ -20,6 +20,7 @@ import logging
 
 from core import feconf
 from core.constants import constants
+from core.domain import config_services
 from core.domain import question_domain
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -515,17 +516,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[self.SKILL_ID2],
             subtopics=[], next_subtopic_id=1)
 
-        with self.swap(constants, 'CLASSROOM_PAGES_DATA', [{
-            'url_fragment': 'math',
-            'name': 'math',
-            'topic_ids': [topic_id],
-            'topic_list_intro': 'Topics Covered',
-            'course_details': 'Course Details'
-        }]):
-            augmented_skill_summaries, next_cursor, more = (
-                skill_services.get_filtered_skill_summaries(
-                    self.num_queries_to_fetch, None, 'math', [],
-                    None, None))
+        config_services.set_property(
+            self.user_id_admin, 'classroom_pages_data', [{
+                'url_fragment': 'math',
+                'name': 'math',
+                'topic_ids': [topic_id],
+                'topic_list_intro': 'Topics Covered',
+                'course_details': 'Course Details'
+            }]
+        )
+
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, None, 'math', [],
+                None, None))
         self.assertEqual(augmented_skill_summaries[0].topic_names, ['topic1'])
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
         self.assertEqual(

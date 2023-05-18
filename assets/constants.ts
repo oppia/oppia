@@ -29,17 +29,6 @@ export default {
   // fragment in the controller is invalid.
   "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
 
-  // Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in this file
-  // to add that classroom to learner group syllabus filter whenever a new
-  // classroom is added.
-  "CLASSROOM_PAGES_DATA": [{
-    "name": "math",
-    "url_fragment": "math",
-    "topic_ids": [],
-    "course_details": "",
-    "topic_list_intro": ""
-  }],
-
   "FEATURED_TRANSLATION_LANGUAGES": [],
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
