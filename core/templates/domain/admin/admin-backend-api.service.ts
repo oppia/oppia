@@ -170,10 +170,8 @@ export class AdminBackendApiService {
           viewableRoles: response.viewable_roles,
           topicSummaries: response.topic_summaries.map(
             CreatorTopicSummary.createFromBackendDict),
-            platformParameters: response.platform_params_dicts.map(
-            dict => PlatformParameter.createFromBackendDict(
-              dict)
-          )
+          platformParameters: response.platform_params_dicts.map(
+            dict => PlatformParameter.createFromBackendDict(dict))
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
