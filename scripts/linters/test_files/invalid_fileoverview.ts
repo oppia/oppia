@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // This file has missing fileoverview.
-const CodeMirror = require('/node_modules/code-mirror/lib/codemirror.js');
+const CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
 Object.defineProperty(window, 'CodeMirror', {
   value: CodeMirror,
   writable: false
 });
 
-require('/node_modules/code-mirror/mode/javascript/javascript.js');
-require('/node_modules/code-mirror/mode/python/python.js');
-require('/node_modules/code-mirror/mode/yaml/yaml.js');
+require('static/code-mirror-5.17.0/mode/javascript/javascript.js');
+require('static/code-mirror-5.17.0/mode/python/python.js');
+require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
 require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
 require('static/diff-match-patch-1.0.0/diff_match_patch.js');
