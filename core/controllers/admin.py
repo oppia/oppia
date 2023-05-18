@@ -1813,8 +1813,7 @@ class VerifyUserModelsDeletedHandler(
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Checks if a user with a specific user_id has been deleted and
-        returns a JSON response indicating whether there are related models
-        or not.
+        if there are related models or not.
         """
         assert self.normalized_request is not None
         user_id = self.normalized_request['user_id']
@@ -1925,9 +1924,7 @@ class UpdateBlogPostHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        """Handles PUT requests to update the author and published date of
-        a blog post.
-        """
+        """Updates the author and published date of a blog post."""
         assert self.normalized_payload is not None
         blog_post_id = self.normalized_payload['blog_post_id']
         author_username = self.normalized_payload['author_username']
