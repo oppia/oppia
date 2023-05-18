@@ -161,10 +161,10 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
             _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
             mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
             return (new_process.returncode, mypy_exec_path)
-        else:
-            _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
-            mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
-            return (process.returncode, mypy_exec_path)
+    else:
+        _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
+        mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
+        return (process.returncode, mypy_exec_path)
 
 
 def main(args: Optional[List[str]] = None) -> int:
