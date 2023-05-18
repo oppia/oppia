@@ -31,7 +31,7 @@ describe('exploration features backend api service', () => {
   var ERROR_STATUS_CODE = 500;
 
   var sampleDataResults = {
-    isExplorationCurated: true,
+    explorationIsCurated: true,
     alwaysAskLearnersForAnswerDetails: false
   };
 

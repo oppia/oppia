@@ -296,9 +296,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
       this.versionHistoryService.init(explorationData.version);
 
-      this.stateEditorService.updateExplorationWhitelistedStatus(
-        featuresData.isExplorationCurated);
-
       this.graphDataService.recompute();
 
       if (!this.stateEditorService.getActiveStateName() ||

@@ -53,7 +53,7 @@ class ExplorationFeaturesHandler(
             exploration_id: str. The ID of the exploration.
         """
         self.render_json({
-            'is_exploration_curated':
+            'exploration_is_curated':
                 opportunity_services.is_exploration_available_for_contribution(
                     exploration_id),
             'always_ask_learners_for_answer_details':

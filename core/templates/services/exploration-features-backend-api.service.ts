@@ -26,12 +26,12 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 interface ExplorationFeaturesBackendDict {
-  'is_exploration_curated': boolean;
+  'exploration_is_curated': boolean;
   'always_ask_learners_for_answer_details': boolean;
 }
 
 export interface ExplorationFeatures {
-  isExplorationCurated: boolean;
+  explorationIsCurated: boolean;
   alwaysAskLearnersForAnswerDetails: boolean;
 }
 
@@ -51,7 +51,7 @@ export class ExplorationFeaturesBackendApiService {
         {exploration_id: explorationId}
       ) as string
     ).toPromise().then(response => ({
-      isExplorationCurated: response.is_exploration_curated,
+      explorationIsCurated: response.is_exploration_curated,
       alwaysAskLearnersForAnswerDetails: (
         response.always_ask_learners_for_answer_details),
     }), errorResponse => {

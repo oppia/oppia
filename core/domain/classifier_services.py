@@ -97,17 +97,10 @@ def verify_signature(
         bool. Whether the incoming request is valid.
     """
     secret = None
-    vmid_shared_secret_key_mapping = secrets_services.get_secret(
-        'VMID_SHARED_SECRET_KEY_MAPPING')
-    if vmid_shared_secret_key_mapping is None and constants.DEV_MODE:
-        vmid_shared_secret_key_mapping = [{
-            'vm_id': feconf.DEFAULT_VM_ID,
-            'shared_secret_key': feconf.DEFAULT_VM_SHARED_SECRET
-        }]
-    for val in vmid_shared_secret_key_mapping:
-        if val['vm_id'] == oppia_ml_auth_info.vm_id:
-            secret = val['shared_secret_key'].encode('utf-8')
-            break
+    vm_id = secrets_services.get_secret('VM_ID')
+    shared_secret_key = secrets_services.get_secret('SHARED_SECRET_KEY')
+    if vm_id == oppia_ml_auth_info.vm_id:
+        secret = shared_secret_key.encode('utf-8')
     if secret is None:
         return False
 

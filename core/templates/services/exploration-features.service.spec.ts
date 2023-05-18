@@ -40,7 +40,7 @@ describe('ExplorationFeatureService', () => {
     // The property alwaysAskLearnersForAnswerDetails is not used. It is just
     // for complete the ExplorationFeatures interface.
     featureData = {
-      isExplorationCurated: true,
+      explorationIsCurated: true,
       alwaysAskLearnersForAnswerDetails: false
     };
     explorationData = {

@@ -295,7 +295,7 @@ export class OutcomeEditorComponent implements OnInit {
     );
     this.canAddPrerequisiteSkill = (
       this.ENABLE_PREREQUISITE_SKILLS &&
-      this.stateEditorService.isExplorationCurated());
+      this.stateEditorService.getExplorationIsCurated());
     this.feedbackEditorIsOpen = false;
     this.destinationEditorIsOpen = false;
     this.correctnessLabelEditorIsOpen = false;

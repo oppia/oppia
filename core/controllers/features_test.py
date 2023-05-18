@@ -58,7 +58,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         ):
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertTrue(json_response['is_exploration_curated'])
+        self.assertTrue(json_response['exploration_is_curated'])
 
     def test_can_not_record_playthroughs_with_non_curated_exps(self) -> None:
         with self.swap_to_always_return(
@@ -68,4 +68,4 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         ):
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        self.assertFalse(json_response['is_exploration_curated'])
+        self.assertFalse(json_response['exploration_is_curated'])

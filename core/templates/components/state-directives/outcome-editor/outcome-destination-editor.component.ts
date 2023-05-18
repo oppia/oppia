@@ -210,7 +210,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
       }));
     this.canAddPrerequisiteSkill = (
       this.ENABLE_PREREQUISITE_SKILLS &&
-      this.stateEditorService.isExplorationCurated());
+      this.stateEditorService.getExplorationIsCurated());
     this.canEditRefresherExplorationId = false;
     this.userService.getUserInfoAsync().then((userInfo) => {
       // We restrict editing of refresher exploration IDs to
