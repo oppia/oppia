@@ -331,7 +331,7 @@ describe('Learner dashboard functionality', function() {
       await collectionEditorPage.setCategory('Algebra');
       await collectionEditorPage.saveChanges();
     }
-    await users.logout();
+    await users.logout(1);
     await users.createAndLoginUser(
       'learner4@learnerDashboard.com', 'learner4learnerDashboard');
 
@@ -403,7 +403,7 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage
       .navigateToCommunityLessonsAndCheckCompleteCollections(
         'Test Collection');
-    await users.logout();
+    await users.logout(2);
 
     // This part of the test is desktop-only for the following reasons:
     // 1. A user can only add an existing exploration to a collection it has
@@ -433,7 +433,7 @@ describe('Learner dashboard functionality', function() {
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Collection Exploration');
       await collectionEditorPage.closeSaveModal();
-      await users.logout();
+      await users.logout(3);
 
       // Verify 'Test Collection' is now in the incomplete section.
       await users.login('learner4@learnerDashboard.com');
@@ -446,6 +446,6 @@ describe('Learner dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
-    await users.logout();
+    await users.logout(0);
   });
 });
