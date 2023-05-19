@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { FeedbackUpdatesPageComponent } from "pages/feedback-updates-page/feedback-updates-page.component";
+
 /**
  * @fileoverview Factory model for FeatureStatusSummary.
  */
@@ -29,7 +31,9 @@ export enum FeatureNames {
   ContributorDashboardAccomplishments = 'contributor_dashboard_accomplishments',
   AndroidBetaLandingPage = 'android_beta_landing_page',
   BlogPages = 'blog_pages',
-  DiagnosticTest = 'diagnostic_test'
+  DiagnosticTest = 'diagnostic_test',
+  FeedbackUpdatesPage = 'feedback_updates_page'
+
 }
 
 export interface FeatureStatusSummaryBackendDict {
