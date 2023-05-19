@@ -61,7 +61,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
     super();
   }
 
-  async signInWithPopupAsync(): Promise<firebase.auth.UserCredential> {
+  async signInWithPopupAsync(): Promise<firebase.auth.UserCredential | null> {
     return null;
   }
 
