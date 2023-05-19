@@ -19,35 +19,33 @@
     </a>
   </div>
 </div>
-
 <style>
   .oppia-subtopic-viewer-nav-breadcrumb {
     align-items: center;
     height: 56px;
     padding-top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-
-  .oppia-subtopic-viewer-nav-labels-container .topic-name {
+ .oppia-subtopic-viewer-nav-labels-container .topic-name {
     font-family: 'Roboto', Arial, sans-serif;
   }
-
-  .oppia-subtopic-viewer-nav-separator {
+ .oppia-subtopic-viewer-nav-separator {
     background-color: white;
     height: 80%;
     margin-right: 12px;
     width: 1px;
   }
-
-  .oppia-subtopic-viewer-nav-labels-container {
+ .oppia-subtopic-viewer-nav-labels-container {
     display: flex;
     flex-direction: column;
+    flex: 1;
   }
-
   .oppia-subtopic-title-text {
     font-size: 18px;
     margin: 0;
   }
-
   .oppia-topic-name-text {
     color: white;
     font-size: 12px;
