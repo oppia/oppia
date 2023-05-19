@@ -37,7 +37,7 @@ from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover

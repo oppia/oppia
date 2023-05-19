@@ -7113,19 +7113,12 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         def post(self) -> None:
             self.render_json({'job_id': 'new_job'})
 
-    def mock_get_secret(arg: str) -> Optional[str]:
-        if arg == 'VM_ID':
-            return 'vm_default'
-        elif arg == 'SHARED_SECRET_KEY':
-            return '1a2b3c4e'
-
     def setUp(self) -> None:
         super().setUp()
-        with self.swap(secrets_services, 'get_secret', self.mock_get_secret):
-            self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-                [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
-                debug=feconf.DEBUG,
-            ))
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
 
     def test_unauthorized_vm_cannot_fetch_jobs(self) -> None:
         payload = {}
