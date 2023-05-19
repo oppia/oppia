@@ -51,7 +51,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, TypedDict, Union
+from typing import Dict, Final, List, Optional, TypedDict, Union
 import webapp2
 import webtest
 
@@ -7113,12 +7113,19 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         def post(self) -> None:
             self.render_json({'job_id': 'new_job'})
 
+    def mock_get_secret(arg: str) -> Optional[str]:
+        if arg == 'VM_ID':
+            return 'vm_default'
+        elif arg == 'SHARED_SECRET_KEY':
+            return '1a2b3c4e'
+
     def setUp(self) -> None:
         super().setUp()
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
+        with self.swap(secrets_services, 'get_secret', self.mock_get_secret):
+            self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+                [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
+                debug=feconf.DEBUG,
+            ))
 
     def test_unauthorized_vm_cannot_fetch_jobs(self) -> None:
         payload = {}

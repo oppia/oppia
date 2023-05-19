@@ -51,7 +51,7 @@ export class ExplorationFeaturesBackendApiService {
         {exploration_id: explorationId}
       ) as string
     ).toPromise().then(response => ({
-      explorationIsCurated: response.is_exploration_curated,
+      explorationIsCurated: response.exploration_is_curated,
       alwaysAskLearnersForAnswerDetails: (
         response.always_ask_learners_for_answer_details),
     }), errorResponse => {

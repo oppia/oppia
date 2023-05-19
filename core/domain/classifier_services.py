@@ -99,6 +99,11 @@ def verify_signature(
     secret = None
     vm_id = secrets_services.get_secret('VM_ID')
     shared_secret_key = secrets_services.get_secret('SHARED_SECRET_KEY')
+    if (vm_id is None or shared_secret_key is None) and constants.DEV_MODE:
+        vm_id = 'vm_default'
+        shared_secret_key = '1a2b3c4e'
+    assert shared_secret_key is not None
+    assert vm_id is not None
     if vm_id == oppia_ml_auth_info.vm_id:
         secret = shared_secret_key.encode('utf-8')
     if secret is None:
