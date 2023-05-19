@@ -201,9 +201,9 @@ export class AuthService {
   }
 
   async signInWithPopupAsync(): Promise<void> {
-    this.creds = await this.authServiceImpl.signInWithPopupAsync();
+    const creds = await this.authServiceImpl.signInWithPopupAsync();
     // eslint-disable-next-line no-console
-    console.log(this.creds);
+    console.log(creds);
   }
 
   async signInWithRedirectAsync(): Promise<void> {
