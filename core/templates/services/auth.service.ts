@@ -31,7 +31,9 @@ abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<
     firebase.auth.UserCredential | null
   >;
-  abstract signInWithPopupAsync(): Promise<firebase.auth.UserCredential>;
+  abstract signInWithPopupAsync(): Promise<
+    firebase.auth.UserCredential | null
+  >;
   abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
