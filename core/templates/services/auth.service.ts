@@ -31,7 +31,7 @@ abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<
     firebase.auth.UserCredential | null
   >;
-  abstract signInWithPopupAsync(): Promise<void>;
+  abstract signInWithPopupAsync(): Promise<firebase.auth.UserCredential>;
   abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
@@ -39,7 +39,7 @@ abstract class AuthServiceImpl {
 class NullAuthServiceImpl extends AuthServiceImpl {
   private error = new Error('AngularFireAuth is not available');
 
-  async signInWithPopupAsync(): Promise<void> {
+  async signInWithPopupAsync(): Promise<firebase.auth.UserCredential> {
     throw this.error;
   }
 
@@ -61,7 +61,8 @@ class DevAuthServiceImpl extends AuthServiceImpl {
     super();
   }
 
-  async signInWithPopupAsync(): Promise<void> {
+  async signInWithPopupAsync(): Promise<firebase.auth.UserCredential> {
+    return null;
   }
 
   async signInWithRedirectAsync(): Promise<void> {
@@ -88,9 +89,8 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
     this.provider.setCustomParameters({prompt: 'select_account'});
   }
 
-  async signInWithPopupAsync(): Promise<void> {
-    await this.angularFireAuth.signInWithPopup(this.provider);
-    return;
+  async signInWithPopupAsync(): Promise<firebase.auth.UserCredential> {
+    return await this.angularFireAuth.signInWithPopup(this.provider);
   }
 
   /** Returns a promise that never resolves or rejects. */
@@ -199,7 +199,9 @@ export class AuthService {
   }
 
   async signInWithPopupAsync(): Promise<void> {
-    return this.authServiceImpl.signInWithPopupAsync();
+    this.creds = await this.authServiceImpl.signInWithPopupAsync();
+    // eslint-disable-next-line no-console
+    console.log(this.creds);
   }
 
   async signInWithRedirectAsync(): Promise<void> {
