@@ -39,10 +39,19 @@
             (click)="startQuestionCreation()"> Continue
     </button>
   </div>
+</div>
+
+<div>
   <div *ngIf="linkedSkillsWithDifficulty.length === 0">
-    <button class="btn btn-secondary" (click)="goToSelectSkillView()"> Back </button>
+    <div class="loading-screen">
+      <span>Loading</span>
+      <span class="oppia-loading-dot-one">.</span>
+      <span class="oppia-loading-dot-two">.</span>
+      <span class="oppia-loading-dot-three">.</span>
+    </div>
   </div>
 </div>
+
 <style>
   .oppia-close-button-position {
     font-size: 2.5rem;
@@ -57,6 +66,13 @@
   .select-skill-modal .skill-description {
     display: block;
     font-size: 1em;
+  }
+  .loading-screen {
+    align-items: center;
+    display: flex;
+    height: 432.79px;
+    justify-content: center;
+    width: 588.4px;
   }
   @media screen and (max-width: 500px) {
     .modal-header {
