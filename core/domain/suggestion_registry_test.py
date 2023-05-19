@@ -1566,7 +1566,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                 exp.id, exp.version))
         self.assertEqual(len(translations), 1)
         self.assertEqual(translations[0].language_code, 'hi')
-        self.assertEqual(translations[0].get_translation_count(), 1)
+        self.assertEqual(len(translations[0].translations), 1)
 
     def test_accept_suggestion_with_set_of_string_adds_translation(
         self
@@ -1605,7 +1605,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(translations), 1)
         self.assertEqual(translations[0].language_code, 'hi')
-        self.assertEqual(translations[0].get_translation_count(), 1)
+        self.assertEqual(len(translations[0].translations), 1)
 
     def test_accept_suggestion_with_psedonymous_author_adds_translation(
         self
@@ -1637,7 +1637,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(translations), 1)
         self.assertEqual(translations[0].language_code, 'hi')
-        self.assertEqual(translations[0].get_translation_count(), 1)
+        self.assertEqual(len(translations[0].translations), 1)
 
     def test_get_all_html_content_strings(self) -> None:
         suggestion = suggestion_registry.SuggestionTranslateContent(

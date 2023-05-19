@@ -269,37 +269,6 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             ['content_id_1', 'content_id_2', 'content_id_3', 'content_id_4']
         )
 
-    def test_get_all_contents_which_need_translations_with_digits(
-        self
-    ) -> None:
-        translation_dict = {
-            'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.',
-                translation_domain.TranslatableContentFormat.HTML,
-                True)
-        }
-        entity_translations = translation_domain.EntityTranslation(
-            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
-            translation_dict)
-
-        translatable_object = DummyTranslatableObjectWithFourParams(
-            '<p>10000</p>', 'My name is jhon.', 'My name is Nikhil.', '')
-        contents_which_need_translation = (
-            translatable_object.get_all_contents_which_need_translations(
-                entity_translations).values())
-
-        expected_list_of_contents_which_need_translataion = [
-            'My name is jhon.',
-            'My name is Nikhil.'
-        ]
-        list_of_contents_which_need_translataion = [
-            translatable_content.content_value
-            for translatable_content in contents_which_need_translation
-        ]
-        self.assertItemsEqual(
-            expected_list_of_contents_which_need_translataion,
-            list_of_contents_which_need_translataion)
-
     def test_are_translations_displayable_with_all_translations(self) -> None:
         translation_dict = {
             'content_id_2': translation_domain.TranslatedContent(
@@ -388,67 +357,6 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual(translatable_object.get_content_count(), 4)
-
-    def test_get_translation_count(self) -> None:
-        translatable_object = DummyTranslatableObjectWithFourParams(
-            'My name is jack.',
-            'My name is jhon.',
-            'My name is Nikhil.',
-            'Content'
-        )
-        translation_dict = {
-            'content_id_1': translation_domain.TranslatedContent(
-                'content_id_1 translation',
-                translation_domain.TranslatableContentFormat.HTML,
-                False),
-            'content_id_2': translation_domain.TranslatedContent(
-                'content_id_2 translation',
-                translation_domain.TranslatableContentFormat.HTML,
-                False),
-            'content_id_3': translation_domain.TranslatedContent(
-                'content_id_3 translation',
-                translation_domain.TranslatableContentFormat.HTML,
-                False),
-            'non_exsting_id': translation_domain.TranslatedContent(
-                'content_id_3 translation',
-                translation_domain.TranslatableContentFormat.HTML,
-                False),
-        }
-
-        entity_translations = translation_domain.EntityTranslation(
-            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
-            translation_dict
-        )
-
-        self.assertEqual(
-            translatable_object.get_translation_count(entity_translations),
-            3
-        )
-
-        translation_dict = {
-            'content_id_1': translation_domain.TranslatedContent(
-                'content_id_1 translation',
-                translation_domain.TranslatableContentFormat.HTML,
-                False),
-            'content_id_2': translation_domain.TranslatedContent(
-                'content_id_2 translation',
-                translation_domain.TranslatableContentFormat.HTML,
-                True),
-            'content_id_3': translation_domain.TranslatedContent(
-                'content_id_3 translation',
-                translation_domain.TranslatableContentFormat.HTML,
-                True),
-        }
-
-        entity_translations = translation_domain.EntityTranslation(
-            'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
-            translation_dict
-        )
-
-        self.assertEqual(
-            translatable_object.get_translation_count(entity_translations),
-            1
-        )
 
     def test_get_all_html_content_strings(self) -> None:
         translatable_object = DummyTranslatableObjectWithFourParams(

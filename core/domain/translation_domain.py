@@ -27,7 +27,6 @@ from core.constants import constants
 from typing import Dict, List, Optional, Union
 from typing_extensions import Final, TypedDict
 
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 
@@ -345,18 +344,8 @@ class BaseTranslatableObject:
 
         for translatable_content in translatable_content_list:
             content_value = translatable_content.content_value
-            if translatable_content.content_type == (
-                ContentType.CUSTOMIZATION_ARG
-            ) and translatable_content.content_format == (
-                TranslatableContentFormat.HTML
-            ):
-                assert isinstance(content_value, str)
-                content_value = html_cleaner.strip_html_tags(content_value)
 
             if content_value == '':
-                continue
-
-            if isinstance(content_value, str) and content_value.isnumeric():
                 continue
 
             if (
@@ -644,14 +633,6 @@ class EntityTranslation:
         """
         self.translations[content_id] = TranslatedContent(
             content_value, content_format, needs_update)
-
-    def get_translation_count(self) -> int:
-        """Returs the number of updated translations avialable."""
-        return len([
-            translated_content
-            for translated_content in self.translations.values()
-            if not translated_content.needs_update
-        ])
 
     def remove_translations(self, content_ids: List[str]) -> None:
         """Remove translations for the given list of content Ids.
