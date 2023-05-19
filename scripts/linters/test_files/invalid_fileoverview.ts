@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // This file has missing fileoverview.
-const CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
+const CodeMirror = require('/node_modules/code-mirror/lib/codemirror.js');
 Object.defineProperty(window, 'CodeMirror', {
   value: CodeMirror,
   writable: false
