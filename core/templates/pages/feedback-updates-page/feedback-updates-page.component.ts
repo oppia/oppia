@@ -373,4 +373,3 @@ angular.module('oppia').directive('oppiaFeedbackUpdatesPage',
   downgradeComponent({
     component: FeedbackUpdatesPageComponent
   }) as angular.IDirectiveFactory);
-

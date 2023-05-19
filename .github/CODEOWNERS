@@ -620,6 +620,7 @@
 /core/templates/pages/delete-account-page/ @oppia/angular-migration-reviewers
 /core/templates/pages/donate-page/ @oppia/angular-migration-reviewers
 /core/templates/pages/error-pages/ @oppia/angular-migration-reviewers
+/core/templates/pages/feedback-updates-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/get-started-page/ @oppia/angular-migration-reviewers
 /core/templates/pages/landing-pages/ @oppia/angular-migration-reviewers
 /core/templates/pages/maintenance-page/ @oppia/angular-migration-reviewers
