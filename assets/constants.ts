@@ -6687,6 +6687,24 @@ export default {
         }
       ]
     },
+    "FEEDBACKUPDATES": {
+      "ROUTE": "feedback-updates",
+      "TITLE": "Feedback Updates",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can learn and give feedback to improve the lessons"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can learn and give feedback to improve the lessons"
+        }
+      ]
+    },
     "PROFILE": {
       "ROUTE": "profile/:username_fragment",
       "TITLE": "I18N_PROFILE_PAGE_TITLE",
@@ -6730,7 +6748,7 @@ export default {
       "META": []
     },
     "CLASSROOM": {
-      "ROUTE": "learn/:classroom_url_fragment",
+      "ROUTE": "learn/math",
       "TITLE": "Oppia",
       "LIGHTWEIGHT": true,
       // Some routes contain url fragments, as syntax for url fragments are

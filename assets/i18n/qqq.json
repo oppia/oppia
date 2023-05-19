@@ -1393,6 +1393,7 @@
 	"I18N_TOPNAV_DONATE_DESCRIPTION": "Text displayed inside a drop-down menu. The description for donate is shown when user hovers over the I18N_TOPNAV_DONATE button, it tells them why they should donate.",
 	"I18N_TOPNAV_FACILITATOR_DASHBOARD": "Text displayed in the navigation bar of the facilitator dashboard page.",
 	"I18N_TOPNAV_FORUM": "Text displayed inside drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the external forum page is loaded.\n{{Identical|Forum}}",
+	"I18N_TOPNAV_FEEDBACK_UPDATES":"Text display in the navigation bar of the  Feedback updates page",
 	"I18N_TOPNAV_GET_INVOLVED": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the Get Involved page on the Oppia Foundation website is loaded.",
 	"I18N_TOPNAV_GET_STARTED": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the Get Started page is loaded.\n{{Identical|Get started}}",
 	"I18N_TOPNAV_HOME": "Text displayed in the navigation bar. - When the user clicks the button, the home page is loaded based on user preferences set.\n{{Identical|Home}}",

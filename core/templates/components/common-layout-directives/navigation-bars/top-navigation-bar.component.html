@@ -532,6 +532,13 @@
             <span [innerHTML]="'I18N_TOPNAV_ADMIN_PAGE' | translate"></span>
           </a>
         </li>
+        <li class="nav-item">
+          <a (click)="closeSubmenuIfNotMobile($event)"
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.FEEDBACKUPDATES.ROUTE"
+             class="dropdown-item nav-link e2e-test-learner-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_FEEDBACK_UPDATES' | translate"></span>
+          </a>
+        </li>
         <hr class="oppia-top-right-menu-item-separator">
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()"
