@@ -34,6 +34,9 @@ from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
 from scripts import servers  # isort:skip
 
+import ffmpeg
+import time
+
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
 SERVER_MODE_PROD: Final = 'dev'
@@ -73,8 +76,11 @@ _PARSER.add_argument(
     '--skip_build', help='Sets whether to skip webpack build',
     action='store_true')
 
+_PARSER.add_argument(
+    '--record_screen', help='Sets whether lighthouse screen-records tests',
+    action='store_true')
 
-def run_lighthouse_puppeteer_script() -> None:
+def run_lighthouse_puppeteer_script(vid_cache=None) -> None:
     """Runs puppeteer script to collect dynamic urls."""
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
@@ -101,6 +107,11 @@ def run_lighthouse_puppeteer_script() -> None:
         # print it.
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
+        if vid_cache:
+            vid_process, vid_path = vid_cache
+            vid_process.kill()
+            print('Saved video of failed script.')
+
         sys.exit(1)
 
 
@@ -143,7 +154,7 @@ def export_url(line: str) -> None:
         os.environ['skill_id'] = url_parts[4]
 
 
-def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
+def run_lighthouse_checks(lighthouse_mode: str, shard: str, vid_cache=None) -> None:
     """Runs the Lighthouse checks through the Lighthouse config.
 
     Args:
@@ -165,6 +176,11 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
+        if vid_cache:
+            vid_process, vid_path = vid_cache
+            vid_process.kill()
+            os.remove(vid_path)
+            print('Corresponding video has been deleted.')
     else:
         print('Return code: %s' % process.returncode)
         print('OUTPUT:')
@@ -176,6 +192,10 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
         # print it.
         print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
+        if vid_cache:
+            vid_process, vid_path = vid_cache
+            vid_process.kill()
+            print('Saved video of failed check.')
         sys.exit(1)
 
 
@@ -208,6 +228,19 @@ def main(args: Optional[List[str]] = None) -> None:
         build.main(args=[])
         common.run_ng_compilation()
         run_webpack_compilation()
+    if parsed_args.record_screen:
+        # starts ffmpeg screen record
+        name = 'lhci.mp4'
+        dirPath = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
+        os.mkdir(dirPath)
+        videoPath = os.path.join(dirPath, name)
+        vid_process = (
+			ffmpeg
+			.input(format='x11grab',framerate=30,filename="desktop")
+			.output(crf="0",preset="ultrafast",filename=videoPath,c= "libx264" )
+			.overwrite_output()
+			)
+        vid_process = vid_process.run_async(pipe_stdin=True)
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
@@ -223,8 +256,13 @@ def main(args: Optional[List[str]] = None) -> None:
             log_level='critical',
             skip_sdk_update_check=True))
 
-        run_lighthouse_puppeteer_script()
-        run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
+        if os.getenv("GITHUB_ACTIONS") and parsed_args.record_screen:
+            run_lighthouse_puppeteer_script((vid_process, videoPath))
+            run_lighthouse_checks(lighthouse_mode, parsed_args.shard, (vid_process, videoPath))
+        else:
+            run_lighthouse_puppeteer_script()
+            run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
+
 
 
 if __name__ == '__main__': # pragma: no cover
