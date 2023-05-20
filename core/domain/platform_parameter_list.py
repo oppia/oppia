@@ -89,10 +89,3 @@ Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
     platform_parameter_domain.FeatureStages.PROD)
-
-
-# Registry.create_feature_flag(
-#     ParamNames.FEEDBACK_UPDATES_PAGE,
-#     'This flag is for feedback updates page.',
-#     platform_parameter_domain.FeatureStages.PROD,
-# )
