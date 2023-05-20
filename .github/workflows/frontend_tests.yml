@@ -31,6 +31,11 @@ jobs:
             JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.standard-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
             echo "job-strategy-matrix=$JOB_STRATEGY_MATRIX" >> $GITHUB_OUTPUT
           fi
+  start-video-recording:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Start video recording
+        run: ffmpeg -y -r 30 -f x11grab -s 1285x1000 -i ${{ process.env.DISPLAY }} -g 100 -loglevel 16 /home/runner/work/oppia/video.mp4
   frontend-karma-tests:
     needs: generate-job-strategy-matrix
     runs-on:  ${{ matrix.os }}
@@ -71,13 +76,16 @@ jobs:
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Run frontend tests ${{ matrix.num_runs }}
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage --headless=False
       - name: Uploading fronted coverage reports as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
+  stop-video-recording:
+    - name: Stop video recording
+      run: pkill -SIGINT ffmpeg
   report-failure:
     needs: frontend-karma-tests
     runs-on: ubuntu-22.04
@@ -89,3 +97,9 @@ jobs:
         with:
           message: "A frontend test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  upload-video-artifact:
+    - name: Upload video artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Frontend test video
+        path: /home/runner/work/oppia/video.mp4
