@@ -17,5 +17,5 @@
  */
 
 require(
-  '/node_modules/angular-drag-and-drop-lists/' +
+  'static/angular-drag-and-drop-lists-2.1.0/' +
   'angular-drag-and-drop-lists.min.js');
