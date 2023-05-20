@@ -286,12 +286,6 @@ jobs:
         with: 
           name: webdriverio-video
           path: /home/runner/work/oppia/webdriverio-video
-      - name: Uploading webdriverio screenshots as Artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: webdriverio-screenshots
-          path: /home/runner/work/oppia/webdriverio-screenshots
       - name: Uploading webpack bundles as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
