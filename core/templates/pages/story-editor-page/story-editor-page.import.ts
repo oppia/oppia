@@ -21,14 +21,14 @@ import 'zone.js';
 
 import uiValidate from 'angular-ui-validate';
 // import 'third-party-imports/dnd-lists.import';
-// eslint-disable-next-line max-len
-import 'node_modules/angular-drag-and-drop-lists/angular-drag-and-drop-lists.min.js';
+import angularDragAndDrop from 'angular-drag-and-drop-lists';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'dndLists', 'ngAnimate',
+  require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'ui.bootstrap',
-  uiValidate
+  uiValidate,
+  angularDragAndDrop
 ]);
 
 require('Polyfills.ts');
