@@ -165,7 +165,6 @@ describe('PlatformFeatureService', () => {
               [FeatureNames.BlogPages]: true,
               [FeatureNames.ContributorDashboardAccomplishments]: true,
               [FeatureNames.DiagnosticTest]: true,
-              // [FeatureNames.FeedbackUpdatesPage]: true,
             }
           })
         });

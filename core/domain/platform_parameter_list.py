@@ -39,8 +39,6 @@ class ParamNames(enum.Enum):
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
-    # FEEDBACK_UPDATES_PAGE = 'feedback_updates_page'
-
 
 # Platform parameters should all be defined below.
 
