@@ -197,10 +197,10 @@ export class ContextService {
         ContextService.customEntityContext.getId()));
       return ContextService.customEntityContext.getId();
     }
-    console.error('Begin split.');
     let pathnameArray = this.urlService.getPathname().split('/');
-    console.error('End split.');
+    console.error('Split into: ' + pathnameArray);
     let hashValues = this.urlService.getHash().split('#');
+    console.error('Hash values: ' + hashValues);
     console.error('For loop started.');
     for (let i = 0; i < pathnameArray.length; i++) {
       console.error('pathnameArray i=' + i + ' ' + pathnameArray[i]);
