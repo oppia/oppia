@@ -34,9 +34,6 @@ from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
 from scripts import servers  # isort:skip
 
-import ffmpeg
-import time
-
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
 SERVER_MODE_PROD: Final = 'dev'
@@ -229,7 +226,8 @@ def main(args: Optional[List[str]] = None) -> None:
         common.run_ng_compilation()
         run_webpack_compilation()
     if parsed_args.record_screen:
-        # starts ffmpeg screen record
+        import ffmpeg
+        # start ffmpeg screen record
         name = 'lhci.mp4'
         dirPath = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
         os.mkdir(dirPath)
