@@ -40,6 +40,7 @@ class ParamNames(enum.Enum):
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
 
+
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
