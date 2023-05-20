@@ -20,7 +20,9 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/dnd-lists.import';
+// import 'third-party-imports/dnd-lists.import';
+// eslint-disable-next-line max-len
+import 'node_modules/angular-drag-and-drop-lists/angular-drag-and-drop-lists.min.js';
 import 'third-party-imports/ui-codemirror.import';
 import 'third-party-imports/ui-tree.import';
 

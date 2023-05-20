@@ -17,5 +17,5 @@
  */
 
 require(
-  '/home/runner/work/oppia/oppia/node_modules/angular-drag-and-drop-lists/' +
+  '/node_modules/angular-drag-and-drop-lists/' +
   'angular-drag-and-drop-lists.min.js');
