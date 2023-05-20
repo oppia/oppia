@@ -80,7 +80,8 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACKUPDATES.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import('pages/feedback-updates-page/feedback-updates-page.module')
+    loadChildren: () => import(
+      'pages/feedback-updates-page/feedback-updates-page.module')
       .then(m => m.FeedbackUpdatesPageModule)
   },
   {
