@@ -195,7 +195,7 @@ describe('Context service', () => {
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
+      spyOn(urlService, 'getHash').and.returnValue('');
 
       expect(ecs.getEntityId()).toBe('123');
     });
@@ -323,7 +323,7 @@ describe('Context service', () => {
       expect(ecs.getEntityId()).toBe('undefined');
 
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
+      spyOn(urlService, 'getHash').and.returnValue('');
 
       expect(ecs.getEntityId()).toBe('123');
     });
