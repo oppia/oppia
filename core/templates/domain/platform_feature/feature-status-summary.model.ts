@@ -32,7 +32,7 @@ export enum FeatureNames {
   AndroidBetaLandingPage = 'android_beta_landing_page',
   BlogPages = 'blog_pages',
   DiagnosticTest = 'diagnostic_test',
-  FeedbackUpdatesPage = 'feedback_updates_page'
+  // FeedbackUpdatesPage = 'feedback_updates_page'
 
 }
 

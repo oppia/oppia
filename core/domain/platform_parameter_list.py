@@ -39,7 +39,7 @@ class ParamNames(enum.Enum):
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
-    FEEDBACK_UPDATES_PAGE = 'feedback_updates_page'
+    # FEEDBACK_UPDATES_PAGE = 'feedback_updates_page'
 
 
 # Platform parameters should all be defined below.
@@ -93,8 +93,8 @@ Registry.create_feature_flag(
     platform_parameter_domain.FeatureStages.PROD)
 
 
-Registry.create_feature_flag(
-    ParamNames.FEEDBACK_UPDATES_PAGE,
-    'This flag is for feedback updates page.',
-    platform_parameter_domain.FeatureStages.DEV,
-)
+# Registry.create_feature_flag(
+#     ParamNames.FEEDBACK_UPDATES_PAGE,
+#     'This flag is for feedback updates page.',
+#     platform_parameter_domain.FeatureStages.PROD,
+# )
