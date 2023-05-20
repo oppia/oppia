@@ -615,7 +615,7 @@ describe('Translation Modal Component', () => {
 
     describe('when alt text is not changed in copied images', () => {
       it('should not submit the translation', () => {
-        component.contentPanel.elementRef.nativeElement.outerHTML = '<oppia' +
+        component.textToTranslate = '<oppia' +
           'noninteractive-image alt-with-' +
           'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
           '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
@@ -637,10 +637,10 @@ describe('Translation Modal Component', () => {
 
     describe('when caption is not changed in copied images', () => {
       it('should not submit the translation', () => {
-        component.contentPanel.elementRef.nativeElement.outerHTML = '<oppia' +
+        component.textToTranslate = '<oppia' +
           '-noninteractive-image alt-with-' +
           'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
-          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
+          '"&amp;quot;Image text&amp;quot;" filepath-with-value="&amp;quot' +
           ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
           '></oppia-noninteractive-image>';
         component.activeWrittenTranslation = '<oppia-noninteractive' +
@@ -654,6 +654,49 @@ describe('Translation Modal Component', () => {
 
         expect(translateTextService.suggestTranslatedText)
           .toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('when some elements are hidden', () => {
+      it('should submit the translation if it is valid', () => {
+        component.textToTranslate = '<p>James and Uncle Berry were in the ' +
+          'kitchen, trying different recipes in the recipe book and finding ' +
+          'ones that would sell well for their smoothie stand.<br><br>Uncle ' +
+          'Berry asked James, "Can you put white chocolate and dark chocolate' +
+          ' in the ratio of 1:2 into the blender?"<br><br>A little confused, ' +
+          'James asked, “So, do I put in 1 piece of white chocolate and 2 ' +
+          'pieces of dark chocolate?”<br><br>“No, those ingredients would ' +
+          'not be enough for the blender to work properly. Let\'s use 4 ' +
+          'pieces of white chocolate and 8 pieces of dark chocolate ' +
+          'instead,” Uncle Berry answered, pointing to the chocolates' +
+          ' on the kitchen table.<br><br>“Hmmm,” James mumbled to himself,' +
+          ' “But then, the ratio of white chocolate to dark chocolate will' +
+          ' become 4:8. Is 4:8 the same as 1:2?”</p><div>' +
+          '<oppia-noninteractive-image alt-with-value="&quot;James thinking' +
+          ' 4:8=1:2?&quot;" caption-with-value="&quot;&quot;" ' +
+          'filepath-with-value="&quot;img_20181105_222613' +
+          '_mrwlyh5tg7_height_343_width_343.png&quot;">' +
+          '</oppia-noninteractive-image></div>';
+        component.activeWrittenTranslation = '<p>Test' +
+          ' Translation that has been translated. ' +
+          'kitchen, trying different recipes in the recipe book and finding ' +
+          'ones that would sell well for their smoothie stand.<br><br>Uncle ' +
+          'Berry asked James, "Can you put white chocolate and dark chocolate' +
+          ' in the ratio of 1:2 into the blender?"<br><br>A little confused, ' +
+          'James asked, “So, do I put in 1 piece of white chocolate and 2 ' +
+          'pieces of dark chocolate?”<br><br>“No, those ingredients would ' +
+          'not be enough for the blender to work properly. Let\'s use 4 ' +
+          'pieces of white chocolate and 8 pieces of dark chocolate ' +
+          'instead,” Uncle Berry answered, pointing to the chocolates' +
+          ' on the kitchen table.<br><br>“Hmmm,” James mumbled to himself,' +
+          ' “But then, the ratio of white chocolate to dark chocolate will' +
+          ' become 4:8. Is 4:8 the same as 1:2?”</p>';
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(1);
       });
     });
 

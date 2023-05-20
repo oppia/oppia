@@ -499,6 +499,14 @@ export class TranslationModalComponent {
   suggestTranslatedText(): void {
     if (!this.isSetOfStringDataFormat()) {
       const domParser = new DOMParser();
+      // Previously we compared textToTranslate with activeWrittenTranslation
+      // to validate the translation contains all the required parts in the
+      // original text. But sometimes some of the texts inside the
+      // textToTranslate are not visible to the translators so that they can
+      // not translate them. Hence we are only validating what is actually
+      // visible for the translator by comparing what is inside contentPanel
+      // with the activeWrittenTranslation.
+      // More context: https://github.com/oppia/oppia/issues/17535
       const originalElements = domParser.parseFromString(
         this.contentPanel.elementRef.nativeElement.outerHTML as string,
         'text/html');
