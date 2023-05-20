@@ -53,7 +53,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('Context service', () => {
+describe('Context service', () => {
   let ecs: ContextService;
   let urlService: UrlService;
   let windowRef: MockWindowRef;
