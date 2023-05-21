@@ -22,7 +22,7 @@ var action = require('./action.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
-  var FEEDBACK_UPDATES_URL  = '/feedback-updates'
+  var FEEDBACK_UPDATES_URL = '/feedback-updates';
   var addToLearnerGoalsButton = $(
     '.e2e-test-add-topic-to-current-goals-button');
   var communityLessonsSection = $('.e2e-test-community-lessons-section');
