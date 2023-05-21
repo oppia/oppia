@@ -74,8 +74,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.skillId = this.contextService.getEntityId()
-    console.log("Skill Id",this.skillId)
+    this.skillId = this.contextService.getEntityId();
     this.showLoading = true;
     this.skills = [];
     if (this.value) {
@@ -108,7 +107,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
      * See issue #16985 for detailed discussion.
      */
     this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS, this.skillId );
+      AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS, this.skillId);
   }
 }
 
