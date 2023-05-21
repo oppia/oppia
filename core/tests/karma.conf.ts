@@ -26,7 +26,7 @@ module.exports = function(config) {
       'third_party/static/jquery-3.5.1/jquery.min.js',
       'third_party/static/angularjs-1.8.2/angular.js',
       'core/templates/karma.module.ts',
-      'third_party/static/angularjs-1.8.2/angular-mocks.js',
+      'node_modules/angular-mocks/angular-mocks.js',
       {
         pattern: 'node_modules/lamejs/worker-example/worker-realtime.js',
         included: false
