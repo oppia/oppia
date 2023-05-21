@@ -84,17 +84,17 @@ class LoadingDotsComponentStub {
 describe('Feedback updates page', () => {
   let component: FeedbackUpdatesPageComponent;
   let fixture: ComponentFixture<FeedbackUpdatesPageComponent>;
-  let alertsService: AlertsService = null;
-  let csrfTokenService: CsrfTokenService = null;
-  let dateTimeFormatService: DateTimeFormatService = null;
+  let alertsService: AlertsService;
+  let csrfTokenService: CsrfTokenService;
+  let dateTimeFormatService: DateTimeFormatService;
   let focusManagerService: FocusManagerService;
   let learnerDashboardBackendApiService:
-    LearnerDashboardBackendApiService = null;
+    LearnerDashboardBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
-  let userService: UserService = null;
-  let translateService: TranslateService = null;
-  let pageTitleService: PageTitleService = null;
+  let userService: UserService;
+  let translateService: TranslateService;
+  let pageTitleService: PageTitleService;
   let urlService: UrlService;
 
   let threadSummaryList = [{

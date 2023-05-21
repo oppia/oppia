@@ -163,7 +163,8 @@ describe('Learner dashboard functionality', function() {
 
     // Verify feedback thread is created.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToFeedbackSection();
+    // await learnerDashboardPage.navigateToFeedbackSection(); 
+    await learnerDashboardPage.getfeedbackpage();
     await learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
     await learnerDashboardPage.navigateToFeedbackThread();
     await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
