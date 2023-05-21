@@ -20,13 +20,14 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/dnd-lists.import';
+import angularDragAndDrop from 'angular-drag-and-drop-lists';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'dndLists', 'ngAnimate',
+  require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'ui.bootstrap',
-  uiValidate
+  uiValidate,
+  angularDragAndDrop
 ]);
 
 require('Polyfills.ts');
