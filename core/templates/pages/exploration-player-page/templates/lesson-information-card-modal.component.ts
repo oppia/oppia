@@ -179,6 +179,19 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       (spaceBetweenEachNode / 2));
   }
 
+  getProgressPercentage(): string {
+    if (this.completedCheckpointsCount === this.checkpointCount) {
+      return '100';
+    }
+    if (this.completedCheckpointsCount === 0) {
+      return '0';
+    }
+    const progressPercentage = Math.floor(
+      (this.completedCheckpointsCount / this.checkpointCount) * 100
+    );
+    return progressPercentage.toString();
+  }
+
   getExplorationTagsSummary(arrayOfTags: string[]): ExplorationTagSummary {
     let tagsToShow = [];
     let tagsInTooltip = [];
