@@ -176,6 +176,15 @@ describe('SkillSelectorEditorComponent', () => {
     expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
   });
 
+  it('should restore custom entity for images of question-editor' +
+  'when component is destroyed', () => {
+    spyOn(contextService, 'setCustomEntityContext');
+
+    component.ngOnDestroy();
+
+    expect(contextService.setCustomEntityContext).toHaveBeenCalled();
+  });
+
   it('should select skill when user selects skill', () => {
     spyOn(contextService, 'setCustomEntityContext');
     spyOn(component.valueChanged, 'emit');

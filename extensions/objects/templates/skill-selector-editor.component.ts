@@ -36,6 +36,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   @Input() modalId!: symbol;
   @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
+  skillId: string = '';
   skills: SkillBackendDict[] = [];
   showLoading = false;
   skillsToShow: SkillBackendDict[] = [];
@@ -73,6 +74,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.skillId = this.contextService.getEntityId()
+    console.log("Skill Id",this.skillId)
     this.showLoading = true;
     this.skills = [];
     if (this.value) {
@@ -98,6 +101,14 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextService.removeCustomEntityContext();
+    /**
+     * Note to developers:
+     * We are manually setting customEntityContext so that it
+     * doesn't cause any breakages in question-editor.
+     * See issue #16985 for detailed discussion.
+     */
+    this.contextService.setCustomEntityContext(
+      AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS, this.skillId );
   }
 }
 
