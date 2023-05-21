@@ -125,7 +125,7 @@ export class VoiceoverRecordingService {
       return;
     }
     if (this.mp3Worker === null) {
-      let lameWorkerFileUrl = '/node_modules/lamejs/' +
+      let lameWorkerFileUrl = '/third_party/static/lamejs-1.2.0/' +
            'worker-example/worker-realtime.js';
       // Config the mp3 encoding worker.
       let config = {sampleRate: 44100, bitRate: 128};
