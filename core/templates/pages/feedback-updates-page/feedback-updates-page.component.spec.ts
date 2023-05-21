@@ -81,7 +81,7 @@ class BackgroundBannerComponentStub {
 class LoadingDotsComponentStub {
 }
 
-fdescribe('Feedback updates page', () => {
+describe('Feedback updates page', () => {
   let component: FeedbackUpdatesPageComponent;
   let fixture: ComponentFixture<FeedbackUpdatesPageComponent>;
   let alertsService: AlertsService;
