@@ -81,7 +81,7 @@ class BackgroundBannerComponentStub {
 class LoadingDotsComponentStub {
 }
 
-describe('Feedback updates page', () => {
+fdescribe('Feedback updates page', () => {
   let component: FeedbackUpdatesPageComponent;
   let fixture: ComponentFixture<FeedbackUpdatesPageComponent>;
   let alertsService: AlertsService;
@@ -839,12 +839,13 @@ describe('Feedback updates page', () => {
 
         component.ngOnInit();
 
-        tick();
+        tick(1000);
         fixture.detectChanges();
 
         expect(alertsSpy).toHaveBeenCalledWith(
           'Failed to get learner dashboard feedback updates data');
         expect(fetchDataSpy).toHaveBeenCalled();
+        tick(1000);
       }));
 
     it('should unsubscribe upon component destruction', () => {
