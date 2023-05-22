@@ -25,7 +25,7 @@ import { GuestCollectionProgressService } from 'domain/collection/guest-collecti
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { ConceptCard } from 'domain/skill/concept-card.model';
@@ -1298,6 +1298,25 @@ describe('Conversation skin component', () => {
     expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
   }));
 
+  it('should display the exploration after the the progress reminder modal' +
+   'has loaded', () => {
+    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(contextService, 'isInExplorationPlayerPage').and.returnValue(true);
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
+      'expl_1');
+    spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(false);
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+
+    componentInstance.ngOnInit();
+    expect(componentInstance.hasFullyLoaded).toBe(false);
+    explorationPlayerStateService.onShowProgressModal.emit();
+    expect(componentInstance.hasFullyLoaded).toBe(true);
+  });
+
   it('should determine if chapter was completed for the first time',
     fakeAsync(() => {
       componentInstance.isLoggedIn = true;
@@ -2334,10 +2353,13 @@ describe('Conversation skin component', () => {
   it('should be able to skip the current question', fakeAsync(() => {
     let sampleCard = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '',
-      // Use unknown type conversion to test that the interaction is not
-      // required to be a string.
-      null as unknown as Interaction, null as unknown as RecordedVoiceovers,
-      'content', audioTranslationLanguageService);
+      // This throws "Type null is not assignable to type
+      // 'string'." We need to suppress this error
+      // because of the need to test validations. This
+      // throws an error only in the frontend test and
+      // not in the frontend.
+      // @ts-ignore
+      null, null, 'content', audioTranslationLanguageService);
 
     let callback = (successCallback: (nextCard: StateCard) => void) => {
       successCallback(sampleCard);

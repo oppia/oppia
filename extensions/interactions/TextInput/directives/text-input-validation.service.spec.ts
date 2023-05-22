@@ -182,8 +182,8 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Answer group 1 has multiple rules with ' +
-        'the same type \'Equals\' within the same group.'
+      message: 'Oppia response 1 has multiple learner answers with ' +
+        'the same type \'Equals\' within the same response.'
     }]);
   });
 
@@ -221,8 +221,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'Contains\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be ' +
+      'matched because it is preceded by a \'Contains\' answer ' +
+      'with a matching input.'
     }]);
 
     answerGroups = [
@@ -258,8 +259,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'Contains\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be ' +
+      'matched because it is preceded by a \'Contains\' answer ' +
+      'with a matching input.'
     }]);
 
     answerGroups = [
@@ -295,8 +297,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'Contains\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be ' +
+      'matched because it is preceded by a \'Contains\' answer ' +
+      'with a matching input.'
     }]);
   });
 
@@ -334,8 +337,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'StartsWith\' answer' +
+      ' with a matching prefix.'
     }]);
 
     answerGroups = [
@@ -371,8 +375,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'StartsWith\' answer' +
+      ' with a matching prefix.'
     }]);
 
     answerGroups = [
@@ -408,8 +413,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'StartsWith\' rule with a matching prefix.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'StartsWith\' answer' +
+      ' with a matching prefix.'
     }]);
   });
 
@@ -447,8 +453,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'Equals\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'Equals\' answer' +
+      ' with a matching input.'
     }]);
 
     answerGroups = [
@@ -484,8 +491,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'FuzzyEquals\' answer' +
+      ' with a matching input.'
     }]);
   });
 
@@ -523,8 +531,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'FuzzyEquals\' answer' +
+      ' with a matching input.'
     }]);
 
     answerGroups = [
@@ -560,8 +569,9 @@ describe('TextInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched because it' +
-      ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
+      message: 'Learner answer 1 from Oppia response 2 will never be matched' +
+      ' because it is preceded by a \'FuzzyEquals\' answer' +
+      ' with a matching input.'
     }]);
   });
 });

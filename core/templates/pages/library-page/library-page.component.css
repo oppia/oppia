@@ -121,11 +121,6 @@ oppia-library-page .oppia-library-group-header a,
   color: #04857c;
   text-decoration: none;
 }
-@media (max-width: 720px) {
-  .oppia-library-group-header {
-    font-size: 6vw;
-  }
-}
 .oppia-carousel-box {
   align-items: center;
   display: flex;
@@ -212,7 +207,7 @@ oppia-library-page .oppia-exploration-summary-header {
   max-width: 856px;
 }
 oppia-library-page .oppia-search-bar-container {
-  margin: 0 auto 5vh auto;
+  margin: 0 auto 6vh auto;
   padding-bottom: 60px;
   width: max-content;
 }

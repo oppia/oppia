@@ -3,7 +3,6 @@ core.controllers.base_test
 core.controllers.blog_homepage_test
 core.controllers.contributor_dashboard_test
 core.controllers.creator_dashboard_test
-core.controllers.domain_objects_validator_test
 core.controllers.editor_test
 core.controllers.feedback_test
 core.controllers.learner_playlist_test
@@ -26,7 +25,6 @@ core.domain.app_feedback_report_services_test
 core.domain.beam_job_services_test
 core.domain.blog_domain_test
 core.domain.blog_services_test
-core.domain.calculation_registry_test
 core.domain.classifier_services_test
 core.domain.collection_domain_test
 core.domain.change_domain_test
@@ -39,12 +37,9 @@ core.domain.exp_domain_test
 core.domain.exp_services_test
 core.domain.feedback_domain_test
 core.domain.feedback_services_test
-core.domain.fs_services_test
 core.domain.html_cleaner_test
 core.domain.html_validation_service_test
-core.domain.image_validation_services_test
 core.domain.interaction_registry_test
-core.domain.learner_goals_services_test
 core.domain.learner_group_fetchers_test
 core.domain.learner_group_services_test
 core.domain.learner_playlist_services_test
@@ -76,8 +71,6 @@ core.domain.user_domain_test
 core.domain.user_query_domain_test
 core.domain.user_query_services_test
 core.domain.user_services_test
-core.domain.visualization_registry_test
-core.domain.wipeout_domain_test
 core.domain.wipeout_service_test
 core.jobs.transforms.validation.base_validation_test
 core.jobs.types.base_validation_errors_test

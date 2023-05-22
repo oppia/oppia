@@ -23,12 +23,10 @@ describe('Learner Group All Learners Info', () => {
     const sampleLearnerGroupAllLearnersInfoDict = {
       learners_info: [{
         username: 'user1',
-        profile_picture_data_url: 'profile_picture',
         error: 'some error message'
       }],
       invited_learners_info: [{
         username: 'user2',
-        profile_picture_data_url: 'profile_picture2',
         error: 'some error message'
       }]
     };
@@ -39,16 +37,10 @@ describe('Learner Group All Learners Info', () => {
     );
 
     expect(sampleAllLearnersInfo.learnersInfo[0].username).toEqual('user1');
-    expect(
-      sampleAllLearnersInfo.learnersInfo[0].userProfilePictureUrl
-    ).toEqual('profile_picture');
     expect(sampleAllLearnersInfo.learnersInfo[0].error).toEqual(
       'some error message');
     expect(sampleAllLearnersInfo.invitedLearnersInfo[0].username).toEqual(
       'user2');
-    expect(
-      sampleAllLearnersInfo.invitedLearnersInfo[0].userProfilePictureUrl
-    ).toEqual('profile_picture2');
     expect(sampleAllLearnersInfo.invitedLearnersInfo[0].error).toEqual(
       'some error message');
   });

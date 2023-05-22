@@ -103,7 +103,6 @@ describe('Topic Editor Navbar', () => {
       TestBed.inject(TopicRightsBackendApiService);
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
-    subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');
     let skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
@@ -136,7 +135,6 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.warningsAreShown).toBeFalse();
     expect(componentInstance.showTopicEditOptions).toBeFalse();
     expect(componentInstance.topic).toEqual(topic);
-    expect(componentInstance.topicSkillIds).toEqual(['skill_1']);
     expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.topicRights).toEqual(
@@ -200,6 +198,18 @@ describe('Topic Editor Navbar', () => {
       'Topic should have meta tag content.',
       'Subtopic subtopic1 should have a thumbnail.'
     ]);
+  });
+
+  it('should load content properly', () => {
+    spyOn(componentInstance, 'getChangeListLength').and.returnValue(1);
+    spyOn(componentInstance, 'isTopicSaveable').and.returnValue(true);
+    spyOn(componentInstance, 'getTotalWarningsCount').and.returnValue(1);
+
+    componentInstance.ngAfterContentChecked();
+
+    expect(componentInstance.changeListLength).toEqual(1);
+    expect(componentInstance.totalWarningsCount).toEqual(1);
+    expect(componentInstance.topicIsSaveable).toBe(true);
   });
 
   it('should validate topic when user undo or redo changes', () => {
@@ -454,7 +464,8 @@ describe('Topic Editor Navbar', () => {
     spyOn(topicEditorStateService, 'saveTopic').and.callFake(
       // This throws "Cannot set properties of undefined (setting
       // 'topicIsPublished')". We need to suppress this error because
-      // we can't return a true value here for spyOn.
+      // we can't return a true value here for spyOn. We need to
+      // return a promise here because the function is async.
       // @ts-ignore
       (commitMessage: string, successCallback: () => void) => {
         successCallback();

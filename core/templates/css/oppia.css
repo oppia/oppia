@@ -994,6 +994,12 @@ textarea {
   border: none;
 }
 
+@media(max-width: 1050px) {
+  .oppia-navbar-breadcrumb {
+    display: none;
+  }
+}
+
 @media(max-width: 768px) {
   .oppia-navbar-breadcrumb > li, .oppia-navbar-breadcrumb {
     float: left;
@@ -1384,8 +1390,8 @@ span.sort-explorations-select .sort-order {
 .oppia-save-draft-button.btn-success,
 .oppia-save-changes-button.btn-success,
 .oppia-editor-publish-button.btn-success {
-  background-color: #28a745;
-  border-color: #28a745;
+  background-color: #24883e;
+  border-color: #24883e;
   color: #fff;
 }
 .oppia-save-draft-button.btn-success:hover,
@@ -2480,7 +2486,8 @@ div#ng-curtain {
 }
 
 .oppia-navbar-dropdown-toggle:focus {
-  color: #fff;
+  background-color: #fff;
+  color: #00645c;
 }
 .oppia-navbar-profile-picture {
   height: 32px;
