@@ -16,22 +16,21 @@
  * @fileoverview Acceptance Test for Blog Post Editor
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import { userFactory } from '../../puppeteer-testing-utilities/user-factory';
+import { testConstants } from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const duplicateBlogPostWarning = ' Blog Post with the' +
+  ' given title exists already. Please use a different title. ';
 
 describe('Blog Editor', function() {
-  let blogPostEditor = null;
+  let blogPostEditor;
 
   beforeAll(async function() {
     blogPostEditor = await userFactory.createNewBlogPostEditor(
       'blogPostEditor');
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, testConstants.DEFAULT_SPEC_TIMEOUT);
 
-  it('should publish blog post and delete published blog post',
+  it('should check blog editor unable to publish duplicate blog post',
     async function() {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
@@ -42,9 +41,12 @@ describe('Blog Editor', function() {
       await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
         'TestBlog');
 
-      await blogPostEditor.deletePublishedBlogPostWithTitle('TestBlog');
-      await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-    }, DEFAULT_SPEC_TIMEOUT);
+      await blogPostEditor.navigateToBlogDashboardPage();
+      await blogPostEditor.createNewBlogPostWithTitle('TestBlog');
+
+      await blogPostEditor.expectUserUnableToPublishBlogPost(
+        duplicateBlogPostWarning);
+    }, testConstants.DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
     await userFactory.closeAllBrowsers();

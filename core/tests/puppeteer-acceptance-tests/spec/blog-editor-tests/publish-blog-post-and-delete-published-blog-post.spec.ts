@@ -16,31 +16,31 @@
  * @fileoverview Acceptance Test for Blog Post Editor
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import { userFactory } from '../../puppeteer-testing-utilities/user-factory';
+import { testConstants } from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Blog Editor', function() {
-  let blogPostEditor = null;
+  let blogPostEditor;
 
   beforeAll(async function() {
     blogPostEditor = await userFactory.createNewBlogPostEditor(
       'blogPostEditor');
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should create draft and delete draft blog post',
+  it('should publish blog post and delete published blog post',
     async function() {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
-      await blogPostEditor.createDraftBlogPostWithTitle('TestBlog');
+      await blogPostEditor.publishNewBlogPostWithTitle('TestBlog');
 
+      await blogPostEditor.navigateToPublishTab();
       await blogPostEditor.expectNumberOfBlogPostsToBe(1);
-      await blogPostEditor.expectDraftBlogPostWithTitleToBePresent('TestBlog');
+      await blogPostEditor.expectPublishedBlogPostWithTitleToBePresent(
+        'TestBlog');
 
-      await blogPostEditor.deleteDraftBlogPostWithTitle('TestBlog');
+      await blogPostEditor.deletePublishedBlogPostWithTitle('TestBlog');
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
     }, DEFAULT_SPEC_TIMEOUT);
 
