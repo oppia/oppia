@@ -1398,20 +1398,46 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
 
     def test_get_featured_translation_languages(self) -> None:
         response = self.get_json('/retrivefeaturedtranslationlanguages')
-        self.assertEqual(
-            response,
-            {'featured_translation_languages': []}
-        )
-
-        new_value = [
-            {'language_code': 'en', 'explanation': 'Partnership with ABC'}
-        ]
-        with self.swap(constants, 'FEATURED_TRANSLATION_LANGUAGES', new_value):
-            response = self.get_json('/retrivefeaturedtranslationlanguages')
-        self.assertEqual(
-            response,
-            {'featured_translation_languages': new_value}
-        )
+        expected_response = {
+            'featured_translation_languages': [
+                {
+                    "language_code": "pt",
+                    "explanation": "português (Portuguese)"
+                },
+                {
+                    "language_code": "ar",
+                    "explanation": "العربية (Arabic)"
+                },
+                {
+                    "language_code": "pcm",
+                    "explanation": "Naijá (Nigerian Pidgin)"
+                },
+                {
+                    "language_code": "es",
+                    "explanation": "Español (Spanish)"
+                },
+                {
+                    "language_code": "sw",
+                    "explanation": "kiswahili (Swahili)"
+                },
+                {
+                    "language_code": "hi",
+                    "explanation": "हिन्दी (Hindi)"
+                },
+                {
+                    "language_code": "ha",
+                    "explanation": "Harshen Hausa (Hausa)"
+                },
+                {
+                    "language_code": "ig",
+                    "explanation": "Ásụ̀sụ́ Ìgbò (Igbo)"
+                },
+                {
+                    "language_code": "yo",
+                    "explanation": "Èdè Yoùbá (Yoruba)"
+                }]
+        }
+        self.assertEqual(response, expected_response)
 
 
 class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):

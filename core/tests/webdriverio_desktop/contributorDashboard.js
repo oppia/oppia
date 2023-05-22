@@ -507,7 +507,7 @@ describe('Translation contribution featured languages', () => {
   it('should show correct featured languages', async function() {
     let featuredLanguages = [];
     for (let language in Constants.FEATURED_TRANSLATION_LANGUAGES) {
-      featuredLanguages.push(language['explanation']);
+      featuredLanguages.push(language.explanation);
     }
     await contributorDashboardTranslateTextTab
       .expectFeaturedLanguagesToBe(featuredLanguages);
