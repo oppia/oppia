@@ -21,6 +21,7 @@ import errno
 import getpass
 from http import client
 import io
+import json
 import os
 import platform
 import re
@@ -82,6 +83,7 @@ PROTOC_VERSION = '3.13.0'
 REDIS_CLI_VERSION = '6.2.4'
 ELASTICSEARCH_VERSION = '7.17.0'
 
+FIREBASE_CONFIG_KEY = 'firebase_config_key'
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
@@ -970,6 +972,31 @@ def modify_constants(
         enable_maintenance_mode_variable,
         expected_number_of_replacements=1
     )
+    replace_firebase_constants()
+
+
+def replace_firebase_constants() -> None:
+    """Replace the firebase constants in the codebase.
+
+    Args:
+        reset_to_default: bool. Whether to reset the constants to default.
+    """
+    firebase_config_cloud_secrets = subprocess.check_output(
+        [
+            GCLOUD_PATH, 'secrets', 'versions', 'access', 'latest',
+            '--secret', FIREBASE_CONFIG_KEY
+        ],
+        stderr=subprocess.STDOUT,
+        encoding='utf-8',
+    )
+    firebase_config_json = json.loads(firebase_config_cloud_secrets)
+    for key in firebase_config_json:
+        inplace_replace_file(
+            CONSTANTS_FILE_PATH,
+            r'"%s": ".*"' % key,
+            r'"%s": "%s"' % (key, firebase_config_json[key]),
+            expected_number_of_replacements=1
+        )
 
 
 def is_oppia_server_already_running() -> bool:
