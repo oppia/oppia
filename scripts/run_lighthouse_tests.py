@@ -77,6 +77,7 @@ _PARSER.add_argument(
     '--record_screen', help='Sets whether lighthouse screen-records tests',
     action='store_true')
 
+
 def run_lighthouse_puppeteer_script(vid_cache=None) -> None:
     """Runs puppeteer script to collect dynamic urls."""
     puppeteer_path = (
@@ -105,7 +106,7 @@ def run_lighthouse_puppeteer_script(vid_cache=None) -> None:
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
         if vid_cache:
-            vid_process, vid_path = vid_cache
+            vid_process = vid_cache[0]
             vid_process.kill()
             print('Saved video of failed script.')
 
@@ -151,7 +152,8 @@ def export_url(line: str) -> None:
         os.environ['skill_id'] = url_parts[4]
 
 
-def run_lighthouse_checks(lighthouse_mode: str, shard: str, vid_cache=None) -> None:
+def run_lighthouse_checks(lighthouse_mode: str, shard: str, 
+                          vid_cache: tuple=None) -> None:
     """Runs the Lighthouse checks through the Lighthouse config.
 
     Args:
@@ -227,17 +229,17 @@ def main(args: Optional[List[str]] = None) -> None:
         run_webpack_compilation()
     if parsed_args.record_screen:
         import ffmpeg
-        # start ffmpeg screen record
+        # Start ffmpeg screen record.
         name = 'lhci.mp4'
-        dirPath = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
-        os.mkdir(dirPath)
-        videoPath = os.path.join(dirPath, name)
+        dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
+        os.mkdir(dir_path)
+        video_path = os.path.join(dir_path, name)
         vid_process = (
-			ffmpeg
-			.input(format='x11grab',framerate=30,filename="desktop")
-			.output(crf="0",preset="ultrafast",filename=videoPath,c= "libx264" )
-			.overwrite_output()
-			)
+            ffmpeg
+            .input(format='x11grab', framerate=30,filename='desktop')
+            .output(crf='0', preset='ultrafast', filename=video_path, c='libx264')
+            .overwrite_output()
+            )
         vid_process = vid_process.run_async(pipe_stdin=True)
 
     with contextlib.ExitStack() as stack:
@@ -255,12 +257,12 @@ def main(args: Optional[List[str]] = None) -> None:
             skip_sdk_update_check=True))
 
         if os.getenv("GITHUB_ACTIONS") and parsed_args.record_screen:
-            run_lighthouse_puppeteer_script((vid_process, videoPath))
-            run_lighthouse_checks(lighthouse_mode, parsed_args.shard, (vid_process, videoPath))
+            cache = (vid_process, video_path)
+            run_lighthouse_puppeteer_script(cache)
+            run_lighthouse_checks(lighthouse_mode, parsed_args.shard, cache)
         else:
             run_lighthouse_puppeteer_script()
             run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
-
 
 
 if __name__ == '__main__': # pragma: no cover
