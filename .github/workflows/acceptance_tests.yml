@@ -1,15 +1,15 @@
 name: Acceptance tests
-on: push
-  # merge_group:
-  #   types: [checks_requested]
-  # push:
-  #   branches:
-  #     - develop
-  #     - release-*
-  # pull_request:
-  #   branches:
-  #     - develop
-  #     - release-*
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   build:
@@ -65,12 +65,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        id: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]
         suite:
-          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js
-          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.js
-          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.js
-          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.js
+          - blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.ts
+          - blog-editor-tests/check-blog-editor-unable-to-publish-duplicate-blog-post.spec.ts
+          - blog-editor-tests/create-draft-and-delete-draft-blog-post.spec.ts
+          - blog-editor-tests/publish-blog-post-and-delete-published-blog-post.spec.ts
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
