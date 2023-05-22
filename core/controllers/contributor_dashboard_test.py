@@ -1401,40 +1401,40 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
         expected_response = {
             'featured_translation_languages': [
                 {
-                    "language_code": "pt",
-                    "explanation": "português (Portuguese)"
+                    'language_code': 'pt',
+                    'explanation': 'português (Portuguese)'
                 },
                 {
-                    "language_code": "ar",
-                    "explanation": "العربية (Arabic)"
+                    'language_code': 'ar',
+                    'explanation': 'العربية (Arabic)'
                 },
                 {
-                    "language_code": "pcm",
-                    "explanation": "Naijá (Nigerian Pidgin)"
+                    'language_code': 'pcm',
+                    'explanation': 'Naijá (Nigerian Pidgin)'
                 },
                 {
-                    "language_code": "es",
-                    "explanation": "Español (Spanish)"
+                    'language_code': 'es',
+                    'explanation': 'Español (Spanish)'
                 },
                 {
-                    "language_code": "sw",
-                    "explanation": "kiswahili (Swahili)"
+                    'language_code': 'sw',
+                    'explanation': 'kiswahili (Swahili)'
                 },
                 {
-                    "language_code": "hi",
-                    "explanation": "हिन्दी (Hindi)"
+                    'language_code': 'hi',
+                    'explanation': 'हिन्दी (Hindi)'
                 },
                 {
-                    "language_code": "ha",
-                    "explanation": "Harshen Hausa (Hausa)"
+                    'language_code': 'ha',
+                    'explanation': 'Harshen Hausa (Hausa)'
                 },
                 {
-                    "language_code": "ig",
-                    "explanation": "Ásụ̀sụ́ Ìgbò (Igbo)"
+                    'language_code': 'ig',
+                    'explanation': 'Ásụ̀sụ́ Ìgbò (Igbo)'
                 },
                 {
-                    "language_code": "yo",
-                    "explanation": "Èdè Yoùbá (Yoruba)"
+                    'language_code': 'yo',
+                    'explanation': 'Èdè Yoùbá (Yoruba)'
                 }]
         }
         self.assertEqual(response, expected_response)
