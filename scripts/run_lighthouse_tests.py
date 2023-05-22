@@ -79,7 +79,12 @@ _PARSER.add_argument(
 
 
 def run_lighthouse_puppeteer_script(vid_cache=None) -> None:
-    """Runs puppeteer script to collect dynamic urls."""
+    """Runs puppeteer script to collect dynamic urls.
+    
+    Args:
+        vid_cache: tuple. If not None, represents screen recording during the
+            LHCI tests by storing the stores the ffmpeg process and video path.
+    """
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
@@ -160,6 +165,8 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str,
         lighthouse_mode: str. Represents whether the lighthouse checks are in
             accessibility mode or performance mode.
         shard: str. Specifies which shard of the tests should be run.
+        vid_cache: tuple. If not None, represents screen recording during the
+            LHCI tests by storing the stores the ffmpeg process and video path.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
