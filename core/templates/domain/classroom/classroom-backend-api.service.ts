@@ -30,10 +30,6 @@ import { CreatorTopicSummaryBackendDict } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface ClassroomPromosStatusBackendDict {
-  'classroom_promos_are_enabled': boolean;
-}
-
 interface ClassroomDataBackendDict {
   'name': string;
   'topic_summary_dicts': CreatorTopicSummaryBackendDict[];

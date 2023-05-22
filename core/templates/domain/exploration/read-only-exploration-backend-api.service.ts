@@ -64,10 +64,6 @@ export interface FetchExplorationBackendResponse {
   'displayable_language_codes': string[];
 }
 
-interface CheckpointsFeatureStatusBackendDict {
-  'checkpoints_feature_is_enabled': boolean;
-}
-
 @Injectable({
   providedIn: 'root'
 })

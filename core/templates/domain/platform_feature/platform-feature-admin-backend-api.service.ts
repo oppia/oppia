@@ -85,8 +85,8 @@ export class PlatformFeatureAdminBackendApiService {
       {
         action: (
           PlatformFeatureDomainConstants.
-          UPDATE_PLATFORM_PARAMETER_RULES_ACTION),
-          platform_param_name: name,
+            UPDATE_PLATFORM_PARAMETER_RULES_ACTION),
+        platform_param_name: name,
         commit_message: message,
         new_rules: newRules.map(rule => rule.toBackendDict())
       }
