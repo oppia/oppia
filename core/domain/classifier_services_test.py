@@ -45,7 +45,6 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
-secrets_services = models.Registry.import_secrets_services()
 (classifier_models,) = models.Registry.import_models([
     models.Names.CLASSIFIER
 ])
@@ -732,7 +731,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             expected_signature
         )
         self.assertTrue(classifier_services.verify_signature(
-        oppia_ml_auth_info))
+            oppia_ml_auth_info))
 
         # Check if an invalid signature causes verify_signature to fail.
         oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
@@ -741,7 +740,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             invalid_signature
         )
         self.assertFalse(classifier_services.verify_signature(
-        oppia_ml_auth_info))
+            oppia_ml_auth_info))
 
         # Check if an invalid vm_id causes verify_signature to fail.
         oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
@@ -750,7 +749,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             expected_signature
         )
         self.assertFalse(classifier_services.verify_signature(
-        oppia_ml_auth_info))
+            oppia_ml_auth_info))
 
     def test_get_state_training_jobs_mapping(self) -> None:
         """Test the get_state_training_jobs_mapping method."""
