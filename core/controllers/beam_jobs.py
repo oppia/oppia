@@ -93,7 +93,7 @@ class BeamJobRunHandler(
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves information about beam job runs."""
         sorted_beam_job_runs = sorted(
             beam_job_services.get_beam_job_runs(),
             key=lambda j: j.job_updated_on,
@@ -102,7 +102,7 @@ class BeamJobRunHandler(
 
     @acl_decorators.can_run_any_job
     def put(self) -> None:
-        """Handles PUT requests."""
+        """Runs a specified beam job."""
         assert self.normalized_payload is not None
         job_name = self.normalized_payload['job_name']
         beam_job_run = beam_job_services.run_beam_job(job_name=job_name)
@@ -110,7 +110,7 @@ class BeamJobRunHandler(
 
     @acl_decorators.can_run_any_job
     def delete(self) -> None:
-        """Handles DELETE requests."""
+        """Cancels a specified beam job."""
         assert self.normalized_request is not None
         job_id = self.normalized_request['job_id']
         beam_job_run = beam_job_services.cancel_beam_job(job_id)
@@ -150,7 +150,7 @@ class BeamJobRunResultHandler(
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves the result of a specified beam job run."""
         assert self.normalized_request is not None
         job_id = self.normalized_request['job_id']
         beam_job_run_result = beam_job_services.get_beam_job_run_result(job_id)

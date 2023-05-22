@@ -1006,7 +1006,7 @@ class ContributorCertificateHandler(
     def get(
         self, username: str, suggestion_type: str
     ) -> None:
-        """Handles GET requests.
+        """Generates contributor certificates.
 
         Args:
             username: str. A user's username.
@@ -1052,7 +1052,7 @@ class ContributorAllStatsSummariesHandler(
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username: str) -> None:
-        """Handles GET requests.
+        """Fetches contributor dashboard statistics.
 
         Args:
             username: str. A user's username.

@@ -188,7 +188,7 @@ class BlogHomepageDataHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves blog post summaries for the blog home page."""
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
         published_post_summaries = (
@@ -249,7 +249,7 @@ class BlogPostDataHandler(
 
     @acl_decorators.open_access
     def get(self, blog_post_url: str) -> None:
-        """Handles GET requests.
+        """Retrieves a specific blog post and its related recommendations.
 
         Args:
             blog_post_url: str. The URL of the blog post.
@@ -357,7 +357,7 @@ class AuthorsPageHandler(
 
     @acl_decorators.open_access
     def get(self, author_username: str) -> None:
-        """Handles GET requests.
+        """Retrieves blog post summaries and specific author details.
 
         Args:
             author_username: str. The username of the author.
@@ -459,7 +459,7 @@ class BlogPostSearchHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Searches for blog posts based on a query and tags."""
         assert self.normalized_request is not None
         query_string = utils.get_formatted_query_string(
             self.normalized_request['q']

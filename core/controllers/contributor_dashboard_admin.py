@@ -132,7 +132,7 @@ class ContributionRightsHandler(
 
     @acl_decorators.can_manage_contributors_role
     def post(self, category: str) -> None:
-        """Handles POST requests."""
+        """Manages contributors' roles."""
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -186,7 +186,7 @@ class ContributionRightsHandler(
 
     @acl_decorators.can_manage_contributors_role
     def delete(self, category: str) -> None:
-        """Handles DELETE requests."""
+        """Removes contributors' roles."""
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -320,6 +320,7 @@ class ContributionRightsDataHandler(
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
     def get(self) -> None:
+        """Fetches contributor dashboard admin page data."""
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -372,7 +373,7 @@ class TranslationContributionStatsHandler(
 
     @acl_decorators.can_access_translation_stats
     def get(self) -> None:
-        """Handles GET requests."""
+        """Fetches translation contribution statistics."""
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
