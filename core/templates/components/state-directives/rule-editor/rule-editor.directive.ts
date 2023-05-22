@@ -248,7 +248,13 @@ angular.module('oppia').directive('ruleEditor', [
           };
 
           ctrl.saveThisRule = function() {
-            ctrl.onSaveRule();
+            if(ctrl.onSaveRule()){
+              }
+              else{
+               result.push({
+                    text: ' [Error: No choices available] ',
+                    type: 'noneditable'
+              }
           };
 
           ctrl.$onInit = function() {
