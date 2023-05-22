@@ -3608,6 +3608,21 @@ angular-cookies@^1.8.2:
   resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.8.3.tgz#180a41e938926790630245d22c02a8d33d1409cc"
   integrity sha512-uRd+zWgqiVnly7+YFRosM8E9tUQeY82dAZdtvonh/CeD/sf5SKN/BNIlMlHxZtoAk72ahTIjqUQGfeHdYcSsRQ==
 
+angular-drag-and-drop-lists@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/angular-drag-and-drop-lists/-/angular-drag-and-drop-lists-2.1.0.tgz#da10cc85c804251fbaaa84d837f7380fb0cd780f"
+  integrity sha512-ibM2tPhgaFEw9/dvY3S7tNQRJ7ND7312QdIhUGhy3h4zKMRWfeWGAByMkjpBlD9UdqGWay4hYxwDxAfxUT91mw==
+
+angular-material@^1.1.19:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/angular-material/-/angular-material-1.2.5.tgz#6fb3fbf3622d443e4449aaf237d692ad04623a23"
+  integrity sha512-bTTDV0vszpfms1tAMzhLntxBiNMCk/I3Mx/vhbtfhijJILODjpDBfWah0nvWrniFIcxMLcsb1tcPri13hZEaew==
+
+angular-mocks@^1.8.2:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.8.3.tgz#c0dd05e5c3fc014e07af6289b23f0e817d7a4724"
+  integrity sha512-vqsT6zwu80cZ8RY7qRQBZuy6Fq5X7/N5hkV9LzNT0c8b546rw4ErGK6muW1u2JnDKYa7+jJuaGM702bWir4HGw==
+
 angular-route@^1.8.2:
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.8.3.tgz#f24a700ebd462454ca83a8b765df55c87a4edde1"
@@ -7595,7 +7610,7 @@ espree@^9.4.0:
     acorn-jsx "^5.3.2"
     eslint-visitor-keys "^3.3.0"
 
-esprima@4.0.1, esprima@^4.0.0, esprima@^4.0.1, esprima@~4.0.0:
+esprima@^4.0.0, esprima@^4.0.1, esprima@~4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
   integrity sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==
@@ -9415,9 +9430,9 @@ html-webpack-plugin@^4.0.3:
     tapable "^1.1.3"
     util.promisify "1.0.0"
 
-"htmllint-cli@github:oppia/htmllint-cli#01a8b74":
+"htmllint-cli@git+https://github.com/oppia/htmllint-cli#01a8b74":
   version "0.0.7"
-  resolved "https://codeload.github.com/oppia/htmllint-cli/tar.gz/01a8b74ae7aaedeadba3d1d4d93a29807f6a52da"
+  resolved "git+https://github.com/oppia/htmllint-cli#01a8b74ae7aaedeadba3d1d4d93a29807f6a52da"
   dependencies:
     bluebird "^3.5.5"
     chalk "^2.4.2"
@@ -11224,6 +11239,13 @@ ky@0.30.0:
   version "0.30.0"
   resolved "https://registry.yarnpkg.com/ky/-/ky-0.30.0.tgz#a3d293e4f6c4604a9a4694eceb6ce30e73d27d64"
   integrity sha512-X/u76z4JtDVq10u1JA5UQfatPxgPaVDMYTrgHyiTpGN2z4TMEJkIHsoSBBSg9SWZEIXTKsi9kHgiQ9o3Y/4yog==
+
+lamejs@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/lamejs/-/lamejs-1.2.0.tgz#0259f83db4666141a7b671b8caa6369d95177d08"
+  integrity sha512-xEYvsB2sZ9jIccqfUQpQEBdB6UYQDG/ta2xQkH7oEpENb0JHFJii965WVF8ErUMdZzoe7EdIruz1WpICdhZ9Pw==
+  dependencies:
+    use-strict "1.0.1"
 
 latest-version@^5.0.0:
   version "5.1.0"
@@ -17761,6 +17783,11 @@ url@^0.11.0:
   dependencies:
     punycode "1.3.2"
     querystring "0.2.0"
+
+use-strict@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/use-strict/-/use-strict-1.0.1.tgz#0bb80d94f49a4a05192b84a8c7d34e95f1a7e3a0"
+  integrity sha512-IeiWvvEXfW5ltKVMkxq6FvNf2LojMKvB2OCeja6+ct24S1XOmQw2dGr2JyndwACWAGJva9B7yPHwAmeA9QCqAQ==
 
 use@^3.1.0:
   version "3.1.1"
