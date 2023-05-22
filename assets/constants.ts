@@ -29,7 +29,16 @@ export default {
   // fragment in the controller is invalid.
   "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
 
-  "FEATURED_TRANSLATION_LANGUAGES": [],
+  "FEATURED_TRANSLATION_LANGUAGES": [
+    {"language_code": "pt", "explanation": "português (Portuguese)"},
+    {"language_code": "ar", "explanation": "العربية (Arabic)"},
+    {"language_code": "pcm", "explanation": "Naijá (Nigerian Pidgin)"},
+    {"language_code": "es", "explanation": "Español (Spanish)"},
+    {"language_code": "sw", "explanation": "kiswahili (Swahili)"},
+    {"language_code": "hi", "explanation": "हिन्दी (Hindi)"},
+    {"language_code": "ha", "explanation": "Harshen Hausa (Hausa)"},
+    {"language_code": "ig", "explanation": "Ásụ̀sụ́ Ìgbò (Igbo)"},
+    {"language_code": "yo", "explanation": "Èdè Yoùbá (Yoruba)"}],
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
     "News", "International", "Educators", "Learners", "Community",

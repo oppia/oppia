@@ -496,16 +496,6 @@ describe('Translation contribution featured languages', () => {
       contributorDashboardPage.getTranslateTextTab());
     await users.createAndLoginSuperAdminUser(
       'config@contributorDashboard.com', 'contributorDashboard');
-    var adminPage = new AdminPage.AdminPage();
-    await adminPage.editConfigProperty(
-      'Featured Translation Languages',
-      'List',
-      async function(elem) {
-        var featured = await elem.addItem('Dictionary');
-        await (await featured.editEntry(0, 'Unicode')).setValue('de');
-        await (await featured.editEntry(1, 'Unicode'))
-          .setValue('Partnership with ABC');
-      });
     await users.logout();
   });
 
@@ -515,15 +505,19 @@ describe('Translation contribution featured languages', () => {
   });
 
   it('should show correct featured languages', async function() {
+    let featuredLanguages = [];
+    for (let language in Constants.FEATURED_TRANSLATION_LANGUAGES) {
+      featuredLanguages.push(language['explanation']);
+    }
     await contributorDashboardTranslateTextTab
-      .expectFeaturedLanguagesToBe(['Deutsch (German)']);
+      .expectFeaturedLanguagesToBe(featuredLanguages);
   });
 
   it('should show correct explanation', async function() {
     await contributorDashboardTranslateTextTab
       .mouseoverFeaturedLanguageTooltip(0);
     await contributorDashboardTranslateTextTab
-      .expectFeaturedLanguageExplanationToBe('Partnership with ABC');
+      .expectFeaturedLanguageExplanationToBe('português (Portuguese)');
   });
 
   afterEach(async function() {
