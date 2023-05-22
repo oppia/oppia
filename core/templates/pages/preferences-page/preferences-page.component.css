@@ -40,12 +40,38 @@
 
 .oppia-editor-profile-picture-container {
   height: 150px;
+  position: relative;
   width: 150px;
 }
 
-.oppia-editor-edit-icon-pos {
-  right: 8px;
-  top: 8px;
+.oppia-editor-edit-btn {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  padding: 2px;
+  position: absolute;
+}
+
+.oppia-editor-profile-edit-icon {
+  font-size: 15px;
+  opacity: 0.4;
+  padding: 2px 4px 2px 4px;
+  position: relative;
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
+}
+
+.oppia-editable-section .oppia-editor-profile-edit-icon:focus,
+.oppia-editable-section:hover .oppia-editor-profile-edit-icon {
+  opacity: 0.8;
+}
+
+.oppia-editor-edit-btn-pos {
+  right: -8px;
+  top: -8px;
 }
 
 .oppia-checkbox {
