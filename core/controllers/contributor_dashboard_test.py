@@ -1439,6 +1439,22 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
         }
         self.assertEqual(response, expected_response)
 
+    def test_featured_translation_langs_are_present_in_supported_audio_langs(
+        self
+    ) -> None:
+        featured_languages = constants.FEATURED_TRANSLATION_LANGUAGES
+        suported_audio_langs_codes = [
+            lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
+        for language in featured_languages:
+            self.assertIn(
+                language['language_code'],
+                suported_audio_langs_codes,
+                'We expect all the featured languages to be present in the '
+                'SUPPORTED_AUDIO_LANGUAGES list present in constants.ts file, '
+                'but the language with language code %s is not present in the '
+                'list' % (language['language_code'])
+            )
+
 
 class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
     """Test for the TranslatableTopicNamesHandler."""
