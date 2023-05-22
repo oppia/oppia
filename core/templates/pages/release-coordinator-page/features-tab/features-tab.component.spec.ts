@@ -23,7 +23,8 @@ import { FormsModule } from '@angular/forms';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { FeatureFlagsResponse } from
+  'domain/platform-feature/platform-feature-admin-backend-api.service';
 import { FeaturesTabComponent } from
   'pages/release-coordinator-page/features-tab/features-tab.component';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
@@ -100,7 +101,7 @@ describe('Admin page feature tab', function() {
     mockConfirmResult = val => confirmResult = val;
     mockPromptResult = msg => promptResult = msg;
 
-    spyOn(featureApiService, 'getDataAsync').and.resolveTo({
+    spyOn(featureApiService, 'getFeatureFlags').and.resolveTo({
       featureFlags: [
         PlatformParameter.createFromBackendDict({
           data_type: 'bool',
@@ -124,7 +125,7 @@ describe('Admin page feature tab', function() {
           }],
         })
       ]
-    } as AdminPageData);
+    } as FeatureFlagsResponse);
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
       .and.resolveTo();

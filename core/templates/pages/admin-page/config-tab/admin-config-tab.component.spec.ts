@@ -102,7 +102,7 @@ describe('Admin config tab component ', () => {
       MODERATOR: 'moderator'
     },
     topicSummaries: [],
-    featureFlags: []
+    platformParameters: []
   };
 
   beforeEach(() => {
