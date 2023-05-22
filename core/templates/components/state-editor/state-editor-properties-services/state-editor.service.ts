@@ -155,7 +155,7 @@ export class StateEditorService {
     this.activeStateName = newActiveStateName;
   }
 
-  getExplorationIsCurated(): boolean {
+  isExplorationCurated(): boolean {
     return this.explorationIsCurated;
   }
 

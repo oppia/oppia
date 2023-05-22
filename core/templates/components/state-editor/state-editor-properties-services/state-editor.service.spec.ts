@@ -303,11 +303,11 @@ describe('Editor state service', () => {
   });
 
   it('should return if exploration is curated or not', () => {
-    expect(ecs.getExplorationIsCurated()).toBeFalse();
+    expect(ecs.isExplorationCurated()).toBeFalse();
     ecs.explorationIsCurated = true;
-    expect(ecs.getExplorationIsCurated()).toBeTrue();
+    expect(ecs.isExplorationCurated()).toBeTrue();
     ecs.explorationIsCurated = false;
-    expect(ecs.getExplorationIsCurated()).toBeFalse();
+    expect(ecs.isExplorationCurated()).toBeFalse();
   });
 
   it('should initialise state content editor', () => {
