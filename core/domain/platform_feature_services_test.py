@@ -34,6 +34,8 @@ class ParamNames(enum.Enum):
 
     FEATURE_A = 'feature_a'
     FEATURE_B = 'feature_b'
+    PARAM_A = 'param_a'
+    PARAM_B = 'param_b'
 
 
 ServerMode = platform_parameter_domain.ServerMode
@@ -51,11 +53,18 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
-        param_names = ['feature_a', 'feature_b']
-        param_name_enums = [ParamNames.FEATURE_A, ParamNames.FEATURE_B]
+        param_names = ['param_a', 'param_b']
+        param_names_features = ['feature_a', 'feature_b']
+        param_name_enums_features = [
+            ParamNames.FEATURE_A,
+            ParamNames.FEATURE_B
+        ]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            param_names_features)
 
         self.dev_feature = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_A, 'a feature in dev stage',
@@ -63,6 +72,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.prod_feature = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_B, 'a feature in prod stage',
             FeatureStages.PROD)
+        self.param_a = registry.Registry.create_platform_parameter(
+            ParamNames.PARAM_A,
+            'Parameter named a',
+            platform_parameter_domain.DataTypes.BOOL)
+        self.param_b = registry.Registry.create_platform_parameter(
+            ParamNames.PARAM_B,
+            'Parameter named b',
+            platform_parameter_domain.DataTypes.BOOL)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
             [
@@ -109,8 +126,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # providing a list of 'ParamNames' enums, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
         # used ignore here.
-        feature_services.ALL_FEATURES_LIST = param_name_enums  # type: ignore[assignment]
-        feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
+        feature_services.ALL_FEATURES_LIST = param_name_enums_features  # type: ignore[assignment]
+        feature_services.ALL_FEATURES_NAMES_SET = set(param_names_features)
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -143,6 +160,18 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         ]
         self.assertEqual(
             feature_services.get_all_feature_flag_dicts(),
+            expected_dicts)
+
+    def test_get_all_platform_parameters_except_feature_flag_dicts(
+        self
+    ) -> None:
+        expected_dicts = [
+            self.param_a.to_dict(),
+            self.param_b.to_dict(),
+        ]
+        self.assertEqual(
+            feature_services.
+            get_all_platform_parameters_except_feature_flag_dicts(),
             expected_dicts)
 
     def test_get_all_feature_flag_values_in_dev_returns_correct_values(
