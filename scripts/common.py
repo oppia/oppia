@@ -976,11 +976,7 @@ def modify_constants(
 
 
 def replace_firebase_constants() -> None:
-    """Replace the firebase constants in the codebase.
-
-    Args:
-        reset_to_default: bool. Whether to reset the constants to default.
-    """
+    """Replace the firebase constants in the codebase."""
     firebase_config_cloud_secrets = subprocess.check_output(
         [
             GCLOUD_PATH, 'secrets', 'versions', 'access', 'latest',
