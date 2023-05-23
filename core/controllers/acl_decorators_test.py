@@ -7114,6 +7114,14 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             self.render_json({'job_id': 'new_job'})
 
     def _swap_function(self, name: str) -> Optional[str]:
+        """Mock for the get_secret function.
+
+        Args:
+            name: str. The name of the secret to retrieve the value.
+
+        Returns:
+            Optional[str]. The value of the secret.
+        """
         if name == 'VM_ID':
             return 'vm_default'
         elif name == 'SHARED_SECRET_KEY':
