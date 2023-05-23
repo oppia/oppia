@@ -105,7 +105,6 @@
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_BREADCRUMB": "作者個人檔案",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TITLE": "部落格 | 作者 | Oppia",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TOTAL_POSTS_DISPLAY": "<[totalNumber]> 個文章",
-	"I18N_BLOG_CARD_PREVIEW_CONTEXT": "這是部落格卡片在首頁與您的作者個人檔案上的顯示方式。",
 	"I18N_BLOG_CARD_PREVIEW_HEADING": "部落格卡片預覽",
 	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING": "簡介",
 	"I18N_BLOG_DASHBOARD_AUTHOR_DETAILS_EDITOR_DESCRIPTION": "在您發布任何部落格文章之前，請添加您的作者姓名和簡短的介紹。這些會顯示在您的部落格作者頁面上，您的作者姓名也會顯示在您發布的文章裡。",

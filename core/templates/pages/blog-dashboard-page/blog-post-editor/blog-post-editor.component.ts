@@ -22,7 +22,7 @@ interface EditorSchema {
 }
 
 import { AppConstants } from 'app.constants';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { BlogPostEditorData, BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
@@ -47,6 +47,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   templateUrl: './blog-post-editor.component.html'
 })
 export class BlogPostEditorComponent implements OnInit {
+  @ViewChild('titleInput') titleInput!: ElementRef;
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -72,6 +73,7 @@ export class BlogPostEditorComponent implements OnInit {
   lastChangesWerePublished: boolean = false;
   saveInProgress: boolean = false;
   publishingInProgress: boolean = false;
+  titleEditorIsActive: boolean = false;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
@@ -145,6 +147,9 @@ export class BlogPostEditorComponent implements OnInit {
           this.defaultTagsList = editorData.listOfDefaulTags;
           this.maxAllowedTags = editorData.maxNumOfTags;
           this.title = this.blogPostData.title;
+          if (this.title.length === 0) {
+            this.titleEditorIsActive = true;
+          }
           let lastUpdated = this.blogPostData.lastUpdated;
           if (lastUpdated) {
             this.dateTimeLastSaved = this.getDateStringInWords(lastUpdated);
@@ -193,6 +198,7 @@ export class BlogPostEditorComponent implements OnInit {
     this.blogPostUpdateService.setBlogPostTitle(
       this.blogPostData, this.title
     );
+    this.titleEditorIsActive = false;
     if (
       this.isTitlePatternValid() &&
       this.title.length <= this.MAX_CHARS_IN_BLOG_POST_TITLE &&
@@ -239,6 +245,11 @@ export class BlogPostEditorComponent implements OnInit {
       this.localEditedContent = $event;
       this.changeDetectorRef.detectChanges();
     }
+  }
+
+  activateTitleEditor(): void {
+    this.titleInput.nativeElement.focus();
+    this.titleEditorIsActive = true;
   }
 
   updateContentValue(): void {
