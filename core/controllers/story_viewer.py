@@ -171,7 +171,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def get(self, story_id: str, node_id: str) -> None:
-        """Handles GET requests.
+        """Views a specific node within a story.
 
         Args:
             story_id: str. The story ID.
@@ -222,7 +222,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def post(self, story_id: str, node_id: str) -> None:
-        """Hanldes POST requests.
+        """Records the completion of a specific node within a story.
 
         Args:
             story_id: str. The story ID.

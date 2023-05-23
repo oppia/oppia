@@ -188,7 +188,7 @@ class EditableStoryDataHandler(
 
     @acl_decorators.can_delete_story
     def delete(self, story_id: str) -> None:
-        """Handles DELETE requests."""
+        """Deletes a story."""
         assert self.user_id is not None
         story_services.delete_story(self.user_id, story_id)
         self.render_json(self.values)

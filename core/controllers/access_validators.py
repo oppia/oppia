@@ -63,7 +63,7 @@ class ClassroomAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves information about a classroom."""
         assert self.normalized_request is not None
         classroom_url_fragment = self.normalized_request[
             'classroom_url_fragment'
@@ -167,7 +167,7 @@ class ViewLearnerGroupPageAccessValidationHandler(
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
-        """Handles GET requests.
+        """Retrieves information about a learner group.
 
         Args:
             learner_group_id: str. The learner group ID.
@@ -231,7 +231,7 @@ class BlogPostPageAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves information about a blog post."""
         assert self.normalized_request is not None
         blog_post_url_fragment = self.normalized_request[
             'blog_post_url_fragment']
@@ -266,7 +266,7 @@ class BlogAuthorProfilePageAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self, author_username: str) -> None:
-        """Handles GET requests.
+        """Retrieves information about a blog post author.
 
         Args:
             author_username: str. The author username.

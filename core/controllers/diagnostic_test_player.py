@@ -108,7 +108,7 @@ class DiagnosticTestQuestionsHandler(
 
     @acl_decorators.open_access
     def get(self, topic_id: str) -> None:
-        """Handled GET requests.
+        """Retrieves diagnostic test questions for a specific topic.
 
         Args:
             topic_id: str. The ID of the topic.

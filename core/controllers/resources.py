@@ -191,7 +191,7 @@ class PromoBarHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves the configuration values for a promotional bar."""
         self.render_json({
             'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
             'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
@@ -199,7 +199,7 @@ class PromoBarHandler(
 
     @acl_decorators.can_access_release_coordinator_page
     def put(self) -> None:
-        """Handles PUT requests."""
+        """Updates the configuration values for a promotional bar."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         promo_bar_enabled_value = self.normalized_payload['promo_bar_enabled']

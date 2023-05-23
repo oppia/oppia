@@ -86,7 +86,7 @@ class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id: str) -> None:
-        """Handles GET requests.
+        """Renders an exploration editor page.
 
         Args:
             unused_exploration_id: str. The unused exploration ID.
@@ -554,7 +554,7 @@ class ExplorationStatusHandler(
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id: str) -> None:
-        """Handles PUT requests.
+        """Publishes an exploration.
 
         Args:
             exploration_id: str. The exploration ID.
@@ -770,7 +770,7 @@ class ExplorationFileDownloader(
 
     @acl_decorators.can_download_exploration
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests.
+        """Downloads an exploration.
 
         Args:
             exploration_id: str. The exploration ID.
@@ -850,7 +850,7 @@ class StateYamlHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id: str) -> None:
-        """Handles POST requests.
+        """Handles POST requests related to playing an exploration.
 
         Args:
             unused_exploration_id: str. The unused exploration ID.
@@ -880,7 +880,7 @@ class ExplorationSnapshotsHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests.
+        """Retrieves snapshots metadata of an exploration.
 
         Args:
             exploration_id: str. The exploration ID.
@@ -924,7 +924,7 @@ class ExplorationCheckRevertValidHandler(
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str, version: int) -> None:
-        """Handles GET requests.
+        """Retrieves the validation error information of an exploration.
 
         Args:
             exploration_id: str. The exploration ID.
@@ -970,7 +970,7 @@ class ExplorationRevertHandler(
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests.
+        """Reverts an exploration to a previous version.
 
         Args:
             exploration_id: str. The exploration ID.
@@ -1008,7 +1008,7 @@ class ExplorationStatisticsHandler(
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests.
+        """Retrieves the statistics of an exploration.
 
         Args:
             exploration_id: str. The exploration ID.
@@ -1040,7 +1040,7 @@ class StateInteractionStatsHandler(
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id: str, state_name: str) -> None:
-        """Handles GET requests.
+        """Retrieves statistics for a specific state of an exploration.
 
         Args:
             exploration_id: str. The exploration ID.
@@ -1091,7 +1091,7 @@ class FetchIssuesHandler(
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exp_id: str) -> None:
-        """Handles GET requests.
+        """Retrieves exploration issues of an exploration.
 
         Args:
             exp_id: str. The exploration ID.
@@ -1134,7 +1134,7 @@ class FetchPlaythroughHandler(
 
     @acl_decorators.can_view_exploration_stats
     def get(self, unused_exploration_id: str, playthrough_id: str) -> None:
-        """Handles GET requests.
+        """Retrieves a playthrough by its ID.
 
         Args:
             unused_exploration_id: str. The unused exploration ID.
@@ -1191,7 +1191,7 @@ class ResolveIssueHandler(
 
     @acl_decorators.can_edit_exploration
     def post(self, exp_id: str) -> None:
-        """Handles POST requests.
+        """Removes an issue from the list of unresolved issues.
 
         Args:
             exp_id: str. The exploration ID.

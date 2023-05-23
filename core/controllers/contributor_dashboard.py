@@ -315,7 +315,7 @@ class ReviewableOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Fetches exploration opportunities."""
         assert self.normalized_request is not None
         topic_name = self.normalized_request.get('topic_name')
         language = self.normalized_request.get('language_code')

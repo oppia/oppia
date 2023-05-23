@@ -58,7 +58,7 @@ class SubscribeHandler(
 
     @acl_decorators.can_subscribe_to_users
     def post(self) -> None:
-        """Handles POST requests."""
+        """Subscribes the current user to another user."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         creator_username = self.normalized_payload['creator_username']
@@ -102,7 +102,7 @@ class UnsubscribeHandler(
 
     @acl_decorators.can_subscribe_to_users
     def post(self) -> None:
-        """Handles POST requests."""
+        """Unsubscribes the current user from another user."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         creator_username = self.normalized_payload['creator_username']

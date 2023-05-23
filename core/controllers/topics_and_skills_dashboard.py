@@ -76,7 +76,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves data for the topics and skills dashboard."""
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         # Here we use MyPy ignore because we are explicitly changing
@@ -225,7 +225,7 @@ class TopicAssignmentsHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id: str) -> None:
-        """Handles GET requests.
+        """Retrieves topic assignments.
 
         Args:
             skill_id: str. The skill ID.
@@ -311,7 +311,7 @@ class SkillsDashboardPageDataHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self) -> None:
-        """Handles POST requests."""
+        """filters and fetches skill summaries."""
         assert self.normalized_payload is not None
         classroom_name = self.normalized_payload['classroom_name']
         urlsafe_start_cursor = self.normalized_payload.get('next_cursor')
@@ -431,7 +431,7 @@ class NewTopicHandler(
 
     @acl_decorators.can_create_topic
     def post(self) -> None:
-        """Handles POST requests."""
+        """Creates a new topic."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
@@ -556,7 +556,7 @@ class NewSkillHandler(
 
     @acl_decorators.can_create_skill
     def post(self) -> None:
-        """Handles POST requests."""
+        """Creates a new skill."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         description = self.normalized_payload['description']
@@ -651,7 +651,7 @@ class MergeSkillHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self) -> None:
-        """Handles the POST request."""
+        """Merges skills."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         old_skill_id = self.normalized_payload['old_skill_id']
@@ -729,7 +729,7 @@ class TopicIdToDiagnosticTestSkillIdsHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves diagnostic test skill IDs."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request[
             'comma_separated_topic_ids']

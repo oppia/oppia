@@ -225,7 +225,7 @@ class VoiceArtistManagementHandler(
 
     @acl_decorators.can_add_voice_artist
     def post(self, unused_entity_type: str, entity_id: str) -> None:
-        """Handles Post requests.
+        """Assigns a voice artist role.
 
         Args:
             unused_entity_type: str. The unused entity type.
@@ -246,7 +246,7 @@ class VoiceArtistManagementHandler(
 
     @acl_decorators.can_remove_voice_artist
     def delete(self, unused_entity_type: str, entity_id: str) -> None:
-        """Handles Delete requests.
+        """Removes the voice artist role from a user.
 
         Args:
             unused_entity_type: str. The unused entity type.
