@@ -20,7 +20,7 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/dnd-lists.import';
+import 'angular-drag-and-drop-lists/angular-drag-and-drop-lists.min.js';
 
 angular.module('oppia', [
   require('angular-cookies'), 'dndLists', 'ngAnimate',
