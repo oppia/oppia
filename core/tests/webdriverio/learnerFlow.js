@@ -206,8 +206,8 @@ describe('Learner dashboard functionality', function() {
       var startStack = new Error().stack;
       await users.logout();
     } catch (error) {
-      error.stack = error.stack + "\n" +
-      startStack.substring(startStack.indexOf("\n") + 1);
+      error.stack = error.stack + '\n' +
+      startStack.substring(startStack.indexOf('\n') + 1);
       throw error;
     }
     await users.createAndLoginUser(
@@ -276,8 +276,8 @@ describe('Learner dashboard functionality', function() {
       var startStack = new Error().stack;
       await users.logout();
     } catch (error) {
-      error.stack = error.stack + "\n" +
-      startStack.substring(startStack.indexOf("\n") + 1);
+      error.stack = error.stack + '\n' +
+      startStack.substring(startStack.indexOf('\n') + 1);
       throw error;
     }
 
@@ -301,8 +301,8 @@ describe('Learner dashboard functionality', function() {
         var startStack = new Error().stack;
         await users.logout();
       } catch (error) {
-        error.stack = error.stack + "\n" +
-        startStack.substring(startStack.indexOf("\n") + 1);
+        error.stack = error.stack + '\n' +
+        startStack.substring(startStack.indexOf('\n') + 1);
         throw error;
       }
 
@@ -428,8 +428,8 @@ describe('Learner dashboard functionality', function() {
       var startStack = new Error().stack;
       await users.logout();
     } catch (error) {
-      error.stack = error.stack + "\n" +
-      startStack.substring(startStack.indexOf("\n") + 1);
+      error.stack = error.stack + '\n' +
+      startStack.substring(startStack.indexOf('\n') + 1);
       throw error;
     }
 
@@ -465,8 +465,8 @@ describe('Learner dashboard functionality', function() {
         var startStack = new Error().stack;
         await users.logout();
       } catch (error) {
-        error.stack = error.stack + "\n" +
-        startStack.substring(startStack.indexOf("\n") + 1);
+        error.stack = error.stack + '\n' +
+        startStack.substring(startStack.indexOf('\n') + 1);
         throw error;
       }
 
@@ -485,8 +485,8 @@ describe('Learner dashboard functionality', function() {
       var startStack = new Error().stack;
       await users.logout();
     } catch (error) {
-      error.stack = error.stack + "\n" +
-      startStack.substring(startStack.indexOf("\n") + 1);
+      error.stack = error.stack + '\n' +
+      startStack.substring(startStack.indexOf('\n') + 1);
       throw error;
     }
   });
