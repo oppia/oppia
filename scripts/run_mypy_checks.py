@@ -150,17 +150,17 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
     output = process.communicate()
     if b'can\'t combine user with prefix' in output[1]:
         uextention_text = ['--user', '--prefix=', '--system']
-        with subprocess.Popen(
+        new_process = subprocess.Popen(  # pylint: disable=consider-using-with
             cmd + uextention_text, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE) as new_process:
-            new_process.communicate()
-            if site.USER_BASE is None:
-                raise Exception(
-                    'No USER_BASE found for the user.'
-                )
-            _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
-            mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
-            return (new_process.returncode, mypy_exec_path)
+            stderr=subprocess.PIPE)
+        new_process.communicate()
+        if site.USER_BASE is None:
+            raise Exception(
+                'No USER_BASE found for the user.'
+            )
+        _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
+        mypy_exec_path = os.path.join(site.USER_BASE, 'bin', 'mypy')
+        return (new_process.returncode, mypy_exec_path)
     else:
         _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
         mypy_exec_path = os.path.join(MYPY_TOOLS_DIR, 'bin', 'mypy')
