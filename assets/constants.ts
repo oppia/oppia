@@ -34,9 +34,9 @@ export default {
       "language_code": "pt",
       "explanation": "For learners in Brazil, Angola and Mozambique."
     },
-    // eslint-disable-next-line max-len
     {
       "language_code": "ar",
+      // eslint-disable-next-line max-len
       "explanation": "For learners in Arabic-speaking countries in the Middle East."
     },
     {
