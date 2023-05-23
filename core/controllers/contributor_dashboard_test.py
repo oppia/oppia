@@ -1397,7 +1397,7 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
     """Test for the FeaturedTranslationLanguagesHandler."""
 
     def test_get_featured_translation_languages(self) -> None:
-        response = self.get_json('/retrivefeaturedtranslationlanguages')
+        response = self.get_json('/retrievefeaturedtranslationlanguages')
         expected_response = {
             'featured_translation_languages': [
                 {

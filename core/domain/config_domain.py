@@ -217,7 +217,9 @@ class ConfigProperty:
     - editor_page_announcement.
     - editor_prerequisites_agreement.
     - embedded_google_group_url.
+    - featured_translation_languages.
     - full_site_url.
+    - list_of_default_tags_for_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
@@ -231,7 +233,9 @@ class ConfigProperty:
     - splash_page_exploration_version.
     - splash_page_youtube_video_id.
     - ssl_challenge_responses.
+    - vmid_shared_secret_key_mapping.
     - whitelisted_email_senders.
+    - whitelisted_exploration_ids_for_playthroughs.
     """
 
     # Here we use type Any because the general structure of schemas are like

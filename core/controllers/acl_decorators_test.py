@@ -51,7 +51,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, TypedDict, Union
+from typing import Dict, Final, List, Optional, TypedDict, Union
 import webapp2
 import webtest
 
@@ -7113,8 +7113,20 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         def post(self) -> None:
             self.render_json({'job_id': 'new_job'})
 
+    def _swap_function(self, name: str) -> Optional[str]:
+        if name == 'VM_ID':
+            return 'vm_default'
+        elif name == 'SHARED_SECRET_KEY':
+            return '1a2b3c4e'
+
     def setUp(self) -> None:
         super().setUp()
+        self.swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._swap_function,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -7130,7 +7142,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             payload['message'].encode('utf-8'),
             payload['vm_id'])
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with self.swap(self, 'testapp', self.mock_testapp), self.swap_secret:
             self.post_json(
                 '/ml/nextjobhandler', payload,
                 expected_status_int=401)
@@ -7157,7 +7169,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['signature'] = classifier_services.generate_signature(
             secret.encode('utf-8'), 'message'.encode('utf-8'), payload['vm_id'])
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with self.swap(self, 'testapp', self.mock_testapp), self.swap_secret:
             self.post_json(
                 '/ml/nextjobhandler', payload, expected_status_int=401)
 
@@ -7171,7 +7183,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             payload['message'].encode('utf-8'),
             payload['vm_id'])
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with self.swap(self, 'testapp', self.mock_testapp), self.swap_secret:
             json_response = self.post_json('/ml/nextjobhandler', payload)
 
         self.assertEqual(json_response['job_id'], 'new_job')

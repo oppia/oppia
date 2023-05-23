@@ -505,14 +505,17 @@ describe('Translation contribution featured languages', () => {
   });
 
   it('should show correct featured languages', async function() {
-    let featuredLanguages = [];
-    for (let language in Constants.FEATURED_TRANSLATION_LANGUAGES) {
-      for (let audioLang in Constants.SUPPORTED_AUDIO_LANGUAGES) {
-        if (language.language_code === audioLang.id) {
-          featuredLanguages.push(audioLang.description);
-        }
-      }
-    }
+    let featuredLanguages = [
+      'português (Portuguese)',
+      'العربية (Arabic)',
+      'Naijá (Nigerian Pidgin)',
+      'español (Spanish)',
+      'kiswahili (Swahili)',
+      'हिन्दी (Hindi)',
+      'Harshen Hausa (Hausa)',
+      'Ásụ̀sụ́ Ìgbò (Igbo)',
+      'Èdè Yoùbá (Yoruba)'
+    ];
     await contributorDashboardTranslateTextTab
       .expectFeaturedLanguagesToBe(featuredLanguages);
   });
@@ -521,7 +524,8 @@ describe('Translation contribution featured languages', () => {
     await contributorDashboardTranslateTextTab
       .mouseoverFeaturedLanguageTooltip(0);
     await contributorDashboardTranslateTextTab
-      .expectFeaturedLanguageExplanationToBe('português (Portuguese)');
+      .expectFeaturedLanguageExplanationToBe(
+        'For learners in Brazil, Angola and Mozambique.');
   });
 
   afterEach(async function() {
