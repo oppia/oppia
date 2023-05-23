@@ -7126,6 +7126,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             return 'vm_default'
         elif name == 'SHARED_SECRET_KEY':
             return '1a2b3c4e'
+        return None
 
     def setUp(self) -> None:
         super().setUp()

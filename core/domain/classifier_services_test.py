@@ -725,6 +725,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
                 return 'vm_default'
             elif name == 'SHARED_SECRET_KEY':
                 return '1a2b3c4e'
+            return None
 
         vm_id = feconf.DEFAULT_VM_ID
         message = 'test message'
