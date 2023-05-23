@@ -23,7 +23,7 @@ import uiValidate from 'angular-ui-validate';
 import 'angular-drag-and-drop-lists/angular-drag-and-drop-lists.min.js';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
+  require('angular-cookies'), 'dndLists', 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'ui.bootstrap',
   uiValidate
