@@ -1402,39 +1402,42 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
             'featured_translation_languages': [
                 {
                     'language_code': 'pt',
-                    'explanation': 'português (Portuguese)'
+                    'explanation': 'For learners in Brazil, Angola '
+                    'and Mozambique.'
                 },
                 {
                     'language_code': 'ar',
-                    'explanation': 'العربية (Arabic)'
+                    'explanation': 'For learners in Arabic-speaking countries '
+                    'in the Middle East.'
                 },
                 {
                     'language_code': 'pcm',
-                    'explanation': 'Naijá (Nigerian Pidgin)'
+                    'explanation': 'For learners in Nigeria.'
                 },
                 {
                     'language_code': 'es',
-                    'explanation': 'Español (Spanish)'
+                    'explanation': 'For learners in Latin America and South '
+                    'America.'
                 },
                 {
                     'language_code': 'sw',
-                    'explanation': 'kiswahili (Swahili)'
+                    'explanation': 'For learners in Kenya and Tanzania.'
                 },
                 {
                     'language_code': 'hi',
-                    'explanation': 'हिन्दी (Hindi)'
+                    'explanation': 'For learners in India'
                 },
                 {
                     'language_code': 'ha',
-                    'explanation': 'Harshen Hausa (Hausa)'
+                    'explanation': 'For learners in Nigeria.'
                 },
                 {
                     'language_code': 'ig',
-                    'explanation': 'Ásụ̀sụ́ Ìgbò (Igbo)'
+                    'explanation': 'For learners in Nigeria.'
                 },
                 {
                     'language_code': 'yo',
-                    'explanation': 'Èdè Yoùbá (Yoruba)'
+                    'explanation': 'For learners in Nigeria.'
                 }]
         }
         self.assertEqual(response, expected_response)
