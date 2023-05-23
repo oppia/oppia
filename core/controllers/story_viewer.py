@@ -59,7 +59,11 @@ class StoryPageDataHandler(
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id: str) -> None:
-        """Handles GET requests."""
+        """Retrieves and organizes the data needed to display a story.
+
+        Args:
+            story_id: str. The story ID.
+        """
         story = story_fetchers.get_story_by_id(story_id)
         topic_id = story.corresponding_topic_id
         topic_name = topic_fetchers.get_topic_by_id(topic_id).name
@@ -227,9 +231,6 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Args:
             story_id: str. The story ID.
             node_id: str. The node ID.
-
-        Returns:
-            json. A json object.
         """
         assert self.user_id is not None
         story = story_fetchers.get_story_by_id(story_id)

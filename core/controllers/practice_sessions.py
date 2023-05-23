@@ -47,8 +47,8 @@ class PracticeSessionsPage(
     }
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, _: str) -> None:
-        """Handles GET requests."""
+    def get(self) -> None:
+        """Renders the practice session page."""
 
         self.render_template('practice-session-page.mainpage.html')
 
@@ -113,7 +113,11 @@ class PracticeSessionsPageDataHandler(
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name: str) -> None:
-        """Retrieves information about a topic."""
+        """Retrieves information about a topic.
+
+        Args:
+            topic_name: str. The topic name.
+        """
         assert self.normalized_request is not None
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.

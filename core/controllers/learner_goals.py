@@ -65,7 +65,12 @@ class LearnerGoalsHandler(
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
     def post(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
-        """Adds a topic to the learner's learning goals."""
+        """Adds a topic to the learner's learning goals.
+
+        Args:
+            activity_type. str. The activity type.
+            topic_id. str. The ID of the topic.
+        """
         assert self.user_id is not None
         belongs_to_learnt_list = False
         goals_limit_exceeded = False
@@ -89,7 +94,12 @@ class LearnerGoalsHandler(
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
-        """Removes a topic from the learner's learning goals."""
+        """Removes a topic from the learner's learning goals.
+
+        Args:
+            activity_type. str. The activity type.
+            topic_id. str. The ID of the topic.
+        """
         assert self.user_id is not None
         learner_goals_services.remove_topics_from_learn_goal(
             self.user_id, [topic_id])

@@ -52,8 +52,11 @@ class StoryEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_edit_story
     def get(self, unused_story_id: str) -> None:
-        """Handles GET requests."""
+        """Renders the story editor page.
 
+        Args:
+            unused_story_id: str. The unused story ID.
+        """
         self.render_template('story-editor-page.mainpage.html')
 
 
@@ -123,6 +126,14 @@ class EditableStoryDataHandler(
     ) -> None:
         """Check that the payload version matches the given story
         version.
+
+        Args:
+            version_from_payload: int. The payload version.
+            story_version: int. The story version.
+
+        Raises:
+            InvalidInputException. Trying to update a story version
+            with an old version.
         """
         if version_from_payload != story_version:
             raise base.BaseHandler.InvalidInputException(
@@ -132,7 +143,11 @@ class EditableStoryDataHandler(
 
     @acl_decorators.can_edit_story
     def get(self, story_id: str) -> None:
-        """Populates the data on the individual story page."""
+        """Populates the data on the individual story page.
+
+        Args:
+            story_id: str. The story ID.
+        """
         story = story_fetchers.get_story_by_id(story_id, strict=True)
         topic_id = story.corresponding_topic_id
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
@@ -161,7 +176,14 @@ class EditableStoryDataHandler(
 
     @acl_decorators.can_edit_story
     def put(self, story_id: str) -> None:
-        """Updates properties of the given story."""
+        """Updates properties of the given story.
+
+        Args:
+            story_id: str. The story ID.
+
+        Raises:
+            InvalidInputException. Error class for invalid input.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         story = story_fetchers.get_story_by_id(story_id, strict=True)
@@ -188,7 +210,11 @@ class EditableStoryDataHandler(
 
     @acl_decorators.can_delete_story
     def delete(self, story_id: str) -> None:
-        """Deletes a story."""
+        """Deletes a story.
+
+        Args:
+            story_id: str. The story ID.
+        """
         assert self.user_id is not None
         story_services.delete_story(self.user_id, story_id)
         self.render_json(self.values)
@@ -228,7 +254,11 @@ class StoryPublishHandler(
 
     @acl_decorators.can_edit_story
     def put(self, story_id: str) -> None:
-        """Published/unpublished given story."""
+        """Published/unpublished given story.
+
+        Args:
+            story_id: str. The story ID.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         story = story_fetchers.get_story_by_id(story_id, strict=True)
@@ -284,6 +314,9 @@ class ValidateExplorationsHandler(
         """Handler that receives a list of exploration IDs, checks whether the
         corresponding explorations are supported on mobile and returns the
         validation error messages (if any).
+
+        Args:
+            unused_story_id: str. The unused story ID.
         """
         assert self.normalized_request is not None
         comma_separated_exp_ids = self.normalized_request[
@@ -313,6 +346,9 @@ class StoryUrlFragmentHandler(
     def get(self, story_url_fragment: str) -> None:
         """Handler that receives a story url fragment and checks whether
         a story with the same url fragment exists or not.
+
+        Args:
+            story_url_fragment: str. The story URL fragment.
         """
         self.values.update({
             'story_url_fragment_exists': (
