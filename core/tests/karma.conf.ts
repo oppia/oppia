@@ -26,7 +26,7 @@ module.exports = function(config) {
       'third_party/static/jquery-3.5.1/jquery.min.js',
       'third_party/static/angularjs-1.8.2/angular.js',
       'core/templates/karma.module.ts',
-      'third_party/static/angularjs-1.8.2/angular-mocks.js',
+      'node_modules/angular-mocks/angular-mocks.js',
       '/third_party/static/lamejs-1.2.0/worker-example/worker-realtime.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
