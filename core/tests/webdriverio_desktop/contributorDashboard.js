@@ -508,8 +508,8 @@ describe('Translation contribution featured languages', () => {
     let featuredLanguages = [];
     for (let language in Constants.FEATURED_TRANSLATION_LANGUAGES) {
       for (let audioLang in Constants.SUPPORTED_AUDIO_LANGUAGES) {
-        if (language['language_code'] === audioLang['id']) {
-          featuredLanguages.push(audioLang['description']);
+        if (language.language_code === audioLang.id) {
+          featuredLanguages.push(audioLang.description);
         }
       }
     }
