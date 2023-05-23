@@ -314,8 +314,7 @@ class EditableSkillDataHandler(
             skill_id: str. The skill ID.
 
         Raises:
-            InvalidInputException. Please delete all questions associated
-            with this skill first.
+            InvalidInputException. Please delete all skill questions.
         """
         assert self.user_id is not None
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)

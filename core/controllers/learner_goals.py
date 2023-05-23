@@ -68,8 +68,8 @@ class LearnerGoalsHandler(
         """Adds a topic to the learner's learning goals.
 
         Args:
-            activity_type. str. The activity type.
-            topic_id. str. The ID of the topic.
+            activity_type: str. The activity type.
+            topic_id: str. The ID of the topic.
         """
         assert self.user_id is not None
         belongs_to_learnt_list = False
@@ -97,8 +97,8 @@ class LearnerGoalsHandler(
         """Removes a topic from the learner's learning goals.
 
         Args:
-            activity_type. str. The activity type.
-            topic_id. str. The ID of the topic.
+            activity_type: str. The activity type.
+            topic_id: str The ID of the topic.
         """
         assert self.user_id is not None
         learner_goals_services.remove_topics_from_learn_goal(
