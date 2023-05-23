@@ -156,26 +156,36 @@ describe('Side Navigation Bar Component', () => {
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
   });
 
-  it('should navigate to learner dashboard when learner clicks on ' +
-  'HOME, when not on the learner dashboard', () => {
+  it('should navigate to default dashboard when user clicks on ' +
+  'HOME, when not on the default dashboard', fakeAsync(() => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
+    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
+      Promise.resolve('contributor'));
     spyOn(sidebarStatusService, 'closeSidebar');
-    componentInstance.navigateToLearnerDashboard();
+
+    componentInstance.currentUrl = '/learner-dashboard';
+    componentInstance.navigateToDefaultDashboard();
+    tick();
 
     expect(sidebarStatusService.closeSidebar).not.toHaveBeenCalled();
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/learner-dashboard');
-  });
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/');
+  }));
 
-  it('should not navigate to learner dashboard when learner clicks on ' +
-  'HOME, when on the learner dashboard', () => {
-    componentInstance.currentUrl = '/learner-dashboard';
-
+  it('should not navigate to default dashboard when user clicks on ' +
+  'HOME, when on the default dashboard', fakeAsync(() => {
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
+      Promise.resolve('creator'));
     spyOn(sidebarStatusService, 'closeSidebar');
-    componentInstance.navigateToLearnerDashboard();
+
+    componentInstance.currentUrl = '/creator-dashboard';
+    componentInstance.navigateToDefaultDashboard();
+    tick();
 
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
-  });
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+  }));
 
   it('should navigate to classroom page when user clicks on' +
   '\'Basic Mathematics\'', fakeAsync(() => {
