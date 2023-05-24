@@ -140,7 +140,8 @@ class ContributionRightsHandler(
         Raises:
             Exception. The language_code cannot be None if the review category
                 is translation.
-            InvalidInputException. User already has rights to review translation.
+            InvalidInputException. User already has rights to review
+                translation.
             InvalidInputException. User already has rights to review question.
             InvalidInputException. User already has rights to submit question.
         """
@@ -349,7 +350,7 @@ class ContributionRightsDataHandler(
     def get(self) -> None:
         """Fetches contributor dashboard admin page data.
 
-        Args:
+        Raises:
             InvalidInputException. Invalid username.
         """
         assert self.normalized_request is not None
