@@ -433,10 +433,9 @@ class ExplorationRightsHandler(
         Raises:
             InvalidInputException. Sorry, we could not find the specified
                 user.
-            InvalidInputException. Please provide a role for the new member
-                of the exploration.
-            InvalidInputException. Users are not allowed to assign other
-                roles to themselves.
+            InvalidInputException. Please provide a role for the new member.
+            InvalidInputException. Users are not allowed to self-assign
+                roles.
             InvalidInputException. Error class for invalid input.
             InvalidInputException. No change was made to this exploration.
         """
