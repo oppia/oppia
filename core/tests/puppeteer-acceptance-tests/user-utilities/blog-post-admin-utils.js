@@ -44,7 +44,6 @@ const LABEL_FOR_DONE_BUTTON = 'DONE';
 const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
-const LABEL_FOR_ADD_ELEMENT_BUTTON = 'Add element';
 
 module.exports = class e2eBlogPostAdmin extends baseUser {
   /**

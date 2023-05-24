@@ -601,7 +601,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.assertIn(
             'TextClassifier',
             state_training_jobs_mapping.algorithm_ids_to_job_ids)
-        
+
         swap_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
@@ -677,10 +677,16 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
             self.payload['vm_id'])
 
     def test_next_job_handler(self) -> None:
-        json_response = self.post_json(
-            '/ml/nextjobhandler', self.payload, expected_status_int=200)
-        self.assertEqual(json_response, self.expected_response)
-        classifier_services.mark_training_jobs_failed([self.job_id])
-        json_response = self.post_json(
-            '/ml/nextjobhandler', self.payload, expected_status_int=200)
-        self.assertEqual(json_response, {})
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
+            json_response = self.post_json(
+                '/ml/nextjobhandler', self.payload, expected_status_int=200)
+            self.assertEqual(json_response, self.expected_response)
+            classifier_services.mark_training_jobs_failed([self.job_id])
+            json_response = self.post_json(
+                '/ml/nextjobhandler', self.payload, expected_status_int=200)
+            self.assertEqual(json_response, {})
