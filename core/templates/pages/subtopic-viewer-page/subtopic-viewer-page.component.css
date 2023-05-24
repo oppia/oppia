@@ -40,7 +40,7 @@
   font-family: Roboto, Arial, sans-serif;
   height: 100%;
   margin: 0 auto;
-  max-width: 880px;
+  max-width: 960px;
   min-height: 500px;
   padding: 72px 48px 48px 48px;
   position: relative;
@@ -70,7 +70,7 @@
   margin-left: auto;
   margin-right: auto;
   margin-top: 20px;
-  max-width: 880px;
+  max-width: 960px;
 }
 .oppia-subtopic-summary-tile {
   background-color: #fff;
