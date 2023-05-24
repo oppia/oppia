@@ -720,7 +720,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_verify_signature(self) -> None:
         """Test the verify_signature method."""
 
-        def _swap_function(name: str) -> Optional[str]:
+        def _mock_get_secret(name: str) -> Optional[str]:
             if name == 'VM_ID':
                 return 'vm_default'
             elif name == 'SHARED_SECRET_KEY':
@@ -741,7 +741,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         with self.swap_with_checks(
             secrets_services,
             'get_secret',
-            _swap_function,
+            _mock_get_secret,
             expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
         ):
             self.assertTrue(classifier_services.verify_signature(
@@ -756,7 +756,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         with self.swap_with_checks(
             secrets_services,
             'get_secret',
-            _swap_function,
+            _mock_get_secret,
             expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
         ):
             self.assertFalse(classifier_services.verify_signature(
@@ -771,7 +771,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         with self.swap_with_checks(
             secrets_services,
             'get_secret',
-            _swap_function,
+            _mock_get_secret,
             expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
         ):
             self.assertFalse(classifier_services.verify_signature(

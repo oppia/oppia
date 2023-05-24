@@ -7113,7 +7113,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         def post(self) -> None:
             self.render_json({'job_id': 'new_job'})
 
-    def _swap_function(self, name: str) -> Optional[str]:
+    def _mock_get_secret(self, name: str) -> Optional[str]:
         """Mock for the get_secret function.
 
         Args:
@@ -7130,12 +7130,6 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            self._swap_function,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -7150,8 +7144,14 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             secret.encode('utf-8'),
             payload['message'].encode('utf-8'),
             payload['vm_id'])
+        swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
 
-        with self.swap(self, 'testapp', self.mock_testapp), self.swap_secret:
+        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
             self.post_json(
                 '/ml/nextjobhandler', payload,
                 expected_status_int=401)
@@ -7177,8 +7177,14 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
             secret.encode('utf-8'), 'message'.encode('utf-8'), payload['vm_id'])
+        swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
 
-        with self.swap(self, 'testapp', self.mock_testapp), self.swap_secret:
+        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
             self.post_json(
                 '/ml/nextjobhandler', payload, expected_status_int=401)
 
@@ -7191,8 +7197,14 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             secret.encode('utf-8'),
             payload['message'].encode('utf-8'),
             payload['vm_id'])
+        swap_secret = self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            self._mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        )
 
-        with self.swap(self, 'testapp', self.mock_testapp), self.swap_secret:
+        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
             json_response = self.post_json('/ml/nextjobhandler', payload)
 
         self.assertEqual(json_response['job_id'], 'new_job')

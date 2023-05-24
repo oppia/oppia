@@ -505,7 +505,7 @@ describe('Translation contribution featured languages', () => {
   });
 
   it('should show correct featured languages', async function() {
-    let featuredLanguages = [
+    let expectedFeaturedLanguages = [
       'português (Portuguese)',
       'العربية (Arabic)',
       'Naijá (Nigerian Pidgin)',
@@ -517,7 +517,7 @@ describe('Translation contribution featured languages', () => {
       'Èdè Yoùbá (Yoruba)'
     ];
     await contributorDashboardTranslateTextTab
-      .expectFeaturedLanguagesToBe(featuredLanguages);
+      .expectFeaturedLanguagesToBe(expectedFeaturedLanguages);
   });
 
   it('should show correct explanation', async function() {
