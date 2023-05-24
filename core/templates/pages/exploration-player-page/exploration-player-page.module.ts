@@ -37,7 +37,7 @@ import { ProgressReminderModalComponent } from './templates/progress-reminder-mo
 import { HintAndSolutionModalService } from './services/hint-and-solution-modal.service';
 import { FatigueDetectionService } from './services/fatigue-detection.service';
 
-import 'guppy-dev/build/guppy.min.js';
+import 'node_modules/guppy-dev/build/guppy.min.js';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 import { ToastrModule } from 'ngx-toastr';

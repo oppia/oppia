@@ -153,6 +153,13 @@ module.exports = {
       )
     }),
     new HtmlWebpackPlugin({
+      template: commonPrefix + '/pages/header_js_libs.html',
+      filename: 'header_js_libs.html',
+      hybrid: true,
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
       hybrid: true,
