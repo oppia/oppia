@@ -692,8 +692,14 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         ):
             json_response = self.post_json(
                 '/ml/nextjobhandler', self.payload, expected_status_int=200)
-            self.assertEqual(json_response, self.expected_response)
-            classifier_services.mark_training_jobs_failed([self.job_id])
+        self.assertEqual(json_response, self.expected_response)
+        classifier_services.mark_training_jobs_failed([self.job_id])
+        with self.swap_with_checks(
+            secrets_services,
+            'get_secret',
+            _mock_get_secret,
+            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
+        ):
             json_response = self.post_json(
                 '/ml/nextjobhandler', self.payload, expected_status_int=200)
-            self.assertEqual(json_response, {})
+        self.assertEqual(json_response, {})
