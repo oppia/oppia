@@ -350,7 +350,7 @@ class CreatorDashboardHandler(
 
     @acl_decorators.can_access_creator_dashboard
     def post(self) -> None:
-        """Handles POST requests."""
+        """Updates the creator dashboard display."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         creator_dashboard_display_pref = self.normalized_payload[

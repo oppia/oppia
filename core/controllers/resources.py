@@ -125,6 +125,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 string is encoded in the frontend using encodeURIComponent().
 
         Raises:
+            PageNotFoundException. The page cannot be found.
             Exception. File not found.
         """
         if not constants.EMULATOR_MODE:

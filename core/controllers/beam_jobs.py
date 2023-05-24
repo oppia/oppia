@@ -35,7 +35,7 @@ class BeamJobHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_run_any_job
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves a list of Beam jobs."""
         sorted_beam_jobs = sorted(
             beam_job_services.get_beam_jobs(),
             key=lambda j: j.name)

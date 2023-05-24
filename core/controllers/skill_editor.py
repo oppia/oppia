@@ -270,7 +270,7 @@ class EditableSkillDataHandler(
             PageNotFoundException. The skill with the given id doesn't exist.
             InvalidInputException. Commit messages must be at most 375
                 characters long.
-            InvalidInputException. Error class for invalid input.
+            InvalidInputException. Invalid input.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None

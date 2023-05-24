@@ -176,7 +176,7 @@ class ExplorationHandler(
             exploration_id: str. The exploration ID.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            PageNotFoundException. The page cannot be found.
         """
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
@@ -228,7 +228,7 @@ class ExplorationHandler(
             InvalidInputException. Error in updating exploration version.
             InvalidInputException. This exploration cannot be edited. Please
                 contact the admin.
-            InvalidInputException. Error class for invalid input.
+            InvalidInputException. Invalid input.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -436,7 +436,7 @@ class ExplorationRightsHandler(
             InvalidInputException. Please provide a role for the new member.
             InvalidInputException. Users are not allowed to self-assign
                 roles.
-            InvalidInputException. Error class for invalid input.
+            InvalidInputException. Invalid input.
             InvalidInputException. No change was made to this exploration.
         """
         assert self.user_id is not None
@@ -1074,7 +1074,7 @@ class StateInteractionStatsHandler(
             state_name: str. The state name.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            PageNotFoundException. The page cannot be found.
         """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -1720,7 +1720,7 @@ class LearnerAnswerInfoHandler(
 
         Raises:
             PageNotFoundException. The page cannot be found.
-            InvalidInputException. Error class for invalid input.
+            InvalidInputException. Invalid input.
         """
         assert self.normalized_request is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:

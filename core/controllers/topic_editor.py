@@ -613,10 +613,13 @@ class TopicRightsHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Returns the TopicRights object of a topic.
+        """Fetches the topic rights of a topic.
 
         Args:
             topic_id: str. The ID of the topic.
+
+        Raises:
+            InvalidInputException. Expected a valid topic id to be provided.
         """
         assert self.user_id is not None
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
@@ -684,7 +687,7 @@ class TopicPublishSendMailHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def put(self, topic_id: str) -> None:
-        """Returns the TopicRights object of a topic.
+        """Requests a review and publication of a topic.
 
         Args:
             topic_id: str. The ID of the topic.
@@ -749,6 +752,10 @@ class TopicPublishHandler(
 
         Args:
             topic_id: str. The ID of the topic.
+
+        Raises:
+            PageNotFoundException. The page cannot be found.
+            UnauthorizedUserException. User does not have permission.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
