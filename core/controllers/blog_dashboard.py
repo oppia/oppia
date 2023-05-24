@@ -361,7 +361,7 @@ class BlogPostHandler(
 
     @acl_decorators.can_delete_blog_post
     def delete(self, blog_post_id: str) -> None:
-        """Handles Delete requests.
+        """Deletes blog post.
 
         Args:
             blog_post_id: str. The ID of the blog post.

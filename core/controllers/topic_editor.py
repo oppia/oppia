@@ -126,7 +126,7 @@ class TopicEditorStoryHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Handles GET requests.
+        """Retrieves information about a topic.
 
         Args:
             topic_id: str. The ID of the topic.

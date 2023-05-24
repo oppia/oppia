@@ -149,7 +149,7 @@ class StartedTranslationTutorialEventHandler(
 
     @acl_decorators.can_play_exploration_as_logged_in_user
     def post(self, unused_exploration_id: str) -> None:
-        """Handles POST requests.
+        """Records that the user has started the state translation tutorial.
 
         unused_exploration_id: str. The unused exploration ID.
         """

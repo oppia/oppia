@@ -188,7 +188,7 @@ class BlogHomepageDataHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Retrieves blog post summaries for the blog home page."""
+        """Retrieves blog post summaries for the blog homepage."""
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
         published_post_summaries = (

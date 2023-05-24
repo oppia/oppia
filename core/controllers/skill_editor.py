@@ -130,7 +130,7 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id: str) -> None:
-        """Returns whether the user can edit the description of a skill.
+        """Checks whether the user can edit the description of a skill.
 
         Args:
             skill_id: str. The skill ID.
