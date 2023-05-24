@@ -132,8 +132,7 @@ class EditableStoryDataHandler(
             story_version: int. The story version.
 
         Raises:
-            InvalidInputException. Trying to update story version with an old
-            version.
+            InvalidInputException. Error in updating story version.
         """
         if version_from_payload != story_version:
             raise base.BaseHandler.InvalidInputException(
