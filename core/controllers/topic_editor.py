@@ -126,7 +126,11 @@ class TopicEditorStoryHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            topic_id. The ID of the topic.
+        """
         topic = topic_fetchers.get_topic_by_id(topic_id)
         story_id_to_publication_status_map = {}
         for reference in topic.canonical_story_references:
@@ -783,7 +787,7 @@ class TopicUrlFragmentHandler(
         a topic with the same url fragment exists.
 
         Args:
-            topic_url_fragment: str. The topic url fragment.
+            topic_url_fragment: str. The topic URL fragment.
         """
         self.values.update({
             'topic_url_fragment_exists': (
@@ -875,7 +879,7 @@ class TopicIdToTopicNameHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
-        """Access a classroom admin page."""
+        """Accesses a classroom admin page."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request[
             'comma_separated_topic_ids']

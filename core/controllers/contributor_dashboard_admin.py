@@ -135,7 +135,7 @@ class ContributionRightsHandler(
         """Manages contributors' roles.
 
         Args:
-            category: str. The roles' category.
+            category: str. The role's category.
 
         Raises:
             Exception. The language_code cannot be None if the review category
@@ -201,7 +201,7 @@ class ContributionRightsHandler(
         """Removes contributors' roles.
 
         Args:
-            category: str. The roles' category.
+            category: str. The role's category.
 
         Raises:
             InvalidInputException. Invalid username.
@@ -310,7 +310,11 @@ class ContributorUsersListHandler(
 
     @acl_decorators.can_manage_contributors_role
     def get(self, category: str) -> None:
-        """Retrieves the usernames of contributors."""
+        """Retrieves the usernames of contributors.
+
+        Args:
+            category: str. The role's category.
+        """
         assert self.normalized_request is not None
         language_code = self.normalized_request.get('language_code')
         usernames = user_services.get_contributor_usernames(

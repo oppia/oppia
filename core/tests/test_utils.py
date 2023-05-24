@@ -2847,7 +2847,7 @@ version: 1
             expect_errors: bool. Whether errors are expected.
 
         Returns:
-            Any. The python object.
+            Any. Python object.
         """
         if expect_errors:
             self.assertTrue(json_response.status_int >= 400)

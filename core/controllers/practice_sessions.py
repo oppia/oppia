@@ -117,6 +117,8 @@ class PracticeSessionsPageDataHandler(
 
         Args:
             topic_name: str. The topic name.
+
+        PageNotFoundException. The page cannot be found.
         """
         assert self.normalized_request is not None
         # Topic cannot be None as an exception will be thrown from its decorator

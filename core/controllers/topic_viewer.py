@@ -61,7 +61,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name: str) -> None:
-        """Access a topic viewer page.
+        """Accesses a topic viewer page.
 
         Args:
             topic_name: str. The topic name.

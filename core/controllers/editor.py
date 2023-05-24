@@ -174,6 +174,9 @@ class ExplorationHandler(
 
         Args:
             exploration_id: str. The exploration ID.
+
+        Raises:
+            PageNotFoundException. The page is not found.
         """
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
@@ -220,6 +223,12 @@ class ExplorationHandler(
 
         Args:
             exploration_id: str. The exploration ID.
+
+        Raises:
+            InvalidInputException. Error in updating exploration version.
+            InvalidInputException. This exploration cannot be edited. Please
+                contact the admin.
+            InvalidInputException. Error class for invalid input.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -420,6 +429,15 @@ class ExplorationRightsHandler(
 
         Args:
             exploration_id: str. The exploration ID.
+
+        Raises:
+            InvalidInputException. Sorry, we could not find the specified user.
+            InvalidInputException. Please provide a role for the new member of
+                the exploration.
+            InvalidInputException. Users are not allowed to assign other roles
+                to themselves.
+            InvalidInputException. Error class for invalid input.
+            InvalidInputException. No change was made to this exploration.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -446,7 +464,7 @@ class ExplorationRightsHandler(
                 )
             if new_member_id == self.user_id:
                 raise self.InvalidInputException(
-                    'Users are not allowed to assign other roles to themselves')
+                    'Users are not allowed to assign other roles to themselves.')
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
@@ -482,6 +500,12 @@ class ExplorationRightsHandler(
 
         Args:
             exploration_id: str. The exploration ID.
+
+        Raises:
+            InvalidInputException. Sorry, we could not find the specified
+                user.
+            InvalidInputException. Sorry, users cannot remove their own
+                roles.
         """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
@@ -613,6 +637,10 @@ class ExplorationModeratorRightsHandler(
 
         Args:
             exploration_id: str. The exploration ID.
+
+        Raises:
+            InvalidInputException. Moderator actions should include an email
+                to the recipient.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -702,7 +730,6 @@ class UserExplorationEmailsHandler(
         Raises:
             InvalidInputException. Invalid message type.
         """
-
         assert self.user_id is not None
         assert self.normalized_payload is not None
         mute = self.normalized_payload.get('mute')
@@ -885,7 +912,6 @@ class ExplorationSnapshotsHandler(
         Args:
             exploration_id: str. The exploration ID.
         """
-
         snapshots = exp_services.get_exploration_snapshots_metadata(
             exploration_id)
 
@@ -1045,6 +1071,9 @@ class StateInteractionStatsHandler(
         Args:
             exploration_id: str. The exploration ID.
             state_name: str. The state name.
+
+        Raises:
+            PageNotFoundException. The page is not found.
         """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -1095,6 +1124,9 @@ class FetchIssuesHandler(
 
         Args:
             exp_id: str. The exploration ID.
+
+        Raises:
+            PageNotFoundException. Invalid version for exploration ID.
         """
         assert self.normalized_request is not None
         exp_version = self.normalized_request['exp_version']
@@ -1139,6 +1171,9 @@ class FetchPlaythroughHandler(
         Args:
             unused_exploration_id: str. The unused exploration ID.
             playthrough_id: str. The playthrough ID.
+
+        Raises:
+            PageNotFoundException. Invalid playthrough ID.
         """
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         if playthrough is None:
@@ -1195,6 +1230,11 @@ class ResolveIssueHandler(
 
         Args:
             exp_id: str. The exploration ID.
+
+        Raises:
+            PageNotFoundException. Invalid exploration ID.
+            PageNotFoundException. Exploration issue does not exist in the
+                list of issues for the exploration.
         """
         assert self.normalized_payload is not None
         exp_issue_object = self.normalized_payload.get('exp_issue_object')
@@ -1303,6 +1343,10 @@ class ImageUploadHandler(
         Args:
             entity_type: str. The entity type.
             entity_id: str. The ID of the entity.
+
+        Raises:
+            InvalidInputException. A file with the name already exists.
+                Please choose a different name.
         """
 
         assert self.normalized_payload is not None
@@ -1401,6 +1445,9 @@ class EditorAutosaveHandler(ExplorationHandler):
 
         Args:
             exploration_id: str. The exploration ID.
+
+        InvalidInputException. Raise this Exception if the draft change
+            list fails non-strict validation.
         """
         # Raise an Exception if the draft change list fails non-strict
         # validation.
@@ -1604,6 +1651,9 @@ class LearnerAnswerInfoHandler(
         Args:
             entity_type: str. The entity type.
             entity_id: str. The ID of the entity.
+
+        Raises:
+            PageNotFoundException. The page cannot be found.
         """
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
@@ -1665,8 +1715,11 @@ class LearnerAnswerInfoHandler(
         Args:
             entity_type: str. The entity type.
             entity_id: str. The ID of the entity.
-        """
 
+        Raises:
+            PageNotFoundException. The page cannot be found.
+            InvalidInputException. Error class for invalid input.
+        """
         assert self.normalized_request is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException

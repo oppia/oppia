@@ -77,7 +77,6 @@ class TopicsAndSkillsDashboardPageDataHandler(
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self) -> None:
         """Retrieves data for the topics and skills dashboard."""
-
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         # Here we use MyPy ignore because we are explicitly changing
         # the type from the list of 'TopicSummaryDict' to the list of

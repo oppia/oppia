@@ -248,7 +248,13 @@ class DeferredTasksHandler(
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self) -> None:
-        """Defers tasks for execution in the background."""
+        """Defers tasks for execution in the background.
+
+        Raises:
+            Exception. This request cannot defer tasks because it does not
+                contain a function identifier attribute (fn_identifier).
+                Deferred tasks must contain a function_identifier in the payload.
+        """
         # The request body has bytes type, thus we need to decode it first.
         payload = json.loads(self.request.body.decode('utf-8'))
         if 'fn_identifier' not in payload:

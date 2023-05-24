@@ -123,6 +123,9 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
                 string is encoded in the frontend using encodeURIComponent().
+
+        Raises:
+            Exception. File not found.
         """
         if not constants.EMULATOR_MODE:
             raise self.PageNotFoundException

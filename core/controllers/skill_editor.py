@@ -49,7 +49,6 @@ def _require_valid_version(
     Raises:
         Exception. Invalid input.
     """
-
     if version_from_payload != skill_version:
         raise base.BaseHandler.InvalidInputException(
             'Trying to update version %s of skill from version %s, '
@@ -106,7 +105,6 @@ def check_can_edit_skill_description(user: user_domain.UserActionsInfo) -> bool:
     Returns:
         bool. Whether the given user can edit skill descriptions.
     """
-
     if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in user.actions:
         return False
     else:
@@ -221,7 +219,6 @@ class EditableSkillDataHandler(
         Raises:
             Exception. The skill with the given id doesn't exist.
         """
-
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
@@ -356,7 +353,6 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Raises:
             Exception. The skill with the given id doesn't exist.
         """
-
         skill_ids = comma_separated_skill_ids.split(',')
 
         try:

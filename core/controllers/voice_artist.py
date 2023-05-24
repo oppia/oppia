@@ -149,7 +149,10 @@ class StartedTranslationTutorialEventHandler(
 
     @acl_decorators.can_play_exploration_as_logged_in_user
     def post(self, unused_exploration_id: str) -> None:
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        unused_exploration_id: str. The unused exploration ID.
+        """
         assert self.user_id is not None
         user_services.record_user_started_state_translation_tutorial(
             self.user_id)
