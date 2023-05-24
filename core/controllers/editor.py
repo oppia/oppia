@@ -431,7 +431,8 @@ class ExplorationRightsHandler(
             exploration_id: str. The exploration ID.
 
         Raises:
-            InvalidInputException. Sorry, we could not find the specified user.
+            InvalidInputException. Sorry, we could not find the specified
+                user.
             InvalidInputException. Please provide a role for the new member of
                 the exploration.
             InvalidInputException. Users are not allowed to assign other roles
@@ -1446,6 +1447,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         Args:
             exploration_id: str. The exploration ID.
 
+        Raises:
         InvalidInputException. Raise this Exception if the draft change
             list fails non-strict validation.
         """

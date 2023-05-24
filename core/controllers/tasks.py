@@ -253,7 +253,8 @@ class DeferredTasksHandler(
         Raises:
             Exception. This request cannot defer tasks because it does not
                 contain a function identifier attribute (fn_identifier).
-                Deferred tasks must contain a function_identifier in the payload.
+                Deferred tasks must contain a function_identifier in the
+                payload.
         """
         # The request body has bytes type, thus we need to decode it first.
         payload = json.loads(self.request.body.decode('utf-8'))

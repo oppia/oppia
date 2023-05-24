@@ -129,7 +129,7 @@ class TopicEditorStoryHandler(
         """Handles GET requests.
 
         Args:
-            topic_id. The ID of the topic.
+            topic_id: The ID of the topic.
         """
         topic = topic_fetchers.get_topic_by_id(topic_id)
         story_id_to_publication_status_map = {}
