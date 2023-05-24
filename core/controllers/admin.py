@@ -1498,7 +1498,13 @@ class AdminSuperAdminPrivilegesHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        """Handles PUT requests to grant super admin privileges to a user."""
+        """Handles PUT requests to grant super admin privileges to a user.
+
+        Raises:
+            UnauthorizedUserException. Only the default system admin can
+                manage super admins.
+            InvalidInputException. No such user exists.
+        """
         assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
@@ -1516,6 +1522,13 @@ class AdminSuperAdminPrivilegesHandler(
     def delete(self) -> None:
         """Handles DELETE requests to revoke super admin privileges from
         a user.
+
+        Raises:
+            UnauthorizedUserException. Only the default system admin can
+                manage super admins.
+            InvalidInputException. No such user exists.
+            InvalidInputException. Cannot revoke privileges from the default
+                super admin account
         """
         assert self.normalized_request is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
@@ -1610,6 +1623,11 @@ class DataExtractionQueryHandler(
     def get(self) -> None:
         """Handles GET requests by retrieving and returning a specified number
         of submitted answers for a particular state within an exploration.
+
+        Raises:
+            InvalidInputException. Entity no found.
+            InvalidInputException. Exploration does not have such state.
+            Exception. No state answer exists.
         """
         assert self.normalized_request is not None
         exp_id = self.normalized_request['exp_id']
@@ -1662,6 +1680,9 @@ class SendDummyMailToAdminHandler(
     def post(self) -> None:
         """Handles POST requests by sending a dummy email to the admin if
         the application is configured to send emails.
+
+        Raises:
+            InvalidInputException. This app cannot send emails.
         """
         username = self.username
         assert username is not None
@@ -1712,6 +1733,13 @@ class UpdateUsernameHandler(
     def put(self) -> None:
         """Handles PUT requests by updating the username, profile picture,
         and logging the username change for a user.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            InvalidInputException. The user does not have a profile picture
+                with png extension.
+            InvalidInputException. The user does not have a profile picture
+                with webp extension.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -1859,6 +1887,11 @@ class DeleteUserHandler(
     def delete(self) -> None:
         """Handles DELETE requests to initiate the pre-deletion process for
         a user based on the provided user ID and username.
+
+        Raises:
+            InvalidInputException. The username doesn't belong to any user.
+            InvalidInputException. The user ID retrieved from the username
+                and the user ID provided by admin differ.
         """
         assert self.normalized_request is not None
         user_id = self.normalized_request['user_id']
@@ -1924,7 +1957,15 @@ class UpdateBlogPostHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        """Updates the author and published date of a blog post."""
+        """Updates the author and published date of a blog post.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            InvalidInputException. User does not have enough rights to be
+                blog post author.
+            PageNotFoundException. The blog post with the given id or url
+                doesn't exist.
+        """
         assert self.normalized_payload is not None
         blog_post_id = self.normalized_payload['blog_post_id']
         author_username = self.normalized_payload['author_username']
