@@ -309,7 +309,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             learner_progress_services.mark_topic_as_learnt(
                 self.user_id, topic.id)
 
-        return self.render_json({
+        self.render_json({
             'summaries': exp_summaries,
             'ready_for_review_test': ready_for_review_test,
             'next_node_id': next_node_id

@@ -1528,7 +1528,7 @@ class AdminSuperAdminPrivilegesHandler(
                 manage super admins.
             InvalidInputException. No such user exists.
             InvalidInputException. Cannot revoke privileges from the default
-                super admin account
+                super admin account.
         """
         assert self.normalized_request is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
