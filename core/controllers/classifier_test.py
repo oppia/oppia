@@ -677,10 +677,17 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
             self.payload['vm_id'])
 
     def test_next_job_handler(self) -> None:
+        def _mock_get_secret(name: str) -> Optional[str]:
+            if name == 'VM_ID':
+                return 'vm_default'
+            elif name == 'SHARED_SECRET_KEY':
+                return '1a2b3c4e'
+            return None
+
         with self.swap_with_checks(
             secrets_services,
             'get_secret',
-            self._mock_get_secret,
+            _mock_get_secret,
             expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
         ):
             json_response = self.post_json(
