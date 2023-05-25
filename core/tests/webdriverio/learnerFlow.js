@@ -173,7 +173,8 @@ describe('Learner dashboard functionality', function() {
         await collectionEditorPage.setCategory('Algebra');
         await collectionEditorPage.saveChanges();
       }
-      await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+      await general.getFullStackTraceForDeferredCall(
+        users.logout, new Error().stack);
       var PLAYER_USERNAME = 'collectionPlayerDM';
       await users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
@@ -202,7 +203,8 @@ describe('Learner dashboard functionality', function() {
         false
       );
     }
-    await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+    await general.getFullStackTraceForDeferredCall(
+      users.logout, new Error().stack);
     await users.createAndLoginUser(
       'learner@learnerDashboard.com', 'learnerlearnerDashboard');
     // Go to 'Dummy Exploration'.
@@ -265,7 +267,8 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage
       .navigateToCommunityLessonsAndCheckCompleteExplorations(
         'Test Exploration');
-    await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+    await general.getFullStackTraceForDeferredCall(
+      users.logout, new Error().stack);
 
     // For desktop, go to the exploration editor page and
     // delete 'Dummy Exploration'.
@@ -283,7 +286,8 @@ describe('Learner dashboard functionality', function() {
       await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.deleteExploration();
-      await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+      await general.getFullStackTraceForDeferredCall(
+        users.logout, new Error().stack);
 
       // Verify exploration 'Dummy Exploration' is deleted
       // from learner dashboard.
@@ -331,7 +335,8 @@ describe('Learner dashboard functionality', function() {
       await collectionEditorPage.setCategory('Algebra');
       await collectionEditorPage.saveChanges();
     }
-    await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+    await general.getFullStackTraceForDeferredCall(
+      users.logout, new Error().stack);
     await users.createAndLoginUser(
       'learner4@learnerDashboard.com', 'learner4learnerDashboard');
 
@@ -403,7 +408,8 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage
       .navigateToCommunityLessonsAndCheckCompleteCollections(
         'Test Collection');
-    await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+    await general.getFullStackTraceForDeferredCall(
+      users.logout, new Error().stack);
 
     // This part of the test is desktop-only for the following reasons:
     // 1. A user can only add an existing exploration to a collection it has
@@ -433,7 +439,8 @@ describe('Learner dashboard functionality', function() {
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Collection Exploration');
       await collectionEditorPage.closeSaveModal();
-      await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+      await general.getFullStackTraceForDeferredCall(
+        users.logout, new Error().stack);
 
       // Verify 'Test Collection' is now in the incomplete section.
       await users.login('learner4@learnerDashboard.com');
@@ -446,6 +453,7 @@ describe('Learner dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
-    await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+    await general.getFullStackTraceForDeferredCall(
+      users.logout, new Error().stack);
   });
 });
