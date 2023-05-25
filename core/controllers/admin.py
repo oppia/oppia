@@ -1313,7 +1313,7 @@ class AdminRoleHandler(
     def delete(self) -> None:
         """Removes a role from a user.
 
-        Args:
+        Raises:
             InvalidInputException. User with given username does not exist.
         """
         # Here we use cast because we are narrowing down the type of
