@@ -209,7 +209,7 @@ class SuggestionHandler(
         """Handles POST requests.
 
            Raises:
-               InvalidInputException. If the suggestion type is SUGGESTION_TYPE_EDIT_STATE_CONTENT.
+               InvalidInputException. Suggestion type is invalid.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -347,9 +347,9 @@ class SuggestionToExplorationActionHandler(
         Raises:
             Exception. The 'commit_message' must be provided when the
                 action is 'accept suggestion'.
-            InvalidInputException. If the suggestion is not for explorations 
-                or the provided exploration ID is invalid.
-            UnauthorizedUserException: If the author ID of the suggestion matches the current user ID.
+            InvalidInputException. The suggestion is not for explorations
+                or the exploration ID is invalid.
+            UnauthorizedUserException. Author ID of the suggestion matches the current user ID.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -565,7 +565,7 @@ class SuggestionToSkillActionHandler(
             suggestion_id: str. The ID of the suggestion.
 
         Raises:
-            InvalidInputException. If the suggestion is not for skills 
+            InvalidInputException. The suggestion is not for skills
                 or the provided skill ID is invalid.
         """
         assert self.user_id is not None
