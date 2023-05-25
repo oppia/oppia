@@ -305,6 +305,16 @@ var goOffline = async function() {
   });
 };
 
+var getFullStackTraceForDeferredCall = async function(logout, errStack) {
+  try {
+    await logout();
+  } catch (error) {
+    error.stack = error.stack + '\n' +
+    errStack.substring(errStack.indexOf('\n') + 1);
+    throw error;
+  }
+}
+
 exports.acceptAlert = acceptAlert;
 exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
@@ -344,3 +354,4 @@ exports.navigateToTopicsAndSkillsDashboardPage = (
 
 exports.goOffline = goOffline;
 exports.goOnline = goOnline;
+exports.getFullStackTraceForDeferredCall = getFullStackTraceForDeferredCall;
