@@ -349,7 +349,7 @@ class SuggestionToExplorationActionHandler(
                 action is 'accept suggestion'.
             InvalidInputException. The suggestion is not for explorations
                 or the exploration ID is invalid.
-            UnauthorizedUserException. Author ID of the suggestion matches the current user ID.
+            UnauthorizedUserException. Author ID of suggestion matches user ID.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
