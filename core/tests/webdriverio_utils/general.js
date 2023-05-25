@@ -305,15 +305,16 @@ var goOffline = async function() {
   });
 };
 
-var getFullStackTraceForDeferredCall = async function(logout, errStack) {
+var getFullStackTraceForDeferredCall = async function(func, errStack) {
+  // Call func and and print full stack trace include line in caller function
   try {
-    await logout();
+    await func();
   } catch (error) {
     error.stack = error.stack + '\n' +
     errStack.substring(errStack.indexOf('\n') + 1);
     throw error;
   }
-}
+};
 
 exports.acceptAlert = acceptAlert;
 exports.acceptPrompt = acceptPrompt;
