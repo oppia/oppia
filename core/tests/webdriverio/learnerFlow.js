@@ -130,7 +130,8 @@ describe('Learner dashboard functionality', function() {
           true
         );
       }
-      await general.getFullStackTraceForDeferredCall(users.logout, new Error().stack);
+      await general.getFullStackTraceForDeferredCall(
+        users.logout, new Error().stack);
       var PLAYER_USERNAME = 'expPlayerDM';
       await users.createAndLoginUser(
         'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
