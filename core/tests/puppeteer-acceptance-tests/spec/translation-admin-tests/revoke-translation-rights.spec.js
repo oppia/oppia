@@ -41,6 +41,8 @@ describe('Translation Admin', function() {
       await translationAdmin.navigateToContributorDashboardAdminPage();
       await translationAdmin.assignTranslationRights(
         'translatorSpanish', 'string:es');
+      await translationAdmin.revokeTranslationRights(
+        'translatorSpanish', 'string:es');
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
