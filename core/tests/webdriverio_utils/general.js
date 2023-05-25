@@ -306,7 +306,7 @@ var goOffline = async function() {
 };
 
 var getFullStackTraceForDeferredCall = async function(func, errStack) {
-  // Call func and and print full stack trace include line in caller function
+  // Call func and and print full stack trace include line in caller function.
   try {
     await func();
   } catch (error) {
