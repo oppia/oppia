@@ -206,7 +206,11 @@ class SuggestionHandler(
 
     @acl_decorators.can_suggest_changes
     def post(self) -> None:
-        """Handles POST requests."""
+        """Handles POST requests.
+
+           Raises:
+               InvalidInputException. If the suggestion type is SUGGESTION_TYPE_EDIT_STATE_CONTENT.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion_type = self.normalized_payload['suggestion_type']
@@ -343,6 +347,9 @@ class SuggestionToExplorationActionHandler(
         Raises:
             Exception. The 'commit_message' must be provided when the
                 action is 'accept suggestion'.
+            InvalidInputException. If the suggestion is not for explorations 
+                or the provided exploration ID is invalid.
+            UnauthorizedUserException: If the author ID of the suggestion matches the current user ID.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -556,6 +563,10 @@ class SuggestionToSkillActionHandler(
         Args:
             target_id: str. The ID of the suggestion target.
             suggestion_id: str. The ID of the suggestion.
+
+        Raises:
+            InvalidInputException. If the suggestion is not for skills 
+                or the provided skill ID is invalid.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -996,6 +1007,9 @@ class UpdateTranslationSuggestionHandler(
     def put(self, suggestion_id: str) -> None:
         """Handles PUT requests.
 
+        Args:
+            suggestion_id: str. The ID of the suggestion.
+
         Raises:
             InvalidInputException. The suggestion is already handled.
         """
@@ -1073,6 +1087,9 @@ class UpdateQuestionSuggestionHandler(
     @acl_decorators.can_update_suggestion
     def post(self, suggestion_id: str) -> None:
         """Handles PUT requests.
+
+        Args:
+            suggestion_id: str. The ID of the suggestion.
 
         Raises:
             InvalidInputException. The suggestion is already handled.
