@@ -305,8 +305,11 @@ var goOffline = async function() {
   });
 };
 
-var getFullStackTraceForDeferredCall = async function(func, errStack) {
-  // Call func and and print full stack trace include line in caller function.
+// Call func. If func errors, print the full stack trace, including the lines from the caller function.
+// This can help us chain stack traces across async promises.
+// @param {function} func Function you want to call
+// @param {string} errStack Put this: new Error().stack
+var callFunctionAndCollectFullStackTraceOnError = async function(func, errStack) {
   try {
     await func();
   } catch (error) {
@@ -355,4 +358,4 @@ exports.navigateToTopicsAndSkillsDashboardPage = (
 
 exports.goOffline = goOffline;
 exports.goOnline = goOnline;
-exports.getFullStackTraceForDeferredCall = getFullStackTraceForDeferredCall;
+exports.callFunctionAndCollectFullStackTraceOnError = callFunctionAndCollectFullStackTraceOnError;
