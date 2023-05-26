@@ -44,7 +44,7 @@ ParamNames = params.ParamNames
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
     params.ParamNames.DUMMY_FEATURE,
-    params.ParamNames.SERIALIZE_CHAPTER_CURRICULUM_ADMIN_VIEW
+    params.ParamNames.CHAPTER_SERIALIZATION_CURRICULUM_ADMIN_VIEW
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
