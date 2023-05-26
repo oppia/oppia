@@ -80,7 +80,7 @@ _PARSER.add_argument(
 
 def run_lighthouse_puppeteer_script(vid_cache=None) -> None:
     """Runs puppeteer script to collect dynamic urls.
-    
+
     Args:
         vid_cache: tuple. If not None, represents screen recording during the
             LHCI tests by storing the stores the ffmpeg process and video path.
@@ -157,7 +157,7 @@ def export_url(line: str) -> None:
         os.environ['skill_id'] = url_parts[4]
 
 
-def run_lighthouse_checks(lighthouse_mode: str, shard: str, 
+def run_lighthouse_checks(lighthouse_mode: str, shard: str,
                           vid_cache: tuple=None) -> None:
     """Runs the Lighthouse checks through the Lighthouse config.
 
@@ -244,7 +244,8 @@ def main(args: Optional[List[str]] = None) -> None:
         vid_process = (
             ffmpeg
             .input(format='x11grab', framerate=30,filename='desktop')
-            .output(crf='0', preset='ultrafast', filename=video_path, c='libx264')
+            .output(crf='0', preset='ultrafast', 
+                    filename=video_path, c='libx264')
             .overwrite_output()
             )
         vid_process = vid_process.run_async(pipe_stdin=True)
@@ -263,7 +264,7 @@ def main(args: Optional[List[str]] = None) -> None:
             log_level='critical',
             skip_sdk_update_check=True))
 
-        if os.getenv("GITHUB_ACTIONS") and parsed_args.record_screen:
+        if os.getenv('GITHUB_ACTIONS') and parsed_args.record_screen:
             cache = (vid_process, video_path)
             run_lighthouse_puppeteer_script(cache)
             run_lighthouse_checks(lighthouse_mode, parsed_args.shard, cache)
