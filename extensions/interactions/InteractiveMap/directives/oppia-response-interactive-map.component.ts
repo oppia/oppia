@@ -24,6 +24,7 @@
 // build to not complain.
 // TODO(#16309): Fix relative imports.
 import '../../../../core/templates/third-party-imports/leaflet.import';
+import '/node_modules/leaflet/dist/leaflet.js';
 
 import { Component, Input, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
