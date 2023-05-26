@@ -295,6 +295,9 @@ class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         Args:
             topic_id: str. The ID of the topic.
+
+        Raises:
+            Exception. The topic with the given id doesn't exist.
         """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
@@ -619,7 +622,7 @@ class TopicRightsHandler(
             topic_id: str. The ID of the topic.
 
         Raises:
-            InvalidInputException. Expected a valid topic id to be provided.
+            InvalidInputException. The topic ID provided is not valid..
         """
         assert self.user_id is not None
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)

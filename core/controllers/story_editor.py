@@ -181,7 +181,7 @@ class EditableStoryDataHandler(
             story_id: str. The story ID.
 
         Raises:
-            InvalidInputException. Error class for invalid input.
+            InvalidInputException. The input provided is not valid.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -253,7 +253,7 @@ class StoryPublishHandler(
 
     @acl_decorators.can_edit_story
     def put(self, story_id: str) -> None:
-        """Published/unpublished given story.
+        """Publishes/unpublishes a given story.
 
         Args:
             story_id: str. The story ID.

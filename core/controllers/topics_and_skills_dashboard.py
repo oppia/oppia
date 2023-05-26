@@ -310,7 +310,7 @@ class SkillsDashboardPageDataHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self) -> None:
-        """filters and fetches skill summaries."""
+        """Filters and fetches skill summaries."""
         assert self.normalized_payload is not None
         classroom_name = self.normalized_payload['classroom_name']
         urlsafe_start_cursor = self.normalized_payload.get('next_cursor')

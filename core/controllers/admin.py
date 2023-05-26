@@ -266,7 +266,8 @@ class AdminHandler(
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
-        """Performs a series of actions based on the action parameter.
+        """Performs a series of actions based on the action parameter on the
+        admin page.
 
         Raises:
             Exception. The exploration_id must be provided when the action
@@ -1209,7 +1210,8 @@ class AdminRoleHandler(
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Retrieves information about users based on different filter
-        criteria.
+        criteria. It expects a request of type
+        AdminRoleHandlerNormalizedGetRequestDict
 
         Raises:
             Exception. The role must be provided when the filter criterion
@@ -1284,7 +1286,7 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        """Assigns a role to a user.
+        """Adds a role to a user.
 
         Raises:
             InvalidInputException. User with given username does not exist.

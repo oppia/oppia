@@ -175,7 +175,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def get(self, story_id: str, node_id: str) -> None:
-        """Views a specific node within a story.
+        """Redirects the user to the next appropriate node or the story page.
 
         Args:
             story_id: str. The story ID.
