@@ -25,6 +25,8 @@ import { AdminDataService } from
 import { AdminPageData, AdminPageDataBackendDict } from
   'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 
 
 describe('Admin Data Service', () => {
@@ -76,6 +78,22 @@ describe('Admin Data Service', () => {
       ]
     ],
     viewable_roles: ['TOPIC_MANAGER'],
+    platform_params_dicts: [{
+      name: 'dummy_parameter',
+      description: 'This is a dummy platform parameter.',
+      data_type: 'string',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [['=', 'dev'] as [string, string]]
+        }],
+        value_when_matched: ''
+      }],
+      rule_schema_version: 1,
+      default_value: '',
+      is_feature: false,
+      feature_stage: null
+    }],
     human_readable_roles: {
       FULL_USER: 'full user',
       TOPIC_MANAGER: 'topic manager'
@@ -100,7 +118,9 @@ describe('Admin Data Service', () => {
       viewableRoles: sampleAdminData.viewable_roles,
       humanReadableRoles: sampleAdminData.human_readable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
-        CreatorTopicSummary.createFromBackendDict)
+        CreatorTopicSummary.createFromBackendDict),
+      platformParameters: sampleAdminData.platform_params_dicts.map(
+        dict => PlatformParameter.createFromBackendDict(dict))
     };
   });
 

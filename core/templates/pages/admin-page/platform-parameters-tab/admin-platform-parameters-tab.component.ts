@@ -30,7 +30,6 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import {
   PlatformParameterFilterType,
   PlatformParameterFilter,
@@ -129,7 +128,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
     private apiService: PlatformFeatureAdminBackendApiService,
-    private featureService: PlatformFeatureService,
   ) { }
 
   async reloadPlatformParametersAsync(): Promise<void> {
