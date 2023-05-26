@@ -296,7 +296,7 @@ class AdminHandler(
                 update_feature_flag_rules.
             Exception. The commit_message must be provided when the action
                 is update_feature_flag_rules.
-            InvalidInputException. Invalid input.
+            InvalidInputException. The input provided is not valid.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None

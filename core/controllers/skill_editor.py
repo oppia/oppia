@@ -47,7 +47,7 @@ def _require_valid_version(
             in the backend.
 
     Raises:
-        Exception. Invalid input.
+        Exception. The skill versions do not match.
     """
     if version_from_payload != skill_version:
         raise base.BaseHandler.InvalidInputException(
