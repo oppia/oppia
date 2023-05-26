@@ -23,7 +23,7 @@ import os
 import subprocess
 import sys
 
-from typing import Final, List, Optional
+from typing import Final, List, Optional, Tuple
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -78,12 +78,14 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def run_lighthouse_puppeteer_script(vid_cache=None) -> None:
+def run_lighthouse_puppeteer_script(
+        vid_cache: Tuple[subprocess.Popen, str]=None) -> None:
+
     """Runs puppeteer script to collect dynamic urls.
 
     Args:
-        vid_cache: tuple. If not None, represents screen recording during the
-            LHCI tests by storing the stores the ffmpeg process and video path.
+        vid_cache: tuple. If not None, 0 index represents screen recording 
+            process and 1 index represents path of video output.
     """
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
@@ -158,7 +160,7 @@ def export_url(line: str) -> None:
 
 
 def run_lighthouse_checks(lighthouse_mode: str, shard: str,
-                          vid_cache: tuple=None) -> None:
+                          vid_cache: Tuple[subprocess.Popen, str]=None) -> None:
 
     """Runs the Lighthouse checks through the Lighthouse config.
 
@@ -166,8 +168,8 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str,
         lighthouse_mode: str. Represents whether the lighthouse checks are in
             accessibility mode or performance mode.
         shard: str. Specifies which shard of the tests should be run.
-        vid_cache: tuple. If not None, represents screen recording during the
-            LHCI tests by storing the stores the ffmpeg process and video path.
+        vid_cache: If not None, 0 index represents screen recording 
+            process and 1 index represents path of video output.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
