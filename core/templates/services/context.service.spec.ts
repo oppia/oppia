@@ -192,7 +192,10 @@ describe('Context service', () => {
 
     it('should correctly set and retrieve the topic id', () => {
       expect(ecs.getEntityId()).toBe('undefined');
+
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
+
       expect(ecs.getEntityId()).toBe('123');
     });
 
@@ -276,7 +279,10 @@ describe('Context service', () => {
 
     it('should correctly retrieve the story id', () => {
       expect(ecs.getEntityId()).toBe('undefined');
+
       spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
+
       expect(ecs.getEntityId()).toBe('123');
     });
 
@@ -314,7 +320,10 @@ describe('Context service', () => {
 
     it('should correctly retrieve the skill id', () => {
       expect(ecs.getEntityId()).toBe('undefined');
+
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
+
       expect(ecs.getEntityId()).toBe('123');
     });
 
@@ -351,6 +360,7 @@ describe('Context service', () => {
 
       spyOn(urlService, 'getPathname').and.returnValue(
         '/blog-dashboard');
+      spyOn(urlService, 'getHash').and.returnValue('');
       spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue(
         'sample123456');
 
@@ -417,6 +427,7 @@ describe('Context service', () => {
 
       spyOn(urlService, 'getPathname').and.returnValue(
         '/blog');
+      spyOn(urlService, 'getHash').and.returnValue('');
       blogPostPageService.blogPostId = 'sample123456';
 
       expect(ecs.getEntityId()).toBe('sample123456');
