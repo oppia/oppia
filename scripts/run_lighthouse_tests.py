@@ -159,6 +159,7 @@ def export_url(line: str) -> None:
 
 def run_lighthouse_checks(lighthouse_mode: str, shard: str,
                           vid_cache: tuple=None) -> None:
+
     """Runs the Lighthouse checks through the Lighthouse config.
 
     Args:
@@ -243,9 +244,10 @@ def main(args: Optional[List[str]] = None) -> None:
         video_path = os.path.join(dir_path, name)
         vid_process = (
             ffmpeg
-            .input(format='x11grab', framerate=30,filename='desktop')
-            .output(crf='0', preset='ultrafast', 
+            .input(format='x11grab', framerate=30, filename='desktop')
+            .output(crf='0', preset='ultrafast',
                     filename=video_path, c='libx264')
+
             .overwrite_output()
             )
         vid_process = vid_process.run_async(pipe_stdin=True)
