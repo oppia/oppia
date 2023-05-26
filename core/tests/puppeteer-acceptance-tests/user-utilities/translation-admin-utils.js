@@ -110,9 +110,9 @@ module.exports = class TranslationAdmin extends baseUser {
     await this.clickOn(viewContributorSubmitButton);
   }
 
-    /**
+  /**
    * Function to display translation rights by language.
-   * @param {string} language - the language option as an option value
+   * @param {string} language - the language option as an option value.
    */
   async viewContributorTranslationRightsByLanguage(language) {
     await this.select(viewContributorMethodSelect, roleMethodVaue);
@@ -142,26 +142,34 @@ module.exports = class TranslationAdmin extends baseUser {
     }
   }
 
-  async expectNoLanguagesToBeDisplayedSelectedUser() {
-    try {
-    let displayedLanguage = await this.page.$eval(
-      viewContributorLanguageResult,
-      el => el.innerText);
-      throw new Error('Selected user has translation rights!');
-    } catch (error) {
-      console.log('User has no translation rights, as expected!');
+  /**
+   * Function to check if the user is displayed as a translator.
+   * @param {string} user - the user option as an option value.
+   */
+    async expectUserToBeDisplayedForSelectedLanguage(user) {
+      await this.page.waitForSelector(viewLanguageRoleUserResult);
+      let displayedUsers = await this.page.$eval(
+        viewLanguageRoleUserResult,
+        element => element.innerText
+      );
+      if (!displayedUsers.includes(user)){
+        throw new Error(
+          `${user} does not have translation rights for selected language!`);
+      }
     }
-  }
 
-  async expectUserToBeDisplayedForSelectedLanguage(user) {
+  /**
+   * Function to check that there are no translators for the selected language.
+   */
+  async expectUserToNotBeDisplayedForSelectedLanguage(user) {
     await this.page.waitForSelector(viewLanguageRoleUserResult);
     let displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => element.innerText
     );
-    if (!displayedUsers.includes(user)){
+    if (displayedUsers.includes(user)){
       throw new Error(
-        `${user} does not have translation rights for selected language!`);
+        `${user} has translation rights for selected language!`);
     }
   }
 };

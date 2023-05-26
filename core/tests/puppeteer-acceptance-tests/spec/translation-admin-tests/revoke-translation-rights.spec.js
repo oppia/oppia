@@ -36,13 +36,21 @@ describe('Translation Admin', function() {
     async function() {
       const translatorSpanish = await userFactory.createNewGuestUser(
         'translatorSpanish', 'translatorSpanish@example.com');
-      translatorSpanish.closeBrowser();
-
       await translationAdmin.navigateToContributorDashboardAdminPage();
       await translationAdmin.assignTranslationRights(
         'translatorSpanish', 'string:es');
+
+      await translationAdmin.viewContributorRightsByUser('translatorSpanish');
+      await translationAdmin.expectLanguageToBeDisplayedforSelectedUser(
+        'Spanish');
+
       await translationAdmin.revokeTranslationRights(
         'translatorSpanish', 'string:es');
+
+      await translationAdmin.viewContributorTranslationRightsByLanguage(
+        'string:es');
+      await translationAdmin.expectUserToNotBeDisplayedForSelectedLanguage(
+        'translatorSpanish');
     }, DEFAULT_SPEC_TIMEOUT);
 
   afterAll(async function() {
