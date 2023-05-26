@@ -312,13 +312,8 @@ var goOffline = async function() {
 // @param {string} errStack Put this: new Error().stack.
 var callFunctionAndCollectFullStackTraceOnError = async function(
     func, errStack) {
-  try {
-    await func();
-  } catch (error) {
-    error.stack = error.stack + '\n' +
-    errStack.substring(errStack.indexOf('\n') + 1);
-    throw error;
-  }
+  var errorMessage = '\n' + errStack.substring(errStack.indexOf('\n') + 1);
+  await func(errorMessage);
 };
 
 exports.acceptAlert = acceptAlert;
