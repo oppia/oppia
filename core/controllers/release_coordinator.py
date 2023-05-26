@@ -167,6 +167,7 @@ class FeatureFlagsHandler(
             logging.info(
                 '[RELEASE-COORDINATOR] %s updated feature %s with new rules: '
                 '%s.' % (self.user_id, feature_name, new_rule_dicts))
+            self.render_json(self.values)
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)
             self.render_json({'error': str(e)})

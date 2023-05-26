@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import enum
 
+from core import feconf
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 
@@ -69,6 +70,13 @@ class ParamNames(enum.Enum):
         'enable_admin_notifications_for_reviewer_shortage')
     MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = (
         'max_number_of_suggestions_per_reviewer')
+    CSRF_SECRET = 'oppia_csrf_secret'
+    EMAIL_SENDER_NAME = 'email_sender_name'
+    EMAIL_FOOTER = 'email_footer'
+    SIGNUP_EMAIL_SUBJECT_CONTENT = 'signup_email_subject_content'
+    SIGNUP_EMAIL_HTML_BODY_CONTENT = 'signup_email_html_body_content'
+    UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
+        'unpublish_exploration_email_html_body')
 
 
 # Platform parameters should all be defined below.
@@ -219,4 +227,55 @@ Registry.create_platform_parameter(
     'given suggestion type on the dashboard, the admins are notified by email.',
     platform_parameter_domain.DataTypes.NUMBER,
     default=5
+)
+
+Registry.create_platform_parameter(
+    ParamNames.CSRF_SECRET,
+    'Text used to encrypt CSRF tokens.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='oppia csrf secret'
+)
+
+Registry.create_platform_parameter(
+    ParamNames.EMAIL_SENDER_NAME,
+    'The default sender name for outgoing emails.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='Site Admin'
+)
+
+Registry.create_platform_parameter(
+    ParamNames.EMAIL_FOOTER,
+    'The footer to append to all outgoing emails. (This should be written in '
+    'HTML and include an unsubscribe link.)',
+    platform_parameter_domain.DataTypes.STRING,
+    default='You can change your email preferences via the '
+    '<a href="%s%s">Preferences</a> page.' % (
+        feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL)
+)
+
+Registry.create_platform_parameter(
+    ParamNames.SIGNUP_EMAIL_SUBJECT_CONTENT,
+    'Subject of email sent after a new user signs up.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='THIS IS A PLACEHOLDER.'
+)
+
+Registry.create_platform_parameter(
+    ParamNames.SIGNUP_EMAIL_HTML_BODY_CONTENT,
+    'The email body should be written with HTML and not include a salutation '
+    'or footer. These emails are only sent if the functionality is enabled in '
+    'feconf.py.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
+)
+
+Registry.create_platform_parameter(
+    ParamNames.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
+    'Default content for the email sent after an exploration is unpublished'
+    ' by a moderator. These emails are only sent if the functionality is '
+    'enabled in feconf.py. Leave this field blank if emails should not be '
+    'sent.',
+    platform_parameter_domain.DataTypes.STRING,
+    default='I\'m writing to inform you that I have unpublished the above '
+    'exploration.'
 )
