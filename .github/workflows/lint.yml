@@ -45,6 +45,8 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - uses: ./.github/actions/install-oppia-dependencies
+      - name: Install ffmpeg for Python
+        run: pip3 install ffmpeg-python
       - name: Third Party Size Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.third_party_size_check
