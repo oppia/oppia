@@ -166,6 +166,7 @@ describe('PlatformFeatureService', () => {
               [FeatureNames.ContributorDashboardAccomplishments]: true,
               [FeatureNames.DiagnosticTest]: true,
               [FeatureNames.ImprovementsTab]: true,
+              [FeatureNames.LearnerGroups]: true,
             }
           })
         });

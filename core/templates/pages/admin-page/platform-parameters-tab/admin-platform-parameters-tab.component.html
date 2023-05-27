@@ -173,14 +173,14 @@
     <!-- Control Buttons -->
     <button
             class="btn btn-primary e2e-test-save-button"
-            (click)="updateFeatureRulesAsync(platformParameter)"
-            [disabled]="!isFeatureFlagRulesChanged(platformParameter)">
+            (click)="updateParameterRulesAsync(platformParameter)"
+            [disabled]="!isPlatformParamRulesChanged(platformParameter)">
       Save
     </button>
     <button
             class="btn btn-secondary"
             (click)="clearChanges(platformParameter)"
-            [disabled]="!isFeatureFlagRulesChanged(platformParameter)">
+            [disabled]="!isPlatformParamRulesChanged(platformParameter)">
       Clear Changes
     </button>
   </div>

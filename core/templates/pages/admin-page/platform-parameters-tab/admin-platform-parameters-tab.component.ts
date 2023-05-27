@@ -132,7 +132,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   async reloadPlatformParametersAsync(): Promise<void> {
     const data = await this.adminDataService.getDataAsync();
-
     this.platformParameters = data.platformParameters;
 
     this.platformParameterNameToBackupMap = new Map(
@@ -200,8 +199,9 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     param.rules.splice(ruleIndex + 1, 0, rule);
   }
 
-  async updateFeatureRulesAsync(param: PlatformParameter): Promise<void> {
-    const issues = this.validateFeatureFlag(param);
+  async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {
+    const issues = (
+      AdminPlatformParametersTabComponent.validatePlatformParam(param));
     if (issues.length > 0) {
       this.windowRef.nativeWindow.alert(issues.join('\n'));
       return;
@@ -264,29 +264,29 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     filter.conditions.splice(0);
   }
 
-  isFeatureFlagRulesChanged(param: PlatformParameter): boolean {
+  isPlatformParamRulesChanged(param: PlatformParameter): boolean {
     const original = this.platformParameterNameToBackupMap.get(
       param.name
     );
     if (original === undefined) {
-      throw new Error('Backup not found for feature flag: ' + param.name);
+      throw new Error('Backup not found for platform params: ' + param.name);
     }
     return !isEqual(original.rules, param.rules);
   }
 
   /**
-   * Validates feature flag before updating, checks if there are identical
+   * Validates platform parameter before updating, checks if there are identical
    * rules, filters or conditions at the same level.
    *
-   * @param {PlatformParameter} feature - the feature flag to be validated.
+   * @param {PlatformParameter} param - the parameter to be validated.
    *
    * @returns {string[]} - Array of issue messages, if any.
    */
-  validateFeatureFlag(feature: PlatformParameter): string[] {
+  static validatePlatformParam(param: PlatformParameter): string[] {
     const issues = [];
 
     const seenRules: PlatformParameterRule[] = [];
-    for (const [ruleIndex, rule] of feature.rules.entries()) {
+    for (const [ruleIndex, rule] of param.rules.entries()) {
       const sameRuleIndex = seenRules.findIndex(
         seenRule => isEqual(seenRule, rule));
       if (sameRuleIndex !== -1) {

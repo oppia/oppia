@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the feature tab in admin page.
+ * @fileoverview Unit tests for the feature tab in release-coordinator page.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -24,7 +24,7 @@ import { FormsModule } from '@angular/forms';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { FeatureFlagsResponse } from
-  'domain/platform-feature/platform-feature-admin-backend-api.service';
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { FeaturesTabComponent } from
   'pages/release-coordinator-page/features-tab/features-tab.component';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
@@ -32,6 +32,8 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { AdminPlatformParametersTabComponent } from
+ 'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { PlatformFeatureDummyBackendApiService } from
   'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -57,7 +59,7 @@ class MockPlatformFeatureService {
   }
 }
 
-describe('Admin page feature tab', function() {
+describe('Release coordinator page feature tab', function() {
   let component: FeaturesTabComponent;
   let fixture: ComponentFixture<FeaturesTabComponent>;
   let adminDataService: AdminDataService;
@@ -378,28 +380,6 @@ describe('Admin page feature tab', function() {
         .toEqual(originalFeatureFlag);
     }));
 
-    it('should not proceed if there is another task running', fakeAsync(() => {
-      mockPromptResult('mock msg');
-
-      adminTaskManagerService.startTask();
-
-      const featureFlag = component.featureFlags[0];
-
-      component.addNewRuleToTop(featureFlag);
-      component.updateFeatureRulesAsync(featureFlag);
-
-      flushMicrotasks();
-
-      expect(updateApiSpy).not.toHaveBeenCalled();
-      expect(setStatusSpy).not.toHaveBeenCalled();
-
-      // We need to do this at the end, otherwise the AdminTaskManager will
-      // still think that the task is running (and this can mess up other
-      // frontend tests that rely on the starting state to be "nothing is
-      // happening").
-      adminTaskManagerService.finishTask();
-    }));
-
     it('should not proceed if the user cancels the prompt', fakeAsync(
       () => {
         mockPromptResult(null);
@@ -597,130 +577,6 @@ describe('Admin page feature tab', function() {
       expect(() => {
         component.isFeatureFlagRulesChanged(featureFlag);
       }).toThrowError();
-    });
-  });
-
-  describe('.validateFeatureFlag', () => {
-    it('should return empty array if no issue', () => {
-      const issues = component.validateFeatureFlag(
-        PlatformParameter.createFromBackendDict({
-          data_type: 'bool',
-          default_value: false,
-          description: 'This is a dummy feature flag.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
-          name: 'dummy_feature',
-          rule_schema_version: 1,
-          rules: [
-            {
-              filters: [
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Test]]
-                },
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Prod]]
-                }
-              ],
-              value_when_matched: true,
-            },
-            {
-              filters: [],
-              value_when_matched: true
-            }
-          ],
-        })
-      );
-
-      expect(issues).toEqual([]);
-    });
-
-    it('should return issues if there are identical rules', () => {
-      const issues = component.validateFeatureFlag(
-        PlatformParameter.createFromBackendDict({
-          data_type: 'bool',
-          default_value: false,
-          description: 'This is a dummy feature flag.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
-          name: 'dummy_feature',
-          rule_schema_version: 1,
-          rules: [
-            {
-              filters: [],
-              value_when_matched: true
-            },
-            {
-              filters: [],
-              value_when_matched: true
-            },
-          ],
-        })
-      );
-
-      expect(issues).toEqual(['The 1-th & 2-th rules are identical.']);
-    });
-
-    it('should return issues if there are identical filters', () => {
-      const issues = component.validateFeatureFlag(
-        PlatformParameter.createFromBackendDict({
-          data_type: 'bool',
-          default_value: false,
-          description: 'This is a dummy feature flag.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
-          name: 'dummy_feature',
-          rule_schema_version: 1,
-          rules: [
-            {
-              filters: [
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
-                },
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev]]
-                }
-              ],
-              value_when_matched: true
-            },
-          ],
-        })
-      );
-
-      expect(issues).toEqual([
-        'In the 1-th rule: the 1-th & 2-th filters are identical.']);
-    });
-
-    it('should return issues if there are identical conditions', () => {
-      const issues = component.validateFeatureFlag(
-        PlatformParameter.createFromBackendDict({
-          data_type: 'bool',
-          default_value: false,
-          description: 'This is a dummy feature flag.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
-          name: 'dummy_feature',
-          rule_schema_version: 1,
-          rules: [
-            {
-              filters: [
-                {
-                  type: PlatformParameterFilterType.ServerMode,
-                  conditions: [['=', ServerMode.Dev], ['=', ServerMode.Dev]]
-                },
-              ],
-              value_when_matched: true
-            },
-          ],
-        })
-      );
-
-      expect(issues).toEqual([
-        'In the 1-th rule, 1-th filter: the 1-th & 2-th conditions' +
-        ' are identical.']);
     });
   });
 

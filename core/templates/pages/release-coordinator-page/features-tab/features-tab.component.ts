@@ -24,6 +24,8 @@ import isEqual from 'lodash/isEqual';
 
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
+import { AdminPlatformParametersTabComponent } from
+  'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -189,7 +191,8 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {
-    const issues = this.validateFeatureFlag(feature);
+    const issues = (
+      AdminPlatformParametersTabComponent.validatePlatformParam(feature));
     if (issues.length > 0) {
       this.windowRef.nativeWindow.alert(issues.join('\n'));
       return;
@@ -253,61 +256,6 @@ export class FeaturesTabComponent implements OnInit {
       throw new Error('Backup not found for feature flag: ' + feature.name);
     }
     return !isEqual(original.rules, feature.rules);
-  }
-
-  /**
-   * Validates feature flag before updating, checks if there are identical
-   * rules, filters or conditions at the same level.
-   *
-   * @param {PlatformParameter} feature - the feature flag to be validated.
-   *
-   * @returns {string[]} - Array of issue messages, if any.
-   */
-  validateFeatureFlag(feature: PlatformParameter): string[] {
-    const issues = [];
-
-    const seenRules: PlatformParameterRule[] = [];
-    for (const [ruleIndex, rule] of feature.rules.entries()) {
-      const sameRuleIndex = seenRules.findIndex(
-        seenRule => isEqual(seenRule, rule));
-      if (sameRuleIndex !== -1) {
-        issues.push(
-          `The ${sameRuleIndex + 1}-th & ${ruleIndex + 1}-th rules are` +
-          ' identical.');
-        continue;
-      }
-      seenRules.push(rule);
-
-      const seenFilters: PlatformParameterFilter[] = [];
-      for (const [filterIndex, filter] of rule.filters.entries()) {
-        const sameFilterIndex = seenFilters.findIndex(
-          seenFilter => isEqual(seenFilter, filter));
-        if (sameFilterIndex !== -1) {
-          issues.push(
-            `In the ${ruleIndex + 1}-th rule: the ${sameFilterIndex + 1}-th` +
-            ` & ${filterIndex + 1}-th filters are identical.`);
-          continue;
-        }
-        seenFilters.push(filter);
-
-        const seenConditions: [string, string][] = [];
-        for (const [conditionIndex, condition] of filter.conditions
-          .entries()) {
-          const sameCondIndex = seenConditions.findIndex(
-            seenCond => isEqual(seenCond, condition));
-          if (sameCondIndex !== -1) {
-            issues.push(
-              `In the ${ruleIndex + 1}-th rule, ${filterIndex + 1}-th` +
-              ` filter: the ${sameCondIndex + 1}-th & ` +
-              `${conditionIndex + 1}-th conditions are identical.`);
-            continue;
-          }
-
-          seenConditions.push(condition);
-        }
-      }
-    }
-    return issues;
   }
 
   get isDummyFeatureEnabled(): boolean {

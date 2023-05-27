@@ -1009,6 +1009,45 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_update_parameter_rules_with_unknown_data_type_returns_400(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        platform_parameter_registry.Registry.parameter_registry.clear()
+        param = platform_parameter_registry.Registry.create_platform_parameter(
+            ParamNames.TEST_FEATURE_1,
+            'Param for test.',
+            platform_parameter_domain.DataTypes.BOOL)
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': 'unknown'
+            }
+        ]
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': param.name,
+                'new_rules': new_rule_dicts,
+                'commit_message': 'test update param',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Expected bool, received \'unknown\' in value_when_matched.')
+
+        self.logout()
+
     def test_update_param_rules_with_param_name_of_non_string_type_returns_400(
         self
     ) -> None:
