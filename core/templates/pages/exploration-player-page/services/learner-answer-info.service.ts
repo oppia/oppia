@@ -47,6 +47,7 @@ export class LearnerAnswerInfoService {
   private currentAnswer!: string;
   private currentInteractionRulesService!: InteractionRulesService;
   private submittedAnswerInfoCount: number = 0;
+  private canAskLearnerForAnswerInfo: boolean = false;
   private visitedStates: string[] = [];
   private probabilityIndexes = {
     // The probability that a request for explanation of the answer that is
@@ -74,7 +75,8 @@ export class LearnerAnswerInfoService {
 
   initLearnerAnswerInfoService(
       entityId: string, state: State, answer: string,
-      interactionRulesService: InteractionRulesService): void {
+      interactionRulesService: InteractionRulesService,
+      alwaysAskLearnerForAnswerInfo: boolean): void {
     this.currentEntityId = entityId;
     this.currentAnswer = answer;
     this.currentInteractionRulesService = interactionRulesService;
@@ -107,6 +109,11 @@ export class LearnerAnswerInfoService {
       return;
     }
 
+    if (alwaysAskLearnerForAnswerInfo === true) {
+      this.canAskLearnerForAnswerInfo = true;
+      return;
+    }
+
     const classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
         this.stateName, state.interaction, answer,
@@ -122,6 +129,9 @@ export class LearnerAnswerInfoService {
     } else {
       thresholdProbabilityIndex = this.probabilityIndexes.typeC;
     }
+
+    this.canAskLearnerForAnswerInfo = (
+      randomProbabilityIndex <= thresholdProbabilityIndex);
   }
 
   resetSubmittedAnswerInfoCount(): void {
@@ -141,6 +151,11 @@ export class LearnerAnswerInfoService {
       this.currentAnswer, answerDetails);
     this.submittedAnswerInfoCount++;
     this.visitedStates.push(this.stateName);
+    this.canAskLearnerForAnswerInfo = false;
+  }
+
+  getCanAskLearnerForAnswerInfo(): boolean {
+    return this.canAskLearnerForAnswerInfo;
   }
 
   getCurrentAnswer(): string {

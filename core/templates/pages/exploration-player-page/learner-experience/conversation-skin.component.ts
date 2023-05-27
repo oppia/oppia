@@ -543,6 +543,14 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  alwaysAskLearnerForAnswerDetails(): boolean {
+    return this.explorationEngineService.getAlwaysAskLearnerForAnswerDetails();
+  }
+
+  getCanAskLearnerForAnswerInfo(): boolean {
+    return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
+  }
+
   fetchCompletedChaptersCount(): void {
     if (this.isLoggedIn) {
       this.learnerDashboardBackendApiService
@@ -554,9 +562,11 @@ export class ConversationSkinComponent {
 
   initLearnerAnswerInfoService(
       entityId: string, state: State, answer: string,
-      interactionRulesService: InteractionRulesService): void {
+      interactionRulesService: InteractionRulesService,
+      alwaysAskLearnerForAnswerInfo: boolean): void {
     this.learnerAnswerInfoService.initLearnerAnswerInfoService(
-      entityId, state, answer, interactionRulesService);
+      entityId, state, answer, interactionRulesService,
+      alwaysAskLearnerForAnswerInfo);
   }
 
   // This variable is used only when viewport is narrow.
@@ -1212,7 +1222,8 @@ export class ConversationSkinComponent {
     ) {
       this.initLearnerAnswerInfoService(
         this.explorationId, this.explorationEngineService.getState(),
-        answer, interactionRulesService);
+        answer, interactionRulesService,
+        this.alwaysAskLearnerForAnswerDetails());
     }
 
     this.numberAttemptsService.submitAttempt();
@@ -1221,6 +1232,20 @@ export class ConversationSkinComponent {
     this.hasInteractedAtLeastOnce = true;
 
     this.playerTranscriptService.addNewInput(answer, false);
+
+    if (this.getCanAskLearnerForAnswerInfo()) {
+      setTimeout(() => {
+        this.playerTranscriptService.addNewResponse(
+          this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
+        this.answerIsBeingProcessed = false;
+        this.playerPositionService.onHelpCardAvailable.emit({
+          helpCardHtml: (
+            this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()),
+          hasContinueButton: false
+        });
+      }, 100);
+      return;
+    }
 
     let timeAtServerCall = new Date().getTime();
     this.playerPositionService.recordAnswerSubmission();

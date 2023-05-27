@@ -34,7 +34,11 @@
                                  [isLearnAgainButton]="isLearnAgainButton()">
         </oppia-supplemental-card>
       </div>
-      <div>
+      <div *ngIf="getCanAskLearnerForAnswerInfo()">
+        <oppia-learner-answer-info-card (submitAnswer)="submitAnswer($event.currentAnswer, $event.rulesService)">
+        </oppia-learner-answer-info-card>
+      </div>
+      <div *ngIf="!getCanAskLearnerForAnswerInfo()">
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
                             [isLearnAgainButton]="isLearnAgainButton()"
                             [displayedCard]="displayedCard"
@@ -76,7 +80,7 @@
                                  [displayedCard]="displayedCard"
                                  [isLearnAgainButton]="isLearnAgainButton()">
         </oppia-supplemental-card>
-        <div class="conversation-skin-supplemental-nav" *ngIf="isSupplementalNavShown()">
+        <div class="conversation-skin-supplemental-nav" *ngIf="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
           <button mat-button
                   type="submit"
                   class="oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"

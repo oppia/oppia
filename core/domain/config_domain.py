@@ -476,6 +476,11 @@ IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
     'Exposes the Improvements Tab for creators in the exploration editor.',
     False)
 
+ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
+    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
+    'Always ask learners for answer details. For testing -- do not use',
+    False)
+
 LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
     'learner_groups_are_enabled', BOOL_SCHEMA,
     'Enable learner groups feature', False)
@@ -510,10 +515,6 @@ MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     ' post',
     10
 )
-
-CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
-    'contributor_dashboard_is_enabled', BOOL_SCHEMA,
-    'Enable contributor dashboard page. The default value is true.', True)
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,

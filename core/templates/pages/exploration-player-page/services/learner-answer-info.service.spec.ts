@@ -191,7 +191,12 @@ describe('Learner answer info service', () =>{
   describe('.initLearnerAnswerInfo', () => {
     beforeEach(function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, tirs);
+        '10', firstState, mockAnswer, tirs, false);
+    });
+
+    it('should return can ask learner for answer info true', () => {
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
+        true);
     });
 
     it('should return current answer', () => {
@@ -209,7 +214,19 @@ describe('Learner answer info service', () =>{
   describe('learner answer info service', () => {
     beforeEach(function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, tirs);
+        '10', firstState, mockAnswer, tirs, false);
+    });
+
+    it('should not ask for answer details for same state', () => {
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
+        true);
+      learnerAnswerInfoService.recordLearnerAnswerInfo('My answer details');
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
+        false);
+      learnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', firstState, mockAnswer, tirs, false);
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
+        false);
     });
   });
 
@@ -219,7 +236,13 @@ describe('Learner answer info service', () =>{
       beforeEach(function() {
         firstState.interaction.id = 'EndExploration';
         learnerAnswerInfoService.initLearnerAnswerInfoService(
-          '10', firstState, mockAnswer, tirs);
+          '10', firstState, mockAnswer, tirs, false);
+      });
+
+      it('should return can ask learner for answer info false', () => {
+        expect(
+          learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
+          false);
       });
     });
 
@@ -228,7 +251,12 @@ describe('Learner answer info service', () =>{
       beforeEach(function() {
         firstState.solicitAnswerDetails = false;
         learnerAnswerInfoService.initLearnerAnswerInfoService(
-          '10', firstState, mockAnswer, tirs);
+          '10', firstState, mockAnswer, tirs, false);
+      });
+      it('should return can ask learner for answer info false', () => {
+        expect(
+          learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
+          false);
       });
     });
 
@@ -236,7 +264,7 @@ describe('Learner answer info service', () =>{
   describe('.recordLearnerAnswerInfo', () => {
     beforeEach(function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, tirs);
+        '10', firstState, mockAnswer, tirs, false);
     });
 
     it('should record learner answer details', (() => {
@@ -251,11 +279,18 @@ describe('Learner answer info service', () =>{
   describe('learner answer info service', () => {
     beforeEach(function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, tirs);
+        '10', firstState, mockAnswer, tirs, false);
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', secondState, mockAnswer, tirs);
+        '10', secondState, mockAnswer, tirs, false);
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
+    });
+
+    it('should not record answer details more than two times', () => {
+      learnerAnswerInfoService.initLearnerAnswerInfoService(
+        '10', thirdState, mockAnswer, tirs, false);
+      expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
+        false);
     });
   });
 
