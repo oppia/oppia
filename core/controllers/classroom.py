@@ -23,7 +23,6 @@ from core.controllers import base
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import classroom_services
-from core.domain import config_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 

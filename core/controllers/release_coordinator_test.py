@@ -25,6 +25,7 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry
 from core.tests import test_utils
 
+
 class ParamNames(enum.Enum):
     """Enum for parameter names."""
 

@@ -22,7 +22,7 @@ import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks, tick } fr
 import { FormsModule } from '@angular/forms';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AdminPageData } from 'domain/admin/admin-backend-api.service';\
+import { AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';

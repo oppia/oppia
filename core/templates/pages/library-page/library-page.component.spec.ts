@@ -23,7 +23,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
 import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
 import { UserInfo } from 'domain/user/user-info.model';
@@ -79,7 +78,6 @@ describe('Library Page Component', () => {
   let componentInstance: LibraryPageComponent;
   let loaderService: LoaderService;
   let urlInterpolationService: UrlInterpolationService;
-  let classroomBackendApiService: ClassroomBackendApiService;
   let pageTitleService: PageTitleService;
   let libraryPageBackendApiService: LibraryPageBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -213,7 +211,6 @@ describe('Library Page Component', () => {
           provide: WindowDimensionsService,
           useClass: MockWindowDimensionsService
         },
-        ClassroomBackendApiService,
         PageTitleService,
         {
           provide: TranslateService,
@@ -229,7 +226,6 @@ describe('Library Page Component', () => {
     componentInstance = fixture.componentInstance;
     loaderService = TestBed.inject(LoaderService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     pageTitleService = TestBed.inject(PageTitleService);
     translateService = TestBed.inject(TranslateService);
     libraryPageBackendApiService = TestBed.inject(LibraryPageBackendApiService);

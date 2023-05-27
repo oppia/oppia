@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the feature tab in the admin panel.
+ * @fileoverview Component for the feature tab in the
+ * release-coordinator panel.
  */
 
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
@@ -25,6 +26,7 @@ import isEqual from 'lodash/isEqual';
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { AdminPlatformParametersTabComponent } from
+  // eslint-disable-next-line max-len
   'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from

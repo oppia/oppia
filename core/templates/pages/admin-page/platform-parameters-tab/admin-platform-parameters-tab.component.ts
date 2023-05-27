@@ -142,7 +142,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     return PlatformParameterRule.createFromBackendDict({
       filters: [this.defaultNewFilter.toBackendDict()],
       value_when_matched: param.defaultValue
-    })
+    });
   }
 
   getPlatformParamSchema(dataType: string): PlatformSchema {
@@ -332,5 +332,4 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   ngOnInit(): void {
     this.reloadPlatformParametersAsync();
   }
-
 }

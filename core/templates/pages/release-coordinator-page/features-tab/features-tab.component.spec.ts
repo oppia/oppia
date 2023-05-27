@@ -27,13 +27,10 @@ import { FeatureFlagsResponse } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { FeaturesTabComponent } from
   'pages/release-coordinator-page/features-tab/features-tab.component';
-import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { AdminPlatformParametersTabComponent } from
- 'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { PlatformFeatureDummyBackendApiService } from
   'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -62,7 +59,6 @@ class MockPlatformFeatureService {
 describe('Release coordinator page feature tab', function() {
   let component: FeaturesTabComponent;
   let fixture: ComponentFixture<FeaturesTabComponent>;
-  let adminDataService: AdminDataService;
   let featureApiService: PlatformFeatureAdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
   let windowRef: WindowRef;
@@ -88,7 +84,6 @@ describe('Release coordinator page feature tab', function() {
 
     fixture = TestBed.createComponent(FeaturesTabComponent);
     component = fixture.componentInstance;
-    adminDataService = TestBed.get(AdminDataService);
     featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
     windowRef = TestBed.get(WindowRef);
     adminTaskManagerService = TestBed.get(AdminTaskManagerService);

@@ -71,6 +71,8 @@ class Registry:
             description: str. The description of the platform parameter.
             data_type: Enum(DataTypes). The data type of the platform
                 parameter, must be one of the following: bool, number, string.
+            default: Optional[Union[bool, int, str, float]]. The default value
+                for the platform parameter.
             is_feature: bool. True if the platform parameter is a feature flag.
             feature_stage: Enum(FeatureStages)|None. The stage of the feature,
                 required if 'is_feature' is True.
