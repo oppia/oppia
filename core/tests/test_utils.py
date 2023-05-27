@@ -286,10 +286,10 @@ def check_image_png_or_webp(image_string: str) -> bool:
 
 
 def get_storage_model_module_names() -> Iterator[models.Names]:
-    """Get all module names in storage.
+    """Get all model names in storage.
 
     Yields:
-        Iterator. The Iterator object.
+        Names. The model with all model names in storage.
     """
     # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
@@ -301,7 +301,7 @@ def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
     """Get all model classes in storage.
 
     Yields:
-        Iterator. The Iterator object.
+        BaseModel. The model with all model classes in storage.
     """
     for module_name in get_storage_model_module_names():
         (module,) = models.Registry.import_models([module_name])
@@ -2847,7 +2847,8 @@ version: 1
             expect_errors: bool. Whether errors are expected.
 
         Returns:
-            Any. Python object.
+            dict. A json response from the server except the
+                XSSI_PREFIX.
         """
         if expect_errors:
             self.assertTrue(json_response.status_int >= 400)
@@ -2881,7 +2882,7 @@ version: 1
             headers: Dict[str, str]. The headers used in the request.
 
         Returns:
-            Any. A python object.
+            dict. A json response from the server.
         """
         if params is not None:
             self.assertIsInstance(params, dict)
