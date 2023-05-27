@@ -23,7 +23,7 @@ import os
 import subprocess
 import sys
 
-from typing import Final, List, Optional, Tuple
+from typing import Final, List, Optional
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -79,13 +79,13 @@ _PARSER.add_argument(
 
 
 def run_lighthouse_puppeteer_script(
-        vid_cache: Tuple[subprocess.Popen, str]=None) -> None:
+        vid_popen: subprocess.Popen=None) -> None:
 
     """Runs puppeteer script to collect dynamic urls.
 
     Args:
-        vid_cache: tuple. If not None, 0 index represents screen recording 
-            process and 1 index represents path of video output.
+        vid_popen: subprocess.Popen. If not None, holds subprocess for ffmpeg
+            screen recording.
     """
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
@@ -112,9 +112,8 @@ def run_lighthouse_puppeteer_script(
         # print it.
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
-        if vid_cache:
-            vid_process = vid_cache[0]
-            vid_process.kill()
+        if vid_popen != None:
+            vid_popen.kill()
             print('Saved video of failed script.')
 
         sys.exit(1)
@@ -159,8 +158,9 @@ def export_url(line: str) -> None:
         os.environ['skill_id'] = url_parts[4]
 
 
-def run_lighthouse_checks(lighthouse_mode: str, shard: str,
-                          vid_cache: Tuple[subprocess.Popen, str]=None) -> None:
+def run_lighthouse_checks(
+        lighthouse_mode: str, shard: str, vid_popen: subprocess.Popen=None, 
+        vid_path: str=None) -> None:
 
     """Runs the Lighthouse checks through the Lighthouse config.
 
@@ -168,8 +168,9 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str,
         lighthouse_mode: str. Represents whether the lighthouse checks are in
             accessibility mode or performance mode.
         shard: str. Specifies which shard of the tests should be run.
-        vid_cache: If not None, 0 index represents screen recording 
-            process and 1 index represents path of video output.
+        vid_popen: subprocess.Popen. If not None, holds subprocess for ffmpeg
+            screen recording.
+        vid_path: str. If not None, represents vid_popen output video path.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
@@ -185,9 +186,8 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str,
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
-        if vid_cache:
-            vid_process, vid_path = vid_cache
-            vid_process.kill()
+        if vid_popen != None and vid_path != None:
+            vid_popen.kill()
             os.remove(vid_path)
             print('Corresponding video has been deleted.')
     else:
@@ -201,9 +201,8 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str,
         # print it.
         print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
-        if vid_cache:
-            vid_process, vid_path = vid_cache
-            vid_process.kill()
+        if vid_popen != None and vid_path != None:
+            vid_popen.kill()
             print('Saved video of failed check.')
         sys.exit(1)
 
@@ -244,7 +243,7 @@ def main(args: Optional[List[str]] = None) -> None:
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
         os.mkdir(dir_path)
         video_path = os.path.join(dir_path, name)
-        vid_process = (
+        vid_popen = (
             ffmpeg
             .input(format='x11grab', framerate=30, filename='desktop')
             .output(crf='0', preset='ultrafast',
@@ -252,7 +251,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
             .overwrite_output()
             )
-        vid_process = vid_process.run_async(pipe_stdin=True)
+        vid_popen = vid_popen.run_async(pipe_stdin=True)
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
@@ -269,9 +268,9 @@ def main(args: Optional[List[str]] = None) -> None:
             skip_sdk_update_check=True))
 
         if os.getenv('GITHUB_ACTIONS') and parsed_args.record_screen:
-            cache = (vid_process, video_path)
-            run_lighthouse_puppeteer_script(cache)
-            run_lighthouse_checks(lighthouse_mode, parsed_args.shard, cache)
+            run_lighthouse_puppeteer_script(vid_popen, video_path)
+            run_lighthouse_checks(
+                lighthouse_mode, parsed_args.shard, vid_popen, video_path)
         else:
             run_lighthouse_puppeteer_script()
             run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
