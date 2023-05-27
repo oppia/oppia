@@ -276,8 +276,7 @@ class BlogPostHandler(
             blog_post.author_id)
         max_no_of_tags = config_domain.Registry.get_config_property(
             'max_number_of_tags_assigned_to_blog_post', strict=True).value
-        list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post', strict=True).value
+        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
         blog_post_dict = blog_post.to_dict()
         blog_post_dict_for_dashboard = {

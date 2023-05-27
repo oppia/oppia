@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core import schema_utils
 from core.constants import constants
 from core.domain import change_domain
@@ -147,24 +146,6 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
     }
 }
 
-VMID_SHARED_SECRET_KEY_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_LIST,
-    'items': {
-        'type': schema_utils.SCHEMA_TYPE_DICT,
-        'properties': [{
-            'name': 'vm_id',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }, {
-            'name': 'shared_secret_key',
-            'schema': {
-                'type': schema_utils.SCHEMA_TYPE_UNICODE
-            }
-        }]
-    }
-}
-
 BOOL_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_BOOL
 }
@@ -236,7 +217,9 @@ class ConfigProperty:
     - editor_page_announcement.
     - editor_prerequisites_agreement.
     - embedded_google_group_url.
+    - featured_translation_languages.
     - full_site_url.
+    - list_of_default_tags_for_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
@@ -250,7 +233,9 @@ class ConfigProperty:
     - splash_page_exploration_version.
     - splash_page_youtube_video_id.
     - ssl_challenge_responses.
+    - vmid_shared_secret_key_mapping.
     - whitelisted_email_senders.
+    - whitelisted_exploration_ids_for_playthroughs.
     """
 
     # Here we use type Any because the general structure of schemas are like
@@ -468,22 +453,6 @@ PROMO_BAR_MESSAGE = ConfigProperty(
     'promo_bar_message', UNICODE_SCHEMA,
     'The message to show to all users if the promo bar is enabled', '')
 
-VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
-    'vmid_shared_secret_key_mapping', VMID_SHARED_SECRET_KEY_SCHEMA,
-    'VMID and shared secret key corresponding to that VM',
-    [{
-        'vm_id': feconf.DEFAULT_VM_ID,
-        'shared_secret_key': feconf.DEFAULT_VM_SHARED_SECRET
-    }])
-
-WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
-    'whitelisted_exploration_ids_for_playthroughs',
-    SET_OF_STRINGS_SCHEMA,
-    'The set of exploration IDs for recording playthrough issues', [
-        'umPkwp0L1M0-', 'MjZzEVOG47_1', '9trAQhj6uUC2', 'rfX8jNkPnA-1',
-        '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
-        'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
-
 # Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
 # to add that classroom to learner group syllabus filter whenever a new
 # classroom is added.
@@ -530,15 +499,6 @@ BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
     'batch_index_for_mailchimp', INT_SCHEMA,
     'Index of batch to populate mailchimp database.', 0)
 
-_FEATURED_TRANSLATION_LANGUAGES_DEFAULT_VALUE: List[str] = []
-
-FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
-    'featured_translation_languages',
-    LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
-    'Featured Translation Languages',
-    _FEATURED_TRANSLATION_LANGUAGES_DEFAULT_VALUE
-)
-
 HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
     'high_bounce_rate_task_state_bounce_rate_creation_threshold',
     FLOAT_SCHEMA,
@@ -578,16 +538,6 @@ MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'The maximum number of tags that can be selected to categorize the blog'
     ' post',
     10
-)
-
-LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST = ConfigProperty(
-    'list_of_default_tags_for_blog_post',
-    SET_OF_STRINGS_SCHEMA,
-    'The list of tags available to a blog post editor for categorizing the blog'
-    ' post.',
-    ['News', 'International', 'Educators', 'Learners', 'Community',
-     'Partnerships', 'Volunteer', 'Stories', 'Languages', 'New features',
-     'New lessons', 'Software development', 'Content']
 )
 
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(

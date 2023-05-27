@@ -18,8 +18,8 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.constants import constants
 from core.domain import blog_services
-from core.domain import config_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -62,9 +62,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s?offset=0' % (feconf.BLOG_HOMEPAGE_DATA_URL),
             )
-        default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post', strict=True
-        ).value
+        default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         self.assertEqual(default_tags, json_response['list_of_default_tags'])
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
@@ -552,9 +550,7 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
                 'tags': '("Science")'
             })
 
-        default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post', strict=True
-        ).value
+        default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         self.assertEqual(default_tags, response_dict['list_of_default_tags'])
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 1)
         self.assertEqual(

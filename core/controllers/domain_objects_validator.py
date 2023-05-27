@@ -133,10 +133,9 @@ def validate_change_dict_for_blog_post(
             change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = config_domain.Registry.get_config_property(
-            'list_of_default_tags_for_blog_post')
+        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
         assert list_of_default_tags is not None
-        list_of_default_tags_value = list_of_default_tags.value
+        list_of_default_tags_value = list_of_default_tags
         if not all(
             tag in list_of_default_tags_value for tag in change_dict['tags']
         ):

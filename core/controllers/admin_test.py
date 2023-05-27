@@ -117,9 +117,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
 
-        self.assertIn(
-            'featured_translation_languages', response_config_properties)
-
         self.assertNotIn('promo_bar_enabled', response_config_properties)
         self.assertNotIn('promo_bar_message', response_config_properties)
 

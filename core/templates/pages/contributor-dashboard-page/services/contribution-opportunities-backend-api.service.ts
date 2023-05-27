@@ -202,7 +202,7 @@ export class ContributionOpportunitiesBackendApiService {
     try {
       const response = await this.http
         .get<FeaturedTranslationLanguagesBackendDict>(
-          '/retrivefeaturedtranslationlanguages').toPromise();
+          '/retrievefeaturedtranslationlanguages').toPromise();
 
       return response.featured_translation_languages.map(
         backendDict => FeaturedTranslationLanguage
