@@ -29,12 +29,12 @@ import { AdminTaskManagerService } from
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { AdminPlatformParametersTabComponent } from
- 'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
+  // eslint-disable-next-line max-len
+  'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformParameterFilterType, ServerMode } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 
@@ -51,12 +51,11 @@ describe('Admin page platform parameters tab', () => {
   let mockConfirmResult: (val: boolean) => void;
   let mockPromptResult: (msg: string | null) => void;
 
-  beforeEach(async () => {
+  beforeEach(async(() => {
     await TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
-      declarations: [ AdminPlatformParametersTabComponent ]
-    })
-    .compileComponents();
+      declarations: [AdminPlatformParametersTabComponent]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AdminPlatformParametersTabComponent);
     component = fixture.componentInstance;
@@ -105,8 +104,7 @@ describe('Admin page platform parameters tab', () => {
       .and.resolveTo();
 
     component.ngOnInit();
-
-  });
+  }));
 
   it('should load platform parameters on init', () => {
     expect(component.platformParameters.length).toBe(1);
@@ -319,39 +317,41 @@ describe('Admin page platform parameters tab', () => {
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
     }));
 
-    it('should update platform param backup after update succeeds', fakeAsync(() => {
-      mockPromptResult('mock msg');
+    it('should update platform param backup after update succeeds',
+      fakeAsync(() => {
+        mockPromptResult('mock msg');
 
-      const platformParameter = component.platformParameters[0];
+        const platformParameter = component.platformParameters[0];
 
-      component.addNewRuleToTop(platformParameter);
-      component.updateFeatureRulesAsync(platformParameter);
+        component.addNewRuleToTop(platformParameter);
+        component.updateFeatureRulesAsync(platformParameter);
 
-      flushMicrotasks();
+        flushMicrotasks();
 
-      expect(component.platformParameterNameToBackupMap.get(platformParameter.name))
-        .toEqual(platformParameter);
+        expect(component.platformParameterNameToBackupMap.get(
+          platformParameter.name)).toEqual(platformParameter);
     }));
 
-    it('should not update platform param backup if update fails', fakeAsync(() => {
-      mockPromptResult('mock msg');
-      const errorResponse = new HttpErrorResponse({
-        error: 'Error loading exploration 1.',
-        status: 500,
-        statusText: 'Internal Server Error'
-      });
-      updateApiSpy.and.rejectWith(errorResponse);
+    it('should not update platform param backup if update fails',
+      fakeAsync(() => {
+        mockPromptResult('mock msg');
+        const errorResponse = new HttpErrorResponse({
+          error: 'Error loading exploration 1.',
+          status: 500,
+          statusText: 'Internal Server Error'
+        });
+        updateApiSpy.and.rejectWith(errorResponse);
 
-      const platformParameter = component.platformParameters[0];
-      const originalFeatureFlag = cloneDeep(platformParameter);
+        const platformParameter = component.platformParameters[0];
+        const originalFeatureFlag = cloneDeep(platformParameter);
 
-      component.addNewRuleToTop(platformParameter);
-      component.updateFeatureRulesAsync(platformParameter);
+        component.addNewRuleToTop(platformParameter);
+        component.updateFeatureRulesAsync(platformParameter);
 
-      flushMicrotasks();
+        flushMicrotasks();
 
-      expect(component.platformParameterNameToBackupMap.get(platformParameter.name))
-        .toEqual(originalFeatureFlag);
+        expect(component.platformParameterNameToBackupMap.get(
+          platformParameter.name)).toEqual(originalFeatureFlag);
     }));
 
     it('should not proceed if there is another task running', fakeAsync(() => {
@@ -465,7 +465,7 @@ describe('Admin page platform parameters tab', () => {
   });
 
   describe('.isPlatformParamRulesChanged', () => {
-    it('should return false if the platform param is the same as the backup instance',
+    it('should return false if the parameter is the same as the backup instance',
       () => {
         const platformParameter = component.platformParameters[0];
 
@@ -475,7 +475,7 @@ describe('Admin page platform parameters tab', () => {
     );
 
     it(
-      'should return true if the platform param is different from the backup instance',
+      'should return true if the parameter is different from the backup instance',
       () => {
         const platformParameter = component.platformParameters[0];
 
