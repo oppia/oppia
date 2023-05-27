@@ -93,5 +93,5 @@ Registry.create_feature_flag(
 
 Registry.create_feature_flag(
     ParamNames.SIGNIN_WITH_POPUP,
-    'This flag is for the new signin with popup feature.',
+    'This flag is for the signin with popup feature.',
     platform_parameter_domain.FeatureStages.PROD)
