@@ -308,6 +308,8 @@ var goOffline = async function() {
 // Call func. If func errors, print the full stack trace,
 // including the lines from the caller function.
 // This can help us chain stack traces across async promises.
+// It's hard to debug without printing error line in caller function,
+// that's why we want to add caller functino errStack to stack trace.
 // @param {function} func Function you want to call.
 // @param {string} errStack Put this: new Error().stack.
 var callFunctionAndCollectFullStackTraceOnError = async function(
