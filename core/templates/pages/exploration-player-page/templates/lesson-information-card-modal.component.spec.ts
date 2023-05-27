@@ -436,4 +436,32 @@ describe('Lesson Information card modal component', () => {
 
     expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
   });
+
+  it('should return 0% when no checkpoints are completed', () => {
+    componentInstance.completedCheckpointsCount = 0;
+    componentInstance.checkpointCount = 5;
+
+    expect(componentInstance.getProgressPercentage()).toEqual('0');
+  });
+
+  it('should return 100% when all checkpoints are completed', () => {
+    componentInstance.completedCheckpointsCount = 5;
+    componentInstance.checkpointCount = 5;
+
+    expect(componentInstance.getProgressPercentage()).toEqual('100');
+  });
+
+  it('should return the correct percentage for 25% progress', () => {
+    componentInstance.completedCheckpointsCount = 1;
+    componentInstance.checkpointCount = 4;
+
+    expect(componentInstance.getProgressPercentage()).toEqual('25');
+  });
+
+  it('should round down to the nearest whole number', () => {
+    componentInstance.completedCheckpointsCount = 2;
+    componentInstance.checkpointCount = 7;
+
+    expect(componentInstance.getProgressPercentage()).toEqual('28');
+  });
 });

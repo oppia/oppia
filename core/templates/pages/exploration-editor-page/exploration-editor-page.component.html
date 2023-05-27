@@ -97,7 +97,8 @@
            [ngbTooltip]="'Improvements'"
            placement="bottom"
            tabindex="0"
-           aria-label="Exploration Improvement Button">
+           aria-label="Exploration Improvement Button"
+           (keydown.enter)="!connectedToInternet || selectImprovementsTab()">
           <i class="material-icons navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'improvements'}">trending_up</i>
         </a>
       </li>
@@ -135,6 +136,8 @@
           [ngbTooltip]="'Help does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a href="#"
            [ngbTooltip]="'Help'"
+           tabindex="0"
+           (keydown.enter)="!connectedToInternet || showUserHelpModal()"
            placement="bottom"
            class="nav-link oppia-editor-navbar-tab-anchor"
            aria-label="Exploration Help Button">
