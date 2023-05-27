@@ -330,7 +330,7 @@ describe('Admin page platform parameters tab', () => {
 
         expect(component.platformParameterNameToBackupMap.get(
           platformParameter.name)).toEqual(platformParameter);
-    }));
+      }));
 
     it('should not update platform param backup if update fails',
       fakeAsync(() => {
@@ -352,7 +352,7 @@ describe('Admin page platform parameters tab', () => {
 
         expect(component.platformParameterNameToBackupMap.get(
           platformParameter.name)).toEqual(originalFeatureFlag);
-    }));
+      }));
 
     it('should not proceed if there is another task running', fakeAsync(() => {
       mockPromptResult('mock msg');
@@ -465,7 +465,7 @@ describe('Admin page platform parameters tab', () => {
   });
 
   describe('.isPlatformParamRulesChanged', () => {
-    it('should return false if the parameter is the same as the backup instance',
+    it('should return false if the parameter is same as the backup instance',
       () => {
         const platformParameter = component.platformParameters[0];
 
@@ -475,7 +475,7 @@ describe('Admin page platform parameters tab', () => {
     );
 
     it(
-      'should return true if the parameter is different from the backup instance',
+      'should return true if the parameter is different from backup instance',
       () => {
         const platformParameter = component.platformParameters[0];
 
