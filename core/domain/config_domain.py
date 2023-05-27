@@ -208,10 +208,13 @@ class ConfigProperty:
     - before_end_body_tag_hook.
     - before_end_head_tag_hook.
     - carousel_slides_config.
+    - checkpoints_feature_is_enabled.
     - classroom_page_is_accessible.
+    - classroom_promos_are_enabled.
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
+    - contributor_dashboard_is_enabled.
     - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
@@ -220,6 +223,8 @@ class ConfigProperty:
     - featured_translation_languages.
     - full_site_url.
     - list_of_default_tags_for_blog_post.
+    - max_number_of_explorations_in_math_svgs_batch.
+    - max_number_of_svgs_in_math_svgs_batch.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
