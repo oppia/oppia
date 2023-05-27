@@ -52,7 +52,7 @@ describe('Admin page platform parameters tab', () => {
   let mockPromptResult: (msg: string | null) => void;
 
   beforeEach(async(() => {
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
       declarations: [AdminPlatformParametersTabComponent]
     }).compileComponents();
