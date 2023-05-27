@@ -2847,8 +2847,7 @@ version: 1
             expect_errors: bool. Whether errors are expected.
 
         Returns:
-            dict. A json response from the server except the
-                XSSI_PREFIX.
+            dict. A json response from the server except the XSSI_PREFIX.
         """
         if expect_errors:
             self.assertTrue(json_response.status_int >= 400)
