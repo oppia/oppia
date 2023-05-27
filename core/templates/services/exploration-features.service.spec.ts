@@ -38,7 +38,8 @@ describe('ExplorationFeatureService', () => {
     ExplorationFeaturesService.serviceIsInitialized = false;
 
     featureData = {
-      isExplorationWhitelisted: true
+      explorationIsCurated: true,
+      alwaysAskLearnersForAnswerDetails: false
     };
     explorationData = {
       param_changes: [testParamChange],

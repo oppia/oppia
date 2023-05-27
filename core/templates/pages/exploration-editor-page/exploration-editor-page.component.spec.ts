@@ -383,7 +383,7 @@ describe('Exploration editor page component', () => {
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
         .and.returnValue(Promise.resolve({
-          isExplorationWhitelisted: null,
+          explorationIsCurated: null,
         } as ExplorationFeatures));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
@@ -692,7 +692,7 @@ describe('Exploration editor page component', () => {
         spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
         .and.returnValue(Promise.resolve({
-          isExplorationWhitelisted: null,
+          explorationIsCurated: null,
         } as ExplorationFeatures));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(eis, 'flushUpdatedTasksToBackend')
