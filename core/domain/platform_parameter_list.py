@@ -39,6 +39,7 @@ class ParamNames(enum.Enum):
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
+    SHOW_TRANSLATION_SIZE = 'show_translation_size'
 
 
 # Platform parameters should all be defined below.
@@ -89,4 +90,11 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
+    platform_parameter_domain.FeatureStages.PROD)
+
+
+Registry.create_feature_flag(
+    ParamNames.SHOW_TRANSLATION_SIZE,
+    'This flag is to show translation size on translation cards in contributor' +
+    ' dashboard.',
     platform_parameter_domain.FeatureStages.PROD)
