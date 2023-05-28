@@ -277,6 +277,38 @@ describe('Blog Post Editor Component', () => {
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
   }));
 
+  it('should activate title editor if blog post does not have a title when it' +
+  ' loads', fakeAsync(() => {
+    let sampleBackendDict = {
+      id: 'sampleBlogId',
+      displayed_author_name: 'test_user',
+      title: '',
+      content: '',
+      thumbnail_filename: null,
+      tags: [],
+      url_fragment: '',
+    };
+    let blogPostEditorData = {
+      displayedAuthorName: 'test_user',
+      listOfDefaulTags: ['news', 'Learners'],
+      maxNumOfTags: 2,
+      blogPostDict: BlogPostData.createFromBackendDict(
+        sampleBackendDict),
+    };
+    component.blogPostId = 'sampleBlogId';
+    component.titleEditorIsActive = false;
+    spyOn(blogPostEditorBackendApiService, 'fetchBlogPostEditorData')
+      .and.returnValue(Promise.resolve(blogPostEditorData));
+
+    component.initEditor();
+    tick();
+
+    expect(blogPostEditorBackendApiService.fetchBlogPostEditorData)
+      .toHaveBeenCalled();
+    expect(component.titleEditorIsActive).toBeTrue();
+  }));
+
+
   it('should display alert when unable to fetch blog post editor data',
     fakeAsync(() => {
       spyOn(blogPostEditorBackendApiService, 'fetchBlogPostEditorData')
