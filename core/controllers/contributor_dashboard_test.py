@@ -1397,26 +1397,66 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
     """Test for the FeaturedTranslationLanguagesHandler."""
 
     def test_get_featured_translation_languages(self) -> None:
-        response = self.get_json('/retrivefeaturedtranslationlanguages')
-        self.assertEqual(
-            response,
-            {'featured_translation_languages': []}
-        )
+        response = self.get_json('/retrievefeaturedtranslationlanguages')
+        expected_response = {
+            'featured_translation_languages': [
+                {
+                    'language_code': 'pt',
+                    'explanation': 'For learners in Brazil, Angola '
+                    'and Mozambique.'
+                },
+                {
+                    'language_code': 'ar',
+                    'explanation': 'For learners in Arabic-speaking countries '
+                    'in the Middle East.'
+                },
+                {
+                    'language_code': 'pcm',
+                    'explanation': 'For learners in Nigeria.'
+                },
+                {
+                    'language_code': 'es',
+                    'explanation': 'For learners in Latin America and South '
+                    'America.'
+                },
+                {
+                    'language_code': 'sw',
+                    'explanation': 'For learners in Kenya and Tanzania.'
+                },
+                {
+                    'language_code': 'hi',
+                    'explanation': 'For learners in India'
+                },
+                {
+                    'language_code': 'ha',
+                    'explanation': 'For learners in Nigeria.'
+                },
+                {
+                    'language_code': 'ig',
+                    'explanation': 'For learners in Nigeria.'
+                },
+                {
+                    'language_code': 'yo',
+                    'explanation': 'For learners in Nigeria.'
+                }]
+        }
+        self.assertEqual(response, expected_response)
 
-        new_value = [
-            {'language_code': 'en', 'explanation': 'Partnership with ABC'}
-        ]
-        config_services.set_property(
-            'admin',
-            'featured_translation_languages',
-            new_value
-        )
-
-        response = self.get_json('/retrivefeaturedtranslationlanguages')
-        self.assertEqual(
-            response,
-            {'featured_translation_languages': new_value}
-        )
+    def test_featured_translation_langs_are_present_in_supported_audio_langs(
+        self
+    ) -> None:
+        featured_languages = constants.FEATURED_TRANSLATION_LANGUAGES
+        suported_audio_langs_codes = [
+            lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
+        for language in featured_languages:
+            self.assertIn(
+                language['language_code'],
+                suported_audio_langs_codes,
+                'We expect all the featured languages to be present in the '
+                'SUPPORTED_AUDIO_LANGUAGES list present in constants.ts file, '
+                'but the language with language code %s is not present in the '
+                'list' % (language['language_code'])
+            )
 
 
 class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
