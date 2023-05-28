@@ -82,7 +82,7 @@ var login = async function(email, useManualNavigation = true) {
   });
 };
 
-var logout = async function(errorMessage = '') {
+var logout = async function() {
   await waitFor.clientSideRedirection(async() => {
     await browser.url(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
@@ -92,7 +92,7 @@ var logout = async function(errorMessage = '') {
   }, async() => {
     var splashPage = $('.e2e-test-splash-page');
     await waitFor.visibilityOf(
-      splashPage, 'Splash page takes too long to appear' + errorMessage);
+      splashPage, 'Splash page takes too long to appear');
     await waitFor.pageToFullyLoad();
   });
 };
