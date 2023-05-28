@@ -178,7 +178,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 ),
                 [{
                     'id': 'exp_id',
-                    'version': 1,
+                    'version': 2,
                     'payload': new_exploration.to_dict()
                 }]
             )
@@ -435,7 +435,13 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     def test_get_exploration_translation_returns_correct_json(self) -> None:
         translation_model = (
             translation_models.EntityTranslationsModel.create_new(
-                'exploration', 'translation_id', 1, 'es', {}))
+                'exploration', 'translation_id', 1, 'es', {
+                    'content_id_123': {
+                        'content_value': 'Hello world!',
+                        'needs_update': False,
+                        'content_format': 'html'
+                    }
+                }))
         translation_model.update_timestamps()
         translation_model.put()
         with self.secrets_swap:
@@ -455,7 +461,11 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     'language_code': 'es',
                     'version': 1,
                     'payload': {
-                        'translations': {}
+                        'content_id_123': {
+                            'content_value': 'Hello world!',
+                            'needs_update': False,
+                            'content_format': 'html'
+                        }
                     }
                 }]
             )

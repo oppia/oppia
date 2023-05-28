@@ -36,7 +36,6 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
-from core.domain import translation_domain
 from core.domain import translation_fetchers
 
 from typing import Dict, List, Optional, TypedDict, Union
@@ -105,7 +104,7 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
         subtopic_page_domain.SubtopicPageDict,
         classroom_config_domain.ClassroomDict,
         topic_domain.TopicDict,
-        translation_domain.EntityTranslationDict,
+        Dict[str, feconf.TranslatedContentDict],
         classroom_domain.ClassroomDict,
         None
     ]
@@ -278,7 +277,8 @@ class AndroidActivityHandler(base.BaseHandler[
                     'version': version,
                     'language_code': language_code,
                     'payload': (
-                        translation.to_dict() if translation is not None
+                        translation.to_dict()['translations']
+                        if translation is not None
                         else None)
                 })
         else:
