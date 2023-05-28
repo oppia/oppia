@@ -92,8 +92,11 @@ describe('ThumbnailUploaderComponent', () => {
   it('should display placeholder image when filename is null', () => {
     component.filename = '';
 
+    expect(component.hidePlaceholder).toBeTrue();
+
     component.ngOnInit();
 
+    // This value shouldn't change since a thumbnail file not not defined.
     expect(component.hidePlaceholder).toBeTrue();
   });
 
