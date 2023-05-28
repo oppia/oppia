@@ -311,7 +311,7 @@ var goOffline = async function() {
 // The red stack trace is from webdriverio function. We do not want to
 // pass error message to the function because it decrease generality.
 // See the black log for the full stack trace when you use this function.
-/** 
+/**
  * Call func. If func errors, print the full stack trace,
  * including the lines from the caller function.
  * @param {function} func - Function you want to call.
