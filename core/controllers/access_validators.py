@@ -122,7 +122,8 @@ class ProfileExistsValidationHandler(
             username: str. The username of the user.
 
         Raises:
-            PageNotFoundException. No user settings found for the given username..
+            PageNotFoundException. No user settings found for the given
+                username.
         """
         user_settings = user_services.get_user_settings_from_username(
             username)
