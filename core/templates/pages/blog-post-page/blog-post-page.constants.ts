@@ -21,6 +21,14 @@
 export const BlogPostPageConstants = {
   BLOG_POST_PAGE_URL_TEMPLATE: '/blog/<blog_post_url>',
   BLOG_POST_PAGE_DATA_URL_TEMPLATE: '/blogdatahandler/data/<blog_post_url>',
+  BLOG_POST_VIEWED_EVENT_HANDLER_URL: (
+    '/blogdatahandler/data/blog_post_viewed_event/<blog_post_url>'),
+  BLOG_POST_READ_EVENT_HANDLER_URL: (
+    '/blogdatahandler/data/blog_post_read_event/<blog_post_url>'),
+  BLOG_POST_EXITED_EVENT_HANDLER_URL: (
+    '/blogdatahandler/data/blog_post_exited_event/<blog_post_url>'),
   BLOG_AUTHOR_PROFILE_PAGE_URL_TEMPLATE: '/blog/author/<author_username>',
   MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST: 2,
+  // 200 words per minute is considered to be a normal reading speed.
+  NORMAL_READING_SPEED: 200
 } as const;

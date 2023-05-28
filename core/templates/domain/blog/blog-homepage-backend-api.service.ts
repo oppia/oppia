@@ -183,6 +183,44 @@ export class BlogHomePageBackendApiService {
         });
     });
   }
+
+  async recordBlogPostViewedEventAsync(blogPostUrl: string): Promise<Object> {
+    const postViewedEventHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogPostPageConstants.BLOG_POST_VIEWED_EVENT_HANDLER_URL, {
+          blog_post_url: blogPostUrl
+        }
+      )
+    );
+    return this.http.post(postViewedEventHandlerUrl, {}).toPromise();
+  }
+
+  async recordBlogPostReadEventAsync(blogPostUrl: string): Promise<Object> {
+    const postReadEventHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogPostPageConstants.BLOG_POST_READ_EVENT_HANDLER_URL, {
+          blog_post_url: blogPostUrl
+        }
+      )
+    );
+    return this.http.post(postReadEventHandlerUrl, {}).toPromise();
+  }
+
+  async recordBlogPostExitedEventAsync(
+      blogPostUrl: string, timeSpent: number
+  ): Promise<Object> {
+    const postExitedEventHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogPostPageConstants.BLOG_POST_EXITED_EVENT_HANDLER_URL, {
+          blog_post_url: blogPostUrl
+        }
+      )
+    );
+    return this.http.post(
+      postExitedEventHandlerUrl,
+      {time_taken_to_read_blog_post: timeSpent}
+    ).toPromise();
+  }
 }
 
 angular.module('oppia').factory(

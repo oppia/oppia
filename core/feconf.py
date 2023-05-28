@@ -142,6 +142,7 @@ class ValidModelNames(enum.Enum):
     BASE_MODEL = 'base_model'
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
+    BLOG_STATISTICS = 'blog_statistics'
     CLASSIFIER = 'classifier'
     CLASSROOM = 'classroom'
     COLLECTION = 'collection'
@@ -893,6 +894,9 @@ BLOG_ADMIN_PAGE_URL = '/blog-admin'
 CLASSROOM_ADMIN_PAGE_URL = '/classroom-admin'
 BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
+BLOG_DASHBOARD_STATISTICS_DATA_URL = '/blogdashboardhandler/stats/data'
+BLOG_DASHBOARD_AUTHOR_STATISTICS_DATA_URL = (
+    '/blogdashboardhandler/authorstats/data')
 BLOG_DASHBOARD_URL = '/blog-dashboard'
 DIAGNOSTIC_TEST_PLAYER_PAGE_URL = '/diagnostic-test-player'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
@@ -1090,6 +1094,10 @@ EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
 EVENT_TYPE_SOLUTION_HIT = 'solution_hit'
 EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP = 'leave_for_refresher_exp'
+EVENT_TYPE_BLOG_POST_VIEWED = 'blog_post_viewed'
+EVENT_TYPE_BLOG_POST_READ = 'blog_post_read'
+EVENT_TYPE_BLOG_POST_EXITED = 'blog_post_exited'
+
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'

@@ -24,6 +24,7 @@ from core.controllers import base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
 from core.domain import blog_services
+from core.domain import blog_statistics_services
 from core.domain import config_domain
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -370,6 +371,7 @@ class BlogPostTitleHandler(
     """A data handler for checking if a blog post with given title exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_id': {
             'schema': {
@@ -417,3 +419,90 @@ class BlogPostTitleHandler(
                 )
             )
         })
+
+
+class BlogDashboardBlogPostStatisticsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for blog dashboard statistics tab for blog post."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'blog_post_id': {
+            'schema': {
+                'type': 'basestring'
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': constants.BLOG_POST_ID_LENGTH
+            }]
+        },
+        'chart_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    'views',
+                    'reads',
+                    'reading_time'
+                ]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self, blog_post_id: str, chart_type: str) -> None:
+        """Populates the data for generating statistics plot."""
+        stats_dict = (
+            blog_statistics_services.get_blog_post_stats_by_blog_post_id(
+                blog_post_id, chart_type
+            ).to_frontend_dict()
+        )
+        self.values.update({
+            'chart_type': chart_type,
+            'stats': stats_dict
+        })
+
+        self.render_json(self.values)
+
+
+class BlogDashboardAuthorBlogPostsStatisticsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for blog dashboard statistics tab for author"""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'chart_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    'views',
+                    'reads',
+                    'reading_time'
+                ]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self, chart_type: str) -> None:
+        """Populates the data for generating author statistics plot."""
+        assert self.user_id is not None
+        author_id = self.user_id
+        stats_dict = (
+            blog_statistics_services.get_author_aggregated_stats_by_author_id(
+                author_id, chart_type
+            ).to_frontend_dict()
+        )
+        self.values.update({
+            'chart_type': chart_type,
+            'stats': stats_dict
+        })
+
+        self.render_json(self.values)

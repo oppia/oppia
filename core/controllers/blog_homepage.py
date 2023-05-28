@@ -25,6 +25,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_domain
 from core.domain import blog_services
+from core.domain import blog_statistics_services
 from core.domain import user_services
 
 from typing import Dict, Final, List, Optional, Tuple, TypedDict
@@ -478,3 +479,130 @@ class BlogPostSearchHandler(
         })
 
         self.render_json(self.values)
+
+
+class BlogPostViewedEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles blog post viewed event coming in from the frontend."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'blog_post_url': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'POST': {}
+    }
+
+    @acl_decorators.open_access
+    def post(self, blog_post_url: str) -> None:
+        blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
+        if blog_post is None:
+            raise self.PageNotFoundException(
+                Exception(
+                    'The blog post page with the given url doesn\'t exist.'
+                )
+            )
+
+        blog_statistics_services.BlogPostViewedEventHandler.record(
+            blog_post.id, blog_post.author_id)
+
+        self.render_json({})
+
+
+class BlogPostReadEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles blog post read event coming in from the frontend."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'blog_post_url': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'POST': {}
+    }
+
+    @acl_decorators.open_access
+    def post(self, blog_post_url: str) -> None:
+        blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
+        if blog_post is None:
+            raise self.PageNotFoundException(
+                Exception(
+                    'The blog post page with the given url doesn\'t exist.'
+                )
+            )
+
+        blog_statistics_services.BlogPostReadEventHandler.record(
+            blog_post.id, blog_post.author_id)
+
+        self.render_json({})
+
+
+class BlogPostExitedEventHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles blog post exited event coming in from the frontend."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'blog_post_url': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'time_taken_to_read_blog_post': {
+                'schema': {
+                    'type': 'float',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                }
+            }
+        }
+    }
+
+    @acl_decorators.open_access
+    def post(self, blog_post_url: str) -> None:
+        assert self.normalized_payload is not None
+        time_taken_to_read_blog_post = self.normalized_payload.get(
+            'time_taken_to_read_blog_post')
+        blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
+        if not blog_post:
+            raise self.PageNotFoundException(
+                Exception(
+                    'The blog post page with the given url doesn\'t exist.'
+                )
+            )
+
+        blog_statistics_services.BlogPostExitedEventHandler.record(
+            blog_post.id, blog_post.author_id, time_taken_to_read_blog_post)
+
+        self.render_json({})

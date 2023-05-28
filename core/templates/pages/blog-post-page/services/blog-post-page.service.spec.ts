@@ -19,6 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, waitForAsync} from '@angular/core/testing';
 import { BlogPostPageService } from 'pages/blog-post-page/services/blog-post-page.service';
+import { BlogPostPageConstants } from '../blog-post-page.constants';
 
 describe('Blog Post Page service', () => {
   let blogPostPageService: BlogPostPageService;
@@ -40,5 +41,37 @@ describe('Blog Post Page service', () => {
     blogPostPageService.blogPostId = 'abc123456abc';
 
     expect(blogPostPageService.blogPostId).toEqual('abc123456abc');
+  });
+
+  it('should calculate estimated blog post reading time correctly', () =>{
+    let postContent = 'This is a test blog post content.';
+    let NUM_WORDS_READ_PER_MIN = BlogPostPageConstants.NORMAL_READING_SPEED;
+    let expectedReadingTime = (
+      postContent.split(' ').length / NUM_WORDS_READ_PER_MIN
+    );
+    expect(
+      blogPostPageService.calculateEstimatedBlogPostReadingTimeInMins(
+        postContent
+      )
+    ).toEqual(expectedReadingTime);
+  });
+
+  it('should calculate maximum blog post reading time correctly', () => {
+    let postContent = 'Content with reading time less than 45 minutes.';
+    let MILLISECS_IN_MIN: number = 60000;
+    expect(
+      blogPostPageService.maximumBlogPostReadingTimeInMilliSeconds(postContent)
+    ).toEqual(45 * MILLISECS_IN_MIN);
+
+    postContent = 'Text with reading time greater than 45 minutes.'.repeat(
+      BlogPostPageConstants.NORMAL_READING_SPEED).repeat(45);
+    let expectedReadingTime = (
+      blogPostPageService.calculateEstimatedBlogPostReadingTimeInMins(
+        postContent
+      )
+    );
+    expect(
+      blogPostPageService.maximumBlogPostReadingTimeInMilliSeconds(postContent)
+    ).toEqual(expectedReadingTime);
   });
 });

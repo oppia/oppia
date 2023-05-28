@@ -35,6 +35,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { ToastrModule } from 'ngx-toastr';
+import { BlogStatisticsTabComponent } from './statistics-tab/blog-statistics-tab.component';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
@@ -59,10 +60,12 @@ import { SharedBlogComponentsModule } from 'pages/blog-dashboard-page/shared-blo
   ],
   declarations: [
     BlogDashboardPageComponent,
+    BlogStatisticsTabComponent,
     BlogAuthorDetailsEditorComponent
   ],
   entryComponents: [
     BlogDashboardPageComponent,
+    BlogStatisticsTabComponent,
     BlogAuthorDetailsEditorComponent
   ],
   providers: [

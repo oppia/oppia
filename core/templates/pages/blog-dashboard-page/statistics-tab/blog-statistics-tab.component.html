@@ -1,0 +1,346 @@
+<div class="blog-dashboard-statistics-container mb-5" [ngClass]="{'row mx-auto mt-5': !smallScreenViewIsActive, 'px-4 mt-3': smallScreenViewIsActive}">
+  <div class="blog-post-list col-3 px-0" [ngClass]="{'d-none': smallScreenViewIsActive}">
+    <mat-selection-list #blogPostSelection [multiple]="false" class="pt-0">
+      <mat-list-option class="blog-post-list-option blog-post-title"
+                       (click)="authorAggregatedStatsShown = true; showViewsChartStats()"
+                       [selected]="authorAggregatedStatsShown"
+                       [value]="'all'">
+        <span class="blog-post-title">
+          {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_STATS_BUTTON' | translate }}
+        </span>
+      </mat-list-option>
+      <mat-list-option *ngFor="let blogPostSummary of publishedBlogPostList"
+                       [value]="blogPostSummary"
+                       class="blog-post-list-option"
+                       (click)="getBlogPostStats(blogPostSummary.id)">
+        <span class="blog-post-title">{{ blogPostSummary.title }}</span>
+        <span class="blog-post-published-on-date">{{ getPublishedOnDateString(blogPostSummary.publishedOn) }}</span>
+      </mat-list-option>
+    </mat-selection-list>
+  </div>
+  <div class="statistics-plot-container col" [ngClass]="{'px-0': smallScreenViewIsActive}">
+    <div class="statistics-plot-header mt-5" [ngClass]="{'ml-5': !smallScreenViewIsActive, 'px-0': smallScreenViewIsActive}">
+      <div class="statistics-plot-heading">
+        <span *ngIf="authorAggregatedStatsShown">
+          {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_HEADING' | translate }}
+        </span>
+        <span *ngIf="!authorAggregatedStatsShown">
+          <span *ngIf="!smallScreenViewIsActive">
+            {{ blogPostSelection.selectedOptions.hasValue() ? blogPostSelection.selectedOptions.selected[0].value.title : 'None' }}
+          </span>
+          <span *ngIf="smallScreenViewIsActive">
+            {{ selectedBlogPostTitle }}
+          </span>
+        </span>
+      </div>
+      <div class="statistics-plot-subheading mt-2" *ngIf="authorAggregatedStatsShown">
+        <span [innerHTML]="'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_DESCRIPTION' | translate: {numberOfPublishedBlogPosts: publishedBlogPostList.length}">
+        </span>
+      </div>
+    </div>
+    <div class="statistics-chart-container mt-5 mb-3" [ngClass]="{'mr-4 ml-auto': !smallScreenViewIsActive}">
+      <mat-button-toggle-group name="chartTypes"
+                               aria-label="chart Types"
+                               class="d-flex"
+                               [value]="selectedChartType">
+        <mat-button-toggle (click)="showViewsChartStats(); selectedChartType = 'VIEWS_CHART'"
+                           value="VIEWS_CHART"
+                           class="statistics-chart-toggle-button">
+          <div class="statistics-chart-toggle-button-heading mx-1"
+               [ngClass]="{'mt-1': smallScreenViewIsActive, 'mt-4': !smallScreenViewIsActive}">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_VIEWS_CHART_HEADING' | translate }}
+          </div>
+          <div class="mt-2 statistics-chart-toggle-button-description">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_VIEWS_CHART_DESCRIPTION' | translate }}
+          </div>
+        </mat-button-toggle>
+        <mat-button-toggle (click)="showReadsChartStats(); selectedChartType = 'READS_CHART'"
+                           value="READS_CHART"
+                           class="statistics-chart-toggle-button">
+          <div class="mx-1 statistics-chart-toggle-button-heading"
+               [ngClass]="{'mt-1': smallScreenViewIsActive, 'mt-4': !smallScreenViewIsActive}">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READS_CHART_HEADING' | translate }}
+          </div>
+          <div class="mt-2 statistics-chart-toggle-button-description">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READS_CHART_DESCRIPTION' | translate }}
+          </div>
+        </mat-button-toggle>
+        <mat-button-toggle (click)="showReadingTimeChartStats(); selectedChartType = 'READING_TIME'"
+                           value="READING_TIME"
+                           class="statistics-chart-toggle-button">
+          <div class="mx-1 statistics-chart-toggle-button-heading"
+               [ngClass]="{'mt-1': smallScreenViewIsActive, 'mt-4': !smallScreenViewIsActive}">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READING_TIME_CHART_HEADING' | translate }}
+          </div>
+          <div class="mt-2 statistics-chart-toggle-button-description">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READING_TIME_CHART_DESCRIPTION' | translate }}
+          </div>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      <div class="statistics-chart-heading" [ngClass]="{'mt-3 mx-5 mb-3': !smallScreenViewIsActive, 'my-1 mx-3': smallScreenViewIsActive}">
+        <span *ngIf="viewsChartShown">
+          {{ 'I18N_BLOG_DASHBOARD_STATISTICS_VIEWS_CHART_HEADING' | translate }}
+        </span>
+        <span *ngIf="readsChartShown">
+          {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READS_CHART_HEADING' | translate }}
+        </span>
+        <span *ngIf="readingTimeChartShown">
+          {{ 'I18N_BLOG_DASHBOARD_STATISTICS_READING_TIME_CHART_HEADING' | translate }}
+        </span>
+      </div>
+      <div #barStats class="blog-stats ml-auto mr-auto mb-2">
+        <div class="bar-chart-loading-spinner mx-auto" *ngIf="loadingChartSpinnerShown">
+          <mat-spinner class="mx-auto my-auto"></mat-spinner>
+        </div>
+      </div>
+      <mat-divider class="mt-3 position-relative" *ngIf="!readingTimeChartShown"></mat-divider>
+      <div class="py-2 blog-stats-time-period">
+        <div class="time-period-button-row" *ngIf="!readingTimeChartShown">
+          <button mat-button
+                  class="time-period-button"
+                  (click)="showHourlyStats()"
+                  autofocus>
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_HOURLY_STATS_BUTTON' | translate }}
+          </button>
+          <button mat-button
+                  class="time-period-button"
+                  (click)="showWeeklyStats()">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_WEEKLY_STATS_BUTTON' | translate }}
+          </button>
+          <button mat-button
+                  class="time-period-button"
+                  (click)="showMonthlyStats()">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_MONTHLY_STATS_BUTTON' | translate }}
+          </button>
+          <button mat-button
+                  class="time-period-button"
+                  (click)="showYearlyStats()">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_YEARLY_STATS_BUTTON' | translate }}
+          </button>
+          <button mat-button
+                  class="time-period-button">
+            {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_STATS_BUTTON' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="smallScreenViewIsActive" class="w-100">
+    <mat-form-field appearance="fill" class="w-100 blog-post-title">
+      <mat-select [(value)]="activeStatsBlogPostId">
+        <mat-option class="blog-post-list-option"
+                    (click)="authorAggregatedStatsShown = true; showViewsChartStats(); activeStatsBlogPostId = 'all'"
+                    [value]="'all'">
+          {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_BLOG_POSTS_STATS_BUTTON' | translate }}
+        </mat-option>
+        <mat-option class="blog-post-list-option"
+                    *ngFor="let blogPostSummary of publishedBlogPostList"
+                    [value]="blogPostSummary.id"
+                    (click)="getBlogPostStats(blogPostSummary.id); selectedBlogPostTitle = blogPostSummary.title">
+          <span class="blog-post-title">{{ blogPostSummary.title }}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</div>
+<style>
+  .blog-stats {
+    height: 320px;
+    width: 550px;
+  }
+
+  .mat-list-base .mat-list-item, .mat-list-base .mat-list-option {
+    height: 56px;
+  }
+
+  @media(max-width: 650px) {
+    .time-period-button {
+      font-size: 14px;
+      padding: 0;
+      text-align: center;
+    }
+    .blog-stats {
+      height: 300px;
+      width: 100%;
+    }
+
+    .statistics-chart-container .statistics-chart-toggle-button-heading {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 18px;
+    }
+
+    .statistics-chart-container .statistics-chart-toggle-button-description {
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .statistics-chart-heading .statistics-plot-heading {
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 24px;
+    }
+
+    .statistics-chart-heading .statistics-plot-subheading {
+      font-size: 12px;
+      line-height: 14px;
+    }
+  }
+
+  @media(max-width: 550px) {
+    .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+      padding: 0 4px;
+    }
+  }
+
+  .mat-list-item .blog-post-title {
+    color: #fff;
+    display: block;
+    font-size: 22px;
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mat-list-item .blog-post-published-on-date {
+    color: #fff;
+    font-size: 16px;
+    line-height: 18px;
+  }
+
+  .time-period-button-row {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-evenly;
+  }
+
+  .time-period-button {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    letter-spacing: 0;
+    text-align: center;
+  }
+
+  .time-period-button:focus {
+    background-color: #00645c33;
+    border-radius: 2px;
+    color: #00645c;
+    opacity: 1;
+  }
+
+
+  .statistics-chart-heading {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 24px;
+    letter-spacing: 0;
+    opacity: 1;
+    text-align: left;
+  }
+
+  .statistics-chart-container /deep/ .mat-button-toggle {
+    white-space: pre-line;
+  }
+
+  .statistics-chart-container /deep/ .mat-button-toggle-button {
+    text-align: left;
+  }
+
+  .statistics-chart-toggle-button {
+    text-align: left;
+    width: 33.33%;
+  }
+  .statistics-chart-toggle-button-heading {
+    color: #00645c;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 22px;
+    opacity: 1;
+    text-align: left;
+  }
+
+  .statistics-chart-toggle-button-description {
+    color: #00645c;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 14px;
+    opacity: 1;
+    text-align: left;
+  }
+
+  .statistics-plot-heading {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 28px;
+    opacity: 1;
+    text-align: left;
+  }
+
+  .statistics-plot-subheading {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 16px;
+    opacity: 1;
+    text-align: left;
+  }
+
+  .blog-dashboard-statistics-container {
+    background-color: #e8e7e3;
+    border: 1px solid #333;
+    border-radius: 2px;
+    max-width: 928px;
+    opacity: 1;
+    width: 100%;
+  }
+
+  .statistics-chart-container {
+    background: #fff padding-box;
+    border: 1px solid #707070;
+    opacity: 1;
+  }
+
+  .blog-post-list {
+    background-color: #333;
+    opacity: 1;
+  }
+
+  .mat-list-single-selected-option,
+  .mat-list-single-selected-option:hover,
+  .mat-list-single-selected-option:focus {
+    background: #e8e7e3;
+    border-right: unset;
+  }
+
+  .mat-list-single-selected-option span.blog-post-title,
+  .mat-list-single-selected-option:hover span.blog-post-title,
+  .mat-list-single-selected-option:focus span.blog-post-title {
+    color: #00645c;
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  .mat-list-single-selected-option span.blog-post-published-on-date,
+  .mat-list-single-selected-option:hover span.blog-post-published-on-date,
+  .mat-list-single-selected-option:focus span.blog-post-published-on-date {
+    color: #00645c;
+    font-size: 16px;
+    line-height: 18px;
+  }
+
+  .blog-post-list-option {
+    border-bottom: 1px solid #707070;
+    border-right: 1px solid #707070;
+  }
+</style>

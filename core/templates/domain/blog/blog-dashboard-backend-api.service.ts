@@ -22,6 +22,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 export interface BlogAuthorDetailsBackendDict {
   'displayed_author_name': string;
@@ -38,6 +39,139 @@ export interface BlogDashboardBackendResponse {
 interface NewBlogPostBackendResponse {
   'blog_post_id': string;
 }
+
+export interface HourlyStats {
+  [hourKey: string]: number;
+}
+
+export interface WeeklyStats {
+  [dateKey: string]: number;
+}
+
+interface MonthlyStats {
+  [dateKey: string]: number;
+}
+
+interface YearlyStats {
+  [monthKey: string]: number;
+}
+
+interface AllStats {
+  [yearKey: string]: YearlyStats;
+}
+
+export interface BlogPostReadsStatsBackendDict {
+  'blog_post_id': string;
+  'stats': ReadsStatsBackendDict;
+}
+
+export interface AuthorBlogPostReadsStatsBackendDict {
+  'stats': ReadsStatsBackendDict;
+}
+
+
+interface ReadsStatsBackendDict {
+  'hourly_reads': HourlyStats;
+  'weekly_reads': WeeklyStats;
+  'monthly_reads': MonthlyStats;
+  'yearly_reads': YearlyStats;
+  'all_reads': AllStats;
+}
+
+export interface BlogPostViewsStatsBackendDict {
+  'blog_post_id': string;
+  'stats': ViewsStatsBackendDict;
+}
+
+export interface AuthorBlogPostViewsStatsBackendDict {
+  'stats': ViewsStatsBackendDict;
+}
+
+interface ViewsStatsBackendDict {
+  'hourly_views': HourlyStats;
+  'weekly_views': WeeklyStats;
+  'monthly_views': MonthlyStats;
+  'yearly_views': YearlyStats;
+  'all_views': AllStats;
+}
+
+export interface BlogPostReadingTimeStatsBackendDict {
+  'blog_post_id': string;
+  'stats': ReadingTimeStatsBackendDict;
+}
+
+export interface AuthorBlogPostReadingTimeStatsBackendDict {
+  'stats': ReadingTimeStatsBackendDict;
+}
+export interface ReadingTimeStatsBackendDict {
+  'zero_to_one_min': number;
+  'one_to_two_min': number;
+  'two_to_three_min': number;
+  'three_to_four_min': number;
+  'four_to_five_min': number;
+  'five_to_six_min': number;
+  'six_to_seven_min': number;
+  'seven_to_eight_min': number;
+  'eight_to_nine_min': number;
+  'nine_to_ten_min': number;
+  'more_than_ten_min': number;
+}
+
+export interface BlogPostViewsStats {
+  blogPostId: string;
+  hourlyViews: HourlyStats;
+  weeklyViews: WeeklyStats;
+  monthlyViews: MonthlyStats;
+  yearlyViews: YearlyStats;
+  allViews: AllStats;
+}
+
+export interface BlogPostReadsStats {
+  blogPostId: string;
+  hourlyReads: HourlyStats;
+  weeklyReads: WeeklyStats;
+  monthlyReads: MonthlyStats;
+  yearlyReads: YearlyStats;
+  allReads: AllStats;
+}
+
+export interface Stats {
+  hourlyStats: HourlyStats;
+  weeklyStats: WeeklyStats;
+  monthlyStats: MonthlyStats;
+  yearlyStats: YearlyStats;
+  allStats: AllStats;
+}
+
+export interface BlogPostReadingTimeStats {
+  blogPostId: string;
+  zeroToOneMin: number;
+  oneToTwoMin: number;
+  twoToThreeMin: number;
+  threeToFourMin: number;
+  fourToFiveMin: number;
+  fiveToSixMin: number;
+  sixToSevenMin: number;
+  sevenToEightMin: number;
+  eightToNineMin: number;
+  nineToTenMin: number;
+  moreThanTenMin: number;
+}
+
+export interface ReadingTimeStats {
+  zeroToOneMin: number;
+  oneToTwoMin: number;
+  twoToThreeMin: number;
+  threeToFourMin: number;
+  fourToFiveMin: number;
+  fiveToSixMin: number;
+  sixToSevenMin: number;
+  sevenToEightMin: number;
+  eightToNineMin: number;
+  nineToTenMin: number;
+  moreThanTenMin: number;
+}
+
 export interface BlogDashboardData {
   displayedAuthorName: string;
   authorBio: string;
@@ -54,7 +188,10 @@ export interface BlogAuthorDetails {
   providedIn: 'root'
 })
 export class BlogDashboardBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async fetchBlogDashboardDataAsync(): Promise<BlogDashboardData> {
     return new Promise((resolve, reject) => {
@@ -89,6 +226,177 @@ export class BlogDashboardBackendApiService {
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {}
       ).toPromise().then(response => {
         resolve(response.blog_post_id);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async fetchBlogPostViewsStatsAsync(
+      blogPostId: string
+  ): Promise<BlogPostViewsStats> {
+    const statsHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogDashboardPageConstants.BLOG_POST_STATS_DATA_URL_TEMPLATE, {
+          blog_post_id: blogPostId,
+          chart_type: BlogDashboardPageConstants.STATS_CHART_TYPES.VIEWS_CHART
+        }
+      )
+    );
+    return new Promise((resolve, reject) => {
+      this.http.get<BlogPostViewsStatsBackendDict>(
+        statsHandlerUrl).toPromise().then(response => {
+        resolve({
+          blogPostId: response.blog_post_id,
+          hourlyViews: response.stats.hourly_views,
+          weeklyViews: response.stats.weekly_views,
+          monthlyViews: response.stats.monthly_views,
+          yearlyViews: response.stats.yearly_views,
+          allViews: response.stats.all_views,
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async fetchAuthorBlogViewsStatsAsync(): Promise<Stats> {
+    const statsHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogDashboardPageConstants.AUTHOR_STATS_DATA_URL_TEMPLATE, {
+          chart_type: BlogDashboardPageConstants.STATS_CHART_TYPES.VIEWS_CHART
+        }
+      )
+    );
+    return new Promise((resolve, reject) => {
+      this.http.get<AuthorBlogPostViewsStatsBackendDict>(
+        statsHandlerUrl).toPromise().then(response => {
+        resolve({
+          hourlyStats: response.stats.hourly_views,
+          weeklyStats: response.stats.weekly_views,
+          monthlyStats: response.stats.monthly_views,
+          yearlyStats: response.stats.yearly_views,
+          allStats: response.stats.all_views,
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+
+  async fetchBlogPostReadsStatsAsync(
+      blogPostId: string
+  ): Promise<BlogPostReadsStats> {
+    const statsHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogDashboardPageConstants.BLOG_POST_STATS_DATA_URL_TEMPLATE, {
+          blog_post_id: blogPostId,
+          chart_type: BlogDashboardPageConstants.STATS_CHART_TYPES.READS_CHART
+        }
+      )
+    );
+    return new Promise((resolve, reject) => {
+      this.http.get<BlogPostReadsStatsBackendDict>(
+        statsHandlerUrl).toPromise().then(response => {
+        resolve({
+          blogPostId: response.blog_post_id,
+          hourlyReads: response.stats.hourly_reads,
+          weeklyReads: response.stats.weekly_reads,
+          monthlyReads: response.stats.monthly_reads,
+          yearlyReads: response.stats.yearly_reads,
+          allReads: response.stats.all_reads,
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+
+  async fetchAuthorBlogReadsStatsAsync(): Promise<Stats> {
+    const statsHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogDashboardPageConstants.AUTHOR_STATS_DATA_URL_TEMPLATE, {
+          chart_type: BlogDashboardPageConstants.STATS_CHART_TYPES.READS_CHART
+        }
+      )
+    );
+    return new Promise((resolve, reject) => {
+      this.http.get<AuthorBlogPostReadsStatsBackendDict>(
+        statsHandlerUrl).toPromise().then(response => {
+        resolve({
+          hourlyStats: response.stats.hourly_reads,
+          weeklyStats: response.stats.weekly_reads,
+          monthlyStats: response.stats.monthly_reads,
+          yearlyStats: response.stats.yearly_reads,
+          allStats: response.stats.all_reads,
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async fetchBlogPostReadingTimeStatsAsync(
+      blogPostId: string
+  ): Promise<BlogPostReadingTimeStats> {
+    const statsHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogDashboardPageConstants.BLOG_POST_STATS_DATA_URL_TEMPLATE, {
+          blog_post_id: blogPostId,
+          chart_type: BlogDashboardPageConstants.STATS_CHART_TYPES.READING_TIME
+        }
+      )
+    );
+    return new Promise((resolve, reject) => {
+      this.http.get<BlogPostReadingTimeStatsBackendDict>(
+        statsHandlerUrl).toPromise().then(response => {
+        resolve({
+          blogPostId: response.blog_post_id,
+          zeroToOneMin: response.stats.zero_to_one_min,
+          oneToTwoMin: response.stats.one_to_two_min,
+          twoToThreeMin: response.stats.two_to_three_min,
+          threeToFourMin: response.stats.three_to_four_min,
+          fourToFiveMin: response.stats.four_to_five_min,
+          fiveToSixMin: response.stats.five_to_six_min,
+          sixToSevenMin: response.stats.six_to_seven_min,
+          sevenToEightMin: response.stats.seven_to_eight_min,
+          eightToNineMin: response.stats.eight_to_nine_min,
+          nineToTenMin: response.stats.nine_to_ten_min,
+          moreThanTenMin: response.stats.more_than_ten_min,
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async fetchAuthorBlogReadingTimeStatsAsync(
+  ): Promise<ReadingTimeStats> {
+    const statsHandlerUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        BlogDashboardPageConstants.AUTHOR_STATS_DATA_URL_TEMPLATE, {
+          chart_type: BlogDashboardPageConstants.STATS_CHART_TYPES.READING_TIME
+        }
+      )
+    );
+    return new Promise((resolve, reject) => {
+      this.http.get<AuthorBlogPostReadingTimeStatsBackendDict>(
+        statsHandlerUrl).toPromise().then(response => {
+        resolve({
+          zeroToOneMin: response.stats.zero_to_one_min,
+          oneToTwoMin: response.stats.one_to_two_min,
+          twoToThreeMin: response.stats.two_to_three_min,
+          threeToFourMin: response.stats.three_to_four_min,
+          fourToFiveMin: response.stats.four_to_five_min,
+          fiveToSixMin: response.stats.five_to_six_min,
+          sixToSevenMin: response.stats.six_to_seven_min,
+          sevenToEightMin: response.stats.seven_to_eight_min,
+          eightToNineMin: response.stats.eight_to_nine_min,
+          nineToTenMin: response.stats.nine_to_ten_min,
+          moreThanTenMin: response.stats.more_than_ten_min,
+        });
       }, errorResponse => {
         reject(errorResponse.error.error);
       });

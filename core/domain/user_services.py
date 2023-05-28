@@ -47,17 +47,25 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import audit_models
     from mypy_imports import auth_models
+    from mypy_imports import blog_stats_models
     from mypy_imports import bulk_email_services
     from mypy_imports import suggestion_models
     from mypy_imports import transaction_services
     from mypy_imports import user_models
 
-(auth_models, user_models, audit_models, suggestion_models) = (
+(
+    auth_models,
+    user_models,
+    audit_models,
+    suggestion_models,
+    blog_stats_models
+) = (
     models.Registry.import_models([
         models.Names.AUTH,
         models.Names.USER,
         models.Names.AUDIT,
-        models.Names.SUGGESTION
+        models.Names.SUGGESTION,
+        models.Names.BLOG_STATISTICS
     ])
 )
 
@@ -1587,7 +1595,33 @@ def add_user_role(user_id: str, role: str) -> None:
         user_id, feconf.ROLE_ACTION_ADD, role=role,
         username=user_settings.username)
 
+    if role in [feconf.ROLE_ID_BLOG_ADMIN, feconf.ROLE_ID_BLOG_POST_EDITOR]:
+        create_aggregated_author_blog_post_stats_models_if_it_does_not_exist(
+            user_id
+        )
+
     save_user_settings(user_settings)
+
+
+def create_aggregated_author_blog_post_stats_models_if_it_does_not_exist(
+    author_id: str
+) -> None:
+    """Creates Author Blog Post Aggreagted Stats Models for a new blog post
+    author.
+
+    Args:
+        author_id: str. User ID of the author.
+    """
+    stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+        author_id, strict=False)
+
+    if stats_model is None:
+        blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
+            author_id)
+        blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
+            author_id)
+        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
+            author_id)
 
 
 def remove_user_role(user_id: str, role: str) -> None:
