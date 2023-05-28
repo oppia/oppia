@@ -45,7 +45,6 @@ export interface ConfigPropertiesBackendResponse {
 
 export interface ConfigPropertyValues {
   'max_number_of_tags_assigned_to_blog_post': number;
-  'list_of_default_tags_for_blog_post': string[];
 }
 
 export interface BlogAdminPageDataBackendDict {
