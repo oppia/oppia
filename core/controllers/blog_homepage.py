@@ -253,6 +253,10 @@ class BlogPostDataHandler(
 
         Args:
             blog_post_url: str. The URL of the blog post.
+
+        Raises:
+            PageNotFoundException. The blog post page with the given url
+                doesn't exist.
         """
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:

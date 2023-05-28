@@ -82,8 +82,7 @@ class BlogDashboardPage(
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
-        """Handles GET requests."""
-
+        """Renders the blog dashboard page."""
         self.render_template('blog-dashboard-page.mainpage.html')
 
 
@@ -125,7 +124,7 @@ class BlogDashboardDataHandler(
 
     @acl_decorators.can_access_blog_dashboard
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves data for the blog dashboard."""
         assert self.user_id is not None
         author_details = (
             blog_services.get_blog_author_details(self.user_id).to_dict())
@@ -162,7 +161,7 @@ class BlogDashboardDataHandler(
 
     @acl_decorators.can_access_blog_dashboard
     def post(self) -> None:
-        """Handles POST requests to create a new blog post draft."""
+        """Creates a new blog post draft."""
         assert self.user_id is not None
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
@@ -269,6 +268,10 @@ class BlogPostHandler(
 
         Args:
             blog_post_id: str. The ID of the blog post.
+
+        Raises:
+            PageNotFoundException. The blog post with the given id
+                or url doesn't exist.
         """
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
@@ -337,6 +340,9 @@ class BlogPostHandler(
 
         Args:
             blog_post_id: str. The ID of the blog post.
+
+        Raises:
+            InvalidInputException. The input provided is not valid.
         """
         assert self.normalized_request is not None
         assert self.normalized_payload is not None
@@ -361,7 +367,7 @@ class BlogPostHandler(
 
     @acl_decorators.can_delete_blog_post
     def delete(self, blog_post_id: str) -> None:
-        """Deletes blog post.
+        """Deletes a blog post.
 
         Args:
             blog_post_id: str. The ID of the blog post.

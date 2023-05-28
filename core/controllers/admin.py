@@ -1384,7 +1384,7 @@ class TopicManagerRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        """Adss or removes the topic-manager role for a user in the context
+        """Adds or removes the topic-manager role for a user in the context
         of a specific topic.
 
         Raises:

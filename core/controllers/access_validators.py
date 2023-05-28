@@ -63,7 +63,11 @@ class ClassroomAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Retrieves information about a classroom."""
+        """Retrieves information about a classroom.
+
+        Raises:
+            PageNotFoundException. The classroom cannot be found.
+        """
         assert self.normalized_request is not None
         classroom_url_fragment = self.normalized_request[
             'classroom_url_fragment'
@@ -116,8 +120,10 @@ class ProfileExistsValidationHandler(
 
         Args:
             username: str. The username of the user.
-        """
 
+        Raises:
+            PageNotFoundException. No user settings found for the given username..
+        """
         user_settings = user_services.get_user_settings_from_username(
             username)
 
@@ -171,6 +177,11 @@ class ViewLearnerGroupPageAccessValidationHandler(
 
         Args:
             learner_group_id: str. The learner group ID.
+
+        Raises:
+            PageNotFoundException. The learner groups are not enabled.
+            PageNotFoundException. The user is not a member of the learner
+                group.
         """
         assert self.user_id is not None
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
@@ -231,7 +242,11 @@ class BlogPostPageAccessValidationHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Retrieves information about a blog post."""
+        """Retrieves information about a blog post.
+
+        Raises:
+            PageNotFoundException. The blog post cannot be found.
+        """
         assert self.normalized_request is not None
         blog_post_url_fragment = self.normalized_request[
             'blog_post_url_fragment']
@@ -270,6 +285,11 @@ class BlogAuthorProfilePageAccessValidationHandler(
 
         Args:
             author_username: str. The author username.
+
+        Raises:
+            PageNotFoundException. User with given username does not exist.
+            PageNotFoundException. User with given username is not a blog
+                post author.
         """
         author_settings = (
             user_services.get_user_settings_from_username(author_username))
