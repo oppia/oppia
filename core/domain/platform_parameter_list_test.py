@@ -35,7 +35,35 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'blog_pages',
                             'contributor_dashboard_accomplishments',
                             'diagnostic_test',
-                            'improvements_tab']
+                            'improvements_tab',
+                            'learner_groups',
+                            'promo_bar_enabled',
+                            'promo_bar_message',
+                            'record_playthrough_probability',
+                            'batch_index_for_mailchimp',
+                            (
+                                'high_bounce_rate_task_state_bounce_'
+                                'rate_creation_threshold'
+                            ),
+                            (
+                                'high_bounce_rate_task_state_bounce_'
+                                'rate_obsoletion_threshold'
+                            ),
+                            'high_bounce_rate_task_minimum_exploration_starts',
+                            'max_number_of_tags_assigned_to_blog_post',
+                            'contributor_dashboard_reviewer_emails_is_enabled',
+                            (
+                                'notify_admins_suggestions_waiting_too_long_'
+                                'is_enabled'
+                            ),
+                            'enable_admin_notifications_for_reviewer_shortage',
+                            'max_number_of_suggestions_per_reviewer',
+                            'oppia_csrf_secret',
+                            'email_sender_name',
+                            'email_footer',
+                            'signup_email_subject_content',
+                            'signup_email_html_body_content',
+                            'unpublish_exploration_email_html_body']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
