@@ -17,12 +17,12 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import config_domain
+from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
-from typing import Final, List
+from typing import Final
 
 
 def exploration_features_url(exp_id: str) -> str:
@@ -49,33 +49,22 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
 class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
     """Tests for fetching whether playthrough recording is enabled."""
 
-    def test_can_record_playthroughs_in_whitelisted_explorations(self) -> None:
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.EXP_ID])
+    def test_can_record_playthroughs_in_curated_explorations(self) -> None:
+        with self.swap_to_always_return(
+            opportunity_services,
+            'is_exploration_available_for_contribution',
+            True
+        ):
+            json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-        json_response = self.get_json(exploration_features_url(self.EXP_ID))
+        self.assertTrue(json_response['exploration_is_curated'])
 
-        self.assertTrue(json_response['is_exploration_whitelisted'])
+    def test_can_not_record_playthroughs_with_non_curated_exps(self) -> None:
+        with self.swap_to_always_return(
+            opportunity_services,
+            'is_exploration_available_for_contribution',
+            False
+        ):
+            json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
-    def test_can_not_record_playthroughs_with_empty_whitelist(self) -> None:
-        config_value: List[str] = []
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            config_value
-        )
-
-        json_response = self.get_json(exploration_features_url(self.EXP_ID))
-
-        self.assertFalse(json_response['is_exploration_whitelisted'])
-
-    def test_can_not_record_playthroughs_for_exploration_not_in_whitelist(
-        self
-    ) -> None:
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.EXP_ID + '-differentiate'])
-
-        json_response = self.get_json(exploration_features_url(self.EXP_ID))
-
-        self.assertFalse(json_response['is_exploration_whitelisted'])
+        self.assertFalse(json_response['exploration_is_curated'])
