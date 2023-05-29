@@ -302,12 +302,12 @@ describe('Editor state service', () => {
     })).toBeNull();
   });
 
-  it('should return if exploration is whitelisted or not', () => {
-    expect(ecs.isExplorationWhitelisted()).toBeFalse();
-    ecs.explorationIsWhitelisted = true;
-    expect(ecs.isExplorationWhitelisted()).toBeTrue();
-    ecs.explorationIsWhitelisted = false;
-    expect(ecs.isExplorationWhitelisted()).toBeFalse();
+  it('should return if exploration is curated or not', () => {
+    expect(ecs.isExplorationCurated()).toBeFalse();
+    ecs.explorationIsCurated = true;
+    expect(ecs.isExplorationCurated()).toBeTrue();
+    ecs.explorationIsCurated = false;
+    expect(ecs.isExplorationCurated()).toBeFalse();
   });
 
   it('should initialise state content editor', () => {
@@ -391,14 +391,6 @@ describe('Editor state service', () => {
     expect(ecs.stateResponsesInitialised).toBeTrue();
     expect(ecs.stateEditorDirectiveInitialised).toBeTrue();
     expect(ecs.checkEventListenerRegistrationStatus()).toBeTrue();
-  });
-
-  it('should update exploration whitelisted status', () => {
-    expect(ecs.isExplorationWhitelisted()).toBeFalse();
-    ecs.updateExplorationWhitelistedStatus(true);
-    expect(ecs.isExplorationWhitelisted()).toBeTrue();
-    ecs.updateExplorationWhitelistedStatus(false);
-    expect(ecs.isExplorationWhitelisted()).toBeFalse();
   });
 
   it('should set interaction', () => {
