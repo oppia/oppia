@@ -79,7 +79,8 @@ class PullRequest:
     def is_reviewer_assigned(self) -> bool:
         """Checks whether a reviewer assigned to the PR."""
         return not (
-            len(self.assignees) == 1 and self.assignees[0].name == self.author)
+            len(self.assignees) == 0 or (
+            len(self.assignees) == 1 and self.assignees[0].name == self.author))
 
     def get_assignee(self, user: str) -> Optional[Assignee]:
         """Returns the assignee object for the given user if exist."""

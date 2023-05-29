@@ -115,9 +115,9 @@ def get_prs_assigned_to_reviewers(
                     datetime.datetime.now(datetime.timezone.utc) -
                     reviewer.timestamp)
                 if (reviewer.name != pull_request.author) and (
-                        pending_review_time >=
-                        datetime.timedelta(hours=wait_hours)
-                    ):
+                    pending_review_time >=
+                    datetime.timedelta(hours=wait_hours)
+                ):
                     reviewer_to_assigned_prs[reviewer.name].append(pull_request)
     return reviewer_to_assigned_prs
 
@@ -156,7 +156,7 @@ def update_assignee_timestamp(
                 activity_url,
                 params={'page': page_number, 'per_page': 100},
                 headers={
-                    'Accept': 'application/vnd.github.mockingbird-preview+json',
+                    'Accept': 'application/vnd.github+json',
                     'Authorization': f'token {_TOKEN}'}
             )
             response.raise_for_status()
@@ -173,17 +173,26 @@ def update_assignee_timestamp(
 
 @check_token
 def create_discussion_comment(org_name: str, repo: str, body: str) -> None:
-    """Creates github discussion on the team_slug with the given title and
-    body.
-    """
+    """Comment in the existing GitHub discussion."""
 
-    query_category_id = """
-        query($org_name: String!, $repository: String!) {
+    query = """
+        query ($org_name: String!, $repository: String!) {
             repository(owner: $org_name, name: $repository) {
                 discussionCategories(first: 10) {
                     nodes {
                         id
                         name
+                        repository {
+                            id
+                            discussions(last: 10) {
+                                edges {
+                                    node {
+                                        id
+                                        title
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -197,52 +206,36 @@ def create_discussion_comment(org_name: str, repo: str, body: str) -> None:
 
     response = requests.post(
         GITHUB_GRAPHQL_URL,
-        json={'query': query_category_id, 'variables': variables},
+        json={'query': query, 'variables': variables},
         headers=_get_request_headers()
     )
 
     data = response.json()
 
-    category_id = ''
-    for category in data['data']['repository']['discussionCategories']['nodes']:
-        if category['name'] == 'Reviewer notifications':
-            category_id = category['id']
-            break
+    discussion_id = ''
+    category_name = 'Reviewer notifications'
+    discussion_title = 'Pending reviews'
+    discussion_categories = (
+        data['data']['repository']['discussionCategories']['nodes'])
+    try:
+        for category in discussion_categories:
+            if category['name'] == category_name:
+                try:
+                    discussions = category['repository']['discussions']['edges']
+                    for discussion in discussions:
+                        if discussion['node']['title'] == discussion_title:
+                            discussion_id = discussion['node']['id']
+                            break
+                except Exception as e:
+                    raise Exception(
+                        'Discussion with title %s not found, please create'
+                        'a discussion with that title.' % (
+                        discussion_title)) from e
+    except Exception as e:
+        raise Exception('%s category is missing in GitHub Discussion.' % (
+            category_name)) from e
 
-    query_discussion_id = """
-        query ($org_name: String!, $repository: String!, $category_id: ID!) {
-            repository(owner: $org_name, name: $repository) {
-                discussions(categoryId: $category_id, first: 10) {
-                    edges{
-                        node {
-                            id
-                            title
-                        }
-                    }
-                }
-            }
-        }
-    """
-
-    variables = {
-        'org_name': org_name,
-        'repository': repo,
-        'category_id': category_id
-    }
-
-    response = requests.post(
-        GITHUB_GRAPHQL_URL,
-        json={'query': query_discussion_id, 'variables': variables},
-        headers=_get_request_headers()
-    )
-
-    data = response.json()
-
-    # Assuming the particular category will have only one discussion.
-    discussion_id = (
-        data['data']['repository']['discussions']['edges'][0]['node']['id'])
-
-    comment_in_discussion = """
+    query = """
         mutation comment($discussion_id: ID!, $comment: String!) {
             addDiscussionComment(input: {discussionId: $discussion_id, body: $comment}) {
                 clientMutationId
@@ -260,7 +253,7 @@ def create_discussion_comment(org_name: str, repo: str, body: str) -> None:
 
     response = requests.post(
         GITHUB_GRAPHQL_URL,
-        json={'query': comment_in_discussion, 'variables': variables},
+        json={'query': query, 'variables': variables},
         headers=_get_request_headers()
     )
     response.raise_for_status()

@@ -52,16 +52,16 @@ PARSER.add_argument(
 PARSER.add_argument(
     '--test_mode',
     type=bool,
-    help='Run the program in test mode and does not sends notifications.')
+    help='Run the program in test mode and do not send notifications.')
 
 
 def generate_message(username: str, pr_list: str) -> str:
     """Generates message using the template provided in
-    PENDING_REVIEW_NOTIFICATION_TEMPLATE.md file.
+    PENDING_REVIEW_NOTIFICATION_TEMPLATE.md.
     """
     template_path = '.github/PENDING_REVIEW_NOTIFICATION_TEMPLATE.md'
     if not os.path.exists(template_path):
-        raise Exception(f'Please add a template on path: {template_path}')
+        raise Exception(f'Please add a template file at: {template_path}')
     message = ''
     with open(template_path, 'r', encoding='UTF-8') as file:
         message = file.read()
@@ -85,7 +85,7 @@ def send_notification(
         assignee = pull_request.get_assignee(username)
         assert assignee is not None
         pr_list_messages.append(
-            f'- [#{pull_request.number}]({pull_request.url}) [Waiting from the'
+            f'- [#{pull_request.number}]({pull_request.url}) [Waiting for the'
             f'last {assignee.get_readable_waiting_time()}]')
 
     title = f'[@{username}] Pending review on PRs'
