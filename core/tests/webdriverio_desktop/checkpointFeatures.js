@@ -174,6 +174,8 @@ describe('Checkpoints functionality', function() {
     async function() {
       await topicAndStoryViewerPage.get(
         'math', 'topic-cf-one', 'checkpointfeaturesstory');
+      await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+
       await topicAndStoryViewerPage.goToChapterIndex(0);
       await explorationPlayerPage.submitAnswer('Continue', null);
       await explorationPlayerPage.dismissLessonInfoTooltip();
