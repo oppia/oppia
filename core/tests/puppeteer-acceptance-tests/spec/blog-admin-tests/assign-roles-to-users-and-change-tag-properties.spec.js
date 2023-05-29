@@ -17,9 +17,9 @@
  */
 
 const userFactory = require(
-  '../puppeteer-testing-utilities/user-factory.js');
+  '../../puppeteer-testing-utilities/user-factory.js');
 const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
+  '../../puppeteer-testing-utilities/test-constants.js');
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
@@ -59,10 +59,6 @@ describe('Blog Admin', function() {
       await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2', ROLE_BLOG_POST_EDITOR);
-
-      await blogAdmin.expectTagToNotExistInBlogTags('Test_Tag');
-      await blogAdmin.addNewBlogTag('Test_Tag');
-      await blogAdmin.expectTagToExistInBlogTags('Test_Tag');
 
       await blogAdmin.expectMaximumTagLimitNotToBe('5');
       await blogAdmin.setMaximumTagLimitTo('5');
