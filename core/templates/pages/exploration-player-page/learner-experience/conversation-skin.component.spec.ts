@@ -579,6 +579,11 @@ describe('Conversation skin component', () => {
       LearnerDashboardBackendApiService);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
+
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
   }));
 
   it('should create && adjust page height on resize of window',
@@ -1283,6 +1288,7 @@ describe('Conversation skin component', () => {
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.alertMessageTimeout = 5;
+    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
 
     componentInstance.initializePage();
     tick(100);

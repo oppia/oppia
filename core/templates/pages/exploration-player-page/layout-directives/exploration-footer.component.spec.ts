@@ -238,6 +238,10 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
       .returnValue(true);
     spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
+    spyOn(
       explorationSummaryBackendApiService,
       'loadPublicAndPrivateExplorationSummariesAsync').and.resolveTo({
       summaries: [
@@ -1282,6 +1286,10 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
     spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
       .returnValue(false);
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
     component.windowIsNarrow = true;
 
     component.ngOnInit();

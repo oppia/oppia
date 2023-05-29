@@ -208,7 +208,6 @@ class ConfigProperty:
     - before_end_body_tag_hook.
     - before_end_head_tag_hook.
     - carousel_slides_config.
-    - checkpoints_feature_is_enabled.
     - classroom_page_is_accessible.
     - classroom_promos_are_enabled.
     - collection_editor_whitelist.
@@ -485,6 +484,10 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'always_ask_learners_for_answer_details', BOOL_SCHEMA,
     'Always ask learners for answer details. For testing -- do not use',
     False)
+
+CHECKPOINTS_FEATURE_IS_ENABLED = ConfigProperty(
+    'checkpoints_feature_is_enabled', BOOL_SCHEMA,
+    'Enable checkpoints feature.', False)
 
 LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
     'learner_groups_are_enabled', BOOL_SCHEMA,

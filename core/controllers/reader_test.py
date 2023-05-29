@@ -3735,6 +3735,27 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
+    """Unit test for CheckpointsFeatureStatusHandler."""
+
+    def test_get_request_returns_correct_status(self) -> None:
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, False)
+
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': False
+            })
+
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, True)
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': True,
+            })
+
 class EntityTranslationHandlerTest(test_utils.GenericTestBase):
     """Unit test for the EntityTranslationHandler."""
 

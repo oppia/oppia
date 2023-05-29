@@ -79,6 +79,7 @@ export class ExplorationFooterComponent {
   lastCheckpointWasCompleted: boolean = false;
   learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
+  CHECKPOINTS_FEATURE_IS_ENABLED = false;
   footerIsInQuestionPlayerMode: boolean = false;
 
   conceptCardForStateExists: boolean = true;
@@ -162,18 +163,28 @@ export class ExplorationFooterComponent {
         });
       this.footerIsInQuestionPlayerMode = true;
     } else if (this.explorationId) {
-      // Fetching the number of checkpoints.
-      this.getCheckpointCount();
-      this.setLearnerHasViewedLessonInfoTooltip();
+      this.readOnlyExplorationBackendApiService
+        .fetchCheckpointsFeatureIsEnabledStatus().then(
+          (checkpointsFeatureIsEnabled) => {
+            this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
+            if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+              // Fetching the number of checkpoints.
+              this.getCheckpointCount();
+              this.setLearnerHasViewedLessonInfoTooltip();
+            }
+          }
+        );
     }
     this.directiveSubscriptions.add(
       this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
-        if (this.checkpointCount) {
-          this.showProgressReminderModal();
-        } else {
-          this.getCheckpointCount().then(() => {
+        if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+          if (this.checkpointCount) {
             this.showProgressReminderModal();
-          });
+          } else {
+            this.getCheckpointCount().then(() => {
+              this.showProgressReminderModal();
+            });
+          }
         }
       })
     );
