@@ -54,10 +54,10 @@
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <input id="view-contributor-username-input"
-                 type="text" 
-                 name="username" 
-                 placeholder="Enter username" 
-                 ng-model="$ctrl.formData.viewContributionReviewers.username" 
+                 type="text"
+                 name="username"
+                 placeholder="Enter username"
+                 ng-model="$ctrl.formData.viewContributionReviewers.username"
                  class="form-control e2e-test-form-contributor-username">
         </div>
       </div>
@@ -133,8 +133,10 @@
 
       <div class="d-xl-inline-flex form-group"
            ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.addContributionReviewer.category)">
-        <label for="add-contribution-rights-language-select" 
-              class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
+        <label for="add-contribution-rights-language-select"
+               class="col-md-4 col-lg-4 col-sm-4 col-form-label">
+          Select language
+        </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="add-contribution-rights-language-select"
                   ng-model="$ctrl.formData.addContributionReviewer.languageCode"
@@ -167,12 +169,14 @@
       </div>
 
       <div class="d-xl-inline-flex form-group">
-        <label for="revoke-contribution-rights-category-select" 
-               class="col-md-4 col-lg-4 col-sm-4 col-form-label">Remove from</label>
+        <label for="revoke-contribution-rights-category-select"
+               class="col-md-4 col-lg-4 col-sm-4 col-form-label">
+          Remove from
+        </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="revoke-contribution-rights-category-select"
-                  ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES" 
-                  ng-model="$ctrl.formData.removeContributionReviewer.category" 
+                  ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
+                  ng-model="$ctrl.formData.removeContributionReviewer.category"
                   class="form-control">
           </select>
         </div>
@@ -181,7 +185,9 @@
       <div class="d-xl-inline-flex form-group"
            ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.removeContributionReviewer.category)">
         <label for="revoke-contribution-rights-language-select"
-               class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
+               class="col-md-4 col-lg-4 col-sm-4 col-form-label">
+          Select language
+        </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="revoke-contribution-rights-language-select"
                   ng-model="$ctrl.formData.removeContributionReviewer.languageCode"
