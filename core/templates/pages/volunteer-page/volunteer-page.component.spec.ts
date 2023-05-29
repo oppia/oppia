@@ -74,8 +74,8 @@ describe('Volunteer page', () => {
   it('should set component properties when ngOnInit() is called', () => {
     spyOn(translateService.onLangChange, 'subscribe');
 
-    expect(component.bannerImgPath).toBeDefined();
-    expect(component.footerImgPath).toBeDefined();
+    expect(component.bannerImgPath).toBe('');
+    expect(component.footerImgPath).toBe('');
 
     component.ngOnInit();
 
