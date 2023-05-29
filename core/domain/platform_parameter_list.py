@@ -97,4 +97,4 @@ Registry.create_feature_flag(
     ParamNames.SHOW_TRANSLATION_SIZE,
     'This flag is to show translation size on translation cards in' +
     'contributor dashboard.',
-    platform_parameter_domain.FeatureStages.PROD)
+    platform_parameter_domain.FeatureStages.DEV)
