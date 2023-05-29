@@ -22,6 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -3755,6 +3756,7 @@ class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
             response, {
                 'checkpoints_feature_is_enabled': True,
             })
+
 
 class EntityTranslationHandlerTest(test_utils.GenericTestBase):
     """Unit test for the EntityTranslationHandler."""
