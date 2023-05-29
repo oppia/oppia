@@ -79,8 +79,8 @@ export class ExplorationFooterComponent {
   lastCheckpointWasCompleted: boolean = false;
   learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
-  CHECKPOINTS_FEATURE_IS_ENABLED = false;
   footerIsInQuestionPlayerMode: boolean = false;
+  CHECKPOINTS_FEATURE_IS_ENABLED = false;
 
   conceptCardForStateExists: boolean = true;
   linkedSkillId: string | null = null;

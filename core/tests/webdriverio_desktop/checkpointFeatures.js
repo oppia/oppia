@@ -92,7 +92,7 @@ describe('Checkpoints functionality', function() {
     // The below lines enable the checkpoint_celebration flag in prod mode.
     // They should be removed after the checkpoint_celebration flag is
     // deprecated.
-    await adminPage.getFeaturesTab();
+    await adminPage.getPlatformParametersTab();
     var checkpointCelebrationFlag = (
       await adminPage.getCheckpointCelebrationFeatureElement());
     await adminPage.enableFeatureForProd(checkpointCelebrationFlag);

@@ -25,7 +25,7 @@ var waitFor = require('./waitFor.js');
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
   var addConditionButtonLocator = '.e2e-test-add-condition-button';
-  var addFeatureRuleButtonLocator = '.e2e-test-feature-add-rule-button';
+  var addParameterRuleButtonLocator = '.e2e-test-parameter-add-rule-button';
   var addNewRoleButton = $('.e2e-test-add-new-role-button');
   var adminRolesTab = $('.e2e-test-admin-roles-tab');
   var adminRolesTabContainer = $('.e2e-test-roles-tab-container');
@@ -34,12 +34,12 @@ var AdminPage = function() {
   var explorationElementsSelector = function() {
     return $$('.e2e-test-reload-exploration-row');
   };
-  var featureFlagElementsSelector = function() {
-    return $$('.e2e-test-feature-flag');
+  var platformParamElementsSelector = function() {
+    return $$('.e2e-test-platform-param');
   };
-  var featureFlagElement = $('.e2e-test-feature-flag');
-  var featureNameLocator = '.e2e-test-feature-name';
-  var featuresTab = $('.e2e-test-admin-features-tab');
+  var platformParameterElement = $('.e2e-test-platform-param');
+  var parameterNameLocator = '.e2e-test-parameter-name';
+  var platformParametersTab = $('.e2e-test-admin-parameters-tab');
   var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
   var progressSpinner = $('.e2e-test-progress-spinner');
   var reloadCollectionButtonsSelector = function() {
@@ -168,20 +168,21 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getFeaturesTab = async function() {
+  this.getPlatformParametersTab = async function() {
     await this.get();
-    await action.click('Admin features tab', featuresTab);
+    await action.click(
+      'Admin platform parameters tab', platformParametersTab);
     await waitFor.visibilityOf(
-      featureFlagElement, 'Feature flags not showing up');
+      platformParameterElement, 'Platform parameters not showing up');
   };
 
   this.getDummyFeatureElement = async function() {
-    var featureFlagElements = await featureFlagElementsSelector();
-    var count = featureFlagElements.length;
+    var platformParameterElements = await platformParamElementsSelector();
+    var count = platformParameterElements.length;
     for (let i = 0; i < count; i++) {
-      var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'dummy_feature') {
+      var elem = platformParameterElements[i];
+      if ((await elem.$(parameterNameLocator).getText()) ===
+          'dummy_platform_parameter') {
         return elem;
       }
     }
@@ -189,24 +190,24 @@ var AdminPage = function() {
     return null;
   };
 
-  this.removeAllRulesOfFeature = async function(featureElement) {
-    while (!await featureElement.$(noRuleIndicatorLocator).isExisting()) {
+  this.removeAllRulesOfFeature = async function(parameterElement) {
+    while (!await parameterElement.$(noRuleIndicatorLocator).isExisting()) {
       await action.click(
-        'Remove feature rule button',
-        featureElement
+        'Remove parameter rule button',
+        parameterElement
           .$(removeRuleButtonLocator)
       );
     }
   };
 
-  // Remove this method after the end_chapter_celebration feature flag
+  // Remove this method after the end_chapter_celebration parameter
   // is deprecated.
   this.getEndChapterCelebrationFeatureElement = async function() {
-    var featureFlagElements = await featureFlagElementsSelector();
-    var count = featureFlagElements.length;
+    var platformParameterElements = await platformParamElementsSelector();
+    var count = platformParameterElements.length;
     for (let i = 0; i < count; i++) {
-      var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
+      var elem = platformParameterElements[i];
+      if ((await elem.$(parameterNameLocator).getText()) ===
           'end_chapter_celebration') {
         return elem;
       }
@@ -215,14 +216,14 @@ var AdminPage = function() {
     return null;
   };
 
-  // Remove this method after the checkpoint_celebration feature flag
+  // Remove this method after the checkpoint_celebration parameter
   // is deprecated.
   this.getCheckpointCelebrationFeatureElement = async function() {
-    var featureFlagElements = await featureFlagElementsSelector();
-    var count = featureFlagElements.length;
+    var platformParameterElements = await platformParamElementsSelector();
+    var count = platformParameterElements.length;
     for (let i = 0; i < count; i++) {
-      var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
+      var elem = platformParameterElements[i];
+      if ((await elem.$(parameterNameLocator).getText()) ===
           'checkpoint_celebration') {
         return elem;
       }
@@ -231,64 +232,64 @@ var AdminPage = function() {
     return null;
   };
 
-  // This function is meant to be used to enable a feature gated behind
-  // a feature flag in prod mode, which is the server environment the E2E
+  // This function is meant to be used to enable a parameter gated behind
+  // a parameter in prod mode, which is the server environment the E2E
   // tests are run in.
-  this.enableFeatureForProd = async function(featureElement) {
-    await this.removeAllRulesOfFeature(featureElement);
+  this.enableFeatureForProd = async function(parameterElement) {
+    await this.removeAllRulesOfFeature(parameterElement);
 
     await action.click(
-      'Add feature rule button',
-      featureElement
-        .$(addFeatureRuleButtonLocator)
+      'Add parameter rule button',
+      parameterElement
+        .$(addParameterRuleButtonLocator)
     );
 
     await waitFor.visibilityOf(
-      featureElement.$(valueSelectorLocator),
+      parameterElement.$(valueSelectorLocator),
       'Value Selector takes too long to appear'
     );
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
+    await (parameterElement.$(valueSelectorLocator)).selectByVisibleText(
       'Enabled');
 
     await action.click(
       'Add condition button',
-      featureElement
+      parameterElement
         .$(addConditionButtonLocator)
     );
 
     await waitFor.visibilityOf(
-      featureElement.$(serverModeSelectorLocator),
+      parameterElement.$(serverModeSelectorLocator),
       'Value Selector takes too long to appear'
     );
-    await (featureElement.$(serverModeSelectorLocator)).selectByVisibleText(
+    await (parameterElement.$(serverModeSelectorLocator)).selectByVisibleText(
       'prod');
 
-    await this.saveChangeOfFeature(featureElement);
+    await this.saveChangeOfFeature(parameterElement);
   };
 
-  this.enableFeatureForDev = async function(featureElement) {
-    await this.removeAllRulesOfFeature(featureElement);
+  this.enableFeatureForDev = async function(parameterElement) {
+    await this.removeAllRulesOfFeature(parameterElement);
 
     await action.click(
-      'Add feature rule button',
-      featureElement
-        .$(addFeatureRuleButtonLocator)
+      'Add parameter rule button',
+      parameterElement
+        .$(addParameterRuleButtonLocator)
     );
 
     await waitFor.visibilityOf(
-      featureElement.$(valueSelectorLocator),
+      parameterElement.$(valueSelectorLocator),
       'Value Selector takes too long to appear'
     );
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
+    await (parameterElement.$(valueSelectorLocator)).selectByVisibleText(
       'Enabled');
 
     await action.click(
       'Add condition button',
-      featureElement
+      parameterElement
         .$(addConditionButtonLocator)
     );
 
-    await this.saveChangeOfFeature(featureElement);
+    await this.saveChangeOfFeature(parameterElement);
   };
 
   this.editConfigProperty = async function(
@@ -348,10 +349,10 @@ var AdminPage = function() {
       removeButtonElement, 'Role removal button takes too long to appear.');
   };
 
-  this.saveChangeOfFeature = async function(featureElement) {
+  this.saveChangeOfFeature = async function(parameterElement) {
     await action.click(
-      'Save feature button',
-      featureElement
+      'Save parameter button',
+      parameterElement
         .$(saveButtonLocator)
     );
 

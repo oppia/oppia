@@ -1300,6 +1300,7 @@ describe('Conversation skin component', () => {
 
   it('should display the exploration after the the progress reminder modal' +
    'has loaded', () => {
+    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(contextService, 'isInExplorationPlayerPage').and.returnValue(true);
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(

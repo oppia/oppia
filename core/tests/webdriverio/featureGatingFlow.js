@@ -47,7 +47,7 @@ describe('Feature Gating Flow', function() {
   afterAll(async function() {
     await users.login(ADMIN_USER1_EMAIL, true);
 
-    await adminPage.getFeaturesTab();
+    await adminPage.getPlatformParametersTab();
     var dummy = await adminPage.getDummyFeatureElement();
 
     await adminPage.removeAllRulesOfFeature(dummy);
@@ -58,7 +58,7 @@ describe('Feature Gating Flow', function() {
   it('should not show indicators gated by dummy feature when disabled',
     async() => {
       await users.login(ADMIN_USER1_EMAIL, true);
-      await adminPage.getFeaturesTab();
+      await adminPage.getPlatformParametersTab();
 
       // Indicator in Angular component that is visible if the dummy_feature
       // is enabled, and the feature status is successfully loaded in the
@@ -81,7 +81,7 @@ describe('Feature Gating Flow', function() {
   it('should show dummy feature in the features tab', async() => {
     await users.login(ADMIN_USER1_EMAIL, true);
 
-    await adminPage.getFeaturesTab();
+    await adminPage.getPlatformParametersTab();
 
     var dummy = await adminPage.getDummyFeatureElement();
 
@@ -93,14 +93,14 @@ describe('Feature Gating Flow', function() {
     async() => {
       await users.login(ADMIN_USER1_EMAIL, true);
 
-      await adminPage.getFeaturesTab();
+      await adminPage.getPlatformParametersTab();
       var dummy = await adminPage.getDummyFeatureElement();
       await adminPage.enableFeatureForDev(dummy);
 
       await users.logout();
       await users.login(ADMIN_USER2_EMAIL, true);
 
-      await adminPage.getFeaturesTab();
+      await adminPage.getPlatformParametersTab();
 
       // Indicator in Angular component that is visible if the dummy_feature
       // is enabled, and the feature status is successfully loaded in the

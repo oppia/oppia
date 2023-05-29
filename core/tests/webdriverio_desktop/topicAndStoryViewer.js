@@ -92,7 +92,7 @@ describe('Topic and Story viewer functionality', function() {
     // The below lines enable the end_chapter_celebration flag in prod mode.
     // They should be removed after the end_chapter_celebration flag is
     // deprecated.
-    await adminPage.getFeaturesTab();
+    await adminPage.getPlatformParametersTab();
     var endChapterFlag = (
       await adminPage.getEndChapterCelebrationFeatureElement());
     await adminPage.enableFeatureForProd(endChapterFlag);

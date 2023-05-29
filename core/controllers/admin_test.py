@@ -982,7 +982,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'filters': [
                     {
                         'type': 'server_mode',
-                        'conditions': [['=', 'dev']]
+                        'conditions': [['=', 'prod']]
                     }
                 ],
                 'value_when_matched': True
