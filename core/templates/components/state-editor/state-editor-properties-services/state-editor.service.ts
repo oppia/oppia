@@ -88,7 +88,7 @@ export class StateEditorService {
   correctnessFeedbackEnabled: boolean = false;
   inQuestionMode: boolean = false;
   misconceptionsBySkill: {} = {};
-  explorationIsWhitelisted: boolean = false;
+  explorationIsCurated: boolean = false;
   solicitAnswerDetails: boolean = false;
   cardIsCheckpoint: boolean = false;
   stateContentEditorInitialised: boolean = false;
@@ -155,12 +155,8 @@ export class StateEditorService {
     this.activeStateName = newActiveStateName;
   }
 
-  isExplorationWhitelisted(): boolean {
-    return this.explorationIsWhitelisted;
-  }
-
-  updateExplorationWhitelistedStatus(value: boolean): void {
-    this.explorationIsWhitelisted = value;
+  isExplorationCurated(): boolean {
+    return this.explorationIsCurated;
   }
 
   setMisconceptionsBySkill(newMisconceptionsBySkill: {}): void {
