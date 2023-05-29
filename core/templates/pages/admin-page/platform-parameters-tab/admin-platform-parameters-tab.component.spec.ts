@@ -17,6 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks, tick } from
   '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
@@ -54,7 +55,9 @@ describe('Admin page platform parameters tab', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
-      declarations: [AdminPlatformParametersTabComponent]
+      declarations: [AdminPlatformParametersTabComponent],
+      providers: [AdminTaskManagerService],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminPlatformParametersTabComponent);
@@ -79,10 +82,10 @@ describe('Admin page platform parameters tab', () => {
         PlatformParameter.createFromBackendDict({
           data_type: 'bool',
           default_value: false,
-          description: 'This is a dummy feature flag.',
-          feature_stage: FeatureStage.DEV,
-          is_feature: true,
-          name: 'dummy_feature',
+          description: 'This is a dummy platform parameter.',
+          feature_stage: null,
+          is_feature: false,
+          name: 'dummy_platform_parameter',
           rule_schema_version: 1,
           rules: [{
             filters: [
@@ -91,7 +94,7 @@ describe('Admin page platform parameters tab', () => {
                 conditions: [['=', ServerMode.Dev]]
               }
             ],
-            // This does not match the data type of feature flags, but this is
+            // This does not match the data type of platform param, but this is
             // intended as string values are more suitable for
             // identifying rules in the following tests.
             value_when_matched: 'original',
@@ -100,7 +103,7 @@ describe('Admin page platform parameters tab', () => {
       ]
     } as AdminPageData);
 
-    updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
+    updateApiSpy = spyOn(featureApiService, 'updatePlatformParameter')
       .and.resolveTo();
 
     component.ngOnInit();
@@ -308,7 +311,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToTop(platformParameter);
-      component.updateFeatureRulesAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -324,7 +327,7 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
 
         component.addNewRuleToTop(platformParameter);
-        component.updateFeatureRulesAsync(platformParameter);
+        component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -346,7 +349,7 @@ describe('Admin page platform parameters tab', () => {
         const originalFeatureFlag = cloneDeep(platformParameter);
 
         component.addNewRuleToTop(platformParameter);
-        component.updateFeatureRulesAsync(platformParameter);
+        component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -362,7 +365,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToTop(platformParameter);
-      component.updateFeatureRulesAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -383,7 +386,7 @@ describe('Admin page platform parameters tab', () => {
         const platformParameter = component.platformParameters[0];
 
         component.addNewRuleToTop(platformParameter);
-        component.updateFeatureRulesAsync(platformParameter);
+        component.updateParameterRulesAsync(platformParameter);
 
         flushMicrotasks();
 
@@ -400,7 +403,7 @@ describe('Admin page platform parameters tab', () => {
       // Two identical rules.
       component.addNewRuleToTop(platformParameter);
       component.addNewRuleToTop(platformParameter);
-      component.updateFeatureRulesAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -420,7 +423,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToTop(platformParameter);
-      component.updateFeatureRulesAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -442,7 +445,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToTop(platformParameter);
-      component.updateFeatureRulesAsync(platformParameter);
+      component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
@@ -458,7 +461,7 @@ describe('Admin page platform parameters tab', () => {
       const platformParameter = component.platformParameters[0];
 
       expect(() => {
-        component.updateFeatureRulesAsync(platformParameter);
+        component.updateParameterRulesAsync(platformParameter);
         tick();
       }).toThrowError();
     }));
@@ -469,7 +472,7 @@ describe('Admin page platform parameters tab', () => {
       () => {
         const platformParameter = component.platformParameters[0];
 
-        expect(component.isFeatureFlagRulesChanged(platformParameter))
+        expect(component.isPlatformParamRulesChanged(platformParameter))
           .toBeFalse();
       }
     );
@@ -481,7 +484,7 @@ describe('Admin page platform parameters tab', () => {
 
         component.addNewRuleToTop(platformParameter);
 
-        expect(component.isFeatureFlagRulesChanged(platformParameter))
+        expect(component.isPlatformParamRulesChanged(platformParameter))
           .toBeTrue();
       }
     );
@@ -517,7 +520,7 @@ describe('Admin page platform parameters tab', () => {
       });
 
       expect(() => {
-        component.isFeatureFlagRulesChanged(platformParameter);
+        component.isPlatformParamRulesChanged(platformParameter);
       }).toThrowError();
     });
   });
