@@ -49,7 +49,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       is_feature: true,
       feature_stage: FeatureStage.DEV
     }]
-  }
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
