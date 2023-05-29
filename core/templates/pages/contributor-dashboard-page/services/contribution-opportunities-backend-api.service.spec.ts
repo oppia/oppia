@@ -332,7 +332,7 @@ describe('Contribution Opportunities backend API service', function() {
         .then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
-        '/retrivefeaturedtranslationlanguages'
+        '/retrievefeaturedtranslationlanguages'
       );
       expect(req.request.method).toEqual('GET');
       req.flush({
@@ -362,7 +362,7 @@ describe('Contribution Opportunities backend API service', function() {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/retrivefeaturedtranslationlanguages'
+      '/retrievefeaturedtranslationlanguages'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({
