@@ -36,7 +36,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   @Input() modalId!: symbol;
   @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
-  skillId: string = '';
+  private _initialEntityId = '';
+  private _initialEntityType = '';
   skills: SkillBackendDict[] = [];
   showLoading = false;
   skillsToShow: SkillBackendDict[] = [];
@@ -74,10 +75,11 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.skillId = this.contextService.getEntityId();
     this.showLoading = true;
     this.skills = [];
     if (this.value) {
+      this._initialEntityId = this.contextService.getEntityId();
+      this._initialEntityType = this.contextService.getEntityType();
       this.contextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.SKILL, this.value);
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
@@ -102,12 +104,12 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     this.contextService.removeCustomEntityContext();
     /**
      * Note to developers:
-     * We are manually setting customEntityContext so that it
-     * doesn't cause any breakages in question-editor.
+     * We are manually setting customEntityContext back to it's previous state
+     * to ensure it doesn't cause any breakages in question-editor.
      * See issue #16985 for detailed discussion.
      */
     this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS, this.skillId);
+      this._initialEntityType, this._initialEntityId);
   }
 }
 
