@@ -83,7 +83,7 @@ describe('Outcome Editor Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
-    spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
+    spyOn(stateEditorService, 'isExplorationCurated').and.returnValue(true);
   });
 
   afterEach(() => {

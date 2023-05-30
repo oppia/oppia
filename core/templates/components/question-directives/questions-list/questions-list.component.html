@@ -72,7 +72,7 @@
                     matTooltipClass="oppia-mat-tooltip-list">
                     ⚠️
               </span>
-              <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId());$event.stopPropagation();"
+              <span (click)="removeQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(),questionSummaryForOneSkill.getSkillDifficulty());$event.stopPropagation();"
                     class="link-off-icon">
                 <i class="fas fa-trash"></i>
               </span>
@@ -137,7 +137,7 @@
             class="w-100">
         <button class="btn add-question-btn question-edit-save-button e2e-test-save-question-button"
                 (click)="saveQuestion()"
-                [disabled]="!isQuestionSavable()">
+                [disabled]="!isQuestionSavable() || questionIsBeingSaved">
           <i class="fas fa-exclamation-triangle story-save-draft-warning"
             *ngIf="!isQuestionSavable()">
           </i>

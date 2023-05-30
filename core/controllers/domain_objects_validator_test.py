@@ -16,16 +16,23 @@
 
 from __future__ import annotations
 
+import datetime
 import os
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.controllers import domain_objects_validator
 from core.domain import blog_services
+from core.domain import change_domain
+from core.domain import improvements_domain
+from core.domain import question_domain
 from core.domain import state_domain
+from core.domain import stats_domain
+from core.domain import translation_domain
 from core.tests import test_utils
 
-from typing import Dict, Optional, Union
+from typing import Dict, Mapping, Optional, Union
 
 
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
@@ -73,6 +80,36 @@ class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
         }
         domain_objects_validator.validate_suggestion_change(
             correct_change_dict)
+
+    def test_correct_question_domain_object_do_not_raises_exception(
+            self
+        ) -> None:
+        content_id_generator: translation_domain.ContentIdGenerator = (
+                translation_domain.ContentIdGenerator()
+        )
+        question_dict: question_domain.QuestionDict = {
+            'question_state_data': self._create_valid_question_data(
+                'default_state', content_id_generator
+            ).to_dict(),
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION
+            ),
+            'linked_skill_ids': ['skill_1'],
+            'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+            'next_content_id_index': (
+                content_id_generator.next_content_id_index),
+            'version': 44,
+            'id': '',
+        }
+        correct_change_dict: Mapping[str,
+            change_domain.AcceptableChangeDictTypes] = {
+            'cmd': 'create_new_fully_specified_question',
+            'question_dict': question_dict,
+            'skill_id': 'skill_123',
+            'skill_difficulty': 0.3
+        }
+        domain_objects_validator.validate_suggestion_change(correct_change_dict)
 
 
 class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
@@ -149,6 +186,54 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             ' received: \'123\''):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change)
+
+    def test_omit_optional_fields_raises_no_exception(self) -> None:
+        # There should be no exception for missing fields because:
+        # 1. When saving blog drafts, only the title and content are required.
+        # 2. When unpublising blogs, the `change_dict` is empty.
+        blog_post_change_no_tags = {
+            'title': 'Hello Bloggers',
+            'thumbnail_filename': 'name.svg',
+            'content': 'hi'
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        domain_objects_validator.validate_change_dict_for_blog_post(
+            blog_post_change_no_tags) # type: ignore[arg-type]
+
+        blog_post_change_no_thumbnail = {
+            'title': 'Hello Bloggers',
+            'tags': ['News', 'Learners'],
+            'content': 'hi'
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        domain_objects_validator.validate_change_dict_for_blog_post(
+            blog_post_change_no_thumbnail) # type: ignore[arg-type]
+
+        blog_post_change_no_content = {
+            'title': 'Hello Bloggers',
+            'tags': ['News', 'Learners'],
+            'thumbnail_filename': 'name.svg',
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        domain_objects_validator.validate_change_dict_for_blog_post(
+            blog_post_change_no_content) # type: ignore[arg-type]
+
+        blog_post_change_no_title = {
+            'tags': ['News', 'Learners'],
+            'thumbnail_filename': 'name.svg',
+            'content': 'hi'
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        domain_objects_validator.validate_change_dict_for_blog_post(
+            blog_post_change_no_title) # type: ignore[arg-type]
 
     def test_valid_dict_raises_no_exception(self) -> None:
         blog_post_change: blog_services.BlogPostChangeDict = {
@@ -287,7 +372,7 @@ class ValidateEmailDashboardDataTests(test_utils.GenericTestBase):
             'created_collection': 6,
             'have_fun': 6,
             'explore': True,
-            }
+        }
         with self.assertRaisesRegex(Exception, '400 Invalid input for query.'):
             domain_objects_validator.validate_email_dashboard_data(data)
 
@@ -300,5 +385,226 @@ class ValidateEmailDashboardDataTests(test_utils.GenericTestBase):
             'edited_at_least_n_exps': True,
             'edited_fewer_than_n_exps': None,
             'created_collection': 7,
-            }
+        }
         domain_objects_validator.validate_email_dashboard_data(data)
+
+
+class ValidarteTaskEntriesTests(test_utils.GenericTestBase):
+    """Tests to validate task entries"""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.mock_date = datetime.datetime(2023, 4, 17, 22, 0, 0, 123456)
+        self.task_entry_dict = improvements_domain.TaskEntry(
+            constants.TASK_ENTITY_TYPE_EXPLORATION, 'eid', 1,
+            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.TASK_TARGET_TYPE_STATE,
+            feconf.DEFAULT_INIT_STATE_NAME, 'issue description',
+            constants.TASK_STATUS_RESOLVED, self.owner_id,
+            self.mock_date
+       ).to_dict()
+
+    def _test_missing_field(self, field: str) -> None:
+        """Check if `domain_objects_validator.validate_task_entries` raises
+        an exception when a field is missing.
+
+        Args:
+            field: str. The name of the field that should be removed from the
+                task entry dictionary before validation.
+
+        Raises:
+            Exception. If the validation does not raise an exception with
+                the message "No [field name] provided".
+        """
+        task_entry_without_field = self.task_entry_dict
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        task_entry_without_field.pop(field) # type: ignore[misc]
+
+        with self.assertRaisesRegex(Exception, 'No %s provided' % field):
+            domain_objects_validator.validate_task_entries(
+                    task_entry_without_field)
+
+    def test_missing_entity_version_raises_exception(self) -> None:
+        self._test_missing_field('entity_version')
+
+    def test_missing_task_type_raises_exception(self) -> None:
+        self._test_missing_field('task_type')
+
+    def test_missing_target_id_raises_exception(self) -> None:
+        self._test_missing_field('target_id')
+
+    def test_missing_status_raises_exception(self) -> None:
+        self._test_missing_field('status')
+
+    def test_valid_dict_raises_no_exception(self) -> None:
+        task_entry_no_entity_version = self.task_entry_dict
+        domain_objects_validator.validate_task_entries(
+                task_entry_no_entity_version)
+
+
+class ValidateAggregatedStatsTests(test_utils.GenericTestBase):
+    """Tests for validate aggregated stats tests.
+
+    The tests here are copied from core.domain.stats_domain_test in
+    SessionStateStatsTests class, because validate_aggregated_stats simply
+    forwards its argument to SessionStateStats.validate_aggregated_stats_dict,
+    which is already tested in SessionStateStatsTests.
+    """
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[typeddict-item] is used
+    # to test that num_starts must be in aggregated stats dict.
+    def test_aggregated_stats_validation_when_session_property_is_missing(
+            self
+        ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = { # type: ignore[typeddict-item]
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'num_starts not in aggregated stats dict.'
+        ):
+            domain_objects_validator.validate_aggregated_stats(
+                sessions_state_stats)
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[typeddict-item] is used
+    # to test that num_actual_starts must be an int.
+    def test_aggregated_stats_validation_when_session_property_type_is_invalid(
+        self
+    ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = {
+            'num_starts': 1,
+            'num_actual_starts': 'invalid_type', # type: ignore[typeddict-item]
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected num_actual_starts to be an int, received invalid_type'
+        ):
+            domain_objects_validator.validate_aggregated_stats(
+                sessions_state_stats)
+
+    def test_aggregated_stats_validation_when_state_property_type_is_missing(
+        self
+    ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'total_answers_count not in state stats mapping of Home in '
+            'aggregated stats dict.'
+        ):
+            domain_objects_validator.validate_aggregated_stats(
+                sessions_state_stats)
+
+    # TODO(#13528): Here we use MyPy ignore because we remove this test after
+    # the backend is fully type-annotated. Here ignore[dict-item] is used to
+    # test that first_hit_count must be an int.
+    def test_aggregated_stats_validation_when_state_property_type_is_invalid(
+        self
+    ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 'invalid_count', # type: ignore[dict-item]
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected first_hit_count to be an int, received invalid_count'
+        ):
+            domain_objects_validator.validate_aggregated_stats(
+                sessions_state_stats)
+
+    def test_aggregated_stats_validation_when_fully_valid(
+        self
+    ) -> None:
+        sessions_state_stats: stats_domain.AggregatedStatsDict = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        self.assertEqual(
+            domain_objects_validator.validate_aggregated_stats(
+                sessions_state_stats
+            ),
+            sessions_state_stats
+        )
+
+
+class ValidateSkillIdsTests(test_utils.GenericTestBase):
+    """Tests to validate skill ids"""
+
+    def test_invalid_skill_ids_raises_exception(self) -> None:
+        # The entire skill_ids string is invalid.
+        entirely_invalid_skill_ids: str = 'not_valid_skill_id_123'
+        with self.assertRaisesRegex(Exception, 'Invalid skill id'):
+            domain_objects_validator.validate_skill_ids(
+                    entirely_invalid_skill_ids)
+
+        # Only part of the skill_ids string is invalid.
+        partially_invalid_skill_ids: str = 'skillid12345,not_valid_skill_id_123'
+        with self.assertRaisesRegex(Exception, 'Invalid skill id'):
+            domain_objects_validator.validate_skill_ids(
+                    partially_invalid_skill_ids)
+
+    def test_valid_skill_ids_do_not_raise_exception(self) -> None:
+        valid_skill_ids: str = 'skillid12345'
+        domain_objects_validator.validate_skill_ids(valid_skill_ids)
