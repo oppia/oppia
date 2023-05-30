@@ -78,7 +78,7 @@ describe('Admin router service', () => {
   });
 
   it('should be able to navigate to the platform params tab', () => {
-    expect(ars.isFeaturesTabOpen()).toBe(false);
+    expect(ars.isPlatformParamsTabOpen()).toBe(false);
     ars.showTab('#/platform-parameters');
     expect(ars.isActivitiesTabOpen()).toBe(false);
     expect(ars.isConfigTabOpen()).toBe(false);
