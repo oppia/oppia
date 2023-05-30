@@ -101,6 +101,7 @@ var LibraryPage = function() {
   this.get = async function() {
     await browser.url(LIBRARY_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
+    await searchButton.isExisting();
   };
 
   this.getHomePage = async function() {

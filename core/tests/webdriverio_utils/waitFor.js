@@ -78,6 +78,10 @@ var invisibilityOf = async function(element, errorMessage) {
 
 /**
  * Consider adding this method after each browser.url() call.
+ * However, note that it does not guarantee that the page is fully loaded. It
+ * is advised to add additional page-specific checks to each page's get()
+ * method that verify the visibility of elements that are guaranteed to be
+ * on that page.
  */
 var pageToFullyLoad = async function() {
   var loadingMessage = await $('.e2e-test-loading-fullpage');
