@@ -22,13 +22,15 @@ const testConstants = require(
   '../puppeteer-testing-utilities/test-constants.js');
 const ContributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
+const { showMessage } = require(
+  '../puppeteer-testing-utilities/show-message-utils.js');
 
 const translationRightValue = 'string:translation';
-const usernameMethodVaue = 'username';
-const roleMethodVaue = 'role';
+const usernameMethodValue = 'username';
+const roleMethodValue = 'role';
 
-// "View Contributor Dashboard Users" form elements
-const viewContributorMethodSelect = 
+// "View Contributor Dashboard Users" form elements.
+const viewContributorMethodSelect =
   'select#view-contributor-method-select';
 const viewContributerUsernameInput =
   'input#view-contributor-username-input';
@@ -36,14 +38,14 @@ const viewContributorCategorySelect =
   'select#view-contributor-category-select';
 const viewContributorLanguageSelect =
   'select#view-contributor-language-select';
-const viewContributorSubmitButton = 
+const viewContributorSubmitButton =
   'button#view-contributor-submit-button';
-const viewContributorLanguageResult = 
-  '.e2e-test-translation-reviewer-language'
+const viewContributorLanguageResult =
+  '.e2e-test-translation-reviewer-language';
 const viewLanguageRoleUserResult =
-  '.e2e-test-reviewer-roles-result'
+  '.e2e-test-reviewer-roles-result';
 
-// "Add Contribution Rights" form elements
+// "Add Contribution Rights" form elements.
 const addContributorUsernameInput =
   'input#add-contribution-rights-user-input';
 const addContributonRightsCategorySelect =
@@ -53,19 +55,19 @@ const addContributonRightsLanguageDropdown =
 const addontributionRightsSubmitButton =
    'button#add-contribution-rights-submit-button';
 
-// "Remove Contribution Rights" form elements
+// "Remove Contribution Rights" form elements.
 const revokeContributorUsernameInput =
-   'input#revoke-contribution-rights-user-input';
- const revokeContributonRightsCategorySelect =
-   'select#revoke-contribution-rights-category-select';
- const revokeContributonRightsLanguageSelect =
-   'select#revoke-contribution-rights-language-select';
- const revokeContributionRightsSubmitButton =
-    'button#revoke-contribution-rights-submit-button';
+  'input#revoke-contribution-rights-user-input';
+const revokeContributonRightsCategorySelect =
+  'select#revoke-contribution-rights-category-select';
+const revokeContributonRightsLanguageSelect =
+  'select#revoke-contribution-rights-language-select';
+const revokeContributionRightsSubmitButton =
+  'button#revoke-contribution-rights-submit-button';
 
 module.exports = class TranslationAdmin extends baseUser {
   /**
-   * Function for navigating to the blog dashboard page.
+   * Function for navigating to the contributor dashboard admin page.
    */
   async navigateToContributorDashboardAdminPage() {
     await this.goto(ContributorDashboardAdminUrl);
@@ -74,89 +76,89 @@ module.exports = class TranslationAdmin extends baseUser {
   /**
    * Function for assigning a translation right to a user.
    * @param {string} username - the username of the user.
-   * @param {string} language - the language the user needing transltion rights.
+   * @param {string} languageValue - the language to assign as an option value.
    */
-  async assignTranslationRights(username, language) {
+  async assignTranslationRights(username, languageValue) {
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect, translationRightValue);
-    await this.select(addContributonRightsLanguageDropdown, language);
+    await this.select(addContributonRightsLanguageDropdown, languageValue);
     await this.clickOn(addontributionRightsSubmitButton);
 
     // Wait a moment for changes to take effect.
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(1000);
   }
 
   /**
-   * Function for revoking a translation right to from user.
+   * Function for revoking a translation right from a user.
    * @param {string} username - the username of the user.
-   * @param {string} language - the language the user with translation rights.
+   * @param {string} languageValue - the language to revoke as an option value.
    */
-  async revokeTranslationRights(username, language) {
+  async revokeTranslationRights(username, languageValue) {
     await this.type(revokeContributorUsernameInput, username);
     await this.select(
       revokeContributonRightsCategorySelect, translationRightValue);
-    await this.select(revokeContributonRightsLanguageSelect, language);
+    await this.select(revokeContributonRightsLanguageSelect, languageValue);
     await this.clickOn(revokeContributionRightsSubmitButton);
   }
 
   /**
    * Function to display contributon rights by user.
-   * @param {string} username - the user to view.
+   * @param {string} username - the username of the user to view.
    */
   async viewContributorRightsByUser(username) {
-    await this.select(viewContributorMethodSelect, usernameMethodVaue);
+    await this.select(viewContributorMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
   }
 
   /**
    * Function to display translation rights by language.
-   * @param {string} language - the language option as an option value.
+   * @param {string} languageValue - the language option as an option value.
    */
-  async viewContributorTranslationRightsByLanguage(language) {
-    await this.select(viewContributorMethodSelect, roleMethodVaue);
+  async viewContributorTranslationRightsByLanguage(languageValue) {
+    await this.select(viewContributorMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
-    await this.select(viewContributorLanguageSelect, language);
+    await this.select(viewContributorLanguageSelect, languageValue);
     await this.clickOn(viewContributorSubmitButton);
 
     // Wait a moment for usernames to appear.
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(1000);
   }
 
   /**
    * Function to check if the language is displayed as a translation right.
-   * @param {string} language - the language.
+   * @param {string} language - the language to match.
    */
   async expectLanguageToBeDisplayedforSelectedUser(language) {
     await this.page.waitForSelector(viewContributorLanguageResult);
     let displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
       element => element.innerText);
-    if (!displayedLanguage.includes(language)){
+    if (!displayedLanguage.includes(language)) {
       throw new Error(
         `Selected user does not have translation rights for ${language}!`);
     } else {
-      console.log(
+      showMessage(
         `Selected user has translation rights for ${displayedLanguage}`);
     }
   }
 
   /**
    * Function to check if the user is displayed as a translator.
-   * @param {string} user - the user option as an option value.
+   * @param {string} user - the user expected to be displayed.
    */
-    async expectUserToBeDisplayedForSelectedLanguage(user) {
-      await this.page.waitForSelector(viewLanguageRoleUserResult);
-      let displayedUsers = await this.page.$eval(
-        viewLanguageRoleUserResult,
-        element => element.innerText
-      );
-      if (!displayedUsers.includes(user)){
-        throw new Error(
-          `${user} does not have translation rights for selected language!`);
-      }
+  async expectUserToBeDisplayedForSelectedLanguage(user) {
+    await this.page.waitForSelector(viewLanguageRoleUserResult);
+    let displayedUsers = await this.page.$eval(
+      viewLanguageRoleUserResult,
+      element => element.innerText
+    );
+    if (!displayedUsers.includes(user)) {
+      throw new Error(
+        `${user} does not have translation rights for selected language!`);
     }
+  }
 
   /**
    * Function to check that there are no translators for the selected language.
@@ -167,7 +169,7 @@ module.exports = class TranslationAdmin extends baseUser {
       viewLanguageRoleUserResult,
       element => element.innerText
     );
-    if (displayedUsers.includes(user)){
+    if (displayedUsers.includes(user)) {
       throw new Error(
         `${user} has translation rights for selected language!`);
     }
