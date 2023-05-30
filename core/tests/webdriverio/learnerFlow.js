@@ -130,6 +130,8 @@ describe('Learner dashboard functionality', function() {
           true
         );
       }
+      // This change helps debugging issue
+      // #16260 E2E Flake: Splash page takes too long to appear.
       await general.callFunctionAndCollectFullStackTraceOnError(
         users.logout, new Error().stack);
       var PLAYER_USERNAME = 'expPlayerDM';
@@ -174,6 +176,8 @@ describe('Learner dashboard functionality', function() {
         await collectionEditorPage.setCategory('Algebra');
         await collectionEditorPage.saveChanges();
       }
+      // This change helps debugging issue
+      // #16260 E2E Flake: Splash page takes too long to appear.
       await general.callFunctionAndCollectFullStackTraceOnError(
         users.logout, new Error().stack);
       var PLAYER_USERNAME = 'collectionPlayerDM';
@@ -204,6 +208,8 @@ describe('Learner dashboard functionality', function() {
         false
       );
     }
+    // This change helps debugging issue
+    // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
       users.logout, new Error().stack);
     await users.createAndLoginUser(
@@ -268,6 +274,8 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage
       .navigateToCommunityLessonsAndCheckCompleteExplorations(
         'Test Exploration');
+    // This change helps debugging issue
+    // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
       users.logout, new Error().stack);
 
@@ -287,6 +295,8 @@ describe('Learner dashboard functionality', function() {
       await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.deleteExploration();
+      // This change helps debugging issue
+      // #16260 E2E Flake: Splash page takes too long to appear.
       await general.callFunctionAndCollectFullStackTraceOnError(
         users.logout, new Error().stack);
 
@@ -336,6 +346,8 @@ describe('Learner dashboard functionality', function() {
       await collectionEditorPage.setCategory('Algebra');
       await collectionEditorPage.saveChanges();
     }
+    // This change helps debugging issue
+    // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
       users.logout, new Error().stack);
     await users.createAndLoginUser(
@@ -409,6 +421,8 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage
       .navigateToCommunityLessonsAndCheckCompleteCollections(
         'Test Collection');
+    // This change helps debugging issue
+    // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
       users.logout, new Error().stack);
 
@@ -440,6 +454,8 @@ describe('Learner dashboard functionality', function() {
       await collectionEditorPage.saveDraft();
       await collectionEditorPage.setCommitMessage('Add Collection Exploration');
       await collectionEditorPage.closeSaveModal();
+      // This change helps debugging issue
+      // #16260 E2E Flake: Splash page takes too long to appear.
       await general.callFunctionAndCollectFullStackTraceOnError(
         users.logout, new Error().stack);
 
@@ -454,6 +470,8 @@ describe('Learner dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+    // This change helps debugging issue
+    // #16260 E2E Flake: Splash page takes too long to appear.
     await general.callFunctionAndCollectFullStackTraceOnError(
       users.logout, new Error().stack);
   });
