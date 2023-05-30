@@ -115,6 +115,23 @@ describe('Admin page platform parameters tab', () => {
       'dummy_platform_parameter');
   });
 
+  describe('.getPlatformParamSchema', () => {
+    it('should return unicode schema for string data type', () => {
+      const schema = component.getPlatformParamSchema('string');
+      expect(schema).toEqual({type: 'unicode'});
+    });
+
+    it('should return float schema for number data type', () => {
+      const schema = component.getPlatformParamSchema('number');
+      expect(schema).toEqual({type: 'float'});
+    });
+
+    it('should return the schema according to the data type', () => {
+      const schema = component.getPlatformParamSchema('bool');
+      expect(schema).toEqual({type: 'bool'});
+    });
+  });
+
   describe('.addNewRuleToTop', () => {
     it('should add new rule to top of rule list', () => {
       const platformParameter = component.platformParameters[0];
