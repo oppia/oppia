@@ -117,7 +117,7 @@ export class ExplorationEditorTabComponent
           // This code make the joyride visible over navbar
           // by overriding the properties of joyride-step__holder class.
           document.querySelector<HTMLElement>(
-            '.joyride-step__holder').style.zIndex = '1007';
+            '.joyride-step__holder').style.zIndex = '1020';
 
           if (value.number === 2) {
             $('html, body').animate({
