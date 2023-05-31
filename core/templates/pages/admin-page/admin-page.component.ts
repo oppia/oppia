@@ -56,10 +56,6 @@ export class AdminPageComponent {
     return this.adminRouterService.isConfigTabOpen();
   }
 
-  isFeaturesTabOpen(): boolean {
-    return this.adminRouterService.isFeaturesTabOpen();
-  }
-
   isRolesTabOpen(): boolean {
     return this.adminRouterService.isRolesTabOpen();
   }

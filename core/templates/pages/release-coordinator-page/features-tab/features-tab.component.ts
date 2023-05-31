@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the feature tab in the admin panel.
+ * @fileoverview Component for the feature tab on the release coordinator page.
  */
 
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
@@ -23,7 +23,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
 import { AdminFeaturesTabConstants } from
-  'pages/admin-page/features-tab/admin-features-tab.constants';
+  'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
@@ -47,10 +47,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 type FilterType = keyof typeof PlatformParameterFilterType;
 
 @Component({
-  selector: 'admin-features-tab',
-  templateUrl: './admin-features-tab.component.html'
+  selector: 'features-tab',
+  templateUrl: './features-tab.component.html'
 })
-export class AdminFeaturesTabComponent implements OnInit {
+export class FeaturesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
 
   readonly availableFilterTypes: PlatformParameterFilterType[] = Object
@@ -342,4 +342,4 @@ export class AdminFeaturesTabComponent implements OnInit {
 
 angular.module('oppia').directive(
   'adminFeaturesTab', downgradeComponent(
-    {component: AdminFeaturesTabComponent}));
+    {component: FeaturesTabComponent}));

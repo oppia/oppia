@@ -39,7 +39,6 @@ export const AdminPageConstants = {
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#/activities',
     CONFIG: '#/config',
-    FEATURES: '#/features',
     ROLES: '#/roles',
     MISC: '#/misc'
   },

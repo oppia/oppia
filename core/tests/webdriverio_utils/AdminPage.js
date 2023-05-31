@@ -39,7 +39,7 @@ var AdminPage = function() {
   };
   var featureFlagElement = $('.e2e-test-feature-flag');
   var featureNameLocator = '.e2e-test-feature-name';
-  var featuresTab = $('.e2e-test-admin-features-tab');
+  var featuresTab = $('.e2e-test-features-tab');
   var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
   var progressSpinner = $('.e2e-test-progress-spinner');
   var reloadCollectionButtonsSelector = function() {
