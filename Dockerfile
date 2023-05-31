@@ -1,8 +1,8 @@
-FROM python:3.8 AS webserver
+FROM python:3.8
 
 WORKDIR /app/oppia
 
-# installing the pre-requisites
+# installing the pre-requisites libs and dependencies
 RUN apt-get update && apt-get upgrade
 RUN apt-get -y install curl
 RUN apt-get -y install git
@@ -17,10 +17,8 @@ RUN apt-get -y install python3-setuptools
 RUN apt-get -y install python3-pip
 RUN apt-get -y install unzip
 RUN apt-get -y install python3-yaml
-# RUN apt-get -y install python-matplotlib
 RUN apt-get -y install python3-matplotlib
 RUN pip install --upgrade pip==21.2.3
-# RUN npm install -g yarn
 
 RUN pip install pip-tools==6.6.2
 RUN pip install setuptools==58.5.3
@@ -45,28 +43,26 @@ RUN apt-get -y install npm
 
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
+
 RUN apt-get -y install chromium
 
 RUN npm install -g yarn
 RUN yarn install
-# RUN npm install --legacy-peer-deps
 
 RUN apt-get -y install python2
+
+COPY . .
+
+RUN python3 -m scripts.install_third_party
 COPY . .
 
 EXPOSE 8181
-# RUN ./node_modules/.bin/ng build --watch
-CMD ["./node_modules/.bin/ng", "build", "--watch"]
+# CMD ["node", "./node_modules/webpack/bin/webpack.js", "--config", "webpack.dev.config.ts", "--watch"]
+# CMD ["./node_modules/.bin/ng", "build", "--watch"]
 
-# STAGE 2 for webpack bundling
-FROM webserver AS webpack-compiler
 
-WORKDIR /app/oppia
 
-# COPY . .
-
-CMD ["node", "./node_modules/webpack/bin/webpack.js", "--config", "webpack.dev.config.ts", "--watch"]
-# TODO: tasks for the day: 1) find a way how to run these 2 live processes in this dockerfile? 2) install the packages from the dependencies.json! 3) connect with google cloud sdk, and launch app.
+# TODO: tasks for the day: 2) install the packages from the dependencies.json! 3) connect with google cloud sdk, and launch app.
 # RUN ./node_modules/.bin/ng build --watch
 # RUN node ./node_modules/webpack/bin/webpack.js --config webpack.dev.config.ts --watch
 

@@ -11,19 +11,46 @@ services:
       - "8181:8181"
     volumes:
       - .:/app/oppia
-      - /app/oppia/node_modules
+      - node_modules:/app/oppia/node_modules
     environment:
       - NODE_ENV=development
     # depends_on:
       # - google_cloud_sdk
-
-  google_cloud_sdk:
+    command: ./node_modules/.bin/ng build --watch
+  
+  webpack-compiler:
     platform: linux/arm64
-    image: google/cloud-sdk:364.0.0
-    ports:
-      - "8089:8089"
-      # - "8181:8181"
-      - "8000:8000"
+    container_name: oppia-webpack-compiler
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
-      - /app/cloud_datastore_emulator_cache
-    command: dev_appserver.py app_dev.yaml --host=localhost --port=8181
+      - .:/app/oppia
+      - node_modules:/app/oppia/node_modules
+    command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
+
+  # webpack-compiler:
+  #   image: node:20-alpine
+  #   container_name: oppia-webpack-compiler
+  #   volumes:
+  #     - .:/app/oppia
+  #     - node_modules:/app/oppia/node_modules
+  #   depends_on:
+  #     - webserver
+  #   # command: app/oppia/node_modules/.bin/ng build --watch
+  #   command: node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.config.ts --watch
+
+  # google_cloud_sdk:
+  #   platform: linux/arm64
+  #   image: google/cloud-sdk:364.0.0
+  #   ports:
+  #     - "8089:8089"
+  #     # - "8181:8181"
+  #     - "8000:8000"
+  #   volumes:
+  #     - /app/cloud_datastore_emulator_cache
+  #   command: dev_appserver.py app_dev.yaml --host=localhost --port=8181
+
+
+volumes:
+  node_modules:
