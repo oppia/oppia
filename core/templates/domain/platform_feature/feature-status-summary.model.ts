@@ -30,8 +30,8 @@ export enum FeatureNames {
   AndroidBetaLandingPage = 'android_beta_landing_page',
   BlogPages = 'blog_pages',
   DiagnosticTest = 'diagnostic_test',
-  ChapterSerializationCurriculumAdminView =
-  'chapter_serialization_curriculum_admin_view'
+  SerialChapterLaunchCurriculumAdminView =
+  'serial_chapter_launch_curriculum_admin_view'
 }
 
 export interface FeatureStatusSummaryBackendDict {
