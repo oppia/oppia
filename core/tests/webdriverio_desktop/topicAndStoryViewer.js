@@ -95,7 +95,7 @@ describe('Topic and Story viewer functionality', function() {
     await adminPage.getFeaturesTab();
     var endChapterFlag = (
       await adminPage.getEndChapterCelebrationFeatureElement());
-    await adminPage.enableFeatureForProd(endChapterFlag);
+    await adminPage.enableFeatureForTest(endChapterFlag);
 
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();

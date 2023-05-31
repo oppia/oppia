@@ -167,28 +167,29 @@ describe('Static Pages Tour', function() {
   it('should visit the Teach page', async function() {
     await browser.url('/teach');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-teach-page').isExisting()).toBe(true);
+    await waitFor.visibilityOf(
+      $('.e2e-test-teach-page'), 'Teach page takes too long to appear');
   });
 
   it('should visit the Home page', async function() {
     await browser.url('/');
     await waitFor.pageToFullyLoad();
-    var splashPage = $('.e2e-test-splash-page');
     await waitFor.visibilityOf(
-      splashPage, 'Splash page takes too long to appear');
-    expect(await splashPage.isExisting()).toBe(true);
+      $('.e2e-test-splash-page'), 'Splash page takes too long to appear');
   });
 
   it('should visit the About page', async function() {
     await browser.url('/about');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-about-page').isExisting()).toBe(true);
+    await waitFor.visibilityOf(
+      $('.e2e-test-about-page'), 'About page takes too long to appear');
   });
 
   it('should visit the Contact page', async function() {
     await browser.url('/contact');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-contact-page').isExisting()).toBe(true);
+    await waitFor.visibilityOf(
+      $('.e2e-test-contact-page'), 'Contact page takes too long to appear');
   });
 
   it('should visit the Donate page', async function() {
@@ -204,31 +205,38 @@ describe('Static Pages Tour', function() {
   it('should visit the Partnerships page', async function() {
     await browser.url('/partnerships');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-partnerships-page').isExisting()).toBe(true);
+    await waitFor.visibilityOf(
+      $('.e2e-test-partnerships-page'),
+      'Partnerships page takes too long to appear');
   });
 
   it('should visit the About the Oppia Foundation page', async function() {
     await browser.url('/about-foundation');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-about-foundation-page').isExisting()).toBe(true);
+    await waitFor.visibilityOf(
+      $('.e2e-test-about-foundation-page'),
+      'About Foundation page takes too long to appear');
   });
 
   it('should visit the Privacy page', async function() {
     await browser.url('/privacy-policy');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-privacy-page').isExisting()).toBe(true);
+    await waitFor.visibilityOf(
+      $('.e2e-test-privacy-page'), 'Privacy page takes too long to appear');
   });
 
   it('should visit the Terms page', async function() {
     await browser.url('/terms');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-terms-page').isExisting()).toBe(true);
+    await waitFor.visibilityOf(
+      $('.e2e-test-terms-page'), 'Terms page takes too long to appear');
   });
 
   it('should visit the Thanks page', async function() {
     await browser.url('/thanks');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-thanks-page').isExisting()).toBe(true);
+    await waitFor.visibilityOf(
+      $('.e2e-test-thanks-page'), 'Terms page takes too long to appear');
   });
 
   it('should visit the Volunteer page', async function() {
@@ -253,6 +261,12 @@ describe('Error reporting', function() {
     await users.createUser('lorem@preferences.com', 'loremPreferences');
     await users.login('lorem@preferences.com');
     await preferencesPage.get();
+    // This delay is needed so that the page gets a chance to fully load before
+    // cookies are deleted. The page makes a backend request for feature flags
+    // and the additional pause avoids that being recorded as an error due to
+    // the user no longer being logged in.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
     // Deleting the cookies simulates an expired session error.
     await browser.deleteCookies();
     await browser.setupInterceptor();

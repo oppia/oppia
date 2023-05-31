@@ -51,10 +51,10 @@ describe('Subscriptions functionality', function() {
     await users.login('learner1@subscriptions.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator1Idsubscriptions');
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator2Idsubscriptions');
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
     await preferencesPage.get();
     await preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
     await preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
@@ -67,13 +67,13 @@ describe('Subscriptions functionality', function() {
     await users.login('learner2@subscriptions.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator1Idsubscriptions');
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator2Idsubscriptions');
 
     // Subscribe and then unsubscribe from the same user.
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
     await preferencesPage.get();
     await preferencesPage.expectSubscriptionCountToEqual(1);
     await preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');

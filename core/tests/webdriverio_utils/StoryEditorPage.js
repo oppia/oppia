@@ -152,6 +152,9 @@ var StoryEditorPage = function() {
     } else {
       await action.click('Publish Story Button', publishStoryButton);
     }
+
+    await waitFor.visibilityOf(
+      unpublishStoryButton, 'Story is taking too long to get published.');
   };
 
   this.unpublishStory = async function() {

@@ -95,7 +95,7 @@ describe('Checkpoints functionality', function() {
     await adminPage.getFeaturesTab();
     var checkpointCelebrationFlag = (
       await adminPage.getCheckpointCelebrationFeatureElement());
-    await adminPage.enableFeatureForProd(checkpointCelebrationFlag);
+    await adminPage.enableFeatureForTest(checkpointCelebrationFlag);
 
     await createDummyExploration();
     var handle = await browser.getWindowHandle();
@@ -174,6 +174,8 @@ describe('Checkpoints functionality', function() {
     async function() {
       await topicAndStoryViewerPage.get(
         'math', 'topic-cf-one', 'checkpointfeaturesstory');
+      await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+
       await topicAndStoryViewerPage.goToChapterIndex(0);
       await explorationPlayerPage.submitAnswer('Continue', null);
       await explorationPlayerPage.dismissLessonInfoTooltip();
