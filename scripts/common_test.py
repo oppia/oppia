@@ -197,7 +197,12 @@ class CommonTests(test_utils.GenericTestBase):
                     line = line.strip()
                     protobuf_version = line.split('==')[1]
                     break
-        self.assertEqual(common.PROTOC_VERSION, protobuf_version)
+        # The minor and patch version numbers from the requirements file should
+        # match the protoc version. See scripts/common.py for an explanation.
+        self.assertEqual(
+            common.PROTOC_VERSION.split('.'),
+            protobuf_version.split('.')[1:],
+        )
 
     def test_is_x64_architecture_in_x86(self) -> None:
         maxsize_swap = self.swap(sys, 'maxsize', 1)

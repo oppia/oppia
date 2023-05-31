@@ -61,8 +61,13 @@ PILLOW_VERSION = '9.0.1'
 # Buf version.
 BUF_VERSION = '0.29.0'
 
-# Must match the version of protobuf in requirements_dev.in.
-PROTOC_VERSION = '4.22.3'
+# Must match the minor and patch versions of protobuf in requirements_dev.in. As
+# documented on https://protobuf.dev/support/version-support/, protobuf is
+# versioned using only two numbers, e.g. 22.3, while the language-specific
+# packages use those two numbers, prefixed by a major version. For example, the
+# Java package for Protobuf 22.3 might be 3.22.3 while the Python package could
+# be 4.22.3.
+PROTOC_VERSION = '22.3'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
