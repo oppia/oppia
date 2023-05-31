@@ -305,6 +305,29 @@ var goOffline = async function() {
   });
 };
 
+// This can help us chain stack traces across async promises.
+// It's hard to debug without printing error line in caller function,
+// so we want to add caller function errStack to stack trace.
+// The red stack trace is from webdriverio function. We do not want to
+// pass error message to the function because it decrease generality.
+// See the black log for the full stack trace when you use this function.
+/**
+ * Call func. If func errors, print the full stack trace,
+ * including the lines from the caller function.
+ * @param {function} func - Function you want to call.
+ * @param {string} errStack - Put this: new Error().stack.
+*/
+var callFunctionAndCollectFullStackTraceOnError = async function(
+    func, errStack) {
+  try {
+    await func();
+  } catch (error) {
+    error.stack = error.stack + '\n' +
+    errStack.substring(errStack.indexOf('\n') + 1);
+    throw error;
+  }
+};
+
 exports.acceptAlert = acceptAlert;
 exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
@@ -344,3 +367,5 @@ exports.navigateToTopicsAndSkillsDashboardPage = (
 
 exports.goOffline = goOffline;
 exports.goOnline = goOnline;
+exports.callFunctionAndCollectFullStackTraceOnError = (
+  callFunctionAndCollectFullStackTraceOnError);
