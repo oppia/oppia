@@ -114,9 +114,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_install_installation_tools(self) -> None:
         expected_tools = {
-            'pip': '22.1.1',
-            'pip-tools': '6.6.2',
-            'setuptools': '58.5.3',
+            'pip': '23.1.2',
+            'pip-tools': '6.13.0',
+            'setuptools': '67.7.1',
         }
         installed_tools: Dict[str, str] = {}
 

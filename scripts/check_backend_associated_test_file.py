@@ -43,6 +43,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'scripts/linters/test_files/invalid_todo.py',
     'scripts/linters/test_files/invalid_urlopen.py',
     'scripts/linters/test_files/valid.py',
+    'scripts/linters/test_files/valid_job_imports.py',
     'scripts/linters/test_files/valid_py_ignore_pragma.py',
     'core/tests/build_sources/extensions/CodeRepl.py',
     'core/tests/build_sources/extensions/DragAndDropSortInput.py',
