@@ -86,8 +86,7 @@ describe('Admin roles tab component ', function() {
     },
     topicSummaries: [
       sampleTopicSummary
-    ],
-    featureFlags: []
+    ]
   };
 
   beforeEach(() => {

@@ -25,10 +25,6 @@ import isEqual from 'lodash/isEqual';
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminDataService } from
-  'pages/admin-page/services/admin-data.service';
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureDummyBackendApiService } from
@@ -134,15 +130,13 @@ export class FeaturesTabComponent implements OnInit {
 
   constructor(
     private windowRef: WindowRef,
-    private adminDataService: AdminDataService,
-    private adminTaskManager: AdminTaskManagerService,
     private apiService: PlatformFeatureAdminBackendApiService,
     private featureService: PlatformFeatureService,
     private dummyApiService: PlatformFeatureDummyBackendApiService,
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
-    const data = await this.adminDataService.getDataAsync();
+    const data = await this.apiService.getFeatureFlags();
 
     this.featureFlags = data.featureFlags;
 
@@ -201,9 +195,6 @@ export class FeaturesTabComponent implements OnInit {
       this.windowRef.nativeWindow.alert(issues.join('\n'));
       return;
     }
-    if (this.adminTaskManager.isTaskRunning()) {
-      return;
-    }
     const commitMessage = this.windowRef.nativeWindow.prompt(
       'This action is irreversible. If you insist to proceed, please enter ' +
       'the commit message for the update',
@@ -214,8 +205,6 @@ export class FeaturesTabComponent implements OnInit {
     }
 
     try {
-      this.adminTaskManager.startTask();
-
       await this.apiService.updateFeatureFlag(
         feature.name, commitMessage, feature.rules);
 
@@ -236,8 +225,6 @@ export class FeaturesTabComponent implements OnInit {
       } else {
         throw new Error('Unexpected error response.');
       }
-    } finally {
-      this.adminTaskManager.finishTask();
     }
   }
 

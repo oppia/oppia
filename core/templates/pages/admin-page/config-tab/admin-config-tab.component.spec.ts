@@ -101,8 +101,7 @@ describe('Admin config tab component ', () => {
     humanReadableRoles: {
       MODERATOR: 'moderator'
     },
-    topicSummaries: [],
-    featureFlags: []
+    topicSummaries: []
   };
 
   beforeEach(() => {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the feature tab in admin page.
+ * @fileoverview Unit tests for the feature tab in release coordinator page.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -23,12 +23,10 @@ import { FormsModule } from '@angular/forms';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { FeatureFlagsResponse } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { FeaturesTabComponent } from
   'pages/release-coordinator-page/features-tab/features-tab.component';
-import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureDummyBackendApiService } from
@@ -59,9 +57,7 @@ class MockPlatformFeatureService {
 describe('Release coordinator page feature tab', function() {
   let component: FeaturesTabComponent;
   let fixture: ComponentFixture<FeaturesTabComponent>;
-  let adminDataService: AdminDataService;
   let featureApiService: PlatformFeatureAdminBackendApiService;
-  let adminTaskManagerService: AdminTaskManagerService;
   let windowRef: WindowRef;
 
   let updateApiSpy: jasmine.Spy;
@@ -85,10 +81,8 @@ describe('Release coordinator page feature tab', function() {
 
     fixture = TestBed.createComponent(FeaturesTabComponent);
     component = fixture.componentInstance;
-    adminDataService = TestBed.get(AdminDataService);
     featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
     windowRef = TestBed.get(WindowRef);
-    adminTaskManagerService = TestBed.get(AdminTaskManagerService);
 
     let confirmResult = true;
     let promptResult: string | null = 'mock msg';
@@ -100,7 +94,7 @@ describe('Release coordinator page feature tab', function() {
     mockConfirmResult = val => confirmResult = val;
     mockPromptResult = msg => promptResult = msg;
 
-    spyOn(adminDataService, 'getDataAsync').and.resolveTo({
+    spyOn(featureApiService, 'getFeatureFlags').and.resolveTo({
       featureFlags: [
         PlatformParameter.createFromBackendDict({
           data_type: 'bool',
@@ -124,7 +118,7 @@ describe('Release coordinator page feature tab', function() {
           }],
         })
       ]
-    } as AdminPageData);
+    } as FeatureFlagsResponse);
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
       .and.resolveTo();
@@ -323,8 +317,6 @@ describe('Release coordinator page feature tab', function() {
     beforeEach(() => {
       setStatusSpy = jasmine.createSpy();
       setStatusSpy = spyOn(component.setStatusMessage, 'emit');
-
-      adminTaskManagerService.finishTask();
     });
 
     it('should update feature rules', fakeAsync(() => {
@@ -375,28 +367,6 @@ describe('Release coordinator page feature tab', function() {
 
       expect(component.featureFlagNameToBackupMap.get(featureFlag.name))
         .toEqual(originalFeatureFlag);
-    }));
-
-    it('should not proceed if there is another task running', fakeAsync(() => {
-      mockPromptResult('mock msg');
-
-      adminTaskManagerService.startTask();
-
-      const featureFlag = component.featureFlags[0];
-
-      component.addNewRuleToTop(featureFlag);
-      component.updateFeatureRulesAsync(featureFlag);
-
-      flushMicrotasks();
-
-      expect(updateApiSpy).not.toHaveBeenCalled();
-      expect(setStatusSpy).not.toHaveBeenCalled();
-
-      // We need to do this at the end, otherwise the AdminTaskManager will
-      // still think that the task is running (and this can mess up other
-      // frontend tests that rely on the starting state to be "nothing is
-      // happening").
-      adminTaskManagerService.finishTask();
     }));
 
     it('should not proceed if the user cancels the prompt', fakeAsync(

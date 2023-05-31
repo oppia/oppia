@@ -18,6 +18,6 @@
 
 export const ReleaseCoordinatorPageConstants = {
   TAB_ID_BEAM_JOBS: 'beam_jobs',
-  TAB_ID_FEATURES: 'features',
+  TAB_ID_FEATURES: 'feature_flags',
   TAB_ID_MISC: ' misc',
 } as const;
