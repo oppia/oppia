@@ -12,7 +12,7 @@
   </oppia-beam-jobs-tab>
 
   <features-tab *ngIf="activeTab === TAB_ID_FEATURES"
-                (setStatusMessage)="setStatusMessage($event)">
+                (setStatusMessage)="statusMessage=$event">
   </features-tab>
 
   <div class="oppia-tlease-coordiator-misc-tab-container" *ngIf="activeTab === TAB_ID_MISC">
