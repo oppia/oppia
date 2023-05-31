@@ -43,9 +43,7 @@ from core.jobs.batch_jobs import (                                   # pylint: d
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     rejecting_suggestion_for_invalid_content_ids_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
-    user_settings_profile_picture_jobs)
-from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
-    store_profile_images_to_gcs_jobs)
+    remove_profile_picture_data_url_field_jobs)
 
 
 class FakeClass:

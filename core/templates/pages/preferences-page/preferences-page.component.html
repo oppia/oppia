@@ -19,7 +19,8 @@
         <div class="col-lg-8 col-md-8 col-sm-8">
           <a *ngIf="username"
              href="/profile/{{ username }}"
-             [smartRouterLink]="'/profile/' + username">
+             [smartRouterLink]="'/profile/' + username"
+             class="preferences-page-tab-focus">
              {{ username }}
           </a>
           <em *ngIf="!username">
@@ -34,17 +35,18 @@
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
           <div class="oppia-editable-section oppia-editor-profile-picture-container"
-               tabindex="0"
                title="{{ 'I18N_PREFERENCES_CHANGE_PICTURE' | translate }}">
             <div class="oppia-click-to-start-editing e2e-test-photo-clickable"
                  (click)="showEditProfilePictureModal()"
                  aria-label="Edit profile picture button">
             </div>
-            <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"
-               tabindex="0"
-               aria-label="Edit profile picture"
-               (keydown.enter)="showEditProfilePictureModal()">
-            </i>
+            <div class="oppia-editor-edit-btn oppia-editor-edit-btn-pos">
+              <i class="fas fa-pen oppia-editor-profile-edit-icon"
+                 tabindex="0"
+                 aria-label="Edit profile picture"
+                 (keydown.enter)="showEditProfilePictureModal()">
+              </i>
+            </div>
             <picture *ngIf="profilePicturePngDataUrl">
               <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
               <source type="image/png" [srcset]="profilePicturePngDataUrl">
@@ -108,6 +110,19 @@
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}">
             <span>
               {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}
+            </span>
+          </label>
+        </div>
+        <div class="checkbox oppia-checkbox">
+          <label>
+            <input type="radio"
+                   [(ngModel)]="defaultDashboard"
+                   value="{{ DASHBOARD_TYPE_CONTRIBUTOR }}"
+                   (change)="saveDefaultDashboard(defaultDashboard)"
+                   class="e2e-test-contributor-dashboard-radio"
+                   attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}">
+            <span>
+              {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}
             </span>
           </label>
         </div>
@@ -326,8 +341,8 @@
         {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
-          <button type="button" class="btn btn-danger e2e-test-delete-account-button">
+        <a href="/delete-account" class="preferences-page-tab-focus" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
+          <button tabindex="-1" type="button" class="btn btn-danger e2e-test-delete-account-button">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
           </button>
         </a>
@@ -344,10 +359,11 @@
         {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
       </label>
       <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
-        <a href="/export-account-handler">
+        <a href="/export-account-handler" tabindex="0" class="preferences-page-tab-focus">
           <button type="button"
                   class="btn btn-primary e2e-test-export-account-button"
                   title="Export account"
+                  tabindex="-1"
                   (click)="handleExportDataClick()">
                   {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
           </button>
