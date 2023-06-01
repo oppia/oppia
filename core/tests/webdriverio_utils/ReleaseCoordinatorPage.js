@@ -109,7 +109,6 @@ var ReleaseCoordinatorPage = function() {
   // a feature flag in test mode, which is the server environment the E2E
   // tests are run in.
   this.enableFeatureForTest = async function(featureElement) {
-
     await action.click(
       'Add feature rule button',
       featureElement
@@ -209,6 +208,6 @@ var ReleaseCoordinatorPage = function() {
     await general.acceptAlert();
     await waitFor.visibilityOf(statusMessage);
   };
-}
+};
 
 exports.ReleaseCoordinatorPage = ReleaseCoordinatorPage;
