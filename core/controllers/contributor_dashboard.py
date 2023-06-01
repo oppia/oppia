@@ -315,7 +315,7 @@ class ReviewableOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Fetches exploration opportunities."""
+        """Fetches reviewable translation suggestions."""
         assert self.normalized_request is not None
         topic_name = self.normalized_request.get('topic_name')
         language = self.normalized_request.get('language_code')
@@ -1006,7 +1006,7 @@ class ContributorCertificateHandler(
     def get(
         self, username: str, suggestion_type: str
     ) -> None:
-        """Generates contributor certificates.
+        """Generates data for contributor certificates.
 
         Args:
             username: str. A user's username.
@@ -1052,7 +1052,7 @@ class ContributorAllStatsSummariesHandler(
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
     def get(self, username: str) -> None:
-        """Fetches contributor dashboard statistics.
+        """Fetches stats for given contributor.
 
         Args:
             username: str. A user's username.
