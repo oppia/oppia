@@ -36,8 +36,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   @Input() modalId!: symbol;
   @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
-  private _initialEntityId = '';
-  private _initialEntityType = '';
+  private _initialEntityId? = '';
+  private _initialEntityType? = '';
   skills: SkillBackendDict[] = [];
   showLoading = false;
   skillsToShow: SkillBackendDict[] = [];
