@@ -32,8 +32,8 @@ describe('Feature Gating Flow', function() {
   let releaseCoordinatorPage = null;
 
   beforeAll(async function() {
-    releaseCoordinatorPage = new (
-      ReleaseCoordinatorPage.ReleaseCoordinatorPage());
+    releaseCoordinatorPage = (
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
 
     await users.createUserWithRole(
       RELEASE_COORDINATOR_USER1_EMAIL,

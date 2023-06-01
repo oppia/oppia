@@ -68,8 +68,8 @@ describe('Checkpoints functionality', function() {
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
-    releaseCoordinatorPage = new (
-      ReleaseCoordinatorPage.ReleaseCoordinatorPage());
+    releaseCoordinatorPage = (
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
