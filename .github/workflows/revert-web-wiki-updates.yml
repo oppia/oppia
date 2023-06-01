@@ -1,5 +1,8 @@
 name: Revert Wiki Changes Made Through the Web Interface
 on:
+  push:
+    branches:
+      - revert
   workflow_dispatch:
 
 jobs:
