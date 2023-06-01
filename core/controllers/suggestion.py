@@ -637,7 +637,7 @@ class SuggestionsProviderHandler(
 
         Raises:
             InvalidInputException. The target_type or suggestion_type 
-                 are invalid.
+                are invalid.
         """
         if target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
             raise self.InvalidInputException(
