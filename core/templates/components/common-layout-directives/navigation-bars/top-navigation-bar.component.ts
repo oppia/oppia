@@ -224,7 +224,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
             );
           }
         });
-      });
+    });
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
     // first save a reference to that context in a variable, and then use that
