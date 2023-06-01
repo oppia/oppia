@@ -78,8 +78,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     this.showLoading = true;
     this.skills = [];
     if (this.value) {
-      this._initialEntityId = this.contextService.getEntityId();
-      this._initialEntityType = this.contextService.getEntityType();
+      this.initialEntityId = this.contextService.getEntityId();
+      this.initialEntityType = this.contextService.getEntityType();
       this.contextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.SKILL, this.value);
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
