@@ -636,7 +636,7 @@ class SuggestionsProviderHandler(
             suggestion_type: str. The type of the suggestion.
 
         Raises:
-            InvalidInputException. The target_type or suggestion_type are invalid.
+            InvalidInputException. target_type or suggestion_type are invalid.
         """
         if target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
             raise self.InvalidInputException(
