@@ -38,13 +38,13 @@ describe('Feature Gating Flow', function() {
     await users.createUserWithRole(
       RELEASE_COORDINATOR_USER1_EMAIL,
       RELEASE_COORDINATOR_USERNAME1,
-      'RELEASE_COORDINATOR');
+      'release coordinator');
     await users.logout();
 
     await users.createUserWithRole(
       RELEASE_COORDINATOR_USER2_EMAIL,
       RELEASE_COORDINATOR_USERNAME2,
-      'RELEASE_COORDINATOR');
+      'release coordinator');
     await users.logout();
   });
 

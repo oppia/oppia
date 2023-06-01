@@ -97,7 +97,8 @@ describe('Checkpoints functionality', function() {
     // The below lines enable the checkpoint_celebration flag in prod mode.
     // They should be removed after the checkpoint_celebration flag is
     // deprecated.
-    await adminPage.addRole('creatorStoryViewer', 'RELEASE_COORDINATOR');
+    await adminPage.get();
+    await adminPage.addRole('creatorStoryViewer', 'release coordinator');
     await releaseCoordinatorPage.getFeaturesTab();
     var checkpointCelebrationFlag = (
       await releaseCoordinatorPage.getCheckpointCelebrationFeatureElement());
