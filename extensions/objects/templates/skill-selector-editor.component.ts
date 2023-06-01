@@ -77,9 +77,9 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.showLoading = true;
     this.skills = [];
+    this.initialEntityId = this.contextService.getEntityId();
+    this.initialEntityType = this.contextService.getEntityType();
     if (this.value) {
-      this.initialEntityId = this.contextService.getEntityId();
-      this.initialEntityType = this.contextService.getEntityType();
       this.contextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.SKILL, this.value);
       this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
@@ -108,9 +108,9 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
      * to ensure it doesn't cause any breakages in question-editor.
      * See issue #16985 for detailed discussion.
      */
-    if (this._initialEntityId && this._initialEntityType) {
+    if (this.initialEntityId && this.initialEntityType) {
       this.contextService.setCustomEntityContext(
-        this._initialEntityType, this._initialEntityId);
+        this.initialEntityType, this.initialEntityId);
     }
   }
 }
