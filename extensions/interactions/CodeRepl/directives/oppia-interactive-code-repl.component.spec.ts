@@ -21,7 +21,8 @@ import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core
 import { InteractiveCodeReplComponent } from './oppia-interactive-code-repl.component';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import 'third-party-imports/skulpt.import';
+import 'skulpt-dist/skulpt.min.js';
+import 'skulpt-dist/skulpt-stdlib.js';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 
