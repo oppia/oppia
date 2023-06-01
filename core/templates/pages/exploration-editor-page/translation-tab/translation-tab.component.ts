@@ -133,7 +133,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
             '.joyride-step__holder') as HTMLElement;
           // This code make the joyride visible over navbar
           // by overriding the properties of joyride-step__holder class.
-          element.style.zIndex = '1007';
+          element.style.zIndex = '1020';
         },
         () => {},
         () => {
