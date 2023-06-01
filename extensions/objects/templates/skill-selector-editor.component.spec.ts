@@ -180,12 +180,12 @@ describe('SkillSelectorEditorComponent', () => {
   'when component is destroyed', () => {
     spyOn(contextService, 'setCustomEntityContext');
 
-    component['_initialEntityId'] = 'exampleEntityId';
-    component['_initialEntityType'] = 'exampleEntityType';
+    component.initialEntityId = 'exampleEntityId';
+    component.initialEntityType = 'exampleEntityType';
     component.ngOnDestroy();
 
     expect(contextService.setCustomEntityContext).toHaveBeenCalledWith(
-      'exampleEntityType', 'exampleEntityId')
+      'exampleEntityType', 'exampleEntityId');
   });
 
   it('should select skill when user selects skill', () => {
