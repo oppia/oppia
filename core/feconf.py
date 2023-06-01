@@ -556,6 +556,10 @@ STORAGE_EMULATOR_REDIS_DB_INDEX = 2
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
+# This flag is used for distinguishing the prod/test environments for feature
+# gating.
+ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
+
 # NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
 # buckets. It's OK for them to be the same.
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'

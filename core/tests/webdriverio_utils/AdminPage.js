@@ -232,9 +232,9 @@ var AdminPage = function() {
   };
 
   // This function is meant to be used to enable a feature gated behind
-  // a feature flag in prod mode, which is the server environment the E2E
+  // a feature flag in test mode, which is the server environment the E2E
   // tests are run in.
-  this.enableFeatureForProd = async function(featureElement) {
+  this.enableFeatureForTest = async function(featureElement) {
     await this.removeAllRulesOfFeature(featureElement);
 
     await action.click(
@@ -261,7 +261,7 @@ var AdminPage = function() {
       'Value Selector takes too long to appear'
     );
     await (featureElement.$(serverModeSelectorLocator)).selectByVisibleText(
-      'prod');
+      'test');
 
     await this.saveChangeOfFeature(featureElement);
   };
