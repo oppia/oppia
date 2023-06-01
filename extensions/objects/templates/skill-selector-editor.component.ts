@@ -108,8 +108,10 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
      * to ensure it doesn't cause any breakages in question-editor.
      * See issue #16985 for detailed discussion.
      */
-    this.contextService.setCustomEntityContext(
-      this._initialEntityType, this._initialEntityId);
+    if(this._initialEntityId && this._initialEntityType){
+      this.contextService.setCustomEntityContext(
+        this._initialEntityType, this._initialEntityId);
+    }
   }
 }
 
