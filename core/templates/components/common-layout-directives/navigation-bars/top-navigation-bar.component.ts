@@ -204,26 +204,26 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
       });
 
-      this.accessValidationBackendApiService.validateAccessToClassroomPage(
-        this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
-        this.classroomBackendApiService.fetchClassroomDataAsync(
-          this.DEFAULT_CLASSROOM_URL_FRAGMENT)
-          .then((classroomData) => {
-            this.classroomData = classroomData.getTopicSummaries();
-            this.classroomBackendApiService.onInitializeTranslation.emit();
-            // Store hacky tranlation keys of topics.
-            for (let i = 0; i < this.classroomData.length; i++) {
-              let topicSummary = this.classroomData[i];
-              let hackyTopicTranslationKey = (
-                this.i18nLanguageCodeService.getTopicTranslationKey(
-                  topicSummary.getId(), TranslationKeyType.TITLE
-                )
-              );
-              this.topicTitlesTranslationKeys.push(
-                hackyTopicTranslationKey
-              );
-            }
-          });
+    this.accessValidationBackendApiService.validateAccessToClassroomPage(
+      this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
+      this.classroomBackendApiService.fetchClassroomDataAsync(
+        this.DEFAULT_CLASSROOM_URL_FRAGMENT)
+        .then((classroomData) => {
+          this.classroomData = classroomData.getTopicSummaries();
+          this.classroomBackendApiService.onInitializeTranslation.emit();
+          // Store hacky tranlation keys of topics.
+          for (let i = 0; i < this.classroomData.length; i++) {
+            let topicSummary = this.classroomData[i];
+            let hackyTopicTranslationKey = (
+              this.i18nLanguageCodeService.getTopicTranslationKey(
+                topicSummary.getId(), TranslationKeyType.TITLE
+              )
+            );
+            this.topicTitlesTranslationKeys.push(
+              hackyTopicTranslationKey
+            );
+          }
+        });
       });
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
