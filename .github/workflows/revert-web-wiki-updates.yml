@@ -1,6 +1,7 @@
 name: Revert Wiki Changes Made Through the Web Interface
-on: 
-  workflow_dispatch
+on:
+  gollum
+  workflow_dispatch:
 jobs:
   revert:
     runs-on: ubuntu-22.04
