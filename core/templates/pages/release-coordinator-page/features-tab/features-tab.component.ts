@@ -126,7 +126,7 @@ export class FeaturesTabComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   featureFlagNameToBackupMap!: Map<string, PlatformParameter>;
   featureFlags: PlatformParameter[] = [];
-
+  showLoadingScreen: boolean = false;
   isDummyApiEnabled: boolean = false;
 
   constructor(
@@ -138,12 +138,14 @@ export class FeaturesTabComponent implements OnInit {
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
+    this.loaderService.showLoadingScreen('Loading');
+    this.showLoadingScreen = true;
     const data = await this.apiService.getFeatureFlags();
-
     this.featureFlags = data.featureFlags;
-
     this.featureFlagNameToBackupMap = new Map(
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
+    this.showLoadingScreen = false;
+    this.loaderService.hideLoadingScreen();
   }
 
   addNewRuleToTop(feature: PlatformParameter): void {
@@ -324,9 +326,7 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loaderService.showLoadingScreen('Loading');
     this.reloadFeatureFlagsAsync();
-    this.loaderService.hideLoadingScreen();
     this.reloadDummyHandlerStatusAsync();
   }
 }
