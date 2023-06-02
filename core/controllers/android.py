@@ -24,8 +24,6 @@ from core.domain import android_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import classroom_domain
-from core.domain import classroom_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import skill_domain
@@ -238,18 +236,9 @@ class AndroidActivityHandler(base.BaseHandler[
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
                         'Version cannot be specified for classroom')
-                matching_classroom_fragment = [
-                    classroom['url_fragment']
-                    for classroom in config_domain.CLASSROOM_PAGES_DATA.value
-                    if classroom['name'] == activity_data['id']
-                ][0]
                 classroom = (
                     classroom_config_services.get_classroom_by_url_fragment(
-                        activity_data['id']
-                    ) or classroom_services.get_classroom_by_url_fragment(
-                        matching_classroom_fragment
-                    )
-                )
+                        activity_data['id']))
                 activities.append({
                     'id': activity_data['id'],
                     'payload': (
