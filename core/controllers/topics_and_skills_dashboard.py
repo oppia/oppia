@@ -564,8 +564,7 @@ class NewSkillHandler(
         """Handles POST requests.
 
         Raises:
-            InvalidInputException. The topic is None or
-            duplicate skill description.
+            InvalidInputException. A topic is None or duplicate skill description.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
