@@ -61,6 +61,7 @@ class TopicsAndSkillsDashboardPage(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self) -> None:
+        """Handles GET requests."""
         self.render_template(
             'topics-and-skills-dashboard-page.mainpage.html')
 
@@ -225,7 +226,10 @@ class TopicAssignmentsHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, skill_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+        ARGS:
+            skill_id. str. The ID of the skill.
+        """
         topic_assignments = skill_services.get_all_topic_assignments_for_skill(
             skill_id)
         topic_assignment_dicts = [
@@ -427,7 +431,10 @@ class NewTopicHandler(
 
     @acl_decorators.can_create_topic
     def post(self) -> None:
-        """Handles POST requests."""
+        """Handles POST requests.
+        Raises:
+            InvalidInputException: If there are validation errors during image validation.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
@@ -552,6 +559,10 @@ class NewSkillHandler(
 
     @acl_decorators.can_create_skill
     def post(self) -> None:
+        """Handles POST requests.
+        Raises:
+            InvalidInputException: If topic is None or skill description is duplicated.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         description = self.normalized_payload['description']
@@ -646,7 +657,7 @@ class MergeSkillHandler(
 
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self) -> None:
-        """Handles the POST request."""
+        """Handles POST request."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         old_skill_id = self.normalized_payload['old_skill_id']
@@ -681,7 +692,6 @@ def normalize_comma_separated_topic_ids(
 ) -> List[str]:
     """Normalizes a string of comma-separated topic IDs into a list of
     topic IDs.
-
     Args:
         comma_separated_topic_ids: str. Comma separated topic IDs.
 
@@ -724,6 +734,7 @@ class TopicIdToDiagnosticTestSkillIdsHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles Get requests."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request[
             'comma_separated_topic_ids']
