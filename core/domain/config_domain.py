@@ -530,10 +530,6 @@ MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     10
 )
 
-CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
-    'contributor_dashboard_is_enabled', BOOL_SCHEMA,
-    'Enable contributor dashboard page. The default value is true.', True)
-
 CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
     (
