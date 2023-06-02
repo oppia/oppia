@@ -103,7 +103,6 @@ export interface ConfigPropertyValues {
   'email_footer': string;
   'email_sender_name': string;
   'enable_admin_notifications_for_reviewer_shortage': boolean;
-  'featured_translation_languages': string[];
   'high_bounce_rate_task_minimum_exploration_starts': number;
   'high_bounce_rate_task_state_bounce_rate_creation_threshold': number;
   'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': number;
@@ -119,8 +118,6 @@ export interface ConfigPropertyValues {
   'record_playthrough_probability': number;
   'signup_email_content': SignupEmailContent;
   'unpublish_exploration_email_html_body': string;
-  'vmid_shared_secret_key_mapping': VmidSharedSecretKeyMapping;
-  'whitelisted_exploration_ids_for_playthroughs': string[];
 }
 
 export interface AdminPageDataBackendDict {
