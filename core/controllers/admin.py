@@ -21,6 +21,7 @@ import logging
 import random
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -38,7 +39,9 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
+from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_registry as registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -109,6 +112,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     config_property_id: Optional[str]
     data: Optional[str]
     topic_id: Optional[str]
+    platform_param_name: Optional[str]
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
     exp_id: Optional[str]
@@ -136,6 +140,7 @@ class AdminHandler(
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
+                        'update_platform_parameter_rules',
                         'rollback_exploration_to_safe_state'
                     ]
                 },
@@ -194,6 +199,12 @@ class AdminHandler(
                 },
                 'default_value': None
             },
+            'platform_param_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
             'commit_message': {
                 'schema': {
                     'type': 'basestring'
@@ -228,6 +239,10 @@ class AdminHandler(
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
+        platform_params_dicts = (
+            feature_services.
+            get_all_platform_parameters_except_feature_flag_dicts())
+
         config_properties = config_domain.Registry.get_config_property_schemas()
         # Removes promo-bar related configs as promo-bar is handled by
         # release coordinators in /release-coordinator page.
@@ -248,6 +263,7 @@ class AdminHandler(
             'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
             'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
+            'platform_params_dicts': platform_params_dicts,
         })
 
     @acl_decorators.can_access_admin_page
@@ -354,13 +370,7 @@ class AdminHandler(
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            else:
-                # The handler schema defines the possible values of 'action'.
-                # If 'action' has a value other than those defined in the
-                # schema, a Bad Request error will be thrown. Hence, 'action'
-                # must be 'rollback_exploration_to_safe_state' if this branch is
-                # executed.
-                assert action == 'rollback_exploration_to_safe_state'
+            elif action == 'rollback_exploration_to_safe_state':
                 exp_id = self.normalized_payload.get('exp_id')
                 if exp_id is None:
                     raise Exception(
@@ -372,6 +382,45 @@ class AdminHandler(
                 result = {
                     'version': version
                 }
+            else:
+                # The handler schema defines the possible values of 'action'.
+                # If 'action' has a value other than those defined in the
+                # schema, a Bad Request error will be thrown. Hence, 'action'
+                # must be 'update_platform_parameter_rules' if this branch is
+                # executed.
+                assert action == 'update_platform_parameter_rules'
+                platform_param_name = self.normalized_payload.get('platform_param_name')
+                if platform_param_name is None:
+                    raise Exception(
+                        'The \'platform_param_name\' must be provided when the action'
+                        ' is update_platform_parameter_rules.'
+                    )
+                new_rules = self.normalized_payload.get('new_rules')
+                if new_rules is None:
+                    raise Exception(
+                        'The \'new_rules\' must be provided when the action'
+                        ' is update_platform_parameter_rules.'
+                    )
+                commit_message = self.normalized_payload.get('commit_message')
+                if commit_message is None:
+                    raise Exception(
+                        'The \'commit_message\' must be provided when the '
+                        'action is update_platform_parameter_rules.'
+                    )
+
+                try:
+                    registry.Registry.update_platform_parameter(
+                        platform_param_name, self.user_id, commit_message,
+                        new_rules)
+                except (
+                        utils.ValidationError,
+                        feature_services.FeatureFlagNotFoundException) as e:
+                    raise self.InvalidInputException(e)
+
+                new_rule_dicts = [rules.to_dict() for rules in new_rules]
+                logging.info(
+                    '[ADMIN] %s updated feature %s with new rules: '
+                    '%s.' % (self.user_id, platform_param_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)

@@ -40,7 +40,7 @@ class Registry:
 
     DEFAULT_VALUE_BY_TYPE_DICT: Dict[
         platform_parameter_domain.DataTypes,
-        Union[bool, str, int]
+        Union[bool, str, int, float]
     ] = {
         platform_parameter_domain.DataTypes.BOOL: False,
         platform_parameter_domain.DataTypes.NUMBER: 0,
@@ -60,6 +60,7 @@ class Registry:
         name: enum.Enum,
         description: str,
         data_type: platform_parameter_domain.DataTypes,
+        default: Optional[Union[bool, int, str, float]] = None,
         is_feature: bool = False,
         feature_stage: Optional[platform_parameter_domain.FeatureStages] = None
     ) -> platform_parameter_domain.PlatformParameter:
@@ -70,6 +71,8 @@ class Registry:
             description: str. The description of the platform parameter.
             data_type: Enum(DataTypes). The data type of the platform
                 parameter, must be one of the following: bool, number, string.
+            default: Optional[Union[bool, int, str, float]]. The default value
+                for the platform parameter.
             is_feature: bool. True if the platform parameter is a feature flag.
             feature_stage: Enum(FeatureStages)|None. The stage of the feature,
                 required if 'is_feature' is True.
@@ -81,7 +84,8 @@ class Registry:
             Exception. The data type is not supported.
         """
         if data_type in cls.DEFAULT_VALUE_BY_TYPE_DICT:
-            default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]
+            if not default:
+                default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]
         else:
             allowed_data_types = [
                 data_type_enum.value
@@ -242,7 +246,7 @@ class Registry:
     def evaluate_all_platform_parameters(
         cls,
         context: platform_parameter_domain.EvaluationContext
-    ) -> Dict[str, Union[str, bool, int]]:
+    ) -> Dict[str, Union[str, bool, int, float]]:
         """Evaluate all platform parameters with the given context.
 
         Args:

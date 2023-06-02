@@ -93,6 +93,28 @@ def get_all_feature_flag_dicts() -> List[
     ]
 
 
+def get_all_platform_parameters_except_feature_flag_dicts() -> List[
+    platform_parameter_domain.PlatformParameterDict
+]:
+    """Returns dict representations of all platform parameters that do not
+    contains feature flags. This method is used for providing detailed
+    platform parameters information to the release-coordinator page.
+    Returns:
+        list(dict). A list containing the dict mappings of all fields of the
+        platform parameters.
+    """
+    all_platform_parameter_names = (
+        registry.Registry.get_all_platform_parameter_names())
+    platform_params_except_feature_flags = [
+        plat_param for plat_param in all_platform_parameter_names
+        if plat_param not in ALL_FEATURES_NAMES_SET
+    ]
+    return [
+        registry.Registry.get_platform_parameter(_plat_param).to_dict()
+        for _plat_param in platform_params_except_feature_flags
+    ]
+
+
 def evaluate_all_feature_flag_values_for_client(
     context: platform_parameter_domain.EvaluationContext
 ) -> Dict[str, bool]:
