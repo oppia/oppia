@@ -432,8 +432,10 @@ class NewTopicHandler(
     @acl_decorators.can_create_topic
     def post(self) -> None:
         """Handles POST requests.
+
         Raises:
-            InvalidInputException: If there are validation errors during image validation.
+            InvalidInputException. If there are validation errors
+                during image validation.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -560,8 +562,10 @@ class NewSkillHandler(
     @acl_decorators.can_create_skill
     def post(self) -> None:
         """Handles POST requests.
+
         Raises:
-            InvalidInputException: If topic is None or skill description is duplicated.
+            InvalidInputException. The topic is None or
+                 skill description is duplicated.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -692,6 +696,7 @@ def normalize_comma_separated_topic_ids(
 ) -> List[str]:
     """Normalizes a string of comma-separated topic IDs into a list of
     topic IDs.
+
     Args:
         comma_separated_topic_ids: str. Comma separated topic IDs.
 
