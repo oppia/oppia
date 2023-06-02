@@ -1,6 +1,6 @@
 <div *ngIf="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-subtopic-viewer-nav-breadcrumb">
   <div class="oppia-subtopic-viewer-nav-separator"></div>
-  <div class="oppia-subtopic-viewer-nav-labels-container">
+  <div class="oppia-subtopic-viewer-nav-labels-container" title="The Place Names and Their Values">
     <p class="oppia-subtopic-title-text">
       <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
         {{ subtopicTitle }}
@@ -53,11 +53,11 @@
     margin: 0;
     margin-bottom: -3px;
     margin-left: -6px;
-    white-space: break-spaces;
     overflow: hidden;
     text-overflow: ellipsis;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
+    white-space: break-spaces;
     width: -webkit-fill-available;
   }
 
