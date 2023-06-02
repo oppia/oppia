@@ -147,8 +147,11 @@
       Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
     </div>
   </div>
-  <div [hidden]="reviewable || !reviewMessage"
+  <div [hidden]="reviewable || !reviewMessage || !reviewer"
        class="oppia-suggestion-review-message">
+    <strong>Reviewer:</strong>
+    {{reviewer}}
+    <br>
     <strong>Review message: </strong>
     <div class="oppia-review-message"
          [ngClass]="{ 'oppia-reviewable-message': reviewable }">
