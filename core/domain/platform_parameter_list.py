@@ -43,6 +43,7 @@ class ParamNames(enum.Enum):
         'serial_chapter_launch_curriculum_admin_view')
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
 
+
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
