@@ -34,7 +34,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'android_beta_landing_page',
                             'blog_pages',
                             'contributor_dashboard_accomplishments',
-                            'diagnostic_test']
+                            'diagnostic_test',
+                            'serial_chapter_launch_curriculum_admin_view']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
