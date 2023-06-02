@@ -223,7 +223,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
     this.activeSuggestion = this.activeContribution.suggestion;
     this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+      AppConstants.ENTITY_TYPE.EXPLORATION,
       this.activeSuggestion.target_id);
     this.subheading = (
       `${this.activeContribution.details.topic_name} / ` +
