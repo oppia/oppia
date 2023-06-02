@@ -1992,11 +1992,11 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         return user_data
 
 
-class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
+class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     """Records the Total Translation contribution stats and data of 
     recent_review keyed per (contributor_id, language_code) tuple. 
     Its IDs will be in the following
-        structure: [contributor_id][language_code]
+        structure: [language_code][contributor_id]
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -2039,7 +2039,7 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
         required=True, indexed=True)
     # The total word count of submitted translations. Excludes HTML tags and
     # attributes.
-    submitted_translations_word_count = datastore_services.IntegerProperty(
+    submitted_translation_word_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The number of accepted translations.
     accepted_translations_count = datastore_services.IntegerProperty(
@@ -2049,14 +2049,14 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
         datastore_services.IntegerProperty(required=True, indexed=True))
     # The total word count of accepted translations. Excludes HTML tags and
     # attributes.
-    accepted_translations_word_count = datastore_services.IntegerProperty(
+    accepted_translation_word_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The number of rejected translations.
     rejected_translations_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The total word count of rejected translations. Excludes HTML tags and
     # attributes.
-    rejected_translations_word_count = datastore_services.IntegerProperty(
+    rejected_translation_word_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The unique first date of the translation suggestions.
     first_contribution_date = datastore_services.DateProperty(indexed=True)
@@ -2076,16 +2076,16 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
         last_hundred_accepted_translations_without_reviewer_edits_count: int,
         last_hundred_rejected_translations_count: int,
         submitted_translations_count: int,
-        submitted_translations_word_count: int,
+        submitted_translation_word_count: int,
         accepted_translations_count: int,
         accepted_translations_without_reviewer_edits_count: int,
-        accepted_translations_word_count: int,
+        accepted_translation_word_count: int,
         rejected_translations_count: int,
-        rejected_translations_word_count: int,
+        rejected_translation_word_count: int,
         first_contribution_date: datetime.date,
         last_contribution_date: datetime.date
     ) -> str:
-        """Creates a new TranslationSubmitterContributionStatsModel 
+        """Creates a new TranslationSubmitterTotalContributionStatsModel 
         instance and returns its ID.
         """
         entity_id = cls.construct_id(
@@ -2105,13 +2105,13 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
             last_hundred_rejected_translations_count=(
                 last_hundred_rejected_translations_count),
             submitted_translations_count=submitted_translations_count,
-            submitted_translations_word_count=submitted_translations_word_count,
+            submitted_translation_word_count=submitted_translation_word_count,
             accepted_translations_count=accepted_translations_count,
             accepted_translations_without_reviewer_edits_count=(
                 accepted_translations_without_reviewer_edits_count),
-            accepted_translations_word_count=accepted_translations_word_count,
+            accepted_translation_word_count=accepted_translation_word_count,
             rejected_translations_count=rejected_translations_count,
-            rejected_translations_word_count=rejected_translations_word_count,
+            rejected_translation_word_count=rejected_translation_word_count,
             first_contribution_date=first_contribution_date,
             last_contribution_date=last_contribution_date)
         entity.update_timestamps()
@@ -2123,7 +2123,7 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
         language_code: str, contributor_user_id: str
     ) -> str:
         """Constructs a unique ID for a 
-        TranslationSubmitterContributionStatsModel instance.
+        TranslationSubmitterTotalContributionStatsModel instance.
 
         Args:
             language_code: str. ISO 639-1 language code.
@@ -2144,14 +2144,14 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
     @classmethod
     def get( # type: ignore[override]
         cls, language_code: str, contributor_user_id: str
-    ) -> Optional[TranslationSubmitterContributionStatsModel]:
-        """Gets the TranslationSubmitterContributionStatsModel matching the supplied
-        language_code, contributor_user_id, topic_id.
+    ) -> Optional[TranslationSubmitterTotalContributionStatsModel]:
+        """Gets the TranslationSubmitterTotalContributionStatsModel
+        matching the supplied language_code, contributor_user_id, topic_id.
 
         Returns:
-            TranslationSubmitterContributionStatsModel|None. The matching
-            TranslationSubmitterContributionStatsModel, or None if no such model
-            instance exists.
+            TranslationSubmitterTotalContributionStatsModel|None. The matching
+            TranslationSubmitterTotalContributionStatsModel, or None if no 
+            such model instance exists.
         """
         entity_id = cls.construct_id(
             language_code, contributor_user_id)
@@ -2160,13 +2160,13 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
     @classmethod
     def get_all_by_user_id(
         cls, user_id: str
-    ) -> Sequence[TranslationSubmitterContributionStatsModel]:
-        """Gets all TranslationSubmitterContributionStatsModel matching the supplied
-        user_id.
+    ) -> Sequence[TranslationSubmitterTotalContributionStatsModel]:
+        """Gets all TranslationSubmitterTotalContributionStatsModel matching 
+        the supplied user_id.
 
         Returns:
-            list(TranslationSubmitterContributionStatsModel). The matching
-            TranslationSubmitterContributionStatsModel.
+            list(TranslationSubmitterTotalContributionStatsModel). The matching
+            TranslationSubmitterTotalContributionStatsModel.
         """
         return cls.get_all().filter(
             cls.contributor_user_id == user_id
@@ -2174,8 +2174,8 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether TranslationSubmitterContributionStatsModel references the
-        supplied user.
+        """Check whether TranslationSubmitterTotalContributionStatsModel 
+        references the supplied user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -2225,17 +2225,17 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'submitted_translations_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'submitted_translations_word_count':
+            'submitted_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translations_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translations_without_reviewer_edits_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'accepted_translations_word_count':
+            'accepted_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'rejected_translations_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'rejected_translations_word_count':
+            'rejected_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_date':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -2245,7 +2245,7 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instances of TranslationSubmitterContributionStatsModel
+        """Delete instances of TranslationSubmitterTotalContributionStatsModel
         for the user.
 
         Args:
@@ -2258,7 +2258,7 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
     def export_data(
         cls, user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
-        """Exports the data from TranslationSubmitterContributionStatsModel
+        """Exports the data from TranslationSubmitterTotalContributionStatsModel
         into dict format for Takeout.
 
         Args:
@@ -2266,17 +2266,30 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
 
         Returns:
             dict. Dictionary of the data from 
-                TranslationSubmitterContributionStatsModel.
+                TranslationSubmitterTotalContributionStatsModel.
         """
         user_data = {}
-        stats_models: Sequence[TranslationSubmitterContributionStatsModel] = (
+        stats_models: Sequence[TranslationSubmitterTotalContributionStatsModel] = ( 
             cls.get_all().filter(cls.contributor_user_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
-            id_without_user_id = '%s.%s' % (splitted_id[0], splitted_id[2])
+            id_without_user_id = '%s' % (splitted_id[0])
             user_data[id_without_user_id] = {
                 'language_code': model.language_code,
-                'topic_id': model.topic_id,
+                'topic_ids_with_translation_submissions': (
+                    model.topic_ids_with_translation_submissions),
+                'recent_review_outcomes': (
+                    model.recent_review_outcomes),
+                'recent_performance': (
+                    model.recent_performance),
+                'overall_accuracy': (
+                    model.overall_accuracy),
+                'last_hundred_accepted_translations_count': (
+                    model.last_hundred_accepted_translations_count),
+                'last_hundred_accepted_translations_without_reviewer_edits_count': (
+                    model.last_hundred_accepted_translations_without_reviewer_edits_count),
+                'last_hundred_rejected_translations_count': (
+                    model.last_hundred_rejected_translations_count),
                 'submitted_translations_count': (
                     model.submitted_translations_count),
                 'submitted_translation_word_count': (
@@ -2289,9 +2302,11 @@ class TranslationSubmitterContributionStatsModel(base_models.BaseModel):
                     model.accepted_translation_word_count),
                 'rejected_translations_count': (
                     model.rejected_translations_count),
-                'rejected_translations_word_count': (
-                    model.rejected_translations_word_count),
-                'contribution_dates': [
-                    date.isoformat() for date in model.contribution_dates]
+                'rejected_translation_word_count': (
+                    model.rejected_translation_word_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
             }
         return user_data

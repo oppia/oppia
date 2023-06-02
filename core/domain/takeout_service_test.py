@@ -771,7 +771,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
-        suggestion_models.TranslationSubmitterContributionStatsModel.create(
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_user_id=self.USER_ID_1,
             topic_ids_with_translation_submissions=(
@@ -788,15 +788,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_hundred_rejected_translations_count=(
                 self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
-            submitted_translations_word_count=(
+            submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
             accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
             accepted_translations_without_reviewer_edits_count=(
                 self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            accepted_translations_word_count=(
+            accepted_translation_word_count=(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
-            rejected_translations_word_count=(
+            rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
@@ -1137,7 +1137,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_question_review_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
-        expected_total_translation_contribution_stats: Dict[
+        expected_translation_submitter_total_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1214,8 +1214,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_contribution_stats,
             'question_review_stats':
                 expected_question_review_stats,
-            'total_translation_contribution_stats':
-                expected_total_translation_contribution_stats,
+            'translation_submitter_total_contribution_stats':
+                expected_translation_submitter_total_contribution_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
@@ -1842,7 +1842,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'topic_id': self.TOPIC_ID_1,
                     'submitted_translations_count': (
                         self.SUBMITTED_TRANSLATIONS_COUNT),
-                    'submitted_translations_word_count': (
+                    'submitted_translation_word_count': (
                         self.SUBMITTED_TRANSLATION_WORD_COUNT),
                     'accepted_translations_count': (
                         self.ACCEPTED_TRANSLATIONS_COUNT),
@@ -1853,7 +1853,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.ACCEPTED_TRANSLATION_WORD_COUNT),
                     'rejected_translations_count': (
                         self.REJECTED_TRANSLATIONS_COUNT),
-                    'rejected_translations_word_count': (
+                    'rejected_translation_word_count': (
                         self.REJECTED_TRANSLATION_WORD_COUNT),
                     'contribution_dates': [
                         date.isoformat() for date in self.CONTRIBUTION_DATES]
@@ -1916,7 +1916,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_CONTRIBUTION_DATE.isoformat())
                 }
         }
-        expected_total_translation_review_stats_data = {
+        expected_translation_submitter_total_contribution_stats_data = {
             '%s.%s' % (
                 self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
                     'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -1934,21 +1934,21 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
                     'submitted_translations_count': (
                         self.SUBMITTED_TRANSLATIONS_COUNT),
-                    'submitted_translations_word_count': (
+                    'submitted_translation_word_count': (
                         self.SUBMITTED_TRANSLATION_WORD_COUNT),
                     'accepted_translations_count': (
                         self.ACCEPTED_TRANSLATIONS_COUNT),
                     'accepted_translations_without_reviewer_edits_count': (
                         self
                         .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-                    'accepted_translations_word_count': (
+                    'accepted_translation_word_count': (
                         self.ACCEPTED_TRANSLATION_WORD_COUNT),
                     'rejected_translations_count': (
                         self.REJECTED_TRANSLATIONS_COUNT),
-                    'rejected_translations_word_count': (
+                    'rejected_translation_word_count': (
                         self.REJECTED_TRANSLATION_WORD_COUNT),
                     'first_contribution_date':(
-                        self.FIRST_CONTRIBUTION_DATE),
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
                     'last_contribution_date': (
                         self.LAST_CONTRIBUTION_DATE.isoformat())
                 }
@@ -2002,8 +2002,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_contribution_stats_data,
             'question_review_stats':
                 expected_question_review_stats_data,
-            'total_translation_contribution_stats':
-                expected_total_translation_review_stats_data,
+            'translation_submitter_total_contribution_stats':
+                expected_translation_submitter_total_contribution_stats_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
