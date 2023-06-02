@@ -38,7 +38,6 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'serial_chapter_launch_curriculum_admin_view',
                             'show_translation_size']
 
-
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()
         for name in all_names:
