@@ -113,7 +113,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
-                '/feature_flags', {
+                feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag_rules',
                     'feature_name': None
                 }, csrf_token=csrf_token)
@@ -134,7 +134,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
-                '/feature_flags', {
+                feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag_rules',
                     'feature_name': 'new_feature',
                     'new_rules': None
@@ -168,7 +168,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         )
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
-                '/feature_flags', {
+                feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag_rules',
                     'feature_name': 'new_feature',
                     'new_rules': new_rule_dicts,
@@ -189,7 +189,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
-            response_dict = self.get_json('/feature_flags')
+            response_dict = self.get_json(feconf.FEATURE_FLAGS_URL)
             self.assertEqual(
                 response_dict['feature_flags'], [feature.to_dict()])
 
@@ -223,7 +223,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
             self.post_json(
-                '/feature_flags', {
+                feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag_rules',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
@@ -265,7 +265,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             platform_feature_services, 'ALL_FEATURES_NAMES_SET', set([]))
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
-                '/feature_flags', {
+                feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag_rules',
                     'feature_name': 'test_feature_1',
                     'new_rules': new_rule_dicts,
@@ -306,7 +306,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             set([feature.name]))
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
-                '/feature_flags', {
+                feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag_rules',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,
@@ -358,7 +358,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             feature.name] = None  # type: ignore[assignment]
         with feature_list_ctx, feature_set_ctx:
             response = self.post_json(
-                '/feature_flags', {
+                feconf.FEATURE_FLAGS_URL, {
                     'action': 'update_feature_flag_rules',
                     'feature_name': feature.name,
                     'new_rules': new_rule_dicts,

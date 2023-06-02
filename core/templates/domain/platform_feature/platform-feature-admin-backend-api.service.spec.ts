@@ -20,6 +20,8 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { PlatformFeatureDomainConstants } from
+  'domain/platform_feature/platform-feature-domain.constants';
 import { PlatformParameterFilterType } from
   'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from
@@ -74,7 +76,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     };
     featureAdminService.getFeatureFlags().then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/feature_flags');
+    let req = httpTestingController.expectOne(
+      PlatformFeatureDomainConstants.FEATURE_FLAGS_URL);
     expect(req.request.method).toEqual('GET');
     req.flush(featureFlagsResponse);
 
@@ -92,7 +95,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
         successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        '/feature_flags');
+        PlatformFeatureDomainConstants.FEATURE_FLAGS_URL);
       expect(req.request.method).toEqual('GET');
 
       req.flush({
@@ -122,7 +125,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
         'feature_name', 'update message', newRules
       ).then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne('/feature_flags');
+      const req = httpTestingController.expectOne(
+        PlatformFeatureDomainConstants.FEATURE_FLAGS_URL);
       req.flush({});
       expect(req.request.method).toEqual('POST');
 
@@ -148,7 +152,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       'feature_name', 'update message', newRules
     ).then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne('/feature_flags');
+    const req = httpTestingController.expectOne(
+      PlatformFeatureDomainConstants.FEATURE_FLAGS_URL);
     req.error(new ErrorEvent('Error'));
 
     flushMicrotasks();

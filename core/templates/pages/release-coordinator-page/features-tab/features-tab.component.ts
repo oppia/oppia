@@ -24,6 +24,7 @@ import isEqual from 'lodash/isEqual';
 
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
+import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -133,6 +134,7 @@ export class FeaturesTabComponent implements OnInit {
     private apiService: PlatformFeatureAdminBackendApiService,
     private featureService: PlatformFeatureService,
     private dummyApiService: PlatformFeatureDummyBackendApiService,
+    private loaderService: LoaderService,
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
@@ -322,7 +324,9 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
     this.reloadFeatureFlagsAsync();
+    this.loaderService.hideLoadingScreen();
     this.reloadDummyHandlerStatusAsync();
   }
 }
