@@ -39,6 +39,8 @@ class ParamNames(enum.Enum):
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
+    SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
+        'serial_chapter_launch_curriculum_admin_view')
 
 
 # Platform parameters should all be defined below.
@@ -90,3 +92,9 @@ Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
     platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
+    'This flag is for serial chapter launch feature and making changes only' +
+    'in the curriculum admin view.',
+    platform_parameter_domain.FeatureStages.DEV)

@@ -29,7 +29,9 @@ export enum FeatureNames {
   ContributorDashboardAccomplishments = 'contributor_dashboard_accomplishments',
   AndroidBetaLandingPage = 'android_beta_landing_page',
   BlogPages = 'blog_pages',
-  DiagnosticTest = 'diagnostic_test'
+  DiagnosticTest = 'diagnostic_test',
+  SerialChapterLaunchCurriculumAdminView =
+  'serial_chapter_launch_curriculum_admin_view'
 }
 
 export interface FeatureStatusSummaryBackendDict {
