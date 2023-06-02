@@ -93,13 +93,11 @@ Registry.create_feature_flag(
     'This flag is for the diagnostic test functionality.',
     platform_parameter_domain.FeatureStages.PROD)
 
-
 Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     'This flag is for serial chapter launch feature and making changes only' +
     'in the curriculum admin view.',
     platform_parameter_domain.FeatureStages.DEV)
-
 
 Registry.create_feature_flag(
     ParamNames.SHOW_TRANSLATION_SIZE,
