@@ -98,6 +98,10 @@ export class UserInfo {
     return this._roles.includes('QUESTION_ADMIN');
   }
 
+  isQuestionCoordinator(): boolean {
+    return this._roles.includes('QUESTION_COORDINATOR');
+  }
+
   isTopicManager(): boolean {
     return this._isTopicManager;
   }
