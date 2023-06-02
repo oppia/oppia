@@ -23,7 +23,9 @@
 <style>
   .oppia-subtopic-viewer-nav-breadcrumb {
     align-items: center;
-    height: 56px;
+    display: flex;
+    flex-direction: column-reverse;
+    height: 53px;
     padding-top: 0;
   }
 
@@ -34,18 +36,29 @@
   .oppia-subtopic-viewer-nav-separator {
     background-color: white;
     height: 80%;
+    margin-bottom: 4px;
     margin-right: 12px;
     width: 1px;
   }
 
   .oppia-subtopic-viewer-nav-labels-container {
-    display: flex;
-    flex-direction: column;
+    display: -webkit-box;
+    line-height: normal;
+    -webkit-box-orient: vertical;
   }
 
   .oppia-subtopic-title-text {
+    display: -webkit-box;
     font-size: 18px;
     margin: 0;
+    margin-bottom: -3px;
+    margin-left: -6px;
+    white-space: break-spaces;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    width: -webkit-fill-available;
   }
 
   .oppia-topic-name-text {
