@@ -420,9 +420,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     SUBMITTED_TRANSLATIONS_COUNT: Final = 2
     SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
     ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT: Final= 1
     ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
     REJECTED_TRANSLATIONS_COUNT: Final = 0
+    LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT: Final = 0
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
     REVIEWED_TRANSLATIONS_COUNT: Final = 0
     REVIEWED_TRANSLATION_WORD_COUNT: Final = 0
@@ -432,6 +435,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
     REVIEWED_QUESTIONS_COUNT: Final = 2
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['15', '16', '17']
+    RECENT_REVIEW_OUTCOMES: Final = ('accepted', 'rejected')
+    RECENT_PERFORMANCE: Final = 20
+    OVERALL_ACCURACY: Final = 2.0
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
     CONTRIBUTION_DATES: Final = [
         datetime.date.fromtimestamp(1616173836),
@@ -760,6 +767,37 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        suggestion_models.TranslationSubmitterContributionStatsModel.create(
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_user_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            last_hundred_accepted_translations_count=(
+                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+            last_hundred_accepted_translations_without_reviewer_edits_count=(
+                self
+            # Pylint disable is needed cause variable name is too long.
+                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+            last_hundred_rejected_translations_count=(
+                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translations_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translations_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translations_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -1099,6 +1137,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_question_review_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
+        expected_total_translation_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1173,6 +1214,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_contribution_stats,
             'question_review_stats':
                 expected_question_review_stats,
+            'total_translation_contribution_stats':
+                expected_total_translation_contribution_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
@@ -1799,7 +1842,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'topic_id': self.TOPIC_ID_1,
                     'submitted_translations_count': (
                         self.SUBMITTED_TRANSLATIONS_COUNT),
-                    'submitted_translation_word_count': (
+                    'submitted_translations_word_count': (
                         self.SUBMITTED_TRANSLATION_WORD_COUNT),
                     'accepted_translations_count': (
                         self.ACCEPTED_TRANSLATIONS_COUNT),
@@ -1810,7 +1853,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.ACCEPTED_TRANSLATION_WORD_COUNT),
                     'rejected_translations_count': (
                         self.REJECTED_TRANSLATIONS_COUNT),
-                    'rejected_translation_word_count': (
+                    'rejected_translations_word_count': (
                         self.REJECTED_TRANSLATION_WORD_COUNT),
                     'contribution_dates': [
                         date.isoformat() for date in self.CONTRIBUTION_DATES]
@@ -1873,6 +1916,43 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_CONTRIBUTION_DATE.isoformat())
                 }
         }
+        expected_total_translation_review_stats_data = {
+            '%s.%s' % (
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
+                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                    'topic_ids_with_translation_submissions': (
+                        self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+                    'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+                    'recent_performance': self.RECENT_PERFORMANCE,
+                    'overall_accuracy': self.OVERALL_ACCURACY,
+                    'last_hundred_accepted_translations_count': (
+                        self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+                    # Pylint disable is needed cause variable name is too long.
+                    'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
+                        self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+                    'last_hundred_rejected_translations_count': (
+                        self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+                    'submitted_translations_count': (
+                        self.SUBMITTED_TRANSLATIONS_COUNT),
+                    'submitted_translations_word_count': (
+                        self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                    'accepted_translations_count': (
+                        self.ACCEPTED_TRANSLATIONS_COUNT),
+                    'accepted_translations_without_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                    'accepted_translations_word_count': (
+                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                    'rejected_translations_count': (
+                        self.REJECTED_TRANSLATIONS_COUNT),
+                    'rejected_translations_word_count': (
+                        self.REJECTED_TRANSLATION_WORD_COUNT),
+                    'first_contribution_date':(
+                        self.FIRST_CONTRIBUTION_DATE),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
@@ -1922,6 +2002,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_contribution_stats_data,
             'question_review_stats':
                 expected_question_review_stats_data,
+            'total_translation_contribution_stats':
+                expected_total_translation_review_stats_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
