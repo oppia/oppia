@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for translation admins to assign translation
+ * @fileoverview Acceptance Test for translation admins to revoke translation
  * rights to users.
  */
 
