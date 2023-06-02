@@ -21,8 +21,11 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/guppy.import';
+// import 'third-party-imports/guppy.import';
+(window as Window).Guppy = require(
+  '/node_modules/guppy-dev/build/guppy.min.js');
 import 'third-party-imports/midi-js.import';
+import 'midi/build/MIDI.js';
 import 'skulpt-dist/skulpt.min.js';
 import 'skulpt-dist/skulpt-stdlib.js';
 

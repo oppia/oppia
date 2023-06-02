@@ -16,8 +16,10 @@
  * @fileoverview This file imports the MIDI.js library.
  */
 
-require('static/midi-js-c26ebb/build/MIDI.js');
-window.Base64Binary = require('static/midi-js-c26ebb/inc/shim/Base64binary.js');
+// require('static/midi-js-c26ebb/build/MIDI.js');
+window.Base64Binary = require('/node_modules/midi/inc/shim/Base64binary.js');
+// window.Base64Binary = require('static/midi-js-c26ebb/inc/shim/Base64binary.js');
+// const soundFile = require('/node_modules/midi/examples/soundfont/');
 
 $(document).ready(function() {
   MIDI.loadPlugin({

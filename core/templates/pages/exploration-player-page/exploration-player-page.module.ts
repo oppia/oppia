@@ -37,8 +37,11 @@ import { ProgressReminderModalComponent } from './templates/progress-reminder-mo
 import { HintAndSolutionModalService } from './services/hint-and-solution-modal.service';
 import { FatigueDetectionService } from './services/fatigue-detection.service';
 
-import 'third-party-imports/guppy.import';
+// import 'third-party-imports/guppy.import';
+(window as Window).Guppy = require(
+  '/node_modules/guppy-dev/build/guppy.min.js');
 import 'third-party-imports/midi-js.import';
+import 'midi/build/MIDI.js';
 import 'skulpt-dist/skulpt.min.js';
 import 'skulpt-dist/skulpt-stdlib.js';
 import { ToastrModule } from 'ngx-toastr';
