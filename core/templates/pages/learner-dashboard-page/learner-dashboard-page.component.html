@@ -182,6 +182,7 @@
           <table class="table" *ngIf="!feedbackThreadActive">
             <tr *ngFor="let thread of threadSummaries | sortBy: isCurrentFeedbackSortDescending: getValueOfFeedbackThreadSortKey()"
                 (click)="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"s
+                (keydown)="onKeyDownOpenFeedback($event, thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
                 class="oppia-feedback-tab-row e2e-test-feedback-thread" tabindex="0">
               <td width="10%">
                 <span [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status) }}</span>
