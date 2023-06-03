@@ -22,6 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { Schema } from 'services/schema-default-value.service';
 
@@ -78,7 +80,23 @@ describe('Admin backend api service', () => {
         'welcome.yaml'
       ]
     ],
-    viewable_roles: ['TOPIC_MANAGER']
+    viewable_roles: ['TOPIC_MANAGER'],
+    platform_params_dicts: [{
+      name: 'dummy_parameter',
+      description: 'This is a dummy platform parameter.',
+      data_type: 'string',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [['=', 'dev'] as [string, string]]
+        }],
+        value_when_matched: ''
+      }],
+      rule_schema_version: 1,
+      default_value: '',
+      is_feature: false,
+      feature_stage: null
+    }]
   };
   let adminDataObject: AdminPageData;
   let configPropertyValues = {
@@ -136,7 +154,9 @@ describe('Admin backend api service', () => {
       viewableRoles: adminBackendResponse.viewable_roles,
       humanReadableRoles: adminBackendResponse.human_readable_roles,
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        dict => CreatorTopicSummary.createFromBackendDict(dict))
+        dict => CreatorTopicSummary.createFromBackendDict(dict)),
+      platformParameters: adminBackendResponse.platform_params_dicts.map(
+        dict => PlatformParameter.createFromBackendDict(dict))
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {

@@ -23,6 +23,10 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
+  PlatformParameter,
+  PlatformParameterBackendDict
+} from 'domain/platform_feature/platform-parameter.model';
+import {
   CreatorTopicSummary,
   CreatorTopicSummaryBackendDict
 } from 'domain/topic/creator-topic-summary.model';
@@ -127,6 +131,7 @@ export interface AdminPageDataBackendDict {
   'viewable_roles': string[];
   'human_readable_roles': HumanReadableRolesBackendResponse;
   'topic_summaries': CreatorTopicSummaryBackendDict[];
+  'platform_params_dicts': PlatformParameterBackendDict[];
 }
 
 export interface AdminPageData {
@@ -139,6 +144,7 @@ export interface AdminPageData {
   viewableRoles: string[];
   humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
+  platformParameters: PlatformParameter[];
 }
 
 @Injectable({
@@ -163,7 +169,9 @@ export class AdminBackendApiService {
           humanReadableRoles: response.human_readable_roles,
           viewableRoles: response.viewable_roles,
           topicSummaries: response.topic_summaries.map(
-            CreatorTopicSummary.createFromBackendDict)
+            CreatorTopicSummary.createFromBackendDict),
+          platformParameters: response.platform_params_dicts.map(
+            dict => PlatformParameter.createFromBackendDict(dict))
         });
       }, errorResponse => {
         reject(errorResponse.error.error);

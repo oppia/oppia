@@ -20,6 +20,10 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { PlatformParameterFilterType } from
+  'domain/platform_feature/platform-parameter-filter.model';
+import { PlatformParameter } from
+  'domain/platform_feature/platform-parameter.model';
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminPageData, AdminPageDataBackendDict } from
@@ -79,7 +83,23 @@ describe('Admin Data Service', () => {
     human_readable_roles: {
       FULL_USER: 'full user',
       TOPIC_MANAGER: 'topic manager'
-    }
+    },
+    platform_params_dicts: [{
+      name: 'dummy_parameter',
+      description: 'This is a dummy platform parameter.',
+      data_type: 'string',
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [['=', 'dev'] as [string, string]]
+        }],
+        value_when_matched: ''
+      }],
+      rule_schema_version: 1,
+      default_value: '',
+      is_feature: false,
+      feature_stage: null
+    }],
   };
   let adminDataResponse: AdminPageData;
 
@@ -100,7 +120,9 @@ describe('Admin Data Service', () => {
       viewableRoles: sampleAdminData.viewable_roles,
       humanReadableRoles: sampleAdminData.human_readable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
-        CreatorTopicSummary.createFromBackendDict)
+        CreatorTopicSummary.createFromBackendDict),
+      platformParameters: sampleAdminData.platform_params_dicts.map(
+        dict => PlatformParameter.createFromBackendDict(dict))
     };
   });
 

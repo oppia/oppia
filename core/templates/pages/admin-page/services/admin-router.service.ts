@@ -64,6 +64,15 @@ export class AdminRouterService {
   }
 
   /**
+   * @returns {boolean} Whether the platform_parameters tab is open.
+   */
+  isPlatformParamsTabOpen(): boolean {
+    return (
+      this.currentTabHash ===
+      AdminPageConstants.ADMIN_TAB_URLS.PLATFORM_PARAMETERS);
+  }
+
+  /**
    * @returns {boolean} Whether the config tab is open.
    */
   isConfigTabOpen(): boolean {
