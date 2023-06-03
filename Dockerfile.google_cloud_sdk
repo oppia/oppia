@@ -1,0 +1,24 @@
+FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:alpine
+# FROM google/cloud-sdk:364.0.0
+
+WORKDIR /app
+
+# RUN apt-get update && apt-get -y install python \
+#     python-dev \
+#     python-pip \
+#     python-setuptools \
+#     --no-install-recommends && \
+#     rm -rf /var/lib/apt/lists/*
+
+# by default, the google/cloud-sdk Docker image does not have the component manager enabled, so enabling it from the environment variable
+# ENV CLOUDSDK_COMPONENT_MANAGER_DISABLE_UPDATE_CHECK=false
+
+# RUN apt-get -y update && apt-get install -y python2
+# RUN apk update && apk add python3
+
+RUN gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras
+
+COPY . .
+
+EXPOSE 8089
+EXPOSE 8000

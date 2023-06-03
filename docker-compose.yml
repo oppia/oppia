@@ -29,28 +29,25 @@ services:
       - node_modules:/app/oppia/node_modules
     command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
 
-  # webpack-compiler:
-  #   image: node:20-alpine
-  #   container_name: oppia-webpack-compiler
-  #   volumes:
-  #     - .:/app/oppia
-  #     - node_modules:/app/oppia/node_modules
-  #   depends_on:
-  #     - webserver
-  #   # command: app/oppia/node_modules/.bin/ng build --watch
-  #   command: node /app/oppia/node_modules/webpack/bin/webpack.js --config /app/oppia/webpack.dev.config.ts --watch
-
-  # google_cloud_sdk:
-  #   platform: linux/arm64
-  #   image: google/cloud-sdk:364.0.0
-  #   ports:
-  #     - "8089:8089"
-  #     # - "8181:8181"
-  #     - "8000:8000"
-  #   volumes:
-  #     - /app/cloud_datastore_emulator_cache
-  #   command: dev_appserver.py app_dev.yaml --host=localhost --port=8181
-
+  google_cloud_sdk:
+    build: 
+      context: .
+      dockerfile: Dockerfile.google_cloud_sdk
+    container_name: oppia-google-cloud-sdk
+    ports:
+      - "8089:8089"
+      # - "8181:8181"
+      - "8000:8000"
+    # volumes:
+      # - .:/app/oppia
+    # environment:
+    #   - CLOUDSDK_COMPONENT_MANAGER_DISABLE_UPDATE_CHECK=false
+    depends_on:
+      - webserver
+      - webpack-compiler
+    # restart: unless-stopped
+    # command: ../google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --host=localhost
+    command: gcloud version
 
 volumes:
   node_modules:
