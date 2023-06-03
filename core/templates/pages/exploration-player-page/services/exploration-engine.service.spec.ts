@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
-import { fakeAsync, TestBed, tick} from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -30,7 +30,6 @@ import { TextInputRulesService } from 'interactions/TextInput/directives/text-in
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
-import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { AudioPreloaderService } from './audio-preloader.service';
 import { ContentTranslationLanguageService } from './content-translation-language.service';
@@ -50,8 +49,6 @@ describe('Exploration engine service ', () => {
   let contextService: ContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
-  let explorationFeaturesBackendApiService:
-    ExplorationFeaturesBackendApiService;
   let explorationEngineService: ExplorationEngineService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
@@ -67,7 +64,6 @@ describe('Exploration engine service ', () => {
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
-  let explorationFeatures: ExplorationFeatures;
 
   beforeEach(() => {
     explorationDict = {
@@ -384,8 +380,6 @@ describe('Exploration engine service ', () => {
       ContentTranslationLanguageService);
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService);
-    explorationFeaturesBackendApiService = TestBed.inject(
-      ExplorationFeaturesBackendApiService);
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
