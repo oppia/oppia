@@ -4143,6 +4143,19 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             last_contribution_date=(
                 datetime.date.fromtimestamp(1616173837))
         ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id=self.QUESTION_STATS_1_ID,
+            contributor_id=self.user_1_id,
+            topic_ids_with_question_reviews=['topic1', 'topic2'],
+            reviewed_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_with_reviewer_edits_count=1,
+            rejected_questions_count=1,
+            first_contribution_date=(
+                datetime.date.fromtimestamp(1616173837)),
+            last_contribution_date=(
+                datetime.date.fromtimestamp(1616173837))
+        ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 

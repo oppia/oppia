@@ -440,8 +440,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     REVIEWED_QUESTIONS_COUNT: Final = 2
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['15', '16', '17']
-    TOPIC_IDS_WITH_QUESTION_SUBMISSIONS: Final = ['18', '19', '20']
     TOPIC_IDS_WITH_TRANSLATION_REVIEWS: Final = ['18', '19', '20']
+    TOPIC_IDS_WITH_QUESTION_SUBMISSIONS: Final = ['18', '19', '20']
+    TOPIC_IDS_WITH_QUESTION_REVIEWS: Final = ['18', '19', '20']
     RECENT_REVIEW_OUTCOMES: Final = ('accepted', 'rejected')
     RECENT_PERFORMANCE: Final = 20
     OVERALL_ACCURACY: Final = 2.0
@@ -847,6 +848,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
+        suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=(
+                self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
         user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
@@ -1191,6 +1205,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_question_submitter_total_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
+        expected_question_reviewer_total_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
@@ -1271,6 +1288,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_translation_reviewer_total_contribution_stats,
             'question_submitter_total_contribution_stats':
                 expected_question_submitter_total_contribution_stats,
+            'question_reviewer_total_contribution_stats':
+                expected_question_reviewer_total_contribution_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
@@ -2059,6 +2078,25 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_CONTRIBUTION_DATE.isoformat())
                 }
         }
+        expected_question_reviewer_total_contribution_stats_data = {
+            '%s' % (
+                self.USER_ID_1): {
+                    'topic_ids_with_question_reviews': (
+                        self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+                    'reviewed_questions_count': (
+                        self.REVIEWED_QUESTIONS_COUNT),
+                    'accepted_questions_count': (
+                        self.ACCEPTED_QUESTIONS_COUNT),
+                    'accepted_questions_with_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+                    'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
@@ -2114,6 +2152,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_translation_reviewer_total_contribution_stats_data,
             'question_submitter_total_contribution_stats':
                 expected_question_submitter_total_contribution_stats_data,
+            'question_reviewer_total_contribution_stats':
+                expected_question_reviewer_total_contribution_stats_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':

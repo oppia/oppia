@@ -2269,7 +2269,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 TranslationSubmitterTotalContributionStatsModel.
         """
         user_data = {}
-        stats_models: Sequence[TranslationSubmitterTotalContributionStatsModel] = ( 
+        stats_models: Sequence[TranslationSubmitterTotalContributionStatsModel] = (
             cls.get_all().filter(cls.contributor_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
@@ -2329,7 +2329,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
     # The user ID of the translation reviewer.
     contributor_id = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The topic ID of the translation reviews.
+    # # The topic ID(s) to which user has atleast one contribution.
     topic_ids_with_translation_reviews = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # The number of reviewed translations.
@@ -2653,11 +2653,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         entity.put()
         return entity_id
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
-    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get( # type: ignore[override]
+    def get(
         cls, contributor_id: str
     ) -> Optional[QuestionSubmitterTotalContributionStatsModel]:
         """Gets the QuestionSubmitterTotalContributionStatsModel
@@ -2670,21 +2667,6 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """
         entity_id = contributor_id
         return cls.get_by_id(entity_id)
-
-    @classmethod
-    def get_all_by_user_id(
-        cls, user_id: str
-    ) -> Sequence[QuestionSubmitterTotalContributionStatsModel]:
-        """Gets all QuestionSubmitterTotalContributionStatsModel
-        matching the supplied user_id.
-
-        Returns:
-            list(QuestionSubmitterTotalContributionStatsModel). The matching
-            QuestionSubmitterTotalContributionStatsModel.
-        """
-        return cls.get_all().filter(
-            cls.contributor_id == user_id
-        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
@@ -2705,7 +2687,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
         """Model contains corresponding to a user: contributor_id."""
         return base_models.DELETION_POLICY.DELETE
-   
+
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
@@ -2800,6 +2782,166 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     model.accepted_questions_count),
                 'accepted_questions_without_reviewer_edits_count': (
                     model.accepted_questions_without_reviewer_edits_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
+            }
+        return user_data
+
+
+class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
+    """Records the question review stats for contributor admin dashboard.
+    There is one instance of this model per contributor_id.
+    Its IDs is same as the user_id of the contributor.
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
+    # The user ID of the question reviewer.
+    contributor_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID(s) to which user has atleast one contribution.
+    topic_ids_with_question_reviews = datastore_services.StringProperty(
+        repeated=True, indexed=True)
+    # The number of reviewed questions.
+    reviewed_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions.
+    accepted_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted questions with reviewer edits.
+    accepted_questions_with_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The number of rejected questions.
+    rejected_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The first date that the reviewer made a question review.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the reviewer made a question review.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        contributor_id: str,
+        topic_ids_with_question_reviews: List[str],
+        reviewed_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_with_reviewer_edits_count: int,
+        rejected_questions_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new QuestionReviewerTotalContributionStatsModel
+        instance and returns its ID.
+        """
+        entity = cls(
+            id=contributor_id,
+            contributor_id=contributor_id,
+            topic_ids_with_question_reviews=topic_ids_with_question_reviews,
+            reviewed_questions_count=reviewed_questions_count,
+            accepted_questions_count=accepted_questions_count,
+            accepted_questions_with_reviewer_edits_count=(
+                accepted_questions_with_reviewer_edits_count),
+            rejected_questions_count=rejected_questions_count,
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return contributor_id
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether QuestionReviewerTotalContributionStatsModel references
+        the supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains corresponding to a user: contributor_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as single instances per user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_question_reviews':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_with_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of QuestionReviewerTotalContributionStatsModel
+        for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from QuestionReviewerTotalContributionStatsModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from
+        QuestionReviewerTotalContributionStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[QuestionReviewerTotalContributionStatsModel] = (
+            cls.get_all().filter(cls.contributor_id == user_id).fetch())
+        for model in stats_models:
+            user_data = {
+                'topic_ids_with_question_reviews': (
+                model.topic_ids_with_question_reviews),
+                'reviewed_questions_count': (
+                    model.reviewed_questions_count),
+                'accepted_questions_count': (
+                    model.accepted_questions_count),
+                'accepted_questions_with_reviewer_edits_count': (
+                    model.accepted_questions_with_reviewer_edits_count),
+                'rejected_questions_count': (
+                    model.rejected_questions_count),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (
