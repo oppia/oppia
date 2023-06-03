@@ -20,6 +20,7 @@
 // build to not complain.
 // TODO(#16309): Fix relative imports.
 import '../../../third-party-imports/ui-codemirror.import';
+import 'diff-match-patch';
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
