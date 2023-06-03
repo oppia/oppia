@@ -389,11 +389,12 @@ class AdminHandler(
                 # must be 'update_platform_parameter_rules' if this branch is
                 # executed.
                 assert action == 'update_platform_parameter_rules'
-                platform_param_name = self.normalized_payload.get('platform_param_name')
+                platform_param_name = self.normalized_payload.get(
+                    'platform_param_name')
                 if platform_param_name is None:
                     raise Exception(
-                        'The \'platform_param_name\' must be provided when the action'
-                        ' is update_platform_parameter_rules.'
+                        'The \'platform_param_name\' must be provided when '
+                        'the action is update_platform_parameter_rules.'
                     )
                 new_rules = self.normalized_payload.get('new_rules')
                 if new_rules is None:

@@ -99,6 +99,7 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
     """Returns dict representations of all platform parameters that do not
     contains feature flags. This method is used for providing detailed
     platform parameters information to the release-coordinator page.
+
     Returns:
         list(dict). A list containing the dict mappings of all fields of the
         platform parameters.
