@@ -543,10 +543,6 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  alwaysAskLearnerForAnswerDetails(): boolean {
-    return this.explorationEngineService.getAlwaysAskLearnerForAnswerDetails();
-  }
-
   getCanAskLearnerForAnswerInfo(): boolean {
     return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
   }
@@ -1223,8 +1219,7 @@ export class ConversationSkinComponent {
     ) {
       this.initLearnerAnswerInfoService(
         this.explorationId, this.explorationEngineService.getState(),
-        answer, interactionRulesService,
-        this.alwaysAskLearnerForAnswerDetails());
+        answer, interactionRulesService, false);
     }
 
     this.numberAttemptsService.submitAttempt();

@@ -363,8 +363,7 @@ describe('Exploration engine service ', () => {
     };
 
     explorationFeatures = {
-      explorationIsCurated: true,
-      alwaysAskLearnersForAnswerDetails: true
+      explorationIsCurated: true
     };
   });
 
@@ -683,27 +682,6 @@ describe('Exploration engine service ', () => {
         .toHaveBeenCalledWith('Question content should not be empty.');
     });
   });
-
-  it('should check whether we can ask learner for answer ' +
-    'details', fakeAsync(() => {
-    let initSuccessCb = jasmine.createSpy('success');
-
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
-    spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
-      .and.returnValue(Promise.resolve(explorationFeatures));
-
-    // Here default value is set to false.
-    expect(explorationEngineService.getAlwaysAskLearnerForAnswerDetails())
-      .toBe(false);
-
-    explorationEngineService.init(
-      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
-    tick();
-
-    const answerDetails = (
-      explorationEngineService.getAlwaysAskLearnerForAnswerDetails());
-    expect(answerDetails).toBe(true);
-  }));
 
   it('should return default exploration id', () => {
     // Please note that default exploration id is 'test_id'.
