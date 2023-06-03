@@ -17,4 +17,4 @@
  */
 
 (window as Window).Guppy = require(
-  'static/guppy-f509e1/build/guppy.min.js');
+  '/node_modules/guppy-dev/build/guppy.min.js');
