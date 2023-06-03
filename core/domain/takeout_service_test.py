@@ -441,6 +441,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['15', '16', '17']
     TOPIC_IDS_WITH_QUESTION_SUBMISSIONS: Final = ['18', '19', '20']
+    TOPIC_IDS_WITH_TRANSLATION_REVIEWS: Final = ['18', '19', '20']
     RECENT_REVIEW_OUTCOMES: Final = ('accepted', 'rejected')
     RECENT_PERFORMANCE: Final = 20
     OVERALL_ACCURACY: Final = 2.0
@@ -807,6 +808,23 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
 
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
         suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
             contributor_id=self.USER_ID_1,
             topic_ids_with_question_submissions=(
@@ -1167,6 +1185,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_translation_submitter_total_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
+        expected_translation_reviewer_total_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_question_submitter_total_contribution_stats: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
@@ -1246,6 +1267,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_review_stats,
             'translation_submitter_total_contribution_stats':
                 expected_translation_submitter_total_contribution_stats,
+            'translation_reviewer_total_contribution_stats':
+                expected_translation_reviewer_total_contribution_stats,
             'question_submitter_total_contribution_stats':
                 expected_question_submitter_total_contribution_stats,
             'story_snapshot_metadata': expected_story_sm,
@@ -1985,6 +2008,29 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_CONTRIBUTION_DATE.isoformat())
                 }
         }
+        expected_translation_reviewer_total_contribution_stats_data = {
+            '%s.%s' % (
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1): {
+                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                    'topic_ids_with_translation_reviews': (
+                        self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+                    'reviewed_translations_count': (
+                        self.REVIEWED_TRANSLATIONS_COUNT),
+                    'accepted_translations_count': (
+                        self.ACCEPTED_TRANSLATIONS_COUNT),
+                    'accepted_translations_with_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                    'accepted_translation_word_count': (
+                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                    'rejected_translations_count': (
+                        self.REJECTED_TRANSLATIONS_COUNT),
+                    'first_contribution_date': (
+                        self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                    'last_contribution_date': (
+                        self.LAST_CONTRIBUTION_DATE.isoformat())
+                }
+        }
         expected_question_submitter_total_contribution_stats_data = {
             '%s' % (
                 self.USER_ID_1): {
@@ -2064,6 +2110,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_question_review_stats_data,
             'translation_submitter_total_contribution_stats':
                 expected_translation_submitter_total_contribution_stats_data,
+            'translation_reviewer_total_contribution_stats':
+                expected_translation_reviewer_total_contribution_stats_data,
             'question_submitter_total_contribution_stats':
                 expected_question_submitter_total_contribution_stats_data,
             'story_snapshot_metadata': expected_story_sm,

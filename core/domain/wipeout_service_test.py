@@ -4109,6 +4109,21 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             last_contribution_date=(
                 datetime.date.fromtimestamp(1616173837))
         ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id=self.TRANSLATION_STATS_1_ID,
+            language_code='cs',
+            contributor_id=self.user_1_id,
+            topic_ids_with_translation_reviews=['topic1', 'topic2'],
+            reviewed_translations_count=1,
+            accepted_translations_count=1,
+            accepted_translations_with_reviewer_edits_count=2,
+            accepted_translation_word_count=3,
+            rejected_translations_count=2,
+            first_contribution_date=(
+                datetime.date.fromtimestamp(1616173837)),
+            last_contribution_date=(
+                datetime.date.fromtimestamp(1616173837))
+        ).put()
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id=self.QUESTION_STATS_1_ID,
             contributor_id=self.user_1_id,
@@ -4170,6 +4185,16 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
 
         self.assertIsNone(
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get_by_id(
+                self.TRANSLATION_STATS_1_ID))
+
+    def test_translation_reviewer_total_contribution_stats_are_deleted(
+            self) -> None:
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertIsNone(
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
             .get_by_id(
                 self.TRANSLATION_STATS_1_ID))
 

@@ -2312,6 +2312,247 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         return user_data
 
 
+class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
+    """Records the translation review stats for contributor admin dashboard.
+    There is one instance of this model per (language_code, contributor_id)
+    tuple. Its IDs are in the following structure:
+    [language_code].[contributor_id]
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
+    # The ISO 639-1 language code for which the translation reviews were
+    # made.
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The user ID of the translation reviewer.
+    contributor_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID of the translation reviews.
+    topic_ids_with_translation_reviews = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # The number of reviewed translations.
+    reviewed_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations.
+    accepted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations with reviewer edits.
+    accepted_translations_with_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The total word count of accepted translations. Excludes HTML tags and
+    # attributes.
+    accepted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total number of rejected translations.
+    rejected_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The first date that the reviewer made a translation review.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the reviewer made a translation review.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
+
+    @classmethod
+    def create(
+        cls,
+        language_code: str,
+        contributor_id: str,
+        topic_ids_with_translation_reviews: List[str],
+        reviewed_translations_count: int,
+        accepted_translations_count: int,
+        accepted_translations_with_reviewer_edits_count: int,
+        rejected_translations_count: int,
+        accepted_translation_word_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> str:
+        """Creates a new TranslationReviewerTotalContributionStatsModel
+        instance and returns its ID.
+        """
+        entity_id = cls.construct_id(
+            language_code, contributor_id)
+        entity = cls(
+            id=entity_id,
+            language_code=language_code,
+            contributor_id=contributor_id,
+            topic_ids_with_translation_reviews=(
+                topic_ids_with_translation_reviews),
+            reviewed_translations_count=reviewed_translations_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_with_reviewer_edits_count=(
+                accepted_translations_with_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            first_contribution_date=first_contribution_date,
+            last_contribution_date=last_contribution_date)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @staticmethod
+    def construct_id(
+        language_code: str, contributor_id: str
+    ) -> str:
+        """Constructs a unique ID for a
+        TranslationReviewerTotalContributionStatsModel instance.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_id: str. User ID.
+
+        Returns:
+            str. An ID of the form:
+
+            [language_code].[contributor_id]
+        """
+        return (
+            '%s.%s' % (language_code, contributor_id)
+        )
+
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
+    @classmethod
+    def get( # type: ignore[override]
+        cls, language_code: str, contributor_id: str
+    ) -> Optional[TranslationReviewerTotalContributionStatsModel]:
+        """Gets the TranslationReviewerTotalContributionStatsModel
+        matching the supplied language_code, contributor_id.
+
+        Returns:
+            TranslationReviewerTotalContributionStatsModel|None. The matching
+            TranslationReviewerTotalContributionStatsModel, or None
+            if no such model instance exists.
+        """
+        entity_id = cls.construct_id(
+            language_code, contributor_id)
+        return cls.get_by_id(entity_id)
+
+    @classmethod
+    def get_all_by_user_id(
+        cls, user_id: str
+    ) -> Sequence[TranslationReviewerTotalContributionStatsModel]:
+        """Gets all TranslationReviewerTotalContributionStatsModel
+        matching the supplied user_id.
+
+        Returns:
+            list(TranslationReviewerTotalContributionStatsModel). The matching
+            TranslationReviewerTotalContributionStatsModel.
+        """
+        return cls.get_all().filter(
+            cls.contributor_id == user_id
+        ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether TranslationReviewerTotalContributionStatsModel
+        references the supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
+        """Model contains corresponding to a user: contributor_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model is exported as multiple instances per user since there are
+        multiple languages relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_translation_reviews':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_with_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of TranslationReviewerTotalContributionStatsModel
+        for the user.
+
+        Args:
+            contributor_id: str. The ID of the user whose data
+        should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, Union[str, int, List[str]]]]:
+        """Exports the data from TranslationReviewerTotalContributionStatsModel
+        into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from
+        TranslationReviewerTotalContributionStatsModel.
+        """
+        user_data = {}
+        stats_models: Sequence[TranslationReviewerTotalContributionStatsModel] = ( # pylint: disable=line-too-long
+            cls.get_all().filter(cls.contributor_id == user_id).fetch())
+        for model in stats_models:
+            splitted_id = model.id.split('.')
+            id_without_user_id = '%s' % (splitted_id[0])
+            user_data[id_without_user_id] = {
+                'language_code': model.language_code,
+                'topic_ids_with_translation_reviews': (
+                    model.topic_ids_with_translation_reviews),
+                'reviewed_translations_count': (
+                    model.reviewed_translations_count),
+                'accepted_translations_count': (
+                    model.accepted_translations_count),
+                'accepted_translations_with_reviewer_edits_count': (
+                    model.accepted_translations_with_reviewer_edits_count),
+                'accepted_translation_word_count': (
+                    model.accepted_translation_word_count),
+                'rejected_translations_count':(
+                    model.rejected_translations_count),
+                'first_contribution_date': (
+                    model.first_contribution_date.isoformat()),
+                'last_contribution_date': (
+                    model.last_contribution_date.isoformat())
+            }
+        return user_data
+
+
 class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     """Records the question contribution stats for contributor dashboard admin
     page. There is one instance of this model per contributor_id.
