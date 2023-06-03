@@ -2094,7 +2094,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             id=entity_id,
             language_code=language_code,
             contributor_id=contributor_id,
-            topic_ids_with_translation_submissions=topic_ids_with_translation_submissions,
+            topic_ids_with_translation_submissions=(
+                topic_ids_with_translation_submissions),
             recent_review_outcomes=recent_review_outcomes,
             recent_performance=recent_performance,
             overall_accuracy=overall_accuracy,
@@ -2269,7 +2270,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 TranslationSubmitterTotalContributionStatsModel.
         """
         user_data = {}
-        stats_models: Sequence[TranslationSubmitterTotalContributionStatsModel] = (
+        stats_models: Sequence[TranslationSubmitterTotalContributionStatsModel] = ( # pylint: disable=line-too-long
             cls.get_all().filter(cls.contributor_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
@@ -2286,8 +2287,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     model.overall_accuracy),
                 'last_hundred_accepted_translations_count': (
                     model.last_hundred_accepted_translations_count),
-                'last_hundred_accepted_translations_without_reviewer_edits_count': (
-                    model.last_hundred_accepted_translations_without_reviewer_edits_count),
+                'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
+                    model.last_hundred_accepted_translations_without_reviewer_edits_count), # pylint: disable=line-too-long
                 'last_hundred_rejected_translations_count': (
                     model.last_hundred_rejected_translations_count),
                 'submitted_translations_count': (
@@ -2652,21 +2653,6 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         entity.update_timestamps()
         entity.put()
         return entity_id
-
-    @classmethod
-    def get(
-        cls, contributor_id: str
-    ) -> Optional[QuestionSubmitterTotalContributionStatsModel]:
-        """Gets the QuestionSubmitterTotalContributionStatsModel
-        matching the supplied contributor_id.
-
-        Returns:
-            QuestionSubmitterTotalContributionStatsModel|None. The matching
-            QuestionSubmitterTotalContributionStatsModel, or None if no
-            such model instance exists.
-        """
-        entity_id = contributor_id
-        return cls.get_by_id(entity_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:

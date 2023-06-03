@@ -2994,3 +2994,878 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+
+class TranslationSubmitterTotalContributionStatsModelUnitTests(
+    test_utils.GenericTestBase):
+    """Tests the TranslationSubmitterTotalContributionStatsModel class."""
+
+    SUGGESTION_LANGUAGE_CODE: Final = 'es'
+    USER_ID_1: Final = 'uid_01234567890123456789012345678912'
+    TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['topic1', 'topic2']
+    RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
+    RECENT_PERFORMANCE: Final = 2
+    OVERALL_ACCURACY: Final = 2.0
+    LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT: Final = 2
+    LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 2
+    LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT: Final = 2
+    SUBMITTED_TRANSLATIONS_COUNT: Final = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
+    REJECTED_TRANSLATIONS_COUNT: Final = 0
+    REJECTED_TRANSLATION_WORD_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_get_all_model_instances_matching_the_given_user_id(self) -> None:
+        model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel)
+        self.assertEqual(
+            model.get_all_by_user_id(self.USER_ID_1), [])
+
+        model.create(
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            last_hundred_accepted_translations_count=(
+                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+            last_hundred_accepted_translations_without_reviewer_edits_count=(
+                self
+            # Pylint disable is needed cause variable name is too long.
+                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+            last_hundred_rejected_translations_count=(
+                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        translation_submitter_total_contribution_stats = (
+            model.get(
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1
+            )
+        )
+        self.assertEqual(
+            model.get_all_by_user_id(self.USER_ID_1),
+            [translation_submitter_total_contribution_stats]
+        )
+
+    def test_has_reference_to_user_id(self) -> None:
+        model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel)
+        model.create(
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            last_hundred_accepted_translations_count=(
+                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+            last_hundred_accepted_translations_without_reviewer_edits_count=(
+                self
+            # Pylint disable is needed cause variable name is too long.
+                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+            last_hundred_rejected_translations_count=(
+                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        self.assertTrue(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertFalse(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .has_reference_to_user_id('non-existent_user')
+        )
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            (
+                suggestion_models
+                .TranslationSubmitterTotalContributionStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_translation_submissions':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'recent_review_outcomes':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'recent_performance':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'overall_accuracy':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_hundred_accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_hundred_accepted_translations_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_hundred_rejected_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        }
+        model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel)
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel)
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+    def test_apply_deletion_policy(self) -> None:
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            last_hundred_accepted_translations_count=(
+                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+            last_hundred_accepted_translations_without_reviewer_edits_count=(
+                self
+            # Pylint disable is needed cause variable name is too long.
+                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+            last_hundred_rejected_translations_count=(
+                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        self.assertTrue(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+
+        (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .apply_deletion_policy(self.USER_ID_1)
+        )
+
+        self.assertFalse(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+
+    def test_export_data_trivial(self) -> None:
+        user_data = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .export_data('non_existent_user'))
+        self.assertEqual(user_data, {})
+
+    def test_export_data_nontrivial(self) -> None:
+        # Seed translation stats data for two different languages.
+        model_1_id = suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            last_hundred_accepted_translations_count=(
+                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+            last_hundred_accepted_translations_without_reviewer_edits_count=(
+                self
+            # Pylint disable is needed cause variable name is too long.
+                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+            last_hundred_rejected_translations_count=(
+                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        model_2_id = suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code='hi',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic3', 'topic4'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            last_hundred_accepted_translations_count=(
+                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+            last_hundred_accepted_translations_without_reviewer_edits_count=(
+                self
+            # Pylint disable is needed cause variable name is too long.
+                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+            last_hundred_rejected_translations_count=(
+                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        splitted_id_1 = model_1_id.split('.')
+        model_1_id_without_user_id = '%s' % (splitted_id_1[0])
+        splitted_id_2 = model_2_id.split('.')
+        model_2_id_without_user_id = '%s' % (splitted_id_2[0])
+        expected_data = {
+            model_1_id_without_user_id: {
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'topic_ids_with_translation_submissions': (
+                    self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+                'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+                'recent_performance': self.RECENT_PERFORMANCE,
+                'overall_accuracy': self.OVERALL_ACCURACY,
+                'last_hundred_accepted_translations_count': (
+                    self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+                # Pylint disable is needed cause variable name is too long.
+                'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
+                    self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+                'last_hundred_rejected_translations_count': (
+                    self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+                'submitted_translations_count': (
+                    self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (
+                    self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (
+                    self
+                    .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (
+                    self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (
+                    self.REJECTED_TRANSLATION_WORD_COUNT),
+                'first_contribution_date':(
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            },
+            model_2_id_without_user_id: {
+                'language_code': 'hi',
+                'topic_ids_with_translation_submissions': [
+                    'topic3', 'topic4'
+                ],
+                'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+                'recent_performance': self.RECENT_PERFORMANCE,
+                'overall_accuracy': self.OVERALL_ACCURACY,
+                'last_hundred_accepted_translations_count': (
+                    self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
+                # Pylint disable is needed cause variable name is too long.
+                'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
+                    self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+                'last_hundred_rejected_translations_count': (
+                    self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
+                'submitted_translations_count': (
+                    self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (
+                    self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (
+                    self
+                    .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (
+                    self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (
+                    self.REJECTED_TRANSLATION_WORD_COUNT),
+                'first_contribution_date':(
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
+        }
+
+        user_data = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .export_data(self.USER_ID_1))
+
+        self.assertEqual(expected_data, user_data)
+
+
+class TranslationReviewerTotalContributionStatsModelUnitTests(
+        test_utils.GenericTestBase):
+    """Tests the TranslationReviewerTotalContributionStatsModel class."""
+
+    LANGUAGE_CODE = 'es'
+    USER_ID_1 = 'uid_01234567890123456789012345678912'
+    TOPIC_IDS_WITH_TRANSLATION_REVIEWS = ['18', '19', '20']
+    REVIEWED_TRANSLATIONS_COUNT = 2
+    ACCEPTED_TRANSLATIONS_COUNT = 1
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT = 50
+    REJECTED_TRANSLATIONS_COUNT = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            (
+                suggestion_models.TranslationReviewerTotalContributionStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_get_all_by_user_id(self) -> None:
+        model = suggestion_models.TranslationReviewerTotalContributionStatsModel
+        self.assertEqual(
+            model.get_all_by_user_id(self.USER_ID_1), [])
+
+        model.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        translation_reviewer_total_contribution_stats = (
+            model.get(
+                self.LANGUAGE_CODE, self.USER_ID_1
+            )
+        )
+        self.assertEqual(
+            model.get_all_by_user_id(self.USER_ID_1),
+            [translation_reviewer_total_contribution_stats]
+        )
+
+    def test_apply_deletion_policy(self) -> None:
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        self.assertTrue(
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+
+        (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .apply_deletion_policy(self.USER_ID_1)
+        )
+
+        self.assertFalse(
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+
+    def test_export_data_trivial(self) -> None:
+        user_data = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .export_data('non_existent_user'))
+        self.assertEqual(user_data, {})
+
+    def test_export_data_nontrivial(self) -> None:
+        # Seed translation stats data for two different languages.
+        model_1_id = suggestion_models.TranslationReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        model_2_id = suggestion_models.TranslationReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
+            language_code='hi',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        splitted_id_1 = model_1_id.split('.')
+        model_1_id_without_user_id = '%s' % (splitted_id_1[0])
+        splitted_id_2 = model_2_id.split('.')
+        model_2_id_without_user_id = '%s' % (splitted_id_2[0])
+        expected_data = {
+            model_1_id_without_user_id: {
+                'language_code': self.LANGUAGE_CODE,
+                'topic_ids_with_translation_reviews': (
+                    self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+                'reviewed_translations_count': (
+                    self.REVIEWED_TRANSLATIONS_COUNT),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (
+                    self
+                    .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (
+                    self.REJECTED_TRANSLATIONS_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            },
+            model_2_id_without_user_id: {
+                'language_code': 'hi',
+                'topic_ids_with_translation_reviews': (
+                    self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+                'reviewed_translations_count': (
+                    self.REVIEWED_TRANSLATIONS_COUNT),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_with_reviewer_edits_count': (
+                    self
+                    .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (
+                    self.REJECTED_TRANSLATIONS_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
+        }
+
+        user_data = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .export_data(self.USER_ID_1))
+
+        self.assertEqual(expected_data, user_data)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_translation_reviews':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_with_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        }
+        model = suggestion_models.TranslationReviewerTotalContributionStatsModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = suggestion_models.TranslationReviewerTotalContributionStatsModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+
+
+class QuestionSubmitterTotalContributionStatsModelUnitTests(
+    test_utils.GenericTestBase):
+    """Tests the QuestionSubmitterTotalContributionStatsModel class."""
+
+    USER_ID_1 = 'uid_01234567890123456789012345678912'
+    TOPIC_IDS_WITH_QUESTION_SUBMISSIONS = ['18', '19', '20']
+    RECENT_REVIEW_OUTCOMES = ['accepted', 'rejected']
+    RECENT_PERFORMANCE = 20
+    OVERALL_ACCURACY = 2.0
+    LAST_HUNDRED_REJECTED_QUESTIONS_COUNT = 0
+    LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT = 1
+    LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    SUBMITTED_QUESTIONS_COUNT = 2
+    REJECTED_QUESTIONS_COUNT = 20
+    ACCEPTED_QUESTIONS_COUNT = 1
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            (
+                suggestion_models.QuestionSubmitterTotalContributionStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self) -> None:
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=(
+                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            last_hundred_rejected_questions_count=(
+                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
+            last_hundred_accepted_questions_count=(
+                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
+            last_hundred_accepted_questions_without_reviewer_edits_count=(
+                self
+                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        self.assertTrue(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+
+        (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .apply_deletion_policy(self.USER_ID_1)
+        )
+
+        self.assertFalse(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+
+    def test_export_data_trivial(self) -> None:
+        user_data = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .export_data('non_existent_user'))
+        self.assertEqual(user_data, {})
+
+    def test_export_data_nontrivial(self) -> None:
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel.create(
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=(
+                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=self.RECENT_PERFORMANCE,
+            overall_accuracy=self.OVERALL_ACCURACY,
+            last_hundred_rejected_questions_count=(
+                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
+            last_hundred_accepted_questions_count=(
+                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
+            last_hundred_accepted_questions_without_reviewer_edits_count=(
+                self
+                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        expected_data = {
+                'topic_ids_with_question_submissions': (
+                    self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
+                'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+                'recent_performance': self.RECENT_PERFORMANCE,
+                'overall_accuracy': self.OVERALL_ACCURACY,
+                'last_hundred_accepted_questions_count': (
+                    self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
+                # Pylint disable is needed cause variable name is too long.
+                'last_hundred_accepted_questions_without_reviewer_edits_count': ( # pylint: disable=line-too-long
+                    self.LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+                'last_hundred_rejected_questions_count': (
+                    self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
+                'submitted_questions_count': (
+                    self.SUBMITTED_QUESTIONS_COUNT),
+                'rejected_questions_count': (
+                    self.REJECTED_QUESTIONS_COUNT
+                ),
+                'accepted_questions_count': (
+                    self.ACCEPTED_QUESTIONS_COUNT),
+                'accepted_questions_without_reviewer_edits_count': (
+                    self
+                    .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
+        }
+
+        user_data = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .export_data(self.USER_ID_1))
+
+        self.assertEqual(expected_data, user_data)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_question_submissions':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'recent_review_outcomes':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'recent_performance':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'overall_accuracy':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_hundred_rejected_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_hundred_accepted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_hundred_accepted_questions_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        }
+        model = suggestion_models.QuestionSubmitterTotalContributionStatsModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = suggestion_models.QuestionSubmitterTotalContributionStatsModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+
+class QuestionReviewerTotalContributionStatsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the QuestionReviewerTotalContributionStatsModel class."""
+
+    USER_ID_1 = 'uid_01234567890123456789012345678912'
+    TOPIC_IDS_WITH_QUESTION_REVIEWS: Final = ['18', '19', '20']
+    REVIEWED_QUESTIONS_COUNT = 2
+    ACCEPTED_QUESTIONS_COUNT = 1
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    REJECTED_QUESTIONS_COUNT: Final = 20
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            (
+                suggestion_models.QuestionReviewerTotalContributionStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self) -> None:
+        suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=(
+                self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        self.assertTrue(
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+
+        (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .apply_deletion_policy(self.USER_ID_1)
+        )
+
+        self.assertFalse(
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .has_reference_to_user_id(self.USER_ID_1))
+
+    def test_export_data_trivial(self) -> None:
+        user_data = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .export_data('non_existent_user'))
+        self.assertEqual(user_data, {})
+
+    def test_export_data_nontrivial(self) -> None:
+        suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=(
+                self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+        expected_data = {
+            'topic_ids_with_question_reviews': (
+                self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
+            'reviewed_questions_count': (
+                self.REVIEWED_QUESTIONS_COUNT),
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_with_reviewer_edits_count': (
+                self
+                .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE.isoformat()),
+            'last_contribution_date': (
+                self.LAST_CONTRIBUTION_DATE.isoformat())
+            }
+
+        user_data = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .export_data(self.USER_ID_1))
+
+        self.assertEqual(expected_data, user_data)
+
+    def test_get_export_policy(self) -> None:
+        expected_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributor_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids_with_question_reviews':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'reviewed_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_questions_with_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_questions_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_contribution_date':
+                base_models.EXPORT_POLICY.EXPORTED
+        }
+        model = suggestion_models.QuestionReviewerTotalContributionStatsModel
+        self.assertEqual(model.get_export_policy(), expected_dict)
+
+    def test_get_model_association_to_user(self) -> None:
+        model = suggestion_models.QuestionReviewerTotalContributionStatsModel
+        self.assertEqual(
+            model.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
