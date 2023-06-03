@@ -21,7 +21,6 @@ import 'zone.js';
 
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/ui-codemirror.import';
-import 'diff-match-patch';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
