@@ -108,7 +108,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=401
             )
 
-    def test_get_non_existent_activity_returns_error(self) -> None:
+    def test_get_non_existent_activity_returns_null_payload(self) -> None:
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
@@ -117,7 +117,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'story_id': None}
+                [{'id': 'story_id', 'version': 1, 'payload': None}]
             )
 
     def test_get_exploration_returns_correct_json(self) -> None:
@@ -130,7 +130,11 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'exp_id': exploration.to_dict()}
+                [{
+                    'id': 'exp_id',
+                    'version': 1,
+                    'payload': exploration.to_dict()
+                }]
             )
 
     def test_get_different_versions_of_exploration_returns_correct_json(
@@ -159,7 +163,11 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'exp_id': exploration.to_dict()}
+                [{
+                    'id': 'exp_id',
+                    'version': 1,
+                    'payload': exploration.to_dict()
+                }]
             )
             self.assertEqual(
                 self.get_json(
@@ -168,7 +176,124 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'exp_id': new_exploration.to_dict()}
+                [{
+                    'id': 'exp_id',
+                    'version': 2,
+                    'payload': new_exploration.to_dict()
+                }]
+            )
+
+    def test_get_multiple_versions_at_a_time_returns_correct_json(self) -> None:
+        exploration = self.save_new_default_exploration('exp_id', 'owner_id')
+        exp_services.update_exploration(
+            'owner_id',
+            'exp_id',
+            [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'new objective'
+                })
+            ],
+            'change objective'
+        )
+        new_exploration = exp_fetchers.get_exploration_by_id('exp_id')
+
+        with self.secrets_swap:
+            # Try fetching two versions at once, in either order.
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exploration&'
+                    'activities_data=[{"id": "exp_id", "version": 2}, '
+                    '{"id": "exp_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                [{
+                    'id': 'exp_id',
+                    'version': 2,
+                    'payload': new_exploration.to_dict()
+                }, {
+                    'id': 'exp_id',
+                    'version': 1,
+                    'payload': exploration.to_dict()
+                }]
+            )
+
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exploration&'
+                    'activities_data=[{"id": "exp_id", "version": 1}, '
+                    '{"id": "exp_id", "version": 2}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                [{
+                    'id': 'exp_id',
+                    'version': 1,
+                    'payload': exploration.to_dict()
+                }, {
+                    'id': 'exp_id',
+                    'version': 2,
+                    'payload': new_exploration.to_dict()
+                }]
+            )
+
+    def test_get_with_invalid_versions_returns_correct_json(self) -> None:
+        exploration = self.save_new_default_exploration('exp_id', 'owner_id')
+
+        with self.secrets_swap:
+            # Note that version 3 does not exist.
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exploration&'
+                    'activities_data=[{"id": "exp_id", "version": 3}, '
+                    '{"id": "exp_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                [{
+                    'id': 'exp_id',
+                    'version': 3,
+                    'payload': None
+                }, {
+                    'id': 'exp_id',
+                    'version': 1,
+                    'payload': exploration.to_dict()
+                }]
+            )
+
+            # For completeness, try the opposite order as well.
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exploration&'
+                    'activities_data=[{"id": "exp_id", "version": 1}, '
+                    '{"id": "exp_id", "version": 3}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                [{
+                    'id': 'exp_id',
+                    'version': 1,
+                    'payload': exploration.to_dict()
+                }, {
+                    'id': 'exp_id',
+                    'version': 3,
+                    'payload': None
+                }]
+            )
+
+    def test_get_with_duplicates_is_rejected(self) -> None:
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exploration&'
+                    'activities_data=[{"id": "exp_id", "version": 1}, '
+                    '{"id": "exp_id", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=400
+                )['error'],
+                'Entries in activities_data should be unique'
             )
 
     def test_get_story_returns_correct_json(self) -> None:
@@ -181,7 +306,11 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'story_id': story.to_dict()}
+                [{
+                    'id': 'story_id',
+                    'version': 1,
+                    'payload': story.to_dict()
+                }]
             )
 
     def test_get_skill_returns_correct_json(self) -> None:
@@ -194,7 +323,11 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'skill_id': skill.to_dict()}
+                [{
+                    'id': 'skill_id',
+                    'version': 1,
+                    'payload': skill.to_dict()
+                }]
             )
 
     def test_get_subtopic_returns_correct_json(self) -> None:
@@ -207,7 +340,11 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'topic_id-1': subtopic.to_dict()}
+                [{
+                    'id': 'topic_id-1',
+                    'version': 1,
+                    'payload': subtopic.to_dict()
+                }]
             )
 
     def test_get_classroom_returns_correct_json(self) -> None:
@@ -234,7 +371,10 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'math': classroom.to_dict()}
+                [{
+                    'id': 'math',
+                    'payload': classroom.to_dict()
+                }]
             )
 
     def test_get_classroom_with_version_returns_error(self) -> None:
@@ -295,7 +435,13 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     def test_get_exploration_translation_returns_correct_json(self) -> None:
         translation_model = (
             translation_models.EntityTranslationsModel.create_new(
-                'exploration', 'translation_id', 1, 'es', {}))
+                'exploration', 'translation_id', 1, 'es', {
+                    'content_id_123': {
+                        'content_value': 'Hello world!',
+                        'needs_update': False,
+                        'content_format': 'html'
+                    }
+                }))
         translation_model.update_timestamps()
         translation_model.put()
         with self.secrets_swap:
@@ -310,15 +456,18 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {
-                    'translation_id': {
-                        'entity_id': 'translation_id',
-                        'entity_type': 'exploration',
-                        'entity_version': 1,
-                        'language_code': 'es',
-                        'translations': {}
+                [{
+                    'id': 'translation_id',
+                    'language_code': 'es',
+                    'version': 1,
+                    'payload': {
+                        'content_id_123': {
+                            'content_value': 'Hello world!',
+                            'needs_update': False,
+                            'content_format': 'html'
+                        }
                     }
-                }
+                }]
             )
 
     def test_get_exploration_translation_with_zero_items_returns_correct_json(
@@ -332,7 +481,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {}
+                []
             )
 
     def test_get_topic_returns_correct_json(self) -> None:
@@ -345,5 +494,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
-                {'topic_id': topic.to_dict()}
+                [{
+                    'id': 'topic_id',
+                    'version': 1,
+                    'payload': topic.to_dict()
+                }]
             )
