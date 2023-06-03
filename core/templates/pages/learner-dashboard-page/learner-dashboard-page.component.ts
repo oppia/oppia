@@ -502,7 +502,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return this.currentFeedbackThreadsSortType;
   }
 
-    onKeyDownOpenFeedback(
+  onKeyDownOpenFeedback(
       event: KeyboardEvent, status: string, explorationId: string,
       threadId: string, explorationTitle: string): void {
     if (event.key === 'Enter' || event.key === ' ') {
