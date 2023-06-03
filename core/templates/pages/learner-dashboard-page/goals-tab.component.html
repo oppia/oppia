@@ -10,13 +10,13 @@
         </div>
         <div #dropdown class="oppia-three-dots-dropdown-container"
              (keydown.enter)="toggleThreeDotsDropdown(i)"
-             role="button" 
+             role="button"
              aria-label="More options"
              tabindex="0"
              (click)="toggleThreeDotsDropdown(i)">
           <i class="fa fa-ellipsis-v"></i>
           <div *ngIf="showThreeDotsDropdown[i]" class="oppia-three-dots-dropdown">
-            <div class="oppia-trash-button" 
+            <div class="oppia-trash-button"
                  (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)"
                  tabindex="0"
                  (keydown.enter)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
@@ -25,7 +25,7 @@
             </div>
           </div>
         </div>
-        <label class="oppia-current-goals-topic-name e2e-test-topic-name-in-current-goals" 
+        <label class="oppia-current-goals-topic-name e2e-test-topic-name-in-current-goals"
                (click)="toggleStory(i)"
                (keydown.enter)="toggleStory(i)"
                tabindex="0">
