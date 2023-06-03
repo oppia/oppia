@@ -50,7 +50,8 @@ export class PlatformFeatureAdminBackendApiService {
   async getFeatureFlags(): Promise<FeatureFlagsResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<FeatureFlagsDicts>(
-        '/feature_flags').toPromise().then(response => {
+        PlatformFeatureDomainConstants.FEATURE_FLAGS_URL
+      ).toPromise().then(response => {
         resolve({
           featureFlags: response.feature_flags.map(
             dict => PlatformParameter.createFromBackendDict(
@@ -67,7 +68,7 @@ export class PlatformFeatureAdminBackendApiService {
       name: string, message: string, newRules: PlatformParameterRule[]):
       Promise<void> {
     await this.http.post(
-      '/feature_flags',
+      PlatformFeatureDomainConstants.FEATURE_FLAGS_URL,
       {
         action: PlatformFeatureDomainConstants.UPDATE_FEATURE_FLAG_RULES_ACTION,
         feature_name: name,

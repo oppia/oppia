@@ -36,6 +36,7 @@ var ReleaseCoordinatorPage = function() {
   var saveButtonLocator = '.e2e-test-save-button';
   var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
   var valueSelectorLocator = '.e2e-test-value-selector';
+  var statusMessage = $('.e2e-test-status-message');
 
   this.get = async function() {
     await browser.url(RELEASE_COORDINATOR_URL_SUFFIX);

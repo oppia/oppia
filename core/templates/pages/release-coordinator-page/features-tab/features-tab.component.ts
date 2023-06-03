@@ -24,6 +24,7 @@ import isEqual from 'lodash/isEqual';
 
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
+import { LoaderService } from 'services/loader.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -125,7 +126,7 @@ export class FeaturesTabComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   featureFlagNameToBackupMap!: Map<string, PlatformParameter>;
   featureFlags: PlatformParameter[] = [];
-
+  showLoadingScreen: boolean = false;
   isDummyApiEnabled: boolean = false;
 
   constructor(
@@ -133,15 +134,18 @@ export class FeaturesTabComponent implements OnInit {
     private apiService: PlatformFeatureAdminBackendApiService,
     private featureService: PlatformFeatureService,
     private dummyApiService: PlatformFeatureDummyBackendApiService,
+    private loaderService: LoaderService,
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
+    this.loaderService.showLoadingScreen('Loading');
+    this.showLoadingScreen = true;
     const data = await this.apiService.getFeatureFlags();
-
     this.featureFlags = data.featureFlags;
-
     this.featureFlagNameToBackupMap = new Map(
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
+    this.showLoadingScreen = false;
+    this.loaderService.hideLoadingScreen();
   }
 
   addNewRuleToTop(feature: PlatformParameter): void {

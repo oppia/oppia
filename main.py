@@ -600,9 +600,9 @@ URLS = [
 
     get_redirect_route(
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
-
     get_redirect_route(
-        r'/feature_flags', release_coordinator.FeatureFlagsHandler),
+        r'%s' % feconf.FEATURE_FLAGS_URL,
+        release_coordinator.FeatureFlagsHandler),
 
     get_redirect_route(
         '/checkpoints_feature_status_handler',
