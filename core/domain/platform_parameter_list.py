@@ -41,6 +41,7 @@ class ParamNames(enum.Enum):
     DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
+    SHOW_TRANSLATION_SIZE = 'show_translation_size'
 
 
 # Platform parameters should all be defined below.
@@ -97,4 +98,10 @@ Registry.create_feature_flag(
     ParamNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     'This flag is for serial chapter launch feature and making changes only' +
     'in the curriculum admin view.',
+    platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.SHOW_TRANSLATION_SIZE,
+    'This flag is to show translation size on translation cards in' +
+    'contributor dashboard.',
     platform_parameter_domain.FeatureStages.DEV)
