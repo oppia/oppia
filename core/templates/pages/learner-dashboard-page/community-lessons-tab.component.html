@@ -1,4 +1,4 @@
-<div class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+<div tabindex="0" class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
   <h1 class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
   </h1>
   <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
@@ -250,7 +250,7 @@
     </div>
   </div>
 </div>
-<div class="playlist-section e2e-test-play-later-section">
+<div tabindex="0" class="playlist-section e2e-test-play-later-section">
   <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
   </h1>
   <div *ngIf="noPlaylistActivity">
@@ -352,7 +352,7 @@
     </div>
   </div>
 </div>
-<div class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
+<div tabindex="0" class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
   <h1 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></h1>
   <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
     <mat-card class="oppia-subscription-card oppia-subscription-container-list"

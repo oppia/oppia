@@ -1,8 +1,8 @@
 <div class="home-tab">
-  <div class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+  <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
     {{ getTimeOfDay() | translate }}, {{ username }}!
   </div>
-  <div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
+  <div tabindex="0" class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
     <p class="continue-where-you-left-off-heading"
        [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" *ngIf="continueWhereYouLeftOffList.length !== 0">
     </p>
@@ -32,7 +32,7 @@
       </div>
     </div>
   </div>
-  <div class="suggested-for-you e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
+  <div tabindex="0" class="suggested-for-you e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="suggested-for-you-section">
@@ -60,7 +60,7 @@
       </div>
     </div>
   </div>
-  <div class="empty-suggested-for-you"
+  <div tabindex="0" class="empty-suggested-for-you"
        *ngIf="isGoalLimitReached()">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></p>
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION' | translate" class="mt-4"></p>
@@ -71,7 +71,7 @@
        [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
-  <div class="empty-suggested-for-you learn-something-new-section"
+  <div tabindex="0" class="empty-suggested-for-you learn-something-new-section"
        *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
