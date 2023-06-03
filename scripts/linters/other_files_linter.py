@@ -83,12 +83,6 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
         'type_defs_filename_prefix': 'guppy-defs-'
     },
     {
-        'name': 'Skulpt',
-        'dependency_key': 'skulpt-dist',
-        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
-        'type_defs_filename_prefix': 'skulpt-defs-'
-    },
-    {
         'name': 'MIDI',
         'dependency_key': 'midiJs',
         'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,

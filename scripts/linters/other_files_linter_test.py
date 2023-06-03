@@ -47,13 +47,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.verbose_mode_enabled = False
         self.dependencies_file = io.StringIO(
             '{\"dependencies\":{\"frontend\":{\"guppy\":'
-            '{\"version\": \"0.1\"},\"skulpt-dist\":{\"version\": \"0.2\"}'
+            '{\"version\": \"0.1\"}'
             ',\"midiJs\":{\"version\": \"0.4\"}}}}')
         self.package_file = io.StringIO(
             '{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
             'guppy-defs-0.1.d.ts',
-            'skulpt-defs-0.2.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
@@ -230,7 +229,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_check_third_party_libs_type_defs_no_type_defs(self) -> None:
         self.files_in_typings_dir = [
-            'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
@@ -250,7 +248,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def test_check_third_party_libs_type_defs_wrong_version(self) -> None:
         self.files_in_typings_dir = [
             'guppy-defs-0.2.d.ts',
-            'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
