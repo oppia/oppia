@@ -480,10 +480,6 @@ LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
     'learner_groups_are_enabled', BOOL_SCHEMA,
     'Enable learner groups feature', False)
 
-BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
-    'batch_index_for_mailchimp', INT_SCHEMA,
-    'Index of batch to populate mailchimp database.', 0)
-
 HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
     'high_bounce_rate_task_state_bounce_rate_creation_threshold',
     FLOAT_SCHEMA,
