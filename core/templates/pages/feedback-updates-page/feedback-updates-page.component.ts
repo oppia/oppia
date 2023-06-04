@@ -288,7 +288,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
       threadId: string, explorationTitle: string): void {
     this.loadingFeedbacks = true;
     let threadDataUrl = this.urlInterpolationService.interpolateUrl(
-      '/learnerdashboardthreadhandler/<threadId>', {
+      '/feedbackupdatesthreadhandler/<threadId>', {
         threadId: threadId
       });
     this.explorationTitle = explorationTitle;

@@ -533,6 +533,17 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['feedback_updates'],
+      filename: 'feedback-updates-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/feedback-updates-page/' +
+        'feedback-updates-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['learner_group_creator'],
       filename: 'create-learner-group-page.mainpage.html',
       hybrid: true,
