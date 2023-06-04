@@ -49,10 +49,14 @@ fastavro==0.23.6
     # via apache-beam
 fasteners==0.16
     # via google-apitools
+ffmpeg-python==0.2.0
+    # via -r requirements.in
 firebase-admin==5.2.0
     # via -r requirements.in
 future==0.18.2
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   ffmpeg-python
 google-api-core[grpc,grpcgcp]==1.33.1
     # via
     #   firebase-admin
