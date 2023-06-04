@@ -34,6 +34,8 @@ from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
 from scripts import servers  # isort:skip
 
+import ffmpeg
+
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
 SERVER_MODE_PROD: Final = 'dev'
@@ -79,7 +81,7 @@ _PARSER.add_argument(
 
 
 def run_lighthouse_puppeteer_script(
-        vid_popen: subprocess.Popen=None) -> None:
+        vid_popen: Optional[subprocess.Popen[bytes]]=None) -> None:
 
     """Runs puppeteer script to collect dynamic urls.
 
@@ -112,7 +114,7 @@ def run_lighthouse_puppeteer_script(
         # print it.
         print(stderr.decode('utf-8'))
         print('Puppeteer script failed. More details can be found above.')
-        if vid_popen != None:
+        if vid_popen:
             vid_popen.kill()
             print('Saved video of failed script.')
 
@@ -159,8 +161,9 @@ def export_url(line: str) -> None:
 
 
 def run_lighthouse_checks(
-        lighthouse_mode: str, shard: str, vid_popen: subprocess.Popen=None, 
-        vid_path: str=None) -> None:
+        lighthouse_mode: str, shard: str, 
+        vid_popen: Optional[subprocess.Popen[bytes]]=None, 
+        vid_path: Optional[str]=None) -> None:
 
     """Runs the Lighthouse checks through the Lighthouse config.
 
@@ -186,8 +189,10 @@ def run_lighthouse_checks(
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
-        if vid_popen != None and vid_path != None:
+        if vid_popen: 
             vid_popen.kill()
+            vid_popen.wait()
+        if vid_path:
             os.remove(vid_path)
             print('Corresponding video has been deleted.')
     else:
@@ -201,7 +206,7 @@ def run_lighthouse_checks(
         # print it.
         print(stderr.decode('utf-8'))
         print('Lighthouse checks failed. More details can be found above.')
-        if vid_popen != None and vid_path != None:
+        if vid_popen:
             vid_popen.kill()
             print('Saved video of failed check.')
         sys.exit(1)
@@ -237,7 +242,6 @@ def main(args: Optional[List[str]] = None) -> None:
         common.run_ng_compilation()
         run_webpack_compilation()
     if parsed_args.record_screen:
-        import ffmpeg
         # Start ffmpeg screen record.
         name = 'lhci.mp4'
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
@@ -268,7 +272,7 @@ def main(args: Optional[List[str]] = None) -> None:
             skip_sdk_update_check=True))
 
         if os.getenv('GITHUB_ACTIONS') and parsed_args.record_screen:
-            run_lighthouse_puppeteer_script(vid_popen, video_path)
+            run_lighthouse_puppeteer_script(vid_popen)
             run_lighthouse_checks(
                 lighthouse_mode, parsed_args.shard, vid_popen, video_path)
         else:
