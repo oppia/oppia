@@ -58,6 +58,8 @@ var PreferencesPage = function() {
   this.get = async function() {
     await browser.url(USER_PREFERENCES_URL);
     await waitFor.pageToFullyLoad();
+    // Click on a neutral element.
+    await action.click('Preferences page header', pageHeader);
   };
 
   this.expectUploadError = async function() {
@@ -189,9 +191,13 @@ var PreferencesPage = function() {
     expect(await audioLanguageSelector.getText()).not.toEqual(language);
   };
 
-  this.expectSubscriptionCountToEqual = async function(value) {
-    var subscriptions = await subscriptionsSelector();
-    expect(await subscriptions.length).toEqual(value);
+  this.expectSubscriptionCountToEqual = async function(expectedCount) {
+    if (expectedCount > 0) {
+      await waitFor.visibilityOf(
+        subscription, 'Subscription tile is not visible');
+    }
+    let actualCount = await subscriptionsSelector().length;
+    expect(actualCount).toEqual(expectedCount);
   };
 
   this.expectUserBioToBe = async function(bio) {

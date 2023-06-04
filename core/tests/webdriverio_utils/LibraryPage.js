@@ -101,6 +101,8 @@ var LibraryPage = function() {
   this.get = async function() {
     await browser.url(LIBRARY_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
+    // Click on a neutral element.
+    await action.click('Main header', mainHeader);
   };
 
   this.getHomePage = async function() {
