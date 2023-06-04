@@ -141,6 +141,9 @@ class ExplorationEmbedPage(
 
         Args:
             exploration_id: str. The ID of the exploration.
+
+        Raises:
+            PageNotFoundException. The exploration cannot be found.
         """
         assert self.normalized_request is not None
         version = self.normalized_request.get('v')
