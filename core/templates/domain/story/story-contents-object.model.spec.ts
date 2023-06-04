@@ -40,7 +40,12 @@ describe('Story contents object factory', () => {
           exploration_id: null,
           outline_is_finalized: false,
           thumbnail_bg_color: '#a33f40',
-          thumbnail_filename: 'filename'
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null
         }, {
           id: 'node_2',
           title: 'Title 2',
@@ -52,7 +57,12 @@ describe('Story contents object factory', () => {
           exploration_id: 'exp_1',
           outline_is_finalized: true,
           thumbnail_bg_color: '#a33f40',
-          thumbnail_filename: 'filename'
+          thumbnail_filename: 'filename',
+          status: 'Draft',
+          planned_publication_date_msecs: 20,
+          last_modified_msecs: 15,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: 'Bad Content'
         }],
       next_node_id: 'node_3'
     };
@@ -222,6 +232,60 @@ describe('Story contents object factory', () => {
 
     expect(_sampleStoryContents._nodes[0].getDescription())
       .toBe('New description');
+  });
+
+  it('should set node status when the user changes the status', () => {
+    expect(_sampleStoryContents._nodes[0].getStatus())
+      .toBe('Published');
+
+    _sampleStoryContents.setNodeStatus('node_1', 'Draft');
+
+    expect(_sampleStoryContents._nodes[0].getStatus())
+      .toBe('Draft');
+  });
+
+  it('should set node planned publicaton date when the user enters the' +
+    ' planned publication date', () => {
+    expect(_sampleStoryContents._nodes[0].getPlannedPublicationDateMsecs())
+      .toBe(10);
+
+    _sampleStoryContents.setNodePlannedPublicationDateMsecs('node_1', 5);
+
+    expect(_sampleStoryContents._nodes[0].getPlannedPublicationDateMsecs())
+      .toBe(5);
+  });
+
+  it('should update node last modified when there is a change in node' +
+    ' properties', () => {
+    expect(_sampleStoryContents._nodes[0].getLastModifiedMsecs())
+      .toBe(10);
+
+    _sampleStoryContents.setNodeLastModifiedMsecs('node_1', 5);
+
+    expect(_sampleStoryContents._nodes[0].getLastModifiedMsecs())
+      .toBe(5);
+  });
+
+  it('should set node first publication date when the user' +
+    ' publishes the node', () => {
+    expect(_sampleStoryContents._nodes[0].getFirstPublicationDateMsecs())
+      .toBe(20);
+
+    _sampleStoryContents.setNodeFirstPublicationDateMsecs('node_1', 30);
+
+    expect(_sampleStoryContents._nodes[0].getFirstPublicationDateMsecs())
+      .toBe(30);
+  });
+
+  it('should set node unpublishing reason when the user unpublishes' +
+    ' a node', () => {
+    expect(_sampleStoryContents._nodes[0].getUnpublishingReason())
+      .toBe(null);
+
+    _sampleStoryContents.setNodeUnpublishingReason('node_1', 'Bad Content');
+
+    expect(_sampleStoryContents._nodes[0].getUnpublishingReason())
+      .toBe('Bad Content');
   });
 
   it('should set a new Exploration Id for the node when called', () => {
@@ -400,6 +464,25 @@ describe('Story contents object factory', () => {
       expect(() => {
         _sampleStoryContents.removeDestinationNodeIdFromNode(
           'node_5', 'node_1');
+      }).toThrowError('The node with given id doesn\'t exist');
+      expect(() => {
+        _sampleStoryContents.setNodeStatus('node_5', 'Draft');
+      }).toThrowError('The node with given id doesn\'t exist');
+      expect(() => {
+        _sampleStoryContents.setNodePlannedPublicationDateMsecs(
+          'node_5', 100);
+      }).toThrowError('The node with given id doesn\'t exist');
+      expect(() => {
+        _sampleStoryContents.setNodeLastModifiedMsecs(
+          'node_5', 100);
+      }).toThrowError('The node with given id doesn\'t exist');
+      expect(() => {
+        _sampleStoryContents.setNodeFirstPublicationDateMsecs(
+          'node_5', 100);
+      }).toThrowError('The node with given id doesn\'t exist');
+      expect(() => {
+        _sampleStoryContents.setNodeUnpublishingReason(
+          'node_5', 'Bad Content');
       }).toThrowError('The node with given id doesn\'t exist');
     });
 });

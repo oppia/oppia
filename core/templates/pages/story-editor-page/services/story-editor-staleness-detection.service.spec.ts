@@ -96,6 +96,11 @@ describe('Story editor staleness detection service', () => {
             outline_is_finalized: false,
             thumbnail_filename: 'fileName',
             thumbnail_bg_color: 'blue',
+            status: 'Published',
+            planned_publication_date_msecs: 100,
+            last_modified_msecs: 100,
+            first_publication_date_msecs: 200,
+            unpublishing_reason: null
           }, {
             id: 'node_2',
             title: 'Title 2',
@@ -108,6 +113,11 @@ describe('Story editor staleness detection service', () => {
             outline_is_finalized: true,
             thumbnail_filename: 'fileName',
             thumbnail_bg_color: 'blue',
+            status: 'Published',
+            planned_publication_date_msecs: 100,
+            last_modified_msecs: 100,
+            first_publication_date_msecs: 200,
+            unpublishing_reason: null
           }],
         next_node_id: 'node_3'
       },

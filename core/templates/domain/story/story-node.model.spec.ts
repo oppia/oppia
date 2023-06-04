@@ -34,6 +34,11 @@ describe('Story node model', () => {
       exploration_id: null,
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
+      status: 'Draft',
+      planned_publication_date_msecs: 10,
+      last_modified_msecs: 10,
+      first_publication_date_msecs: 20,
+      unpublishing_reason: null
     };
     _sampleStoryNode = StoryNode.createFromBackendDict(
       sampleStoryNodeBackendDict);
@@ -90,6 +95,11 @@ describe('Story node model', () => {
       exploration_id: null,
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
     const expectedErrorMessage = (
@@ -113,6 +123,11 @@ describe('Story node model', () => {
       exploration_id: null,
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
     const expectedErrorMessage = (
@@ -137,6 +152,11 @@ describe('Story node model', () => {
       exploration_id: null,
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
     const expectedErrorMessage = (
@@ -161,6 +181,11 @@ describe('Story node model', () => {
       exploration_id: null,
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
 
@@ -182,6 +207,11 @@ describe('Story node model', () => {
       exploration_id: null,
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null
     };
     const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
     const expectedErrorMessage = (
@@ -307,6 +337,46 @@ describe('Story node model', () => {
     _sampleStoryNode.setDescription('Description 2');
 
     expect(_sampleStoryNode.getDescription()).toEqual('Description 2');
+  });
+
+  it('should be able to set story node status', () => {
+    expect(_sampleStoryNode.getStatus()).toEqual('Draft');
+
+    _sampleStoryNode.setStatus('Published');
+
+    expect(_sampleStoryNode.getStatus()).toEqual('Published');
+  });
+
+  it('should be able to set story node planned publication date', () => {
+    expect(_sampleStoryNode.getPlannedPublicationDateMsecs()).toEqual(10);
+
+    _sampleStoryNode.setPlannedPublicationDateMsecs(20);
+
+    expect(_sampleStoryNode.getPlannedPublicationDateMsecs()).toEqual(20);
+  });
+
+  it('should be able to set story node last modified date time', () => {
+    expect(_sampleStoryNode.getLastModifiedMsecs()).toEqual(10);
+
+    _sampleStoryNode.setLastModifiedMsecs(11);
+
+    expect(_sampleStoryNode.getLastModifiedMsecs()).toEqual(11);
+  });
+
+  it('should be able to set story node first publication date', () => {
+    expect(_sampleStoryNode.getFirstPublicationDateMsecs()).toEqual(20);
+
+    _sampleStoryNode.setFirstPublicationDateMsecs(30);
+
+    expect(_sampleStoryNode.getFirstPublicationDateMsecs()).toEqual(30);
+  });
+
+  it('should be able to set story node unpublishing reason', () => {
+    expect(_sampleStoryNode.getUnpublishingReason()).toEqual(null);
+
+    _sampleStoryNode.setUnpublishingReason('Bad Content');
+
+    expect(_sampleStoryNode.getUnpublishingReason()).toEqual('Bad Content');
   });
 
   it('should be able to get and set story node outline status', () => {
