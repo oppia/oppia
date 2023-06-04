@@ -499,13 +499,6 @@ HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
     'generate high bounce-rate improvements tasks.',
     100)
 
-MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
-    'max_number_of_svgs_in_math_svgs_batch',
-    INT_SCHEMA,
-    'The maximum number of Math SVGs that can be send in a batch of math rich '
-    'text svgs.',
-    25)
-
 MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'max_number_of_explorations_in_math_svgs_batch',
     INT_SCHEMA,
