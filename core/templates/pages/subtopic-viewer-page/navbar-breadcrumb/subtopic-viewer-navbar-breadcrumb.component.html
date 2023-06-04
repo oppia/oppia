@@ -1,11 +1,11 @@
 <div *ngIf="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-subtopic-viewer-nav-breadcrumb">
   <div class="oppia-subtopic-viewer-nav-separator"></div>
-  <div class="oppia-subtopic-viewer-nav-labels-container" title="The Place Names and Their Values">
+  <div class="oppia-subtopic-viewer-nav-labels-container">
     <p class="oppia-subtopic-title-text">
-      <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
+      <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()" title="{{ subtopicTitle }}">
         {{ subtopicTitle }}
       </span>
-      <span *ngIf="isHackySubtopicTitleTranslationDisplayed()">
+      <span *ngIf="isHackySubtopicTitleTranslationDisplayed()" title="{{ subtopicTitleTranslationKey | translate }}">
         {{ subtopicTitleTranslationKey | translate }}
       </span>
     </p>
