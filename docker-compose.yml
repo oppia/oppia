@@ -64,6 +64,16 @@ services:
       - google_app_engine
     command: ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=localhost --port=8089 --store_on_disk=False  --consistency=1.0 /app/cloud_datastore_emulator_cache
 
+  firebase_emulator:
+    image: node:16.13.0-alpine
+    container_name: oppia-firebase-emulator
+    ports:
+      - "9099:9099"
+    volumes:
+      - .:/app/oppia
+      - node_modules:/app/oppia/node_modules
+    command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --export-on-exit /app/firebase_emulator_cache
+
 
 volumes:
   node_modules:

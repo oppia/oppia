@@ -13,12 +13,6 @@ RUN apt-get update -y && apt-get upgrade -y \
     python3-yaml \
     python3-matplotlib \
     chromium
-# RUN apt-get -y install software-properties-common
-# RUN apt-get update
-# RUN add-apk-repository ppa:webupd8team/java
-# RUN apt-get install openjdk-8-jre
-# TODO: install openjdk-8-jre (ps: I am using python:3.8 base image that is implemented on Debian10 - and openjdk-8 is not avaialble on Debian10).
-
 RUN pip install --upgrade pip==21.2.3
 
 RUN pip install pip-tools==6.6.2 setuptools==58.5.3
