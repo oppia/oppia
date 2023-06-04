@@ -20,10 +20,6 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
-import { PlatformParameterRule } from
-  'domain/platform_feature/platform-parameter-rule.model';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformFeatureDomainConstants } from
@@ -32,7 +28,6 @@ import { ClientContext } from 'domain/platform_feature/client-context.model';
 import { FeatureStatusSummary } from 'domain/platform_feature/feature-status-summary.model';
 
 describe('PlatformFeatureBackendApiService', () => {
-  let featureAdminService: PlatformFeatureAdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let platformFeatureBackendApiService: PlatformFeatureBackendApiService;
 
