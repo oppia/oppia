@@ -118,7 +118,8 @@
             {{ 'I18N_BLOG_DASHBOARD_STATISTICS_YEARLY_STATS_BUTTON' | translate }}
           </button>
           <button mat-button
-                  class="time-period-button">
+                  class="time-period-button"
+                  (click)="showAllStats()">
             {{ 'I18N_BLOG_DASHBOARD_STATISTICS_ALL_STATS_BUTTON' | translate }}
           </button>
         </div>

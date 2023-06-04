@@ -172,12 +172,15 @@ def _generate_monthly_views_from_views_by_date(
         the ongoing month.
     """
     current_month_year = datetime.datetime.utcnow().strftime('%Y-%m')
+    current_day = datetime.datetime.utcnow().day
+    published_on = stats.created_on.day
     # We add '_' infront of day stat keys to avoid auto ordering of keys
     # in frontend, otherwise the keys get treated like numeric keys instead of
     # strings by typescript.
     stats_dict = {
         '_' + k: stats.views_by_date[current_month_year][k] for k in list(
-            stats.views_by_date[current_month_year])
+            stats.views_by_date[current_month_year])[
+                published_on - 1 : current_day]
     }
     return stats_dict
 

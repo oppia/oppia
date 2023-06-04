@@ -227,6 +227,7 @@ export class BlogStatisticsTabComponent implements OnInit {
         return;
       }
     }
+    console.log(this._dataForActiveChart);
     this.blogDashboardBackendApiService.fetchBlogPostViewsStatsAsync(
       this.activeStatsBlogPostId
     ).then((stats: BlogPostViewsStats) => {
@@ -340,6 +341,7 @@ export class BlogStatisticsTabComponent implements OnInit {
   showMonthlyStats(): void {
     let data = (this._dataForActiveChart as Stats).monthlyStats;
     let statsKeys = Object.keys(data);
+    console.log(statsKeys)
     let dayOffset = 0;
     this.xAxisLabels = [];
     statsKeys.map(() => {
@@ -380,6 +382,17 @@ export class BlogStatisticsTabComponent implements OnInit {
     });
     this.selectedTimePeriod = 'yearly';
     this.plotStatsGraph(data);
+  }
+
+  showAllStats(): void {
+    let data = (this._dataForActiveChart as Stats).allStats;
+    this.xAxisLabels = Object.keys(data);
+    let cumulatedYearlyStats: StatsDict = {};
+    for (let year in data) {
+      cumulatedYearlyStats.year = (d3.sum(Object.values(data[year])));
+    }
+    this.selectedTimePeriod = 'all';
+    this.plotStatsGraph(cumulatedYearlyStats as StatsDict);
   }
 
   plotReadingTimeStatsChart(): void {
