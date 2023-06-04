@@ -68,26 +68,28 @@ class PopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             returned otherwise.
         """
         try:
-            question_summary = (
-                question_services.get_question_summary_from_model(
-                    question_summary_model
+            with datastore_services.get_ndb_context():
+                question_summary = (
+                    question_services.get_question_summary_from_model(
+                        question_summary_model
+                    )
                 )
-            )
             question_summary.version = question_version
             question_summary.validate()
         except Exception as e:
             logging.exception(e)
             return result.Err((question_summary.id, e))
 
-        question_summary_model = question_models.QuestionSummaryModel(
-            id=question_summary.id,
-            question_model_last_updated=question_summary.last_updated,
-            question_model_created_on=question_summary.created_on,
-            question_content=question_summary.question_content,
-            misconception_ids=question_summary.misconception_ids,
-            interaction_id=question_summary.interaction_id,
-            version=question_summary.version
-        )
+        with datastore_services.get_ndb_context():
+            question_summary_model = question_models.QuestionSummaryModel(
+                id=question_summary.id,
+                question_model_last_updated=question_summary.last_updated,
+                question_model_created_on=question_summary.created_on,
+                question_content=question_summary.question_content,
+                misconception_ids=question_summary.misconception_ids,
+                interaction_id=question_summary.interaction_id,
+                version=question_summary.version
+            )
         question_summary_model.update_timestamps()
         return result.Ok((question_summary_model.id, question_summary_model))
 
@@ -196,26 +198,28 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
             returned otherwise.
         """
         try:
-            question_summary = (
-                question_services.get_question_summary_from_model(
-                    question_summary_model
+            with datastore_services.get_ndb_context():
+                question_summary = (
+                    question_services.get_question_summary_from_model(
+                        question_summary_model
+                    )
                 )
-            )
             question_summary.version = question_version
             question_summary.validate()
         except Exception as e:
             logging.exception(e)
             return result.Err((question_summary.id, e))
 
-        question_summary_model = question_models.QuestionSummaryModel(
-            id=question_summary.id,
-            question_model_last_updated=question_summary.last_updated,
-            question_model_created_on=question_summary.created_on,
-            question_content=question_summary.question_content,
-            misconception_ids=question_summary.misconception_ids,
-            interaction_id=question_summary.interaction_id,
-            version=question_summary.version
-        )
+        with datastore_services.get_ndb_context():
+            question_summary_model = question_models.QuestionSummaryModel(
+                id=question_summary.id,
+                question_model_last_updated=question_summary.last_updated,
+                question_model_created_on=question_summary.created_on,
+                question_content=question_summary.question_content,
+                misconception_ids=question_summary.misconception_ids,
+                interaction_id=question_summary.interaction_id,
+                version=question_summary.version
+            )
         question_summary_model.update_timestamps()
         return result.Ok((question_summary.id, question_summary_model))
 
