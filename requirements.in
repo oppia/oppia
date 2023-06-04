@@ -42,3 +42,4 @@ typing-extensions==3.10.0.2
 urllib3==1.26.7
 webapp2==3.0.0b1
 webencodings==0.5.1
+ffmpeg-python==0.2.0
