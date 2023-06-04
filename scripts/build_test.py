@@ -1236,7 +1236,15 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(return_code,)]))
+            sys, 'exit', lambda _: None,
+            expected_args=[
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (return_code,),
+                (1,),
+            ]))
 
         build.build_js_files(True)
 
