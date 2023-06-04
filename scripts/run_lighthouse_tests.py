@@ -81,7 +81,7 @@ _PARSER.add_argument(
 
 
 def run_lighthouse_puppeteer_script(
-        vid_popen: Optional[subprocess.Popen[bytes]]=None) -> None:
+        vid_popen: Optional[subprocess.Popen[bytes]]=None) -> None: # pylint: disable=unsubscriptable-object
 
     """Runs puppeteer script to collect dynamic urls.
 
@@ -161,8 +161,8 @@ def export_url(line: str) -> None:
 
 
 def run_lighthouse_checks(
-        lighthouse_mode: str, shard: str, 
-        vid_popen: Optional[subprocess.Popen[bytes]]=None, 
+        lighthouse_mode: str, shard: str,
+        vid_popen: Optional[subprocess.Popen[bytes]]=None, # pylint: disable=unsubscriptable-object
         vid_path: Optional[str]=None) -> None:
 
     """Runs the Lighthouse checks through the Lighthouse config.
@@ -189,7 +189,7 @@ def run_lighthouse_checks(
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print('Lighthouse checks completed successfully.')
-        if vid_popen: 
+        if vid_popen:
             vid_popen.kill()
             vid_popen.wait()
         if vid_path:
@@ -250,8 +250,8 @@ def main(args: Optional[List[str]] = None) -> None:
         vid_popen = (
             ffmpeg
             .input(format='x11grab', framerate=30, filename='desktop')
-            .output(crf='0', preset='ultrafast',
-                    filename=video_path, c='libx264')
+            .output(
+            crf='0', preset='ultrafast', filename=video_path, c='libx264')
 
             .overwrite_output()
             )
