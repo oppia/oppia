@@ -913,9 +913,9 @@ textarea {
 
 }
 .oppia-navbar-breadcrumb {
+  -webkit-box-orient: vertical;
   color: #fff;
   cursor: default;
-  -webkit-box-orient: vertical;
   display: -webkit-box;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 20px;
