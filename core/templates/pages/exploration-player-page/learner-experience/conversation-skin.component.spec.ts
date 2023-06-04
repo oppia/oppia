@@ -1993,7 +1993,6 @@ describe('Conversation skin component', () => {
       .and.returnValues(false, false, false, true);
     spyOn(componentInstance, 'initLearnerAnswerInfoService');
     spyOn(explorationEngineService, 'getState');
-    spyOn(componentInstance, 'alwaysAskLearnerForAnswerDetails');
     spyOn(numberAttemptsService, 'submitAttempt');
     spyOn(playerTranscriptService, 'addNewInput');
     spyOn(componentInstance, 'getCanAskLearnerForAnswerInfo').and.returnValues(

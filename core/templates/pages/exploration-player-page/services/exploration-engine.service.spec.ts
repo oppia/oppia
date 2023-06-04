@@ -30,6 +30,7 @@ import { TextInputRulesService } from 'interactions/TextInput/directives/text-in
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { ExplorationFeatures } from 'services/exploration-features-backend-api.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { AudioPreloaderService } from './audio-preloader.service';
 import { ContentTranslationLanguageService } from './content-translation-language.service';
@@ -64,6 +65,7 @@ describe('Exploration engine service ', () => {
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
+  let explorationFeatures: ExplorationFeatures;
 
   beforeEach(() => {
     explorationDict = {
