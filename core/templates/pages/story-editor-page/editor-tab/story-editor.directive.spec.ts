@@ -26,7 +26,7 @@ class MockNgbModalRef {
     body: 'xyz';
   };
 }
-describe('Story editor Directive having two story nodes', function() {
+describe('Story editor Directive having three story nodes', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -91,7 +91,12 @@ describe('Story editor Directive having two story nodes', function() {
             destination_node_ids: [],
             outline: 'Outline',
             exploration_id: null,
-            outline_is_finalized: false
+            outline_is_finalized: false,
+            status: 'Published',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: 'Bad Content'
           }, {
             id: 'node_2',
             title: 'Title 2',
@@ -101,9 +106,29 @@ describe('Story editor Directive having two story nodes', function() {
             destination_node_ids: ['node_1'],
             outline: 'Outline 2',
             exploration_id: 'exp_1',
-            outline_is_finalized: true
+            outline_is_finalized: true,
+            status: 'Ready To Publish',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: null
+          }, {
+            id: 'node_3',
+            title: 'Title 3',
+            description: 'Description 3',
+            prerequisite_skill_ids: ['skill_4'],
+            acquired_skill_ids: ['skill_5'],
+            destination_node_ids: ['node_2'],
+            outline: 'Outline 3',
+            exploration_id: 'exp_3',
+            outline_is_finalized: true,
+            status: 'Draft',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: null
           }],
-        next_node_id: 'node_3'
+        next_node_id: 'node_4'
       },
       language_code: 'en'
     };
@@ -173,6 +198,26 @@ describe('Story editor Directive having two story nodes', function() {
 
     $scope.closeNotesEditor();
     expect($scope.notesEditorIsShown).toEqual(false);
+  });
+
+  it('should correctly initialize chapterIsPublishable', function() {
+    expect($scope.chapterIsPublishable[0]).toEqual(true);
+    expect($scope.chapterIsPublishable[1]).toEqual(true);
+    expect($scope.chapterIsPublishable[2]).toEqual(false);
+  });
+
+  it('should call rearrangeNodeInStory on move chapter up', function() {
+    var storyUpdateSpy = spyOn(StoryUpdateService, 'rearrangeNodeInStory');
+    $scope.moveNodeUpInStory(2);
+    expect($scope.dragStartIndex).toEqual(2);
+    expect(storyUpdateSpy).toHaveBeenCalled();
+  });
+
+  it('should call rearrangeNodeInStory on move chapter down', function() {
+    var storyUpdateSpy = spyOn(StoryUpdateService, 'rearrangeNodeInStory');
+    $scope.moveNodeDownInStory(1);
+    expect($scope.dragStartIndex).toEqual(1);
+    expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should return when the node is the initial node', function() {
@@ -475,7 +520,12 @@ describe('Story editor Directive having one story node', function() {
             destination_node_ids: [],
             outline: 'Outline',
             exploration_id: null,
-            outline_is_finalized: false
+            outline_is_finalized: false,
+            status: 'Published',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: 'Bad Content'
           }],
         next_node_id: 'node_3'
       },

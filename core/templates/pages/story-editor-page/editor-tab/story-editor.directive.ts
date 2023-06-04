@@ -43,6 +43,8 @@ require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/ngb-modal.service.ts');
+require('services/platform-feature.service.ts');
+require('services/date-time-format.service');
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -53,17 +55,19 @@ angular.module('oppia').directive('storyEditor', [
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'FocusManagerService', 'NgbModal',
-        'StoryEditorNavigationService', 'StoryEditorStateService',
-        'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
+        'DateTimeFormatService', 'FocusManagerService', 'NgbModal',
+        'PlatformFeatureService', 'StoryEditorNavigationService',
+        'StoryEditorStateService', 'StoryUpdateService',
+        'UndoRedoService', 'WindowDimensionsService',
         'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
         'MAX_CHARS_IN_STORY_DESCRIPTION',
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
-            FocusManagerService, NgbModal,
-            StoryEditorNavigationService, StoryEditorStateService,
-            StoryUpdateService, UndoRedoService, WindowDimensionsService,
+            DateTimeFormatService, FocusManagerService, NgbModal,
+            PlatformFeatureService, StoryEditorNavigationService,
+            StoryEditorStateService, StoryUpdateService,
+            UndoRedoService, WindowDimensionsService,
             WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
             MAX_CHARS_IN_STORY_DESCRIPTION,
             MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
@@ -94,6 +98,7 @@ angular.module('oppia').directive('storyEditor', [
               $scope.storyContents = $scope.story.getStoryContents();
               $scope.disconnectedNodes = [];
               $scope.linearNodesList = [];
+              $scope.chapterIsPublishable = [];
               $scope.nodes = [];
               $scope.allowedBgColors = (
                 AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
@@ -103,6 +108,16 @@ angular.module('oppia').directive('storyEditor', [
                 $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
                 $scope.linearNodesList =
                   $scope.storyContents.getLinearNodesList();
+                $scope.linearNodesList.forEach((node, index) => {
+                  if (node.getStatus() === 'Published') {
+                    $scope.chapterIsPublishable.push(true);
+                  } else if (node.getStatus() === 'Ready To Publish' &&
+                    index !== 0 && $scope.chapterIsPublishable[index - 1]) {
+                    $scope.chapterIsPublishable.push(true);
+                  } else {
+                    $scope.chapterIsPublishable.push(false);
+                  }
+                });
               }
               $scope.notesEditorIsShown = false;
               $scope.storyTitleEditorIsShown = false;
@@ -159,6 +174,16 @@ angular.module('oppia').directive('storyEditor', [
             StoryUpdateService.rearrangeNodeInStory(
               $scope.story, $scope.dragStartIndex, toIndex);
             _initEditor();
+          };
+
+          $scope.moveNodeUpInStory = function(index) {
+            $scope.dragStartIndex = index;
+            $scope.rearrangeNodeInStory(index - 1);
+          };
+
+          $scope.moveNodeDownInStory = function(index) {
+            $scope.dragStartIndex = index;
+            $scope.rearrangeNodeInStory(index + 1);
           };
 
           $scope.deleteNode = function(nodeId) {
@@ -356,6 +381,8 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           ctrl.$onInit = function() {
+            $scope.dateTimeFormatService = DateTimeFormatService;
+            $scope.platformFeatureService = PlatformFeatureService;
             $scope.storyPreviewCardIsShown = false;
             $scope.mainStoryCardIsShown = true;
             $scope.chaptersListIsShown = (
@@ -383,7 +410,7 @@ angular.module('oppia').directive('storyEditor', [
               StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _initEditor()
               ));
-
+            $scope.selectedChapterIndexToPublishUpToInDropdown = 0;
             _init();
             _initEditor();
           };

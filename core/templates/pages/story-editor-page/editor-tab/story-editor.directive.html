@@ -167,7 +167,7 @@
       </md-card>
     </div>
 
-    <div class="chapter-list-container">
+    <div class="chapter-list-container" ng-if="!platformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled">
       <md-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
         <div class="story-node-editor">
           <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
@@ -228,6 +228,109 @@
         </div>
       </md-card>
     </div>
+
+    <div class="chapter-list-container" ng-if="platformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled">
+      <md-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card chapter-control-container">
+        <div class="story-node-editor-container">
+          <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
+               ng-click="toggleChapterLists()">
+            <span>Chapter Control</span>
+            <i class="fa fa-caret-down"
+               ng-if="!chaptersListIsShown"
+               aria-hidden="true">
+            </i>
+            <i class="fa fa-caret-up"
+               ng-if="chaptersListIsShown"
+               aria-hidden="true">
+            </i>
+          </div>
+        </div>
+        <div ng-if="chaptersListIsShown" class="oppia-mobile-collapsible-card-content chapter-control-panel">
+          <div>
+            <div class="chapter-control-bar">
+              <button ng-click="createNode()" class="btn add-chapter-button e2e-test-add-chapter-button">
+                + ADD CHAPTER
+              </button>
+              <div class="publish-upto-chapter-menu">
+                <span class="publish-upto-chapter-label">Publish Upto Chapter</span>
+                <select ng-model="selectedChapterIndexToPublishUpToInDropdown"
+                        ng-change="updatePublishUptoChapterSelection(selectedChapterIndexToPublishUpToInDropdown)"
+                        class="publish-upto-chapter-dropdown">
+                  <option ng-repeat="node in linearNodesList track by $index"
+                          ng-disabled="!chapterIsPublishable[$index]"
+                          ng-value="<[$index]>">
+                          <[$index+1]>
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div ng-if="!linearNodesList.length">
+              <p class="no-chapters-message">
+                This story has no chapters.
+              </p>
+            </div>
+            <div ng-if="linearNodesList.length">
+              <div  class="story-nodes-container">
+                <table>
+                  <tr class="chapter-list-heading">
+                    <th></th>
+                    <th>Chapter Name</th>
+                    <th>Status</th>
+                    <th>Last Modified or Published</th>
+                    <th>Planned Publication Date</th>
+                  </tr>
+                  <tr ng-repeat="node in linearNodesList track by $index"
+                      class="story-node"
+                      ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
+                      ng-click="navigateToChapterWithId(node.getId(), $index)"
+                      dnd-draggable="node"
+                      dnd-disable-if="node.getStatus()=='Published'"
+                      dnd-list="linearNodesList"
+                      dnd-effect-allowed="move"
+                      dnd-dragstart="onMoveChapterStart($index, node.getId())"
+                      dnd-drop="rearrangeNodeInStory($index)">
+                    <td class="chapter-index"> <[$index+1]>. </td>
+                    <td class="e2e-test-chapter-title chapter-title"><[node.getTitle()]></td>
+                    <td class="chapter-status">
+                      <[node.getStatus()]>
+                      <i class="fas fa-exclamation-triangle oppia-save-draft-warning" ng-if="node.getStatus()=='Draft'"></i>
+                      <md-tooltip md-direction="bottom" ng-if="node.getStatus()=='Draft'">
+                        <div layout-wrap class="draft-node-tooltip"> More details are required to publish this chapter. Use the Edit option from the Side Menu </div>
+                      </md-tooltip>
+                    </td>
+                    <td class="chapter-last-modified">
+                        <[dateTimeFormatService.getLocaleAbbreviatedDatetimeString(node.getLastModifiedMsecs())]>
+                      <div ng-if="node.getStatus()=='Published'">(published)</div>
+                      <div ng-if="node.getStatus()=='Ready To Publish'">(draft modified)</div>
+                      <div ng-if="node.getStatus()=='Draft'">(draft added)</div>
+                    </td>
+                    <td class="chapter-planned-publication-date"><[dateTimeFormatService.getLocaleAbbreviatedDatetimeString(node.getPlannedPublicationDateMsecs())]></td>
+                    <td class="edit-options-container">
+                      <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options" ng-click="toggleChapterEditOptions($index);$event.stopPropagation()" aria-label="Chapter edit"></i>
+                      <div class="chapter-option-box" ng-if="selectedChapterIndex === $index" ng-mouseleave="toggleChapterEditOptions(-1)" ng-click="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                        <div class="chapter-edit-option e2e-test-move-chapter-up-button" ng-if="$index!=0 && linearNodesList[$index-1].getStatus()!='Published' && linearNodesList[$index].getStatus()!='Published'" ng-click="moveNodeUpInStory($index)">
+                          <span>Move Up</span>
+                        </div>
+                        <div class="chapter-edit-option e2e-test-move-chapter-down-button" ng-if="$index!=linearNodesList.length-1 && node.getStatus()!='Published'" ng-click="moveNodeDownInStory($index)">
+                          <span>Move Down</span>
+                        </div>
+                        <div class="chapter-edit-option e2e-test-edit-chapter-button" ng-click="navigateToChapterWithId(node.getId(), $index)">
+                          <span>Edit</span>
+                        </div>
+                        <div class="chapter-edit-option e2e-test-delete-chapter-button" ng-click="deleteNode(node.getId())">
+                          <span>Delete</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </md-card>
+    </div>
   </div>
 </div>
 
@@ -243,11 +346,61 @@
     padding: 0.25rem;
   }
 
+  story-editor .oppia-page-card.chapter-control-container {
+    padding: 10px;
+  }
+
   story-editor .no-chapters-message {
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 18px;
     padding-top: 6px;
     text-align: center;
+  }
+
+  story-editor .chapter-control-bar {
+    display: flex;
+    gap: 5%;
+    margin-right: 15px;
+    padding-bottom: 10px;
+  }
+
+  story-editor .publish-upto-chapter-menu {
+    background-color: #88c3b9f2;
+    border-radius: 5px;
+    display: flex;
+    font-weight: bold;
+    gap: 1rem;
+    justify-content: space-around;
+    margin: 15px 0 15px;
+    padding: 10px;
+  }
+
+  story-editor .publish-upto-chapter-dropdown {
+    background-color: rgb(184 231 247);
+    width: 40px;
+  }
+
+  story-editor .publish-upto-chapter-dropdown option {
+    background-color: white;
+    border: 0.5px solid black;
+  }
+
+  story-editor .publish-upto-chapter-dropdown option:disabled {
+    background-color: rgb(207, 206, 206);
+  }
+
+  story-editor .chapter-list-heading th {
+    border-top: 4px solid black;
+    font-size: 15px;
+    font-weight: bold;
+    height: 30px;
+    padding: 2%;
+    vertical-align: top;
+    word-wrap: break-word;
+  }
+
+  story-editor .dndPlaceholder {
+    display: none;
   }
 
   story-editor .story-editor-node {
@@ -265,6 +418,52 @@
     cursor: pointer;
     text-align: left;
     width: 95%;
+  }
+
+  story-editor .story-node .chapter-index {
+    font-weight: bold;
+    padding-left: 5px;
+    width: 7%;
+  }
+
+  story-editor .story-node .chapter-title {
+    font-weight: bold;
+    width: 28%;
+  }
+
+  story-editor .story-node .chapter-status {
+    font-style: italic;
+    width: 20%;
+  }
+
+  story-editor .story-node .chapter-last-modified {
+    font-style: italic;
+  }
+
+  story-editor .story-node .chapter-planned-publication-date {
+    font-style: italic;
+    font-weight: bold;
+  }
+
+  story-editor .story-node .edit-options-container {
+    border: none;
+    padding-left: 5px;
+  }
+
+  story-editor .story-node td {
+    height: 50px;
+    padding: 2%;
+    vertical-align: top;
+    word-wrap: break-word;
+  }
+
+  story-editor .story-node {
+    cursor: pointer;
+    position: relative;
+  }
+
+  story-editor story-node:hover {
+    cursor: grab;
   }
 
   story-editor story-editor-node:hover {
@@ -292,6 +491,15 @@
     white-space: initial;
   }
 
+  story-editor .story-nodes-container table, th, td {
+    border: 1px solid #dbdbdb;
+  }
+
+  story-editor .story-nodes-container table {
+    border-right: none;
+    font-size: 14px;
+  }
+
   story-editor .node-editor {
     display: inline-block;
     min-height: 25vh;
@@ -301,6 +509,11 @@
 
   story-editor .story-node-editor {
     margin-top: 20px;
+  }
+
+  story-editor .story-node-editor-container {
+    margin-left: 5%;
+    margin-top: 5px;
   }
 
   story-editor .form-heading {
@@ -338,7 +551,6 @@
     flex-wrap: wrap;
     justify-content: center;
     margin: 0 auto;
-    width: 85%;
   }
   story-editor .content-container {
     margin-bottom: 40px;
@@ -384,6 +596,13 @@
     margin: 15px 0 15px;
     text-align: left;
   }
+  story-editor .add-chapter-button {
+    background-color: #008098;
+    color: #fff;
+    font-weight: bold;
+    margin: 15px 0 15px;
+    text-align: left;
+  }
   story-editor .chapter-list-card-header {
     align-items: center;
     display: flex;
@@ -400,15 +619,16 @@
     font-weight: bold;
   }
   story-editor .chapter-option-box {
-    background-color: #e1dcdc;
-    border: 1px solid #000;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.5);
     padding: 0;
     position: absolute;
-    right: -5px;
-    width: 140px;
+    right: 10px;
+    width: 120px;
     z-index: 1;
   }
   story-editor .chapter-edit-option {
+    border: 1px solid rgba(0, 0, 0, 0.5);
     cursor: pointer;
     font-size: 15px;
     padding: 5px;
@@ -434,6 +654,15 @@
     story-editor .chapter-list-container {
       margin-right: 2%;
       width: 35%;
+    }
+    story-editor .add-chapter-button {
+      font-size: 12px;
+    }
+    story-editor .publish-upto-chapter-label {
+      font-size: 14px;
+    }
+    story-editor .chapter-list-heading th {
+      font-size: 14px;
     }
   }
   @media screen and (max-width: 1000px) {
@@ -499,6 +728,28 @@
     }
     story-editor .chapter-list-card-heading {
       padding-top: 15px;
+    }
+  }
+  @media screen and (max-width: 350px) {
+    story-editor .chapter-control-bar {
+      flex-direction: column;
+      padding-left: 5px;
+    }
+    story-editor .publish-upto-chapter-menu {
+      margin-top: 5px;
+    }
+    story-editor .add-chapter-button {
+      font-size: 14px;
+      width: 70%;
+    }
+    story-editor .story-nodes-container table {
+      font-size: 12px;
+    }
+    story-editor .chapter-control-panel {
+      padding: 20px 0 15px;
+    }
+    story-editor .chapter-edit-option span {
+      font-size: 12px;
     }
   }
 </style>
