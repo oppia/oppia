@@ -65,7 +65,6 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       displayName: string;
       operators: readonly string[];
       options?: readonly string[];
-      optionFilter?: (feature: PlatformParameter, option: string) => boolean;
       placeholder?: string;
       inputRegex?: RegExp;
     }
@@ -73,10 +72,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       [PlatformParameterFilterType.ServerMode]: {
         displayName: 'Server Mode',
         options: AdminFeaturesTabConstants.ALLOWED_SERVER_MODES,
-        operators: ['='],
-        optionFilter: (feature: PlatformParameter, option: string): boolean => {
-          return true;
-        }
+        operators: ['=']
       },
       [PlatformParameterFilterType.PlatformType]: {
         displayName: 'Platform Type',
