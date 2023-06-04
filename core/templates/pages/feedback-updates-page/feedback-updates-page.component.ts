@@ -28,6 +28,7 @@ import { AppConstants } from 'app.constants';
 import { FeedbackThreadSummary, FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
 import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
@@ -133,6 +134,8 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService:
       LearnerDashboardBackendApiService,
+    private feedbackUpdatesBackendApiService:
+      FeedbackUpdatesBackendApiService,
     private loaderService: LoaderService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private urlInterpolationService: UrlInterpolationService,
@@ -224,11 +227,12 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   fetchFeedbackUpdates(): void {
     this.loadingIndicatorIsShown = true;
     let dashboardFeedbackUpdatesDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardFeedbackUpdatesDataAsync(
+      this.feedbackUpdatesBackendApiService
+        .fetchFeedbackUpdatesDataAsync(
           this.paginatedThreadsList));
     dashboardFeedbackUpdatesDataPromise.then(
       responseData => {
+        console.error(responseData,"response data");
         this.isCurrentFeedbackSortDescending = true;
         this.currentFeedbackThreadsSortType = (
           LearnerDashboardPageConstants
@@ -308,7 +312,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl)
+    this.feedbackUpdatesBackendApiService.onClickThreadAsync(threadDataUrl)
       .then((messageSummaryList) => {
         let messageSummaryDicts = messageSummaryList;
         this.messageSummaries = [];
@@ -336,7 +340,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
       text: newMessage
     };
     this.messageSendingInProgress = true;
-    this.learnerDashboardBackendApiService
+    this.feedbackUpdatesBackendApiService
       .addNewMessageAsync(url, payload).then(() => {
         this.threadSummary = this.threadSummaries[this.threadIndex];
         this.threadSummary.appendNewMessage(

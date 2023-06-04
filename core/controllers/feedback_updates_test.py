@@ -21,20 +21,14 @@ import datetime
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subscription_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -47,19 +41,19 @@ if MYPY:  # pragma: no cover
 (suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
-# class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
-#     """Test for redirecting the old learner dashboard page URL
-#     to the new one.
-#     """
+class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old learner dashboard page URL
+    to the new one.
+    """
 
-#     def test_old_learner_dashboard_page_url(self) -> None:
-#         """Test to validate that the old learner dashboard page url redirects
-#         to the new one.
-#         """
-#         response = self.get_html_response(
-#             '/learner_dashboard', expected_status_int=301)
-#         self.assertEqual(
-#             'http://localhost/learner-dashboard', response.headers['location'])
+    def test_old_learner_dashboard_page_url(self) -> None:
+        """Test to validate that the old learner dashboard page url redirects
+        to the new one.
+        """
+        response = self.get_html_response(
+            '/learner_dashboard', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/learner-dashboard', response.headers['location'])
 
 
 

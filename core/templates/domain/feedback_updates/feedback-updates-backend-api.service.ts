@@ -27,7 +27,6 @@ import {
   FeedbackThreadSummaryBackendDict
 } from 'domain/feedback_thread/feedback-thread-summary.model';
 import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
-import { AppConstants } from 'app.constants';
 
 
 interface FeedbackUpdatesDataBackendDict {

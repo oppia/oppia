@@ -33,6 +33,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -88,8 +89,8 @@ describe('Feedback updates page', () => {
   let csrfTokenService: CsrfTokenService;
   let dateTimeFormatService: DateTimeFormatService;
   let focusManagerService: FocusManagerService;
-  let learnerDashboardBackendApiService:
-    LearnerDashboardBackendApiService;
+  let feedbackUpdatesBackendApiService:
+      FeedbackUpdatesBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService;
@@ -155,7 +156,7 @@ describe('Feedback updates page', () => {
   }
   ];
 
-  let learnerDashboardFeedbackUpdatesData = {
+  let FeedbackUpdatesData = {
     thread_summaries: threadSummaryList,
     number_of_unread_threads: 10,
   };
@@ -210,6 +211,7 @@ describe('Feedback updates page', () => {
           DateTimeFormatService,
           FocusManagerService,
           LearnerDashboardBackendApiService,
+          FeedbackUpdatesBackendApiService,
           {
             provide: LearnerDashboardActivityBackendApiService,
             useClass: MockLearnerDashboardActivityBackendApiService
@@ -242,8 +244,8 @@ describe('Feedback updates page', () => {
       dateTimeFormatService = TestBed.inject(DateTimeFormatService);
       focusManagerService = TestBed.inject(FocusManagerService);
       windowDimensionsService = TestBed.inject(WindowDimensionsService);
-      learnerDashboardBackendApiService =
-        TestBed.inject(LearnerDashboardBackendApiService);
+      feedbackUpdatesBackendApiService =
+        TestBed.inject(FeedbackUpdatesBackendApiService);
       userService = TestBed.inject(UserService);
       translateService = TestBed.inject(TranslateService);
       pageTitleService = TestBed.inject(PageTitleService);
@@ -257,13 +259,13 @@ describe('Feedback updates page', () => {
         ['profile-image-url-png', 'profile-image-url-webp']);
 
       spyOn(
-        learnerDashboardBackendApiService,
-        'fetchLearnerDashboardFeedbackUpdatesDataAsync')
+        feedbackUpdatesBackendApiService,
+        'fetchFeedbackUpdatesDataAsync')
         .and.returnValue(Promise.resolve({
-          numberOfUnreadThreads: learnerDashboardFeedbackUpdatesData.
+          numberOfUnreadThreads: FeedbackUpdatesData.
             number_of_unread_threads,
           threadSummaries: (
-            learnerDashboardFeedbackUpdatesData.thread_summaries.map(
+            FeedbackUpdatesData.thread_summaries.map(
               threadSummary => FeedbackThreadSummary
                 .createFromBackendDict(threadSummary))),
           paginatedThreadsList: []
@@ -585,7 +587,7 @@ describe('Feedback updates page', () => {
         created_on_msecs: 1200
       }];
       const threadSpy = spyOn(
-        learnerDashboardBackendApiService, 'onClickThreadAsync')
+        feedbackUpdatesBackendApiService, 'onClickThreadAsync')
         .and.returnValue(Promise.resolve(threadMessages));
 
       expect(component.numberOfUnreadThreads).toBe(10);
@@ -623,7 +625,7 @@ describe('Feedback updates page', () => {
         created_on_msecs: 1200
       }];
       const threadSpy = spyOn(
-        learnerDashboardBackendApiService, 'onClickThreadAsync')
+        feedbackUpdatesBackendApiService, 'onClickThreadAsync')
         .and.returnValue(Promise.resolve(threadMessages));
 
       expect(component.numberOfUnreadThreads).toBe(10);
@@ -662,7 +664,7 @@ describe('Feedback updates page', () => {
         }];
 
         const threadSpy =
-          spyOn(learnerDashboardBackendApiService, 'onClickThreadAsync')
+          spyOn(feedbackUpdatesBackendApiService, 'onClickThreadAsync')
             .and.returnValue(Promise.resolve(threadMessages));
 
         expect(component.numberOfUnreadThreads).toBe(10);
@@ -707,11 +709,11 @@ describe('Feedback updates page', () => {
         }];
 
         const threadSpy = spyOn(
-          learnerDashboardBackendApiService, 'onClickThreadAsync')
+          feedbackUpdatesBackendApiService, 'onClickThreadAsync')
           .and.returnValue(Promise.resolve(threadMessages));
 
         const addMessageSpy = spyOn(
-          learnerDashboardBackendApiService, 'addNewMessageAsync')
+          feedbackUpdatesBackendApiService, 'addNewMessageAsync')
           .and.returnValue(Promise.resolve());
 
         expect(component.numberOfUnreadThreads).toBe(10);
@@ -797,6 +799,7 @@ describe('Feedback updates page', () => {
           AlertsService,
           CsrfTokenService,
           LearnerDashboardBackendApiService,
+          FeedbackUpdatesBackendApiService,
           UserService,
           PageTitleService,
           {
@@ -813,8 +816,8 @@ describe('Feedback updates page', () => {
       component = fixture.componentInstance;
       alertsService = TestBed.inject(AlertsService);
       csrfTokenService = TestBed.inject(CsrfTokenService);
-      learnerDashboardBackendApiService =
-        TestBed.inject(LearnerDashboardBackendApiService);
+      feedbackUpdatesBackendApiService =
+        TestBed.inject(FeedbackUpdatesBackendApiService);
       userService = TestBed.inject(UserService);
       translateService = TestBed.inject(TranslateService);
       pageTitleService = TestBed.inject(PageTitleService);
@@ -832,7 +835,7 @@ describe('Feedback updates page', () => {
     it('should show an alert warning when fails to get feedback updates data',
       fakeAsync(() => {
         const fetchDataSpy = spyOn(
-          learnerDashboardBackendApiService,
+          feedbackUpdatesBackendApiService,
           'fetchLearnerDashboardFeedbackUpdatesDataAsync')
           .and.rejectWith(404);
         const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
