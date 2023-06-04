@@ -23,6 +23,7 @@ import os
 import subprocess
 import sys
 
+import ffmpeg
 from typing import Final, List, Optional
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
@@ -33,8 +34,6 @@ from scripts import common  # isort:skip pylint: disable=wrong-import-position
 from core.constants import constants  # isort:skip
 from scripts import build  # isort:skip
 from scripts import servers  # isort:skip
-
-import ffmpeg
 
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
