@@ -105,7 +105,6 @@ export interface ConfigPropertyValues {
   'high_bounce_rate_task_state_bounce_rate_creation_threshold': number;
   'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': number;
   'is_improvements_tab_enabled': boolean;
-  'max_number_of_explorations_in_math_svgs_batch': number;
   'max_number_of_suggestions_per_reviewer': number;
   'notification_user_ids_for_failed_tasks': string[];
   'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;

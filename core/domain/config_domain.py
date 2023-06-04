@@ -499,13 +499,6 @@ HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
     'generate high bounce-rate improvements tasks.',
     100)
 
-MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
-    'max_number_of_explorations_in_math_svgs_batch',
-    INT_SCHEMA,
-    'The maximum number of explorations that can be send in a batch of math '
-    'rich text svgs.',
-    2)
-
 MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'max_number_of_tags_assigned_to_blog_post',
     POSITIVE_INT_SCHEMA,
