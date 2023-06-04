@@ -44,9 +44,9 @@ var constants = {
   "CATEGORIES_TO_COLORS": {
     "Mathematics": "#cd672b",
     "Algebra": "#cd672b",
-    "Arithmetic": "#ae511b",
+    "Arithmetic": "#d68453",
     "Calculus": "#b86330",
-    "Logic": "#ae511b",
+    "Logic": "#d68453",
     "Combinatorics": "#cf5935",
     "Graph Theory": "#cf5935",
     "Probability": "#cf5935",
@@ -56,15 +56,15 @@ var constants = {
 
     "Algorithms": "#d0982a",
     "Computing": "#bb8b2f",
-    "Programming": "#886628",
+    "Programming": "#d9aa53",
 
-    "Astronomy": "#58613a",
-    "Biology": "#657030",
+    "Astronomy": "#879d6c",
+    "Biology": "#97a766",
     "Chemistry": "#aab883",
     "Engineering": "#8b9862",
-    "Environment": "#747142",
-    "Medicine": "#657030",
-    "Physics": "#58613a",
+    "Environment": "#aba86d",
+    "Medicine": "#97a766",
+    "Physics": "#879d6c",
 
     "Architecture": "#6e3466",
     "Art": "#895a83",
