@@ -46,7 +46,7 @@ pillow==9.5.0
     # via -r requirements_dev.in
 platformdirs==2.5.2
     # via pylint
-protobuf==4.22.3
+protobuf==3.13.0
     # via -r requirements_dev.in
 psutil==5.9.5
     # via -r requirements_dev.in
@@ -73,7 +73,9 @@ rcssmin==1.1.1
 requests==2.27.1
     # via pygithub
 six==1.16.0
-    # via -r requirements_dev.in
+    # via
+    #   -r requirements_dev.in
+    #   protobuf
 soupsieve==2.3.2.post1
     # via beautifulsoup4
 tomli==2.0.1
@@ -99,3 +101,6 @@ wrapt==1.13.3
     #   deprecated
 xmltodict==0.13.0
     # via -r requirements_dev.in
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
