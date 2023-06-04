@@ -23,7 +23,6 @@ import os
 import subprocess
 import sys
 
-import ffmpeg
 from typing import Final, List, Optional
 
 # TODO(#15567): This can be removed after Literal in utils.py is loaded
@@ -242,6 +241,7 @@ def main(args: Optional[List[str]] = None) -> None:
         run_webpack_compilation()
     if parsed_args.record_screen:
         # Start ffmpeg screen record.
+        import ffmpeg
         name = 'lhci.mp4'
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
         os.mkdir(dir_path)
