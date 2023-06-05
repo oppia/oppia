@@ -47,7 +47,7 @@ interface PlatformSchema {
 type FilterType = keyof typeof PlatformParameterFilterType;
 
 @Component({
-  selector: 'admin-platform-parameters-tab',
+  selector: 'oppia-admin-platform-parameters-tab',
   templateUrl: './admin-platform-parameters-tab.component.html'
 })
 export class AdminPlatformParametersTabComponent implements OnInit {
