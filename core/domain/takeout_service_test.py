@@ -443,7 +443,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     TOPIC_IDS_WITH_TRANSLATION_REVIEWS: Final = ['18', '19', '20']
     TOPIC_IDS_WITH_QUESTION_SUBMISSIONS: Final = ['18', '19', '20']
     TOPIC_IDS_WITH_QUESTION_REVIEWS: Final = ['18', '19', '20']
-    RECENT_REVIEW_OUTCOMES: Final = ('accepted', 'rejected')
+    RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
     RECENT_PERFORMANCE: Final = 20
     OVERALL_ACCURACY: Final = 2.0
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
