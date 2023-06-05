@@ -25,6 +25,7 @@ var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
   var creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+  var contributorDashboardRadio = $('.e2e-test-contributor-dashboard-radio');
   var customProfilePhoto = $('.e2e-test-custom-photo');
   var deleteAccountButton = $('.e2e-test-delete-account-button');
   var editorRoleEmailsCheckbox = $('.e2e-test-editor-role-email-checkbox');
@@ -57,6 +58,8 @@ var PreferencesPage = function() {
   this.get = async function() {
     await browser.url(USER_PREFERENCES_URL);
     await waitFor.pageToFullyLoad();
+    // Click on a neutral element.
+    await action.click('Preferences page header', pageHeader);
   };
 
   this.expectUploadError = async function() {
@@ -188,9 +191,13 @@ var PreferencesPage = function() {
     expect(await audioLanguageSelector.getText()).not.toEqual(language);
   };
 
-  this.expectSubscriptionCountToEqual = async function(value) {
-    var subscriptions = await subscriptionsSelector();
-    expect(await subscriptions.length).toEqual(value);
+  this.expectSubscriptionCountToEqual = async function(expectedCount) {
+    if (expectedCount > 0) {
+      await waitFor.visibilityOf(
+        subscription, 'Subscription tile is not visible');
+    }
+    let actualCount = await subscriptionsSelector().length;
+    expect(actualCount).toEqual(expectedCount);
   };
 
   this.expectUserBioToBe = async function(bio) {
@@ -203,6 +210,12 @@ var PreferencesPage = function() {
     await action.click(
       'Creator Dashboard radio', creatorDashboardRadio);
     await saveNewChanges('Creator Dashboard Option');
+  };
+
+  this.selectContributorDashboard = async function() {
+    await action.click(
+      'Contributor Dashboard radio', contributorDashboardRadio);
+    await saveNewChanges('Contributor Dashboard Option');
   };
 
   this.selectLearnerDashboard = async function() {

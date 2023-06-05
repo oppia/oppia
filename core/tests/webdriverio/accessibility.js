@@ -23,6 +23,8 @@ var waitFor = require('../webdriverio_utils/waitFor.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
+var ExplorationPlayerPage = require(
+  '../webdriverio_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 var EXPLORATION = {
@@ -53,6 +55,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     await users.createAndLoginSuperAdminUser(
       'user11@accessibility.com', 'user11accessibility');
     libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   afterAll(async function() {
@@ -491,6 +494,9 @@ describe('screenreader and keyboard user accessibility features', function() {
       await libraryPage.get();
       await libraryPage.findExploration('A new exploration');
       await libraryPage.playExploration('A new exploration');
+
+      // This forces a wait until the exploration card fully loads on the page.
+      await explorationPlayerPage.expectExplorationToNotBeOver();
 
       // Should test the skip to main content shortcut.
       var skipLink = $('.e2e-test-skip-link');
