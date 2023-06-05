@@ -106,16 +106,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.get_html_response('/admin')
         self.logout()
 
-    def test_promo_bar_configuration_not_present_to_admin(self) -> None:
-        """Test that promo bar configuration is not presentd in admin page."""
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        response_dict = self.get_json('/adminhandler')
-        response_config_properties = response_dict['config_properties']
-
-        self.assertNotIn('promo_bar_enabled', response_config_properties)
-        self.assertNotIn('promo_bar_message', response_config_properties)
-
     def test_change_configuration_property(self) -> None:
         """Test that configuration properties can be changed."""
 
@@ -813,21 +803,24 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        config_services.set_property(self.admin_id, 'promo_bar_enabled', True)
-        self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
+        config_services.set_property(
+            self.admin_id, 'record_playthrough_probability', 0.5)
+        self.assertEqual(
+            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.5)
 
         with self.swap(logging, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler', {
                     'action': 'revert_config_property',
-                    'config_property_id': 'promo_bar_enabled'
+                    'config_property_id': 'record_playthrough_probability'
                 }, csrf_token=csrf_token)
 
-        self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
+        self.assertEqual(
+            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2)
         self.assertEqual(
             observed_log_messages,
-            ['[ADMIN] %s reverted config property: promo_bar_enabled'
-             % self.admin_id])
+            ['[ADMIN] %s reverted config property: '
+             'record_playthrough_probability' % self.admin_id])
 
         self.logout()
 

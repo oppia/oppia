@@ -196,7 +196,9 @@ class PromoBarHandler(
             'promo_bar_enabled': (
                 platform_feature_services.get_platform_parameter_value(
                     'promo_bar_enabled')),
-            'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
+            'promo_bar_message': (
+                platform_feature_services.get_platform_parameter_value(
+                    'promo_bar_message'))
         })
 
     @acl_decorators.can_access_release_coordinator_page

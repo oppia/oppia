@@ -244,10 +244,6 @@ class AdminHandler(
             get_all_platform_parameters_except_feature_flag_dicts())
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-        # Removes promo-bar related configs as promo-bar is handled by
-        # release coordinators in /release-coordinator page.
-        del config_properties['promo_bar_enabled']
-        del config_properties['promo_bar_message']
 
         # Remove blog related configs as they will be handled by 'blog admins'
         # on blog admin page.

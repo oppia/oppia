@@ -124,8 +124,6 @@ describe('Admin backend api service', () => {
     notification_user_ids_for_failed_tasks: [],
     notify_admins_suggestions_waiting_too_long_is_enabled: false,
     oppia_csrf_secret: 'H62T5aIngXb1PB6arDkFrAnxakpQ=',
-    promo_bar_enabled: false,
-    promo_bar_message: 'fasdfa',
     record_playthrough_probability: 0.2,
     signup_email_content: {
       subject: 'THIS IS A PLACEHOLDER.',
@@ -977,7 +975,7 @@ describe('Admin backend api service', () => {
     'value given the config property ID when calling' +
     'revertConfigPropertyAsync', fakeAsync(() => {
     let action = 'revert_config_property';
-    let configPropertyId = 'promo_bar_enabled';
+    let configPropertyId = 'record_playthrough_probability';
     let payload = {
       action: action,
       config_property_id: configPropertyId

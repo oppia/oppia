@@ -113,8 +113,6 @@ export interface ConfigPropertyValues {
   'notification_user_ids_for_failed_tasks': string[];
   'notify_admins_suggestions_waiting_too_long_is_enabled': boolean;
   'oppia_csrf_secret': string;
-  'promo_bar_enabled': boolean;
-  'promo_bar_message': string;
   'record_playthrough_probability': number;
   'signup_email_content': SignupEmailContent;
   'unpublish_exploration_email_html_body': string;
