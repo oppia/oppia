@@ -80,14 +80,14 @@ export class HtmlLengthService {
     if (nonTextNode.tagName.toLowerCase() === 'oppia-noninteractive-math') {
       return 1;
     }
-    if (nonTextNode.tagName.toLowerCase() === 'oppia-noninteractive-image') {
-      const altText = nonTextNode.getAttribute('alt-with-value');
-      if (altText) {
-        const wordCount = altText.trim().split(' ').length;
-        // +2 is a bonus for images as sometimes images have text
-        // which needs to be translated as well.
-        return wordCount + 2;
-      }
+    // <oppia-noninteractive-image>
+    const altText = nonTextNode.getAttribute('alt-with-value');
+    const wordCount = 0;
+    if (altText) {
+      wordCount = altText.trim().split(' ').length;
     }
+    // +2 is a bonus for images as sometimes images have text
+    // which needs to be translated as well.
+    return wordCount + 2;
   }
 }
