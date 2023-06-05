@@ -2000,8 +2000,8 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 
 
 class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
-    """Records the Total Translation contribution stats and data of 
-    recent_review keyed per (contributor_id, language_code) tuple. 
+    """Records the Total Translation contribution stats and data of
+    recent_review keyed per (contributor_id, language_code) tuple.
     Its IDs will be in the following
         structure: [contributor_id][language_code]
     """
@@ -2016,7 +2016,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     # The user ID of the translation contributor.
     contributor_id = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The topic ID(s) of the topics the contributor has atleast one 
+    # The topic ID(s) of the topics the contributor has atleast one
     # contribution.
     topic_ids_with_translation_submissions = datastore_services.StringProperty(
         repeated=True, indexed=True)
@@ -2092,7 +2092,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         first_contribution_date: datetime.date,
         last_contribution_date: datetime.date
     ) -> str:
-        """Creates a new TranslationSubmitterTotalContributionStatsModel 
+        """Creates a new TranslationSubmitterTotalContributionStatsModel
         instance and returns its ID.
         """
         entity_id = cls.construct_id(
@@ -2130,7 +2130,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     def construct_id(
         language_code: str, contributor_id: str
     ) -> str:
-        """Constructs a unique ID for a 
+        """Constructs a unique ID for a
         TranslationSubmitterTotalContributionStatsModel instance.
 
         Args:
@@ -2158,7 +2158,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         Returns:
             TranslationSubmitterTotalContributionStatsModel|None. The matching
-            TranslationSubmitterTotalContributionStatsModel, or None if no 
+            TranslationSubmitterTotalContributionStatsModel, or None if no
             such model instance exists.
         """
         entity_id = cls.construct_id(
@@ -2181,17 +2181,18 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         Args:
             page_size: int. Number of models to fetch.
-            offset: sint. Number of results to skip from the beginning of all
+            offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str|None. A string indicating how to sort the result.
+            sort_by: str. A string indicating how to sort the result.
             topic_ids: List[str]. List of topics user has contributed to.
-            last_activity: int. Number of days within which a user has 
+            last_activity: int. Number of days within which a user has
                 contributed.
-            language_code: Language Code for filter.
+            language_code: str. Language Code for filter.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
-                sorted_results: list(TranslationSubmitterTotalContributionStatsModel).
+                sorted_results: 
+                    list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models with supplied filters and sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -2276,7 +2277,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         next_result_model: Sequence[
             TranslationSubmitterTotalContributionStatsModel] = (
                 sort_query.fetch(offset=next_offset))
-        more: bool = True if len(next_result_model) else False
+        more: bool = len(next_result_model) != 0
 
         return (
             sorted_results,
@@ -2288,7 +2289,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     def get_all_by_user_id(
         cls, user_id: str
     ) -> Sequence[TranslationSubmitterTotalContributionStatsModel]:
-        """Gets all TranslationSubmitterTotalContributionStatsModel matching 
+        """Gets all TranslationSubmitterTotalContributionStatsModel matching
         the supplied user_id.
 
         Returns:
@@ -2301,7 +2302,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether TranslationSubmitterTotalContributionStatsModel 
+        """Check whether TranslationSubmitterTotalContributionStatsModel
         references the supplied user.
 
         Args:
@@ -2392,7 +2393,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from 
+            dict. Dictionary of the data from
                 TranslationSubmitterTotalContributionStatsModel.
         """
         user_data = {}
@@ -2586,16 +2587,16 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         Args:
             page_size: int. Number of models to fetch.
-            offset: sint. Number of results to skip from the beginning of all
+            offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str|None. A string indicating how to sort the result.
-            last_activity: int. Number of days within which a user has 
+            sort_by: str. A string indicating how to sort the result.
+            last_activity: int. Number of days within which a user has
                 contributed.
-            language_code: Language Code for filter.
+            language_code: str. Language Code for filter.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
-                sorted_results: 
+                sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models with supplied filters and sort_by.
                 next_offset: int. Number of results to skip in next batch.
@@ -2658,7 +2659,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         next_result_model: Sequence[
             TranslationReviewerTotalContributionStatsModel] = (
                 sort_query.fetch(1, offset=next_offset))
-        more: bool = True if len(next_result_model) else False
+        more: bool = len(next_result_model) != 0
 
         return (
             sorted_results,
@@ -2727,8 +2728,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         for the user.
 
         Args:
-            contributor_id: str. The ID of the user whose data
-        should be deleted.
+            user_id: str. The ID of the user whose data should be deleted.
         """
         datastore_services.delete_multi(
             cls.query(cls.contributor_id == user_id).fetch(keys_only=True))
@@ -2745,7 +2745,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         Returns:
             dict. Dictionary of the data from
-        TranslationReviewerTotalContributionStatsModel.
+            TranslationReviewerTotalContributionStatsModel.
         """
         user_data = {}
         stats_models: Sequence[TranslationReviewerTotalContributionStatsModel] = ( # pylint: disable=line-too-long
@@ -2765,7 +2765,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     model.accepted_translations_with_reviewer_edits_count),
                 'accepted_translation_word_count': (
                     model.accepted_translation_word_count),
-                'rejected_translations_count':(
+                'rejected_translations_count': (
                     model.rejected_translations_count),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
@@ -2905,16 +2905,17 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         Args:
             page_size: int. Number of models to fetch.
-            offset: sint. Number of results to skip from the beginning of all
+            offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str|None. A string indicating how to sort the result.
+            sort_by: str. A string indicating how to sort the result.
             topic_ids: List[str]. List of topics user has contributed to.
-            last_activity: int. Number of days within which a user has 
+            last_activity: int. Number of days within which a user has
                 contributed.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
-                sorted_results: list(QuestionSubmitterTotalContributionStatsModel).
+                sorted_results: 
+                    list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models with supplied filters and sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
@@ -2995,14 +2996,13 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         next_result_model: Sequence[
             QuestionSubmitterTotalContributionStatsModel] = (
                 sort_query.fetch(offset=next_offset))
-        more: bool = True if len(next_result_model) else False
+        more: bool = len(next_result_model) != 0
 
         return (
             sorted_results,
             next_offset,
             more
         )
-
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
@@ -3012,8 +3012,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model is exported as single instances per user.
-        """
+        """Model is exported as single instances per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -3097,7 +3096,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     model.last_hundred_accepted_questions_without_reviewer_edits_count), # pylint: disable=line-too-long
                 'submitted_questions_count': (
                     model.submitted_questions_count),
-                'rejected_questions_count':(
+                'rejected_questions_count': (
                     model.rejected_questions_count),
                 'accepted_questions_count': (
                     model.accepted_questions_count),
@@ -3202,16 +3201,15 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         Args:
             page_size: int. Number of models to fetch.
-            offset: sint. Number of results to skip from the beginning of all
+            offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str|None. A string indicating how to sort the result.
-            last_activity: int. Number of days within which a user has 
-                contributed.
-            language_code: Language Code for filter.
+            sort_by: str. A string indicating how to sort the result.
+            last_activity: int. Number of days within which a user has
+                contributed
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
-                sorted_results: 
+                sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models with supplied filters and sort_by.
                 next_offset: int. Number of results to skip in next batch.
@@ -3271,7 +3269,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         next_result_model: Sequence[
             QuestionReviewerTotalContributionStatsModel] = (
                 sort_query.fetch(1, offset=next_offset))
-        more: bool = True if len(next_result_model) else False
+        more: bool = len(next_result_model) != 0
 
         return (
             sorted_results,
@@ -3287,8 +3285,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model is exported as single instances per user.
-        """
+        """Model is exported as single instances per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
@@ -3336,8 +3333,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from
-        QuestionReviewerTotalContributionStatsModel.
+            dict. Dictionary of the data from 
+            QuestionReviewerTotalContributionStatsModel.
         """
         user_data = {}
         stats_models: Sequence[QuestionReviewerTotalContributionStatsModel] = (

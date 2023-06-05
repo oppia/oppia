@@ -3195,7 +3195,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         ).put()
 
         # Check for decreasing performance(default) sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -3205,12 +3205,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
         # Check for decreasing Accuracy sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3221,12 +3221,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for increasing Accuracy sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3237,12 +3237,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for decreasing Translated cards sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3253,12 +3253,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for increasing Translated cards sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3269,28 +3269,28 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_2')
+        self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for topic filter and non-performance sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
             offset=1,
             sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
                     'IncreasingPerformance'],
-            topic_ids=['topic1','topic2'],
+            topic_ids=['topic1', 'topic2'],
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
         # Check for language filter.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3300,12 +3300,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='hi'
             ))
-        self.assertEqual(models[0].id, 'model_4')
+        self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
         # Check for decreasing last activity sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -3316,12 +3316,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
         # Check for increasing last activity sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -3332,12 +3332,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
         # Check for last activity under 7 days.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -3347,12 +3347,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=7,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_2')
+        self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
         # Check for last activity under 90 days.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3362,12 +3362,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=90,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for no models in given time.
-        models, next_offset, more = (
+        # Check for no sorted_results in given time.
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3377,7 +3377,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_activity=7,
             language_code='hi'
             ))
-        self.assertEqual(len(models), 0)
+        self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
@@ -3633,7 +3633,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                     self.REJECTED_TRANSLATIONS_COUNT),
                 'rejected_translation_word_count': (
                     self.REJECTED_TRANSLATION_WORD_COUNT),
-                'first_contribution_date':(
+                'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (
                     self.LAST_CONTRIBUTION_DATE.isoformat())
@@ -3668,7 +3668,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                     self.REJECTED_TRANSLATIONS_COUNT),
                 'rejected_translation_word_count': (
                     self.REJECTED_TRANSLATION_WORD_COUNT),
-                'first_contribution_date':(
+                'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (
                     self.LAST_CONTRIBUTION_DATE.isoformat())
@@ -3807,7 +3807,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         ).put()
 
         # Check for decreasing order of reviewed cards(default)
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3816,12 +3816,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for increasing order of reviewed cards.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3831,12 +3831,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for decreasing order of last activity.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3846,12 +3846,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for increasing order of last activity.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3861,12 +3861,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_2')
+        self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for language filter.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3876,12 +3876,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_activity=None,
             language_code='hi'
             ))
-        self.assertEqual(models[0].id, 'model_4')
+        self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
         # Check for last_acitvity filter within 7 days.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -3891,12 +3891,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_activity=7,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_2')
+        self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
         # Check for last_acitvity filter within 90 days.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3906,12 +3906,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_activity=90,
             language_code='es'
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for no models within 7 days.
-        models, next_offset, more = (
+        # Check for no sorted_results within 7 days.
+        sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -3920,7 +3920,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_activity=7,
             language_code='hi'
             ))
-        self.assertEqual(len(models), 0)
+        self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
@@ -4207,7 +4207,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         ).put()
 
         # Check for decreasing performance(default) sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -4216,12 +4216,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_4')
+        self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
         # Check for decreasing Accuracy sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4231,12 +4231,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for increasing Accuracy sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4246,12 +4246,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_4')
+        self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for decreasing Submitted cards sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4261,12 +4261,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_4')
+        self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for increasing Submitted cards sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4276,27 +4276,27 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for topic filter and non-performance sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
             offset=1,
             sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
                     'IncreasingPerformance'],
-            topic_ids=['topic1','topic2'],
+            topic_ids=['topic1', 'topic2'],
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_2')
+        self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
         # Check for decreasing last activity sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -4306,12 +4306,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
         # Check for increasing last activity sort order.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -4321,12 +4321,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_4')
+        self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
         # Check for last activity under 7 days.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -4335,12 +4335,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=7
             ))
-        self.assertEqual(models[0].id, 'model_4')
+        self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
         self.assertEqual(next_offset, 5)
 
         # Check for last activity under 90 days.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4349,12 +4349,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             topic_ids=None,
             last_activity=90
             ))
-        self.assertEqual(models[0].id, 'model_4')
+        self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for no models in given time.
-        models, next_offset, more = (
+        # Check for no sorted_results in given time.
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4365,10 +4365,9 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             ],
             last_activity=7
             ))
-        self.assertEqual(len(models), 0)
+        self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
-
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -4583,7 +4582,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         ).put()
 
         # Check for decreasing order of reviewed questions(default)
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4591,12 +4590,12 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             sort_by=None,
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for increasing order of reviewed questions.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4605,12 +4604,12 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                     'IncreasingReviewedQuestion'],
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for decreasing order of last activity.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4619,12 +4618,12 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                     'DecreasingLastActivity'],
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for increasing order of last activity.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4633,12 +4632,12 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                     'IncreasingLastActivity'],
             last_activity=None
             ))
-        self.assertEqual(models[0].id, 'model_3')
+        self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
         # Check for last_acitvity filter within 7 days.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=2,
@@ -4647,12 +4646,12 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                     'IncreasingReviewedQuestion'],
             last_activity=7
             ))
-        self.assertEqual(models[0].id, 'model_2')
+        self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
         # Check for last_acitvity filter within 90 days.
-        models, next_offset, more = (
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4661,12 +4660,12 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                     'IncreasingReviewedQuestion'],
             last_activity=90
             ))
-        self.assertEqual(models[0].id, 'model_1')
+        self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for no models within 1 day.
-        models, next_offset, more = (
+        # Check for no sorted_results within 1 day.
+        sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
             page_size=1,
@@ -4674,7 +4673,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             sort_by=None,
             last_activity=1
             ))
-        self.assertEqual(len(models), 0)
+        self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 4)
 

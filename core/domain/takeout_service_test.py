@@ -838,7 +838,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             last_hundred_accepted_questions_count=(
                 self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
             last_hundred_accepted_questions_without_reviewer_edits_count=(
-                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                self
+                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
@@ -2003,7 +2004,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
                     # Pylint disable is needed cause variable name is too long.
                     'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                        self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
+                        self
+                        .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), 
                     'last_hundred_rejected_translations_count': (
                         self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
                     'submitted_translations_count': (
@@ -2021,7 +2023,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.REJECTED_TRANSLATIONS_COUNT),
                     'rejected_translation_word_count': (
                         self.REJECTED_TRANSLATION_WORD_COUNT),
-                    'first_contribution_date':(
+                    'first_contribution_date': (
                         self.FIRST_CONTRIBUTION_DATE.isoformat()),
                     'last_contribution_date': (
                         self.LAST_CONTRIBUTION_DATE.isoformat())
