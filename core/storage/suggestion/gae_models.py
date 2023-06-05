@@ -2184,7 +2184,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
             sort_by: Optional[str]. A string indicating how to sort the result.
-            topic_ids: Optional[List[str]]. List of topics user has contributed to.
+            topic_ids: Optional[List[str]].
+                List of topics user has contributions.
             last_activity: int. Number of days within which a user has
                 contributed.
             language_code: str. Language Code for filter.
@@ -2908,7 +2909,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
             sort_by: Optional[str]. A string indicating how to sort the result.
-            topic_ids: Optional[List[str]]. List of topics user has contributed to.
+            topic_ids: Optional[List[str]].
+                List of topics user has contributions.
             last_activity: int. Number of days within which a user has
                 contributed.
 
