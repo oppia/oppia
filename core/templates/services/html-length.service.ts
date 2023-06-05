@@ -89,7 +89,5 @@ export class HtmlLengthService {
         return wordCount + 2;
       }
     }
-    // Default weight for unknown or unexpected tags.
-    return 1;
   }
 }

@@ -89,6 +89,7 @@ describe('Html Length Service', () => {
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
     expect(result).toBe(expectedLength);
   });
+
   it('should compute length of content with both text and non-text' +
   '(image tag)', () => {
     const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
