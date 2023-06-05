@@ -113,9 +113,9 @@ describe('Learner dashboard functionality', function() {
     await users.login('learner1@learnerDashboard.com');
     // Subscribe to both the creators.
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
 
     // Completing exploration 'Activations' to activate /learner_dashboard.
     await libraryPage.get();
