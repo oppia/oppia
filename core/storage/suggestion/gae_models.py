@@ -2183,15 +2183,15 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str. A string indicating how to sort the result.
-            topic_ids: List[str]. List of topics user has contributed to.
+            sort_by: Optional[str]. A string indicating how to sort the result.
+            topic_ids: Optional[List[str]]. List of topics user has contributed to.
             last_activity: int. Number of days within which a user has
                 contributed.
             language_code: str. Language Code for filter.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
-                sorted_results: 
+                sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models with supplied filters and sort_by.
                 next_offset: int. Number of results to skip in next batch.
@@ -2394,7 +2394,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         Returns:
             dict. Dictionary of the data from
-                TranslationSubmitterTotalContributionStatsModel.
+            TranslationSubmitterTotalContributionStatsModel.
         """
         user_data = {}
         stats_models: Sequence[TranslationSubmitterTotalContributionStatsModel] = ( # pylint: disable=line-too-long
@@ -2589,7 +2589,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str. A string indicating how to sort the result.
+            sort_by: Optional[str]. A string indicating how to sort the result.
             last_activity: int. Number of days within which a user has
                 contributed.
             language_code: str. Language Code for filter.
@@ -2907,14 +2907,14 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str. A string indicating how to sort the result.
-            topic_ids: List[str]. List of topics user has contributed to.
+            sort_by: Optional[str]. A string indicating how to sort the result.
+            topic_ids: Optional[List[str]]. List of topics user has contributed to.
             last_activity: int. Number of days within which a user has
                 contributed.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
-                sorted_results: 
+                sorted_results:
                     list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models with supplied filters and sort_by.
                 next_offset: int. Number of results to skip in next batch.
@@ -3203,7 +3203,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str. A string indicating how to sort the result.
+            sort_by: Optional[str]. A string indicating how to sort the result.
             last_activity: int. Number of days within which a user has
                 contributed
 
@@ -3333,7 +3333,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from 
+            dict. Dictionary of the data from
             QuestionReviewerTotalContributionStatsModel.
         """
         user_data = {}

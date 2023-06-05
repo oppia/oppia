@@ -2004,8 +2004,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
                     # Pylint disable is needed cause variable name is too long.
                     'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                        self
-                        .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), 
+                        self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
                     'last_hundred_rejected_translations_count': (
                         self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
                     'submitted_translations_count': (
