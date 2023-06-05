@@ -222,6 +222,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
     this.activeSuggestion = this.activeContribution.suggestion;
+
+    // In order to fetch and upload images properly, entity contexts need to
+    // be consistent(ENTITY_TYPE.EXPLORATION) across all the modals to avoid
+    // mismatch of contexts. Refer to #17958 & #17191 for more context.
     this.contextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.EXPLORATION,
       this.activeSuggestion.target_id);
