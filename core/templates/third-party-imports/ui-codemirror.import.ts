@@ -22,5 +22,4 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/yaml/yaml';
 require('static/diff-match-patch-1.0.0/diff_match_patch.js');
-// require('diff-match-patch/javascript/diff_match_patch');
 import 'codemirror/addon/merge/merge';

@@ -77,12 +77,6 @@ WORKFLOWS_EXEMPT_FROM_MERGE_REQUIREMENT: Final = (
 
 THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
-        'name': 'Guppy',
-        'dependency_key': 'guppy',
-        'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
-        'type_defs_filename_prefix': 'guppy-defs-'
-    },
-    {
         'name': 'MIDI',
         'dependency_key': 'midiJs',
         'dependency_source': _DEPENDENCY_SOURCE_DEPENDENCIES_JSON,
