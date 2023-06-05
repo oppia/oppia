@@ -438,7 +438,7 @@ import { VersionHistoryService } from 'pages/exploration-editor-page/services/ve
 import { ConceptCardManagerService } from 'pages/exploration-player-page/services/concept-card-manager.service';
 import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
-import { HtmlLengthService } from './html-length.service';
+import { HtmlLengthService } from 'services/html-length.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
