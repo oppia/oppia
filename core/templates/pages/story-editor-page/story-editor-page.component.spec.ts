@@ -241,6 +241,10 @@ describe('Story Editor Page Component', () => {
         .OPENED_STORY_EDITOR_BROWSER_TABS);
   });
 
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
   it('should load story based on its id on url when component is initialized' +
     ' and set page title', () => {
     let storyInitializedEventEmitter = new EventEmitter();
@@ -259,12 +263,11 @@ describe('Story Editor Page Component', () => {
     spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
     storyEditorNavigationService
       .checkIfPresentInChapterEditor = () => true;
+
     component.ngOnInit();
 
     expect(storyEditorStateService.loadStory).toHaveBeenCalledWith('story_1');
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledTimes(2);
-
-    component.ngOnDestroy();
   });
 
   it('should addListener by passing getChangeCount to ' +
@@ -314,21 +317,23 @@ describe('Story Editor Page Component', () => {
   it('should open topic editor page when there is no change',
     fakeAsync(() => {
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve()
-        }) as NgbModalRef;
-      });
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('/url');
+      spyOn(windowRef.nativeWindow, 'open');
+
       component.returnToTopicEditorPage();
+
       flush();
       tick();
+
+      expect(windowRef.nativeWindow.open).toHaveBeenCalledWith('/url', '_self');
     }));
 
   it('should return the active tab', () => {
     storyEditorNavigationService.activeTab = 'story_editor';
     storyEditorNavigationService.getActiveTab = () => 'story_editor';
+
     storyEditorNavigationService.navigateToStoryEditor();
+
     expect(component.getActiveTab()).toEqual('story_editor');
   });
 
@@ -336,8 +341,10 @@ describe('Story Editor Page Component', () => {
     spyOn(storyEditorStateService, 'loadStory').and.stub();
     spyOn(urlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(pageTitleService, 'setDocumentTitle').and.callThrough();
+
     storyEditorNavigationService.navigateToStoryEditor();
     component.ngOnInit();
+
     expect(component.getTotalWarningsCount()).toEqual(0);
   });
 
@@ -363,18 +370,24 @@ describe('Story Editor Page Component', () => {
       id: 'skill_id'
     }]);
     storyEditorNavigationService.checkIfPresentInChapterEditor = () => true;
+
     component.ngOnInit();
+
     expect(component.validationIssues).toEqual(
       ['Story URL fragment already exists.']);
-    component.ngOnDestroy();
   });
 
   it('should toggle the display of warnings', () => {
     component.isWarningsAreShown(true);
+
     expect(component.warningsAreShown).toEqual(true);
+
     component.isWarningsAreShown(false);
+
     expect(component.warningsAreShown).toEqual(false);
+
     component.isWarningsAreShown(true);
+
     expect(component.warningsAreShown).toEqual(true);
   });
 
@@ -412,14 +425,18 @@ describe('Story Editor Page Component', () => {
   it('should navigate to story editor', () => {
     storyEditorNavigationService.activeTab = 'story_editor';
     storyEditorNavigationService.getActiveTab = () => 'story_editor';
+
     component.navigateToStoryEditor();
+
     expect(component.getActiveTab()).toEqual('story_editor');
   });
 
   it('should navigate to story preview tab', () => {
     storyEditorNavigationService.activeTab = 'story_preview';
     storyEditorNavigationService.getActiveTab = () => 'story_preview';
+
     component.navigateToStoryPreviewTab();
+
     expect(component.getActiveTab()).toEqual('story_preview');
   });
 
@@ -444,10 +461,11 @@ describe('Story Editor Page Component', () => {
         mockUndoRedoChangeEventEmitter);
     spyOn(urlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(pageTitleService, 'setDocumentTitle');
+
     component.ngOnInit();
     mockUndoRedoChangeEventEmitter.emit();
+
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalled();
-    component.ngOnDestroy();
   });
 
   it('should create story editor browser tabs info on ' +

@@ -285,17 +285,26 @@ describe('Story node editor component', () => {
 
   it('should toggle chapter preview card', () => {
     component.chapterPreviewCardIsShown = false;
+
     component.togglePreview();
+
+    expect(component.chapterPreviewCardIsShown).toBeTrue();
+  });
+
+  it('should untoggle chapter preview card', () => {
     component.chapterPreviewCardIsShown = true;
 
     component.togglePreview();
-    component.chapterPreviewCardIsShown = false;
+
+    expect(component.chapterPreviewCardIsShown).toBeFalse();
   });
 
   it('should toggle prereq skill list', () => {
     component.prerequisiteSkillIsShown = true;
+
     component.togglePrerequisiteSkillsList();
-    component.prerequisiteSkillIsShown = false;
+
+    expect(component.prerequisiteSkillIsShown).toBeFalse();
   });
 
   it('should call StoryUpdate service to set story thumbnail filename',
@@ -446,44 +455,58 @@ describe('Story node editor component', () => {
 
   it('should toggle chapter outline', fakeAsync(() => {
     component.chapterOutlineIsShown = false;
+
     component.toggleChapterOutline();
 
-    tick();
-
-    expect(component.chapterOutlineIsShown).toEqual(true);
+    expect(component.chapterOutlineIsShown).toBe(true);
   }));
 
   it('should toggle acquired skills list', () => {
     component.acquiredSkillIsShown = false;
-    component.toggleAcquiredSkillsList();
-
-    expect(component.acquiredSkillIsShown).toEqual(true);
 
     component.toggleAcquiredSkillsList();
 
-    expect(component.acquiredSkillIsShown).toEqual(false);
+    expect(component.acquiredSkillIsShown).toBe(true);
+  });
+
+  it('should untoggle acquired skills list', () => {
+    component.acquiredSkillIsShown = true;
+
+    component.toggleAcquiredSkillsList();
+
+    expect(component.acquiredSkillIsShown).toBe(false);
   });
 
   it('should toggle chapter card', () => {
+    component.mainChapterCardIsShown = false
+
+    component.toggleChapterCard();
+
+    expect(component.mainChapterCardIsShown).toBe(true);
+  });
+
+  it('should untoggle chapter card', () => {
     component.mainChapterCardIsShown = true;
-    component.toggleChapterCard();
-
-    expect(component.mainChapterCardIsShown).toEqual(false);
 
     component.toggleChapterCard();
 
-    expect(component.mainChapterCardIsShown).toEqual(true);
+    expect(component.mainChapterCardIsShown).toBe(false);
   });
 
   it('should toggle chapter todo card', () => {
     component.chapterTodoCardIsShown = false;
-    component.toggleChapterTodoCard();
-
-    expect(component.chapterTodoCardIsShown).toEqual(true);
 
     component.toggleChapterTodoCard();
 
-    expect(component.chapterTodoCardIsShown).toEqual(false);
+    expect(component.chapterTodoCardIsShown).toBe(true);
+  });
+
+  it('should untoggle chapter todo card', () => {
+    component.chapterTodoCardIsShown = true;
+
+    component.toggleChapterTodoCard();
+
+    expect(component.chapterTodoCardIsShown).toBe(false);
   });
 
   it('should toggle exploration input buttons', () => {
@@ -491,22 +514,26 @@ describe('Story node editor component', () => {
 
     component.toggleExplorationInputButtons();
 
-    expect(component.explorationInputButtonsAreShown).toEqual(true);
+    expect(component.explorationInputButtonsAreShown).toBe(true);
+  });
+
+  it('should untoggle exploration input buttons', () => {
+    component.explorationInputButtonsAreShown = true;
 
     component.toggleExplorationInputButtons();
 
-    expect(component.explorationInputButtonsAreShown).toEqual(false);
+    expect(component.explorationInputButtonsAreShown).toBe(false);
   });
 
   it('should toggle chapter outline buttons', () => {
     component.chapterOutlineButtonsAreShown = false;
     component.toggleChapterOutlineButtons();
 
-    expect(component.chapterOutlineButtonsAreShown).toEqual(true);
+    expect(component.chapterOutlineButtonsAreShown).toBe(true);
 
     component.toggleChapterOutlineButtons();
 
-    expect(component.chapterOutlineButtonsAreShown).toEqual(false);
+    expect(component.chapterOutlineButtonsAreShown).toBe(false);
 
     component.chapterOutlineButtonsAreShown = false;
     component.editableOutline = '';

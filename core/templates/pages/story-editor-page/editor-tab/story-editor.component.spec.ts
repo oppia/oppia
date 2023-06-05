@@ -206,7 +206,7 @@ describe('Story Editor Component having two story nodes', () => {
     component.drop(event2);
     tick();
 
-    expect(storyUpdateService.rearrangeNodeInStory).toHaveBeenCalled();
+    expect(storyUpdateService.rearrangeNodeInStory).toHaveBeenCalledTimes(2);
   }));
 
   it('should display topicname on main story card', () => {

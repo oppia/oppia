@@ -96,7 +96,8 @@ describe('ThumbnailUploaderComponent', () => {
 
     component.ngOnInit();
 
-    // This value shouldn't change since a thumbnail file not not defined.
+    // Since a thumbnail is unavailable a placeholder will be used. Hence,
+    // the value of hidePlaceholder should not change.
     expect(component.hidePlaceholder).toBeTrue();
   });
 
