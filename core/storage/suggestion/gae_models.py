@@ -43,10 +43,17 @@ datastore_services = models.Registry.import_datastore_services()
 STATUS_ACCEPTED: Final = 'accepted'
 STATUS_IN_REVIEW: Final = 'review'
 STATUS_REJECTED: Final = 'rejected'
+STATUS_ACCEPTED_WITH_EDITS: Final = 'accepted_with_edits'
 
 STATUS_CHOICES: Final = [
     STATUS_ACCEPTED,
     STATUS_IN_REVIEW,
+    STATUS_REJECTED
+]
+
+REVIEW_OUTCOME_STATUS: Final = [
+    STATUS_ACCEPTED,
+    STATUS_ACCEPTED_WITH_EDITS,
     STATUS_REJECTED
 ]
 
@@ -2015,7 +2022,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         repeated=True, indexed=True)
     # The outcomes of last 100 translation submitted by the user.
     recent_review_outcomes = datastore_services.StringProperty(
-        repeated=True, indexed=True)
+        repeated=True, indexed=True, choices=REVIEW_OUTCOME_STATUS)
     # Performance of the user in last 100 translations.
     # recent_performance = accepted cards - 2 (rejected cards).
     recent_performance = datastore_services.IntegerProperty(
@@ -2157,6 +2164,125 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         entity_id = cls.construct_id(
             language_code, contributor_id)
         return cls.get_by_id(entity_id)
+
+    @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        offset: int,
+        sort_by: Optional[str],
+        topic_ids: Optional[List[str]],
+        last_activity: int,
+        language_code: str
+    ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
+                Optional[str],
+                bool]:
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: sint. Number of results to skip from the beginning of all
+                results matching the query
+            sort_by: str|None. A string indicating how to sort the result.
+            topic_ids: List[str]. List of topics user has contributed to.
+            last_activity: int. Number of days within which a user has 
+                contributed.
+            language_code: Language Code for filter.
+
+        Returns:
+            3-tuple(sorted_results, next_offset, more). where:
+                sorted_results: list(TranslationSubmitterTotalContributionStatsModel).
+                    The list of models with supplied filters and sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+        sort = -cls.recent_performance
+        if sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingLastActivity']):
+            sort = -cls.last_contribution_date
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'DecreasingLastActivity']):
+            sort = cls.last_contribution_date
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingPerformance']):
+            sort = cls.recent_performance
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'DecreasingAccuracy']):
+            sort = -cls.overall_accuracy
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingAccuracy']):
+            sort = cls.overall_accuracy
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'DecreasingSubmissions']):
+            sort = -cls.submitted_translations_count
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingSubmissions']):
+            sort = cls.submitted_translations_count
+
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # last_activity can not be used here.
+        if topic_ids is not None:
+            sort_query = cls.query(
+                datastore_services.all_of(
+                    cls.language_code == language_code,
+                    cls.topic_ids_with_translation_submissions.IN(topic_ids)
+                    )).order(sort)
+        else:
+            sort_query = cls.query(
+                datastore_services.all_of(
+                    cls.language_code == language_code
+                    )).order(sort)
+
+        sorted_results: List[
+            TranslationSubmitterTotalContributionStatsModel] = []
+        num_models_per_fetch = 100
+        today = datetime.date.today()
+
+        if last_activity is not None:
+            last_date = today - datetime.timedelta(days=last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    TranslationSubmitterTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        num_models_per_fetch, offset=next_offset))
+                if not result_models:
+                    next_offset += 1
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
+        else:
+            sorted_results: Sequence[
+                TranslationSubmitterTotalContributionStatsModel] = (
+                sort_query.fetch(
+                    page_size, offset=offset))
+            next_offset = offset + len(sorted_results)
+
+        # Check whether we have more results.
+        next_result_model: Sequence[
+            TranslationSubmitterTotalContributionStatsModel] = (
+                sort_query.fetch(offset=next_offset))
+        more: bool = True if len(next_result_model) else False
+
+        return (
+            sorted_results,
+            next_offset,
+            more
+        )
 
     @classmethod
     def get_all_by_user_id(
@@ -2446,6 +2572,101 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        offset: int,
+        sort_by: Optional[str],
+        last_activity: int,
+        language_code: str
+    ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
+                Optional[str],
+                bool]:
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: sint. Number of results to skip from the beginning of all
+                results matching the query
+            sort_by: str|None. A string indicating how to sort the result.
+            last_activity: int. Number of days within which a user has 
+                contributed.
+            language_code: Language Code for filter.
+
+        Returns:
+            3-tuple(sorted_results, next_offset, more). where:
+                sorted_results: 
+                    list(TranslationSubmitterTotalContributionStatsModel).
+                    The list of models with supplied filters and sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+        sort = -cls.reviewed_translations_count
+        if sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingLastActivity']):
+            sort = -cls.last_contribution_date
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'DecreasingLastActivity']):
+            sort = cls.last_contribution_date
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingReviewedTranslation']):
+            sort = cls.reviewed_translations_count
+
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # last_activity can not be used here.
+        sort_query = cls.query(
+            datastore_services.all_of(
+                cls.language_code == language_code
+                )).order(sort)
+
+        sorted_results: List[
+            TranslationReviewerTotalContributionStatsModel] = []
+        num_models_per_fetch = 100
+        today = datetime.date.today()
+
+        if last_activity is not None:
+            last_date = today - datetime.timedelta(days=last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    TranslationReviewerTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        num_models_per_fetch, offset=next_offset))
+                if not result_models:
+                    next_offset += 1
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
+        else:
+            sorted_results: Sequence[
+                TranslationReviewerTotalContributionStatsModel] = (
+                sort_query.fetch(
+                    page_size, offset=offset))
+            next_offset = offset + len(sorted_results)
+
+        # Check whether we have more results.
+        next_result_model: Sequence[
+            TranslationReviewerTotalContributionStatsModel] = (
+                sort_query.fetch(1, offset=next_offset))
+        more: bool = True if len(next_result_model) else False
+
+        return (
+            sorted_results,
+            next_offset,
+            more
+        )
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Check whether TranslationReviewerTotalContributionStatsModel
         references the supplied user.
@@ -2670,6 +2891,120 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         ).get(keys_only=True) is not None
 
     @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        offset: int,
+        sort_by: Optional[str],
+        topic_ids: Optional[List[str]],
+        last_activity: int
+    ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
+                Optional[str],
+                bool]:
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: sint. Number of results to skip from the beginning of all
+                results matching the query
+            sort_by: str|None. A string indicating how to sort the result.
+            topic_ids: List[str]. List of topics user has contributed to.
+            last_activity: int. Number of days within which a user has 
+                contributed.
+
+        Returns:
+            3-tuple(sorted_results, next_offset, more). where:
+                sorted_results: list(QuestionSubmitterTotalContributionStatsModel).
+                    The list of models with supplied filters and sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+        sort = -cls.recent_performance
+        if sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingLastActivity']):
+            sort = -cls.last_contribution_date
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'DecreasingLastActivity']):
+            sort = cls.last_contribution_date
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingPerformance']):
+            sort = cls.recent_performance
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'DecreasingAccuracy']):
+            sort = -cls.overall_accuracy
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingAccuracy']):
+            sort = cls.overall_accuracy
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'DecreasingSubmissions']):
+            sort = -cls.submitted_questions_count
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingSubmissions']):
+            sort = cls.submitted_questions_count
+
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # last_activity can not be used here.
+        if topic_ids is not None:
+            sort_query = cls.query(
+                datastore_services.all_of(
+                    cls.topic_ids_with_question_submissions.IN(topic_ids)
+                    )).order(sort)
+        else:
+            sort_query = cls.get_all().order(sort)
+
+        sorted_results: List[
+            QuestionSubmitterTotalContributionStatsModel] = []
+        num_models_per_fetch = 100
+        today = datetime.date.today()
+
+        if last_activity is not None:
+            last_date = today - datetime.timedelta(days=last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    QuestionSubmitterTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        num_models_per_fetch, offset=next_offset))
+                if not result_models:
+                    next_offset += 1
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
+        else:
+            sorted_results: Sequence[
+                QuestionSubmitterTotalContributionStatsModel] = (
+                sort_query.fetch(
+                    page_size, offset=offset))
+            next_offset = offset + len(sorted_results)
+
+        # Check whether we have more results.
+        next_result_model: Sequence[
+            QuestionSubmitterTotalContributionStatsModel] = (
+                sort_query.fetch(offset=next_offset))
+        more: bool = True if len(next_result_model) else False
+
+        return (
+            sorted_results,
+            next_offset,
+            more
+        )
+
+
+    @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
         """Model contains corresponding to a user: contributor_id."""
         return base_models.DELETION_POLICY.DELETE
@@ -2852,6 +3187,97 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         return cls.query(
             cls.contributor_id == user_id
         ).get(keys_only=True) is not None
+
+    @classmethod
+    def fetch_page(
+        cls,
+        page_size: int,
+        offset: int,
+        sort_by: Optional[str],
+        last_activity: int
+    ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
+                Optional[str],
+                bool]:
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of models to fetch.
+            offset: sint. Number of results to skip from the beginning of all
+                results matching the query
+            sort_by: str|None. A string indicating how to sort the result.
+            last_activity: int. Number of days within which a user has 
+                contributed.
+            language_code: Language Code for filter.
+
+        Returns:
+            3-tuple(sorted_results, next_offset, more). where:
+                sorted_results: 
+                    list(TranslationSubmitterTotalContributionStatsModel).
+                    The list of models with supplied filters and sort_by.
+                next_offset: int. Number of results to skip in next batch.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+        sort = -cls.reviewed_questions_count
+        if sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingLastActivity']):
+            sort = -cls.last_contribution_date
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'DecreasingLastActivity']):
+            sort = cls.last_contribution_date
+        elif sort_by == (
+                constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingReviewedQuestion']):
+            sort = cls.reviewed_questions_count
+
+        # The first sort property must be the same as the property to which
+        # an inequality filter is applied. Thus, the inequality filter on
+        # last_activity can not be used here.
+        sort_query = cls.get_all().order(sort)
+
+        sorted_results: List[
+            QuestionReviewerTotalContributionStatsModel] = []
+        num_models_per_fetch = 100
+        today = datetime.date.today()
+
+        if last_activity is not None:
+            last_date = today - datetime.timedelta(days=last_activity)
+            next_offset = offset
+            while len(sorted_results) < page_size:
+                result_models: Sequence[
+                    QuestionReviewerTotalContributionStatsModel] = (
+                    sort_query.fetch(
+                        num_models_per_fetch, offset=next_offset))
+                if not result_models:
+                    next_offset += 1
+                    break
+                for result_model in result_models:
+                    next_offset += 1
+                    if result_model.last_contribution_date >= last_date:
+                        sorted_results.append(result_model)
+                        if len(sorted_results) == page_size:
+                            break
+        else:
+            sorted_results: Sequence[
+                QuestionReviewerTotalContributionStatsModel] = (
+                sort_query.fetch(
+                    page_size, offset=offset))
+            next_offset = offset + len(sorted_results)
+
+        # Check whether we have more results.
+        next_result_model: Sequence[
+            QuestionReviewerTotalContributionStatsModel] = (
+                sort_query.fetch(1, offset=next_offset))
+        more: bool = True if len(next_result_model) else False
+
+        return (
+            sorted_results,
+            next_offset,
+            more
+        )
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
