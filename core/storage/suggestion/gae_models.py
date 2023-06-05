@@ -2182,7 +2182,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         Args:
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
-                results matching the query
+                results matching the query.
             sort_by: str|None. A string indicating how to sort the result.
             topic_ids: List[str]|None.
                 List of topics user has contributions.
@@ -2589,7 +2589,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         Args:
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
-                results matching the query
+                results matching the query.
             sort_by: str|None. A string indicating how to sort the result.
             last_activity: int. Number of days within which a user has
                 contributed.
@@ -2907,7 +2907,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         Args:
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
-                results matching the query
+                results matching the query.
             sort_by: str|None. A string indicating how to sort the result.
             topic_ids: List[str]|None. List of topics user has contributions.
             last_activity: int. Number of days within which a user has
@@ -3203,10 +3203,10 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         Args:
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
-                results matching the query
+                results matching the query.
             sort_by: str|None. A string indicating how to sort the result.
             last_activity: int. Number of days within which a user has
-                contributed
+                contributed.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
