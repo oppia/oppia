@@ -27,8 +27,8 @@ jobs:
         run: git fetch source
       - name: Check for differences
         id: check-diff
-        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         run:
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "diff<<$EOF" >> $GITHUB_OUTPUT
           echo "$(git log source/develop..origin/master)" >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
