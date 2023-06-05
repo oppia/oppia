@@ -27,7 +27,7 @@ jobs:
         run: git fetch source
       - name: Check for differences
         id: check-diff
-        run: echo "Author: YONG LI <85102180+462702985@users.noreply.github.com>" >> $GITHUB_OUTPUT
+        run: echo "diff=$Author: YONG LI <85102180+462702985@users.noreply.github.com>" >> $GITHUB_OUTPUT
       - name: Revert commits
         if: ${{ steps.check-diff.outputs.diff != '' }}
         run: |
