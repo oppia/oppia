@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
+import { Subscription } from 'rxjs';
 
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
@@ -128,6 +129,8 @@ export class FeaturesTabComponent implements OnInit {
   featureFlags: PlatformParameter[] = [];
   loadingScreenIsShown: boolean = false;
   isDummyApiEnabled: boolean = false;
+  loadingMessage: string = '';
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private windowRef: WindowRef,
@@ -324,10 +327,20 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe(
+        (message: string) => {
+          this.loadingMessage = message;
+        }
+      ));
     this.loadingScreenIsShown = true;
     this.loaderService.showLoadingScreen('Loading');
     this.reloadFeatureFlagsAsync();
     this.reloadDummyHandlerStatusAsync();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 
