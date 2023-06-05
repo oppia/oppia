@@ -2908,8 +2908,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: Optional[str]. A string indicating how to sort the result.
-            topic_ids: Optional[List[str]].
+            sort_by: str. A string indicating how to sort the result.
+            topic_ids: List[str].
                 List of topics user has contributions.
             last_activity: int. Number of days within which a user has
                 contributed.
