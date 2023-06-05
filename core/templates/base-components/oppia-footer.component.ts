@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 
@@ -34,8 +35,15 @@ export class OppiaFooterComponent {
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
+  BRANCH_NAME = AppConstants.BRANCH_NAME;
+
+  SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
+
+  versionInformationIsShown: boolean = this.router.url === '/about';
+
   constructor(
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private router: Router
   ) {}
 
   getOppiaBlogUrl(): string {

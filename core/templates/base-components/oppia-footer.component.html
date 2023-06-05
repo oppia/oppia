@@ -107,5 +107,9 @@
         <oppia-social-buttons></oppia-social-buttons>
       </div>
     </div>
+    <div class="oppia-footer-version-info e2e-test-footer-version-info"
+         *ngIf="versionInformationIsShown">
+      Version: {{ BRANCH_NAME + ' (' + SHORT_COMMIT_HASH + ')' }}
+    </div>
   </div>
 </footer>

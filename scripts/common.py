@@ -929,13 +929,19 @@ def run_ng_compilation() -> None:
 
 def set_constants_to_default() -> None:
     """Set variables in constants.ts and feconf.py to default values."""
-    modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
+    modify_constants(
+        prod_env=False,
+        emulator_mode=True,
+        maintenance_mode=False,
+        version_info_must_be_set=False
+        )
 
 
 def modify_constants(
     prod_env: bool = False,
     emulator_mode: bool = True,
-    maintenance_mode: bool = False
+    maintenance_mode: bool = False,
+    version_info_must_be_set: bool = True
 ) -> None:
     """Modify constants.ts and feconf.py.
 
@@ -944,6 +950,7 @@ def modify_constants(
         emulator_mode: bool. Whether the server is started in emulator mode.
         maintenance_mode: bool. Whether the site should be put into
             the maintenance mode.
+        version_info_must_be_set: bool. Whether the version info must be set.
     """
     dev_mode_variable = (
         '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
@@ -968,6 +975,40 @@ def modify_constants(
         FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = (True|False)',
         enable_maintenance_mode_variable,
+        expected_number_of_replacements=1
+    )
+
+    branch_name_variable = (
+        '"BRANCH_NAME": "%s"'
+        % (
+            subprocess.check_output(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                encoding='utf-8'
+            ).strip().split('\n', maxsplit=1)[0]
+            if version_info_must_be_set else ''
+        )
+    )
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"BRANCH_NAME": ".*"',
+        branch_name_variable,
+        expected_number_of_replacements=1
+    )
+
+    short_commit_hash_variable = (
+        '"SHORT_COMMIT_HASH": "%s"'
+        % (
+            subprocess.check_output(
+                ['git', 'rev-parse', '--short', 'HEAD'],
+                encoding='utf-8'
+            ).strip().split('\n', maxsplit=1)[0]
+            if version_info_must_be_set else ''
+        )
+    )
+    inplace_replace_file(
+        CONSTANTS_FILE_PATH,
+        r'"SHORT_COMMIT_HASH": ".*"',
+        short_commit_hash_variable,
         expected_number_of_replacements=1
     )
 

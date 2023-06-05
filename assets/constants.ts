@@ -6976,5 +6976,7 @@ export default {
     "id", "states", "next_content_id_index", "version"
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
-  "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313
+  "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
 } as const;
