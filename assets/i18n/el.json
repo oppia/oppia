@@ -83,6 +83,7 @@
 	"I18N_ERROR_PAGE_TITLE_401": "Σφάλμα 401 - Oppia",
 	"I18N_ERROR_PAGE_TITLE_404": "Σφάλμα 404 - Oppia",
 	"I18N_ERROR_PAGE_TITLE_500": "Σφάλμα 500 - Oppia",
+	"I18N_EXPLORATION_STARTING_FROM_BEGINNING": "Συγχαρητήρια για την ολοκλήρωση αυτού του μαθήματος! Όταν ξαναεπιστρέψετε θα ξεκινήσετε το μάθημα από την αρχή.",
 	"I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Ανώνυμος",
 	"I18N_FOOTER_ABOUT": "Σχετικά",
 	"I18N_FOOTER_ABOUT_ALL_CAPS": "Σχετικά με το Oppia",
