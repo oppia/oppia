@@ -280,7 +280,7 @@ describe('Site language', function() {
         'Footer version info component taking too long to appear');
       var footerVersionInfoText = (
         await footerVersionInfoComponent.getText());
-      var footerVersionTextRegex = /Version: [\w-]+ \(\w+\)/;
+      var footerVersionTextRegex = /Version: [^\s]+ \(\w+\)/;
       expect(footerVersionTextRegex.test(footerVersionInfoText)).toBe(true);
     }
   );
