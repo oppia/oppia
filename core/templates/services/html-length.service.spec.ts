@@ -76,8 +76,8 @@ fdescribe('Html Length Service', () => {
     expect(result).toBe(26);
   });
 
-  it('should compute length of content with both text and non-text ' +
-  'nodes 2', () => {
+  it('should compute length of content with text and non-text ' +
+  '(math tag)', () => {
     const htmlString = '<p>Hi this seems too good to be true but what' +
       ' to do man<oppia-noninteractive-math math_content-with-value="' +
       '{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{22}{12}&amp' +
@@ -90,7 +90,7 @@ fdescribe('Html Length Service', () => {
     expect(result).toBe(expectedLength);
   });
   it('should compute length of content with both text and non-text' +
-  'nodes 3', () => {
+  '(image tag)', () => {
     const htmlString = '<p>naghiue abghy gjuh &nbsp;</p>' +
       '<oppia-noninteractive-image alt-with-value="&amp;quot;Svg ' +
       'file for demol&amp;quot;" caption-with-value="&amp;quot;l;Sv' +
