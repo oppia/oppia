@@ -56,6 +56,12 @@ describe('Html Length Service', () => {
     expect(htmlLengthService).toBeTruthy();
   });
 
+  it('should compute length for empty string', () => {
+    const htmlString = '';
+    const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+    expect(result).toBe(0);
+  });
+
   it('should compute length for strings with only paragraph tag', () => {
     const htmlString = '<p>Earth Our home planet is the third planet' +
       ' from the sun. Despite the vastness of the Solar System and' +
