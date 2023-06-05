@@ -1,18 +1,178 @@
-<div class="modal-header">
-  <p>
-    Are you sure you want to unpublish this story? Unpublishing a story will
-    delete any corresponding translation opportunities from the Contributor
-    Dashboard and reject any related pending translation suggestions.
-  </p>
+<div *ngIf="platformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled">
+  <div class="modal-header">
+    <p>
+      You're attempting to unpublish chapters, please specify a reason and note the warning
+      message before proceeding.
+    </p>
+  </div>
+  <div class="modal-body">
+    <div class="reason-select">
+      <span>Select Reason:</span>
+
+      <div ngbDropdown class="dropdown">
+        <div ngbDropdownToggle
+             aria-label="Dropdown toggle to select unpublishing reason"
+             aria-haspopup="menu"
+             class="selected-reason-text">
+          {{ selectedReasonText }}
+        </div>
+        <div ngbDropdownMenu
+             class="dropdown-menu">
+          <div ngbDropdownItem
+               (click)="setReason('BAD_CONTENT')"
+               class="dropdown-item">
+            {{ badContentReasonText }}
+          </div>
+          <hr>
+          <div ngbDropdownItem
+               (click)="setReason('CHAPTER_NEEDS_SPLITTING')"
+               class="dropdown-item">
+            {{ splitChapterReasonText }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-and-confirmation">
+      <div class="warning-container">
+        <span>Warning:</span>
+        <div class="bad-content-warning warning-text" *ngIf="unpublishingReason=='BAD_CONTENT'">
+          “Please edit the existing explorations instead of adding/deleting new ones, to avoid inadvertently impacting learners' progress”
+        </div>
+        <div class="split-chapters-warning warning-text" *ngIf="unpublishingReason=='CHAPTER_NEEDS_SPLITTING'">
+          “Please note that learners' overall progress score will decrease if some of the content they've played gets moved to a new exploration.”
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn cancel-button"
+                (click)="cancel()">
+                Cancel
+        </button>
+        <button class="btn confirm-reason-button"
+                (click)="confirm()">
+          Confirm and Unpblish
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="modal-footer">
-  <button class="btn btn-secondary"
-          (click)="cancel()"
-          type="button">
-          Cancel
-  </button>
-  <button class="btn btn-success e2e-test-close-save-modal-button"
-          (click)="confirm()">
-    Unpublish Story
-  </button>
+
+<div *ngIf="!platformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled">
+  <div class="modal-header">
+    <p>
+      Are you sure you want to unpublish this story? Unpublishing a story will
+      delete any corresponding translation opportunities from the Contributor
+      Dashboard and reject any related pending translation suggestions.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary"
+            (click)="cancel()"
+            type="button">
+            Cancel
+    </button>
+    <button class="btn btn-success e2e-test-close-save-modal-button"
+            (click)="confirm()">
+      Unpublish Story
+    </button>
+  </div>
 </div>
+
+<style>
+  .modal-body {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .reason-select {
+    border: 1px solid black;
+    padding: 5px;
+    width: 35%;
+  }
+
+  .reason-select span {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  .reason-select .dropdown {
+    left: 50%;
+    transform: translate(-50%);
+    width: 90%;
+  }
+
+  .reason-select .selected-reason-text {
+    background-color: rgb(218, 218, 218);
+    margin-top: 5px;
+    padding: 5px;
+    white-space: normal;
+    width: 100%;
+    word-wrap: break-word;
+  }
+
+  .reason-select .dropdown-menu {
+    width: 100%;
+  }
+
+  .reason-select .dropdown-item {
+    cursor: pointer;
+    white-space: normal;
+  }
+
+  .warning-and-confirmation {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+  }
+
+  .warning-container {
+    border: 1px solid black;
+    padding: 10px;
+  }
+
+  .warning-container span {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  .warning-container .warning-text {
+    font-style: italic;
+    line-height: 100%;
+    margin-top: 5px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+
+  .modal-buttons .cancel-button {
+    background-color: #79c979b8;
+    width: 40%;
+  }
+
+  .modal-buttons .confirm-reason-button {
+    background-color: #f1dd9599;
+    width: 50%;
+  }
+
+  @media screen and (max-width: 410px) {
+    .reason-select .selected-reason-text {
+      font-size: 14px;
+    }
+
+    .modal-buttons {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal-buttons .confirm-reason-button {
+      width: 100%;
+    }
+
+    .modal-buttons .cancel-button {
+      width: 100%;
+    }
+  }
+</style>
