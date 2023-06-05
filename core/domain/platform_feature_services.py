@@ -57,6 +57,12 @@ class FeatureFlagNotFoundException(Exception):
     pass
 
 
+class PlatformParameterNotFoundException(Exception):
+    """Exception thrown when an unknown platform parameter is requested."""
+
+    pass
+
+
 def create_evaluation_context_for_client(
     client_context_dict: platform_parameter_domain.ClientSideContextDict
 ) -> platform_parameter_domain.EvaluationContext:
@@ -267,3 +273,29 @@ def _evaluate_feature_flag_value_for_server(feature_name: str) -> bool:
     values_dict = _evaluate_feature_flag_values_for_context(
         set([feature_name]), context)
     return values_dict[feature_name]
+
+
+def get_platform_parameter_value(
+    parameter_name: str) -> platform_parameter_domain.PlatformDataTypes:
+    """Returns the value of the platform parameter.
+
+    Args:
+        parameter_name: str. The name of the platform parameter whose
+            value is required.
+
+    Returns: PlatformDataTypes. The value of the platform parameter.
+
+    Raises:
+        PlatformParameterNotFoundException. Platform parameter is not valid.
+    """
+    all_platform_params_dicts = (
+        get_all_platform_parameters_except_feature_flag_dicts())
+    all_platform_params_names_set = set(
+        param['name'] for param in all_platform_params_dicts)
+    if parameter_name not in all_platform_params_names_set:
+        raise PlatformParameterNotFoundException(
+            'Unknown platform parameter: %s.' % parameter_name)
+
+    context = _create_evaluation_context_for_server()
+    param = registry.Registry.get_platform_parameter(parameter_name)
+    return param.evaluate(context)

@@ -27,6 +27,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import fs_services
+from core.domain import platform_feature_services
 from core.domain import value_generators_domain
 
 from typing import Dict, TypedDict
@@ -192,7 +193,9 @@ class PromoBarHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         self.render_json({
-            'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
+            'promo_bar_enabled': (
+                platform_feature_services.get_platform_parameter_value(
+                    'promo_bar_enabled')),
             'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
         })
 
