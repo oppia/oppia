@@ -2268,8 +2268,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results: Sequence[
-                TranslationSubmitterTotalContributionStatsModel] = (
+            sorted_results = (
                 sort_query.fetch(
                     page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -2650,8 +2649,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results: Sequence[
-                TranslationReviewerTotalContributionStatsModel] = (
+            sorted_results = (
                 sort_query.fetch(
                     page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -2987,8 +2985,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results: Sequence[
-                QuestionSubmitterTotalContributionStatsModel] = (
+            sorted_results = (
                 sort_query.fetch(
                     page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -3260,8 +3257,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results: Sequence[
-                QuestionReviewerTotalContributionStatsModel] = (
+            sorted_results = (
                 sort_query.fetch(
                     page_size, offset=offset))
             next_offset = offset + len(sorted_results)
