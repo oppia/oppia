@@ -143,7 +143,7 @@ class ExplorationEmbedPage(
             exploration_id: str. The ID of the exploration.
 
         Raises:
-            PageNotFoundException. The exploration cannot be found.
+            PageNotFoundException. The exploration does not exist.
         """
         assert self.normalized_request is not None
         version = self.normalized_request.get('v')
@@ -237,10 +237,13 @@ class ExplorationPage(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests.
+        """Plays the exploration..
 
         Args:
             exploration_id: str. The ID of the exploration.
+
+        Raises:
+            PageNotFoundException. The exploration does not exist.
         """
         assert self.normalized_request is not None
         version = self.normalized_request.get('v')
@@ -326,6 +329,9 @@ class ExplorationHandler(
 
         Args:
             exploration_id: str. The ID of the exploration.
+
+        Raises:
+            PageNotFoundException. The exploration cannot be found.
         """
         assert self.normalized_request is not None
         version = self.normalized_request.get('v')
@@ -568,7 +574,17 @@ class PretestHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        """Handles GET request."""
+        """Retrieves the pretest questions for an exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Raises:
+            InvalidInputException. The story cannot be found.
+            InvalidInputException. The story does not have the given
+                exploration ID.
+            Exception. No prerequisite skill_ids found for the exploration.
+        """
         assert self.normalized_request is not None
         story_url_fragment = self.normalized_request['story_url_fragment']
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
@@ -647,8 +663,7 @@ class StorePlaythroughHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests. Appends to existing list of playthroughs or
-        deletes it if already full.
+        """Adds a playthrough to an exploration.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -721,6 +736,11 @@ class StatsEventsHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
+        """Records stats for an exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_payload is not None
         aggregated_stats = self.normalized_payload['aggregated_stats']
         exp_version = self.normalized_payload['exp_version']
@@ -850,7 +870,7 @@ class AnswerSubmittedEventHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests.
+        """Records the learners's answer submission.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -975,7 +995,7 @@ class StateHitEventHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests.
+        """Records a state hit.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -1063,7 +1083,11 @@ class StateCompleteEventHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests."""
+        """Records the learner's completion of a state.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_payload is not None
         state_name = self.normalized_payload['state_name']
         session_id = self.normalized_payload['session_id']
@@ -1153,7 +1177,12 @@ class LeaveForRefresherExpEventHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests."""
+        """Records when a learner leaves a state to visit a refresher
+        exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_payload is not None
         refresher_exp_id = self.normalized_payload['refresher_exp_id']
         exp_version = self.normalized_payload['exp_version']
@@ -1243,7 +1272,7 @@ class ReaderFeedbackHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests.
+        """Creates a new feedback thread for an exploration.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -1336,7 +1365,7 @@ class ExplorationStartEventHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests.
+        """Records the start of an exploration..
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -1411,7 +1440,11 @@ class ExplorationActualStartEventHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests."""
+        """Records exploration actual start events.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_payload is not None
         event_services.ExplorationActualStartEventHandler.record(
             exploration_id,
@@ -1480,7 +1513,11 @@ class SolutionHitEventHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests."""
+        """Records a solution hit.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_payload is not None
         event_services.SolutionHitEventHandler.record(
             exploration_id,
@@ -1580,7 +1617,7 @@ class ExplorationCompleteEventHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests.
+        """Records the completion of an exploration.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -1710,7 +1747,7 @@ class ExplorationMaybeLeaveHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests.
+        """Records leaving an exploration.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -1861,7 +1898,11 @@ class RatingHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests."""
+        """Fetches retings for an exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         self.values.update({
             'overall_ratings':
                 rating_services.get_overall_ratings_for_exploration(
@@ -1874,8 +1915,10 @@ class RatingHandler(
 
     @acl_decorators.can_rate_exploration
     def put(self, exploration_id: str) -> None:
-        """Handles PUT requests for submitting ratings at the end of an
-        exploration.
+        """Submits ratings at the end of an exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -1975,7 +2018,11 @@ class RecommendationsHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests."""
+        """Retrieves recommendations for an exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_request is not None
         collection_id = self.normalized_request.get('collection_id')
         include_system_recommendations = self.normalized_request[
@@ -2059,7 +2106,7 @@ class FlagExplorationHandler(
 
     @acl_decorators.can_flag_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests.
+        """Adds a 'send flagged exploration email' task.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -2122,7 +2169,7 @@ class QuestionPlayerHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET request."""
+        """Retrieves questions based on skill IDs."""
         # Skill ids are given as a comma separated list because this is
         # a GET request.
         assert self.normalized_request is not None
@@ -2170,8 +2217,14 @@ class TransientCheckpointUrlPage(
 
     @acl_decorators.open_access
     def get(self, unique_progress_url_id: str) -> None:
-        """Handles GET requests. Fetches the logged-out learner's progress."""
+        """Fetches the logged-out learner's progress.
 
+        Args:
+            unique_progress_url_id: str. The unique progress URL ID.
+
+        Raises:
+            PageNotFoundException. The logged out user cannot be found.
+        """
         logged_out_user_data = (
             exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
 
@@ -2247,8 +2300,8 @@ class SaveTransientCheckpointProgressHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests. Creates a new unique progress
-        url ID and a new corresponding TransientCheckpointUrl model.
+        """Creates a new unique progress url ID and a new corresponding
+        TransientCheckpointUrl model.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -2278,7 +2331,11 @@ class SaveTransientCheckpointProgressHandler(
 
     @acl_decorators.can_play_exploration
     def put(self, exploration_id: str) -> None:
-        """"Handles the PUT requests. Saves the logged-out user's progress."""
+        """"Saves the logged-out user's progress.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_payload is not None
         unique_progress_url_id = (
             self.normalized_payload['unique_progress_url_id'])
@@ -2367,8 +2424,20 @@ class LearnerAnswerDetailsSubmissionHandler(
 
     @acl_decorators.can_play_entity
     def put(self, entity_type: str, entity_id: str) -> None:
-        """"Handles the PUT requests. Stores the answer details submitted
-        by the learner.
+        """Stores the answer details submitted by the learner.
+
+        Args:
+            entity_type: str. The entity type.
+            entity_id: str. The entity ID.
+
+        Raises:
+            PageNotFoundException. The feature flag is disabled.
+            Exception. The state_name must be provided when the entity_type
+                is exploration.
+            InvalidInputException. The interaction id given does not match
+                with the interaction id of the state.
+            InvalidInputException. The interaction id given does not match
+                with the interaction id of the question.
         """
         assert self.normalized_payload is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
@@ -2449,7 +2518,7 @@ class CheckpointReachedEventHandler(
 
     @acl_decorators.can_play_exploration
     def put(self, exploration_id: str) -> None:
-        """Handles PUT requests.
+        """Updates the learner's checkpoint progress for an exploration.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -2511,7 +2580,7 @@ class ExplorationRestartEventHandler(
 
     @acl_decorators.can_play_exploration
     def put(self, exploration_id: str) -> None:
-        """Handles PUT requests.
+        """Clears learner's checkpoint progress through the exploration.
 
         Args:
             exploration_id: str. The ID of the exploration.
@@ -2568,7 +2637,11 @@ class SyncLoggedOutLearnerProgressHandler(
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests."""
+        """Syncs logged out and logged in learner's checkpoints progress.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_payload is not None
         unique_progress_url_id = self.normalized_payload[
             'unique_progress_url_id']
@@ -2623,7 +2696,17 @@ class StateVersionHistoryHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str, state_name: str, version: int) -> None:
-        """Handles GET requests."""
+        """Retrieves the exploration version history.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            state_name: str. The state name.
+            version: int. The version number of the exploration.
+
+        Raises:
+            PageNotFoundException. There exploration history does not exist
+                for the given exploration id and version.
+        """
         version_history = exp_fetchers.get_exploration_version_history(
             exploration_id, version
         )
@@ -2701,7 +2784,16 @@ class MetadataVersionHistoryHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str, version: int) -> None:
-        """Handles GET requests."""
+        """Retrieves the metadata of exploration version history.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            version: int. The version number of the exploration.
+
+        Raises:
+            PageNotFoundException. There exploration history does not exist
+                for the given exploration id and version.
+        """
         version_history = exp_fetchers.get_exploration_version_history(
             exploration_id, version
         )
@@ -2747,6 +2839,7 @@ class CheckpointsFeatureStatusHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Retrieves info if checkpoint feature is enabled."""
         self.render_json({
             'checkpoints_feature_is_enabled': (
                 config_domain.CHECKPOINTS_FEATURE_IS_ENABLED.value)
