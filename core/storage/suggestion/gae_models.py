@@ -2183,8 +2183,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: Optional[str]. A string indicating how to sort the result.
-            topic_ids: Optional[List[str]].
+            sort_by: str|None. A string indicating how to sort the result.
+            topic_ids: List[str]|None.
                 List of topics user has contributions.
             last_activity: int. Number of days within which a user has
                 contributed.
@@ -2590,7 +2590,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: Optional[str]. A string indicating how to sort the result.
+            sort_by: str|None. A string indicating how to sort the result.
             last_activity: int. Number of days within which a user has
                 contributed.
             language_code: str. Language Code for filter.
@@ -2908,8 +2908,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: str. A string indicating how to sort the result.
-            topic_ids: List[str]. List of topics user has contributions.
+            sort_by: str|None. A string indicating how to sort the result.
+            topic_ids: List[str]|None. List of topics user has contributions.
             last_activity: int. Number of days within which a user has
                 contributed.
 
@@ -3204,7 +3204,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query
-            sort_by: Optional[str]. A string indicating how to sort the result.
+            sort_by: str|None. A string indicating how to sort the result.
             last_activity: int. Number of days within which a user has
                 contributed
 
