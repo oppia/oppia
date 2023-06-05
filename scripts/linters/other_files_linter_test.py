@@ -46,11 +46,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         super().setUp()
         self.verbose_mode_enabled = False
         self.dependencies_file = io.StringIO(
-            '{\"dependencies\":{\"frontend\":{\"midiJs\":'
-            '{\"version\": \"0.4\"}}}}')
+            '{\"dependencies\":{\"frontend\":{\"guppy\":'
+            '{\"version\": \"0.1\"},\"skulpt-dist\":{\"version\": \"0.2\"}'
+            ',\"midiJs\":{\"version\": \"0.4\"}}}}')
         self.package_file = io.StringIO(
             '{\"dependencies\":{\"nerdamer\":\"^0.6\"}}')
         self.files_in_typings_dir = [
+            'guppy-defs-0.1.d.ts',
+            'skulpt-defs-0.2.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
@@ -212,7 +215,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertFalse(error_messages.failed)
 
     def test_check_third_party_libs_type_defs_multiple(self) -> None:
-        self.files_in_typings_dir.append('midi-defs-0.4.d.ts')
+        self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
         expected_error_messages = 'FAILED  Third party type defs check failed'
         with self.open_file_swap, self.listdir_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
@@ -220,13 +223,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual(
                 error_messages.get_report()[1], expected_error_messages)
             self.assert_same_list_elements([
-                'There are multiple type definitions for Midi in the '
+                'There are multiple type definitions for Guppy in the '
                 'typings dir.'], error_messages.get_report())
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertTrue(error_messages.failed)
 
     def test_check_third_party_libs_type_defs_no_type_defs(self) -> None:
         self.files_in_typings_dir = [
+            'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
@@ -245,6 +249,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_check_third_party_libs_type_defs_wrong_version(self) -> None:
         self.files_in_typings_dir = [
+            'guppy-defs-0.2.d.ts',
+            'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
@@ -256,8 +262,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual(
                 error_messages.get_report()[1], expected_error_messages)
             self.assert_same_list_elements([
-                'Type definitions for Midi are not up to date. The '
-                'current version of Midi is 0.1 and the type definitions '
+                'Type definitions for Guppy are not up to date. The '
+                'current version of Guppy is 0.1 and the type definitions '
                 'are for version 0.2. Please refer typings/README.md '
                 'for more details.'], error_messages.get_report())
             self.assertEqual('Third party type defs', error_messages.name)
