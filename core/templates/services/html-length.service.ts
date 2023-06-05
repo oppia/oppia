@@ -82,7 +82,7 @@ export class HtmlLengthService {
     }
     // <oppia-noninteractive-image>
     const altText = nonTextNode.getAttribute('alt-with-value');
-    const wordCount = 0;
+    let wordCount = 0;
     if (altText) {
       wordCount = altText.trim().split(' ').length;
     }
