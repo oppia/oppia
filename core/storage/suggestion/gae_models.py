@@ -2172,10 +2172,10 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         sort_by: Optional[str],
         topic_ids: Optional[List[str]],
-        last_activity: int,
+        last_activity: Optional[int],
         language_code: str
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
-                Optional[str],
+                int,
                 bool]:
         """Returns the models according to values specified.
 
@@ -2579,10 +2579,10 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         sort_by: Optional[str],
-        last_activity: int,
+        last_activity: Optional[int],
         language_code: str
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
-                Optional[str],
+                int,
                 bool]:
         """Returns the models according to values specified.
 
@@ -2898,9 +2898,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         sort_by: Optional[str],
         topic_ids: Optional[List[str]],
-        last_activity: int
+        last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
-                Optional[str],
+                int,
                 bool]:
         """Returns the models according to values specified.
 
@@ -3194,9 +3194,9 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         sort_by: Optional[str],
-        last_activity: int
+        last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
-                Optional[str],
+                int,
                 bool]:
         """Returns the models according to values specified.
 
