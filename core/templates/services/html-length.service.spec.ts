@@ -32,7 +32,7 @@ class MockDomSanitizer {
   }
 }
 
-fdescribe('Html Length Service', () => {
+describe('Html Length Service', () => {
   let htmlLengthService: HtmlLengthService;
 
   beforeEach(() => {
