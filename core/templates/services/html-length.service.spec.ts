@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for I18nLanguageCodeService.
+ * @fileoverview Unit tests for HtmlLengthService.
  */
 
 import { TestBed } from '@angular/core/testing';
