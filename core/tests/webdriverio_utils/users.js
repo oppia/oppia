@@ -85,6 +85,7 @@ var login = async function(email, useManualNavigation = true) {
 var logout = async function() {
   await waitFor.clientSideRedirection(async() => {
     await browser.url(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+    await waitFor.pageToFullyLoad();
   }, (url) => {
     // Wait until the URL has changed to something that is not /logout.
     return !(/logout/.test(url));

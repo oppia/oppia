@@ -29,6 +29,50 @@ export default {
   // fragment in the controller is invalid.
   "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
 
+  "FEATURED_TRANSLATION_LANGUAGES": [
+    {
+      "language_code": "pt",
+      "explanation": "For learners in Brazil, Angola and Mozambique."
+    },
+    {
+      "language_code": "ar",
+      // eslint-disable-next-line max-len
+      "explanation": "For learners in Arabic-speaking countries in the Middle East."
+    },
+    {
+      "language_code": "pcm",
+      "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "es",
+      "explanation": "For learners in Latin America and South America."
+    },
+    {
+      "language_code": "sw",
+      "explanation": "For learners in Kenya and Tanzania."
+    },
+    {
+      "language_code": "hi",
+      "explanation": "For learners in India"
+    },
+    {
+      "language_code": "ha",
+      "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "ig",
+      "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "yo",
+      "explanation": "For learners in Nigeria."
+    }],
+
+  "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
+    "News", "International", "Educators", "Learners", "Community",
+    "Partnerships", "Volunteer", "Stories", "Languages", "New features",
+    "New lessons", "Software development", "Content"],
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
