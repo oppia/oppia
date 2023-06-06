@@ -25,8 +25,6 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import fs_services
 from core.domain import platform_feature_services
 from core.domain import platform_parameter_domain

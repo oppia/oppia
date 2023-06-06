@@ -419,8 +419,9 @@ class AdminHandler(
                         platform_param_name, self.user_id, commit_message,
                         new_rules)
                 except (
-                        utils.ValidationError,
-                        feature_services.PlatformParameterNotFoundException) as e:
+                    utils.ValidationError,
+                    feature_services.PlatformParameterNotFoundException
+                ) as e:
                     raise self.InvalidInputException(e)
 
                 new_rule_dicts = [rules.to_dict() for rules in new_rules]

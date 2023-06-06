@@ -283,7 +283,8 @@ def get_platform_parameter_value(
         parameter_name: str. The name of the platform parameter whose
             value is required.
 
-    Returns: PlatformDataTypes. The value of the platform parameter.
+    Returns:
+        PlatformDataTypes. The value of the platform parameter.
 
     Raises:
         PlatformParameterNotFoundException. Platform parameter is not valid.

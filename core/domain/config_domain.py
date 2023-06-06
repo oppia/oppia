@@ -443,6 +443,7 @@ class Registry:
         """
         return list(cls._config_registry)
 
+
 # Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
 # to add that classroom to learner group syllabus filter whenever a new
 # classroom is added.
