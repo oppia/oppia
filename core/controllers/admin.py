@@ -1210,8 +1210,7 @@ class AdminRoleHandler(
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Retrieves information about users based on different filter
-        criteria. It expects a request of type
-        AdminRoleHandlerNormalizedGetRequestDict
+        criteria to populate the roles tab.
 
         Raises:
             Exception. The role must be provided when the filter criterion
@@ -1475,7 +1474,7 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        """Marks a user as banned by their username.
+        """Marks a user as banned.
 
         Raises:
             InvalidInputException. User with given username does not exist.
@@ -1494,7 +1493,7 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
-        """Removes the banned status of user.
+        """Removes the banned status of the user.
 
         Raises:
             InvalidInputException. User with given username does not exist.
@@ -1787,8 +1786,7 @@ class UpdateUsernameHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
-        """Updates the username, profile picture, and logs the username
-        change for a user.
+        """Updates the username for a user.
 
         Raises:
             InvalidInputException. Invalid username.
