@@ -40,11 +40,13 @@
                  (click)="showEditProfilePictureModal()"
                  aria-label="Edit profile picture button">
             </div>
-            <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-pos"
-               tabindex="0"
-               aria-label="Edit profile picture"
-               (keydown.enter)="showEditProfilePictureModal()">
-            </i>
+            <div class="oppia-editor-edit-btn oppia-editor-edit-btn-pos">
+              <i class="fas fa-pen oppia-editor-profile-edit-icon"
+                 tabindex="0"
+                 aria-label="Edit profile picture"
+                 (keydown.enter)="showEditProfilePictureModal()">
+              </i>
+            </div>
             <picture *ngIf="profilePicturePngDataUrl">
               <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
               <source type="image/png" [srcset]="profilePicturePngDataUrl">
@@ -108,6 +110,19 @@
                    attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}">
             <span>
               {{ 'I18N_TOPNAV_LEARNER_DASHBOARD' | translate }}
+            </span>
+          </label>
+        </div>
+        <div class="checkbox oppia-checkbox">
+          <label>
+            <input type="radio"
+                   [(ngModel)]="defaultDashboard"
+                   value="{{ DASHBOARD_TYPE_CONTRIBUTOR }}"
+                   (change)="saveDefaultDashboard(defaultDashboard)"
+                   class="e2e-test-contributor-dashboard-radio"
+                   attr.aria-label="{{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}, {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}">
+            <span>
+              {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}
             </span>
           </label>
         </div>

@@ -98,8 +98,6 @@ class BlogAdminHandler(
         """Handles GET requests."""
         config_properties = config_domain.Registry.get_config_property_schemas()
         config_prop_for_blog_admin = {
-            'list_of_default_tags_for_blog_post': (
-                config_properties['list_of_default_tags_for_blog_post']),
             'max_number_of_tags_assigned_to_blog_post': (
                 config_properties['max_number_of_tags_assigned_to_blog_post'])
         }
