@@ -17,6 +17,7 @@
  */
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -95,6 +96,7 @@ describe('Story node editor component', () => {
   let component: StoryNodeEditorComponent;
   let ngbModal: NgbModal;
   let story: Story;
+  let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
   let storyUpdateService: StoryUpdateService;
   let curatedExplorationValidationService:
@@ -111,6 +113,7 @@ describe('Story node editor component', () => {
         StoryNodeEditorComponent
       ],
       providers: [
+        UrlInterpolationService,
         WindowDimensionsService,
         StoryUpdateService,
         AlertsService,
@@ -135,6 +138,7 @@ describe('Story node editor component', () => {
     fixture = TestBed.createComponent(StoryNodeEditorComponent);
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     curatedExplorationValidationService = (
       TestBed.inject(CuratedExplorationValidationService));
@@ -478,7 +482,7 @@ describe('Story node editor component', () => {
   });
 
   it('should toggle chapter card', () => {
-    component.mainChapterCardIsShown = false
+    component.mainChapterCardIsShown = false;
 
     component.toggleChapterCard();
 
