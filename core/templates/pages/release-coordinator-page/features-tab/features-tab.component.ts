@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
+import { Subscription } from 'rxjs';
 
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
@@ -126,8 +127,10 @@ export class FeaturesTabComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   featureFlagNameToBackupMap!: Map<string, PlatformParameter>;
   featureFlags: PlatformParameter[] = [];
-  showLoadingScreen: boolean = false;
+  loadingScreenIsShown: boolean = false;
   isDummyApiEnabled: boolean = false;
+  loadingMessage: string = '';
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private windowRef: WindowRef,
@@ -138,13 +141,11 @@ export class FeaturesTabComponent implements OnInit {
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
-    this.loaderService.showLoadingScreen('Loading');
-    this.showLoadingScreen = true;
     const data = await this.apiService.getFeatureFlags();
+    this.loadingScreenIsShown = false;
     this.featureFlags = data.featureFlags;
     this.featureFlagNameToBackupMap = new Map(
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
-    this.showLoadingScreen = false;
     this.loaderService.hideLoadingScreen();
   }
 
@@ -326,8 +327,20 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe(
+        (message: string) => {
+          this.loadingMessage = message;
+        }
+      ));
+    this.loadingScreenIsShown = true;
+    this.loaderService.showLoadingScreen('Loading');
     this.reloadFeatureFlagsAsync();
     this.reloadDummyHandlerStatusAsync();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 }
 
