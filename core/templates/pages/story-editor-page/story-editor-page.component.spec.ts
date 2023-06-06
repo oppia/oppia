@@ -193,6 +193,7 @@ describe('Story Editor Page Component', () => {
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     urlService = TestBed.inject(UrlService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     localStorageService = TestBed.inject(LocalStorageService);
     storyEditorStalenessDetectionService = TestBed.inject(
       StoryEditorStalenessDetectionService);

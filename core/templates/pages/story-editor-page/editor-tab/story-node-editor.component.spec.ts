@@ -135,7 +135,6 @@ describe('Story node editor component', () => {
     fixture = TestBed.createComponent(StoryNodeEditorComponent);
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     curatedExplorationValidationService = (
       TestBed.inject(CuratedExplorationValidationService));
