@@ -58,6 +58,8 @@ var PreferencesPage = function() {
   this.get = async function() {
     await browser.url(USER_PREFERENCES_URL);
     await waitFor.pageToFullyLoad();
+    // Click on a neutral element.
+    await action.click('Preferences page header', pageHeader);
   };
 
   this.expectUploadError = async function() {
