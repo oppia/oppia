@@ -914,7 +914,8 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'question_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
             question_models.QuestionSummaryModel.get_export_policy(),
