@@ -2307,7 +2307,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             interaction_id='TextInput',
             question_model_created_on=self.fake_date_created,
             question_model_last_updated=self.fake_date_updated,
-            misconception_ids=['skill1-1', 'skill2-2']
+            misconception_ids=['skill1-1', 'skill2-2'],
+            version=1
         )
 
     def test_to_dict(self) -> None:
@@ -2322,7 +2323,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
                 self.fake_date_updated),
             'created_on_msec': utils.get_time_in_millisecs(
                 self.fake_date_created),
-            'misconception_ids': ['skill1-1', 'skill2-2']
+            'misconception_ids': ['skill1-1', 'skill2-2'],
+            'version': 1
         }
 
         self.assertEqual(expected_object_dict, self.observed_object.to_dict())
@@ -2406,6 +2408,25 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected misconception ids to be a list of strings, '
             'received 123'):
+            self.observed_object.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_invalid_version(self) -> None:
+        """Test to verify that the validation fails when
+        version value is an invalid.
+        """
+        self.observed_object.version = -2
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be non-negative, received -2'):
+            self.observed_object.validate()
+
+        self.observed_object.version = 'invalid' # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected version to be int, received invalid'):
             self.observed_object.validate()
 
 
