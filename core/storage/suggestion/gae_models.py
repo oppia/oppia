@@ -2275,7 +2275,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         # Check whether we have more results.
         next_result_model: Sequence[
-            TranslationSubmitterTotalContributionStatsModel]|None = (
+            TranslationSubmitterTotalContributionStatsModel] = (
                 sort_query.fetch(offset=next_offset))
         more: bool = len(next_result_model) != 0
 
@@ -2656,7 +2656,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         # Check whether we have more results.
         next_result_model: Sequence[
-            TranslationReviewerTotalContributionStatsModel]|None = (
+            TranslationReviewerTotalContributionStatsModel] = (
                 sort_query.fetch(1, offset=next_offset))
         more: bool = len(next_result_model) != 0
 
@@ -2992,7 +2992,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         # Check whether we have more results.
         next_result_model: Sequence[
-            QuestionSubmitterTotalContributionStatsModel]|None = (
+            QuestionSubmitterTotalContributionStatsModel] = (
                 sort_query.fetch(offset=next_offset))
         more: bool = len(next_result_model) != 0
 
@@ -3264,7 +3264,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         # Check whether we have more results.
         next_result_model: Sequence[
-            QuestionReviewerTotalContributionStatsModel]|None = (
+            QuestionReviewerTotalContributionStatsModel] = (
                 sort_query.fetch(1, offset=next_offset))
         more: bool = len(next_result_model) != 0
 
