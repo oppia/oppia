@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the feature tab in release coordinator page.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks, tick } from
   '@angular/core/testing';
@@ -75,7 +76,8 @@ describe('Release coordinator page feature tab', function() {
             provide: PlatformFeatureService,
             useClass: MockPlatformFeatureService
           }
-        ]
+        ],
+        schemas: [NO_ERRORS_SCHEMA]
       })
       .compileComponents();
 
