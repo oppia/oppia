@@ -198,7 +198,8 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
                         'max_number_of_tags_assigned_to_blog_post',
                 }, csrf_token=csrf_token)
 
-        self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
+        self.assertEqual(
+            config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value, 10)
         self.assertEqual(
             observed_log_messages,
             ['[BLOG ADMIN] %s reverted config property:'
