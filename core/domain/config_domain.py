@@ -203,12 +203,16 @@ class ConfigProperty:
     - admin_ids.
     - admin_usernames.
     - allow_yaml_file_upload.
+    - always_ask_learners_for_answer_details.
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
     - before_end_head_tag_hook.
+    - batch_index_for_mailchimp
     - carousel_slides_config.
+    - checkpoints_feature_is_enabled.
     - classroom_page_is_accessible.
+    - classroom_promos_are_enabled.
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
@@ -220,6 +224,8 @@ class ConfigProperty:
     - featured_translation_languages.
     - full_site_url.
     - list_of_default_tags_for_blog_post.
+    - max_number_of_explorations_in_math_svgs_batch.
+    - max_number_of_svgs_in_math_svgs_batch.
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
