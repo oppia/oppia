@@ -158,8 +158,13 @@
   }
 
   @media screen and (max-width: 410px) {
-    .reason-select .selected-reason-text {
-      font-size: 14px;
+    .modal-body {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .modal-body .reason-select,.warning-and-confirmation {
+      width: 100%;
     }
 
     .modal-buttons {
