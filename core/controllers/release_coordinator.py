@@ -56,19 +56,20 @@ class MemoryCacheHandler(
         self.render_json({})
 
 
-class FeatureFlagsNormalizePayloadDict(TypedDict):
+class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of FeatureFlag's normalized_payload
     dictionary.
     """
 
-    action: Optional[str]
-    feature_name: Optional[str]
-    commit_message: Optional[str]
-    new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
+    action: str
+    feature_name: str
+    commit_message: str
+    new_rules: List[parameter_domain.PlatformParameterRule]
 
 
 class FeatureFlagsHandler(
-    base.BaseHandler[FeatureFlagsNormalizePayloadDict, Dict[str, str]]
+    base.BaseHandler[
+        FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler for feature-flags."""
 
@@ -84,9 +85,6 @@ class FeatureFlagsHandler(
                         'update_feature_flag_rules'
                     ]
                 },
-                # TODO(#13331): Remove default_value when it is confirmed that,
-                # for clearing the search indices of exploration & collection
-                # 'action' field must be provided in the payload.
                 'default_value': None
             },
             'feature_name': {
@@ -163,10 +161,10 @@ class FeatureFlagsHandler(
                     feature_services.FeatureFlagNotFoundException) as e:
                 raise self.InvalidInputException(e)
 
-            new_rule_dicts = [rules.to_dict() for rules in new_rules]
+            new_rules_dicts = [rule.to_dict() for rule in new_rules]
             logging.info(
                 '[RELEASE-COORDINATOR] %s updated feature %s with new rules: '
-                '%s.' % (self.user_id, feature_name, new_rule_dicts))
+                '%s.' % (self.user_id, feature_name, new_rules_dicts))
             self.render_json(self.values)
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)
