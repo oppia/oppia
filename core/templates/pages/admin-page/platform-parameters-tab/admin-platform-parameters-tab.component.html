@@ -1,3 +1,4 @@
+<oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
 <div *ngFor="let platformParameter of platformParameters;" class="container oppia-page-card oppia-long-text oppia-admin-parameters e2e-test-platform-param">
   <h2 class="oppia-parameter-name e2e-test-parameter-name">{{platformParameter.name}}</h2>
   <div class="row oppia-parameter-top-margin">
@@ -186,7 +187,7 @@
   </div>
 </div>
 
-<div *ngIf="platformParameters.length === 0" class="oppia-page-card oppia-long-text oppia-admin-parameters oppia-empty-indicator e2e-test-no-parameter">
+<div *ngIf="platformParameters.length === 0 && !loadingScreenIsShown" class="oppia-page-card oppia-long-text oppia-admin-parameters oppia-empty-indicator e2e-test-no-parameter">
   No platform parameters are available.
 </div>
 

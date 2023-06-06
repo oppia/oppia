@@ -20,6 +20,7 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
+import { Subscription } from 'rxjs';
 
 import { AdminFeaturesTabConstants } from
   'pages/release-coordinator-page/features-tab/features-tab.constants';
@@ -28,6 +29,7 @@ import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
+import { LoaderService } from 'services/loader.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import {
@@ -109,20 +111,25 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   platformParameterNameToBackupMap!: Map<string, PlatformParameter>;
   platformParameters: PlatformParameter[] = [];
+  loadingScreenIsShown: boolean = false;
+  loadingMessage: string = '';
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
     private apiService: PlatformFeatureAdminBackendApiService,
+    private loaderService: LoaderService,
   ) { }
 
   async reloadPlatformParametersAsync(): Promise<void> {
     const data = await this.adminDataService.getDataAsync();
+    this.loadingScreenIsShown = false;
     this.platformParameters = data.platformParameters;
-
     this.platformParameterNameToBackupMap = new Map(
       this.platformParameters.map(param => [param.name, cloneDeep(param)]));
+    this.loaderService.hideLoadingScreen();
   }
 
   getdefaultNewRule(param: PlatformParameter): PlatformParameterRule {
@@ -317,6 +324,14 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe(
+        (message: string) => {
+          this.loadingMessage = message;
+        }
+      ));
+    this.loadingScreenIsShown = true;
+    this.loaderService.showLoadingScreen('Loading');
     this.reloadPlatformParametersAsync();
   }
 }
