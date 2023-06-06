@@ -27,7 +27,7 @@ jobs:
         shell: bash
       - name: Send notification
         run:
-          python -m send_review_notification.index --repo=${{ github.repository }} --token=${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }} --max-wait-hours=48 --verbose
+          python -m send_review_notification.index --repo=${{ github.repository }} --category='Reviewer notifications' --title='Pending Reviews' --token=${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }} --max-wait-hours=48 --verbose
       - name: Report if failed
         if: ${{ failure() }}
         uses: ./.github/actions/send-webhook-notification
