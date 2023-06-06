@@ -50,9 +50,9 @@
     </div>
 
     <div class="oppia-release-coordinator-page-card oppia-page-card oppia-long-text">
-      <form (ngSubmit)="updatePromoBarConfig()" [formGroup]="promoBarConfigForm">
+      <form (ngSubmit)="updatePromoBarParameter()" [formGroup]="promoBarConfigForm">
         <div class="oppia-promo-bar-config-field">
-          <h3>Promo-bar config</h3>
+          <h3>Promo-bar platform parameter</h3>
           <mat-slide-toggle [color]="'primary'" formControlName="enabled">
           </mat-slide-toggle>
         </div>

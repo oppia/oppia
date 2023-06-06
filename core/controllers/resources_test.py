@@ -23,6 +23,7 @@ from core import utils
 from core.constants import constants
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_registry
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import story_services
@@ -877,7 +878,6 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
@@ -912,6 +912,27 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
                 'promo_bar_message': 'New promo bar message.'
             })
 
+        self.logout()
+
+    def test_update_param_rules_with_unexpected_exception_returns_error(
+        self
+    ) -> None:
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        # Here we use MyPy ignore because we are assigning a None value
+        # where instance of 'PlatformParameter' is expected, and this is
+        # done to Replace the stored instance with None in order to
+        # trigger the unexpected exception during update.
+        platform_parameter_registry.Registry.parameter_registry[
+            'promo_bar_enabled'] = None  # type: ignore[assignment]
+        response = self.put_json(
+            '/promo_bar_handler', {
+                'promo_bar_enabled': True,
+                'promo_bar_message': 'New promo bar message.'
+            }, csrf_token=csrf_token)
+        self.assertEqual(
+            response['error'],
+            '\'NoneType\' object has no attribute \'serialize\'')
         self.logout()
 
 

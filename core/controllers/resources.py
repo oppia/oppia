@@ -21,6 +21,7 @@ import logging
 import urllib
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -28,6 +29,8 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import fs_services
 from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_registry as registry
 from core.domain import value_generators_domain
 
 from typing import Dict, TypedDict
@@ -211,9 +214,54 @@ class PromoBarHandler(
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
             '%s' % (self.user_id, promo_bar_message_value))
-        config_services.set_property(
-            self.user_id, 'promo_bar_enabled', promo_bar_enabled_value)
-        config_services.set_property(
-            self.user_id, 'promo_bar_message', promo_bar_message_value)
+        server_mode = (
+            'dev'
+            if constants.DEV_MODE
+            else 'prod'
+            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+            else 'test'
+        )
+        rules_for_promo_bar_enabled_value = [
+            platform_parameter_domain.PlatformParameterRule.from_dict({
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', server_mode]]
+                    }
+                ],
+                'value_when_matched': promo_bar_enabled_value
+            })
+        ]
+        rules_for_promo_bar_message_value = [
+            platform_parameter_domain.PlatformParameterRule.from_dict({
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', server_mode]]
+                    }
+                ],
+                'value_when_matched': promo_bar_message_value
+            })
+        ]
+        assert self.user_id is not None
+        try:
+            registry.Registry.update_platform_parameter(
+                'promo_bar_enabled',
+                self.user_id,
+                'Update promo_bar_enabled property from release '
+                'coordinator page.',
+                rules_for_promo_bar_enabled_value)
+
+            registry.Registry.update_platform_parameter(
+                'promo_bar_message',
+                self.user_id,
+                'Update promo_bar_message property from release '
+                'coordinator page.',
+                rules_for_promo_bar_message_value)
+        except (
+                utils.ValidationError,
+                platform_feature_services.PlatformParameterNotFoundException
+        ) as e:
+            raise self.InvalidInputException(e)
 
         self.render_json({})

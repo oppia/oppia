@@ -242,6 +242,15 @@ class AdminHandler(
         platform_params_dicts = (
             feature_services.
             get_all_platform_parameters_except_feature_flag_dicts())
+        # Removes promo-bar related platform params as promo-bar is handled by
+        # release coordinators in /release-coordinator page.
+        platform_params_dicts = [
+            param for param in platform_params_dicts
+            if (
+                param['name'] != 'promo_bar_enabled' and
+                param['name'] != 'promo_bar_message'
+            )
+        ]
 
         config_properties = config_domain.Registry.get_config_property_schemas()
 
@@ -411,7 +420,7 @@ class AdminHandler(
                         new_rules)
                 except (
                         utils.ValidationError,
-                        feature_services.FeatureFlagNotFoundException) as e:
+                        feature_services.PlatformParameterNotFoundException) as e:
                     raise self.InvalidInputException(e)
 
                 new_rule_dicts = [rules.to_dict() for rules in new_rules]
