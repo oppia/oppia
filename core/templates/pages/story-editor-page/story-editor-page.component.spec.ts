@@ -143,6 +143,7 @@ describe('Story Editor Page Component', () => {
   let urlService: UrlService;
   let storyEditorNavigationService: StoryEditorNavigationService;
   let story: Story;
+  let windowRef: WindowRef;
 
   class MockWindowRef {
     nativeWindow = {
@@ -197,6 +198,8 @@ describe('Story Editor Page Component', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     storyEditorStalenessDetectionService = TestBed.inject(
       StoryEditorStalenessDetectionService);
+    windowRef = TestBed.inject(WindowRef);
+
     story = Story.createFromBackendDict({
       id: '2',
       title: 'Story title',
