@@ -29,6 +29,7 @@ import { PreventPageUnloadEventService } from 'services/prevent-page-unload-even
 import { StoryEditorStateService } from './services/story-editor-state.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { StoryEditorStalenessDetectionService } from './services/story-editor-staleness-detection.service';
 import { Story, StoryBackendDict } from 'domain/story/story.model';
@@ -135,6 +136,7 @@ describe('Story Editor Page Component', () => {
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let storyEditorStateService: StoryEditorStateService;
   let undoRedoService: UndoRedoService;
+  let urlInterpolationService: UrlInterpolationService;
   let localStorageService: LocalStorageService;
   let storyEditorStalenessDetectionService:
     StoryEditorStalenessDetectionService;
@@ -161,6 +163,7 @@ describe('Story Editor Page Component', () => {
         LocalStorageService,
         StoryEditorStalenessDetectionService,
         UrlService,
+        UrlInterpolationService,
         {
           provide: EditableStoryBackendApiService,
           useClass: MockEditableStoryBackendApiService
