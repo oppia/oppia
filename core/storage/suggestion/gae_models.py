@@ -2268,9 +2268,9 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results = (
+            sorted_results = list((
                 sort_query.fetch(
-                    page_size, offset=offset))
+                    page_size, offset=offset)))
             next_offset = offset + len(sorted_results)
 
         # Check whether we have more results.
@@ -2649,9 +2649,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results = (
+            sorted_results = list((
                 sort_query.fetch(
-                    page_size, offset=offset))
+                    page_size, offset=offset)))
             next_offset = offset + len(sorted_results)
 
         # Check whether we have more results.
@@ -2985,9 +2985,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results = (
+            sorted_results = list((
                 sort_query.fetch(
-                    page_size, offset=offset))
+                    page_size, offset=offset)))
             next_offset = offset + len(sorted_results)
 
         # Check whether we have more results.
@@ -3257,9 +3257,9 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results = (
+            sorted_results = list((
                 sort_query.fetch(
-                    page_size, offset=offset))
+                    page_size, offset=offset)))
             next_offset = offset + len(sorted_results)
 
         # Check whether we have more results.
