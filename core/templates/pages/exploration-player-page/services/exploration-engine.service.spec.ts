@@ -357,10 +357,6 @@ describe('Exploration engine service ', () => {
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     };
-
-    explorationFeatures = {
-      explorationIsCurated: true
-    };
   });
 
   beforeEach(() => {
