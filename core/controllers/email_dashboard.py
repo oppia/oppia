@@ -48,7 +48,7 @@ class EmailDashboardPage(
 
     @acl_decorators.can_manage_email_dashboard
     def get(self) -> None:
-        """Handles GET requests."""
+        """Renders the email dashboard page."""
         self.render_template('email-dashboard-page.mainpage.html')
 
 
@@ -144,6 +144,7 @@ class EmailDashboardDataHandler(
 
     @acl_decorators.can_manage_email_dashboard
     def get(self) -> None:
+        """Retrieves recent user queries."""
         assert self.normalized_request is not None
         cursor = self.normalized_request.get('cursor')
         num_queries_to_fetch = (
@@ -161,7 +162,7 @@ class EmailDashboardDataHandler(
 
     @acl_decorators.can_manage_email_dashboard
     def post(self) -> None:
-        """Post handler for query."""
+        """Saves a new user query."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         data = self.normalized_payload['data']
@@ -208,6 +209,11 @@ class QueryStatusCheckHandler(
 
     @acl_decorators.can_manage_email_dashboard
     def get(self) -> None:
+        """Retrieves user query with some ID.
+
+        Raises:
+            InvalidInputException. Invalid query id.
+        """
         assert self.normalized_request is not None
         query_id = self.normalized_request['query_id']
 
@@ -275,6 +281,16 @@ class EmailDashboardResultPage(
 
     @acl_decorators.can_manage_email_dashboard
     def get(self, query_id: str) -> None:
+        """Retrieves the results of a query.
+
+        Args:
+            query_id: str. The query ID.
+
+        Raises:
+            InvalidInputException. Invalid query id.
+            UnauthorizedUserException. The user is not an authorized user for
+                this query.
+        """
         user_query = user_query_services.get_user_query(query_id)
         if (
                 user_query is None or
@@ -290,6 +306,16 @@ class EmailDashboardResultPage(
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id: str) -> None:
+        """Sends email to maximum qualified users.
+
+        Args:
+            query_id: str. The query ID.
+
+        Raises:
+            InvalidInputException. Invalid query id.
+            UnauthorizedUserException. The user is not an authorized user for
+                this query.
+        """
         assert self.normalized_payload is not None
         user_query = user_query_services.get_user_query(query_id)
         if (
@@ -327,6 +353,16 @@ class EmailDashboardCancelEmailHandler(
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id: str) -> None:
+        """Deletes the user query.
+
+        Args:
+            query_id: str. The query ID.
+
+        Raises:
+            InvalidInputException. Invalid query id.
+            UnauthorizedUserException. The user is not an authorized user for
+                this query.
+        """
         user_query = user_query_services.get_user_query(query_id)
         if (
                 user_query is None or
@@ -386,6 +422,16 @@ class EmailDashboardTestBulkEmailHandler(
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id: str) -> None:
+        """Sends a test email to the tester.
+
+        Args:
+            query_id: str. The query ID.
+
+        Raises:
+            InvalidInputException. Invalid query id.
+            UnauthorizedUserException. The user is not an authorized user for
+                this query.
+        """
         assert self.normalized_payload is not None
         user_query = user_query_services.get_user_query(query_id)
         if (
