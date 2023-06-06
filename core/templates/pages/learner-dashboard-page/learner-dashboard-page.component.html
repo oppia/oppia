@@ -345,6 +345,7 @@
                       <button class="btn btn-success feedback-thread-new-message-send"
                               (click)="addNewMessage(threadId, newMessage.text)"
                               aria-label="Send message button"
+                              aria-live="polite"
                               ng-disabled="messageSendingInProgress || !newMessage.text">
                         <span *ngIf="messageSendingInProgress"
                               [innerHTML]="'I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS' | translate">
@@ -361,7 +362,8 @@
             </tr>
           </table>
           <div class="feedback-thread-warning"
-               *ngIf="feedbackThreadActive">
+               *ngIf="feedbackThreadActive"
+               tabindex="0">
             <i class="fas fa-exclamation-circle"></i>
             <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
           </div>

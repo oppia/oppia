@@ -6,7 +6,7 @@
     <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
       <div class="story-card">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-          <img class="oppia-thumbnail-image" alt="Thumbnail image for the story {{storyTitle}} from the topic {{topicName}}" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
+          <img class="oppia-thumbnail-image" alt="" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
           <div class="oppia-story-completion">
             <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
             <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
