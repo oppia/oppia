@@ -350,7 +350,7 @@ URLS = [
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler),
     get_redirect_route(
-        r'/retrivefeaturedtranslationlanguages',
+        r'/retrievefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
         r'/gettranslatabletopicnames',
