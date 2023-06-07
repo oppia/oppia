@@ -127,7 +127,7 @@ export class FeaturesTabComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   featureFlagNameToBackupMap!: Map<string, PlatformParameter>;
   featureFlags: PlatformParameter[] = [];
-  loadingScreenIsShown: boolean = false;
+  featureFlagsAreFetched: boolean = false;
   isDummyApiEnabled: boolean = false;
   loadingMessage: string = '';
   directiveSubscriptions = new Subscription();
@@ -142,7 +142,7 @@ export class FeaturesTabComponent implements OnInit {
 
   async reloadFeatureFlagsAsync(): Promise<void> {
     const data = await this.apiService.getFeatureFlags();
-    this.loadingScreenIsShown = false;
+    this.featureFlagsAreFetched = true;
     this.featureFlags = data.featureFlags;
     this.featureFlagNameToBackupMap = new Map(
       this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
@@ -333,7 +333,6 @@ export class FeaturesTabComponent implements OnInit {
           this.loadingMessage = message;
         }
       ));
-    this.loadingScreenIsShown = true;
     this.loaderService.showLoadingScreen('Loading');
     this.reloadFeatureFlagsAsync();
     this.reloadDummyHandlerStatusAsync();
