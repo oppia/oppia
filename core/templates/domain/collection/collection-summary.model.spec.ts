@@ -27,7 +27,7 @@ describe('Collection summary model', () => {
       id: '44LKoKLlIbGe',
       thumbnail_icon_url: '/subjects/Algebra.svg',
       language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
+      thumbnail_bg_color: '#cc4b00',
       created_on: 1591296635736.666,
       status: 'public',
       category: 'Algebra',
@@ -45,7 +45,7 @@ describe('Collection summary model', () => {
     expect(collectionSummaryObject.thumbnailIconUrl).toEqual(
       '/subjects/Algebra.svg');
     expect(collectionSummaryObject.languageCode).toEqual('en');
-    expect(collectionSummaryObject.thumbnailBgColor).toEqual('#cd672b');
+    expect(collectionSummaryObject.thumbnailBgColor).toEqual('#cc4b00');
     expect(collectionSummaryObject.createdOn).toEqual(1591296635736.666);
     expect(collectionSummaryObject.status).toEqual('public');
     expect(collectionSummaryObject.category).toEqual('Algebra');

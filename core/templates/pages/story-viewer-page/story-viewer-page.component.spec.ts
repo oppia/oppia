@@ -144,7 +144,7 @@ describe('Story Viewer Page component', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -158,7 +158,7 @@ describe('Story Viewer Page component', () => {
         category: 'Algebra'
       },
       completed: true,
-      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_bg_color: '#927117',
       thumbnail_filename: 'filename'
     };
     var secondSampleReadOnlyStoryNodeBackendDict = {
@@ -182,7 +182,7 @@ describe('Story Viewer Page component', () => {
         thumbnail_icon_url: '/subjects/Algebra.svg',
         human_readable_contributors_summary: {},
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on_msec: 1591296635736.666,
         ratings: {
           1: 0,
@@ -196,7 +196,7 @@ describe('Story Viewer Page component', () => {
         category: 'Algebra'
       },
       completed: false,
-      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_bg_color: '#927117',
       thumbnail_filename: 'filename',
     };
     var storyPlaythroughBackendObject = {
@@ -421,12 +421,12 @@ describe('Story Viewer Page component', () => {
         thumbnailIconUrl: 'thumbnail-url',
         left: '225px',
         top: '35px',
-        thumbnailBgColor: '#bb8b2f'
+        thumbnailBgColor: '#927117'
       }, {
         thumbnailIconUrl: 'thumbnail-url',
         left: '225px',
         top: '35px',
-        thumbnailBgColor: '#bb8b2f' }]);
+        thumbnailBgColor: '#927117' }]);
     }));
 
   it('should obtain translated title and set it whenever the ' +
@@ -485,7 +485,7 @@ describe('Story Viewer Page component', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -499,7 +499,7 @@ describe('Story Viewer Page component', () => {
           category: 'Algebra'
         },
         completed: true,
-        thumbnail_bg_color: '#bb8b2f',
+        thumbnail_bg_color: '#927117',
         thumbnail_filename: ''
       };
       var secondSampleReadOnlyStoryNodeBackendDict = {
@@ -523,7 +523,7 @@ describe('Story Viewer Page component', () => {
           thumbnail_icon_url: '/subjects/Algebra.svg',
           human_readable_contributors_summary: {},
           language_code: 'en',
-          thumbnail_bg_color: '#cd672b',
+          thumbnail_bg_color: '#cc4b00',
           created_on_msec: 1591296635736.666,
           ratings: {
             1: 0,
@@ -537,7 +537,7 @@ describe('Story Viewer Page component', () => {
           category: 'Algebra'
         },
         completed: false,
-        thumbnail_bg_color: '#bb8b2f',
+        thumbnail_bg_color: '#927117',
         thumbnail_filename: '',
       };
 

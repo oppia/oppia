@@ -179,7 +179,7 @@ describe('Creator Dashboard Page Component', () => {
             language_code: 'en',
             objective: 'To test exploration recommendations',
             id: 'hi27Jix1QGbT',
-            thumbnail_bg_color: '#cd672b',
+            thumbnail_bg_color: '#cc4b00',
             activity_type: 'exploration',
             ratings: {
               1: 0,
@@ -439,7 +439,7 @@ describe('Creator Dashboard Page Component', () => {
         id: '44LKoKLlIbGe',
         thumbnail_icon_url: '/subjects/Algebra.svg',
         language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
+        thumbnail_bg_color: '#cc4b00',
         created_on: 1591296635736.666,
         status: 'public',
         category: 'Algebra',
