@@ -167,7 +167,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature_services.
             get_all_platform_parameters_except_feature_flag_dicts(),
             expected_dicts)
-        
+
     def test_get_platform_parameter_value(self) -> None:
         self.assertEqual(
             feature_services.get_platform_parameter_value(
