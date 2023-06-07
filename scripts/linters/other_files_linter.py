@@ -190,6 +190,21 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
                 if lib_version[0] == '^':
                     lib_version = lib_version[1:]
+                # This is to handle the case where the version is of the form
+                # git commit hashes. eg. 'username/repo#commit-hash', then
+                # we need to have the commit hash as the version.
+                elif lib_version[0] >= 'a' and lib_version[0] <= 'z':
+                    cntr = 0
+                    while cntr < len(lib_version) and lib_version[cntr] != '#':
+                        cntr += 1
+                    if cntr == len(lib_version):
+                        error_message = (
+                            'The version of %s in package.json is not '
+                            'supported.' % third_party_lib['dependency_key'])
+                        error_messages.append(error_message)
+                        failed = True
+
+                    lib_version = lib_version[(cntr + 1):]
 
             prefix_name = third_party_lib['type_defs_filename_prefix']
 
