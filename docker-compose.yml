@@ -83,7 +83,8 @@ services:
     volumes:
       - .:/app/oppia
     # command: redis-server /app/oppia/redis.conf
-    # on running this command, redis server is exiting? why? checked the redis.conf file, not sure about the configurations defined there are compactible within the docker container?
+    # redis running fine without any command, also seen in other orgs too, no need to pass any command
+    # on running this command, redis server is exiting? why? checked the redis.conf file, not sure about the configurations defined there are compactible within the docker container? we can define all the configrations from redis.conf here in the docker compose service itself.
 
   elasticsearch:
     image: elasticsearch:7.17.0

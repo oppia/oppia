@@ -26,7 +26,7 @@ COPY requirements_dev.txt .
 RUN pip-compile --generate-hashes requirements.in
 RUN pip-compile --generate-hashes requirements_dev.in
 RUN pip install cmake
-# TODO: not installing pyarrow for now as facing problem while installing in my M1: refer - https://github.com/streamlit/streamlit/issues/2774
+# TODO: not installing pyarrow for now as facing problem while installing in my mac M1: refer - https://github.com/streamlit/streamlit/issues/2774
 RUN pip install --require-hashes --no-deps -r requirements.txt
 RUN pip install --require-hashes --no-deps -r requirements_dev.txt
 
@@ -41,6 +41,7 @@ RUN apt-get install -y nodejs
 RUN npm install -g yarn
 RUN yarn install
 
+# installing third party dependencies
 COPY scripts ./scripts
 COPY /core ./core
 COPY /assets ./assets
@@ -49,18 +50,6 @@ RUN python -m scripts.install_third_party
 
 COPY . .
 
-# RUN python3 -m scripts.install_third_party
-# COPY . .
-
 EXPOSE 8181
 # CMD ["node", "./node_modules/webpack/bin/webpack.js", "--config", "webpack.dev.config.ts", "--watch"]
 # CMD ["./node_modules/.bin/ng", "build", "--watch"]
-
-
-## NOTE:
-## I am using Google App Engine to serve our app in to the browser (by serving the built webpack bundles) using
-## the `app_dev.yaml` file. For the prototype to work, I am using the already installed `Google Cloud SDK- 364.0.0`
-## from the /oppia-tools directory (copied to our root directory). This is a temporary solution,
-## and I will be using the official docker image for the google cloud SDK while working in the GSoC project
-## [link for the verified Google Cloud SDK image](https://hub.docker.com/r/google/cloud-sdk).
-# CMD [ "./oppia_tools/google-cloud-sdk-364.0.0/google-cloud-sdk/bin/dev_appserver.py", "app_dev.yaml", "--runtime", "python38", "--host", "0.0.0.0"]
