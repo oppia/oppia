@@ -38,9 +38,14 @@ RUN apt-get -y install npm
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
-
 RUN npm install -g yarn
 RUN yarn install
+
+COPY scripts ./scripts
+COPY /core ./core
+COPY /assets ./assets
+COPY dependencies.json .
+RUN python -m scripts.install_third_party
 
 COPY . .
 
@@ -51,9 +56,6 @@ EXPOSE 8181
 # CMD ["node", "./node_modules/webpack/bin/webpack.js", "--config", "webpack.dev.config.ts", "--watch"]
 # CMD ["./node_modules/.bin/ng", "build", "--watch"]
 
-
-
-# TODO: tasks for the day: 2) install the packages from the dependencies.json! 3) connect with google cloud sdk, and launch app.
 
 ## NOTE:
 ## I am using Google App Engine to serve our app in to the browser (by serving the built webpack bundles) using

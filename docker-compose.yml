@@ -14,8 +14,9 @@ services:
       - node_modules:/app/oppia/node_modules
     environment:
       - NODE_ENV=development
-    # depends_on:
-      # - google_cloud_sdk
+    depends_on:
+      - firebase_emulator
+      - redis
     command: ./node_modules/.bin/ng build --watch
   
   webpack-compiler:
@@ -74,6 +75,28 @@ services:
       - node_modules:/app/oppia/node_modules
     command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --export-on-exit /app/firebase_emulator_cache
 
+  redis:
+    image: redis:7.0-alpine
+    container_name: oppia-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - .:/app/oppia
+    # command: redis-server /app/oppia/redis.conf
+    # on running this command, redis server is exiting? why? checked the redis.conf file, not sure about the configurations defined there are compactible within the docker container?
+
+  elasticsearch:
+    image: elasticsearch:7.17.0
+    container_name: oppia-elasticsearch
+    ports:
+      - "9200:9200"
+    volumes:
+      - .:/app/oppia
+    environment:
+      - ES_JAVA_OPTS=-Xms100m -Xmx500m
+      - ES_PATH_CONF=/usr/share/elasticsearch/config
+    # command: elasticsearch -q
+    # command: ls ./config
 
 volumes:
   node_modules:
