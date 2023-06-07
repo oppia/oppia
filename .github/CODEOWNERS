@@ -347,6 +347,9 @@
 /extensions/value_generators/ @oppia/lace-backend-reviewers
 /extensions/__init__.py @oppia/lace-frontend-reviewers
 
+# Learner Dashboard Redesign Project
+/core/templates/domain/feedback_updates/feedback-updates-backend-api.service.ts @oppia/lace-frontend-reviewers
+/core/templates/domain/feedback_updates/feedback-updates-backend-api.service.spec.ts @oppia/lace-frontend-reviewers 
 
 # Lesson Analytics team.
 /core/controllers/features*.py @oppia/learner-analytics-reviewers
