@@ -1139,6 +1139,7 @@ export class ConversationSkinComponent {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
     }
+    this.hasFullyLoaded = true;
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
