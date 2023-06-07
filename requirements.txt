@@ -277,7 +277,7 @@ protobuf==3.20.2
     #   proto-plus
 py==1.10.0
     # via pytest
-# pyarrow==0.17.1
+pyarrow==0.17.1
     # via apache-beam
 pyasn1==0.4.8
     # via
