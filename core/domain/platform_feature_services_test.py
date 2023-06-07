@@ -167,6 +167,18 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             feature_services.
             get_all_platform_parameters_except_feature_flag_dicts(),
             expected_dicts)
+        
+    def test_get_platform_parameter_value(self) -> None:
+        self.assertEqual(
+            feature_services.get_platform_parameter_value(
+                self.param_a.name), False)
+
+    def test_get_unknown_platform_param_value_results_in_error(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Unknown platform parameter: unknown_platform_param'
+        ):
+            feature_services.get_platform_parameter_value(
+                'unknown_platform_param')
 
     def test_create_evaluation_context_for_client_returns_correct_context(
         self

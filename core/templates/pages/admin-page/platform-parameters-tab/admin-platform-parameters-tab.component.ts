@@ -111,7 +111,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   platformParameterNameToBackupMap!: Map<string, PlatformParameter>;
   platformParameters: PlatformParameter[] = [];
-  loadingScreenIsShown: boolean = false;
+  platformParametersAreFetched: boolean = false;
   loadingMessage: string = '';
   directiveSubscriptions = new Subscription();
 
@@ -125,7 +125,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   async reloadPlatformParametersAsync(): Promise<void> {
     const data = await this.adminDataService.getDataAsync();
-    this.loadingScreenIsShown = false;
+    this.platformParametersAreFetched = false;
     this.platformParameters = data.platformParameters;
     this.platformParameterNameToBackupMap = new Map(
       this.platformParameters.map(param => [param.name, cloneDeep(param)]));
@@ -330,7 +330,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
           this.loadingMessage = message;
         }
       ));
-    this.loadingScreenIsShown = true;
+    this.platformParametersAreFetched = true;
     this.loaderService.showLoadingScreen('Loading');
     this.reloadPlatformParametersAsync();
   }

@@ -424,7 +424,7 @@ class AdminHandler(
                 ) as e:
                     raise self.InvalidInputException(e)
 
-                new_rule_dicts = [rules.to_dict() for rules in new_rules]
+                new_rule_dicts = [rule.to_dict() for rule in new_rules]
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, platform_param_name, new_rule_dicts))

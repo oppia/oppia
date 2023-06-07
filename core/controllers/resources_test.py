@@ -929,7 +929,9 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
             '/promo_bar_handler', {
                 'promo_bar_enabled': True,
                 'promo_bar_message': 'New promo bar message.'
-            }, csrf_token=csrf_token)
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500)
         self.assertEqual(
             response['error'],
             '\'NoneType\' object has no attribute \'serialize\'')
