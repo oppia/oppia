@@ -47,7 +47,16 @@ from typing import Dict, List, Optional, TypedDict
 def _require_valid_version(
     version_from_payload: Optional[int], exploration_version: int
 ) -> None:
-    """Check that the payload version matches the given exploration version."""
+    """Check that the payload version matches the given exploration version.
+
+        Args:
+            version_from_payload: Optional[int]. The payload version.
+            exploration_version: int. The exploration version to compare with.
+
+        Raises:
+            InvalidInputException. The version_from_payload does not match
+                the exploration_version.
+    """
 
     if version_from_payload != exploration_version:
         raise base.BaseHandler.InvalidInputException(
@@ -85,7 +94,7 @@ class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(self, unused_exploration_id: str) -> None:
+    def get(self) -> None:
         """Handles GET requests."""
 
         self.render_template('exploration-editor-page.mainpage.html')
@@ -166,7 +175,15 @@ class ExplorationHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        """Gets the data for the exploration overview page."""
+        """Gets the data for the exploration overview page.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Raises:
+            PageNotFoundException. An error occurs while retrieving
+                exploration data.
+        """
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
