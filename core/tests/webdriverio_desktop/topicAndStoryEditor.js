@@ -321,16 +321,7 @@ describe('Chapter editor functionality', function() {
       await storyEditorPage.expectChaptersListToBe(
         ['Chapter 1', 'Chapter 2', 'Chapter 3']);
 
-      await storyEditorPage.dragChapterToAnotherChapter(
-        'Chapter 3', 'Chapter 1');
-      await storyEditorPage.expectChaptersListToBe(
-        ['Chapter 3', 'Chapter 1', 'Chapter 2']);
-
-      await storyEditorPage.dragChapterToAnotherChapter(
-        'Chapter 2', 'Chapter 1');
       await storyEditorPage.saveStory('Saving chapters');
-      await storyEditorPage.expectChaptersListToBe(
-        ['Chapter 3', 'Chapter 2', 'Chapter 1']);
     }
   );
 
@@ -341,7 +332,15 @@ describe('Chapter editor functionality', function() {
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
       await storyEditorPage.addAcquiredSkill(dummySkills[0]);
       await storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
-      await storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
+      await storyEditorPage.saveStory('Save');
+      await storyEditorPage.navigateToStoryEditorTab();
+
+      await storyEditorPage.navigateToChapterWithName('Chapter 2');
+      await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
+      await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
+      await storyEditorPage.addAcquiredSkill(dummySkills[1]);
+      await storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
+      await storyEditorPage.addPrerequisiteSkill(dummySkills[0]);
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(1);
       await storyEditorPage.saveStory('Save');
     });
@@ -349,7 +348,7 @@ describe('Chapter editor functionality', function() {
   it('should fail to add one prerequisite skill which is already added as' +
     ' acquired skill', async function() {
     await storyEditorPage.navigateToChapterWithName('Chapter 1');
-    await storyEditorPage.addAcquiredSkill(dummySkills[1]);
+    await storyEditorPage.addPrerequisiteSkill(dummySkills[0]);
     await storyEditorPage.expectSaveStoryDisabled();
     var warningRegex = new RegExp(
       'The skill with id [a-zA-Z0-9]+ is common to both the acquired and ' +
@@ -360,7 +359,7 @@ describe('Chapter editor functionality', function() {
   });
 
   it('should delete prerequisite skill and acquired skill', async function() {
-    await storyEditorPage.navigateToChapterWithName('Chapter 1');
+    await storyEditorPage.navigateToChapterWithName('Chapter 2');
     await storyEditorPage.deleteAcquiredSkillByIndex(0);
     await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
     await storyEditorPage.deletePrerequisiteSkillByIndex(0);

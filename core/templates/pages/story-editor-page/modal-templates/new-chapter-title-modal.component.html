@@ -1,0 +1,138 @@
+<div class="modal-header create-new-chapter-modal-header">
+  <h3>
+    New Chapter
+  </h3>
+  <i class="fa fa-times modal-close-button" (click)="cancel()"></i>
+</div>
+<form (submit)="saveAsync()">
+  <div class="modal-body create-new-chapter">
+    <div class="chapter-input">
+      <div class="chapter-input-header">
+        <span>Title*</span>
+        <div class="oppia-input-box-subtitle">
+          <i>
+            This will be shown to the learner. It overrides the title of the exploration.
+          </i>
+        </div>
+      </div>
+      <input class="form-control e2e-test-new-chapter-title-field oppia-new-chapter-title-field"
+             placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
+             [(ngModel)]="title"
+             [ngModelOptions]="{standalone: true}"
+             (change)="resetErrorMsg()"
+             maxlength="MAX_CHARS_IN_EXPLORATION_TITLE" autofocus>
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Chapter title should be at most {{ MAX_CHARS_IN_EXPLORATION_TITLE }} characters.
+        </i>
+      </span>
+      <span class="new-chapter-error-msg" *ngIf="errorMsg">
+        <span>{{ errorMsg }}</span>
+      </span>
+    </div>
+
+    <div class="chapter-input story-input-description">
+      <div class="chapter-input-header">
+        <span>Exploration ID*</span>
+      </div>
+      <input (change)="resetErrorMsg()"
+             [(ngModel)]="explorationId"
+             [ngModelOptions]="{standalone: true}"
+             class="form-control e2e-test-chapter-exploration-input">
+      <div *ngIf="invalidExpId || explorationId && !validateExplorationId()">
+        <div *ngFor="let invalidExpErrorString of invalidExpErrorStrings" class="new-chapter-error-msg e2e-test-invalid-exp-id">
+          <span>{{ invalidExpErrorString }}</span>
+        </div>
+      </div>
+      <span class="new-chapter-error-msg" *ngIf="correctnessFeedbackDisabled">
+        <span>{{ correctnessFeedbackDisabledString }}</span>
+      </span>
+      <span class="new-chapter-error-msg" *ngIf="!categoryIsDefault">
+        <span>The category of this exploration is invalid. Curated lessons need to have their category to be one of the default categories.</span>
+      </span>
+      <span class="new-chapter-error-msg" *ngIf="statesWithRestrictedInteractions.length > 0">
+        <span>The states [{{ statesWithRestrictedInteractions.join(', ') }}] contain restricted interaction types.</span>
+      </span>
+      <span class="new-chapter-error-msg" *ngIf="statesWithTooFewMultipleChoiceOptions.length > 0">
+        <span>The states [{{ statesWithTooFewMultipleChoiceOptions.join(', ') }}] contain invalid multiple choice interactions. They must each have at least 4 options.</span>
+      </span>
+    </div>
+    <div class="chapter-input chapter-input-thumbnail e2e-test-chapter-input-thumbnail">
+      <div class="chapter-input-header">
+        <span>Thumbnail Image*</span>
+      </div>
+      <oppia-thumbnail-uploader [useLocalStorage]="false"
+                                (updateFilename)="updateThumbnailFilename($event)"
+                                [bgColor]="editableThumbnailBgColor"
+                                (updateBgColor)="updateThumbnailBgColor($event)"
+                                [allowedBgColors]="allowedBgColors"
+                                [aspectRatio]="'16:9'"
+                                [previewTitle]="title"
+                                previewDescriptionBgColor="#BE563C">
+      </oppia-thumbnail-uploader>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary e2e-test-cancel-chapter-creation-button" (click)="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success e2e-test-confirm-chapter-creation-button" type="submit" [disabled]="!isValid()">
+      <span>Create Chapter</span>
+    </button>
+  </div>
+</form>
+
+<style>
+  .chapter-input-header span {
+    font-weight: bold;
+  }
+  .chapter-input {
+    padding-bottom: 15px;
+  }
+  .chapter-input-thumbnail {
+    padding-bottom: 0;
+    padding-top: 10px;
+  }
+  .new-chapter-error-msg {
+    color: #f00;
+    font-size: small;
+  }
+  .modal-close-button {
+    display: none;
+  }
+  .oppia-new-chapter-title-field {
+    font-size: 12px;
+  }
+  @media screen and (max-width: 768px) {
+    .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .modal-content {
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+    }
+    .modal-header {
+      align-items: center;
+      background-color: #00609c;
+      display: flex;
+    }
+    .modal-header h3 {
+      color: #fff;
+    }
+    .chapter-input {
+      margin: 30px 10px;
+    }
+    .create-new-chapter-input-field {
+      margin: 25px 0;
+    }
+    .modal-close-button {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+  }
+
+</style>

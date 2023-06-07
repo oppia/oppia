@@ -39,6 +39,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { StoryNodeEditorComponent } from './editor-tab/story-node-editor.component';
+import { ChapterEditorTabComponent } from './chapter-editor/chapter-editor-tab.component';
+import { StoryEditorComponent } from './editor-tab/story-editor.component';
+import { StoryEditorPageComponent } from './story-editor-page.component';
+import { DeleteChapterModalComponent } from './modal-templates/delete-chapter-modal.component';
+import { NewChapterTitleModalComponent } from './modal-templates/new-chapter-title-modal.component';
 
 @NgModule({
   imports: [
@@ -57,14 +63,26 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryNodeEditorComponent,
+    StoryPreviewTabComponent,
+    ChapterEditorTabComponent,
+    StoryEditorComponent,
+    NewChapterTitleModalComponent,
+    StoryEditorPageComponent,
+    DeleteChapterModalComponent
   ],
   entryComponents: [
     StoryEditorNavbarBreadcrumbComponent,
     StoryEditorSaveModalComponent,
     StoryEditorUnpublishModalComponent,
     StoryEditorNavbarComponent,
-    StoryPreviewTabComponent
+    StoryNodeEditorComponent,
+    StoryPreviewTabComponent,
+    ChapterEditorTabComponent,
+    StoryEditorComponent,
+    NewChapterTitleModalComponent,
+    StoryEditorPageComponent,
+    DeleteChapterModalComponent
   ],
   providers: [
     {

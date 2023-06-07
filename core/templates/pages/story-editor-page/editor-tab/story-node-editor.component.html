@@ -1,0 +1,457 @@
+<div class="story-node">
+  <div class="story-node-content-container">
+    <div class="story-node-content">
+      <mat-card class="oppia-page-card oppia-long-text story-node-card story-node-input-card oppia-mobile-collapsible-card">
+        <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterCard()">
+          <span>Chapter Card</span>
+          <i class="fa fa-caret-down"
+             *ngIf="!mainChapterCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             *ngIf="mainChapterCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="mainChapterCardIsShown">
+          <div class="story-node-title">
+            <label for="storyNodeTitle" class="form-heading">Title*</label>
+            <div>
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  This will be shown to the learner. It overrides the title of the linked exploration.
+                </i>
+              </span>
+            </div>
+            <input id="storyNodeTitle" type="text" class="form-control"
+                   [(ngModel)]="editableTitle" [ngModelOptions]="{standalone: true}" (blur)="updateTitle(editableTitle)"
+                   placeholder="Enter a title for the chapter." [maxlength]="MAX_CHARS_IN_EXPLORATION_TITLE">
+            <span class="oppia-input-box-subtitle">
+              <i>
+                Chapter title should be at most {{ MAX_CHARS_IN_EXPLORATION_TITLE }} characters.
+              </i>
+            </span>
+          </div>
+          <div class="story-node-description">
+            <label for="storyNodeDescription" class="form-heading">Chapter description*</label>
+            <textarea id="storyNodeDescription" type="text" class="form-control e2e-test-add-chapter-description"
+                      [(ngModel)]="editableDescription" [ngModelOptions]="{standalone: true}" (blur)="updateDescription(editableDescription)" [oppiaFocusOn]="storyNodeDesc"
+                      placeholder="Enter the description for the chapter." [maxlength]="MAX_CHARS_IN_CHAPTER_DESCRIPTION">
+            </textarea>
+            <span class="oppia-input-box-subtitle">
+              <i>
+                Chapter description should be at most {{ MAX_CHARS_IN_CHAPTER_DESCRIPTION }} characters.
+              </i>
+            </span>
+          </div>
+          <div class="story-node-exploration">
+            <label class="form-heading"> Exploration ID*</label>
+            <form class="form-horizontal">
+              <input class="form-control e2e-test-exploration-id-input" type="text" [(ngModel)]="explorationId" [ngModelOptions]="{standalone: true}" (change)="checkCanSaveExpId()"
+                     (focus)="toggleExplorationInputButtons()">
+              <div class="save-button-container" *ngIf="explorationInputButtonsAreShown">
+                <span *ngIf="!isStoryPublished()" (click)="updateExplorationId(null)" class="fas fa-trash-alt list-summary"></span>
+                <button class="btn btn-default" (click)="toggleExplorationInputButtons()">Cancel</button>
+                <button type="submit"
+                        class="e2e-test-exploration-id-save-button btn btn-success btn-sm"
+                        (click)="updateExplorationId(explorationId)"
+                        [disabled]="!expIdCanBeSaved || (explorationId === currentExplorationId)">
+                  Save
+                </button>
+              </div>
+              <span class="form-text error-message" *ngIf="invalidExpErrorIsShown">
+                <em>Please enter a valid exploration id.</em>
+              </span>
+            </form>
+          </div>
+          <div class="e2e-test-story-node-thumbnail">
+            <label class="form-heading">Thumbnail Image*</label>
+            <oppia-thumbnail-uploader [filename]="thumbnailFilename"
+                                      [useLocalStorage]="false"
+                                      (updateFilename)="updateThumbnailFilename($event)"
+                                      [bgColor]="thumbnailBgColor"
+                                      (updateBgColor)="updateThumbnailBgColor($event)"
+                                      [allowedBgColors]="allowedBgColors"
+                                      [aspectRatio]="'16:9'"
+                                      [previewTitle]="editableTitle"
+                                      [previewDescription]="editableDescription">
+            </oppia-thumbnail-uploader>
+          </div>
+        </div>
+        <div *ngIf="mainChapterCardIsShown">
+          <div *ngIf="!chapterPreviewCardIsShown">
+            <button class="btn btn-default show-chapter-preview-button" (click)="togglePreview()">
+              Preview Chapter Card
+              <i class="fa fa-angle-down"></i>
+            </button>
+          </div>
+          <div *ngIf="chapterPreviewCardIsShown">
+            <button class="btn btn-default show-chapter-preview-button" (click)="togglePreview()">
+              Collapse Chapter Card
+              <i class="fa fa-angle-up"></i>
+            </button>
+          </div>
+          <div *ngIf="chapterPreviewCardIsShown">
+            <oppia-preview-thumbnail [name]="editableTitle"
+                                     [aspectRatio]="'16:9'"
+                                     [filename]="thumbnailFilename"
+                                     [description]="editableDescription"
+                                     [thumbnailBgColor]="thumbnailBgColor"
+                                     [bgColor]="thumbnailBgColor">
+            </oppia-preview-thumbnail>
+          </div>
+        </div>
+      </mat-card>
+      <mat-card class="oppia-page-card oppia-long-text story-node-card story-node-input-card oppia-mobile-collapsible-card">
+        <div class="e2e-test-add-chapter-outline">
+          <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterOutline()">
+            <span>Chapter Outline</span>
+            <i class="fa fa-caret-down"
+               *ngIf="!chapterOutlineIsShown"
+               aria-hidden="true">
+            </i>
+            <i class="fa fa-caret-up"
+               *ngIf="chapterOutlineIsShown"
+               aria-hidden="true">
+            </i>
+          </div>
+          <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
+            Outline Finalized
+            <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
+            <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
+            <div tabindex="-1" (blur)="toggleChapterOutlineButtons()" (click)="toggleChapterOutlineButtons()">
+              <schema-based-editor id="storyNodeOutline"
+                                   [schema]="OUTLINE_SCHEMA"
+                                   [localValue]="editableOutline"
+                                   (localValueChange)="updateLocalEditableOutline($event)">
+              </schema-based-editor>
+              <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
+                <button class="btn btn-default">Cancel</button>
+                <button type="button"
+                        class="btn btn-success save-button e2e-test-node-outline-save-button"
+                        [disabled]="!isOutlineModified(editableOutline)"
+                        (click)="updateOutline(editableOutline)">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+      <mat-card class="oppia-page-card oppia-long-text story-node-card skill-requirements-card story-skill-desktop">
+        <div class="story-node-header skill-requirements-header">
+          <span>Skill Requirements and Achievements</span>
+        </div>
+        <div>
+          <span class="oppia-input-box-subtitle">
+            <i>
+              The skill should be one of the skills that are linked to this topic.
+            </i>
+          </span>
+        </div>
+        <div class="story-skill-requirements">
+          <div class="prerequisite-skills">
+            <div class="skill-header">
+              <span>Prerequisite</span>
+            </div>
+            <div>
+              <div class="skills-card-item" *ngFor="let skillId of prerequisiteSkillIds">
+                <div class="skill-description-card e2e-test-prerequisite-skill-description-card">
+                  <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
+                  <span class="e2e-test-remove-prerequisite-skill" (click)="removePrerequisiteSkillId(skillId)" aria-hidden="true">
+                    <i class="fas fa-times md-18"></i>
+                  </span>
+                </div>
+              </div>
+              <button class="btn add-skill-btn e2e-test-add-prerequisite-skill" (click)="addPrerequisiteSkillId()" [disabled]="!skillInfoHasLoaded">+ ADD PREREQUISITE SKILL</button>
+            </div>
+          </div>
+          <div class="acquired-skills">
+            <div class="skill-header">
+              <span>Acquired</span>
+            </div>
+            <div>
+              <div class="skills-card-item" *ngFor="let skillId of acquiredSkillIds">
+                <div class="skill-description-card e2e-test-acquired-skill-description-card">
+                  <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
+                  <span class="e2e-test-remove-acquired-skill" (click)="removeAcquiredSkillId(skillId)" aria-hidden="true">
+                    <i class="fas fa-times md-18"></i>
+                  </span>
+                </div>
+              </div>
+              <button class="btn add-skill-btn e2e-test-add-acquired-skill" (click)="addAcquiredSkillId()" [disabled]="!skillInfoHasLoaded">+ ADD ACQUIRED SKILL</button>
+            </div>
+          </div>
+        </div>
+      </mat-card>
+
+      <div class="story-skill-mobile">
+        <mat-card class="oppia-page-card oppia-long-text story-node-card skill-requirements-card oppia-mobile-collapsible-card">
+          <div class="story-node-header skill-requirements-header oppia-mobile-collapsible-card-header" (click)="togglePrerequisiteSkillsList()">
+            <span>Prerequisite Skills</span>
+            <i class="fa fa-caret-down"
+               *ngIf="!prerequisiteSkillIsShown"
+               aria-hidden="true">
+            </i>
+            <i class="fa fa-caret-up"
+               *ngIf="prerequisiteSkillIsShown"
+               aria-hidden="true">
+            </i>
+          </div>
+          <div class="story-skill-requirements oppia-mobile-collapsible-card-content" *ngIf="prerequisiteSkillIsShown">
+            <div>
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  The skill should be one of the skills that are linked to this topic.
+                </i>
+              </span>
+            </div>
+            <div class="prerequisite-skills">
+              <div>
+                <div class="skills-card-item" *ngFor="let skillId of prerequisiteSkillIds">
+                  <div class="skill-description-card">
+                    <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
+                    <span class="e2e-test-remove-prerequisite-skill" (click)="removePrerequisiteSkillId(skillId)" aria-hidden="true">
+                      <i class="fas fa-times md-18"></i>
+                    </span>
+                  </div>
+                </div>
+                <button class="btn add-skill-btn e2e-test-add-prerequisite-skill" (click)="addPrerequisiteSkillId()" [disabled]="!skillInfoHasLoaded">+ ADD PREREQUISITE SKILL</button>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+
+        <mat-card class="oppia-page-card oppia-long-text story-node-card skill-requirements-card oppia-mobile-collapsible-card">
+          <div class="story-node-header skill-requirements-header oppia-mobile-collapsible-card-header" (click)="toggleAcquiredSkillsList()">
+            <span>Acquired Skills</span>
+            <i class="fa fa-caret-down"
+               *ngIf="!acquiredSkillIsShown"
+               aria-hidden="true">
+            </i>
+            <i class="fa fa-caret-up"
+               *ngIf="acquiredSkillIsShown"
+               aria-hidden="true">
+            </i>
+          </div>
+          <div class="story-skill-requirements oppia-mobile-collapsible-card-content" *ngIf="acquiredSkillIsShown">
+            <div>
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  The skill should be one of the skills that are linked to this topic.
+                </i>
+              </span>
+            </div>
+            <div class="acquired-skills">
+              <div>
+                <div class="skills-card-item" *ngFor="let skillId of acquiredSkillIds">
+                  <div class="skill-description-card">
+                    <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
+                    <span class="e2e-test-remove-acquired-skill" (click)="removeAcquiredSkillId(skillId)" aria-hidden="true">
+                      <i class="fas fa-times md-18"></i>
+                    </span>
+                  </div>
+                </div>
+                <button class="btn add-skill-btn e2e-test-add-acquired-skill" (click)="addAcquiredSkillId()" [disabled]="!skillInfoHasLoaded">+ ADD ACQUIRED SKILL</button>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+    <div class="story-node-content-info">
+      <mat-card class="oppia-page-card oppia-long-text story-node-card story-node-input-card oppia-mobile-collapsible-card">
+        <div class="story-node-header oppia-mobile-collapsible-card-header" (click)="toggleChapterTodoCard()">
+          <span>To-Do List</span>
+          <i class="fa fa-caret-down"
+             *ngIf="!chapterTodoCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             *ngIf="chapterTodoCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterTodoCardIsShown">
+          <div class="todo-item-container">
+            <i class="fa fa-minus" *ngIf="!outlineIsFinalized"></i>
+            <i class="fa fa-check todo-completed" *ngIf="outlineIsFinalized"></i>
+            <span>Complete Chapter Outline</span>
+          </div>
+          <div class="todo-item-container">
+            <i class="fa fa-minus" *ngIf="!explorationId"></i>
+            <i class="fa fa-check todo-completed" *ngIf="explorationId"></i>
+            <span>Link Exploration ID</span>
+          </div>
+          <div class="todo-item-container">
+            <i class="fa fa-minus" *ngIf="!currentDescription"></i>
+            <i class="fa fa-check todo-completed" *ngIf="currentDescription"></i>
+            <span>Create a chapter description</span>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</div>
+
+<style>
+  .story-node-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    width: 85%;
+  }
+  .story-node-content {
+    margin-right: 3%;
+    width: 50%;
+  }
+  .story-node-content-info {
+    margin-right: 5%;
+    width: 30%;
+  }
+  .story-node-card {
+    margin-bottom: 25px;
+    margin-top: 0;
+  }
+  .story-node-input-card {
+    margin-bottom: 20px;
+    margin-top: 0;
+    padding: 0;
+  }
+  .chapter-card-inputs {
+    padding: 30px 55px 30px 45px;
+  }
+  .story-node-header {
+    margin-bottom: 0;
+    margin-left: 25px;
+    padding-top: 35px;
+  }
+  .story-node-header span {
+    font-size: 17px;
+    font-weight: bold;
+  }
+  .story-node-header i {
+    display: none;
+  }
+  .show-chapter-preview-button {
+    border-top: 1px solid #c1c1c1;
+    color: #419889;
+    font-size: 15px;
+    padding: 10px 0;
+    width: 100%;
+  }
+  .skill-requirements-card {
+    padding: 35px 25px;
+  }
+  .story-skill-requirements {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .skill-requirements-header {
+    margin-left: 0;
+    margin-top: 0;
+  }
+  .story-node-header.skill-requirements-header {
+    padding-top: 0;
+  }
+  .prerequisite-skills,
+  .acquired-skills {
+    display: inline-block;
+    width: 48%;
+  }
+  .add-skill-btn {
+    background-color: #008098;
+    color: #fff;
+    font-weight: bold;
+    margin-top: 12px;
+    text-align: left;
+  }
+  .skill-header {
+    border-bottom: 2px solid #000;
+    margin: 8px 0;
+  }
+  .skill-description-card {
+    border-bottom: 1px solid #e6e6e6;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+  }
+  .skill-description-card a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .skill-description-card a:hover {
+    font-weight: bold;
+  }
+  .todo-completed {
+    color: #00ff7f;
+  }
+  .story-node-title,
+  .story-node-description,
+  .story-node-exploration {
+    margin-bottom: 25px;
+  }
+  .todo-item-container {
+    margin-bottom: 5px;
+  }
+  .save-button-container {
+    text-align: right;
+  }
+  .save-button-container button {
+    margin-top: 2px;
+  }
+  .story-skill-mobile {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    .story-node-content-container {
+      width: 100%;
+    }
+    .story-node-content {
+      margin-right: 0;
+      order: 10;
+      width: 100%;
+    }
+    .story-node-header i {
+      display: block;
+    }
+    .chapter-card-inputs {
+      padding: 20px 26px 15px;
+    }
+    .story-node-content-info {
+      margin-right: 0;
+      order: 1;
+      width: 100%;
+    }
+    .story-skill-desktop {
+      display: none;
+    }
+    .story-skill-mobile {
+      display: block;
+    }
+    .prerequisite-skills,
+    .acquired-skills {
+      width: 100%;
+    }
+    .skill-requirements-header {
+      margin-left: 0;
+      margin-top: 0;
+    }
+    .story-node-header {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      margin-left: 0;
+      margin-top: 0;
+    }
+    .skill-requirements-card {
+      padding: 0;
+    }
+    .story-skill-requirements {
+      margin-top: 0;
+    }
+  }
+</style>
