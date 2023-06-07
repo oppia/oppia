@@ -27,7 +27,6 @@ import { Subscription } from 'rxjs';
 import { AppConstants } from 'app.constants';
 import { FeedbackThreadSummary, FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
 import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
-import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -132,8 +131,6 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     private dateTimeFormatService: DateTimeFormatService,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private learnerDashboardBackendApiService:
-      LearnerDashboardBackendApiService,
     private feedbackUpdatesBackendApiService:
       FeedbackUpdatesBackendApiService,
     private loaderService: LoaderService,

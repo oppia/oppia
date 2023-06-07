@@ -30,10 +30,6 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import './goals-tab.component.css';
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
-import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
-import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
 @Component({
   selector: 'oppia-goals-tab',
@@ -45,10 +41,6 @@ export class GoalsTabComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private playerTranscriptService: PlayerTranscriptService,
-    private explorationEngineService: ExplorationEngineService,
-    private readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService,
     private learnerDashboardActivityBackendApiService:
       LearnerDashboardActivityBackendApiService,
     private deviceInfoService: DeviceInfoService) {
@@ -92,10 +84,6 @@ export class GoalsTabComponent implements OnInit {
   editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
-  recentcheckpoint: number[] = [];
-  expStates: StateObjectsBackendDict;
-  checkpointCount: number = 0;
-
 
 
   ngOnInit(): void {
@@ -128,51 +116,12 @@ export class GoalsTabComponent implements OnInit {
     for (topic of this.partiallyLearntTopicsList) {
       this.topicIdsInPartiallyLearntTopics.push(topic.id);
     }
-    console.error(this.completedGoals,"completed");
-    console.error(this.currentGoals,"current goals");
-    console.error(this.partiallyLearntTopicsList,"partially learnt topic");
-    console.error(this.learntToPartiallyLearntTopics,"learnt to partially learnt topic");
-    console.error(this.playerTranscriptService.getNumCards(),"no of cards in exploration");
-    // this.getMostRecentlyReachedCheckpointIndex();
-    this.getCheckpointCount();
+
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       }));
-  }
-
-  getMostRecentlyReachedCheckpointIndex(): number {
-    let checkpointIndex = 0;
-    let numberOfCards = this.playerTranscriptService.getNumCards();
-    for (let i = 0; i < numberOfCards; i++) {
-      let stateName = this.playerTranscriptService.getCard(i).getStateName();
-      let correspondingState = this.explorationEngineService.
-        getStateFromStateName(stateName);
-      if (correspondingState.cardIsCheckpoint) {
-        checkpointIndex++;
-        this.recentcheckpoint.push(checkpointIndex);
-      }
-    }
-    console.error(checkpointIndex,"checkpoint index from goal tab");
-    console.error(this.recentcheckpoint,"recent checkpoint array goal tab");
-    return checkpointIndex;
-  }
-
-  async getCheckpointCount(): Promise<void> {
-    return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync('mRYzXqTbnbdw', null).then(
-        (response: FetchExplorationBackendResponse) => {
-          this.expStates = response.exploration.states;
-          let count = 0;
-          for (let [, value] of Object.entries(this.expStates)) {
-            if (value.card_is_checkpoint) {
-              count++;
-            }
-          }
-          console.error(count,"total checkpoint count in an exploration in goal tab");
-          this.checkpointCount = count;
-        });
   }
 
   getTopicPageUrl(

@@ -31,8 +31,6 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
@@ -55,14 +53,6 @@ class MockSlicePipe {
 class MockTrunctePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
-  }
-}
-
-class MockLearnerDashboardActivityBackendApiService {
-  async removeActivityModalAsync(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      resolve();
-    });
   }
 }
 
@@ -187,7 +177,7 @@ describe('Feedback updates page', () => {
     isLoggedIn: () => true
   };
 
-  describe('when succesfully fetching learner dashboard data', () => {
+  describe('when succesfully fetching feedback updates data', () => {
     beforeEach(async(() => {
       mockResizeEmitter = new EventEmitter();
       TestBed.configureTestingModule({
@@ -210,12 +200,7 @@ describe('Feedback updates page', () => {
           AlertsService,
           DateTimeFormatService,
           FocusManagerService,
-          LearnerDashboardBackendApiService,
           FeedbackUpdatesBackendApiService,
-          {
-            provide: LearnerDashboardActivityBackendApiService,
-            useClass: MockLearnerDashboardActivityBackendApiService
-          },
           {
             provide: WindowDimensionsService,
             useValue: {
@@ -363,9 +348,9 @@ describe('Feedback updates page', () => {
       component.setPageTitle();
 
       expect(translateService.instant).toHaveBeenCalledWith(
-        'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
+        'I18N_FEEDBACK_UPDATES_PAGE_TITLE');
       expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-        'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
+        'I18N_FEEDBACK_UPDATES_PAGE_TITLE');
     });
 
     it('should get static image url', () => {
@@ -798,7 +783,6 @@ describe('Feedback updates page', () => {
         providers: [
           AlertsService,
           CsrfTokenService,
-          LearnerDashboardBackendApiService,
           FeedbackUpdatesBackendApiService,
           UserService,
           PageTitleService,
@@ -836,7 +820,7 @@ describe('Feedback updates page', () => {
       fakeAsync(() => {
         const fetchDataSpy = spyOn(
           feedbackUpdatesBackendApiService,
-          'fetchLearnerDashboardFeedbackUpdatesDataAsync')
+          'fetchFeedbackUpdatesDataAsync')
           .and.rejectWith(404);
         const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
@@ -846,7 +830,7 @@ describe('Feedback updates page', () => {
         fixture.detectChanges();
 
         expect(alertsSpy).toHaveBeenCalledWith(
-          'Failed to get learner dashboard feedback updates data');
+          'Failed to get feedback updates data');
         expect(fetchDataSpy).toHaveBeenCalled();
         tick(1000);
       }));

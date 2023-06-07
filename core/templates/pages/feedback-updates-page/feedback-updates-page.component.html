@@ -41,7 +41,7 @@
                 <span [innerHTML]="activeSection | translate">
                 </span>
               </span>
-              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS' | translate" class="empty-feedback-threads"></p>
+              <p [innerHTML]="'I18N_EMPTY_FEEDBACK_UPDATES_THREADS' | translate" class="empty-feedback-threads"></p>
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-feedback-updates-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
@@ -94,11 +94,11 @@
                 </span>
                 <span *ngIf="thread.lastMessageText">{{ thread.lastMessageText | truncate:50 }}</span>
                 <span *ngIf="!thread.lastMessageText && thread.totalMessageCount !== 1">
-                  <i [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(thread.status)}">
+                  <i [innerHTML]="'I18N_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(thread.status)}">
                   </i>
                 </span>
                 <span *ngIf="!thread.lastMessageText && thread.totalMessageCount === 1">
-                  <i [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT' | translate"></i>
+                  <i [innerHTML]="'I18N_FEEDBACK_UPDATES_SUGGESTION_TEXT' | translate"></i>
                 </span>
               </td>
               <td width="20%">
@@ -113,7 +113,7 @@
                 <button (click)="showAllThreads()"
                         class="btn btn-secondary oppia-btn-secondary oppia-box-size">
                   <i class="fas fa-chevron-left"
-                     title="{{ 'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
+                     title="{{ 'I18N_FEEDBACK_UPDATES_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
                   </i>
                 </button>
                 <span class="oppia-exploration-title">{{ explorationTitle }}</span>
@@ -163,7 +163,7 @@
                       </span>
                       <span class="oppia-updated-status"
                             *ngIf="message.messageId !== 0 && message.updatedStatus">
-                        <em [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(message.updatedStatus)}">
+                        <em [innerHTML]="'I18N_FEEDBACK_UPDATES_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(message.updatedStatus)}">
                         </em>
                       </span>
                     </div>
@@ -180,7 +180,7 @@
                         <button *ngIf="message.currentContentHtml"
                                 class="btn btn-primary oppia-dashboard-view-suggestion-button"
                                 (click)="showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
-                                [innerHTML]="'I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION' | translate">
+                                [innerHTML]="'I18N_FEEDBACK_UPDATES_VIEW_SUGGESTION' | translate">
                         </button>
                       </div>
                     </div>
@@ -208,7 +208,7 @@
                   <div class="col-sm-11">
                     <div class="feedback-thread-new-message">
                       <textarea class="form-control feedback-thread-reply-box"
-                                placeholder="{{ 'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate }}" [(ngModel)]="newMessage.text">
+                                placeholder="{{ 'I18N_FEEDBACK_UPDATES_THREAD_DEFAULT_MESSAGE' | translate }}" [(ngModel)]="newMessage.text">
                       </textarea>
                     </div>
                     <div>
@@ -216,11 +216,11 @@
                               (click)="addNewMessage(threadId, newMessage.text)"
                               ng-disabled="messageSendingInProgress || !newMessage.text">
                         <span *ngIf="messageSendingInProgress"
-                              [innerHTML]="'I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS' | translate">
+                              [innerHTML]="'I18N_FEEDBACK_UPDATES_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS' | translate">
                         </span>
                         <span class="e2e-test-feedback-send-message"
                               *ngIf="!messageSendingInProgress"
-                              [innerHTML]="'I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE' | translate">
+                              [innerHTML]="'I18N_FEEDBACK_UPDATES_SEND_FEEDBACK_THREAD_MESSAGE' | translate">
                         </span>
                       </button>
                     </div>
@@ -232,7 +232,7 @@
           <div class="feedback-thread-warning"
                *ngIf="feedbackThreadActive">
             <i class="fas fa-exclamation-circle"></i>
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
+            <span [innerHTML]="'I18N_FEEDBACK_UPDATES_FEEDBACK_THREAD_WARNING' | translate"></span>
           </div>
           <div class="oppia-feedback-updates-page-pagination-container" *ngIf="paginatedThreadsList.length > 0">
             <button class="oppia-pagination-button" type="button" (click)="fetchFeedbackUpdates()">
