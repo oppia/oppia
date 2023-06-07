@@ -2227,7 +2227,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
-        # last_activity can not be used here.
+        # last_activity can not be used here. Learn more about this here
+        # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         if topic_ids is not None:
             sort_query = cls.query(
                 datastore_services.all_of(
@@ -2613,7 +2614,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
-        # last_activity can not be used here.
+        # last_activity can not be used here. Learn more about this here
+        # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         sort_query = cls.query(
             datastore_services.all_of(
                 cls.language_code == language_code
@@ -2935,7 +2937,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
-        # last_activity can not be used here.
+        # last_activity can not be used here. Learn more about this here
+        # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         if topic_ids is not None:
             sort_query = cls.query(
                 datastore_services.all_of(
@@ -3211,7 +3214,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
-        # last_activity can not be used here.
+        # last_activity can not be used here. Learn more about this here
+        # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         sort_query = cls.get_all().order(sort)
 
         sorted_results: List[
