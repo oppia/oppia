@@ -543,6 +543,10 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
+  alwaysAskLearnerForAnswerDetails(): boolean {
+    return this.explorationEngineService.getAlwaysAskLearnerForAnswerDetails();
+  }
+
   getCanAskLearnerForAnswerInfo(): boolean {
     return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
   }
@@ -1138,7 +1142,6 @@ export class ConversationSkinComponent {
 
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
-    this.hasFullyLoaded = true;
 
     // If the exploration is embedded, use the url language code
     // as site language. If the url language code is not supported
@@ -1219,7 +1222,8 @@ export class ConversationSkinComponent {
     ) {
       this.initLearnerAnswerInfoService(
         this.explorationId, this.explorationEngineService.getState(),
-        answer, interactionRulesService, false);
+        answer, interactionRulesService,
+        this.alwaysAskLearnerForAnswerDetails());
     }
 
     this.numberAttemptsService.submitAttempt();

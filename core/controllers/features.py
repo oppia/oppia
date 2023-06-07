@@ -20,6 +20,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import opportunity_services
 
 from typing import Dict
@@ -54,5 +55,7 @@ class ExplorationFeaturesHandler(
         self.render_json({
             'exploration_is_curated':
                 opportunity_services.is_exploration_available_for_contribution(
-                    exploration_id)
+                    exploration_id),
+            'always_ask_learners_for_answer_details':
+                config_domain.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
         })

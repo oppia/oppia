@@ -27,10 +27,12 @@ import { UrlInterpolationService } from
 
 interface ExplorationFeaturesBackendDict {
   'exploration_is_curated': boolean;
+  'always_ask_learners_for_answer_details': boolean;
 }
 
 export interface ExplorationFeatures {
   explorationIsCurated: boolean;
+  alwaysAskLearnersForAnswerDetails: boolean;
 }
 
 @Injectable({
@@ -49,7 +51,9 @@ export class ExplorationFeaturesBackendApiService {
         {exploration_id: explorationId}
       ) as string
     ).toPromise().then(response => ({
-      explorationIsCurated: response.exploration_is_curated
+      explorationIsCurated: response.exploration_is_curated,
+      alwaysAskLearnersForAnswerDetails: (
+        response.always_ask_learners_for_answer_details),
     }), errorResponse => {
       throw new Error(errorResponse.error.error);
     });

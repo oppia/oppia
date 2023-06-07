@@ -1393,6 +1393,14 @@ describe('Conversation skin component', () => {
       .toHaveBeenCalled();
   });
 
+  it('should always ask learner for answer details', () => {
+    spyOn(explorationEngineService, 'getAlwaysAskLearnerForAnswerDetails')
+      .and.returnValues(true, false);
+
+    expect(componentInstance.alwaysAskLearnerForAnswerDetails()).toBeTrue();
+    expect(componentInstance.alwaysAskLearnerForAnswerDetails()).toBeFalse();
+  });
+
   it('should get can ask learner for answer info', () => {
     spyOn(learnerAnswerInfoService, 'getCanAskLearnerForAnswerInfo')
       .and.returnValues(true, false);

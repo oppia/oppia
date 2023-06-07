@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -30,6 +30,7 @@ import { TextInputRulesService } from 'interactions/TextInput/directives/text-in
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { AudioPreloaderService } from './audio-preloader.service';
 import { ContentTranslationLanguageService } from './content-translation-language.service';
@@ -49,6 +50,8 @@ describe('Exploration engine service ', () => {
   let contextService: ContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
+  let explorationFeaturesBackendApiService:
+    ExplorationFeaturesBackendApiService;
   let explorationEngineService: ExplorationEngineService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
@@ -64,6 +67,7 @@ describe('Exploration engine service ', () => {
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
+  let explorationFeatures: ExplorationFeatures;
 
   beforeEach(() => {
     explorationDict = {
@@ -357,6 +361,11 @@ describe('Exploration engine service ', () => {
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     };
+
+    explorationFeatures = {
+      explorationIsCurated: true,
+      alwaysAskLearnersForAnswerDetails: true
+    };
   });
 
   beforeEach(() => {
@@ -376,6 +385,8 @@ describe('Exploration engine service ', () => {
       ContentTranslationLanguageService);
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService);
+    explorationFeaturesBackendApiService = TestBed.inject(
+      ExplorationFeaturesBackendApiService);
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
@@ -672,6 +683,27 @@ describe('Exploration engine service ', () => {
         .toHaveBeenCalledWith('Question content should not be empty.');
     });
   });
+
+  it('should check whether we can ask learner for answer ' +
+    'details', fakeAsync(() => {
+    let initSuccessCb = jasmine.createSpy('success');
+
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
+      .and.returnValue(Promise.resolve(explorationFeatures));
+
+    // Here default value is set to false.
+    expect(explorationEngineService.getAlwaysAskLearnerForAnswerDetails())
+      .toBe(false);
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], [], initSuccessCb);
+    tick();
+
+    const answerDetails = (
+      explorationEngineService.getAlwaysAskLearnerForAnswerDetails());
+    expect(answerDetails).toBe(true);
+  }));
 
   it('should return default exploration id', () => {
     // Please note that default exploration id is 'test_id'.

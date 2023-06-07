@@ -203,7 +203,6 @@ class ConfigProperty:
     - admin_ids.
     - admin_usernames.
     - allow_yaml_file_upload.
-    - always_ask_learners_for_answer_details.
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
@@ -480,6 +479,11 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
 IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
     'is_improvements_tab_enabled', BOOL_SCHEMA,
     'Exposes the Improvements Tab for creators in the exploration editor.',
+    False)
+
+ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
+    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
+    'Always ask learners for answer details. For testing -- do not use',
     False)
 
 LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
