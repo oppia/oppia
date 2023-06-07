@@ -131,6 +131,7 @@ COMMUNITY_CONTRIBUTION_STATS_MODEL_ID: Final = 'community_contribution_stats'
 # Number of models to fetch for contributor admin dashboard stats.
 NUM_MODELS_PER_FETCH: Final = 100
 
+
 class GeneralSuggestionExportDataDict(TypedDict):
     """Type for the Dictionary of the data from GeneralSuggestionModel."""
 
@@ -2601,7 +2602,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                 -cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
                 cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingReviewedTranslation']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                'IncreasingReviewedTranslation']:
                 cls.reviewed_translations_count
         }
 
@@ -3198,7 +3200,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 -cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
                 cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingReviewedTranslation']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                'IncreasingReviewedTranslation']:
                 cls.reviewed_questions_count
         }
 
