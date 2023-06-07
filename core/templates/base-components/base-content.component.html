@@ -24,9 +24,10 @@
     </div>
   </div>
   <div *ngIf="!iframed">
-    <div role="button" tabindex="0" (click)="skipToMainContent()"
-         class="oppia-skip-to-content e2e-test-skip-link">Skip to Main Content
-    </div>
+    <a role="button" tabindex="0" (click)="skipToMainContent()"
+       class="oppia-skip-to-content e2e-test-skip-link">
+      Skip to Main Content
+    </a>
     <oppia-promo-bar>
     </oppia-promo-bar>
     <div *ngIf="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
