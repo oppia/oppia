@@ -274,7 +274,8 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                   CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
               };
             }
-            if (userInfo.isQuestionAdmin()) {
+            if (userInfo.isQuestionAdmin() ||
+                userInfo.isQuestionCoordinator()) {
               questionCategories = {
                 REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
