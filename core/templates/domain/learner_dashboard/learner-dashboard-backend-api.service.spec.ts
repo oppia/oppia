@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AddMessagePayload, LearnerDashboardBackendApiService } from
+import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';

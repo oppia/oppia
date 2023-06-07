@@ -120,8 +120,6 @@ export class FeedbackUpdatesBackendApiService {
       });
     });
   }
-
-
 }
 
 angular.module('oppia').factory(

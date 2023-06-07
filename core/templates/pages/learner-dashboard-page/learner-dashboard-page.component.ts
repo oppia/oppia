@@ -88,7 +88,6 @@ import './learner-dashboard-page.component.css';
   ]
 })
 export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
-
   LEARNER_DASHBOARD_SECTION_I18N_IDS = (
     LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS);
 
