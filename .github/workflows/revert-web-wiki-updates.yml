@@ -1,4 +1,4 @@
-name: Revert Wiki Changes Made Through the Web Interface
+name: Manual revert
 on:
   workflow_dispatch:
 
