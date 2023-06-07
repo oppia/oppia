@@ -3201,7 +3201,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                'IncreasingReviewedTranslation']:
+                'IncreasingReviewedQuestion']:
                 cls.reviewed_questions_count
         }
 
