@@ -790,7 +790,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
             last_hundred_accepted_translations_without_reviewer_edits_count=(
                 self
-            # Pylint disable is needed cause variable name is too long.
+            # Pylint disable is needed because variable name is too long.
                 .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
             last_hundred_rejected_translations_count=(
                 self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
@@ -2002,7 +2002,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'overall_accuracy': self.OVERALL_ACCURACY,
                     'last_hundred_accepted_translations_count': (
                         self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-                    # Pylint disable is needed cause variable name is too long.
+                    # Pylint disable is needed because variable name is too long.
                     'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
                         self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
                     'last_hundred_rejected_translations_count': (
@@ -2061,7 +2061,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'overall_accuracy': self.OVERALL_ACCURACY,
                     'last_hundred_accepted_questions_count': (
                         self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-                    # Pylint disable is needed cause variable name is too long.
+                    # Pylint disable is needed because variable name is too long.
                     'last_hundred_accepted_questions_without_reviewer_edits_count': ( # pylint: disable=line-too-long
                         self.LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
                     'last_hundred_rejected_questions_count': (

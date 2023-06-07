@@ -128,6 +128,8 @@ INCREMENT_SCORE_OF_AUTHOR_BY: Final = 1
 # The unique ID for the CommunityContributionStatsModel.
 COMMUNITY_CONTRIBUTION_STATS_MODEL_ID: Final = 'community_contribution_stats'
 
+# Number of models to fetch for contributor admin dashboard stats.
+NUM_MODELS_PER_FETCH: Final = 100
 
 class GeneralSuggestionExportDataDict(TypedDict):
     """Type for the Dictionary of the data from GeneralSuggestionModel."""
@@ -2020,7 +2022,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     # contribution.
     topic_ids_with_translation_submissions = datastore_services.StringProperty(
         repeated=True, indexed=True)
-    # The outcomes of last 100 translation submitted by the user.
+    # The outcomes of last 100 translations submitted by the user.
     recent_review_outcomes = datastore_services.StringProperty(
         repeated=True, indexed=True, choices=REVIEW_OUTCOME_STATUS)
     # Performance of the user in last 100 translations.
@@ -2031,14 +2033,14 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     # overall_accuracy = accepted cards/ submitted cards.
     overall_accuracy = datastore_services.FloatProperty(
         required=True, indexed=True)
-    # The number of accepted translation in last 100 reviews.
+    # The number of accepted translations in last 100 reviews.
     last_hundred_accepted_translations_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-    # The number of accepted translation without reviewer edits in
+    # The number of accepted translations without reviewer edits in
     # last 100 reviews.
     last_hundred_accepted_translations_without_reviewer_edits_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-    # The number of rejected translation in last 100 reviews.
+    # The number of rejected translations in last 100 reviews.
     last_hundred_rejected_translations_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
     # The number of submitted translations.
@@ -2200,35 +2202,27 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
+
+        sort_options_dict = {
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingLastActivity']:
+                -cls.last_contribution_date,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
+                cls.last_contribution_date,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingPerformance']:
+                cls.recent_performance,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingAccuracy']:
+                -cls.overall_accuracy,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingAccuracy']:
+                cls.overall_accuracy,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingSubmissions']:
+                -cls.submitted_translations_count,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingSubmissions']:
+                cls.submitted_translations_count
+        }
+
         sort = -cls.recent_performance
-        if sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity']):
-            sort = -cls.last_contribution_date
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingLastActivity']):
-            sort = cls.last_contribution_date
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingPerformance']):
-            sort = cls.recent_performance
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingAccuracy']):
-            sort = -cls.overall_accuracy
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingAccuracy']):
-            sort = cls.overall_accuracy
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingSubmissions']):
-            sort = -cls.submitted_translations_count
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingSubmissions']):
-            sort = cls.submitted_translations_count
+        if sort_by is not None:
+            sort = sort_options_dict[sort_by]
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
@@ -2238,16 +2232,15 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 datastore_services.all_of(
                     cls.language_code == language_code,
                     cls.topic_ids_with_translation_submissions.IN(topic_ids)
-                    )).order(sort)
+                )).order(sort)
         else:
             sort_query = cls.query(
                 datastore_services.all_of(
                     cls.language_code == language_code
-                    )).order(sort)
+                )).order(sort)
 
         sorted_results: List[
             TranslationSubmitterTotalContributionStatsModel] = []
-        num_models_per_fetch = 100
         today = datetime.date.today()
 
         if last_activity is not None:
@@ -2257,7 +2250,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result_models: Sequence[
                     TranslationSubmitterTotalContributionStatsModel] = (
                     sort_query.fetch(
-                        num_models_per_fetch, offset=next_offset))
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
                 if not result_models:
                     next_offset += 1
                     break
@@ -2268,9 +2261,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results = list((
-                sort_query.fetch(
-                    page_size, offset=offset)))
+            sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
 
         # Check whether we have more results.
@@ -2401,7 +2392,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             cls.get_all().filter(cls.contributor_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
-            id_without_user_id = '%s' % (splitted_id[0])
+            id_without_user_id = splitted_id[0]
             user_data[id_without_user_id] = {
                 'language_code': model.language_code,
                 'topic_ids_with_translation_submissions': (
@@ -2604,19 +2595,19 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
+
+        sort_options_dict = {
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingLastActivity']:
+                -cls.last_contribution_date,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
+                cls.last_contribution_date,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingReviewedTranslation']:
+                cls.reviewed_translations_count
+        }
+
         sort = -cls.reviewed_translations_count
-        if sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity']):
-            sort = -cls.last_contribution_date
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingLastActivity']):
-            sort = cls.last_contribution_date
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslation']):
-            sort = cls.reviewed_translations_count
+        if sort_by is not None:
+            sort = sort_options_dict[sort_by]
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
@@ -2624,11 +2615,10 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         sort_query = cls.query(
             datastore_services.all_of(
                 cls.language_code == language_code
-                )).order(sort)
+            )).order(sort)
 
         sorted_results: List[
             TranslationReviewerTotalContributionStatsModel] = []
-        num_models_per_fetch = 100
         today = datetime.date.today()
 
         if last_activity is not None:
@@ -2638,7 +2628,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                 result_models: Sequence[
                     TranslationReviewerTotalContributionStatsModel] = (
                     sort_query.fetch(
-                        num_models_per_fetch, offset=next_offset))
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
                 if not result_models:
                     next_offset += 1
                     break
@@ -2649,9 +2639,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results = list((
-                sort_query.fetch(
-                    page_size, offset=offset)))
+            sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
 
         # Check whether we have more results.
@@ -2751,7 +2739,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             cls.get_all().filter(cls.contributor_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
-            id_without_user_id = '%s' % (splitted_id[0])
+            id_without_user_id = splitted_id[0]
             user_data[id_without_user_id] = {
                 'language_code': model.language_code,
                 'topic_ids_with_translation_reviews': (
@@ -2792,7 +2780,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     # Review outcomes of last 100 contributions of the user.
     recent_review_outcomes = datastore_services.StringProperty(
         repeated=True, indexed=True)
-    # Performance of the user in last 100 question submission.
+    # Performance of the user in last 100 questions submission.
     # recent_performance = accepted_questions - 2 (rejected_questions).
     recent_performance = datastore_services.IntegerProperty(
         required=True, indexed=True)
@@ -2921,35 +2909,27 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
+
+        sort_options_dict = {
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingLastActivity']:
+                -cls.last_contribution_date,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
+                cls.last_contribution_date,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingPerformance']:
+                cls.recent_performance,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingAccuracy']:
+                -cls.overall_accuracy,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingAccuracy']:
+                cls.overall_accuracy,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingSubmissions']:
+                -cls.submitted_questions_count,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingSubmissions']:
+                cls.submitted_questions_count
+        }
+
         sort = -cls.recent_performance
-        if sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity']):
-            sort = -cls.last_contribution_date
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingLastActivity']):
-            sort = cls.last_contribution_date
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingPerformance']):
-            sort = cls.recent_performance
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingAccuracy']):
-            sort = -cls.overall_accuracy
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingAccuracy']):
-            sort = cls.overall_accuracy
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingSubmissions']):
-            sort = -cls.submitted_questions_count
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingSubmissions']):
-            sort = cls.submitted_questions_count
+        if sort_by is not None:
+            sort = sort_options_dict[sort_by]
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
@@ -2958,13 +2938,12 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             sort_query = cls.query(
                 datastore_services.all_of(
                     cls.topic_ids_with_question_submissions.IN(topic_ids)
-                    )).order(sort)
+                )).order(sort)
         else:
             sort_query = cls.get_all().order(sort)
 
         sorted_results: List[
             QuestionSubmitterTotalContributionStatsModel] = []
-        num_models_per_fetch = 100
         today = datetime.date.today()
 
         if last_activity is not None:
@@ -2974,7 +2953,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result_models: Sequence[
                     QuestionSubmitterTotalContributionStatsModel] = (
                     sort_query.fetch(
-                        num_models_per_fetch, offset=next_offset))
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
                 if not result_models:
                     next_offset += 1
                     break
@@ -2985,9 +2964,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results = list((
-                sort_query.fetch(
-                    page_size, offset=offset)))
+            sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
 
         # Check whether we have more results.
@@ -3215,19 +3192,19 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
+
+        sort_options_dict = {
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingLastActivity']:
+                -cls.last_contribution_date,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
+                cls.last_contribution_date,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingReviewedTranslation']:
+                cls.reviewed_questions_count
+        }
+
         sort = -cls.reviewed_questions_count
-        if sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity']):
-            sort = -cls.last_contribution_date
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingLastActivity']):
-            sort = cls.last_contribution_date
-        elif sort_by == (
-                constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedQuestion']):
-            sort = cls.reviewed_questions_count
+        if sort_by is not None:
+            sort = sort_options_dict[sort_by]
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
@@ -3236,7 +3213,6 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         sorted_results: List[
             QuestionReviewerTotalContributionStatsModel] = []
-        num_models_per_fetch = 100
         today = datetime.date.today()
 
         if last_activity is not None:
@@ -3246,7 +3222,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 result_models: Sequence[
                     QuestionReviewerTotalContributionStatsModel] = (
                     sort_query.fetch(
-                        num_models_per_fetch, offset=next_offset))
+                        NUM_MODELS_PER_FETCH, offset=next_offset))
                 if not result_models:
                     next_offset += 1
                     break
@@ -3257,9 +3233,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                         if len(sorted_results) == page_size:
                             break
         else:
-            sorted_results = list((
-                sort_query.fetch(
-                    page_size, offset=offset)))
+            sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
 
         # Check whether we have more results.

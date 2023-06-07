@@ -124,12 +124,12 @@ export default {
     "DecreasingPerformance": "Highest to Lowest Performance",
     "IncreasingAccuracy": "Lowest to Highest Accuracy",
     "DecreasingAccuracy": "Highest to Lowest Accuracy",
-    "IncreasingSubmissions": "Lowest to Highest submitted Translations",
-    "DecreasingSubmissions": "Highest to Lowest Translations",
-    "IncreasingReviewedTranslation": "Lowest to Highest reviewed Translations",
-    "DecreasingReviewedTranslation": "Highest to Lowest reviewed Translations",
-    "IncreasingReviewedQuestion": "Lowest to Highest reviewed Questions",
-    "DecreasingReviewedQuestion": "Highest to Lowest reviewed Questions"
+    "IncreasingSubmissions": "Lowest to Highest Submitted Contributions",
+    "DecreasingSubmissions": "Highest to Lowest Submitted Contributions",
+    "IncreasingReviewedTranslation": "Lowest to Highest Reviewed Translations",
+    "DecreasingReviewedTranslation": "Highest to Lowest Reviewed Translations",
+    "IncreasingReviewedQuestion": "Lowest to Highest Reviewed Questions",
+    "DecreasingReviewedQuestion": "Highest to Lowest Reviewed Questions"
   },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
