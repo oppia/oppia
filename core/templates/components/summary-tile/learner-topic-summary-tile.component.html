@@ -3,6 +3,7 @@
      target="{{ openInNewWindow ? '_blank' : '_self' }}"
      class="oppia-topic-link">
     <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+      // The alt text is empty as the image is just a thumbnail image, it is not supposed to convey any important information to the user
       <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
     <div class="oppia-summary-section">

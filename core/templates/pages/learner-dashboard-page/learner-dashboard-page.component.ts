@@ -90,6 +90,10 @@ import './learner-dashboard-page.component.css';
   ]
 })
 export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
+  @ViewChild(
+    'explorationTitleRef', { 'static': false })
+    explorationTitleRef!: ElementRef;
+
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
 
@@ -538,6 +542,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         }
         this.loadingFeedbacks = false;
       });
+    setTimeout(() => {
+      this.explorationTitleRef.nativeElement.focus();
+    });
   }
 
   showAllThreads(): void {

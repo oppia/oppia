@@ -240,12 +240,13 @@
             <tr>
               <td>
                 <button (click)="showAllThreads()"
-                        class="btn btn-secondary oppia-btn-secondary oppia-box-size">
+                        class="btn btn-secondary oppia-btn-secondary oppia-box-size"
+                        aria-label="Return to the list of messages button">
                   <i class="fas fa-chevron-left"
                      title="{{ 'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
                   </i>
                 </button>
-                <span class="oppia-exploration-title">{{ explorationTitle }}</span>
+                <span class="oppia-exploration-title" #explorationTitleRef tabindex="0">{{ explorationTitle }}</span>
               </td>
             </tr>
             <tr *ngIf="loadingFeedbacks">
