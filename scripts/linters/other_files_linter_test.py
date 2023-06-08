@@ -49,11 +49,11 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             '{"dependencies":{"frontend":{"midiJs":{"version": "0.4"}}}}'
         )
         self.package_file = io.StringIO(
-            '{"dependencies":{"nerdamer":"^0.6","guppy-dev":"0.1",'
-            '"skulpt-dist":"0.2"}}'
+            '{"dependencies":{"nerdamer":"^0.6","skulpt-dist":"0.2",'
+            '"guppy-dev":"oppia/guppy#f509e"}}'
         )
         self.files_in_typings_dir = [
-            'guppy-defs-0.1.d.ts',
+            'guppy-defs-f509e.d.ts',
             'skulpt-defs-0.2.d.ts',
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
@@ -250,7 +250,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_check_third_party_libs_type_defs_wrong_version(self) -> None:
         self.files_in_typings_dir = [
-            'guppy-defs-0.2.d.ts',
+            # 'guppy-defs-0.2.d.ts',
+            'guppy-defs-x509x.d.ts',
             'skulpt-defs-0.2.d.ts',
             'math-expressions-defs-0.3.d.ts',
             'midi-defs-0.4.d.ts',
@@ -263,10 +264,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual(
                 error_messages.get_report()[1], expected_error_messages)
             self.assert_same_list_elements([
-                'Type definitions for Guppy are not up to date. The '
-                'current version of Guppy is 0.1 and the type definitions '
-                'are for version 0.2. Please refer typings/README.md '
-                'for more details.'], error_messages.get_report())
+                'Type definitions for Guppy are not up to date. The current '
+                'version of Guppy is f509e and the type definitions are for '
+                'version x509x. Please refer typings/README.md for more details.'
+                ], error_messages.get_report())
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertTrue(error_messages.failed)
 
