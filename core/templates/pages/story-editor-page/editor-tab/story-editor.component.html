@@ -1,86 +1,90 @@
-<p class="oppia-mobile-back-to-parent e2e-test-mobile-back-to-topic" ng-click="returnToTopicEditorPage()">
+<p class="oppia-mobile-back-to-parent e2e-test-mobile-back-to-topic" (click)="returnToTopicEditorPage()">
   <i class="fa fa-angle-left"></i>
   <span>Back to Topic</span>
 </p>
 <div class="topic-story-name">
-  <span class="topic-name e2e-test-return-to-topic-button" ng-click="returnToTopicEditorPage()">
-    <[getTopicName()]> /
+  <span class="topic-name e2e-test-return-to-topic-button" (click)="returnToTopicEditorPage()">
+    {{ getTopicName() }} /
   </span>
   <span class="chapter-name">
-    <[story.getTitle()]>
+    {{ story.getTitle() }}
   </span>
 </div>
 <div role="form" class="form-horizontal">
   <div class="parent-container">
     <div class="content-container">
-      <md-card class="oppia-page-card oppia-long-text content-card story-content-card oppia-mobile-collapsible-card">
-        <div class="chapter-list-card-header oppia-mobile-collapsible-card-header" ng-click="toggleStoryEditorCard()">
+      <mat-card class="oppia-page-card oppia-long-text content-card story-content-card oppia-mobile-collapsible-card">
+        <div class="chapter-list-card-header oppia-mobile-collapsible-card-header" (click)="toggleStoryEditorCard()">
           <h3 class="story-card-header">Story Card</h3>
           <i class="fa fa-caret-down"
-             ng-if="!mainStoryCardIsShown"
+             *ngIf="!mainStoryCardIsShown"
              aria-hidden="true">
           </i>
           <i class="fa fa-caret-up"
-             ng-if="mainStoryCardIsShown"
+             *ngIf="mainStoryCardIsShown"
              aria-hidden="true">
           </i>
         </div>
-        <div class="oppia-mobile-collapsible-card-content" ng-if="mainStoryCardIsShown">
+        <div class="oppia-mobile-collapsible-card-content" *ngIf="mainStoryCardIsShown">
           <div class="story-content">
             <div class="story-title">
               <label for="storyTitle" class="form-heading">Title*</label>
               <input id="storyTitle" type="text" class="form-control e2e-test-story-title-field"
-                     ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
-                     placeholder="Enter a title for the story." maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" ng-trim="false">
+                     [(ngModel)]="editableTitle" (blur)="updateStoryTitle(editableTitle)"
+                     [ngModelOptions]="{standalone: true}"
+                     placeholder="Enter a title for the story." maxlength="{{ MAX_CHARS_IN_STORY_TITLE }}" ng-trim="false">
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Story title should be at most <[MAX_CHARS_IN_STORY_TITLE]> characters.
+                  Story title should be at most {{ MAX_CHARS_IN_STORY_TITLE }} characters.
                 </em>
               </span>
             </div>
-            <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
+            <div class="story-description" [ngClass]="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
               <label for="storyDescription" class="form-heading">Description*</label>
               <textarea type="text" class="form-control e2e-test-story-description-field"
-                        maxlength="<[MAX_CHARS_IN_STORY_DESCRIPTION]>"
-                        ng-model="editableDescription"
-                        ng-change="updateStoryDescriptionStatus(editableDescription)"
-                        ng-blur="updateStoryDescription(editableDescription)"
+                        maxlength="{{ MAX_CHARS_IN_STORY_DESCRIPTION }}"
+                        [(ngModel)]="editableDescription"
+                        [ngModelOptions]="{standalone: true}"
+                        (change)="updateStoryDescriptionStatus(editableDescription)"
+                        (blur)="updateStoryDescription(editableDescription)"
                         placeholder="Enter the description of the story">
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
                   Story description should be at most
-                  <[MAX_CHARS_IN_STORY_DESCRIPTION]> characters.
+                  {{ MAX_CHARS_IN_STORY_DESCRIPTION }} characters.
                 </em>
               </span>
-              <span ng-if="editableDescriptionIsEmpty && storyDescriptionChanged" class="form-text story-contain-text">
+              <span *ngIf="editableDescriptionIsEmpty && storyDescriptionChanged" class="form-text story-contain-text">
                 What does this story contain?
               </span>
             </div>
-            <div class="story-meta-tag-content" ng-class="{'has-error': editableMetaTagContent.length === 0}">
+            <div class="story-meta-tag-content" [ngClass]="{'has-error': editableMetaTagContent.length === 0}">
               <label for="storyMetaTagContent" class="form-heading e2e-test-story-meta-tag-content-label">Meta Tag Content</label>
               <textarea type="text" class="form-control e2e-test-story-meta-tag-content-field oppia-autofocus"
-                        ng-model="editableMetaTagContent"
-                        ng-blur="updateStoryMetaTagContent(editableMetaTagContent)"
+                        [(ngModel)]="editableMetaTagContent"
+                        [ngModelOptions]="{standalone: true}"
+                        (blur)="updateStoryMetaTagContent(editableMetaTagContent)"
                         placeholder="Enter the meta tag content for the story"
-                        maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>"
-                        focus-on="metaTagInputField">
+                        maxlength="{{ MAX_CHARS_IN_META_TAG_CONTENT }}"
+                        [oppiaFocusOn]="metaTagInputField">
               </textarea>
             </div>
             <div class="story-url-fragment">
               <label for="storyUrlFragment" class="form-heading">Url Fragment*</label>
               <input id="storyUrlFragment" type="text" class="form-control e2e-test-story-url-fragment-field"
-                     ng-model="editableUrlFragment" ng-blur="updateStoryUrlFragment(editableUrlFragment)"
-                     placeholder="Enter url fragment for the story." maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>" ng-trim="true"
-                     ng-class="{'is-invalid': storyUrlFragmentExists}">
+                     [(ngModel)]="editableUrlFragment" (blur)="updateStoryUrlFragment(editableUrlFragment)"
+                     [ngModelOptions]="{standalone: true}"
+                     placeholder="Enter url fragment for the story." maxlength="{{ MAX_CHARS_IN_STORY_URL_FRAGMENT }}" ng-trim="true"
+                     [ngClass]="{'is-invalid': storyUrlFragmentExists}">
               <span class="oppia-input-box-subtitle">
                 <em>
-                  The story URL fragment is used to uniquely access the story viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_STORY_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                  The story URL fragment is used to uniquely access the story viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_STORY_URL_FRAGMENT }} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
                   This story can be accessed at the following URL:<br>
-                  <[hostname]>/learn/<[getClassroomUrlFragment()]>/<[getTopicUrlFragment()]>/story/<[editableUrlFragment]>
+                  {{ hostname }}/learn/{{ getClassroomUrlFragment() }}/{{ getTopicUrlFragment() }}/story/{{ editableUrlFragment }}
                 </em>
               </span>
-              <div ng-if="storyUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
+              <div *ngIf="storyUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
                 <em>
                   This story URL fragment already exists.
                 </em>
@@ -88,32 +92,32 @@
             </div>
             <div class="story-thumbnail e2e-test-story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>
-              <oppia-thumbnail-uploader [filename]="story.getThumbnailFilename()"
-                                        [use-local-storage]="false"
-                                        (update-filename)="updateStoryThumbnailFilename($event)"
-                                        [bg-color]="story.getThumbnailBgColor()"
-                                        (update-bg-color)="updateStoryThumbnailBgColor($event)"
-                                        [allowed-bg-colors]="allowedBgColors"
-                                        [aspect-ratio]="'4:3'"
-                                        [preview-title]="editableTitle"
-                                        [preview-description]="editableDescription">
+              <oppia-thumbnail-uploader [filename]="story?.getThumbnailFilename()"
+                                        [useLocalStorage]="false"
+                                        (updateFilename)="updateStoryThumbnailFilename($event)"
+                                        [bgColor]="story?.getThumbnailBgColor()"
+                                        (updateBgColor)="updateStoryThumbnailBgColor($event)"
+                                        [allowedBgColors]="allowedBgColors"
+                                        [aspectRatio]="'4:3'"
+                                        [previewTitle]="editableTitle"
+                                        [previewDescription]="editableDescription">
               </oppia-thumbnail-uploader>
             </div>
             <div class="story-notes">
               <div class="oppia-editor-card-body">
                 <label class="form-heading">Notes</label>
-                <div ng-if="!notesEditorIsShown">
-                  <div ng-click="openNotesEditor()" class="oppia-editable-section e2e-test-open-story-notes-editor-button">
+                <div *ngIf="!notesEditorIsShown">
+                  <div (click)="openNotesEditor()" class="oppia-editable-section e2e-test-open-story-notes-editor-button">
                     <i class="fas fa-pen oppia-editor-edit-icon float-right story-editor-notes-edit-icon"
                        title="Edit Story Notes">
                     </i>
                     <div class="oppia-state-content-display oppia-transition-200 oppia-prevent-selection"
                          title="Story notes">
-                      <span class="oppia-placeholder" ng-show="editableNotes === ''">
+                      <span class="oppia-placeholder" [hidden]="!(editableNotes === '')">
                           Add notes about the story to help other contributors.
                       </span>
-                      <angular-html-bind class="story-notes e2e-test-story-notes" html-data="editableNotes">
-                      </angular-html-bind>
+                      <oppia-rte-output-display class="story-notes e2e-test-story-notes" [rteString]="editableNotes">
+                      </oppia-rte-output-display>
                     </div>
                     <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
                     <div class="oppia-editable-section-mask">
@@ -121,101 +125,104 @@
                   </div>
                 </div>
 
-                <div ng-if="notesEditorIsShown" class="e2e-test-story-notes-rte">
-                  <schema-based-editor [schema]="NOTES_SCHEMA" ng-model="editableNotes" ng-model-change="$applyAsync()">
+                <div *ngIf="notesEditorIsShown" class="e2e-test-story-notes-rte">
+                  <schema-based-editor [schema]="NOTES_SCHEMA" [(ngModel)]="editableNotes">
                   </schema-based-editor>
-                  <div ng-if="editableNotes.length > 4000" class="story-length-validation-error">
+                  <div *ngIf="editableNotes.length > 4000" class="story-length-validation-error">
                     The notes length is too long. Please make it under 4000 characters.
                   </div>
                   <div class="editor-buttons">
                     <button type="button"
                             class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-story-notes-button"
-                            ng-disabled="!editableNotes || editableNotes.length > 4000"
-                            ng-click="updateNotes(editableNotes)">
+                            [disabled]="!editableNotes || editableNotes.length > 4000"
+                            (click)="updateNotes(editableNotes)">
                       Save
                     </button>
-                    <button type="button" class="btn btn-secondary float-right" ng-click="closeNotesEditor()">Cancel</button>
+                    <button type="button" class="btn btn-secondary float-right" (click)="closeNotesEditor()">Cancel</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div ng-if="story.getThumbnailFilename() && mainStoryCardIsShown">
-          <div ng-if="!storyPreviewCardIsShown" >
-            <button class="btn btn-default show-story-preview-button" ng-click="togglePreview()">
+        <div *ngIf="story.getThumbnailFilename() && mainStoryCardIsShown">
+          <div *ngIf="!storyPreviewCardIsShown" >
+            <button class="btn btn-default show-story-preview-button" (click)="togglePreview()">
               Expand Preview
               <i class="fa fa-angle-down"></i>
             </button>
           </div>
-          <div ng-if="storyPreviewCardIsShown">
-            <button class="btn btn-default show-story-preview-button" ng-click="togglePreview()">
+          <div *ngIf="storyPreviewCardIsShown">
+            <button class="btn btn-default show-story-preview-button" (click)="togglePreview()">
               Collapse Preview
               <i class="fa fa-angle-up"></i>
             </button>
           </div>
-          <div ng-if="storyPreviewCardIsShown">
+          <div *ngIf="storyPreviewCardIsShown">
             <oppia-preview-thumbnail [name]="editableTitle"
-                                     [aspect-ratio]="'16:9'"
+                                     [aspectRatio]="'16:9'"
                                      [description]="editableDescription"
                                      [filename]="story.getThumbnailFilename()"
-                                     [thumbnail-bg-color]="story.getThumbnailBgColor()"
-                                     bg-color="#2F6687">
+                                     [thumbnailBgColor]="story.getThumbnailBgColor()"
+                                     bgColor="#2F6687">
             </oppia-preview-thumbnail>
           </div>
         </div>
-      </md-card>
+      </mat-card>
     </div>
 
     <div class="chapter-list-container">
-      <md-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
+      <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
         <div class="story-node-editor">
           <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
-               ng-click="toggleChapterLists()">
+               (click)="toggleChapterLists()">
             <span>Chapters</span>
             <i class="fa fa-caret-down"
-               ng-if="!chaptersListIsShown"
+               *ngIf="!chaptersListIsShown"
                aria-hidden="true">
             </i>
             <i class="fa fa-caret-up"
-               ng-if="chaptersListIsShown"
+               *ngIf="chaptersListIsShown"
                aria-hidden="true">
             </i>
           </div>
         </div>
-        <div ng-if="chaptersListIsShown" class="oppia-mobile-collapsible-card-content">
+        <div *ngIf="chaptersListIsShown" class="oppia-mobile-collapsible-card-content">
           <div>
-            <button ng-click="createNode()" class="btn add-chapter-btn e2e-test-add-chapter-button">
+            <button (click)="createNode()" class="btn add-chapter-btn e2e-test-add-chapter-button">
               + ADD CHAPTER
             </button>
-            <div ng-if="!linearNodesList.length">
+            <div *ngIf="!linearNodesList.length">
               <p class="no-chapters-message">
                 This story has no chapters.
               </p>
             </div>
-            <div ng-if="linearNodesList.length">
+            <div *ngIf="linearNodesList.length">
               <div class="chapter-list-card-heading">
                 <span>Name</span>
               </div>
-              <div class="story-nodes-container">
-                <div ng-repeat="node in linearNodesList track by $index">
+              <div class="story-nodes-container" cdkDropList (cdkDropListDropped)="drop($event)">
+                <div *ngFor="let node of linearNodesList;index as idx"
+                     cdkDrag>
                   <div class="story-editor-node"
-                       ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                       ng-click="navigateToChapterWithId(node.getId(), $index)"
-                       dnd-draggable="node"
-                       dnd-list="linearNodesList"
-                       dnd-effect-allowed="move"
-                       dnd-dragstart="onMoveChapterStart($index, node.getId())"
-                       dnd-drop="rearrangeNodeInStory($index)">
+                       [ngClass]="{'selected-node': (node.getId() === idOfNodeToEdit)}"
+                       (click)="navigateToChapterWithId(node.getId(), idx)">
                     <div class="story-editor-node-title">
-                      <span> <[$index+1]>. </span>
-                      <span class="e2e-test-chapter-title"><[node.getTitle()]></span>
+                      <span> {{ idx+1 }}. </span>
+                      <span class="e2e-test-chapter-title">{{ node.getTitle() }}</span>
                     </div>
                     <div class="edit-options-container">
-                      <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options" ng-click="toggleChapterEditOptions($index);$event.stopPropagation()" aria-label="Chapter edit"></i>
+                      <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
+                         (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
+                         aria-label="Chapter edit">
+                      </i>
                     </div>
-                    <div class="chapter-option-box" ng-if="selectedChapterIndex === $index" ng-mouseleave="toggleChapterEditOptions(-1)" ng-click="toggleChapterEditOptions(-1);$event.stopPropagation()">
-                      <div class="chapter-edit-option e2e-test-delete-chapter-button" ng-click="deleteNode(node.getId())">
+                    <div class="chapter-option-box"
+                         *ngIf="selectedChapterIndex === idx"
+                         (mouseleave)="toggleChapterEditOptions(-1)"
+                         (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                      <div class="chapter-edit-option e2e-test-delete-chapter-button"
+                           (click)="deleteNode(node.getId())">
                         <i class="fa fa-trash"></i>
                         <span>Delete</span>
                       </div>
@@ -226,7 +233,7 @@
             </div>
           </div>
         </div>
-      </md-card>
+      </mat-card>
     </div>
   </div>
 </div>
@@ -243,14 +250,14 @@
     padding: 0.25rem;
   }
 
-  story-editor .no-chapters-message {
+  .no-chapters-message {
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 18px;
     padding-top: 6px;
     text-align: center;
   }
 
-  story-editor .story-editor-node {
+  .story-editor-node {
     align-items: center;
     border-bottom: 1px solid #dbdbdb;
     cursor: pointer;
@@ -261,130 +268,130 @@
     position: relative;
   }
 
-  story-editor .story-editor-node-title {
+  .story-editor-node-title {
     cursor: pointer;
     text-align: left;
     width: 95%;
   }
 
-  story-editor story-editor-node:hover {
+  story-editor-node:hover {
     cursor: grab;
   }
 
-  story-editor .topic-story-name {
+  .topic-story-name {
     font-size: 15px;
     margin-bottom: 35px;
     margin-left: 4%;
   }
 
-  story-editor .topic-name {
+  .topic-name {
     color: #666;
     cursor: pointer;
   }
 
-  story-editor story-editor-node:active {
+  story-editor-node:active {
     cursor: move;
   }
 
-  story-editor .story-nodes-container {
+  .story-nodes-container {
     background-color: #fff;
     text-align: left;
     white-space: initial;
   }
 
-  story-editor .node-editor {
+  .node-editor {
     display: inline-block;
     min-height: 25vh;
     padding-left: 5%;
     width: 65%;
   }
 
-  story-editor .story-node-editor {
+  .story-node-editor {
     margin-top: 20px;
   }
 
-  story-editor .form-heading {
+  .form-heading {
     font-size: 15px;
   }
 
-  story-editor .story-title {
+  .story-title {
     margin: 20px 0 15px;
   }
 
-  story-editor .story-thumbnail {
+  .story-thumbnail {
     margin: 25px 0;
   }
 
-  story-editor .story-nodes-title {
+  .story-nodes-title {
     margin-bottom: 2%;
   }
 
-  story-editor .story-notes .save-button {
+  .story-notes .save-button {
     margin-top: 1.5vh;
   }
 
-  story-editor .story-description textarea,
-  story-editor .story-meta-tag-content textarea {
+  .story-description textarea,
+  .story-meta-tag-content textarea {
     height: 10vh;
   }
 
-  story-editor .story-meta-tag-content {
+  .story-meta-tag-content {
     margin-bottom: 25px;
     margin-top: 32px;
   }
 
-  story-editor .parent-container {
+  .parent-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 0 auto;
     width: 85%;
   }
-  story-editor .content-container {
+  .content-container {
     margin-bottom: 40px;
     margin-right: 3%;
     width: 50%;
   }
-  story-editor .chapter-list-container {
+  .chapter-list-container {
     width: 35%;
   }
-  story-editor .content-card {
+  .content-card {
     margin: 0;
   }
-  story-editor .chapter-editor-card {
+  .chapter-editor-card {
     width: 80%;
   }
-  story-editor .show-story-preview-button {
+  .show-story-preview-button {
     border-top: 1px solid #c1c1c1;
     color: #00645d;
     font-size: 15px;
     padding: 10px 0;
     width: 100%;
   }
-  story-editor .story-content-card {
+  .story-content-card {
     padding: 0;
   }
-  story-editor .story-content {
+  .story-content {
     padding: 5px 55px 30px 45px;
   }
-  story-editor .story-notes p {
+  .story-notes p {
      margin: 0;
   }
-  story-editor .story-card-header {
+  .story-card-header {
     font-size: 20px;
     margin: 40px 18px 5px;
   }
-  story-editor .story-contain-text {
+  .story-contain-text {
     font-size: smaller;
   }
-  story-editor .add-chapter-btn {
+  .add-chapter-btn {
     background-color: #008098;
     color: #fff;
     font-weight: bold;
     margin: 15px 0 15px;
     text-align: left;
   }
-  story-editor .chapter-list-card-header {
+  .chapter-list-card-header {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
@@ -399,7 +406,7 @@
   .chapter-list-card-heading span {
     font-weight: bold;
   }
-  story-editor .chapter-option-box {
+  .chapter-option-box {
     background-color: #e1dcdc;
     border: 1px solid #000;
     padding: 0;
@@ -408,16 +415,16 @@
     width: 140px;
     z-index: 1;
   }
-  story-editor .chapter-edit-option {
+  .chapter-edit-option {
     cursor: pointer;
     font-size: 15px;
     padding: 5px;
     text-align: left;
   }
-  story-editor .chapter-edit-option span {
+  .chapter-edit-option span {
     margin-left: 5%;
   }
-  story-editor .chapter-edit-toggle-button {
+  .chapter-edit-toggle-button {
     cursor: pointer;
     position: relative;
   }
@@ -427,77 +434,80 @@
   .story-editor-notes-edit-icon {
     padding-top: 4px;
   }
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
   @media screen and (max-width: 1150px) {
-    story-editor .content-container {
+    .content-container {
         width: 55%;
     }
-    story-editor .chapter-list-container {
+    .chapter-list-container {
       margin-right: 2%;
       width: 35%;
     }
   }
   @media screen and (max-width: 1000px) {
-    story-editor .parent-container {
+    .parent-container {
         width: 100%;
     }
-    story-editor .chapter-list-container {
+    .chapter-list-container {
       margin-right: 0;
       width: 40%;
     }
   }
   @media screen and (max-width: 800px) {
-    story-editor .story-content {
+    .story-content {
       padding: 0;
     }
   }
   @media screen and (max-width: 768px) {
-    story-editor .content-container,
-    story-editor .chapter-list-container {
+    .content-container,
+    .chapter-list-container {
       margin-bottom: 100px;
       margin-right: 0;
       width: 100%;
     }
 
-    story-editor .content-container {
+    .content-container {
       margin-bottom: 0;
     }
 
-    story-editor .topic-story-name {
+    .topic-story-name {
       display: none;
     }
 
-    story-editor .chapter-list-container {
+    .chapter-list-container {
       margin-top: 40px;
     }
 
-    story-editor .story-notes {
+    .story-notes {
       width: 95%;
     }
 
-    story-editor .story-node-editor {
+    .story-node-editor {
       margin-top: 0;
     }
 
-    story-editor .story-card-header {
+    .story-card-header {
       margin: 0;
     }
 
-    story-editor .chapter-option-box {
+    .chapter-option-box {
       right: 20px;
     }
 
-    story-editor .chapter-list-card-header i {
+    .chapter-list-card-header i {
       display: block;
     }
-    story-editor .chapter-list-card-header div {
+    .chapter-list-card-header div {
       margin-top: 16px;
       width: 100%;
     }
-    story-editor .chapter-list-card-header {
+    .chapter-list-card-header {
       margin-bottom: 0;
       padding-bottom: 18px;
     }
-    story-editor .chapter-list-card-heading {
+    .chapter-list-card-heading {
       padding-top: 15px;
     }
   }
