@@ -39,7 +39,6 @@ export class StoryEditorUnpublishModalComponent {
   selectedReasonText: string = this.badContentReasonText;
   unpublishingReason: string = 'BAD_CONTENT';
 
-
   cancel(): void {
     this.activeModal.dismiss();
   }

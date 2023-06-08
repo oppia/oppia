@@ -8,8 +8,7 @@
   <div class="modal-body">
     <div class="reason-select">
       <span>Select Reason:</span>
-
-      <div ngbDropdown class="dropdown">
+      <div ngbDropdown class="unpublishing-dropdown">
         <div ngbDropdownToggle
              aria-label="Dropdown toggle to select unpublishing reason"
              aria-haspopup="menu"
@@ -17,16 +16,16 @@
           {{ selectedReasonText }}
         </div>
         <div ngbDropdownMenu
-             class="dropdown-menu">
+             class="unpublishing-dropdown-menu">
           <div ngbDropdownItem
                (click)="setReason('BAD_CONTENT')"
-               class="dropdown-item">
+               class="unpublishing-dropdown-item">
             {{ badContentReasonText }}
           </div>
           <hr>
           <div ngbDropdownItem
                (click)="setReason('CHAPTER_NEEDS_SPLITTING')"
-               class="dropdown-item">
+               class="unpublishing-dropdown-item">
             {{ splitChapterReasonText }}
           </div>
         </div>
@@ -95,7 +94,7 @@
     text-decoration: underline;
   }
 
-  .reason-select .dropdown {
+  .reason-select .unpublishing-dropdown {
     left: 50%;
     transform: translate(-50%);
     width: 90%;
@@ -110,11 +109,11 @@
     word-wrap: break-word;
   }
 
-  .reason-select .dropdown-menu {
+  .reason-select .unpublishing-dropdown-menu {
     width: 100%;
   }
 
-  .reason-select .dropdown-item {
+  .reason-select .unpublishing-dropdown-item {
     cursor: pointer;
     white-space: normal;
   }

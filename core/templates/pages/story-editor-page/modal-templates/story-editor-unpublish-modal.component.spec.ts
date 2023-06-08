@@ -80,11 +80,22 @@ describe('Story Editor Unpublish Modal Component', () => {
     expect(confirmSpy).toHaveBeenCalled();
   });
 
-  it('should set unpublishing reason', () => {
+  it('should set unpublishing reason to BAD_CONTENT', () => {
     mockPlatformFeatureService.
       status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
 
+    expect(component.unpublishingReason).toBe('BAD_CONTENT');
+    expect(component.selectedReasonText).toBe(component.badContentReasonText);
+
     component.setReason('BAD_CONTENT');
+    expect(component.unpublishingReason).toBe('BAD_CONTENT');
+    expect(component.selectedReasonText).toBe(component.badContentReasonText);
+  });
+
+  it('should set unpublishing reason to CHAPTER_NEEDS_SPLITTING', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+
     expect(component.unpublishingReason).toBe('BAD_CONTENT');
     expect(component.selectedReasonText).toBe(component.badContentReasonText);
 
