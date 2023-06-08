@@ -82,7 +82,9 @@ describe('Html Length Service', () => {
       'conjugations in Spanish.</em>Consider the following sentence' +
       ':<br><br><em> Yo jugar al fútbol con amigos los domingos.<br>' +
       '<br></em> What verb conjugation goes in the blank?</p>';
+
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
     expect(result).toBe(26);
   });
 
