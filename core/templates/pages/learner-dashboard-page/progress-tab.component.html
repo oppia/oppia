@@ -65,13 +65,13 @@
                (keydown.enter)="showSkills(i)"
                (click)="showSkills(i)"
                *ngIf="!displaySkills[i]">
-          <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')" 
-               alt="up button" 
-               class="oppia-svg-up-image" 
-               role="button" 
-               tabindex="0" 
-               (keydown.enter)="showSkills(i)" 
-               (click)="showSkills(i)" 
+          <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')"
+               alt="up button"
+               class="oppia-svg-up-image"
+               role="button"
+               tabindex="0"
+               (keydown.enter)="showSkills(i)"
+               (click)="showSkills(i)"
                *ngIf="displaySkills[i]">
           <div *ngIf="tile[0] > 0">
             <div class="circle-border" [ngStyle]="{'background-image': calculateCircularProgress(i)}">
