@@ -16,6 +16,14 @@
  * @fileoverview Frontend Model for user info.
  */
 
+enum UserRoles {
+  QUESTION_COORDINATOR='QUESTION_COORDINATOR',
+  QUESTION_ADMIN='QUESTION_ADMIN',
+  BLOG_ADMIN='BLOG_ADMIN',
+  BLOG_POST_EDITOR='BLOG_POST_EDITOR',
+  TRANSLATION_ADMIN='TRANSLATION_ADMIN',
+ }
+
 export interface UserInfoBackendDict {
   'roles': string[];
   'is_moderator': boolean;
@@ -79,11 +87,11 @@ export class UserInfo {
   }
 
   isBlogAdmin(): boolean {
-    return (this._roles.includes('BLOG_ADMIN'));
+    return (this._roles.includes(UserRoles.BLOG_ADMIN));
   }
 
   isBlogPostEditor(): boolean {
-    return (this._roles.includes('BLOG_POST_EDITOR'));
+    return (this._roles.includes(UserRoles.BLOG_POST_EDITOR));
   }
 
   isCurriculumAdmin(): boolean {
@@ -91,11 +99,15 @@ export class UserInfo {
   }
 
   isTranslationAdmin(): boolean {
-    return this._roles.includes('TRANSLATION_ADMIN');
+    return this._roles.includes(UserRoles.TRANSLATION_ADMIN);
   }
 
   isQuestionAdmin(): boolean {
-    return this._roles.includes('QUESTION_ADMIN');
+    return this._roles.includes(UserRoles.QUESTION_ADMIN);
+  }
+
+  isQuestionCoordinator(): boolean {
+    return this._roles.includes(UserRoles.QUESTION_COORDINATOR);
   }
 
   isTopicManager(): boolean {

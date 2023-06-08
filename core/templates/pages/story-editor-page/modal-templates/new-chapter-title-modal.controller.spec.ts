@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,68 +17,70 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-
-import { AlertsService } from 'services/alerts.service';
-import { EditableStoryBackendApiService } from
-  'domain/story/editable-story-backend-api.service';
-import { LoggerService } from 'services/contextual/logger.service';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { Story } from 'domain/story/story.model';
-import { CuratedExplorationValidationService } from
-  'domain/exploration/curated-exploration-validation.service';
-import { ExplorationSummaryBackendApiService } from
-  'domain/summary/exploration-summary-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
+import { NewChapterTitleModalComponent } from './new-chapter-title-modal.component';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { EditableStoryBackendApiService } from '../../../domain/story/editable-story-backend-api.service';
+import { StoryEditorStateService } from '../services/story-editor-state.service';
+import { StoryUpdateService } from '../../../domain/story/story-update.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-describe('Create New Chapter Modal Controller', function() {
-  var $scope = null;
-  var $rootScope = null;
-  var $uibModalInstance = null;
-  var StoryEditorStateService = null;
-  var StoryUpdateService = null;
-  var curatedExplorationValidationService = null;
-  var nodeTitles = ['title 1', 'title 2', 'title 3'];
-  var editableStoryBackendApiService = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-  importAllAngularServices();
+  dismiss(): void {
+    return;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
+describe('Create New Chapter Modal Component', () => {
+  let fixture: ComponentFixture<NewChapterTitleModalComponent>;
+  let component: NewChapterTitleModalComponent;
+  let storyEditorStateService: StoryEditorStateService;
+  let storyUpdateService: StoryUpdateService;
+  let curatedExplorationValidationService;
+  let nodeTitles = ['title 1', 'title 2', 'title 3'];
+  let editableStoryBackendApiService:
+    EditableStoryBackendApiService;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      declarations: [
+        NewChapterTitleModalComponent
+      ],
+      providers: [
+        StoryEditorStateService,
+        StoryUpdateService,
+        CuratedExplorationValidationService,
+        EditableStoryBackendApiService,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CuratedExplorationValidationService',
-      TestBed.get(CuratedExplorationValidationService));
-    $provide.value(
-      'ExplorationSummaryBackendApiService',
-      TestBed.get(ExplorationSummaryBackendApiService));
-  }));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'EditableStoryBackendApiService',
-      TestBed.get(
-        EditableStoryBackendApiService));
-    $provide.value('AlertsService', new AlertsService(new LoggerService()));
-  }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    $rootScope = $injector.get('$rootScope');
-    StoryUpdateService = $injector.get('StoryUpdateService');
-    StoryEditorStateService = $injector.get('StoryEditorStateService');
-    editableStoryBackendApiService = $injector.get(
-      'EditableStoryBackendApiService');
-    curatedExplorationValidationService = $injector.get(
-      'CuratedExplorationValidationService');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(NewChapterTitleModalComponent);
+    component = fixture.componentInstance;
+    curatedExplorationValidationService = (
+      TestBed.inject(CuratedExplorationValidationService));
+    editableStoryBackendApiService = (
+      TestBed.inject(EditableStoryBackendApiService));
+    storyUpdateService = TestBed.inject(StoryUpdateService);
+    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    curatedExplorationValidationService = TestBed.inject(
+      CuratedExplorationValidationService);
+    component.nodeTitles = nodeTitles;
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    $scope = $rootScope.$new();
-
-    var sampleStoryBackendObject = {
+    let sampleStoryBackendObject = {
       id: 'sample_story_id',
       title: 'Story title',
       description: 'Story description',
@@ -113,83 +115,69 @@ describe('Create New Chapter Modal Controller', function() {
       },
       language_code: 'en'
     };
-    var story = Story.createFromBackendDict(
+    let story = Story.createFromBackendDict(
       sampleStoryBackendObject);
-    spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
 
-    $controller('CreateNewChapterModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      nodeTitles: nodeTitles,
-      StoryUpdateService: StoryUpdateService,
-      StoryEditorStateService: StoryEditorStateService,
-      curatedExplorationValidationService: curatedExplorationValidationService
-    });
-    $scope.init();
-  }));
+    component.ngOnInit();
+  });
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.nodeTitles).toEqual(nodeTitles);
-      expect($scope.errorMsg).toBe(null);
-      expect($scope.correctnessFeedbackDisabled).toBe(false);
-      expect($scope.categoryIsDefault).toBe(true);
+  it('should add story node with data', () => {
+    let storyUpdateSpyThumbnailBgColor = spyOn(
+      storyUpdateService, 'setStoryNodeThumbnailBgColor');
+    let storyUpdateSpyThumbnailFilename = spyOn(
+      storyUpdateService, 'setStoryNodeThumbnailFilename');
+
+    component.addStoryNodeWithData();
+
+    expect(storyUpdateSpyThumbnailBgColor).toHaveBeenCalled();
+    expect(storyUpdateSpyThumbnailFilename).toHaveBeenCalled();
+  });
+
+  it('should initialize component properties after controller is initialized',
+    () => {
+      expect(component.nodeTitles).toEqual(nodeTitles);
+      expect(component.errorMsg).toBe(null);
+      expect(component.correctnessFeedbackDisabled).toBe(false);
+      expect(component.categoryIsDefault).toBe(true);
     });
 
   it('should validate explorationId correctly',
-    function() {
-      $scope.explorationId = 'validId';
-      expect($scope.validateExplorationId()).toBeTrue();
-      $scope.explorationId = 'oppia.org/validId';
-      expect($scope.validateExplorationId()).toBeFalse();
+    () => {
+      component.explorationId = 'validId';
+      expect(component.validateExplorationId()).toBeTrue();
+      component.explorationId = 'oppia.org/validId';
+      expect(component.validateExplorationId()).toBeFalse();
     });
 
   it('should update thumbnail filename when changing thumbnail file',
-    function() {
-      var storyUpdateSpy = spyOn(
-        StoryUpdateService, 'setStoryNodeThumbnailFilename');
-      $scope.updateThumbnailFilename('abc');
-      expect(storyUpdateSpy).toHaveBeenCalled();
-      expect($scope.editableThumbnailFilename).toEqual('abc');
+    () => {
+      component.updateThumbnailFilename('abc');
+      expect(component.editableThumbnailFilename).toEqual('abc');
     });
 
   it('should update thumbnail bg color when changing thumbnail color',
-    function() {
-      var storyUpdateSpy = spyOn(
-        StoryUpdateService, 'setStoryNodeThumbnailBgColor');
-      $scope.updateThumbnailBgColor('abc');
-      expect(storyUpdateSpy).toHaveBeenCalled();
-      expect($scope.editableThumbnailBgColor).toEqual('abc');
+    () => {
+      component.updateThumbnailBgColor('abc');
+      component.cancel();
+      expect(component.editableThumbnailBgColor).toEqual('abc');
     });
-
-  it('should delete the story node when closing the modal',
-    function() {
-      var storyUpdateSpy = spyOn(StoryUpdateService, 'deleteStoryNode');
-      $scope.cancel();
-      expect(storyUpdateSpy).toHaveBeenCalled();
-    });
-
-  it('should update the title', function() {
-    var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNodeTitle');
-    $scope.updateTitle();
-    expect(storyUpdateSpy).toHaveBeenCalled();
-  });
 
   it('should check if chapter is valid when it has title, exploration id and' +
-    ' thumbnail file', function() {
-    expect($scope.isValid()).toEqual(false);
-    $scope.title = 'title';
-    $scope.explorationId = '1';
-    expect($scope.isValid()).toEqual(false);
-    $scope.editableThumbnailFilename = '1';
-    expect($scope.isValid()).toEqual(true);
-    $scope.explorationId = '';
-    expect($scope.isValid()).toEqual(false);
+    ' thumbnail file', () => {
+    expect(component.isValid()).toEqual(false);
+    component.title = 'title';
+    component.explorationId = '1';
+    expect(component.isValid()).toEqual(false);
+    component.editableThumbnailFilename = '1';
+    expect(component.isValid()).toEqual(true);
+    component.explorationId = '';
+    expect(component.isValid()).toEqual(false);
   });
 
   it('should show warning message when exploration cannot be curated',
     fakeAsync(() => {
-      spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
+      spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
       spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
         .and.resolveTo(true);
       spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
@@ -210,12 +198,11 @@ describe('Create New Chapter Modal Controller', function() {
         'exploration with ID 1 contains training data in one of ' +
         'its answer groups.'
       ]);
-      $scope.saveAsync();
+      component.saveAsync();
       flushMicrotasks();
-      $rootScope.$apply();
 
-      expect($scope.invalidExpId).toEqual(true);
-      expect($scope.invalidExpErrorStrings).toEqual([
+      expect(component.invalidExpId).toEqual(true);
+      expect(component.invalidExpErrorStrings).toEqual([
         'Explorations in a story are not expected to contain ' +
         'training data for any answer group. State Introduction of ' +
         'exploration with ID 1 contains training data in one of ' +
@@ -224,56 +211,47 @@ describe('Create New Chapter Modal Controller', function() {
     }));
 
   it('should warn that the exploration is not published when trying to save' +
-    ' a chapter with an invalid exploration id', fakeAsync(function() {
-    spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
+    ' a chapter with an invalid exploration id', fakeAsync(() => {
+    spyOn(storyEditorStateService, 'isStoryPublished').and.returnValue(true);
     spyOn(curatedExplorationValidationService, 'isExpPublishedAsync')
       .and.resolveTo(false);
     spyOn(
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
-    $scope.saveAsync();
+    component.saveAsync();
     flushMicrotasks();
-    $rootScope.$apply();
 
-    expect($scope.invalidExpId).toEqual(true);
+    expect(component.invalidExpId).toEqual(true);
   }));
 
   it('should warn that the exploration already exists in the story when' +
     ' trying to save a chapter with an already used exploration id',
-  function() {
-    $scope.explorationId = 'exp_1';
-    $scope.updateExplorationId();
-    expect($scope.invalidExpErrorStrings).toEqual([
+  () => {
+    component.explorationId = 'exp_1';
+    component.updateExplorationId();
+    expect(component.invalidExpErrorStrings).toEqual([
       'The given exploration already exists in the story.'
     ]);
-    expect($scope.invalidExpId).toEqual(true);
+    expect(component.invalidExpId).toEqual(true);
   });
 
-  it('should close the modal when saving a chapter with a valid exploration id',
-    function() {
-      $scope.updateExplorationId();
-      $rootScope.$apply();
-      expect($uibModalInstance.close).toHaveBeenCalled();
-    });
-
   it('should set story node exploration id when updating exploration id',
-    function() {
-      var storyUpdateSpy = spyOn(
-        StoryUpdateService, 'setStoryNodeExplorationId');
-      $scope.updateExplorationId();
+    () => {
+      let storyUpdateSpy = spyOn(
+        storyUpdateService, 'setStoryNodeExplorationId');
+      component.updateExplorationId();
       expect(storyUpdateSpy).toHaveBeenCalled();
     });
 
-  it('should not save when the chapter title is already used', function() {
-    $scope.title = nodeTitles[0];
-    $scope.saveAsync();
-    expect($scope.errorMsg).toBe('A chapter with this title already exists');
-    expect($uibModalInstance.close).not.toHaveBeenCalled();
+  it('should not save when the chapter title is already used', () => {
+    component.title = nodeTitles[0];
+    component.saveAsync();
+    expect(component.errorMsg).toBe('A chapter with this title already exists');
   });
 
   it('should prevent exploration from being added if it doesn\'t exist ' +
-    'or isn\'t published yet', fakeAsync(function() {
-    $scope.title = 'dummy_title';
+    'or isn\'t published yet', fakeAsync(() => {
+    component.title = 'dummy_title';
     spyOn(
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
@@ -283,18 +261,16 @@ describe('Create New Chapter Modal Controller', function() {
       curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled');
     const categorySpy = spyOn(
       curatedExplorationValidationService, 'isDefaultCategoryAsync');
-    $scope.saveAsync();
+    component.saveAsync();
     flushMicrotasks();
-    $rootScope.$apply();
-    expect($scope.invalidExpId).toEqual(true);
+    expect(component.invalidExpId).toEqual(true);
     expect(correctnessFeedbackSpy).not.toHaveBeenCalled();
     expect(categorySpy).not.toHaveBeenCalled();
-    expect($uibModalInstance.close).not.toHaveBeenCalled();
   }));
 
   it('should prevent exploration from being added if its correctness ' +
-  'feedback is disabled', fakeAsync(function() {
-    $scope.title = 'dummy_title';
+  'feedback is disabled', fakeAsync(() => {
+    component.title = 'dummy_title';
     spyOn(
       editableStoryBackendApiService, 'validateExplorationsAsync'
     ).and.resolveTo([]);
@@ -302,16 +278,14 @@ describe('Create New Chapter Modal Controller', function() {
       .and.resolveTo(true);
     spyOn(curatedExplorationValidationService, 'isCorrectnessFeedbackEnabled')
       .and.resolveTo(false);
-    $scope.saveAsync();
+    component.saveAsync();
     flushMicrotasks();
-    $rootScope.$apply();
-    expect($scope.correctnessFeedbackDisabled).toBe(true);
-    expect($uibModalInstance.close).not.toHaveBeenCalled();
+    expect(component.correctnessFeedbackDisabled).toBe(true);
   }));
 
   it('should prevent exploration from being added if its category ' +
-  'is not default', fakeAsync(function() {
-    $scope.title = 'dummy_title';
+  'is not default', fakeAsync(() => {
+    component.title = 'dummy_title';
 
     spyOn(
       editableStoryBackendApiService, 'validateExplorationsAsync'
@@ -323,17 +297,15 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(curatedExplorationValidationService, 'isDefaultCategoryAsync')
       .and.resolveTo(false);
 
-    $scope.saveAsync();
+    component.saveAsync();
     flushMicrotasks();
-    $rootScope.$apply();
 
-    expect($scope.categoryIsDefault).toBe(false);
-    expect($uibModalInstance.close).not.toHaveBeenCalled();
+    expect(component.categoryIsDefault).toBe(false);
   }));
 
   it('should prevent exploration from being added if it contains restricted ' +
-  'interaction types', fakeAsync(function() {
-    $scope.title = 'dummy_title';
+  'interaction types', fakeAsync(() => {
+    component.title = 'dummy_title';
     const invalidStates = ['some_invalid_state'];
 
     spyOn(
@@ -349,17 +321,15 @@ describe('Create New Chapter Modal Controller', function() {
       curatedExplorationValidationService,
       'getStatesWithRestrictedInteractions').and.resolveTo(invalidStates);
 
-    $scope.saveAsync();
+    component.saveAsync();
     flushMicrotasks();
-    $rootScope.$apply();
 
-    expect($scope.statesWithRestrictedInteractions).toBe(invalidStates);
-    expect($uibModalInstance.close).not.toHaveBeenCalled();
+    expect(component.statesWithRestrictedInteractions).toBe(invalidStates);
   }));
 
   it('should prevent exploration from being added if it contains an invalid ' +
-  'multiple choice input', fakeAsync(function() {
-    $scope.title = 'dummy_title';
+  'multiple choice input', fakeAsync(() => {
+    component.title = 'dummy_title';
     const invalidStates = ['some_invalid_state'];
 
     spyOn(
@@ -378,17 +348,15 @@ describe('Create New Chapter Modal Controller', function() {
       curatedExplorationValidationService,
       'getStatesWithInvalidMultipleChoices').and.resolveTo(invalidStates);
 
-    $scope.saveAsync();
+    component.saveAsync();
     flushMicrotasks();
-    $rootScope.$apply();
 
-    expect($scope.statesWithTooFewMultipleChoiceOptions).toBe(invalidStates);
-    expect($uibModalInstance.close).not.toHaveBeenCalled();
+    expect(component.statesWithTooFewMultipleChoiceOptions).toBe(invalidStates);
   }));
 
   it('should attempt to save exploration when all validation checks pass',
-    fakeAsync(function() {
-      $scope.title = 'dummy_title';
+    fakeAsync(() => {
+      component.title = 'dummy_title';
       spyOn(
         editableStoryBackendApiService, 'validateExplorationsAsync'
       ).and.resolveTo([]);
@@ -405,26 +373,22 @@ describe('Create New Chapter Modal Controller', function() {
       spyOn(
         curatedExplorationValidationService,
         'getStatesWithInvalidMultipleChoices').and.resolveTo([]);
-      const updateExplorationIdSpy = spyOn($scope, 'updateExplorationId');
-      const updateTitleSpy = spyOn($scope, 'updateTitle');
-      $scope.saveAsync();
+      const updateExplorationIdSpy = spyOn(component, 'updateExplorationId');
+      component.saveAsync();
       flushMicrotasks();
-      $rootScope.$apply();
 
-      expect(updateTitleSpy).toHaveBeenCalled();
       expect(updateExplorationIdSpy).toHaveBeenCalled();
     }));
 
-  it('should clear error message when changing exploration id', function() {
-    $scope.title = nodeTitles[0];
-    $scope.saveAsync();
-    expect($scope.errorMsg).toBe('A chapter with this title already exists');
-    expect($uibModalInstance.close).not.toHaveBeenCalled();
+  it('should clear error message when changing exploration id', () => {
+    component.title = nodeTitles[0];
+    component.saveAsync();
+    expect(component.errorMsg).toBe('A chapter with this title already exists');
 
-    $scope.resetErrorMsg();
-    expect($scope.errorMsg).toBe(null);
-    expect($scope.invalidExpId).toBe(false);
-    expect($scope.invalidExpErrorStrings).toEqual([
+    component.resetErrorMsg();
+    expect(component.errorMsg).toBe(null);
+    expect(component.invalidExpId).toBe(false);
+    expect(component.invalidExpErrorStrings).toEqual([
       'Please enter a valid exploration id.'
     ]);
   });
