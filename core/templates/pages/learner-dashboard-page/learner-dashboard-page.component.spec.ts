@@ -164,64 +164,6 @@ describe('Learner dashboard page', () => {
     'Computer Science', 'Biology', 'Zoo'
   ];
 
-  let threadSummaryList = [{
-    status: 'open',
-    original_author_id: '1',
-    last_updated_msecs: 1000,
-    last_message_text: 'Last Message',
-    total_message_count: 5,
-    last_message_is_read: false,
-    second_last_message_is_read: true,
-    author_last_message: '2',
-    author_second_last_message: 'Last Message',
-    exploration_title: 'Biology',
-    exploration_id: 'exp1',
-    thread_id: 'thread_1'
-  },
-  {
-    status: 'open',
-    original_author_id: '2',
-    last_updated_msecs: 1001,
-    last_message_text: 'Last Message',
-    total_message_count: 5,
-    last_message_is_read: false,
-    second_last_message_is_read: true,
-    author_last_message: '2',
-    author_second_last_message: 'Last Message',
-    exploration_title: 'Algebra',
-    exploration_id: 'exp1',
-    thread_id: 'thread_1'
-  },
-  {
-    status: 'open',
-    original_author_id: '3',
-    last_updated_msecs: 1002,
-    last_message_text: 'Last Message',
-    total_message_count: 5,
-    last_message_is_read: false,
-    second_last_message_is_read: true,
-    author_last_message: '2',
-    author_second_last_message: 'Last Message',
-    exploration_title: 'Three Balls',
-    exploration_id: 'exp1',
-    thread_id: 'thread_1'
-  },
-  {
-    status: 'open',
-    original_author_id: '4',
-    last_updated_msecs: 1003,
-    last_message_text: 'Last Message',
-    total_message_count: 5,
-    last_message_is_read: false,
-    second_last_message_is_read: true,
-    author_last_message: '2',
-    author_second_last_message: 'Last Message',
-    exploration_title: 'Zebra',
-    exploration_id: 'exp1',
-    thread_id: 'thread_1'
-  }
-  ];
-
   let subscriptionsList = [{
     creator_impact: 0,
     creator_username: 'Bucky',

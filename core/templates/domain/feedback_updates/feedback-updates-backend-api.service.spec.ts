@@ -62,8 +62,7 @@ describe('Feedback Updates Backend API Service', () => {
       providers: [FeedbackUpdatesBackendApiService]
     });
     feedbackUpdatesBackendApiService = TestBed.get(
-        FeedbackUpdatesBackendApiService);
-
+      FeedbackUpdatesBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
