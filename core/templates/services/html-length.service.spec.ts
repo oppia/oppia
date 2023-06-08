@@ -99,6 +99,7 @@ describe('Html Length Service', () => {
     const expectedLength = 14;
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
     expect(result).toBe(expectedLength);
   });
 
