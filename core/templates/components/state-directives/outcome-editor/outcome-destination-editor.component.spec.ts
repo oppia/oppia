@@ -79,7 +79,7 @@ describe('Outcome Destination Editor', () => {
       null,
     );
 
-    spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
+    spyOn(stateEditorService, 'isExplorationCurated').and.returnValue(true);
   });
 
   afterEach(() => {
