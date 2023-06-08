@@ -197,12 +197,6 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                     cntr = 0
                     while cntr < len(lib_version) and lib_version[cntr] != '#':
                         cntr += 1
-                    if cntr == len(lib_version):
-                        error_message = (
-                            'The version of %s in package.json is not '
-                            'supported.' % third_party_lib['dependency_key'])
-                        error_messages.append(error_message)
-                        failed = True
 
                     lib_version = lib_version[(cntr + 1):]
 
