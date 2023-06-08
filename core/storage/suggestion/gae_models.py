@@ -2034,17 +2034,6 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     # overall_accuracy = accepted cards/ submitted cards.
     overall_accuracy = datastore_services.FloatProperty(
         required=True, indexed=True)
-    # The number of accepted translations in last 100 reviews.
-    last_hundred_accepted_translations_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
-    # The number of accepted translations without reviewer edits in
-    # last 100 reviews.
-    last_hundred_accepted_translations_without_reviewer_edits_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
-    # The number of rejected translations in last 100 reviews.
-    last_hundred_rejected_translations_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
-    # The number of submitted translations.
     submitted_translations_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The total word count of submitted translations. Excludes HTML tags and
@@ -2082,9 +2071,6 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         recent_review_outcomes: List[str],
         recent_performance: int,
         overall_accuracy: float,
-        last_hundred_accepted_translations_count: int,
-        last_hundred_accepted_translations_without_reviewer_edits_count: int,
-        last_hundred_rejected_translations_count: int,
         submitted_translations_count: int,
         submitted_translation_word_count: int,
         accepted_translations_count: int,
@@ -2109,12 +2095,6 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             recent_review_outcomes=recent_review_outcomes,
             recent_performance=recent_performance,
             overall_accuracy=overall_accuracy,
-            last_hundred_accepted_translations_count=(
-                last_hundred_accepted_translations_count),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-            last_hundred_accepted_translations_without_reviewer_edits_count),
-            last_hundred_rejected_translations_count=(
-                last_hundred_rejected_translations_count),
             submitted_translations_count=submitted_translations_count,
             submitted_translation_word_count=submitted_translation_word_count,
             accepted_translations_count=accepted_translations_count,
@@ -2338,12 +2318,6 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'overall_accuracy':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_accepted_translations_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_accepted_translations_without_reviewer_edits_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_rejected_translations_count':
-                base_models.EXPORT_POLICY.EXPORTED,
             'submitted_translations_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'submitted_translation_word_count':
@@ -2405,12 +2379,6 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     model.recent_performance),
                 'overall_accuracy': (
                     model.overall_accuracy),
-                'last_hundred_accepted_translations_count': (
-                    model.last_hundred_accepted_translations_count),
-                'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                    model.last_hundred_accepted_translations_without_reviewer_edits_count), # pylint: disable=line-too-long
-                'last_hundred_rejected_translations_count': (
-                    model.last_hundred_rejected_translations_count),
                 'submitted_translations_count': (
                     model.submitted_translations_count),
                 'submitted_translation_word_count': (
@@ -2792,21 +2760,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     # overall_accuracy = accepted questions/ submitted questions.
     overall_accuracy = datastore_services.FloatProperty(
         required=True, indexed=True)
-    # The number of accepted questions in last 100 reviews.
-    last_hundred_accepted_questions_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
-    # The number of accepted questions without reviewer edits in
-    # last 100 reviews.
-    last_hundred_accepted_questions_without_reviewer_edits_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
-    # The number of rejected questions in last 100 reviews.
-    last_hundred_rejected_questions_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
     # The number of submitted questions.
     submitted_questions_count = datastore_services.IntegerProperty(
-        required=True, indexed=True)
-    # The number of rejected questions.
-    rejected_questions_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The number of accepted questions.
     accepted_questions_count = datastore_services.IntegerProperty(
@@ -2814,6 +2769,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     # The number of accepted questions without reviewer edits.
     accepted_questions_without_reviewer_edits_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
+    # The number of rejected questions.
+    rejected_questions_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
     # The first date that the submitter made a question submission.
     first_contribution_date = datastore_services.DateProperty(indexed=True)
     # The last date that the submitter made a question submission.
@@ -2827,13 +2785,10 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         recent_review_outcomes: List[str],
         recent_performance: int,
         overall_accuracy: float,
-        last_hundred_rejected_questions_count: int,
-        last_hundred_accepted_questions_count: int,
-        last_hundred_accepted_questions_without_reviewer_edits_count: int,
         submitted_questions_count: int,
-        rejected_questions_count: int,
         accepted_questions_count: int,
         accepted_questions_without_reviewer_edits_count: int,
+        rejected_questions_count: int,
         first_contribution_date: datetime.date,
         last_contribution_date: datetime.date
     ) -> str:
@@ -2849,17 +2804,11 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             recent_review_outcomes=recent_review_outcomes,
             recent_performance=recent_performance,
             overall_accuracy=overall_accuracy,
-            last_hundred_rejected_questions_count=(
-                last_hundred_rejected_questions_count),
-            last_hundred_accepted_questions_count=(
-                last_hundred_accepted_questions_count),
-            last_hundred_accepted_questions_without_reviewer_edits_count=(
-            last_hundred_accepted_questions_without_reviewer_edits_count),
             submitted_questions_count=submitted_questions_count,
-            rejected_questions_count=rejected_questions_count,
             accepted_questions_count=accepted_questions_count,
             accepted_questions_without_reviewer_edits_count=(
                 accepted_questions_without_reviewer_edits_count),
+            rejected_questions_count=rejected_questions_count,
             first_contribution_date=first_contribution_date,
             last_contribution_date=last_contribution_date)
         entity.update_timestamps()
@@ -3010,19 +2959,13 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'overall_accuracy':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_rejected_questions_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_accepted_questions_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_accepted_questions_without_reviewer_edits_count':
-                base_models.EXPORT_POLICY.EXPORTED,
             'submitted_questions_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'rejected_questions_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_questions_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_questions_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_questions_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_date':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -3068,20 +3011,14 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     model.recent_performance),
                 'overall_accuracy': (
                     model.overall_accuracy),
-                'last_hundred_rejected_questions_count': (
-                    model.last_hundred_rejected_questions_count),
-                'last_hundred_accepted_questions_count': (
-                    model.last_hundred_accepted_questions_count),
-                'last_hundred_accepted_questions_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                    model.last_hundred_accepted_questions_without_reviewer_edits_count), # pylint: disable=line-too-long
                 'submitted_questions_count': (
                     model.submitted_questions_count),
-                'rejected_questions_count': (
-                    model.rejected_questions_count),
                 'accepted_questions_count': (
                     model.accepted_questions_count),
                 'accepted_questions_without_reviewer_edits_count': (
                     model.accepted_questions_without_reviewer_edits_count),
+                'rejected_questions_count': (
+                    model.rejected_questions_count),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (

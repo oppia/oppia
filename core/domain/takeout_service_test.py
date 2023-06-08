@@ -420,23 +420,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     SUBMITTED_TRANSLATIONS_COUNT: Final = 2
     SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
     ACCEPTED_TRANSLATIONS_COUNT: Final = 1
-    LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT: Final = 1
     ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
-    LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
     REJECTED_TRANSLATIONS_COUNT: Final = 0
-    LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT: Final = 0
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
     REVIEWED_TRANSLATIONS_COUNT: Final = 0
     REVIEWED_TRANSLATION_WORD_COUNT: Final = 0
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     SUBMITTED_QUESTIONS_COUNT: Final = 20
     REJECTED_QUESTIONS_COUNT: Final = 20
-    LAST_HUNDRED_REJECTED_QUESTIONS_COUNT: Final = 0
     ACCEPTED_QUESTIONS_COUNT: Final = 2
-    LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT: Final = 1
     ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
-    LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
     REVIEWED_QUESTIONS_COUNT: Final = 2
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
     TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['15', '16', '17']
@@ -786,14 +780,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -833,18 +819,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_rejected_questions_count=(
-                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_count=(
-                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_without_reviewer_edits_count=(
-                self
-                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2000,14 +1979,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
                     'recent_performance': self.RECENT_PERFORMANCE,
                     'overall_accuracy': self.OVERALL_ACCURACY,
-                    'last_hundred_accepted_translations_count': (
-                        self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-                    # Pylint disable is needed because variable name is too
-                    # long.
-                    'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                        self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-                    'last_hundred_rejected_translations_count': (
-                        self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
                     'submitted_translations_count': (
                         self.SUBMITTED_TRANSLATIONS_COUNT),
                     'submitted_translation_word_count': (
@@ -2060,14 +2031,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
                     'recent_performance': self.RECENT_PERFORMANCE,
                     'overall_accuracy': self.OVERALL_ACCURACY,
-                    'last_hundred_accepted_questions_count': (
-                        self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-                    # Pylint disable is needed because variable name is too
-                    # long.
-                    'last_hundred_accepted_questions_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                        self.LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-                    'last_hundred_rejected_questions_count': (
-                        self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
                     'submitted_questions_count': (
                         self.SUBMITTED_QUESTIONS_COUNT),
                     'accepted_questions_count': (
@@ -2075,6 +2038,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'accepted_questions_without_reviewer_edits_count': (
                         self
                         .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                    'rejected_questions_count': self.REJECTED_QUESTIONS_COUNT,
                     'first_contribution_date': (
                         self.FIRST_CONTRIBUTION_DATE.isoformat()),
                     'last_contribution_date': (

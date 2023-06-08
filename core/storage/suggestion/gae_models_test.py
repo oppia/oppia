@@ -3006,9 +3006,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
     RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
     RECENT_PERFORMANCE: Final = 2
     OVERALL_ACCURACY: Final = 2.0
-    LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT: Final = 2
-    LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 2
-    LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT: Final = 2
     SUBMITTED_TRANSLATIONS_COUNT: Final = 2
     SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
     ACCEPTED_TRANSLATIONS_COUNT: Final = 1
@@ -3033,14 +3030,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3076,14 +3065,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=1,
             overall_accuracy=4,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=20,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3108,14 +3089,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=2,
             overall_accuracy=2,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=10,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3140,14 +3113,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=3,
             overall_accuracy=1,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=50,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3171,14 +3136,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=4,
             overall_accuracy=1,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=4,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3392,14 +3349,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3450,12 +3399,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 base_models.EXPORT_POLICY.EXPORTED,
             'overall_accuracy':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_accepted_translations_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_accepted_translations_without_reviewer_edits_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_rejected_translations_count':
-                base_models.EXPORT_POLICY.EXPORTED,
             'submitted_translations_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'submitted_translation_word_count':
@@ -3495,14 +3438,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3546,14 +3481,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3577,14 +3504,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_accepted_translations_count=(
-                self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-            last_hundred_accepted_translations_without_reviewer_edits_count=(
-                self
-            # Pylint disable is needed because variable name is too long.
-                .LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-            last_hundred_rejected_translations_count=(
-                self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
             submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
             submitted_translation_word_count=(
                 self.SUBMITTED_TRANSLATION_WORD_COUNT),
@@ -3611,13 +3530,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
                 'recent_performance': self.RECENT_PERFORMANCE,
                 'overall_accuracy': self.OVERALL_ACCURACY,
-                'last_hundred_accepted_translations_count': (
-                    self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-                # Pylint disable is needed because variable name is too long.
-                'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                    self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-                'last_hundred_rejected_translations_count': (
-                    self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
                 'submitted_translations_count': (
                     self.SUBMITTED_TRANSLATIONS_COUNT),
                 'submitted_translation_word_count': (
@@ -3646,13 +3558,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
                 'recent_performance': self.RECENT_PERFORMANCE,
                 'overall_accuracy': self.OVERALL_ACCURACY,
-                'last_hundred_accepted_translations_count': (
-                    self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_COUNT),
-                # Pylint disable is needed because variable name is too long.
-                'last_hundred_accepted_translations_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                    self.LAST_HUNDRED_ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-                'last_hundred_rejected_translations_count': (
-                    self.LAST_HUNDRED_REJECTED_TRANSLATIONS_COUNT),
                 'submitted_translations_count': (
                     self.SUBMITTED_TRANSLATIONS_COUNT),
                 'submitted_translation_word_count': (
@@ -4098,13 +4003,10 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
     RECENT_REVIEW_OUTCOMES = ['accepted', 'rejected']
     RECENT_PERFORMANCE = 20
     OVERALL_ACCURACY = 2.0
-    LAST_HUNDRED_REJECTED_QUESTIONS_COUNT = 0
-    LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT = 1
-    LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
     SUBMITTED_QUESTIONS_COUNT = 2
-    REJECTED_QUESTIONS_COUNT = 20
     ACCEPTED_QUESTIONS_COUNT = 1
     ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    REJECTED_QUESTIONS_COUNT = 20
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
@@ -4118,18 +4020,11 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=10,
             overall_accuracy=30.0,
-            last_hundred_rejected_questions_count=(
-                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_count=(
-                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_without_reviewer_edits_count=(
-                self
-                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             submitted_questions_count=10,
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.date(2023, 2, 1)
         ).put()
@@ -4142,18 +4037,11 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=20,
             overall_accuracy=20.0,
-            last_hundred_rejected_questions_count=(
-                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_count=(
-                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_without_reviewer_edits_count=(
-                self
-                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             submitted_questions_count=20,
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.date(2023, 2, 1)
         ).put()
@@ -4166,18 +4054,11 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=30,
             overall_accuracy=10.0,
-            last_hundred_rejected_questions_count=(
-                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_count=(
-                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_without_reviewer_edits_count=(
-                self
-                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             submitted_questions_count=30,
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.date(2023, 5, 1)
         ).put()
@@ -4190,18 +4071,11 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=40,
             overall_accuracy=5.0,
-            last_hundred_rejected_questions_count=(
-                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_count=(
-                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_without_reviewer_edits_count=(
-                self
-                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             submitted_questions_count=40,
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=datetime.date(2023, 6, 4)
         ).put()
@@ -4385,18 +4259,11 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_rejected_questions_count=(
-                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_count=(
-                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_without_reviewer_edits_count=(
-                self
-                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -4427,18 +4294,11 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
             recent_performance=self.RECENT_PERFORMANCE,
             overall_accuracy=self.OVERALL_ACCURACY,
-            last_hundred_rejected_questions_count=(
-                self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_count=(
-                self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-            last_hundred_accepted_questions_without_reviewer_edits_count=(
-                self
-                .LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             submitted_questions_count=self.SUBMITTED_QUESTIONS_COUNT,
-            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -4448,23 +4308,16 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
                 'recent_performance': self.RECENT_PERFORMANCE,
                 'overall_accuracy': self.OVERALL_ACCURACY,
-                'last_hundred_accepted_questions_count': (
-                    self.LAST_HUNDRED_ACCEPTED_QUESTIONS_COUNT),
-                # Pylint disable is needed because variable name is too long.
-                'last_hundred_accepted_questions_without_reviewer_edits_count': ( # pylint: disable=line-too-long
-                    self.LAST_HUNDRED_ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT), # pylint: disable=line-too-long
-                'last_hundred_rejected_questions_count': (
-                    self.LAST_HUNDRED_REJECTED_QUESTIONS_COUNT),
                 'submitted_questions_count': (
                     self.SUBMITTED_QUESTIONS_COUNT),
-                'rejected_questions_count': (
-                    self.REJECTED_QUESTIONS_COUNT
-                ),
                 'accepted_questions_count': (
                     self.ACCEPTED_QUESTIONS_COUNT),
                 'accepted_questions_without_reviewer_edits_count': (
                     self
                     .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'rejected_questions_count': (
+                    self.REJECTED_QUESTIONS_COUNT
+                ),
                 'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (
@@ -4492,19 +4345,13 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 base_models.EXPORT_POLICY.EXPORTED,
             'overall_accuracy':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_rejected_questions_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_accepted_questions_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_hundred_accepted_questions_without_reviewer_edits_count':
-                base_models.EXPORT_POLICY.EXPORTED,
             'submitted_questions_count':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'rejected_questions_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_questions_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_questions_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_questions_count':
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_date':
                 base_models.EXPORT_POLICY.EXPORTED,
