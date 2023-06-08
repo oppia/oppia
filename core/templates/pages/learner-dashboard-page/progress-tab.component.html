@@ -58,7 +58,13 @@
           <span class="skill-proficiency-topic-title e2e-test-skill-proficiency-topic-title" [ngStyle]="tile[0] === 0 && {'left': '51px'}">
           {{tile[1].name}}
           </span>
-          <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown button" class="oppia-svg-dropdown-image" role="button" tabindex="0" (keydown.enter)="showSkills(i)" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
+          <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')"
+               alt="dropdown button"
+               class="oppia-svg-dropdown-image"
+               role="button" tabindex="0"
+               (keydown.enter)="showSkills(i)"
+               (click)="showSkills(i)"
+               *ngIf="!displaySkills[i]">
           <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')" alt="up button" class="oppia-svg-up-image" role="button" tabindex="0" (keydown.enter)="showSkills(i)" (click)="showSkills(i)" *ngIf="displaySkills[i]">
           <div *ngIf="tile[0] > 0">
             <div class="circle-border" [ngStyle]="{'background-image': calculateCircularProgress(i)}">
