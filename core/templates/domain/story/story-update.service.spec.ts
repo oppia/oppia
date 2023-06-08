@@ -85,6 +85,9 @@ describe('Story update service', () => {
       meta_tag_content: 'meta'
     };
 
+    spyOn(storyUpdateService.onStoryChapterUpdateEventEmitter, 'emit')
+      .and.stub();
+
     _sampleStory = Story.createFromBackendDict(
       sampleStoryBackendObject);
   });
@@ -99,6 +102,8 @@ describe('Story update service', () => {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual(['skill_1', 'skill_3']);
+      expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+        .toHaveBeenCalled();
 
       undoRedoService.undoChange(_sampleStory);
       expect(
@@ -131,6 +136,8 @@ describe('Story update service', () => {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
       ).toEqual(['skill_2', 'skill_4']);
+      expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+        .toHaveBeenCalled();
 
       undoRedoService.undoChange(_sampleStory);
       expect(
@@ -202,6 +209,8 @@ describe('Story update service', () => {
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
       ).toEqual([]);
+      expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+        .toHaveBeenCalled();
 
       undoRedoService.undoChange(_sampleStory);
       expect(
@@ -406,6 +415,8 @@ describe('Story update service', () => {
       _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
     ).toBe(true);
 
+    expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+      .toHaveBeenCalled();
     undoRedoService.undoChange(_sampleStory);
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
@@ -440,6 +451,8 @@ describe('Story update service', () => {
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
     ).toBe(false);
+    expect(storyUpdateService.onStoryChapterUpdateEventEmitter.emit)
+      .toHaveBeenCalled();
 
     undoRedoService.undoChange(_sampleStory);
     expect(
