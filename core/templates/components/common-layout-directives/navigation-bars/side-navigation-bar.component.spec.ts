@@ -244,7 +244,7 @@ describe('Side Navigation Bar Component', () => {
     fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve());
+        .and.returnValue(Promise.resolve());
       spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.returnValue(Promise.reject({
           error: {error: 'Backend error'},

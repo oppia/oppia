@@ -593,7 +593,7 @@ describe('TopNavigationBarComponent', () => {
         status: 500
       }));
 
-      component.ngOnInit();
+    component.ngOnInit();
 
     tick();
 
@@ -606,14 +606,14 @@ describe('TopNavigationBarComponent', () => {
     fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve());
+        .and.returnValue(Promise.resolve());
       spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
         .and.returnValue(Promise.reject({
           error: {error: 'Backend error'},
           status: 500
         }));
 
-        component.ngOnInit();
+      component.ngOnInit();
 
       tick();
 
