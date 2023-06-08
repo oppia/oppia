@@ -249,7 +249,6 @@ class AdminHandler(
         # Remove blog related configs as they will be handled by 'blog admins'
         # on blog admin page.
         del config_properties['max_number_of_tags_assigned_to_blog_post']
-        del config_properties['list_of_default_tags_for_blog_post']
 
         self.render_json({
             'config_properties': config_properties,

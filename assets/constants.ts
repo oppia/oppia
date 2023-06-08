@@ -29,6 +29,50 @@ export default {
   // fragment in the controller is invalid.
   "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
 
+  "FEATURED_TRANSLATION_LANGUAGES": [
+    {
+      "language_code": "pt",
+      "explanation": "For learners in Brazil, Angola and Mozambique."
+    },
+    {
+      "language_code": "ar",
+      // eslint-disable-next-line max-len
+      "explanation": "For learners in Arabic-speaking countries in the Middle East."
+    },
+    {
+      "language_code": "pcm",
+      "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "es",
+      "explanation": "For learners in Latin America and South America."
+    },
+    {
+      "language_code": "sw",
+      "explanation": "For learners in Kenya and Tanzania."
+    },
+    {
+      "language_code": "hi",
+      "explanation": "For learners in India"
+    },
+    {
+      "language_code": "ha",
+      "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "ig",
+      "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "yo",
+      "explanation": "For learners in Nigeria."
+    }],
+
+  "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
+    "News", "International", "Educators", "Learners", "Community",
+    "Partnerships", "Volunteer", "Stories", "Languages", "New features",
+    "New lessons", "Software development", "Content"],
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -51,6 +95,7 @@ export default {
   "LIBRARY_MOBILE_TILE_WIDTH_PX": 350,
   "DASHBOARD_TYPE_CREATOR": "creator",
   "DASHBOARD_TYPE_LEARNER": "learner",
+  "DASHBOARD_TYPE_CONTRIBUTOR": "contributor",
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
@@ -5080,7 +5125,7 @@ export default {
     "decimal_separator": ","
   }, {
     "code": "ha",
-    "description": "Halshen Hausa (Hausa)",
+    "description": "Harshen Hausa (Hausa)",
     "direction": "ltr",
     "decimal_separator": "."
   }, {
@@ -5478,7 +5523,7 @@ export default {
     "direction": "ltr"
   }, {
     "id": "ha",
-    "description": "Halshen Hausa (Hausa)",
+    "description": "Harshen Hausa (Hausa)",
     "relatedLanguages": ["ha"],
     "direction": "ltr"
   }, {
@@ -6931,5 +6976,7 @@ export default {
     "id", "states", "next_content_id_index", "version"
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
-  "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313
+  "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
 } as const;
