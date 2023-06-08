@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the learner dashboard and the notifications dashboard."""
+"""Tests for the feedback updates."""
 
 from __future__ import annotations
 
@@ -25,7 +25,6 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import learner_progress_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services

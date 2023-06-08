@@ -217,7 +217,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_LEARNER_DASHBOARD_PAGE_TITLE');
+      'I18N_FEEDBACK_UPDATES_PAGE_TITLE');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -247,7 +247,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
           this.alertsService.addWarning(
-            'Failed to get learner dashboard feedback updates data');
+            'Failed to get feedback updates data');
         }
       }
     );
