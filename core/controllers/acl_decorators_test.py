@@ -85,6 +85,7 @@ class OpenAccessDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_access_with_logged_in_user(self) -> None:
+        """Tests that a logged-in user can access the mock page."""
         self.login(self.VIEWER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock')
@@ -92,6 +93,7 @@ class OpenAccessDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_access_with_guest_user(self) -> None:
+        """Tests that a guest user can access the mock page."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock')
         self.assertTrue(response['success'])
@@ -128,6 +130,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_error_when_mailchimp_webhook_secret_is_none(self) -> None:
+        """Tests that an error is returned when secret is not provided."""
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         swap_api_key_secrets_return_none = self.swap_with_checks(
             secrets_services,
@@ -153,6 +156,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['status_code'], 404)
 
     def test_error_when_given_webhook_secret_is_invalid(self) -> None:
+        """Tests that an error is returned when secret is invalid."""
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
             secrets_services, 'get_secret', self.secret)
@@ -171,6 +175,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['status_code'], 404)
 
     def test_no_error_when_given_webhook_secret_is_valid(self) -> None:
+        """Tests that no error is returned when secret is valid."""
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         mailchimp_swap = self.swap_to_always_return(
             secrets_services, 'get_secret', self.secret)
@@ -217,6 +222,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_can_view_skill_with_valid_skill_id(self) -> None:
+        """Tests that skill ID is valid."""
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         skill_ids = [skill_id]
@@ -226,6 +232,9 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['selected_skill_ids'], skill_ids)
 
     def test_invalid_input_exception_with_invalid_skill_ids(self) -> None:
+        """Tests that an InvalidIputException is returned when skill ID is
+        invalid.
+        """
         skill_ids = ['abcd1234']
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(

@@ -111,7 +111,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_promo_bar_configuration_not_present_to_admin(self) -> None:
-        """Test that promo bar configuration is not presentd in admin page."""
+        """Test that promo bar configuration is not present in admin page."""
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response_dict = self.get_json('/adminhandler')
