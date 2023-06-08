@@ -16,10 +16,8 @@
 
 from __future__ import annotations
 
-import datetime
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_progress_services
@@ -28,16 +26,9 @@ from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Union
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import suggestion_models
-
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+from typing import Final
 
 
 class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
@@ -809,4 +800,3 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             response['subscription_list'][0]['creator_username'],
             self.OWNER_USERNAME)
         self.logout()
-

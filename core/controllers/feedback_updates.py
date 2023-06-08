@@ -78,6 +78,7 @@ class FeedbackUpdatesPage(
         """Handles GET requests."""
         self.render_template('feedback-updates-page.mainpage.html')
 
+
 class FeedbackUpdatesHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of FeedbackUpdatesHandler's
     normalized_payload dictionary.

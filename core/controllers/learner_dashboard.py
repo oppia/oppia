@@ -17,8 +17,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core import utils
-from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import learner_progress_services
@@ -27,7 +25,8 @@ from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
 
-from typing import Dict, List, Optional, TypedDict, Union
+from typing import Dict, Optional, TypedDict
+
 
 class SuggestionSummaryDict(TypedDict):
     """Dict representation of suggestion's summary."""
@@ -304,5 +303,3 @@ class LearnerDashboardIdsHandler(
                 learner_dashboard_activities.to_dict())
         })
         self.render_json(self.values)
-
-

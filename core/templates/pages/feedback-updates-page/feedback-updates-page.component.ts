@@ -229,7 +229,6 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
           this.paginatedThreadsList));
     dashboardFeedbackUpdatesDataPromise.then(
       responseData => {
-        console.error(responseData,"response data");
         this.isCurrentFeedbackSortDescending = true;
         this.currentFeedbackThreadsSortType = (
           LearnerDashboardPageConstants

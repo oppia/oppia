@@ -610,7 +610,7 @@ export const angularServices: [string, Type<{}>][] = [
     FatigueDetectionService],
   ['FeedbackPopupBackendApiService', FeedbackPopupBackendApiService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
-  ['FeedbackUpdatesBackendApiService',FeedbackUpdatesBackendApiService],
+  ['FeedbackUpdatesBackendApiService', FeedbackUpdatesBackendApiService],
   ['FilterForMatchingSubstringPipe', FilterForMatchingSubstringPipe],
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],

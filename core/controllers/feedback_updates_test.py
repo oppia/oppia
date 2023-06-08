@@ -20,7 +20,6 @@ import datetime
 
 from core import feconf
 from core import utils
-from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -31,7 +30,7 @@ from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Union
+from typing import Dict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -53,7 +52,6 @@ class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
             '/learner_dashboard', expected_status_int=301)
         self.assertEqual(
             'http://localhost/learner-dashboard', response.headers['location'])
-
 
 
 class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
