@@ -114,6 +114,7 @@ describe('Html Length Service', () => {
     const expectedLength = 9;
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
     expect(result).toBe(expectedLength);
   });
 });
