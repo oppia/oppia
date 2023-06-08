@@ -115,6 +115,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isLastItem!: boolean;
   isFirstItem: boolean = true;
   reviewMessage!: string;
+  reviewer!: string;
   status!: string;
   heading: string = 'Your Translation Contributions';
   subheading!: string;
@@ -364,6 +365,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     // a review message the second element of the threadMessages
     // array contains the actual review message.
     if (threadMessages[1] !== undefined) {
+      this.reviewer = threadMessages[1].authorUsername;
       this.reviewMessage = threadMessages[1].text;
     }
   }
