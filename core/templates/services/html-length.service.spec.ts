@@ -70,7 +70,9 @@ describe('Html Length Service', () => {
       ' the rest of space, it is the only place that we know life' +
       ' exists on. It is at just the right distance from the sun to' +
       ' ensure a comfortable temperature for us to exist in.</p>';
+  
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
     expect(result).toBe(54);
   });
 
