@@ -58,7 +58,9 @@ describe('Html Length Service', () => {
 
   it('should compute length for empty string', () => {
     const htmlString = '';
+
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
     expect(result).toBe(0);
   });
 
