@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for blog post editor.
  */
 
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -162,6 +162,7 @@ describe('Blog Post Editor Component', () => {
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
       ['default-image-url-png', 'default-image-url-webp']);
     component.ngOnInit();
+    component.titleInput = new ElementRef(document.createElement('div'));
   });
 
   it('should create', () => {
@@ -250,6 +251,7 @@ describe('Blog Post Editor Component', () => {
       blogPostDict: sampleBlogPostData,
     };
     component.blogPostId = 'sampleBlogId';
+    component.titleEditorIsActive = false;
     spyOn(blogPostEditorBackendApiService, 'fetchBlogPostEditorData')
       .and.returnValue(Promise.resolve(blogPostEditorData));
 
@@ -265,14 +267,47 @@ describe('Blog Post Editor Component', () => {
     expect(component.thumbnailDataUrl).toEqual(
       '/assetsdevhandler/blog_post/sampleBlogId/assets/thumbnail' +
       '/image.png');
-    expect(blogDashboardPageService.imageUploaderIsNarrow).toBe(true);
+    expect(blogDashboardPageService.imageUploaderIsNarrow).toBeTrue();
     expect(component.dateTimeLastSaved).toEqual(
       'November 21, 2014 at 04:52 AM');
     expect(component.title).toEqual('sample title');
-    expect(component.contentEditorIsActive).toBe(false);
-    expect(component.lastChangesWerePublished).toBe(true);
+    expect(component.contentEditorIsActive).toBeFalse();
+    expect(component.lastChangesWerePublished).toBeTrue();
+    expect(component.titleEditorIsActive).toBeFalse();
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
   }));
+
+  it('should activate title editor if blog post does not have a title when it' +
+  ' loads', fakeAsync(() => {
+    let sampleBackendDict = {
+      id: 'sampleBlogId',
+      displayed_author_name: 'test_user',
+      title: '',
+      content: '',
+      thumbnail_filename: null,
+      tags: [],
+      url_fragment: '',
+    };
+    let blogPostEditorData = {
+      displayedAuthorName: 'test_user',
+      listOfDefaulTags: ['news', 'Learners'],
+      maxNumOfTags: 2,
+      blogPostDict: BlogPostData.createFromBackendDict(
+        sampleBackendDict),
+    };
+    component.blogPostId = 'sampleBlogId';
+    component.titleEditorIsActive = false;
+    spyOn(blogPostEditorBackendApiService, 'fetchBlogPostEditorData')
+      .and.returnValue(Promise.resolve(blogPostEditorData));
+
+    component.initEditor();
+    tick();
+
+    expect(blogPostEditorBackendApiService.fetchBlogPostEditorData)
+      .toHaveBeenCalled();
+    expect(component.titleEditorIsActive).toBeTrue();
+  }));
+
 
   it('should display alert when unable to fetch blog post editor data',
     fakeAsync(() => {
@@ -674,6 +709,16 @@ describe('Blog Post Editor Component', () => {
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Thumbnail Saved Successfully.');
     }));
+
+  it('should activate title editor', () => {
+    component.titleEditorIsActive = false;
+    spyOn(component.titleInput.nativeElement, 'focus');
+
+    component.activateTitleEditor();
+
+    expect(component.titleInput.nativeElement.focus).toHaveBeenCalled();
+    expect(component.titleEditorIsActive).toBeTrue();
+  });
 
   it('should correctly return if the publish button is disabled or not', () => {
     component.blogPostData = sampleBlogPostData;

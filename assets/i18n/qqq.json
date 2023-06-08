@@ -139,6 +139,7 @@
 	"I18N_BLOG_POST_EDITOR_DELETE_BUTTON": "Button displayed in the blog post editor page. - Text of the delete button which deletes the blog post.\n\n{{Identical|Delete}}",
 	"I18N_BLOG_POST_EDITOR_EDIT_THUMBNAIL_TEXT": "Text displayed in the blog post editor page. - Text of the button that allows the user to edit the thumbnail image for the blog post.",
 	"I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX": "Text displayed in the blog post editor page. - Text shown before the date and time when the blog post was last saved.",
+	"I18N_BLOG_POST_EDITOR_NO_THUMBNAIL_UPLOADED_WARNING": "Text displayed in the blog post editor page in thumbnail preview. - Text shown if the thumbnail is not uploaded by the editor.",
 	"I18N_BLOG_POST_EDITOR_PUBLISH_BUTTON": "Button displayed in the blog post editor page. - Text of the publish button which publishes the blog post on the blog home page.",
 	"I18N_BLOG_POST_EDITOR_SAVE_CONTENT_BUTTON_TEXT": "Button displayed in the blog post editor page. - Text of the save content button which saves the content written in RTE locally.",
 	"I18N_BLOG_POST_EDITOR_SAVE_DRAFT_BUTTON": "Button displayed in the blog post editor page. - Text of the save draft button which saves the blog post as a draft.",
