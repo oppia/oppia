@@ -2,54 +2,54 @@
   <div class="navbar-helper">
     <div class="navbar-tabs">
       <div class="navbar-text">
-        <[$ctrl.getNavbarText()]>
+        {{ getNavbarText() }}
       </div>
       <div class="navbar-icons">
-        <li ng-class="{'navbar-tab-active': $ctrl.isMainEditorTabSelected(), 'uib-dropdown': $ctrl.getTotalWarningsCount()}"
-            ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>"
+        <li [ngClass]="{'navbar-tab-active': isMainEditorTabSelected(), 'dropdown': getTotalWarningsCount()}"
+            [attr.dropdown]="getTotalWarningsCount()"
             class="nav-item icon nav-list-item"
-            ng-click="$ctrl.navigateToStoryEditor()">
-          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab">
-            <i class="fas fa-pen navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected()}"></i>
+            (click)="navigateToStoryEditor()">
+          <a ngbTooltip="Main Editor" placement="bottom" class="nav-link navbar-tab">
+            <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': isMainEditorTabSelected()}"></i>
           </a>
-          <div ng-show="$ctrl.getTotalWarningsCount()"
+          <div [hidden]="!getTotalWarningsCount()"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-               ng-mouseover="$ctrl.warningsAreShown=true" ng-mouseleave="$ctrl.warningsAreShown=false">
+               (mouseover)="isWarningsAreShown(true)" (mouseleave)="isWarningsAreShown(false)">
             <span class="oppia-editor-warnings-count e2e-test-warning-indicator">
-              <[$ctrl.getTotalWarningsCount()]>
+              {{ getTotalWarningsCount() }}
             </span>
-            <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box story-editor-warning-box" ng-if="$ctrl.warningsAreShown">
+            <ul class="uib-dropdown-menu dropdown-menu oppia-editor-warnings-box story-editor-warning-box" *ngIf="warningsAreShown">
               <span class="oppia-editor-warnings-header">Warnings</span>
               <li class="oppia-editor-warnings-text e2e-test-warnings-text"
-                  ng-repeat="issue in $ctrl.validationIssues.concat($ctrl.explorationValidationIssues) track by $index">
+                  *ngFor="let issue of validationIssues.concat(explorationValidationIssues);trackBy: $index">
                 <hr class="oppia-editor-warnings-separator">
-                <[issue]>
+                {{ issue }}
               </li>
               <li class="oppia-editor-warnings-text e2e-test-warnings-text"
-                  ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
+                  *ngFor="let issue of prepublishValidationIssues;trackBy: $index">
                 <hr class="oppia-editor-warnings-separator">
-                <[issue]>
+                {{ issue }}
               </li>
             </ul>
           </div>
         </li>
 
-        <li ng-if="!($ctrl.getActiveTab() === 'chapter_editor')" ng-class="{'navbar-tab-active': $ctrl.getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.navigateToStoryPreviewTab()">
-          <a class="nav-link navbar-tab" uib-tooltip="Preview" aria-label="Preview" tooltip-placement="bottom">
-            <i class="fas fa-play navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTab() === 'story_preview'}"></i>
+        <li *ngIf="!(getActiveTab() === 'chapter_editor')" [ngClass]="{'navbar-tab-active': getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" (click)="navigateToStoryPreviewTab()">
+          <a class="nav-link navbar-tab" ngbTooltip="Preview" aria-label="Preview" placement="bottom">
+            <i class="fas fa-play navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTab() === 'story_preview'}"></i>
           </a>
         </li>
       </div>
     </div>
   </div>
-  <div ng-if="$ctrl.story" class="story-editor-parent">
-    <div ng-if="$ctrl.getActiveTab() === 'story_editor'">
-      <story-editor></story-editor>
+  <div *ngIf="story" class="story-editor-parent">
+    <div *ngIf="getActiveTab() === 'story_editor'">
+      <oppia-story-editor></oppia-story-editor>
     </div>
-    <div ng-if="$ctrl.getActiveTab() === 'chapter_editor'">
-      <chapter-editor-tab></chapter-editor-tab>
+    <div *ngIf="getActiveTab() === 'chapter_editor'">
+      <oppia-chapter-editor-tab></oppia-chapter-editor-tab>
     </div>
-    <div ng-if="$ctrl.getActiveTab() === 'story_preview'">
+    <div *ngIf="getActiveTab() === 'story_preview'">
       <oppia-story-preview-tab></oppia-story-preview-tab>
     </div>
   </div>
@@ -61,10 +61,10 @@
     margin-left: 9%;
     margin-top: 1.5%;
   }
-  story-editor-page .story-editor {
+  .story-editor {
     margin-bottom: 80px;
   }
-  story-editor-page .navbar-helper {
+  .navbar-helper {
     background-color: #00609c;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
     height: 70px;
@@ -75,53 +75,53 @@
     width: 100%;
     z-index: 10;
   }
-  story-editor-page .navbar-tabs {
+  .navbar-tabs {
     display: flex;
     flex-wrap: wrap;
     height: 100%;
     justify-content: flex-start;
     text-align: center;
   }
-  story-editor-page .navbar-tab-icon {
+  .navbar-tab-icon {
     color: #fff;
     display: block;
     font-size: 22px;
     width: 100%;
   }
-  story-editor-page .navbar-tab span {
+  .navbar-tab span {
     color: #fff;
     font-size: 12px;
   }
-  story-editor-page .oppia-editor-warnings-box {
+  .oppia-editor-warnings-box {
     cursor: default;
     max-width: none;
   }
-  story-editor-page .navbar-tab-active {
+  .navbar-tab-active {
     background-color: #e6e6e6;
     box-shadow: 0 3px 2px 0 #e6e6e6;
   }
-  story-editor-page .navbar-tab-active-icon {
+  .navbar-tab-active-icon {
     color: #00609c;
   }
-  story-editor-page .topic-warning-container {
+  .topic-warning-container {
     display: block;
   }
-  story-editor-page .story-editor-parent {
+  .story-editor-parent {
     margin-top: 100px;
   }
 
   @media screen and (max-width: 800px) {
-    story-editor-page .story-editor-parent {
+    .story-editor-parent {
       margin-top: 40px;
     }
   }
 
   @media screen and (max-width: 768px) {
-    story-editor-page .navbar-helper {
+    .navbar-helper {
       display: none;
     }
   }
-  story-editor-page .navbar-text {
+  .navbar-text {
     align-items: center;
     color: #fff;
     display: flex;
@@ -130,23 +130,25 @@
     margin-left: 4%;
     width: 35%;
   }
-  story-editor-page .navbar-icons {
+  .navbar-icons {
     display: flex;
   }
-  story-editor-page .nav-list-item {
+  .nav-list-item {
     align-items: center;
     cursor: pointer;
     display: flex;
     justify-content: center;
     width: 90px;
   }
-  story-editor-page .navbar-icons .nav-list-item:hover {
+  .navbar-icons .nav-list-item:hover {
     background-color: #4eb0c0;
   }
   .story-editor-warning-box {
+    cursor: default;
     display: block;
+    max-width: none;
   }
-  story-editor-page .story-warning-count {
+  .story-warning-count {
     display: inline-block;
     height: 20px;
     margin-left: -10px;
@@ -154,16 +156,16 @@
   }
 
   @media screen and (max-width: 800px) {
-    story-editor-page .navbar-helper {
+    .navbar-helper {
       position: inherit;
     }
-    story-editor-page .navbar-tabs {
+    .navbar-tabs {
       justify-content: center;
     }
-    story-editor-page .navbar-text {
+    .navbar-text {
       display: none;
     }
-    story-editor-page .topic-editor-main {
+    .topic-editor-main {
       margin-top: 16px;
     }
   }
