@@ -47,7 +47,7 @@ class PracticeSessionsPage(
     }
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self) -> None:
+    def get(self, _: str) -> None:
         """Renders the practice session page."""
 
         self.render_template('practice-session-page.mainpage.html')
