@@ -2572,7 +2572,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                'IncreasingReviewedTranslation']:
+                'IncreasingReviewedTranslations']:
                 cls.reviewed_translations_count
         }
 
@@ -3141,7 +3141,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                'IncreasingReviewedQuestion']:
+                'IncreasingReviewedQuestions']:
                 cls.reviewed_questions_count
         }
 

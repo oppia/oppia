@@ -3732,7 +3732,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             page_size=1,
             offset=0,
             sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslation'],
+                    'IncreasingReviewedTranslations'],
             last_activity=None,
             language_code='es'
             ))
@@ -3792,7 +3792,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             page_size=2,
             offset=0,
             sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslation'],
+                    'IncreasingReviewedTranslations'],
             last_activity=7,
             language_code='es'
             ))
@@ -3807,7 +3807,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             page_size=1,
             offset=0,
             sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslation'],
+                    'IncreasingReviewedTranslations'],
             last_activity=90,
             language_code='es'
             ))
@@ -4448,7 +4448,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             page_size=1,
             offset=0,
             sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedQuestion'],
+                    'IncreasingReviewedQuestions'],
             last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
@@ -4490,7 +4490,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             page_size=2,
             offset=0,
             sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedQuestion'],
+                    'IncreasingReviewedQuestions'],
             last_activity=7
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
@@ -4504,7 +4504,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             page_size=1,
             offset=0,
             sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedQuestion'],
+                    'IncreasingReviewedQuestions'],
             last_activity=90
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')

@@ -126,10 +126,10 @@ export default {
     "DecreasingAccuracy": "Highest to Lowest Accuracy",
     "IncreasingSubmissions": "Lowest to Highest Submitted Contributions",
     "DecreasingSubmissions": "Highest to Lowest Submitted Contributions",
-    "IncreasingReviewedTranslation": "Lowest to Highest Reviewed Translations",
-    "DecreasingReviewedTranslation": "Highest to Lowest Reviewed Translations",
-    "IncreasingReviewedQuestion": "Lowest to Highest Reviewed Questions",
-    "DecreasingReviewedQuestion": "Highest to Lowest Reviewed Questions"
+    "IncreasingReviewedTranslations": "Lowest to Highest Reviewed Translations",
+    "DecreasingReviewedTranslations": "Highest to Lowest Reviewed Translations",
+    "IncreasingReviewedQuestions": "Lowest to Highest Reviewed Questions",
+    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions"
   },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
@@ -6993,6 +6993,6 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "gsoc_M1.2",
-  "SHORT_COMMIT_HASH": "e526997625"
+  "BRANCH_NAME": "",
+  "SHORT_COMMIT_HASH": ""
 } as const;
