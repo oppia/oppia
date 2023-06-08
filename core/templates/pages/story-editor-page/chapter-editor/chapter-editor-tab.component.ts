@@ -15,64 +15,86 @@
 /**
  * @fileoverview Component for the chapter editor tab.
  */
-require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 
-require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('pages/story-editor-page/services/story-editor-navigation.service');
-require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
-require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { StoryEditorStateService } from '../services/story-editor-state.service';
+import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { StoryUpdateService } from 'domain/story/story-update.service';
+import { Story } from 'domain/story/story.model';
+import { StoryContents } from 'domain/story/story-contents-object.model';
+import { StoryNode } from 'domain/story/story-node.model';
 
-angular.module('oppia').component('chapterEditorTab', {
-  template: require('./chapter-editor-tab.component.html'),
-  controller: [
-    'StoryEditorNavigationService', 'StoryEditorStateService',
-    function(
-        StoryEditorNavigationService, StoryEditorStateService) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.initEditor = function() {
-        ctrl.story = StoryEditorStateService.getStory();
-        ctrl.storyContents = ctrl.story.getStoryContents();
-        ctrl.chapterIndex = StoryEditorNavigationService.getChapterIndex();
-        ctrl.chapterId = StoryEditorNavigationService.getChapterId();
-        if (ctrl.storyContents &&
-            ctrl.storyContents.getNodes().length > 0) {
-          ctrl.nodes = ctrl.storyContents.getNodes();
-          if (!ctrl.chapterIndex) {
-            ctrl.storyContents.getNodes().map((node, index) => {
-              if (node.getId() === ctrl.chapterId) {
-                ctrl.chapterIndex = index;
-                return;
-              }
-            });
+@Component({
+  selector: 'oppia-chapter-editor-tab',
+  templateUrl: './chapter-editor-tab.component.html'
+})
+export class ChapterEditorTabComponent implements OnInit, OnDestroy {
+  story: Story;
+  storyContents: StoryContents;
+  chapterIndex: number | null;
+  chapterId: string;
+  node: StoryNode;
+  nodes: StoryNode[];
+
+  constructor(
+    private storyUpdateService: StoryUpdateService,
+    private storyEditorStateService: StoryEditorStateService,
+    private storyEditorNavigationService: StoryEditorNavigationService
+
+  ) {}
+
+  directiveSubscriptions = new Subscription();
+
+  initEditor(): void {
+    this.story = this.storyEditorStateService.getStory();
+    this.storyContents = this.story.getStoryContents();
+    this.chapterIndex = this.storyEditorNavigationService.getChapterIndex();
+    this.chapterId = this.storyEditorNavigationService.getChapterId();
+    if (this.storyContents &&
+        this.storyContents.getNodes().length > 0) {
+      this.nodes = this.storyContents.getNodes();
+      if (!this.chapterIndex) {
+        this.storyContents.getNodes().map((node, index) => {
+          if (node.getId() === this.chapterId) {
+            this.chapterIndex = index;
+            return;
           }
-          ctrl.node = ctrl.nodes[ctrl.chapterIndex];
-        }
-      };
-
-      ctrl.navigateToStoryEditor = function() {
-        StoryEditorNavigationService.navigateToStoryEditor();
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(
-          StoryEditorStateService.onStoryInitialized.subscribe(
-            () => ctrl.initEditor()
-          )
-        );
-        ctrl.directiveSubscriptions.add(
-          StoryEditorStateService.onStoryReinitialized.subscribe(
-            () => ctrl.initEditor()
-          )
-        );
-        ctrl.initEditor();
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+        });
+      }
+      this.node = this.nodes[this.chapterIndex];
     }
-  ]
-});
+  }
+
+  navigateToStoryEditor(): void {
+    this.storyEditorNavigationService.navigateToStoryEditor();
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onStoryInitialized.subscribe(
+        () => this.initEditor()
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onStoryReinitialized.subscribe(
+        () => this.initEditor()
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.storyUpdateService.storyChapterUpdateEventEmitter.subscribe(
+        () => {}
+      )
+    );
+    this.initEditor();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaChapterEditorTab', downgradeComponent({
+  component: ChapterEditorTabComponent
+}));

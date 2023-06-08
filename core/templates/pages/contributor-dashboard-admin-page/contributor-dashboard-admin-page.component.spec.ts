@@ -74,6 +74,7 @@ describe('Contributor dashboard admin page ', function() {
       isTopicManager: () => false,
       isTranslationAdmin: () => true,
       isQuestionAdmin: () => true,
+      isQuestionCoordinator: () => true,
       canCreateCollections: () => true,
       getPreferredSiteLanguageCode: () =>'en',
       getUsername: () => 'username1',
