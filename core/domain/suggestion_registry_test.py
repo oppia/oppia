@@ -3845,3 +3845,72 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             contribution_summary.to_dict(), expected_contribution_summary
         )
+
+
+class TranslationSubmitterTotalContributionStatsUnitTests(
+    test_utils.GenericTestBase):
+    """Tests for the TranslationSubmitterTotalContributionStats class."""
+
+    SUGGESTION_LANGUAGE_CODE: Final = 'es'
+    USER_ID_1: Final = 'uid_01234567890123456789012345678912'
+    TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS: Final = ['topic1', 'topic2']
+    RECENT_REVIEW_OUTCOMES: Final = ['accepted', 'rejected']
+    RECENT_PERFORMANCE: Final = 2
+    OVERALL_ACCURACY: Final = 2.0
+    SUBMITTED_TRANSLATIONS_COUNT: Final = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
+    REJECTED_TRANSLATIONS_COUNT: Final = 0
+    REJECTED_TRANSLATION_WORD_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_translation_review_stats(self) -> None:
+        expected_stats_dict = {
+            'language_code': self.SUGGESTION_LANGUAGE_CODE,
+            'contributor_id': self.USER_ID_1,
+            'topic_ids_with_translation_submissions': (
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+            'recent_performance': self.RECENT_PERFORMANCE,
+            'overall_accuracy': self.OVERALL_ACCURACY,
+            'submitted_translations_count': (
+                self.SUBMITTED_TRANSLATIONS_COUNT),
+            'submitted_translation_word_count': (
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            'accepted_translations_count': (
+                self.ACCEPTED_TRANSLATIONS_COUNT),
+            'accepted_translations_without_reviewer_edits_count': (
+                self
+                .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            'rejected_translations_count': (
+                self.REJECTED_TRANSLATIONS_COUNT),
+            'rejected_translation_word_count': (
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': (
+                self.LAST_CONTRIBUTION_DATE)
+        }
+
+        actual_stats = suggestion_registry.TranslationSubmitterTotalContributionStats(
+            self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
+            self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS,
+            self.RECENT_REVIEW_OUTCOMES, self.RECENT_PERFORMANCE,
+            self.OVERALL_ACCURACY,
+            self.SUBMITTED_TRANSLATIONS_COUNT,
+            self.SUBMITTED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.REJECTED_TRANSLATIONS_COUNT,
+            self.REJECTED_TRANSLATION_WORD_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), expected_stats_dict)

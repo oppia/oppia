@@ -2008,8 +2008,33 @@ class TranslationSubmitterTotalContributionStatsDict(TypedDict):
     object.
     """
 
-    language_code: Optional[str]
-    topic_id: Optional[str]
+    language_code: str
+    contributor_id: str
+    topic_ids_with_translation_submissions: List[str]
+    recent_review_outcomes: List[str]
+    recent_performance: int
+    overall_accuracy: float
+    submitted_translations_count: int
+    submitted_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translations_without_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    rejected_translation_word_count: int
+    first_contribution_date: datetime.date
+    last_contribution_date: datetime.date
+
+class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationSubmitterTotalContributionStats
+    object.
+    """
+
+    language_code: str
+    contributor_id: str
+    topic_ids_with_translation_submissions: List[str]
+    recent_review_outcomes: List[str]
+    recent_performance: int
+    overall_accuracy: float
     submitted_translations_count: int
     submitted_translation_word_count: int
     accepted_translations_count: int
@@ -2018,7 +2043,7 @@ class TranslationSubmitterTotalContributionStatsDict(TypedDict):
     rejected_translations_count: int
     rejected_translation_word_count: int
     first_contribution_date: str
-    last_contribution_date: str
+    last_contribution_date: int
 
 
 class TranslationSubmitterTotalContributionStats:
@@ -2043,7 +2068,7 @@ class TranslationSubmitterTotalContributionStats:
         last_contribution_date: datetime.date
     ) -> None:
         self.language_code = language_code
-        self.contributor_user_id = contributor_id
+        self.contributor_id = contributor_id
         self.topic_ids_with_translation_submissions = (
             topic_ids_with_translation_submissions)
         self.recent_review_outcomes = recent_review_outcomes
@@ -2061,51 +2086,52 @@ class TranslationSubmitterTotalContributionStats:
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
 
-    def to_dict(self) -> TranslationContributionStatsDict:
-        """Returns a dict representation of a TranslationContributionStats
+    def to_dict(self) -> TranslationSubmitterTotalContributionStatsDict:
+        """Returns a dict representation of a TranslationSubmitterTotalContributionStats
         domain object.
 
         Returns:
-            dict. A dict representation of a TranslationContributionStats
+            dict. A dict representation of a TranslationSubmitterTotalContributionStats
             domain object.
         """
         return {
-            'language_code': self.SUGGESTION_LANGUAGE_CODE,
+            'language_code': self.language_code,
+            'contributor_id': self.contributor_id,
             'topic_ids_with_translation_submissions': (
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
-            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
-            'recent_performance': self.RECENT_PERFORMANCE,
-            'overall_accuracy': self.OVERALL_ACCURACY,
+                self.topic_ids_with_translation_submissions),
+            'recent_review_outcomes': self.recent_review_outcomes,
+            'recent_performance': self.recent_performance,
+            'overall_accuracy': self.overall_accuracy,
             'submitted_translations_count': (
-                self.SUBMITTED_TRANSLATIONS_COUNT),
+                self.submitted_translations_count),
             'submitted_translation_word_count': (
-                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                self.submitted_translation_word_count),
             'accepted_translations_count': (
-                self.ACCEPTED_TRANSLATIONS_COUNT),
+                self.accepted_translations_count),
             'accepted_translations_without_reviewer_edits_count': (
                 self
-                .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                .accepted_translations_without_reviewer_edits_count),
             'accepted_translation_word_count': (
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                self.accepted_translation_word_count),
             'rejected_translations_count': (
-                self.REJECTED_TRANSLATIONS_COUNT),
+                self.rejected_translations_count),
             'rejected_translation_word_count': (
-                self.REJECTED_TRANSLATION_WORD_COUNT),
-            'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
-            'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+                self.rejected_translation_word_count),
+            'first_contribution_date': self.first_contribution_date,
+            'last_contribution_date': self.last_contribution_date
         }
 
-    # TODO(#16051): TranslationContributionStats to use first_contribution_date
-    # and last_contribution_date.
-    def to_frontend_dict(self) -> TranslationContributionStatsFrontendDict:
-        """Returns a dict representation of a TranslationContributionStats
-        domain object for frontend.
+    def to_frontend_dict(
+            self) -> TranslationSubmitterTotalContributionStatsFrontendDict:
+        """Returns a dict representation of a
+        TranslationSubmitterTotalContributionStats domain object for frontend.
 
         Returns:
-            dict. A dict representation of a TranslationContributionStats
-            domain object for frontend.
+            dict. A dict representation of a
+            TranslationSubmitterTotalContributionStats domain object for
+            frontend.
         """
-        sorted_contribution_dates = sorted(self.contribution_dates)
+        today = datetime.datetime.today()
         return {
             'language_code': self.language_code,
             'topic_id': self.topic_id,
@@ -2121,7 +2147,7 @@ class TranslationSubmitterTotalContributionStats:
             'rejected_translation_word_count': (
                 self.rejected_translation_word_count),
             'first_contribution_date': (
-                sorted_contribution_dates[0].strftime('%b %Y')),
-            'last_contribution_date': (
-                sorted_contribution_dates[-1].strftime('%b %Y'))
+                self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contribution_date': int(
+                (today-self.last_contribution_date).days)
         }
