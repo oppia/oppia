@@ -19,6 +19,7 @@
  */
 
 import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
@@ -150,6 +151,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   );
 
   constructor(
+    private alertsService: AlertsService,
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
@@ -223,7 +225,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
               hackyTopicTranslationKey
             );
           }
+        }, (error) => {
+          this.alertsService.addWarning(
+            `Unable to fetch classroom page data.Error: ${error.error.error}`);
         });
+    }, (error) => {
+      this.alertsService.addWarning(
+        `Unable to check the validation access to classroom page.Error: ${
+          error.error.error}`);
     });
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to

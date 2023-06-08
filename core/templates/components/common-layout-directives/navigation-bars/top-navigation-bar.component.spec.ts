@@ -19,6 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { AlertsService } from 'services/alerts.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -105,6 +106,7 @@ describe('TopNavigationBarComponent', () => {
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
+  let alertsService: AlertsService;
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -167,6 +169,7 @@ describe('TopNavigationBarComponent', () => {
     accessValidationBackendApiService = TestBed
       .inject(AccessValidationBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    alertsService = TestBed.inject(AlertsService);
 
     spyOn(searchService, 'onSearchBarLoaded')
       .and.returnValue(new EventEmitter<string>());
@@ -580,6 +583,43 @@ describe('TopNavigationBarComponent', () => {
     expect(component.getInvolvedMenuOffset).toBe(-10);
     expect(component.donateMenuOffset).toBe(-10);
   }));
+
+  it('should use rejection handler when request to ' +
+  'validateAccessToClassroomPage fails', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.reject({
+        error: {error: 'Backend error'},
+        status: 500
+      }));
+
+      component.ngOnInit();
+
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Unable to check the validation access to classroom page.Error: ' +
+      'Backend error');
+  }));
+
+  it('should use rejection handler when request to fetch classroom data fails',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
+      .and.returnValue(Promise.resolve());
+      spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
+        .and.returnValue(Promise.reject({
+          error: {error: 'Backend error'},
+          status: 500
+        }));
+
+        component.ngOnInit();
+
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Unable to fetch classroom page data.Error: Backend error');
+    }));
 
   it('should fetch classroom data', fakeAsync(() => {
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
