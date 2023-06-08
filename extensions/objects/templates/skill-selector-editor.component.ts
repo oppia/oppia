@@ -103,9 +103,10 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.contextService.removeCustomEntityContext();
     /**
-     * Note to developers:
-     * We are manually setting customEntityContext back to it's previous state
-     * to ensure it doesn't cause any breakages in question-editor.
+     * Restore the entity context to that of the state before the skill selector
+     * editor was initialized. This prevents change of context issues in calling
+     * components once the editor is closed, e.g. uploading images in the
+     * question editor.
      * See issue #16985 for detailed discussion.
      */
     if (this.initialEntityId && this.initialEntityType) {
