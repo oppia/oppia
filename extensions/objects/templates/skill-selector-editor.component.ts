@@ -36,6 +36,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   @Input() modalId!: symbol;
   @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
+  initialEntityId: string = '';
+  initialEntityType?: string | undefined = '';
   skills: SkillBackendDict[] = [];
   showLoading = false;
   skillsToShow: SkillBackendDict[] = [];
@@ -75,6 +77,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.showLoading = true;
     this.skills = [];
+    this.initialEntityId = this.contextService.getEntityId();
+    this.initialEntityType = this.contextService.getEntityType();
     if (this.value) {
       this.contextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.SKILL, this.value);
@@ -98,6 +102,16 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.contextService.removeCustomEntityContext();
+    /**
+     * Note to developers:
+     * We are manually setting customEntityContext back to it's previous state
+     * to ensure it doesn't cause any breakages in question-editor.
+     * See issue #16985 for detailed discussion.
+     */
+    if (this.initialEntityId && this.initialEntityType) {
+      this.contextService.setCustomEntityContext(
+        this.initialEntityType, this.initialEntityId);
+    }
   }
 }
 
