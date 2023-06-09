@@ -243,13 +243,6 @@
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
       },
-      "midiJs": {
-        "version": "c26ebb9baaf0abc060c8a13254dad283c6ee7304",
-        "downloadFormat": "zip",
-        "url": "https://github.com/oppia/MIDI.js/archive/c26ebb9baaf0abc060c8a13254dad283c6ee7304.zip",
-        "rootDirPrefix": "MIDI.js-",
-        "targetDir": "midi-js-c26ebb"
-      },
       "select2": {
         "version": "4.0.3",
         "downloadFormat": "zip",
