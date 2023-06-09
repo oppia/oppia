@@ -2105,7 +2105,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     ) -> str:
         """Creates a new TranslationSubmitterTotalContributionStatsModel
         instance and returns its ID.
-        
+
         Args:
             language_code: str. The ISO 639-1 language code for which the
                 translation contributions were made.
@@ -2943,10 +2943,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 the question suggestions.
             last_contribution_date: datetime.date. The unique last date of
                 the question suggestions.
-        
-        Returns:
-            str. The ID of the model created
 
+        Returns:
+            str. The ID of the model created.
         """
         entity_id = contributor_id
         entity = cls(
@@ -3264,10 +3263,9 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 the question suggestions.
             last_contribution_date: datetime.date. The unique last date of
                 the question suggestions.
-        
-        Returns:
-            str. The ID of the model created
 
+        Returns:
+            str. The ID of the model created.
         """
         entity = cls(
             id=contributor_id,

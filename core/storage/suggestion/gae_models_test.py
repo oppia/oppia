@@ -3900,7 +3900,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
 
     def test_export_data_nontrivial(self) -> None:
         # Seed translation stats data for two different languages.
-        model_1_id = suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
             topic_ids_with_translation_submissions=(
@@ -3922,7 +3922,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
-        model_2_id = suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel.create( # pylint: disable=line-too-long
             language_code='hi',
             contributor_id=self.USER_ID_1,
             topic_ids_with_translation_submissions=[
@@ -4276,7 +4276,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
             first_contribution_date=datetime.datetime.utcnow(),
-            last_contribution_date=datetime.date.today() - datetime.timedelta(65)
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(65))
         ).put()
 
         # Check for 'es' language filter.
