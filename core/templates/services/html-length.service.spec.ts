@@ -117,4 +117,15 @@ describe('Html Length Service', () => {
 
     expect(result).toBe(expectedLength);
   });
+
+  it('should compute length of content of lists', () => {
+    const htmlString = '<ul><li>This is the first item</li><li> This is' +
+      ' second item</li><li> This is the third item</li></ul>';
+
+    const expectedLength = 14;
+
+    const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
+
+    expect(result).toBe(expectedLength);
+  });
 });
