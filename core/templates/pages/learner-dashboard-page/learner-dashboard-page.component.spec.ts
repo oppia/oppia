@@ -326,6 +326,7 @@ describe('Learner dashboard page', () => {
     isBlogAdmin: () => false,
     isBlogPostEditor: () => false,
     isQuestionAdmin: () => false,
+    isQuestionCoordinator: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
