@@ -2195,6 +2195,10 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """Gets the TranslationSubmitterTotalContributionStatsModel
         matching the supplied language_code, contributor_id.
 
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_id: str. User ID.
+
         Returns:
             TranslationSubmitterTotalContributionStatsModel|None. The matching
             TranslationSubmitterTotalContributionStatsModel, or None if no
@@ -2342,6 +2346,9 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     ) -> Sequence[TranslationSubmitterTotalContributionStatsModel]:
         """Gets all TranslationSubmitterTotalContributionStatsModel matching
         the supplied user_id.
+
+        Args:
+            user_id: str. User ID.
 
         Returns:
             list(TranslationSubmitterTotalContributionStatsModel). The matching
@@ -2611,6 +2618,10 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         """Gets the TranslationReviewerTotalContributionStatsModel
         matching the supplied language_code, contributor_id.
 
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_id: str. User ID.
+
         Returns:
             TranslationReviewerTotalContributionStatsModel|None. The matching
             TranslationReviewerTotalContributionStatsModel, or None
@@ -2626,6 +2637,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
     ) -> Sequence[TranslationReviewerTotalContributionStatsModel]:
         """Gets all TranslationReviewerTotalContributionStatsModel
         matching the supplied user_id.
+
+        Args:
+            user_id: str. User ID.
 
         Returns:
             list(TranslationReviewerTotalContributionStatsModel). The matching
@@ -3232,6 +3246,28 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
     ) -> str:
         """Creates a new QuestionReviewerTotalContributionStatsModel
         instance and returns its ID.
+
+        Args:
+            contributor_id: str. The user ID of the contributor.
+            topic_ids_with_question_reviews: List[str]. The topic ID(s)
+                of the topics for which the contributor has at least one
+                review.
+            reviewed_questions_count: int. The number of reviewed
+                questions.
+            accepted_questions_count: int. The number of accepted
+                questions.
+            accepted_questions_with_reviewer_edits_count: int.
+                The number of accepted questions with reviewer edits.
+            rejected_questions_count: int. The number of rejected
+                questions.
+            first_contribution_date: datetime.date. The unique first date of
+                the question suggestions.
+            last_contribution_date: datetime.date. The unique last date of
+                the question suggestions.
+        
+        Returns:
+            str. The ID of the model created
+
         """
         entity = cls(
             id=contributor_id,
