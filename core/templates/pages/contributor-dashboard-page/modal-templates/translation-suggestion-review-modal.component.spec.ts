@@ -670,7 +670,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           updated_subject: '',
         },
         {
-          author_username: '',
+          author_username: 'Reviewer',
           created_on_msecs: 0,
           entity_type: '',
           entity_id: '',
@@ -697,6 +697,7 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.hasExplorationContentChanged()).toBe(true);
         expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('suggestion_1');
         expect(component.reviewMessage).toBe('Review Message');
+        expect(component.reviewer).toBe('Reviewer');
       }));
 
     it('should correctly determine whether the panel data is overflowing',
