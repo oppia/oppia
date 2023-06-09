@@ -32,7 +32,6 @@ import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
@@ -90,7 +89,6 @@ class MockWindowRef {
 
 describe('TopNavigationBarComponent', () => {
   let accessValidationBackendApiService: AccessValidationBackendApiService;
-  let alertsService: AlertsService;
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -172,7 +170,6 @@ describe('TopNavigationBarComponent', () => {
     i18nService = TestBed.inject(I18nService);
     feedbackUpdatesBackendApiService =
         TestBed.inject(FeedbackUpdatesBackendApiService);
-    alertsService = TestBed.inject(AlertsService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
@@ -186,12 +183,12 @@ describe('TopNavigationBarComponent', () => {
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
       ['default-image-url-png', 'default-image-url-webp']);
     spyOn(
-        feedbackUpdatesBackendApiService,
-        'fetchFeedbackUpdatesDataAsync')
-        .and.returnValue(Promise.resolve({
-          numberOfUnreadThreads: FeedbackUpdatesData.
-            number_of_unread_threads
-        }));
+      feedbackUpdatesBackendApiService,
+      'fetchFeedbackUpdatesDataAsync')
+      .and.returnValue(Promise.resolve({
+        numberOfUnreadThreads: FeedbackUpdatesData.
+          number_of_unread_threads
+      }));
   });
 
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {
