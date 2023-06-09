@@ -190,9 +190,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
                 if lib_version[0] == '^':
                     lib_version = lib_version[1:]
-                # This is to handle the case where the version is of the form
-                # git commit hashes. eg. 'git+https://github.com/username/repo#commit-hash',
-                # then we need to have the commit hash as the version.
+                # In cases where the version is in the form of git commit hashes
+                # such as 'git+https://github.com/username/repo#commit-hash',
+                # we extract the commit hash and use it as the version.
                 elif lib_version[:3] == 'git':
                     print('herr')
                     cntr = 0
