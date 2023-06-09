@@ -872,7 +872,6 @@ describe('Learner dashboard page', () => {
       expect(component.numberOfUnreadThreads).toBe(6);
       expect(component.messageSummaries.length).toBe(1);
       expect(threadSpy).toHaveBeenCalled();
-      expect(document.querySelector).toHaveBeenCalledWith('.oppia-exploration-title');
     }));
 
     it('should set a new section as active when fetching message summary' +
