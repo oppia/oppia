@@ -215,6 +215,7 @@ class ConfigProperty:
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
+    - contributor_dashboard_is_enabled.
     - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
