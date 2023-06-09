@@ -167,6 +167,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private windowDimensionService: WindowDimensionsService,
     private dateTimeFormatService: DateTimeFormatService,
+    private elementRef: ElementRef,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService:
@@ -185,6 +186,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
+    this.explorationTitleRef = this.elementRef.nativeElement
+      .querySelector('.oppia-exploration-title');
 
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then(userInfo => {
