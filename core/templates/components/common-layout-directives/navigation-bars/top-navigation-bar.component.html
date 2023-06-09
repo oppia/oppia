@@ -537,6 +537,7 @@
              [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.FEEDBACKUPDATES.ROUTE"
              class="dropdown-item nav-link e2e-test-learner-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_FEEDBACK_UPDATES' | translate"></span>
+            <span *ngIf="numberOfUnreadThreads !== 0">({{ numberOfUnreadThreads }})</span>
           </a>
         </li>
         <hr class="oppia-top-right-menu-item-separator">

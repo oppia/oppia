@@ -31,6 +31,8 @@ import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { I18nService } from 'i18n/i18n.service';
@@ -88,6 +90,7 @@ class MockWindowRef {
 
 describe('TopNavigationBarComponent', () => {
   let accessValidationBackendApiService: AccessValidationBackendApiService;
+  let alertsService: AlertsService;
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -99,12 +102,18 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
   let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
+  let feedbackUpdatesBackendApiService:
+      FeedbackUpdatesBackendApiService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
+
+  let FeedbackUpdatesData = {
+    number_of_unread_threads: 10
+  };
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -122,6 +131,7 @@ describe('TopNavigationBarComponent', () => {
       providers: [
         NavigationService,
         CookieService,
+        FeedbackUpdatesBackendApiService,
         UserService,
         {
           provide: I18nService,
@@ -160,6 +170,9 @@ describe('TopNavigationBarComponent', () => {
     debouncerService = TestBed.inject(DebouncerService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
+    feedbackUpdatesBackendApiService =
+        TestBed.inject(FeedbackUpdatesBackendApiService);
+    alertsService = TestBed.inject(AlertsService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
@@ -172,6 +185,13 @@ describe('TopNavigationBarComponent', () => {
       .and.returnValue(new EventEmitter<string>());
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
       ['default-image-url-png', 'default-image-url-webp']);
+    spyOn(
+        feedbackUpdatesBackendApiService,
+        'fetchFeedbackUpdatesDataAsync')
+        .and.returnValue(Promise.resolve({
+          numberOfUnreadThreads: FeedbackUpdatesData.
+            number_of_unread_threads
+        }));
   });
 
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {

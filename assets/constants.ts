@@ -6996,5 +6996,5 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "shifted-feedback-updates-with-feature-flag",
-  "SHORT_COMMIT_HASH": "56a9bff055"
+  "SHORT_COMMIT_HASH": "9d0ef4a77b"
 } as const;
