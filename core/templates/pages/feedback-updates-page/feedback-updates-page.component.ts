@@ -30,7 +30,7 @@ import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
+import { FeedbackUpdatesPageConstants } from 'pages/feedback-updates-page/feedback-updates-page.constants'
 import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
@@ -84,7 +84,7 @@ import './feedback-updates-page.component.css';
 })
 export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
-    LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
+    FeedbackUpdatesPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
 
   username: string = '';
   PAGES_REGISTERED_WITH_FRONTEND = (
@@ -161,11 +161,6 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
             AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
       }
     });
-    this.homeImageUrl = this.getStaticImageUrl('/learner_dashboard/home.svg');
-    this.todolistImageUrl = this.getStaticImageUrl(
-      '/learner_dashboard/todolist.svg');
-    this.progressImageUrl = this.getStaticImageUrl(
-      '/learner_dashboard/progress.svg');
 
     this.fetchFeedbackUpdates();
 
@@ -231,7 +226,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
       responseData => {
         this.isCurrentFeedbackSortDescending = true;
         this.currentFeedbackThreadsSortType = (
-          LearnerDashboardPageConstants
+          FeedbackUpdatesPageConstants
             .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
         this.threadSummaries = [
           ... this.threadSummaries,
