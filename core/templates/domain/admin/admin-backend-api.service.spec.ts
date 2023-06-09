@@ -114,7 +114,6 @@ describe('Admin backend api service', () => {
     email_footer: 'fsdf',
     email_sender_name: 'Site Admin',
     enable_admin_notifications_for_reviewer_shortage: false,
-    featured_translation_languages: [],
     high_bounce_rate_task_minimum_exploration_starts: 1001,
     high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.2,
     high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.2,
@@ -132,13 +131,7 @@ describe('Admin backend api service', () => {
       subject: 'THIS IS A PLACEHOLDER.',
       html_body: 'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
     },
-    unpublish_exploration_email_html_body: 'test',
-    vmid_shared_secret_key_mapping: {
-      shared_secret_key: 'aafd1a2b3c4e',
-      vm_id: 'fds'
-    },
-    whitelisted_exploration_ids_for_playthroughs: [
-      'umPkawp0L1M0-', 'oswa1m5Q3jK41']
+    unpublish_exploration_email_html_body: 'test'
   };
 
   beforeEach(() => {

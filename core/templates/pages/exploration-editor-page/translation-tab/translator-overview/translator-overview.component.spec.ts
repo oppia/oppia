@@ -33,6 +33,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
 import { EntityTranslationsService } from 'services/entity-translations.services';
+import { UserExplorationPermissionsService } from '../../services/user-exploration-permissions.service';
 
 class MockNgbModal {
   open() {
@@ -57,6 +58,7 @@ describe('Translator Overview component', () => {
   let focusManagerService: FocusManagerService;
   let routerService: RouterService;
   let entityTranslationsService: EntityTranslationsService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -94,6 +96,8 @@ describe('Translator Overview component', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     routerService = TestBed.inject(RouterService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    userExplorationPermissionsService = TestBed.inject(
+      UserExplorationPermissionsService);
 
     spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
       .returnValue(true);
@@ -122,6 +126,17 @@ describe('Translator Overview component', () => {
 
   it('should initialize component properties after controller is initialized',
     () => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
       component.canShowTabModeSwitcher();
 
@@ -140,6 +155,17 @@ describe('Translator Overview component', () => {
 
   it('should change to voiceover active mode when changing translation tab',
     fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(translationTabActiveModeService, 'activateVoiceoverMode');
       spyOn(translationStatusService, 'refresh');
 
@@ -156,6 +182,17 @@ describe('Translator Overview component', () => {
 
   it('should change to translation active mode when changing translation tab',
     fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(translationTabActiveModeService, 'activateTranslationMode');
       spyOn(graphDataService, 'recompute');
       spyOn(translationStatusService, 'refresh');
@@ -174,6 +211,17 @@ describe('Translator Overview component', () => {
 
   it('should change translation language when translation tab is not busy',
     fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(translationLanguageService, 'setActiveLanguageCode');
       component.languageCode = 'es';
       component.changeTranslationLanguage();
@@ -187,6 +235,17 @@ describe('Translator Overview component', () => {
 
   it('should not change translation language when translation tab is busy',
     fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       component.isTranslationTabBusy = true;
       let showTranslationTabBusyModalEmitter = new EventEmitter();
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
@@ -204,6 +263,17 @@ describe('Translator Overview component', () => {
 
   it('should get translation bar progress data when there are more' +
     ' than 1 item to be translated', () => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue(Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
+        canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false
+      }));
     spyOn(translationStatusService, 'getExplorationContentRequiredCount').and
       .returnValue(3);
     spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
@@ -215,6 +285,17 @@ describe('Translator Overview component', () => {
 
   it('should get translation bar progress data when there is 1 item to be' +
     ' translated', () => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue(Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
+        canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false
+      }));
     spyOn(translationStatusService, 'getExplorationContentRequiredCount')
       .and.returnValue(2);
     spyOn(translationStatusService, 'getExplorationContentNotAvailableCount')
@@ -226,6 +307,17 @@ describe('Translator Overview component', () => {
 
   it('should apply autofocus to history tab element when tab is switched',
     fakeAsync(() => {
+      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue(Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false
+        }));
       spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
       spyOn(focusManagerService, 'setFocus');
 
