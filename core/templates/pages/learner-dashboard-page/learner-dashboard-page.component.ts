@@ -539,7 +539,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.loadingFeedbacks = false;
       });
     setTimeout(() => {
-      const explorationTitleReference = document.querySelector('.oppia-exploration-title');
+      const explorationTitleReference = document
+        .querySelector('.oppia-exploration-title');
       if (explorationTitleReference instanceof HTMLElement) {
         explorationTitleReference.focus();
       }
