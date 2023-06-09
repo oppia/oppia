@@ -8,24 +8,27 @@
   <div class="modal-body">
     <div class="reason-select">
       <span>Select Reason:</span>
-      <div ngbDropdown class="unpublishing-dropdown">
+      <div ngbDropdown class="oppia-unpublishing-dropdown">
         <div ngbDropdownToggle
              aria-label="Dropdown toggle to select unpublishing reason"
              aria-haspopup="menu"
+             aria-expanded="false"
              class="selected-reason-text">
           {{ selectedReasonText }}
         </div>
         <div ngbDropdownMenu
-             class="unpublishing-dropdown-menu">
+             class="oppia-unpublishing-dropdown-menu">
           <div ngbDropdownItem
                (click)="setReason('BAD_CONTENT')"
-               class="unpublishing-dropdown-item">
+               class="oppia-unpublishing-dropdown-item"
+               tabindex="0">
             {{ badContentReasonText }}
           </div>
           <hr>
           <div ngbDropdownItem
                (click)="setReason('CHAPTER_NEEDS_SPLITTING')"
-               class="unpublishing-dropdown-item">
+               class="oppia-unpublishing-dropdown-item"
+               tabindex="0">
             {{ splitChapterReasonText }}
           </div>
         </div>
@@ -35,10 +38,16 @@
     <div class="warning-and-confirmation">
       <div class="warning-container">
         <span>Warning:</span>
-        <div class="bad-content-warning warning-text" *ngIf="unpublishingReason=='BAD_CONTENT'">
+        <div class="bad-content-warning warning-text"
+             *ngIf="unpublishingReason=='BAD_CONTENT'"
+             tabindex="0"
+             role="alert">
           “Please edit the existing explorations instead of adding/deleting new ones, to avoid inadvertently impacting learners' progress”
         </div>
-        <div class="split-chapters-warning warning-text" *ngIf="unpublishingReason=='CHAPTER_NEEDS_SPLITTING'">
+        <div class="split-chapters-warning warning-text"
+             *ngIf="unpublishingReason=='CHAPTER_NEEDS_SPLITTING'"
+             tabindex="0"
+             role="alert">
           “Please note that learners' overall progress score will decrease if some of the content they've played gets moved to a new exploration.”
         </div>
       </div>
@@ -49,7 +58,7 @@
         </button>
         <button class="btn confirm-reason-button"
                 (click)="confirm()">
-          Confirm and Unpblish
+          Confirm and Unpublish
         </button>
       </div>
     </div>
@@ -94,14 +103,14 @@
     text-decoration: underline;
   }
 
-  .reason-select .unpublishing-dropdown {
+  .reason-select .oppia-unpublishing-dropdown {
     left: 50%;
     transform: translate(-50%);
     width: 90%;
   }
 
   .reason-select .selected-reason-text {
-    background-color: rgb(218, 218, 218);
+    background-color: #dadada;
     margin-top: 5px;
     padding: 5px;
     white-space: normal;
@@ -109,11 +118,11 @@
     word-wrap: break-word;
   }
 
-  .reason-select .unpublishing-dropdown-menu {
+  .reason-select .oppia-unpublishing-dropdown-menu {
     width: 100%;
   }
 
-  .reason-select .unpublishing-dropdown-item {
+  .reason-select .oppia-unpublishing-dropdown-item {
     cursor: pointer;
     white-space: normal;
   }
@@ -147,13 +156,15 @@
   }
 
   .modal-buttons .cancel-button {
-    background-color: #79c979b8;
+    background-color: #79c979;
+    opacity: 80%;
     width: 40%;
   }
 
   .modal-buttons .confirm-reason-button {
-    background-color: #f1dd9599;
-    width: 50%;
+    background-color: #f1dd95;
+    opacity: 80%;
+    width: 55%;
   }
 
   @media screen and (max-width: 410px) {
