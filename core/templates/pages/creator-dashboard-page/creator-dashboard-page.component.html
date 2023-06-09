@@ -2,7 +2,7 @@
 <div class="oppia-dashboard-container position-relative">
   <div class="oppia-dashboard-title"
     [ngClass]="{'oppia-dashboard-title-mobile': checkTabletView(), 'oppia-dashboard-title-desktop': !checkTabletView()}">
-    <span [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></span>
+    <h1 [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h1>
     <oppia-create-activity-button></oppia-create-activity-button>
   </div>
 
@@ -12,14 +12,14 @@
     <mat-card layout="row" class="oppia-mat-card">
       <div class="average-ratings stats-card">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate"></p>
-        <h1 class="stat-value-with-rating e2e-test-oppia-average-rating"
+        <h2 class="stat-value-with-rating e2e-test-oppia-average-rating"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.averageRatings || 'N/A' }}
-        </h1>
-        <h1 class="stat-value-without-rating"
+        </h2>
+        <h2 class="stat-value-without-rating"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.averageRatings || 'N/A' }}
-        </h1>
+        </h2>
         <div [hidden]="!dashboardStats.numRatings">
           <p *ngIf="dashboardStats.numRatings === 1">
             (by {{ dashboardStats.numRatings }} user)
@@ -31,36 +31,36 @@
       </div>
       <div class="total-plays stats-card">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_PLAYS' | translate"></p>
-        <h1 class="stat-value-with-rating e2e-test-oppia-total-plays"
+        <h2 class="stat-value-with-rating e2e-test-oppia-total-plays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalPlays }}
-        </h1>
-        <h1 class="stat-value-without-rating"
+        </h2>
+        <h2 class="stat-value-without-rating"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalPlays }}
-        </h1>
+        </h2>
         <p [hidden]="!relativeChangeInTotalPlays">
           (+{{ relativeChangeInTotalPlays }} from last week)
         </p>
       </div>
       <div class="total-open-feedback stats-card">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate"></p>
-        <h1 class="stat-value-with-rating e2e-test-oppia-open-feedback"
+        <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalOpenFeedback }}
-        </h1>
-        <h1 class="stat-value-without-rating" [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">{{ dashboardStats.totalOpenFeedback }}</h1>
+        </h2>
+        <h2 class="stat-value-without-rating" [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">{{ dashboardStats.totalOpenFeedback }}</h2>
       </div>
       <div class="total-open-feedback stats-card">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate"></p>
-        <h1 class="stat-value-with-rating e2e-test-oppia-total-subscribers"
+        <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ subscribersList?.length }}
-        </h1>
-        <h1 class="stat-value-without-rating"
+        </h2>
+        <h2 class="stat-value-without-rating"
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ subscribersList?.length }}
-        </h1>
+        </h2>
       </div>
     </mat-card>
   </div>
@@ -499,12 +499,20 @@
     padding-top: 1em;
   }
   .oppia-dashboard-title {
+    margin-bottom: 50px;
+    margin-top: 0;
+  }
+  .oppia-dashboard-title h1 {
     color: #01645c;
+    display: inline;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 3em;
     margin-bottom: 25px;
-    margin-top: 0;
   }
+  .stats-card h2 {
+      font-size: 32px;
+      font-weight: 500;
+    }
   .oppia-dashboard-title-desktop {
     padding-top: 78.5px;
   }
@@ -883,6 +891,11 @@
 
     .oppia-exp-arrow:after {
       content: none;
+    }
+
+    .stats-card h2 {
+      font-size: 24px;
+      font-weight: 500;
     }
   }
   @media(max-width: 316px) {
