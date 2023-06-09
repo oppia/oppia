@@ -28,6 +28,7 @@ from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
+from core.domain import platform_feature_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -662,9 +663,6 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
                 self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
     def test_get_returns_exploration_id(self) -> None:
-        self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
-
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
 
@@ -690,19 +688,21 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(json_response['exploration_version'], 2)
 
     def test_improvements_tab_disabled(self) -> None:
-        self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
-
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
 
         self.assertFalse(json_response['is_improvements_tab_enabled'])
 
     def test_improvements_tab_enabled(self) -> None:
-        self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, True)
+        swap_is_feature_enabled = self.swap_to_always_return(
+            platform_feature_services,
+            'is_feature_enabled',
+            True
+        )
 
-        with self.login_context(self.OWNER_EMAIL):
+        with swap_is_feature_enabled, self.login_context(
+            self.OWNER_EMAIL
+        ):
             json_response = self.get_json(self.get_url())
 
         self.assertTrue(json_response['is_improvements_tab_enabled'])

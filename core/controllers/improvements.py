@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
+from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -27,6 +28,7 @@ from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import improvements_domain
 from core.domain import improvements_services
+from core.domain import platform_feature_services
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
@@ -236,7 +238,9 @@ class ExplorationImprovementsConfigHandler(
             'exploration_version': (
                 exp_fetchers.get_exploration_by_id(exploration_id).version),
             'is_improvements_tab_enabled': (
-                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.value),
+                platform_feature_services.is_feature_enabled(
+                    platform_feature_list.ParamNames.
+                    IS_IMPROVEMENTS_TAB_ENABLED.value)),
             'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
                 config_domain
                 .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD

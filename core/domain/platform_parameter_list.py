@@ -42,6 +42,7 @@ class ParamNames(enum.Enum):
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
+    IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
 
     PROMO_BAR_ENABLED = 'promo_bar_enabled'
     PROMO_BAR_MESSAGE = 'promo_bar_message'
@@ -91,7 +92,6 @@ Registry.create_feature_flag(
     ' page.',
     platform_parameter_domain.FeatureStages.PROD)
 
-
 Registry.create_feature_flag(
     ParamNames.DIAGNOSTIC_TEST,
     'This flag is for the diagnostic test functionality.',
@@ -108,6 +108,11 @@ Registry.create_feature_flag(
     'This flag is to show translation size on translation cards in' +
     'contributor dashboard.',
     platform_parameter_domain.FeatureStages.DEV)
+
+Registry.create_feature_flag(
+    ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
+    'Exposes the Improvements Tab for creators in the exploration editor.',
+    platform_parameter_domain.FeatureStages.PROD)
 
 Registry.create_platform_parameter(
     ParamNames.PROMO_BAR_ENABLED,
