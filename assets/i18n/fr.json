@@ -107,7 +107,6 @@
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_BREADCRUMB": "Profil de l’auteur",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TITLE": "Blogue | Auteur | Oppia",
 	"I18N_BLOG_AUTHOR_PROFILE_PAGE_TOTAL_POSTS_DISPLAY": "<[totalNumber]> billets",
-	"I18N_BLOG_CARD_PREVIEW_CONTEXT": "Voici comment la carte de blog apparaîtra sur la page d’accueil et sur votre profil d’auteur.",
 	"I18N_BLOG_CARD_PREVIEW_HEADING": "Aperçu de la carte de blogue",
 	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_EXPLAIN_TEXT": "Ajoutez une courte description à propos de vous. Notez que tout ce que vous écrirez ici sera visible par le public.",
 	"I18N_BLOG_DASHBOARD_AUTHOR_BIO_HEADING": "Biographie",

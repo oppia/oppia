@@ -53,7 +53,7 @@
               </mat-card-subtitle>
             </div>
             <button mat-icon-button (click)="showPreview()" class="preview-button">
-              <mat-icon class="align-self-center">remove_red_eye</mat-icon>
+              <i class="fas fa-eye"></i>
               <h6 class="mt-1">{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h6>
             </button>
           </div>
@@ -75,15 +75,23 @@
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase }}</span>
       </div>
       <div class="d-block flex-grow-1">
-        <input class="form-control required general-text-format e2e-test-blog-post-title-field"
-               [(ngModel)]="title"
-               [ngClass]="{'blog-title-input-field': blogPostData.title.length > 0}"
-               maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
-               minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
-               aria-label="Title"
-               (focusout)="updateLocalTitleValue()"
-               [pattern]="BLOG_POST_TITLE_PATTERN"
-               autofocus>
+        <div class="d-flex flex-grow-1">
+          <input #titleInput
+                 class="form-control required general-text-format e2e-test-blog-post-title-field"
+                 [(ngModel)]="title"
+                 [ngClass]="{'blog-title-input-field': blogPostData.title.length > 0}"
+                 maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
+                 minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
+                 aria-label="Title"
+                 (focus)="activateTitleEditor()"
+                 (focusout)="updateLocalTitleValue()"
+                 [pattern]="BLOG_POST_TITLE_PATTERN"
+                 autofocus>
+          <button class="fas fa-pen oppia-editor-edit-icon position-relative"
+                  *ngIf="!titleEditorIsActive"
+                  (click)="activateTitleEditor()">
+          </button>
+        </div>
         <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
           <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE }">
           </em>
@@ -292,6 +300,7 @@
   }
 
   .blog-title-input-field {
+    border: none;
     color: #333;
     font: normal normal bold 28px/33px 'Roboto', Arial, sans-serif;
     height: unset;
@@ -393,8 +402,8 @@
 
   .preview-button {
     font-size: 32px;
-    height: 32px;
-    width: 32px;
+    height: max-content;
+    width: max-content;
   }
 
   .preview-button /deep/ .mat-button-wrapper {
