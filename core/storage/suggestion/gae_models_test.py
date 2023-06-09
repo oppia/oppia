@@ -3054,7 +3054,246 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             [translation_submitter_total_contribution_stats]
         )
 
-    def test_fetch_page(self) -> None:
+    def test_fetch_page_for_sorting(self) -> None:
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=1,
+            overall_accuracy=4,
+            submitted_translations_count=20,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 5, 4)
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=2,
+            overall_accuracy=3,
+            submitted_translations_count=10,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 4, 4)
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic1', 'topic2'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=3,
+            overall_accuracy=2,
+            submitted_translations_count=50,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 3, 4)
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_4',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=4,
+            overall_accuracy=1,
+            submitted_translations_count=4,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 2, 4)
+        ).put()
+
+        # Check for decreasing performance(default) sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=3,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 3)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 3)
+
+        # Check for non-performance sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=4,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingPerformance'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 4)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for decreasing Accuracy sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=4,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingAccuracy'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 4)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for increasing Accuracy sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingAccuracy'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for decreasing Translated cards sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingSubmissions'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_1')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for increasing Translated cards sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingSubmissions'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for decreasing last activity sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for increasing last activity sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+    def test_fetch_page_for_filtering(self) -> None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -3151,102 +3390,24 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             last_contribution_date=datetime.date(2023, 2, 4)
         ).put()
 
-        # Check for decreasing performance(default) sort order.
+        # Check for 'es' language filter.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-                page_size=2,
+                page_size=4,
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
+        self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for decreasing Accuracy sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingAccuracy'],
-                topic_ids=None,
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for increasing Accuracy sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingAccuracy'],
-                topic_ids=None,
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for decreasing Translated cards sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingSubmissions'],
-                topic_ids=None,
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for increasing Translated cards sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingSubmissions'],
-                topic_ids=None,
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_2')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for topic filter and non-performance sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=1,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingPerformance'],
-                topic_ids=['topic1', 'topic2'],
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_2')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
+        self.assertEqual(next_offset, 3)
 
-        # Check for language filter.
+        # Check for 'hi' language filter.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
@@ -3261,36 +3422,21 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for decreasing last activity sort order.
+        # Check for topic filter ['topic1', 'topic2'].
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-                page_size=2,
+                page_size=4,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
-                topic_ids=None,
+                sort_by=None,
+                topic_ids=['topic1', 'topic2'],
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
+        self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for increasing last activity sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
-                topic_ids=None,
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
+        self.assertEqual(sorted_results[1].id, 'model_1')
+        self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
         # Check for last activity under 7 days.
@@ -3337,6 +3483,269 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
+
+    def test_fetch_page_for_sorting_and_filtering(self) -> None:
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=1,
+            overall_accuracy=4,
+            submitted_translations_count=20,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.datetime.utcnow()
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=2,
+            overall_accuracy=2,
+            submitted_translations_count=10,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.datetime.utcnow()
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic1', 'topic2'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=3,
+            overall_accuracy=1,
+            submitted_translations_count=50,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 4, 4)
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_4',
+            language_code='hi',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=4,
+            overall_accuracy=1,
+            submitted_translations_count=4,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 2, 4)
+        ).put()
+
+        # Check for topic filter and non-performance sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingPerformance'],
+                topic_ids=['topic1', 'topic2'],
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for decreasing last activity sort order and
+        # topic filter.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                topic_ids=['topic1', 'topic2'],
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_1')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 2)
+
+    def test_fetch_page_for_pagination(self) -> None:
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=1,
+            overall_accuracy=4,
+            submitted_translations_count=20,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 5, 4)
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=2,
+            overall_accuracy=3,
+            submitted_translations_count=10,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 4, 4)
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=[
+                'topic1', 'topic2'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=3,
+            overall_accuracy=2,
+            submitted_translations_count=50,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 3, 4)
+        ).put()
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel(
+            id='model_4',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_submissions=(
+                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=4,
+            overall_accuracy=1,
+            submitted_translations_count=4,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 2, 4)
+        ).put()
+
+        # Check for pagination with offset 2.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=2,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertEqual(sorted_results[1].id, 'model_1')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for pagination with no results.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=4,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingPerformance'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 0)
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
 
     def test_has_reference_to_user_id(self) -> None:
         model = (
@@ -3639,7 +4048,144 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             [translation_reviewer_total_contribution_stats]
         )
 
-    def test_fetch_page(self) -> None:
+    def test_fetch_page_for_sorting(self) -> None:
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=10,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 4, 4)
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=20,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 3, 2)
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=30,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 2, 2)
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_4',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=40,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 1, 2)
+        ).put()
+
+        # Check for decreasing order of reviewed cards(default)
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=4,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 4)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for increasing order of reviewed cards.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=4,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedTranslations'],
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 4)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for decreasing order of last activity.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for increasing order of last activity.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=3,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 3)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 3)
+
+    def test_fetch_page_for_filtering(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
@@ -3709,76 +4255,33 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             last_contribution_date=datetime.date(2023, 4, 2)
         ).put()
 
-        # Check for decreasing order of reviewed cards(default)
+        # Check for 'es' language filter.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-                page_size=1,
+                page_size=4,
                 offset=0,
                 sort_by=None,
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
+        self.assertEqual(len(sorted_results), 3)
         self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
 
-        # Check for increasing order of reviewed cards.
+        # Check for 'hi' language filter.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-                page_size=1,
+                page_size=3,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedTranslations'],
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for decreasing order of last activity.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for increasing order of last activity.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
-                num_days_since_last_activity=None,
-                language_code='es'
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_2')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for language filter.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
+                sort_by=None,
                 num_days_since_last_activity=None,
                 language_code='hi'
             ))
+        self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
@@ -3787,14 +4290,15 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-                page_size=2,
+                page_size=4,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedTranslations'],
+                sort_by=None,
                 num_days_since_last_activity=7,
                 language_code='es'
             ))
-        self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
@@ -3802,16 +4306,17 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-                page_size=1,
+                page_size=4,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedTranslations'],
+                sort_by=None,
                 num_days_since_last_activity=90,
                 language_code='es'
             ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(len(sorted_results), 3)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[2].id, 'model_1')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
 
         # Check for no sorted_results within 7 days.
         sorted_results, next_offset, more = (
@@ -3826,6 +4331,195 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
+
+    def test_fetch_page_for_sorting_and_filtering(self) -> None:
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=10,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 4, 4)
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=20,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.datetime.utcnow()
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=30,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.datetime.utcnow()
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_4',
+            language_code='hi',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 4, 2)
+        ).put()
+
+        # Check for language filter and IncreasingLastActivity sort.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                num_days_since_last_activity=None,
+                language_code='hi'
+            ))
+        self.assertEqual(len(sorted_results), 1)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 1)
+
+        # Check for num_days_since_last_activity filter within 7 days
+        # and IncreasingReviewedTranslations sort.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedTranslations'],
+                num_days_since_last_activity=7,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
+
+    def test_fetch_page_for_pagination(self) -> None:
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=10,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 4, 4)
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=20,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.datetime.utcnow()
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=30,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.datetime.utcnow()
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_4',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=40,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.date(2023, 4, 2)
+        ).put()
+
+        # Check for Pagination with offset 2.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=2,
+                sort_by=None,
+                num_days_since_last_activity=None,
+                language_code='es'
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertEqual(sorted_results[1].id, 'model_1')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
 
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
@@ -4006,7 +4700,212 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
-    def test_fetch_page(self) -> None:
+    def test_fetch_page_for_sorting(self) -> None:
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_1',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=10,
+            overall_accuracy=30.0,
+            submitted_questions_count=10,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 1, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_2',
+            contributor_id=self.USER_ID_2,
+            topic_ids_with_question_submissions=[
+                'topic2', 'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=20,
+            overall_accuracy=20.0,
+            submitted_questions_count=20,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 2, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_3',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=[
+                'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=30,
+            overall_accuracy=10.0,
+            submitted_questions_count=30,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 5, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_4',
+            contributor_id=self.USER_ID_3,
+            topic_ids_with_question_submissions=[
+                'topic4'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=40,
+            overall_accuracy=5.0,
+            submitted_questions_count=40,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 6, 4)
+        ).put()
+
+        # Check for decreasing performance(default) sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=4,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 4)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for increasing performance sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=4,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingPerformance'],
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 4)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for decreasing Accuracy sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=3,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingAccuracy'],
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 3)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 3)
+
+        # Check for increasing Accuracy sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=4,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingAccuracy'],
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 4)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for decreasing Submitted cards sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=3,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingSubmissions'],
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 3)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 3)
+
+        # Check for increasing Submitted cards sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=3,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingSubmissions'],
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 3)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 3)
+
+        # Check for decreasing last activity sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for increasing last activity sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+    def test_fetch_page_for_filtering(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -4076,126 +4975,23 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             last_contribution_date=datetime.date(2023, 6, 4)
         ).put()
 
-        # Check for decreasing performance(default) sort order.
+        # Check for topic filter.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-                page_size=2,
+                page_size=4,
                 offset=0,
                 sort_by=None,
-                topic_ids=None,
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_4')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for decreasing Accuracy sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingAccuracy'],
-                topic_ids=None,
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for increasing Accuracy sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingAccuracy'],
-                topic_ids=None,
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_4')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for decreasing Submitted cards sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingSubmissions'],
-                topic_ids=None,
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_4')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for increasing Submitted cards sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingSubmissions'],
-                topic_ids=None,
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for topic filter and non-performance sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=1,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingPerformance'],
                 topic_ids=['topic1', 'topic2'],
                 num_days_since_last_activity=None
             ))
+        self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertEqual(sorted_results[1].id, 'model_1')
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
-        # Check for decreasing last activity sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
-                topic_ids=None,
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for increasing last activity sort order.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=2,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
-                topic_ids=None,
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_4')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 2)
-
-        # Check for last activity under 7 days.
+        # Check for num_days_since_last_activity under 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
@@ -4205,23 +5001,27 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
                 topic_ids=None,
                 num_days_since_last_activity=7
             ))
+        self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
         self.assertEqual(next_offset, 4)
 
-        # Check for last activity under 90 days.
+        # Check for num_days_since_last_activity under 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
+            .fetch_page(o   
+            
+                page_size=2,
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
                 num_days_since_last_activity=90
             ))
+        self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_4')
+        self.assertEqual(sorted_results[1].id, 'model_3')
         self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(next_offset, 2)
 
         # Check for no sorted_results in given time.
         sorted_results, next_offset, more = (
@@ -4238,6 +5038,209 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
         self.assertEqual(next_offset, 0)
+
+    def test_fetch_page_for_sorting_and_filtering(self) -> None:
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_1',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=10,
+            overall_accuracy=30.0,
+            submitted_questions_count=10,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 2, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_2',
+            contributor_id=self.USER_ID_2,
+            topic_ids_with_question_submissions=[
+                'topic2', 'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=20,
+            overall_accuracy=20.0,
+            submitted_questions_count=20,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 2, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_3',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=[
+                'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=30,
+            overall_accuracy=10.0,
+            submitted_questions_count=30,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 5, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_4',
+            contributor_id=self.USER_ID_3,
+            topic_ids_with_question_submissions=[
+                'topic4'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=40,
+            overall_accuracy=5.0,
+            submitted_questions_count=40,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 6, 4)
+        ).put()
+
+        # Check for topic filter and non-performance sort order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=1,
+                offset=1,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingPerformance'],
+                topic_ids=['topic1', 'topic2'],
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for num_days_since_last_activity in 90 days
+        # and DecreasingLastActivity order.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=90
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_4')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+    def test_fetch_page_for_pagination(self) -> None:
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_1',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=[
+                'topic1'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=10,
+            overall_accuracy=30.0,
+            submitted_questions_count=10,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 2, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_2',
+            contributor_id=self.USER_ID_2,
+            topic_ids_with_question_submissions=[
+                'topic2', 'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=20,
+            overall_accuracy=20.0,
+            submitted_questions_count=20,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 2, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_3',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_submissions=[
+                'topic3'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=30,
+            overall_accuracy=10.0,
+            submitted_questions_count=30,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 5, 1)
+        ).put()
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel(
+            id='model_4',
+            contributor_id=self.USER_ID_3,
+            topic_ids_with_question_submissions=[
+                'topic4'
+            ],
+            recent_review_outcomes=self.RECENT_REVIEW_OUTCOMES,
+            recent_performance=40,
+            overall_accuracy=5.0,
+            submitted_questions_count=40,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 6, 4)
+        ).put()
+
+        # Check for pagination with offset=2.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=2,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertEqual(sorted_results[1].id, 'model_1')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
+
+        # Check for pagination with no results.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=4,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 0)
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 4)
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -4380,7 +5383,200 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
-    def test_fetch_page(self) -> None:
+    def test_fetch_page_for_sorting(self) -> None:
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_1',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=[
+                'topic1'
+            ],
+            reviewed_questions_count=10,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 2, 2)
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_2',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=[
+                'topic1', 'topic2'
+            ],
+            reviewed_questions_count=20,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 4, 2)
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_3',
+            contributor_id=self.USER_ID_2,
+            topic_ids_with_question_reviews=[
+                'topic3'
+            ],
+            reviewed_questions_count=30,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 6, 3)
+        ).put()
+
+        # Check for decreasing order of reviewed questions(default)
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=3,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 3)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
+
+        # Check for increasing order of reviewed questions.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=3,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedQuestions'],
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 3)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
+
+        # Check for decreasing order of last activity.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+        # Check for increasing order of last activity.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+    def test_fetch_page_for_filtering(self) -> None:
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_1',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=[
+                'topic1'
+            ],
+            reviewed_questions_count=10,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 4, 2)
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_2',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=[
+                'topic1', 'topic2'
+            ],
+            reviewed_questions_count=20,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 5, 2)
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_3',
+            contributor_id=self.USER_ID_2,
+            topic_ids_with_question_reviews=[
+                'topic3'
+            ],
+            reviewed_questions_count=30,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 6, 3)
+        ).put()
+
+        # Check for num_days_since_last_activity filter within 7 days.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=7
+            ))
+        self.assertEqual(len(sorted_results), 1)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
+
+        # Check for num_days_since_last_activity filter within 90 days.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=90
+            ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_3')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 1)
+
+        # Check for no sorted_results within 1 day.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=1
+            ))
+        self.assertEqual(len(sorted_results), 0)
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
+
+    def test_fetch_page_for_sorting_and_filtering(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -4424,62 +5620,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             last_contribution_date=datetime.date(2023, 6, 3)
         ).put()
 
-        # Check for decreasing order of reviewed questions(default)
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for increasing order of reviewed questions.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedQuestions'],
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for decreasing order of last activity.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for increasing order of last activity.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
-                num_days_since_last_activity=None
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for num_days_since_last_activity filter within 7 days.
+        # Check for num_days_since_last_activity filter within 90 days
+        # and IncreasingReviewedQuestions sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
@@ -4487,34 +5629,81 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
                             'IncreasingReviewedQuestions'],
-                num_days_since_last_activity=7
+                num_days_since_last_activity=90
             ))
+        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertEqual(sorted_results[1].id, 'model_2')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
+
+    def test_fetch_page_for_pagination(self) -> None:
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_1',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=[
+                'topic1'
+            ],
+            reviewed_questions_count=10,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 4, 2)
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_2',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_question_reviews=[
+                'topic1', 'topic2'
+            ],
+            reviewed_questions_count=20,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 6, 2)
+        ).put()
+        suggestion_models.QuestionReviewerTotalContributionStatsModel(
+            id='model_3',
+            contributor_id=self.USER_ID_2,
+            topic_ids_with_question_reviews=[
+                'topic3'
+            ],
+            reviewed_questions_count=30,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=datetime.date(2023, 6, 3)
+        ).put()
+
+        # Check for pagination with offset=1.
+        sorted_results, next_offset, more = (
+            suggestion_models.QuestionReviewerTotalContributionStatsModel
+            .fetch_page(
+                page_size=2,
+                offset=1,
+                sort_by=None,
+                num_days_since_last_activity=None
+            ))
+        self.assertEqual(len(sorted_results), 2)
         self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertEqual(sorted_results[1].id, 'model_1')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for num_days_since_last_activity filter within 90 days.
+        # Check for pagination with no results.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedQuestions'],
-                num_days_since_last_activity=90
-            ))
-        self.assertEqual(sorted_results[0].id, 'model_1')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for no sorted_results within 1 day.
-        sorted_results, next_offset, more = (
-            suggestion_models.QuestionReviewerTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
+                page_size=2,
+                offset=3,
                 sort_by=None,
-                num_days_since_last_activity=1
+                num_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
