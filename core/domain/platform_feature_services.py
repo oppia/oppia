@@ -33,22 +33,29 @@ docstrings in this file.
 from __future__ import annotations
 
 from core import feconf
-from core import platform_feature_list
+from core import platform_feature_list as feature_list
 from core.constants import constants
 from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, List, Set
 
-ALL_FEATURES_LIST: List[platform_feature_list.ParamNames] = (
-    platform_feature_list.DEV_FEATURES_LIST +
-    platform_feature_list.TEST_FEATURES_LIST +
-    platform_feature_list.PROD_FEATURES_LIST
+ALL_FEATURES_LIST: List[feature_list.ParamNames] = (
+    feature_list.DEV_FEATURES_LIST +
+    feature_list.TEST_FEATURES_LIST +
+    feature_list.PROD_FEATURES_LIST
 )
 
 ALL_FEATURES_NAMES_SET: Set[str] = set(
     feature.value for feature in ALL_FEATURES_LIST
 )
+
+ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES: List[feature_list.ParamNames] = [
+    platform_parameter_list.ParamNames.DUMMY_PARAMETER,
+    platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
+    platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE
+]
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -110,15 +117,9 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
         list(dict). A list containing the dict mappings of all fields of the
         platform parameters.
     """
-    all_platform_parameter_names = (
-        registry.Registry.get_all_platform_parameter_names())
-    platform_params_except_feature_flags = [
-        plat_param for plat_param in all_platform_parameter_names
-        if plat_param not in ALL_FEATURES_NAMES_SET
-    ]
     return [
         registry.Registry.get_platform_parameter(_plat_param).to_dict()
-        for _plat_param in platform_params_except_feature_flags
+        for _plat_param in ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES
     ]
 
 

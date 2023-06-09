@@ -414,3 +414,35 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     })
                 ]
             )
+
+    def test_all_platform_params_should_appear_once_in_features_or_in_params_list(
+        self
+    ) -> None:
+        all_params_name = registry.get_all_platform_parameter_names()
+        all_features_list = feature_services.ALL_FEATURES_LIST
+        all_params_except_features_list = (
+            feature_services.ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES)
+        self.assertEqual(
+            len(all_params_name),
+            (
+                len(all_features_list) +
+                len(all_params_except_features_list)
+            )
+        )
+        for param_name in all_params_name:
+            if param_name in all_features_list:
+                self.assertNotIn(
+                    param_name,
+                    all_params_except_features_list,
+                    'The platform parameter named %s is already present '
+                    'in the ALL_FEATURES_LIST list and should not be present '
+                    'in the ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES list.' % (
+                        param_name))
+            elif param_name in all_params_except_features_list:
+                self.assertNotIn(
+                    param_name,
+                    all_features_list,
+                    'The platform parameter named %s is already present '
+                    'in the ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES list and '
+                    'should not be present in the ALL_FEATURES_LIST list.' % (
+                        param_name))
