@@ -17,7 +17,7 @@
  * @fileoverview Component for the learner dashboard.
  */
 
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { trigger, state, style, transition,
   animate, group } from '@angular/animations';
@@ -90,10 +90,6 @@ import './learner-dashboard-page.component.css';
   ]
 })
 export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
-  @ViewChild(
-    'explorationTitleRef', { 'static': false })
-    explorationTitleRef!: ElementRef;
-
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
 
@@ -167,7 +163,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private windowDimensionService: WindowDimensionsService,
     private dateTimeFormatService: DateTimeFormatService,
-    private elementRef: ElementRef,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerDashboardBackendApiService:
@@ -186,8 +181,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.explorationTitleRef = this.elementRef.nativeElement
-      .querySelector('.oppia-exploration-title');
 
     let userInfoPromise = this.userService.getUserInfoAsync();
     userInfoPromise.then(userInfo => {
@@ -546,7 +539,10 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.loadingFeedbacks = false;
       });
     setTimeout(() => {
-      this.explorationTitleRef.nativeElement.focus();
+      const explorationTitleReference = document.querySelector('.oppia-exploration-title');
+      if (explorationTitleReference instanceof HTMLElement) {
+        explorationTitleReference.focus();
+      }
     });
   }
 
