@@ -6828,11 +6828,6 @@ di@^0.0.1:
   resolved "https://registry.yarnpkg.com/di/-/di-0.0.1.tgz#806649326ceaa7caa3306d75d985ea2748ba913c"
   integrity sha512-uJaamHkagcZtHPqCIHZxnFrXlunQXgBOsZSUOWwFw31QJCAbyTBoHMW75YOTur5ZNx8pIeAKgf6GWIgaqqiLhA==
 
-diff-match-patch@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/diff-match-patch/-/diff-match-patch-1.0.0.tgz#1cc3c83a490d67f95d91e39f6ad1f2e086b63048"
-  integrity sha512-G7wYE6SR4Sr2O3ZBvGd1f+r+7t9D5MzBSMqUx4JvpDBTPckqpZ9bfpH6YJRKWFhMryjzPh1r7XOP3YME3vrSzA==
-
 diff-sequences@^28.1.1:
   version "28.1.1"
   resolved "https://registry.yarnpkg.com/diff-sequences/-/diff-sequences-28.1.1.tgz#9989dc731266dc2903457a70e996f3a041913ac6"
@@ -9111,9 +9106,9 @@ gtoken@^5.0.4:
     google-p12-pem "^3.1.3"
     jws "^4.0.0"
 
-guppy-dev@oppia/guppy#f509e155dc66f6310737c328cbfbc35b85194be2:
+"guppy-dev@git+https://github.com/oppia/guppy#f509e":
   version "2.0.0-rc.1"
-  resolved "https://codeload.github.com/oppia/guppy/tar.gz/f509e155dc66f6310737c328cbfbc35b85194be2"
+  resolved "git+https://github.com/oppia/guppy#f509e155dc66f6310737c328cbfbc35b85194be2"
 
 hammerjs@^2.0.8:
   version "2.0.8"
@@ -16012,9 +16007,9 @@ sisteransi@^1.0.5:
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
 
-skulpt-dist@skulpt/skulpt-dist#7b61d9bca2b8f18d4691c27de8262b281bb0e8a7:
+"skulpt-dist@git+https://github.com/skulpt/skulpt-dist#7b61d":
   version "0.0.0"
-  resolved "https://codeload.github.com/skulpt/skulpt-dist/tar.gz/7b61d9bca2b8f18d4691c27de8262b281bb0e8a7"
+  resolved "git+https://github.com/skulpt/skulpt-dist#7b61d9bca2b8f18d4691c27de8262b281bb0e8a7"
 
 slash@^3.0.0:
   version "3.0.0"
