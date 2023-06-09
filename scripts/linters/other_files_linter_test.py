@@ -50,7 +50,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         )
         self.package_file = io.StringIO(
             '{"dependencies":{"nerdamer":"^0.6","skulpt-dist":"0.2",'
-            '"guppy-dev":"oppia/guppy#f509e"}}'
+            '"guppy-dev":"git+https://github.com/oppia/guppy#f509e"}}'
         )
         self.files_in_typings_dir = [
             'guppy-defs-f509e.d.ts',
