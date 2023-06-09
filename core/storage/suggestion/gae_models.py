@@ -55,7 +55,7 @@ STATUS_CHOICES: Final = [
     STATUS_REJECTED
 ]
 
-REVIEW_OUTCOME_STATUS: Final = [
+REVIEW_OUTCOME_CHOICES: Final = [
     REVIEW_OUTCOME_ACCEPTED,
     REVIEW_OUTCOME_ACCEPTED_WITH_EDITS,
     REVIEW_OUTCOME_REJECTED
@@ -2046,7 +2046,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         repeated=True, indexed=True)
     # The outcomes of last 100 translations submitted by the user.
     recent_review_outcomes = datastore_services.StringProperty(
-        repeated=True, indexed=True, choices=REVIEW_OUTCOME_STATUS)
+        repeated=True, indexed=True, choices=REVIEW_OUTCOME_CHOICES)
     # Performance of the user in last 100 translations.
     # recent_performance = accepted cards - 2 (rejected cards).
     recent_performance = datastore_services.IntegerProperty(
@@ -2140,8 +2140,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         Returns:
             str. The id of the model created.
         """
-        entity_id = cls.construct_id(
-            language_code, contributor_id)
+        entity_id = cls.construct_id(language_code, contributor_id)
         entity = cls(
             id=entity_id,
             language_code=language_code,
