@@ -162,19 +162,19 @@ describe('Feedback updates page', () => {
     _username: 'username1',
     _email: 'tester@example.org',
     _isLoggedIn: true,
-    isModerator: () => true,
-    isCurriculumAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    isTranslationAdmin: () => false,
-    isBlogAdmin: () => false,
-    isBlogPostEditor: () => false,
-    isQuestionAdmin: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
+    isModerator: (): boolean => true,
+    isCurriculumAdmin: (): boolean => false,
+    isSuperAdmin: (): boolean => false,
+    isTopicManager: (): boolean => false,
+    isTranslationAdmin: (): boolean => false,
+    isBlogAdmin: (): boolean => false,
+    isBlogPostEditor: (): boolean => false,
+    isQuestionAdmin: (): boolean => false,
+    canCreateCollections: (): boolean => true,
+    getPreferredSiteLanguageCode: (): string =>'en',
+    getUsername: (): string => 'username1',
+    getEmail: (): string => 'tester@example.org',
+    isLoggedIn: (): boolean => true
   };
 
   describe('when succesfully fetching feedback updates data', () => {
@@ -407,12 +407,13 @@ describe('Feedback updates page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.e2e-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration') as
+           NodeListOf<HTMLElement>;
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
-      feedbackListNameNodes.forEach((titleNode, index) => {
+      feedbackListNameNodes.forEach((titleNode, index: number) => {
         if (index === 0) {
           expect(titleNode.innerText).toContain('Biology');
         }
@@ -446,12 +447,13 @@ describe('Feedback updates page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.e2e-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration') as
+           NodeListOf<HTMLElement>;
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
-      feedbackListNameNodes.forEach((titleNode, index) => {
+      feedbackListNameNodes.forEach((titleNode, index: number) => {
         if (index === 0) {
           expect(titleNode.innerText).toContain('Zebra');
         }
@@ -488,12 +490,13 @@ describe('Feedback updates page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.e2e-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration') as
+           NodeListOf<HTMLElement>;
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
-      feedbackListNameNodes.forEach((titleNode, index) => {
+      feedbackListNameNodes.forEach((titleNode, index: number) => {
         if (index === 0) {
           expect(titleNode.innerText).toContain('Algebra');
         }
@@ -534,12 +537,13 @@ describe('Feedback updates page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.e2e-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration') as
+           NodeListOf<HTMLElement>;
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
       // Note that given subscription list is not sorted.
-      feedbackListNameNodes.forEach((titleNode, index) => {
+      feedbackListNameNodes.forEach((titleNode, index: number) => {
         if (index === 0) {
           expect(titleNode.innerText).toContain('Zebra');
         }

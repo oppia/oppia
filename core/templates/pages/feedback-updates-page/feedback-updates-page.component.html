@@ -94,7 +94,7 @@
                 </span>
                 <span *ngIf="thread.lastMessageText">{{ thread.lastMessageText | truncate:50 }}</span>
                 <span *ngIf="!thread.lastMessageText && thread.totalMessageCount !== 1">
-                  <i [innerHTML]="'I18N_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(thread.status)}">
+                  <i [innerHTML]="'I18N_FEEDBACK_UPDATES_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(thread.status)}">
                   </i>
                 </span>
                 <span *ngIf="!thread.lastMessageText && thread.totalMessageCount === 1">
