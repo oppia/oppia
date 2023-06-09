@@ -43,7 +43,11 @@ datastore_services = models.Registry.import_datastore_services()
 STATUS_ACCEPTED: Final = 'accepted'
 STATUS_IN_REVIEW: Final = 'review'
 STATUS_REJECTED: Final = 'rejected'
-STATUS_ACCEPTED_WITH_EDITS: Final = 'accepted_with_edits'
+
+# Constants defining different possible outcomes of a suggestion submitted.
+REVIEW_OUTCOME_ACCEPTED: Final = 'accepted'
+REVIEW_OUTCOME_ACCEPTED_WITH_EDITS: Final = 'accepted_with_edits'
+REVIEW_OUTCOME_REJECTED: Final = 'rejected'
 
 STATUS_CHOICES: Final = [
     STATUS_ACCEPTED,
@@ -52,9 +56,9 @@ STATUS_CHOICES: Final = [
 ]
 
 REVIEW_OUTCOME_STATUS: Final = [
-    STATUS_ACCEPTED,
-    STATUS_ACCEPTED_WITH_EDITS,
-    STATUS_REJECTED
+    REVIEW_OUTCOME_ACCEPTED,
+    REVIEW_OUTCOME_ACCEPTED_WITH_EDITS,
+    REVIEW_OUTCOME_REJECTED
 ]
 
 # Daily emails are sent to reviewers to notify them of suggestions on the
@@ -129,7 +133,24 @@ INCREMENT_SCORE_OF_AUTHOR_BY: Final = 1
 COMMUNITY_CONTRIBUTION_STATS_MODEL_ID: Final = 'community_contribution_stats'
 
 # Number of models to fetch for contributor admin dashboard stats.
-NUM_MODELS_PER_FETCH: Final = 100
+NUM_MODELS_PER_FETCH: Final = 500
+
+
+class SortChoice():
+    """Enum for Sort Options available in Contributor Admin Dashboard"""
+
+    SORT_KEY_INCREASING_LAST_ACTIVITY = 'IncreasingLastActivity'
+    SORT_KEY_DECREASING_LAST_ACTIVITY = 'DecreasingLastActivity'
+    SORT_KEY_INCREASING_PERFORMANCE = 'IncreasingPerformance'
+    SORT_KEY_DECREASING_PERFORMANCE = 'DecreasingPerformance'
+    SORT_KEY_INCREASING_ACCURACY = 'IncreasingAccuracy'
+    SORT_KEY_DECREASING_ACCURACY = 'DecreasingAccuracy'
+    SORT_KEY_INCREASING_SUBMISSIONS = 'IncreasingSubmissions'
+    SORT_KEY_DECREASING_SUBMISSIONS = 'DecreasingSubmissions'
+    SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS = 'IncreasingReviewedTranslations'
+    SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS = 'DecreasingReviewedTranslations'
+    SORT_KEY_INCREASING_REVIEWED_QUESTIONS = 'IncreasingReviewedQuestions'
+    SORT_KEY_DECREASING_REVIEWED_QUESTIONS = 'DecreasingReviewedQuestions'
 
 
 class GeneralSuggestionExportDataDict(TypedDict):
@@ -2004,9 +2025,9 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 
 class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     """Records the Total Translation contribution stats and data of
-    recent_review keyed per (contributor_id, language_code) tuple.
+    recent_review keyed per (language_code, contributor_id) tuple.
     Its IDs will be in the following
-        structure: [contributor_id][language_code]
+        structure: [language_code].[contributor_id]
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -2019,7 +2040,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     # The user ID of the translation contributor.
     contributor_id = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The topic ID(s) of the topics the contributor has atleast one
+    # The topic ID(s) of the topics for which the contributor has at least one
     # contribution.
     topic_ids_with_translation_submissions = datastore_services.StringProperty(
         repeated=True, indexed=True)
@@ -2031,9 +2052,10 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     recent_performance = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # Overall accuracy of the user.
-    # overall_accuracy = accepted cards/ submitted cards.
+    # overall_accuracy = accepted cards / submitted cards.
     overall_accuracy = datastore_services.FloatProperty(
         required=True, indexed=True)
+    # The number of submitted translations.
     submitted_translations_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The total word count of submitted translations. Excludes HTML tags and
@@ -2083,6 +2105,40 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     ) -> str:
         """Creates a new TranslationSubmitterTotalContributionStatsModel
         instance and returns its ID.
+        
+        Args:
+            language_code: str. The ISO 639-1 language code for which the
+                translation contributions were made.
+            contributor_id: str. The user ID of the translation contributor.
+            topic_ids_with_translation_submissions: List[str]. The topic ID(s)
+                of the topics for which the contributor has at least one
+                contribution.
+            recent_review_outcomes: List[str]. The outcomes of last 100
+                translations submitted by the user.
+            recent_performance: int. Performance of the user in last 100
+                translations.
+            overall_accuracy: float. Overall accuracy of the user.
+            submitted_translations_count: int. The number of submitted
+                translations.
+            submitted_translation_word_count: int. The total word count of
+                submitted translations.
+            accepted_translations_count: int. The number of accepted
+                translations.
+            accepted_translations_without_reviewer_edits_count: int.
+                The number of accepted translations without reviewer edits.
+            accepted_translation_word_count: int. The total word count of
+                accepted translations.
+            rejected_translations_count: int. The number of rejected
+                translations.
+            rejected_translation_word_count: int. The total word count of
+                rejected translations.
+            first_contribution_date: datetime.date. The unique first date of
+                the translation suggestions.
+            last_contribution_date: datetime.date. The unique last date of
+                the translation suggestions.
+
+        Returns:
+            str. The id of the model created.
         """
         entity_id = cls.construct_id(
             language_code, contributor_id)
@@ -2137,7 +2193,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls, language_code: str, contributor_id: str
     ) -> Optional[TranslationSubmitterTotalContributionStatsModel]:
         """Gets the TranslationSubmitterTotalContributionStatsModel
-        matching the supplied language_code, contributor_id, topic_id.
+        matching the supplied language_code, contributor_id.
 
         Returns:
             TranslationSubmitterTotalContributionStatsModel|None. The matching
@@ -2153,10 +2209,10 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[str],
+        language_code: str,
+        sort_by: Optional[SortChoice],
         topic_ids: Optional[List[str]],
-        last_activity: Optional[int],
-        language_code: str
+        num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
                 int,
                 bool]:
@@ -2166,18 +2222,21 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
-            sort_by: str|None. A string indicating how to sort the result.
-            topic_ids: List[str]|None.
-                List of topics user has contributions.
-            last_activity: int. Number of days within which a user has
-                contributed.
-            language_code: str. Language Code for filter.
+            language_code: str. The language code to get results for.
+            sort_by: SortChoice|None. A string indicating how to sort the
+                result.
+            topic_ids: List[str]|None. List of topic ID(s) to fetch
+                contributor stats.
+            num_days_since_last_activity: int. To get number of users
+                who are active in num_days_since_last_activity.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
-                    The list of models with supplied filters and sort_by.
+                    The list of models which match the supplied language_code,
+                    topic_ids and num_days_since_last_activity filters,
+                    returned in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -2185,19 +2244,37 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingLastActivity']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_LAST_ACTIVITY
+            ]:
                 -cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_LAST_ACTIVITY
+            ]:
                 cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingPerformance']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_PERFORMANCE
+            ]:
                 cls.recent_performance,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingAccuracy']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_PERFORMANCE
+            ]:
+                -cls.recent_performance,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_ACCURACY
+            ]:
                 -cls.overall_accuracy,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingAccuracy']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_ACCURACY
+            ]:
                 cls.overall_accuracy,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingSubmissions']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_SUBMISSIONS
+            ]:
                 -cls.submitted_translations_count,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingSubmissions']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_SUBMISSIONS
+            ]:
                 cls.submitted_translations_count
         }
 
@@ -2207,7 +2284,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
-        # last_activity can not be used here. Learn more about this here
+        # last_activity can not be used here and we have implemented it below.
+        # Learn more about this here
         # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         if topic_ids is not None:
             sort_query = cls.query(
@@ -2225,8 +2303,9 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             TranslationSubmitterTotalContributionStatsModel] = []
         today = datetime.date.today()
 
-        if last_activity is not None:
-            last_date = today - datetime.timedelta(days=last_activity)
+        if num_days_since_last_activity is not None:
+            last_date = today - datetime.timedelta(
+                days=num_days_since_last_activity)
             next_offset = offset
             while len(sorted_results) < page_size:
                 result_models: Sequence[
@@ -2234,7 +2313,6 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     sort_query.fetch(
                         NUM_MODELS_PER_FETCH, offset=next_offset))
                 if not result_models:
-                    next_offset += 1
                     break
                 for result_model in result_models:
                     next_offset += 1
@@ -2290,14 +2368,14 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_id."""
+        """Model contains data corresponding to a user: contributor_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model is exported as multiple instances per user since there are
-        multiple languages and topics relevant to a user.
+        multiple languages relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
@@ -2368,8 +2446,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             cls.get_all().filter(cls.contributor_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
-            id_without_user_id = splitted_id[0]
-            user_data[id_without_user_id] = {
+            language_code = splitted_id[0]
+            user_data[language_code] = {
                 'language_code': model.language_code,
                 'topic_ids_with_translation_submissions': (
                     model.topic_ids_with_translation_submissions),
@@ -2418,7 +2496,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
     # The user ID of the translation reviewer.
     contributor_id = datastore_services.StringProperty(
         required=True, indexed=True)
-    # # The topic ID(s) to which user has atleast one contribution.
+    # # The topic ID(s) to which user has at least one review.
     topic_ids_with_translation_reviews = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # The number of reviewed translations.
@@ -2451,16 +2529,40 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         reviewed_translations_count: int,
         accepted_translations_count: int,
         accepted_translations_with_reviewer_edits_count: int,
-        rejected_translations_count: int,
         accepted_translation_word_count: int,
+        rejected_translations_count: int,
         first_contribution_date: datetime.date,
         last_contribution_date: datetime.date
     ) -> str:
         """Creates a new TranslationReviewerTotalContributionStatsModel
         instance and returns its ID.
+
+        Args:
+            language_code: str. The ISO 639-1 language code for which the
+                translation contributions were made.
+            contributor_id: str. The user ID of the translation reviewer.
+            topic_ids_with_translation_reviews: List[str]. The topic ID(s)
+                of the topics for which the contributor has at least one
+                review.
+            reviewed_translations_count: int. The number of reviewed
+                translations.
+            accepted_translations_count: int. The number of accepted
+                translations.
+            accepted_translations_with_reviewer_edits_count: int.
+                The number of accepted translations with reviewer edits.
+            accepted_translation_word_count: int. The total word count of
+                accepted translations.
+            rejected_translations_count: int. The number of rejected
+                translations.
+            first_contribution_date: datetime.date. The unique first date of
+                the translation suggestions.
+            last_contribution_date: datetime.date. The unique last date of
+                the translation suggestions.
+
+        Returns:
+            str. The id of the model created.
         """
-        entity_id = cls.construct_id(
-            language_code, contributor_id)
+        entity_id = cls.construct_id(language_code, contributor_id)
         entity = cls(
             id=entity_id,
             language_code=language_code,
@@ -2538,9 +2640,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[str],
-        last_activity: Optional[int],
-        language_code: str
+        language_code: str,
+        sort_by: Optional[SortChoice],
+        num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
                 bool]:
@@ -2550,16 +2652,19 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
-            sort_by: str|None. A string indicating how to sort the result.
-            last_activity: int. Number of days within which a user has
-                contributed.
-            language_code: str. Language Code for filter.
+            language_code: str. The language code to get results for.
+            sort_by: SortChoice|None. A string indicating how to sort the
+                result.
+            num_days_since_last_activity: int|None. To get number of users
+                who are active in num_days_since_last_activity.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
-                    The list of models with supplied filters and sort_by.
+                    The list of models which match the supplied language_code,
+                    and num_days_since_last_activity filters, returned in the
+                    order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -2567,13 +2672,22 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingLastActivity']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_LAST_ACTIVITY
+            ]:
                 -cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_LAST_ACTIVITY
+            ]:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                'IncreasingReviewedTranslations']:
-                cls.reviewed_translations_count
+                SortChoice.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS
+            ]:
+                cls.reviewed_translations_count,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS
+            ]:
+                -cls.reviewed_translations_count
         }
 
         sort = -cls.reviewed_translations_count
@@ -2582,7 +2696,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
-        # last_activity can not be used here. Learn more about this here
+        # last_activity can not be used here and we have implemented it below.
+        # Learn more about this here
         # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         sort_query = cls.query(
             datastore_services.all_of(
@@ -2593,8 +2708,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             TranslationReviewerTotalContributionStatsModel] = []
         today = datetime.date.today()
 
-        if last_activity is not None:
-            last_date = today - datetime.timedelta(days=last_activity)
+        if num_days_since_last_activity is not None:
+            last_date = today - datetime.timedelta(
+                days=num_days_since_last_activity)
             next_offset = offset
             while len(sorted_results) < page_size:
                 result_models: Sequence[
@@ -2602,7 +2718,6 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     sort_query.fetch(
                         NUM_MODELS_PER_FETCH, offset=next_offset))
                 if not result_models:
-                    next_offset += 1
                     break
                 for result_model in result_models:
                     next_offset += 1
@@ -2711,8 +2826,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             cls.get_all().filter(cls.contributor_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
-            id_without_user_id = splitted_id[0]
-            user_data[id_without_user_id] = {
+            language_code = splitted_id[0]
+            user_data[language_code] = {
                 'language_code': model.language_code,
                 'topic_ids_with_translation_reviews': (
                     model.topic_ids_with_translation_reviews),
@@ -2737,16 +2852,13 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     """Records the question contribution stats for contributor dashboard admin
     page. There is one instance of this model per contributor_id.
-    Its IDs is same as [contributor_id].
+    Its ID is same as [contributor_id].
     """
-
-    # We use the model id as a key in the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The user ID of the question contributor.
     contributor_id = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The topic ID(s) to which user has atleast one contribution.
+    # The topic ID(s) to which user has at least one contribution.
     topic_ids_with_question_submissions = datastore_services.StringProperty(
         repeated=True, indexed=True)
     # Review outcomes of last 100 contributions of the user.
@@ -2757,7 +2869,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     recent_performance = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # Overall accuracy of the user.
-    # overall_accuracy = accepted questions/ submitted questions.
+    # overall_accuracy = accepted questions / submitted questions.
     overall_accuracy = datastore_services.FloatProperty(
         required=True, indexed=True)
     # The number of submitted questions.
@@ -2794,6 +2906,33 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
     ) -> str:
         """Creates a new QuestionSubmitterTotalContributionStatsModel
         instance and returns its ID.
+
+        Args:
+            contributor_id: str. The user ID of the contributor.
+            topic_ids_with_question_submissions: List[str]. The topic ID(s)
+                of the topics for which the contributor has at least one
+                contribution.
+            recent_review_outcomes: List[str]. The outcomes of last 100
+                questions submitted by the user.
+            recent_performance: int. Performance of the user in last 100
+                questions.
+            overall_accuracy: float. Overall accuracy of the user.
+            submitted_questions_count: int. The number of submitted
+                questions.
+            accepted_questions_count: int. The number of accepted
+                questions.
+            accepted_questions_without_reviewer_edits_count: int.
+                The number of accepted questions without reviewer edits.
+            rejected_questions_count: int. The number of rejected
+                questions.
+            first_contribution_date: datetime.date. The unique first date of
+                the question suggestions.
+            last_contribution_date: datetime.date. The unique last date of
+                the question suggestions.
+        
+        Returns:
+            str. The ID of the model created
+
         """
         entity_id = contributor_id
         entity = cls(
@@ -2835,9 +2974,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[str],
+        sort_by: Optional[SortChoice],
         topic_ids: Optional[List[str]],
-        last_activity: Optional[int]
+        num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
                 int,
                 bool]:
@@ -2847,16 +2986,20 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
-            sort_by: str|None. A string indicating how to sort the result.
-            topic_ids: List[str]|None. List of topics user has contributions.
-            last_activity: int. Number of days within which a user has
-                contributed.
+            sort_by: SortChoice|None. A string indicating how to sort the
+                result.
+            topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
+                stats.
+            num_days_since_last_activity: int|None. To get number of users
+                who are active in num_days_since_last_activity.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionSubmitterTotalContributionStatsModel).
-                    The list of models with supplied filters and sort_by.
+                    The list of models which match the supplied topic_ids
+                    and num_days_since_last_activity filters,
+                    returned in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -2864,19 +3007,37 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingLastActivity']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_LAST_ACTIVITY
+            ]:
                 -cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_LAST_ACTIVITY
+            ]:
                 cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingPerformance']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_PERFORMANCE
+            ]:
                 cls.recent_performance,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingAccuracy']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_PERFORMANCE
+            ]:
+                -cls.recent_performance,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_ACCURACY
+            ]:
                 -cls.overall_accuracy,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingAccuracy']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_ACCURACY
+            ]:
                 cls.overall_accuracy,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingSubmissions']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_SUBMISSIONS
+            ]:
                 -cls.submitted_questions_count,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingSubmissions']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_SUBMISSIONS
+            ]:
                 cls.submitted_questions_count
         }
 
@@ -2886,7 +3047,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
-        # last_activity can not be used here. Learn more about this here
+        # last_activity can not be used here and we have implemented it below.
+        # Learn more about this here
         # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         if topic_ids is not None:
             sort_query = cls.query(
@@ -2900,8 +3062,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             QuestionSubmitterTotalContributionStatsModel] = []
         today = datetime.date.today()
 
-        if last_activity is not None:
-            last_date = today - datetime.timedelta(days=last_activity)
+        if num_days_since_last_activity is not None:
+            last_date = today - datetime.timedelta(
+                days=num_days_since_last_activity)
             next_offset = offset
             while len(sorted_results) < page_size:
                 result_models: Sequence[
@@ -2909,7 +3072,6 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     sort_query.fetch(
                         NUM_MODELS_PER_FETCH, offset=next_offset))
                 if not result_models:
-                    next_offset += 1
                     break
                 for result_model in result_models:
                     next_offset += 1
@@ -3030,16 +3192,13 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
     """Records the question review stats for contributor admin dashboard.
     There is one instance of this model per contributor_id.
-    Its IDs is same as the user_id of the contributor.
+    Its ID is same as the user_id of the contributor.
     """
-
-    # We use the model id as a key in the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The user ID of the question reviewer.
     contributor_id = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The topic ID(s) to which user has atleast one contribution.
+    # The topic ID(s) to which user has at least one contribution.
     topic_ids_with_question_reviews = datastore_services.StringProperty(
         repeated=True, indexed=True)
     # The number of reviewed questions.
@@ -3109,8 +3268,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[str],
-        last_activity: Optional[int]
+        sort_by: Optional[SortChoice],
+        num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
                 bool]:
@@ -3120,15 +3279,18 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
-            sort_by: str|None. A string indicating how to sort the result.
-            last_activity: int. Number of days within which a user has
-                contributed.
+            sort_by: SortChoice|None. A string indicating how to sort the
+                result.
+            num_days_since_last_activity: int|None. To get number of users
+                who are active in num_days_since_last_activity.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
-                    The list of models with supplied filters and sort_by.
+                    The list of models which match the supplied
+                    num_days_since_last_activity filters,
+                    returned in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3136,13 +3298,22 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['IncreasingLastActivity']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_INCREASING_LAST_ACTIVITY
+            ]:
                 -cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS['DecreasingLastActivity']:
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_LAST_ACTIVITY
+            ]:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                'IncreasingReviewedQuestions']:
-                cls.reviewed_questions_count
+                SortChoice.SORT_KEY_INCREASING_REVIEWED_QUESTIONS
+            ]:
+                cls.reviewed_questions_count,
+            constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                SortChoice.SORT_KEY_DECREASING_REVIEWED_QUESTIONS
+            ]:
+                -cls.reviewed_questions_count
         }
 
         sort = -cls.reviewed_questions_count
@@ -3151,7 +3322,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         # The first sort property must be the same as the property to which
         # an inequality filter is applied. Thus, the inequality filter on
-        # last_activity can not be used here. Learn more about this here
+        # last_activity can not be used here and we have implemented it below.
+        # Learn more about this here
         # https://cloud.google.com/appengine/docs/legacy/standard/go111/datastore/query-restrictions#properties_used_in_inequality_filters_must_be_sorted_first.
         sort_query = cls.get_all().order(sort)
 
@@ -3159,8 +3331,9 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             QuestionReviewerTotalContributionStatsModel] = []
         today = datetime.date.today()
 
-        if last_activity is not None:
-            last_date = today - datetime.timedelta(days=last_activity)
+        if num_days_since_last_activity is not None:
+            last_date = today - datetime.timedelta(
+                days=num_days_since_last_activity)
             next_offset = offset
             while len(sorted_results) < page_size:
                 result_models: Sequence[
@@ -3168,7 +3341,6 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     sort_query.fetch(
                         NUM_MODELS_PER_FETCH, offset=next_offset))
                 if not result_models:
-                    next_offset += 1
                     break
                 for result_model in result_models:
                     next_offset += 1
@@ -3257,7 +3429,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         for model in stats_models:
             user_data = {
                 'topic_ids_with_question_reviews': (
-                model.topic_ids_with_question_reviews),
+                    model.topic_ids_with_question_reviews),
                 'reviewed_questions_count': (
                     model.reviewed_questions_count),
                 'accepted_questions_count': (

@@ -3155,12 +3155,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=None,
-            topic_ids=None,
-            last_activity=None,
-            language_code='es'
+                page_size=2,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
@@ -3170,13 +3170,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingAccuracy'],
-            topic_ids=None,
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingAccuracy'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -3186,13 +3186,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingAccuracy'],
-            topic_ids=None,
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingAccuracy'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
@@ -3202,13 +3202,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingSubmissions'],
-            topic_ids=None,
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingSubmissions'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
@@ -3218,13 +3218,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingSubmissions'],
-            topic_ids=None,
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingSubmissions'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertTrue(more)
@@ -3234,13 +3234,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=1,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingPerformance'],
-            topic_ids=['topic1', 'topic2'],
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=1,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingPerformance'],
+                topic_ids=['topic1', 'topic2'],
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertFalse(more)
@@ -3250,12 +3250,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            topic_ids=None,
-            last_activity=None,
-            language_code='hi'
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='hi'
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
@@ -3265,13 +3265,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingLastActivity'],
-            topic_ids=None,
-            last_activity=None,
-            language_code='es'
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
@@ -3281,13 +3281,13 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity'],
-            topic_ids=None,
-            last_activity=None,
-            language_code='es'
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -3297,12 +3297,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=None,
-            topic_ids=None,
-            last_activity=7,
-            language_code='es'
+                page_size=2,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=7,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
@@ -3312,12 +3312,12 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            topic_ids=None,
-            last_activity=90,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=90,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
@@ -3327,16 +3327,16 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            topic_ids=None,
-            last_activity=7,
-            language_code='hi'
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=7,
+                language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
+        self.assertEqual(next_offset, 1)
 
     def test_has_reference_to_user_id(self) -> None:
         model = (
@@ -3518,10 +3518,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
-        splitted_id_1 = model_1_id.split('.')
-        model_1_id_without_user_id = '%s' % (splitted_id_1[0])
-        splitted_id_2 = model_2_id.split('.')
-        model_2_id_without_user_id = '%s' % (splitted_id_2[0])
+        model_1_id_without_user_id = self.SUGGESTION_LANGUAGE_CODE
+        model_2_id_without_user_id = 'hi'
         expected_data = {
             model_1_id_without_user_id: {
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -3715,11 +3713,11 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
@@ -3729,12 +3727,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslations'],
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedTranslations'],
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -3744,12 +3742,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingLastActivity'],
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -3759,12 +3757,12 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity'],
-            last_activity=None,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                num_days_since_last_activity=None,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertTrue(more)
@@ -3774,42 +3772,42 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity'],
-            last_activity=None,
-            language_code='hi'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                num_days_since_last_activity=None,
+                language_code='hi'
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for last_acitvity filter within 7 days.
+        # Check for num_days_since_last_activity filter within 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslations'],
-            last_activity=7,
-            language_code='es'
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedTranslations'],
+                num_days_since_last_activity=7,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for last_acitvity filter within 90 days.
+        # Check for num_days_since_last_activity filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslations'],
-            last_activity=90,
-            language_code='es'
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedTranslations'],
+                num_days_since_last_activity=90,
+                language_code='es'
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -3819,15 +3817,15 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            last_activity=7,
-            language_code='hi'
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=7,
+                language_code='hi'
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
+        self.assertEqual(next_offset, 1)
 
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
@@ -3867,7 +3865,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
 
     def test_export_data_nontrivial(self) -> None:
         # Seed translation stats data for two different languages.
-        model_1_id = suggestion_models.TranslationReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.USER_ID_1,
             topic_ids_with_translation_reviews=(
@@ -3883,7 +3881,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
-        model_2_id = suggestion_models.TranslationReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
+        suggestion_models.TranslationReviewerTotalContributionStatsModel.create( # pylint: disable=line-too-long
             language_code='hi',
             contributor_id=self.USER_ID_1,
             topic_ids_with_translation_reviews=(
@@ -3899,10 +3897,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
-        splitted_id_1 = model_1_id.split('.')
-        model_1_id_without_user_id = '%s' % (splitted_id_1[0])
-        splitted_id_2 = model_2_id.split('.')
-        model_2_id_without_user_id = '%s' % (splitted_id_2[0])
+        model_1_id_without_user_id = self.LANGUAGE_CODE
+        model_2_id_without_user_id = 'hi'
         expected_data = {
             model_1_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
@@ -4084,11 +4080,11 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=None,
-            topic_ids=None,
-            last_activity=None
+                page_size=2,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
@@ -4098,12 +4094,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingAccuracy'],
-            topic_ids=None,
-            last_activity=None
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingAccuracy'],
+                topic_ids=None,
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -4113,12 +4109,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingAccuracy'],
-            topic_ids=None,
-            last_activity=None
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingAccuracy'],
+                topic_ids=None,
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
@@ -4128,12 +4124,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingSubmissions'],
-            topic_ids=None,
-            last_activity=None
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingSubmissions'],
+                topic_ids=None,
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
@@ -4143,12 +4139,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingSubmissions'],
-            topic_ids=None,
-            last_activity=None
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingSubmissions'],
+                topic_ids=None,
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -4158,12 +4154,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=1,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingPerformance'],
-            topic_ids=['topic1', 'topic2'],
-            last_activity=None
+                page_size=1,
+                offset=1,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingPerformance'],
+                topic_ids=['topic1', 'topic2'],
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
@@ -4173,12 +4169,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingLastActivity'],
-            topic_ids=None,
-            last_activity=None
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -4188,12 +4184,12 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity'],
-            topic_ids=None,
-            last_activity=None
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                topic_ids=None,
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
@@ -4203,25 +4199,25 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=None,
-            topic_ids=None,
-            last_activity=7
+                page_size=2,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=7
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertFalse(more)
-        self.assertEqual(next_offset, 5)
+        self.assertEqual(next_offset, 4)
 
         # Check for last activity under 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            topic_ids=None,
-            last_activity=90
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                num_days_since_last_activity=90
             ))
         self.assertEqual(sorted_results[0].id, 'model_4')
         self.assertTrue(more)
@@ -4231,17 +4227,17 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionSubmitterTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            topic_ids=[
-                'non_existent_topic'
-            ],
-            last_activity=7
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                topic_ids=[
+                    'non_existent_topic'
+                ],
+                num_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 1)
+        self.assertEqual(next_offset, 0)
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -4432,10 +4428,10 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            last_activity=None
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
@@ -4445,11 +4441,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedQuestions'],
-            last_activity=None
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedQuestions'],
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -4459,11 +4455,11 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'DecreasingLastActivity'],
-            last_activity=None
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'DecreasingLastActivity'],
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -4473,39 +4469,39 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingLastActivity'],
-            last_activity=None
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingLastActivity'],
+                num_days_since_last_activity=None
             ))
         self.assertEqual(sorted_results[0].id, 'model_3')
         self.assertTrue(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for last_acitvity filter within 7 days.
+        # Check for num_days_since_last_activity filter within 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=2,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedQuestions'],
-            last_activity=7
+                page_size=2,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedQuestions'],
+                num_days_since_last_activity=7
             ))
         self.assertEqual(sorted_results[0].id, 'model_2')
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for last_acitvity filter within 90 days.
+        # Check for num_days_since_last_activity filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedQuestions'],
-            last_activity=90
+                page_size=1,
+                offset=0,
+                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                            'IncreasingReviewedQuestions'],
+                num_days_since_last_activity=90
             ))
         self.assertEqual(sorted_results[0].id, 'model_1')
         self.assertTrue(more)
@@ -4515,14 +4511,14 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
-            page_size=1,
-            offset=0,
-            sort_by=None,
-            last_activity=1
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                num_days_since_last_activity=1
             ))
         self.assertEqual(len(sorted_results), 0)
         self.assertFalse(more)
-        self.assertEqual(next_offset, 4)
+        self.assertEqual(next_offset, 3)
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
