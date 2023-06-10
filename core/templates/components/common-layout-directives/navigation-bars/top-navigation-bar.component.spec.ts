@@ -26,6 +26,7 @@ import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { SearchService } from 'services/search.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
+import { AlertsService } from 'services/alerts.service';
 import { MockI18nService, MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
@@ -95,6 +96,7 @@ describe('TopNavigationBarComponent', () => {
   let searchService: SearchService;
   let wds: WindowDimensionsService;
   let userService: UserService;
+  let alertsService: AlertsService;
   let siteAnalyticsService: SiteAnalyticsService;
   let navigationService: NavigationService;
   let deviceInfoService: DeviceInfoService;
@@ -129,6 +131,7 @@ describe('TopNavigationBarComponent', () => {
       providers: [
         NavigationService,
         CookieService,
+        AlertsService,
         FeedbackUpdatesBackendApiService,
         UserService,
         {
@@ -170,6 +173,7 @@ describe('TopNavigationBarComponent', () => {
     i18nService = TestBed.inject(I18nService);
     feedbackUpdatesBackendApiService =
         TestBed.inject(FeedbackUpdatesBackendApiService);
+    alertsService = TestBed.inject(AlertsService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
@@ -182,14 +186,45 @@ describe('TopNavigationBarComponent', () => {
       .and.returnValue(new EventEmitter<string>());
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
       ['default-image-url-png', 'default-image-url-webp']);
-    spyOn(
-      feedbackUpdatesBackendApiService,
-      'fetchFeedbackUpdatesDataAsync')
-      .and.returnValue(Promise.resolve({
-        numberOfUnreadThreads: FeedbackUpdatesData.
-          number_of_unread_threads
-      }));
   });
+
+  it('should set the number of unread threads when fetch' +
+  'feedback updates data resolve', fakeAsync(() => {
+    const fetchDataSpy = spyOn(
+      feedbackUpdatesBackendApiService,
+      'fetchFeedbackUpdatesDataAsync').and.returnValue(Promise.resolve({
+      numberOfUnreadThreads: FeedbackUpdatesData.
+        number_of_unread_threads
+    }));
+
+    component.userIsLoggedIn = true;
+
+    component.ngOnInit();
+    tick();
+    expect(component.numberOfUnreadThreads).toBe(10);
+    expect(fetchDataSpy).toHaveBeenCalled();
+  }));
+
+  it('should show an alert warning when fails to get feedback updates data',
+    fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        feedbackUpdatesBackendApiService,
+        'fetchFeedbackUpdatesDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+
+      component.userIsLoggedIn = true;
+
+      component.ngOnInit();
+
+      tick(1000);
+      fixture.detectChanges();
+
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get number of unread thread of feedback updates');
+      expect(fetchDataSpy).toHaveBeenCalled();
+      tick(1000);
+    }));
 
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();

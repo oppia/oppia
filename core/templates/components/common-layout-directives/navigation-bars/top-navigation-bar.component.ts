@@ -215,22 +215,23 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       });
 
     if (this.userIsLoggedIn) {
-    let dashboardFeedbackUpdatesDataPromise = (
-      this.feedbackUpdatesBackendApiService
-        .fetchFeedbackUpdatesDataAsync(
-          this.paginatedThreadsList));
-    dashboardFeedbackUpdatesDataPromise.then(
-      responseData => {
-        this.numberOfUnreadThreads =
-          responseData.numberOfUnreadThreads;
-      }, errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get number of unread thread of feedback updates');
+      let feedbackUpdatesDataPromise = (
+        this.feedbackUpdatesBackendApiService
+          .fetchFeedbackUpdatesDataAsync(
+            this.paginatedThreadsList));
+      feedbackUpdatesDataPromise.then(
+        responseData => {
+          this.numberOfUnreadThreads =
+            responseData.numberOfUnreadThreads;
+        }, errorResponseStatus => {
+          if (
+            AppConstants.FATAL_ERROR_CODES.
+              indexOf(errorResponseStatus) !== -1) {
+            this.alertsService.addWarning(
+              'Failed to get number of unread thread of feedback updates');
+          }
         }
-      }
-    );
+      );
     }
 
     let service = this.classroomBackendApiService;
