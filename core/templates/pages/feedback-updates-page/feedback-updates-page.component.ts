@@ -30,7 +30,7 @@ import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { FeedbackUpdatesPageConstants } from 'pages/feedback-updates-page/feedback-updates-page.constants'
+import { FeedbackUpdatesPageConstants } from 'pages/feedback-updates-page/feedback-updates-page.constants';
 import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
