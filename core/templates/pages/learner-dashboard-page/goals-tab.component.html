@@ -77,7 +77,13 @@
                     (click)="addToLearnerGoals(topic, topic.id, i)"
                     [disabled]="this.currentGoals.length == this.MAX_CURRENT_GOALS_LENGTH">
        </mat-checkbox>
-      <mat-checkbox aria-label="{{ topic.name }} checkbox is disabled" color="primary" *ngIf="editGoalsTopicClassification[i] == 0" checked disabled class="oppia-checkbox"></mat-checkbox>
+      <mat-checkbox checked disabled
+                    aria-label="{{ topic.name }}
+                    checkbox is disabled"
+                    color="primary"
+                    *ngIf="editGoalsTopicClassification[i] == 0"
+                    class="oppia-checkbox">
+     </mat-checkbox>
     </div>
   </div>
 </div>
