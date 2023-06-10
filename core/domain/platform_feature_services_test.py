@@ -53,6 +53,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+        parameter_registry = registry.Registry.parameter_registry
+        self.original_parameter_registry = (
+            {key: value for key, value in parameter_registry.items()})
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
         param_names = ['param_a', 'param_b']
@@ -155,6 +158,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
+        registry.Registry.parameter_registry = self.original_parameter_registry
 
     def test_get_all_platform_parameters_except_feature_flag_dicts(
         self
@@ -418,30 +422,36 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_all_platform_params_should_appear_once_in_features_or_in_params_list( # pylint: disable=line-too-long
         self
     ) -> None:
+        feature_services.ALL_FEATURES_LIST = self.original_feature_list
+        feature_services.ALL_FEATURES_NAMES_SET = (
+            self.original_feature_name_set)
+        registry.Registry.parameter_registry = self.original_parameter_registry
         all_params_name = registry.Registry.get_all_platform_parameter_names()
-        all_features_list = feature_services.ALL_FEATURES_LIST
-        all_params_except_features_list = (
-            feature_services.ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES)
+        all_features_names_list = [
+            feature.value for feature in feature_services.ALL_FEATURES_LIST]
+        all_params_except_features_names_list = [
+            params.value
+            for params in feature_services.ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES]
         self.assertEqual(
             len(all_params_name),
             (
-                len(all_features_list) +
-                len(all_params_except_features_list)
+                len(all_features_names_list) +
+                len(all_params_except_features_names_list)
             )
         )
         for param_name in all_params_name:
-            if param_name in all_features_list:
+            if param_name in all_features_names_list:
                 self.assertNotIn(
                     param_name,
-                    all_params_except_features_list,
+                    all_params_except_features_names_list,
                     'The platform parameter named %s is already present '
                     'in the ALL_FEATURES_LIST list and should not be present '
                     'in the ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES list.' % (
                         param_name))
-            elif param_name in all_params_except_features_list:
+            elif param_name in all_params_except_features_names_list:
                 self.assertNotIn(
                     param_name,
-                    all_features_list,
+                    all_features_names_list,
                     'The platform parameter named %s is already present '
                     'in the ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES list and '
                     'should not be present in the ALL_FEATURES_LIST list.' % (
