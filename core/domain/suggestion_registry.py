@@ -2132,7 +2132,7 @@ class TranslationSubmitterTotalContributionStats:
             TranslationSubmitterTotalContributionStats domain object for
             frontend.
         """
-        today = datetime.datetime.today()
+        today = datetime.datetime.utcnow()
         return {
             'language_code': self.language_code,
             'contributor_id': self.contributor_id,
@@ -2261,7 +2261,7 @@ class TranslationReviewerTotalContributionStats:
             TranslationReviewerTotalContributionStats domain object for
             frontend.
         """
-        today = datetime.datetime.today()
+        today = datetime.datetime.utcnow()
         return {
             'language_code': self.language_code,
             'contributor_id': self.contributor_id,
@@ -2387,7 +2387,7 @@ class QuestionSubmitterTotalContributionStats:
             QuestionSubmitterTotalContributionStats domain object for
             frontend.
         """
-        today = datetime.datetime.today()
+        today = datetime.datetime.utcnow()
         return {
             'contributor_id': self.contributor_id,
             'topic_ids_with_question_submissions': (
@@ -2498,7 +2498,7 @@ class QuestionReviewerTotalContributionStats:
             QuestionReviewerTotalContributionStats domain object for
             frontend.
         """
-        today = datetime.datetime.today()
+        today = datetime.datetime.utcnow()
         return {
             'contributor_id': self.contributor_id,
             'topic_ids_with_question_reviews': (
