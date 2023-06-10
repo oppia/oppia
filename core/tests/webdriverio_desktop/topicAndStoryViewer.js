@@ -23,6 +23,8 @@ var users = require('../webdriverio_utils/users.js');
 var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
+var ReleaseCoordinatorPage = require(
+  '../webdriverio_utils/ReleaseCoordinatorPage.js');
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var TopicsAndSkillsDashboardPage =
@@ -41,6 +43,7 @@ var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 
 describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
+  var releaseCoordinatorPage = null;
   var topicAndStoryViewerPage = null;
   var topicViewerPage = null;
   var topicsAndSkillsDashboardPage = null;
@@ -74,6 +77,8 @@ describe('Topic and Story viewer functionality', function() {
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
+    releaseCoordinatorPage = (
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -92,10 +97,12 @@ describe('Topic and Story viewer functionality', function() {
     // The below lines enable the end_chapter_celebration flag in prod mode.
     // They should be removed after the end_chapter_celebration flag is
     // deprecated.
-    await adminPage.getFeaturesTab();
+    await adminPage.get();
+    await adminPage.addRole('creatorStoryViewer', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
     var endChapterFlag = (
-      await adminPage.getEndChapterCelebrationFeatureElement());
-    await adminPage.enableFeatureForTest(endChapterFlag);
+      await releaseCoordinatorPage.getEndChapterCelebrationFeatureElement());
+    await releaseCoordinatorPage.enableFeatureForTest(endChapterFlag);
 
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();

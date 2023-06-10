@@ -16,28 +16,34 @@
  * @fileoverview End-to-end tests to login, enable feature and re-login.
  */
 
-var AdminPage = require('../webdriverio_utils/AdminPage.js');
+var ReleaseCoordinatorPage = require(
+  '../webdriverio_utils/ReleaseCoordinatorPage.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 
 describe('Feature Gating Flow', function() {
-  var ADMIN_USER1_EMAIL = 'admin1@featureGatingFlow.com';
-  var ADMIN_USERNAME1 = 'featuregating1';
-  var ADMIN_USER2_EMAIL = 'admin2@featureGatingFlow.com';
-  var ADMIN_USERNAME2 = 'featuregating2';
+  var RELEASE_COORDINATOR_USER1_EMAIL = (
+    'releasecoordinator1@featureGatingFlow.com');
+  var RELEASE_COORDINATOR_USERNAME1 = 'featuregating1';
+  var RELEASE_COORDINATOR_USER2_EMAIL = (
+    'releasecoordinator2@featureGatingFlow.com');
+  var RELEASE_COORDINATOR_USERNAME2 = 'featuregating2';
 
-  let adminPage = null;
+  let releaseCoordinatorPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
+    releaseCoordinatorPage = (
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
 
-    await users.createAndLoginCurriculumAdminUser(
-      ADMIN_USER1_EMAIL, ADMIN_USERNAME1);
-    await users.logout();
+    await users.createUserWithRole(
+      RELEASE_COORDINATOR_USER1_EMAIL,
+      RELEASE_COORDINATOR_USERNAME1,
+      'release coordinator');
 
-    await users.createAndLoginCurriculumAdminUser(
-      ADMIN_USER2_EMAIL, ADMIN_USERNAME2);
-    await users.logout();
+    await users.createUserWithRole(
+      RELEASE_COORDINATOR_USER2_EMAIL,
+      RELEASE_COORDINATOR_USERNAME2,
+      'release coordinator');
   });
 
   afterEach(async function() {
@@ -45,20 +51,20 @@ describe('Feature Gating Flow', function() {
   });
 
   afterAll(async function() {
-    await users.login(ADMIN_USER1_EMAIL, true);
+    await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
-    await adminPage.getFeaturesTab();
-    var dummy = await adminPage.getDummyFeatureElement();
+    await releaseCoordinatorPage.getFeaturesTab();
+    var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
 
-    await adminPage.removeAllRulesOfFeature(dummy);
-    await adminPage.saveChangeOfFeature(dummy);
+    await releaseCoordinatorPage.removeAllRulesOfFeature(dummy);
+    await releaseCoordinatorPage.saveChangeOfFeature(dummy);
     await users.logout();
   });
 
   it('should not show indicators gated by dummy feature when disabled',
     async() => {
-      await users.login(ADMIN_USER1_EMAIL, true);
-      await adminPage.getFeaturesTab();
+      await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
+      await releaseCoordinatorPage.getFeaturesTab();
 
       // Indicator in Angular component that is visible if the dummy_feature
       // is enabled, and the feature status is successfully loaded in the
@@ -79,11 +85,11 @@ describe('Feature Gating Flow', function() {
   );
 
   it('should show dummy feature in the features tab', async() => {
-    await users.login(ADMIN_USER1_EMAIL, true);
+    await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
-    await adminPage.getFeaturesTab();
+    await releaseCoordinatorPage.getFeaturesTab();
 
-    var dummy = await adminPage.getDummyFeatureElement();
+    var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
 
     expect(await dummy.isExisting()).toBe(true);
     await users.logout();
@@ -91,16 +97,16 @@ describe('Feature Gating Flow', function() {
 
   it('should not show indicators for dummy_feature to different users',
     async() => {
-      await users.login(ADMIN_USER1_EMAIL, true);
+      await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
-      await adminPage.getFeaturesTab();
-      var dummy = await adminPage.getDummyFeatureElement();
-      await adminPage.enableFeatureForDev(dummy);
+      await releaseCoordinatorPage.getFeaturesTab();
+      var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
+      await releaseCoordinatorPage.enableFeatureForDev(dummy);
 
       await users.logout();
-      await users.login(ADMIN_USER2_EMAIL, true);
+      await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
 
-      await adminPage.getFeaturesTab();
+      await releaseCoordinatorPage.getFeaturesTab();
 
       // Indicator in Angular component that is visible if the dummy_feature
       // is enabled, and the feature status is successfully loaded in the

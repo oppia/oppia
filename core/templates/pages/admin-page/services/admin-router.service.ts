@@ -71,13 +71,6 @@ export class AdminRouterService {
   }
 
   /**
-   * @returns {boolean} Whether the features tab is open.
-   */
-  isFeaturesTabOpen(): boolean {
-    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.FEATURES;
-  }
-
-  /**
    * @returns {boolean} Whether the roles tab is open.
    */
   isRolesTabOpen(): boolean {

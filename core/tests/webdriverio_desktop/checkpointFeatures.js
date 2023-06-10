@@ -22,6 +22,8 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
+var ReleaseCoordinatorPage = require(
+  '../webdriverio_utils/ReleaseCoordinatorPage.js');
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var TopicsAndSkillsDashboardPage =
@@ -38,6 +40,7 @@ var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 
 describe('Checkpoints functionality', function() {
   var adminPage = null;
+  var releaseCoordinatorPage = null;
   var topicAndStoryViewerPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
@@ -65,6 +68,8 @@ describe('Checkpoints functionality', function() {
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
+    releaseCoordinatorPage = (
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -92,10 +97,13 @@ describe('Checkpoints functionality', function() {
     // The below lines enable the checkpoint_celebration flag in prod mode.
     // They should be removed after the checkpoint_celebration flag is
     // deprecated.
-    await adminPage.getFeaturesTab();
+    await adminPage.get();
+    await adminPage.addRole('creatorStoryViewer', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
     var checkpointCelebrationFlag = (
-      await adminPage.getCheckpointCelebrationFeatureElement());
-    await adminPage.enableFeatureForTest(checkpointCelebrationFlag);
+      await releaseCoordinatorPage.getCheckpointCelebrationFeatureElement());
+    await releaseCoordinatorPage.enableFeatureForTest(
+      checkpointCelebrationFlag);
 
     await createDummyExploration();
     var handle = await browser.getWindowHandle();

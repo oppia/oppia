@@ -111,15 +111,6 @@ describe('Admin Page component ', () => {
     expect(result).toBe(true);
   });
 
-  it('should check whether the admin features tab is open', () => {
-    // Setting admin features tab to be open.
-    spyOn(adminRouterService, 'isFeaturesTabOpen').and.returnValue(true);
-
-    let result = component.isFeaturesTabOpen();
-
-    expect(result).toBe(true);
-  });
-
   it('should check whether the admin roles tab is open', () => {
     // Setting admin roles tab to be open.
     spyOn(adminRouterService, 'isRolesTabOpen').and.returnValue(true);
