@@ -118,7 +118,7 @@ def get_all_platform_parameters_except_feature_flag_dicts() -> List[
         platform parameters.
     """
     return [
-        registry.Registry.get_platform_parameter(_plat_param).to_dict()
+        registry.Registry.get_platform_parameter(_plat_param.value).to_dict()
         for _plat_param in ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES
     ]
 

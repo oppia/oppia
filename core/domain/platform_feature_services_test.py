@@ -415,10 +415,10 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 ]
             )
 
-    def test_all_platform_params_should_appear_once_in_features_or_in_params_list(
+    def test_all_platform_params_should_appear_once_in_features_or_in_params_list( # pylint: disable=line-too-long
         self
     ) -> None:
-        all_params_name = registry.get_all_platform_parameter_names()
+        all_params_name = registry.Registry.get_all_platform_parameter_names()
         all_features_list = feature_services.ALL_FEATURES_LIST
         all_params_except_features_list = (
             feature_services.ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES)
