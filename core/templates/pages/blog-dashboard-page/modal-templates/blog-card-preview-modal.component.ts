@@ -23,7 +23,6 @@ import { BlogDashboardPageService } from '../services/blog-dashboard-page.servic
 import { BlogPostData } from 'domain/blog/blog-post.model';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-
 @Component({
   selector: 'oppia-blog-card-preview-modal',
   templateUrl: './blog-card-preview-modal.component.html',
@@ -37,6 +36,7 @@ export class BlogCardPreviewModalComponent
   blogPostData!: BlogPostData;
   blogPostSummary!: BlogPostSummary;
   summaryContent!: string;
+  blogHomePageLink: string = '';
   constructor(
       ngbActiveModal: NgbActiveModal,
       private blogDashboardPageService: BlogDashboardPageService,
@@ -70,5 +70,10 @@ export class BlogCardPreviewModalComponent
       this.blogPostData.lastUpdated,
       dateString,
     );
+    this.blogHomePageLink = (
+      '<a href=\"\/blog\" rel=\"noopener\" target=\"_blank\"><span>' +
+      '( link </span><span ' +
+      'class=\"fas fa-external-link-alt oppia-open-new-tab-icon\">' +
+      '</span> )</a>');
   }
 }
