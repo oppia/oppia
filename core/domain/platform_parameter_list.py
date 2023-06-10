@@ -43,6 +43,7 @@ class ParamNames(enum.Enum):
         'serial_chapter_launch_curriculum_admin_view')
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
+    LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
 
     PROMO_BAR_ENABLED = 'promo_bar_enabled'
     PROMO_BAR_MESSAGE = 'promo_bar_message'
@@ -112,6 +113,11 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
     'Exposes the Improvements Tab for creators in the exploration editor.',
+    platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_feature_flag(
+    ParamNames.LEARNER_GROUPS_ARE_ENABLED,
+    'Enable learner groups feature',
     platform_parameter_domain.FeatureStages.PROD)
 
 Registry.create_platform_parameter(

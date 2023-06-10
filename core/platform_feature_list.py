@@ -62,7 +62,8 @@ PROD_FEATURES_LIST: List[ParamNames] = [
     params.ParamNames.BLOG_PAGES,
     params.ParamNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
     params.ParamNames.DIAGNOSTIC_TEST,
-    params.ParamNames.IS_IMPROVEMENTS_TAB_ENABLED
+    params.ParamNames.IS_IMPROVEMENTS_TAB_ENABLED,
+    params.ParamNames.LEARNER_GROUPS_ARE_ENABLED
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
