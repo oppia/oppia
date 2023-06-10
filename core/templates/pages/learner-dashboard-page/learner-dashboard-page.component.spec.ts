@@ -856,6 +856,10 @@ describe('Learner dashboard page', () => {
         learnerDashboardBackendApiService, 'onClickThreadAsync')
         .and.returnValue(Promise.resolve(threadMessages));
 
+      const focusSpy = spyOn(
+        (document.querySelector(
+        '.oppia-exploration-title') as HTMLElement), 'focus');
+
       expect(component.numberOfUnreadThreads).toBe(10);
       expect(component.loadingFeedbacks).toBe(false);
 
@@ -872,6 +876,7 @@ describe('Learner dashboard page', () => {
       expect(component.numberOfUnreadThreads).toBe(6);
       expect(component.messageSummaries.length).toBe(1);
       expect(threadSpy).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalled();
     }));
 
     it('should set a new section as active when fetching message summary' +
