@@ -24,8 +24,6 @@ var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
-  var addConditionButtonLocator = '.e2e-test-add-condition-button';
-  var addFeatureRuleButtonLocator = '.e2e-test-feature-add-rule-button';
   var addNewRoleButton = $('.e2e-test-add-new-role-button');
   var adminRolesTab = $('.e2e-test-admin-roles-tab');
   var adminRolesTabContainer = $('.e2e-test-roles-tab-container');
@@ -34,18 +32,10 @@ var AdminPage = function() {
   var explorationElementsSelector = function() {
     return $$('.e2e-test-reload-exploration-row');
   };
-  var featureFlagElementsSelector = function() {
-    return $$('.e2e-test-feature-flag');
-  };
-  var featureFlagElement = $('.e2e-test-feature-flag');
-  var featureNameLocator = '.e2e-test-feature-name';
-  var featuresTab = $('.e2e-test-admin-features-tab');
-  var noRuleIndicatorLocator = '.e2e-test-no-rule-indicator';
   var progressSpinner = $('.e2e-test-progress-spinner');
   var reloadCollectionButtonsSelector = function() {
     return $$('.e2e-test-reload-collection-button');
   };
-  var removeRuleButtonLocator = '.e2e-test-remove-rule-button';
   var reloadCollectionButtonsSelector = function() {
     return $$('.e2e-test-reload-collection-button');
   };
@@ -58,10 +48,8 @@ var AdminPage = function() {
   var roleSelector = $('.e2e-test-new-role-selector');
   var roleValueOption = $('.e2e-test-role-value');
   var saveAllConfigs = $('.e2e-test-save-all-configs');
-  var saveButtonLocator = '.e2e-test-save-button';
-  var serverModeSelectorLocator = '.e2e-test-server-mode-selector';
+
   var statusMessage = $('.e2e-test-status-message');
-  var valueSelectorLocator = '.e2e-test-value-selector';
   var userRoleItemsSelector = function() {
     return $$('.e2e-test-user-role-description');
   };
@@ -168,129 +156,6 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getFeaturesTab = async function() {
-    await this.get();
-    await action.click('Admin features tab', featuresTab);
-    await waitFor.visibilityOf(
-      featureFlagElement, 'Feature flags not showing up');
-  };
-
-  this.getDummyFeatureElement = async function() {
-    var featureFlagElements = await featureFlagElementsSelector();
-    var count = featureFlagElements.length;
-    for (let i = 0; i < count; i++) {
-      var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'dummy_feature') {
-        return elem;
-      }
-    }
-
-    return null;
-  };
-
-  this.removeAllRulesOfFeature = async function(featureElement) {
-    while (!await featureElement.$(noRuleIndicatorLocator).isExisting()) {
-      await action.click(
-        'Remove feature rule button',
-        featureElement
-          .$(removeRuleButtonLocator)
-      );
-    }
-  };
-
-  // Remove this method after the end_chapter_celebration feature flag
-  // is deprecated.
-  this.getEndChapterCelebrationFeatureElement = async function() {
-    var featureFlagElements = await featureFlagElementsSelector();
-    var count = featureFlagElements.length;
-    for (let i = 0; i < count; i++) {
-      var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'end_chapter_celebration') {
-        return elem;
-      }
-    }
-
-    return null;
-  };
-
-  // Remove this method after the checkpoint_celebration feature flag
-  // is deprecated.
-  this.getCheckpointCelebrationFeatureElement = async function() {
-    var featureFlagElements = await featureFlagElementsSelector();
-    var count = featureFlagElements.length;
-    for (let i = 0; i < count; i++) {
-      var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'checkpoint_celebration') {
-        return elem;
-      }
-    }
-
-    return null;
-  };
-
-  // This function is meant to be used to enable a feature gated behind
-  // a feature flag in test mode, which is the server environment the E2E
-  // tests are run in.
-  this.enableFeatureForTest = async function(featureElement) {
-    await this.removeAllRulesOfFeature(featureElement);
-
-    await action.click(
-      'Add feature rule button',
-      featureElement
-        .$(addFeatureRuleButtonLocator)
-    );
-
-    await waitFor.visibilityOf(
-      featureElement.$(valueSelectorLocator),
-      'Value Selector takes too long to appear'
-    );
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
-      'Enabled');
-
-    await action.click(
-      'Add condition button',
-      featureElement
-        .$(addConditionButtonLocator)
-    );
-
-    await waitFor.visibilityOf(
-      featureElement.$(serverModeSelectorLocator),
-      'Value Selector takes too long to appear'
-    );
-    await (featureElement.$(serverModeSelectorLocator)).selectByVisibleText(
-      'test');
-
-    await this.saveChangeOfFeature(featureElement);
-  };
-
-  this.enableFeatureForDev = async function(featureElement) {
-    await this.removeAllRulesOfFeature(featureElement);
-
-    await action.click(
-      'Add feature rule button',
-      featureElement
-        .$(addFeatureRuleButtonLocator)
-    );
-
-    await waitFor.visibilityOf(
-      featureElement.$(valueSelectorLocator),
-      'Value Selector takes too long to appear'
-    );
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText(
-      'Enabled');
-
-    await action.click(
-      'Add condition button',
-      featureElement
-        .$(addConditionButtonLocator)
-    );
-
-    await this.saveChangeOfFeature(featureElement);
-  };
-
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();
@@ -346,17 +211,6 @@ var AdminPage = function() {
       '-remove-button-container');
     await waitFor.visibilityOf(
       removeButtonElement, 'Role removal button takes too long to appear.');
-  };
-
-  this.saveChangeOfFeature = async function(featureElement) {
-    await action.click(
-      'Save feature button',
-      featureElement
-        .$(saveButtonLocator)
-    );
-
-    await general.acceptAlert();
-    await waitFor.visibilityOf(statusMessage);
   };
 
   this.getUsersAsssignedToRole = async function(role) {
