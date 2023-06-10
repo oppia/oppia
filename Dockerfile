@@ -48,8 +48,6 @@ COPY /assets ./assets
 COPY dependencies.json .
 RUN python -m scripts.install_third_party
 
-COPY . .
+RUN python -m scripts.build
 
-EXPOSE 8181
-# CMD ["node", "./node_modules/webpack/bin/webpack.js", "--config", "webpack.dev.config.ts", "--watch"]
-# CMD ["./node_modules/.bin/ng", "build", "--watch"]
+COPY . .
