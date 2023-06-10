@@ -2135,6 +2135,7 @@ class TranslationSubmitterTotalContributionStats:
         today = datetime.datetime.today()
         return {
             'language_code': self.language_code,
+            'contributor_id': self.contributor_id,
             'topic_ids_with_translation_submissions': (
                 self.topic_ids_with_translation_submissions),
             'recent_review_outcomes': self.recent_review_outcomes,
@@ -2242,6 +2243,8 @@ class TranslationReviewerTotalContributionStats:
             'accepted_translations_with_reviewer_edits_count': (
                 self
                 .accepted_translations_with_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
             'rejected_translations_count': (
                 self.rejected_translations_count),
             'first_contribution_date': self.first_contribution_date,
@@ -2261,12 +2264,15 @@ class TranslationReviewerTotalContributionStats:
         today = datetime.datetime.today()
         return {
             'language_code': self.language_code,
+            'contributor_id': self.contributor_id,
             'topic_ids_with_translation_reviews': (
                 self.topic_ids_with_translation_reviews),
             'reviewed_translations_count': self.reviewed_translations_count,
             'accepted_translations_count': self.accepted_translations_count,
             'accepted_translations_with_reviewer_edits_count': (
                 self.accepted_translations_with_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
             'rejected_translations_count': self.rejected_translations_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
@@ -2286,12 +2292,9 @@ class QuestionSubmitterTotalContributionStatsDict(TypedDict):
     recent_performance: int
     overall_accuracy: float
     submitted_questions_count: int
-    submitted_question_word_count: int
     accepted_questions_count: int
     accepted_questions_without_reviewer_edits_count: int
-    accepted_question_word_count: int
     rejected_questions_count: int
-    rejected_question_word_count: int
     first_contribution_date: datetime.date
     last_contribution_date: datetime.date
 
@@ -2307,12 +2310,9 @@ class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
     recent_performance: int
     overall_accuracy: float
     submitted_questions_count: int
-    submitted_question_word_count: int
     accepted_questions_count: int
     accepted_questions_without_reviewer_edits_count: int
-    accepted_question_word_count: int
     rejected_questions_count: int
-    rejected_question_word_count: int
     first_contribution_date: datetime.date
     last_contributed_in_days: int
 
@@ -2389,6 +2389,7 @@ class QuestionSubmitterTotalContributionStats:
         """
         today = datetime.datetime.today()
         return {
+            'contributor_id': self.contributor_id,
             'topic_ids_with_question_submissions': (
                 self.topic_ids_with_question_submissions),
             'recent_review_outcomes': self.recent_review_outcomes,
@@ -2430,6 +2431,7 @@ class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
     topic_ids_with_question_reviews: List[str]
     reviewed_questions_count: int
     accepted_questions_count: int
+    accepted_questions_with_reviewer_edits_count: int
     rejected_questions_count: int
     first_contribution_date: datetime.date
     last_contributed_in_days: int
@@ -2498,6 +2500,7 @@ class QuestionReviewerTotalContributionStats:
         """
         today = datetime.datetime.today()
         return {
+            'contributor_id': self.contributor_id,
             'topic_ids_with_question_reviews': (
                 self.topic_ids_with_question_reviews),
             'reviewed_questions_count': self.reviewed_questions_count,
