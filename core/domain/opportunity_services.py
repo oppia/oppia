@@ -214,9 +214,7 @@ def create_exp_opportunity_summary(
 
     content_count = exploration.get_content_count()
     translation_counts = translation_services.get_translation_counts(
-        feconf.TranslatableEntityType.EXPLORATION,
-        exploration.id,
-        exploration.version
+        feconf.TranslatableEntityType.EXPLORATION, exploration
     )
 
     story_node = story.story_contents.get_node_with_corresponding_exp_id(

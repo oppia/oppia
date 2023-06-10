@@ -444,7 +444,8 @@ class SignupHandler(
                     'type': 'basestring',
                     'choices': [
                         constants.DASHBOARD_TYPE_LEARNER,
-                        constants.DASHBOARD_TYPE_CREATOR
+                        constants.DASHBOARD_TYPE_CREATOR,
+                        constants.DASHBOARD_TYPE_CONTRIBUTOR
                     ]
                 }
             },

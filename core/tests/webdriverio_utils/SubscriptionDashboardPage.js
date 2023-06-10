@@ -58,7 +58,7 @@ var SubscriptionDashboardPage = function() {
     expect(subscriptionName.length).toEqual(value);
   };
 
-  this.navigateToSubscriptionButton = async function() {
+  this.clickSubscribeButton = async function() {
     await waitFor.elementToBeClickable(
       subscriptionButton, 'Subscription button is not clickable');
     var subscribeButtonStatusBeforeClick = await subscriptionButton.getText();

@@ -1,3 +1,4 @@
+<oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
 <div *ngFor="let featureFlag of featureFlags;" class="container oppia-page-card oppia-long-text oppia-admin-features e2e-test-feature-flag">
   <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlag.name}}</h2>
   <div class="row oppia-feature-top-margin">
@@ -192,7 +193,7 @@
   </div>
 </div>
 
-<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text oppia-admin-features oppia-empty-indicator e2e-test-no-feature">
+<div *ngIf="featureFlags.length === 0 && featureFlagsAreFetched" class="oppia-page-card oppia-long-text oppia-admin-features oppia-empty-indicator e2e-test-no-feature">
   No platform features are available.
 </div>
 
