@@ -63,6 +63,7 @@ export interface ContributionsSummary {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationLengthInWords?: number;
 }
 
 export interface Opportunity {
@@ -72,6 +73,7 @@ export interface Opportunity {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationLengthInWords?: number;
 }
 
 export interface GetOpportunitiesResponse {
@@ -229,9 +231,10 @@ export class ContributionsAndReview
       }
       const translationLengthLabelRequired = (
         this.isReviewTranslationsTab() && this.activeExplorationId);
-      let translationLabelDict;
+      let translationLengthInWords;
+
       if (translationLengthLabelRequired) {
-        translationLabelDict = this.computeTranslationLengthLabel(
+        translationLengthInWords = this.computeTranslationLengthLabel(
           suggestion.exploration_content_html);
       }
       const requiredData = {
@@ -247,10 +250,8 @@ export class ContributionsAndReview
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
-        translationLengthLabelText: (
-          translationLengthLabelRequired ? translationLabelDict.label : null),
         translationLengthInWords: (
-          translationLengthLabelRequired ? translationLabelDict.length : null)
+          translationLengthLabelRequired ? translationLengthInWords : null)
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -548,22 +549,11 @@ export class ContributionsAndReview
       .reloadOpportunitiesEventEmitter.emit();
   }
 
-  computeTranslationLengthLabel(translationHtml: string): {
-    label: string; length: number; } {
+  computeTranslationLengthLabel(translationHtml: string): number {
     const translationLength = this.htmlLengthService.
       computeHtmlLengthInWords(translationHtml);
-    let translationLabel = '';
 
-    if (translationLength <= 20) {
-      translationLabel = 'short';
-    } else {
-      translationLabel = 'long';
-    }
-
-    return {
-      label: translationLabel,
-      length: translationLength
-    };
+    return translationLength;
   }
 
   ngOnInit(): void {

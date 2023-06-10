@@ -1098,7 +1098,8 @@ describe('Contributions and review component', () => {
             subheading: 'Skill description',
             labelText: 'Awaiting review',
             labelColor: '#eeeeee',
-            actionButtonTitle: 'Review'
+            actionButtonTitle: 'Review',
+            translationLengthInWords: undefined
           }]);
           expect(more).toEqual(false);
         });
@@ -1149,7 +1150,8 @@ describe('Contributions and review component', () => {
             subheading: 'topic_name / story_title / chapter_title',
             labelText: 'Obsolete',
             labelColor: '#e76c8c',
-            actionButtonTitle: 'View'
+            actionButtonTitle: 'View',
+            translationLengthInWords: null
           }]);
           expect(more).toEqual(false);
         });
@@ -1182,13 +1184,15 @@ describe('Contributions and review component', () => {
               id: '1',
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
-              actionButtonTitle: 'Translations'
+              actionButtonTitle: 'Translations',
+              translationLengthInWords: null
             } as Opportunity,
             {
               id: '2',
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
-              actionButtonTitle: 'Translations'
+              actionButtonTitle: 'Translations',
+              translationLengthInWords: null
             } as Opportunity
           ]);
           expect(more).toEqual(false);
@@ -1296,7 +1300,8 @@ describe('Contributions and review component', () => {
           subheading: 'Skill description',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
-          actionButtonTitle: 'Review'
+          actionButtonTitle: 'Review',
+          translationLengthInWords: undefined
         }]);
         expect(more).toEqual(false);
       });
@@ -1310,7 +1315,8 @@ describe('Contributions and review component', () => {
           subheading: 'Skill description',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
-          actionButtonTitle: 'Review'
+          actionButtonTitle: 'Review',
+          translationLengthInWords: undefined
         }]);
         expect(more).toEqual(false);
       });
@@ -1325,7 +1331,8 @@ describe('Contributions and review component', () => {
           subheading: 'Skill description',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
-          actionButtonTitle: 'Review'
+          actionButtonTitle: 'Review',
+          translationLengthInWords: undefined
         }]);
         expect(more).toEqual(false);
       });
@@ -1420,7 +1427,8 @@ describe('Contributions and review component', () => {
           subheading: 'topic_name / story_title / chapter_title',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
-          actionButtonTitle: 'Review'
+          actionButtonTitle: 'Review',
+          translationLengthInWords: 1
         }]);
       }));
 
@@ -1465,7 +1473,8 @@ describe('Contributions and review component', () => {
           subheading: 'skill_description',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
-          actionButtonTitle: 'Review'
+          actionButtonTitle: 'Review',
+          translationLengthInWords: undefined
         }]);
       }));
     });
