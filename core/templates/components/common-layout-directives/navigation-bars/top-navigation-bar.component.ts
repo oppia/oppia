@@ -214,6 +214,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
       });
 
+    if (this.userIsLoggedIn) {
     let dashboardFeedbackUpdatesDataPromise = (
       this.feedbackUpdatesBackendApiService
         .fetchFeedbackUpdatesDataAsync(
@@ -230,6 +231,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         }
       }
     );
+    }
 
     let service = this.classroomBackendApiService;
     service.fetchClassroomPromosAreEnabledStatusAsync().then(
