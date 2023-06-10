@@ -69,7 +69,14 @@
         </p>
       </a>
       <img [src]="bookImageUrl" alt="book image" class="oppia-svg-book-image" *ngIf="editGoalsTopicClassification[i] == 1" ngbTooltip="You have completed this topic.">
-      <mat-checkbox aria-label="{{ topic.name }} checkbox" color="primary" *ngIf="editGoalsTopicClassification[i] == 2" class="oppia-checkbox e2e-test-add-topic-to-current-goals-button" (click)="addToLearnerGoals(topic, topic.id, i)" [disabled]="this.currentGoals.length == this.MAX_CURRENT_GOALS_LENGTH"></mat-checkbox>
+      <mat-checkbox aria-label="{{ topic.name }}
+                    checkbox"
+                    color="primary"
+                    *ngIf="editGoalsTopicClassification[i] == 2"
+                    class="oppia-checkbox e2e-test-add-topic-to-current-goals-button
+                    (click)="addToLearnerGoals(topic, topic.id, i)"
+                    [disabled]="this.currentGoals.length == this.MAX_CURRENT_GOALS_LENGTH">
+       </mat-checkbox>
       <mat-checkbox aria-label="{{ topic.name }} checkbox is disabled" color="primary" *ngIf="editGoalsTopicClassification[i] == 0" checked disabled class="oppia-checkbox"></mat-checkbox>
     </div>
   </div>
