@@ -26,10 +26,6 @@ import {
   CreatorTopicSummary,
   CreatorTopicSummaryBackendDict
 } from 'domain/topic/creator-topic-summary.model';
-import {
-  PlatformParameter,
-  PlatformParameterBackendDict
-} from 'domain/platform_feature/platform-parameter.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { Schema } from 'services/schema-default-value.service';
@@ -128,7 +124,6 @@ export interface AdminPageDataBackendDict {
   'viewable_roles': string[];
   'human_readable_roles': HumanReadableRolesBackendResponse;
   'topic_summaries': CreatorTopicSummaryBackendDict[];
-  'feature_flags': PlatformParameterBackendDict[];
 }
 
 export interface AdminPageData {
@@ -141,7 +136,6 @@ export interface AdminPageData {
   viewableRoles: string[];
   humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
-  featureFlags: PlatformParameter[];
 }
 
 @Injectable({
@@ -166,11 +160,7 @@ export class AdminBackendApiService {
           humanReadableRoles: response.human_readable_roles,
           viewableRoles: response.viewable_roles,
           topicSummaries: response.topic_summaries.map(
-            CreatorTopicSummary.createFromBackendDict),
-          featureFlags: response.feature_flags.map(
-            dict => PlatformParameter.createFromBackendDict(
-              dict)
-          )
+            CreatorTopicSummary.createFromBackendDict)
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
