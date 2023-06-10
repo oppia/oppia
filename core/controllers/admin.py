@@ -375,13 +375,7 @@ class AdminHandler(
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            else:
-                # The handler schema defines the possible values of 'action'.
-                # If 'action' has a value other than those defined in the
-                # schema, a Bad Request error will be thrown. Hence, 'action'
-                # must be 'rollback_exploration_to_safe_state' if this branch is
-                # executed.
-                assert action == 'rollback_exploration_to_safe_state'
+            elif action == 'rollback_exploration_to_safe_state':
                 exp_id = self.normalized_payload.get('exp_id')
                 if exp_id is None:
                     raise Exception(
