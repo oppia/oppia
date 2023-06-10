@@ -2027,7 +2027,7 @@ class TranslationSubmitterTotalContributionStatsDict(TypedDict):
 
 class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationSubmitterTotalContributionStats
-    object.
+    object for frontend.
     """
 
     language_code: str
@@ -2178,7 +2178,7 @@ class TranslationReviewerTotalContributionStatsDict(TypedDict):
 
 class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationReviewerTotalContributionStats
-    object.
+    object for frontend.
     """
 
     language_code: str
@@ -2424,7 +2424,7 @@ class QuestionReviewerTotalContributionStatsDict(TypedDict):
 
 class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the QuestionReviewerTotalContributionStats
-    object.
+    object for frontend.
     """
 
     contributor_id: str
