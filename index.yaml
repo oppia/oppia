@@ -456,3 +456,55 @@ indexes:
   - name: suggestion_type
   - name: target_id
   - name: author_id
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: last_contribution_date
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: last_contribution_date
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: recent_performance
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: recent_performance
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: overall_accuracy
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: overall_accuracy
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: submitted_translations_count
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: submitted_translations_count
+    direction: desc

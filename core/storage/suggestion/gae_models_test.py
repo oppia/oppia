@@ -4550,6 +4550,122 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 4)
 
+    def test_fetch_page_covering_all_branches(self) -> None:
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_1',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=10,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(65))
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_2',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=20,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.datetime.utcnow()
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_3',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=30,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=datetime.datetime.utcnow()
+        ).put()
+        suggestion_models.TranslationReviewerTotalContributionStatsModel(
+            id='model_4',
+            language_code='hi',
+            contributor_id=self.USER_ID_1,
+            topic_ids_with_translation_reviews=(
+                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=(
+                self.REJECTED_TRANSLATIONS_COUNT),
+            first_contribution_date=datetime.datetime.utcnow(),
+            last_contribution_date=(
+                datetime.date.today() - datetime.timedelta(65))
+        ).put()
+
+        # Check for last_acitvity filter within 7 days.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+            page_size=2,
+            offset=0,
+            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingReviewedTranslations'],
+            num_days_since_last_activity=7,
+            language_code='es'
+            ))
+        self.assertEqual(sorted_results[0].id, 'model_2')
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 3)
+
+        # Check for last_acitvity filter within 90 days.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
+                    'IncreasingReviewedTranslations'],
+            num_days_since_last_activity=90,
+            language_code='es'
+            ))
+        self.assertEqual(sorted_results[0].id, 'model_1')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 1)
+
+        # Check for no sorted_results within 7 days.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationReviewerTotalContributionStatsModel
+            .fetch_page(
+            page_size=1,
+            offset=0,
+            sort_by=None,
+            num_days_since_last_activity=7,
+            language_code='hi'
+            ))
+        self.assertEqual(len(sorted_results), 0)
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 1)
+
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel.create(
             language_code=self.LANGUAGE_CODE,

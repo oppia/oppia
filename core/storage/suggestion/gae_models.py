@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import enum
 
 from core import feconf
 from core.constants import constants
@@ -136,7 +137,7 @@ COMMUNITY_CONTRIBUTION_STATS_MODEL_ID: Final = 'community_contribution_stats'
 NUM_MODELS_PER_FETCH: Final = 500
 
 
-class SortChoice():
+class SortChoices(enum.Enum):
     """Enum for Sort Options available in Contributor Admin Dashboard"""
 
     SORT_KEY_INCREASING_LAST_ACTIVITY = 'IncreasingLastActivity'
@@ -2026,8 +2027,8 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     """Records the Total Translation contribution stats and data of
     recent_review keyed per (language_code, contributor_id) tuple.
-    Its IDs will be in the following
-        structure: [language_code].[contributor_id]
+    Its IDs will be in the following structure:
+    [language_code].[contributor_id]
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -2192,7 +2193,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls, language_code: str, contributor_id: str
     ) -> Optional[TranslationSubmitterTotalContributionStatsModel]:
         """Gets the TranslationSubmitterTotalContributionStatsModel
-        matching the supplied language_code, contributor_id.
+        matching the supplied language_code and contributor_id.
 
         Args:
             language_code: str. ISO 639-1 language code.
@@ -2213,7 +2214,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoice],
+        sort_by: Optional[SortChoices],
         topic_ids: Optional[List[str]],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
@@ -2226,7 +2227,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             language_code: str. The language code to get results for.
-            sort_by: SortChoice|None. A string indicating how to sort the
+            sort_by: SortChoices|None. A string indicating how to sort the
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats.
@@ -2248,35 +2249,35 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         sort_options_dict = {
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_LAST_ACTIVITY
+                SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value
             ]:
                 -cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_LAST_ACTIVITY
+                SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value
             ]:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_PERFORMANCE
+                SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value
             ]:
                 cls.recent_performance,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_PERFORMANCE
+                SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value
             ]:
                 -cls.recent_performance,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_ACCURACY
+                SortChoices.SORT_KEY_DECREASING_ACCURACY.value
             ]:
                 -cls.overall_accuracy,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_ACCURACY
+                SortChoices.SORT_KEY_INCREASING_ACCURACY.value
             ]:
                 cls.overall_accuracy,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_SUBMISSIONS
+                SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value
             ]:
                 -cls.submitted_translations_count,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_SUBMISSIONS
+                SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value
             ]:
                 cls.submitted_translations_count
         }
@@ -2654,7 +2655,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoice],
+        sort_by: Optional[SortChoices],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
@@ -2666,7 +2667,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             language_code: str. The language code to get results for.
-            sort_by: SortChoice|None. A string indicating how to sort the
+            sort_by: SortChoices|None. A string indicating how to sort the
                 result.
             num_days_since_last_activity: int|None. To get number of users
                 who are active in num_days_since_last_activity.
@@ -2686,19 +2687,19 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         sort_options_dict = {
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_LAST_ACTIVITY
+                SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value
             ]:
                 -cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_LAST_ACTIVITY
+                SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value
             ]:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS
+                SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value
             ]:
                 cls.reviewed_translations_count,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS
+                SortChoices.SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS.value
             ]:
                 -cls.reviewed_translations_count
         }
@@ -2986,7 +2987,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoice],
+        sort_by: Optional[SortChoices],
         topic_ids: Optional[List[str]],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
@@ -2998,7 +2999,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
-            sort_by: SortChoice|None. A string indicating how to sort the
+            sort_by: SortChoices|None. A string indicating how to sort the
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats.
@@ -3020,35 +3021,35 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
         sort_options_dict = {
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_LAST_ACTIVITY
+                SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value
             ]:
                 -cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_LAST_ACTIVITY
+                SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value
             ]:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_PERFORMANCE
+                SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value
             ]:
                 cls.recent_performance,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_PERFORMANCE
+                SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value
             ]:
                 -cls.recent_performance,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_ACCURACY
+                SortChoices.SORT_KEY_DECREASING_ACCURACY.value
             ]:
                 -cls.overall_accuracy,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_ACCURACY
+                SortChoices.SORT_KEY_INCREASING_ACCURACY.value
             ]:
                 cls.overall_accuracy,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_SUBMISSIONS
+                SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value
             ]:
                 -cls.submitted_questions_count,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_SUBMISSIONS
+                SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value
             ]:
                 cls.submitted_questions_count
         }
@@ -3301,7 +3302,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoice],
+        sort_by: Optional[SortChoices],
         num_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
@@ -3312,7 +3313,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             page_size: int. Number of models to fetch.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
-            sort_by: SortChoice|None. A string indicating how to sort the
+            sort_by: SortChoices|None. A string indicating how to sort the
                 result.
             num_days_since_last_activity: int|None. To get number of users
                 who are active in num_days_since_last_activity.
@@ -3332,19 +3333,19 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
         sort_options_dict = {
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_LAST_ACTIVITY
+                SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value
             ]:
                 -cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_LAST_ACTIVITY
+                SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value
             ]:
                 cls.last_contribution_date,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_INCREASING_REVIEWED_QUESTIONS
+                SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value
             ]:
                 cls.reviewed_questions_count,
             constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoice.SORT_KEY_DECREASING_REVIEWED_QUESTIONS
+                SortChoices.SORT_KEY_DECREASING_REVIEWED_QUESTIONS.value
             ]:
                 -cls.reviewed_questions_count
         }
