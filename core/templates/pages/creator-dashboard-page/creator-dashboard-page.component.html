@@ -1,7 +1,7 @@
 <background-banner></background-banner>
 <div class="oppia-dashboard-container position-relative">
   <div class="oppia-dashboard-title"
-    [ngClass]="{'oppia-dashboard-title-mobile': checkTabletView(), 'oppia-dashboard-title-desktop': !checkTabletView()}"
+    [ngClass]="{'oppia-dashboard-title-mobile': checkTabletView(), 'oppia-dashboard-title-desktop': !checkTabletView()}">
     <h1 tabindex="0" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h1>
     <oppia-create-activity-button></oppia-create-activity-button>
   </div>
