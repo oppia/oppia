@@ -3926,6 +3926,7 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     REVIEWED_TRANSLATIONS_COUNT: Final = 2
     ACCEPTED_TRANSLATIONS_COUNT: Final = 1
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 1
     REJECTED_TRANSLATIONS_COUNT: Final = 0
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
@@ -3957,6 +3958,7 @@ class TranslationReviewerTotalContributionStatsUnitTests(
             self.REVIEWED_TRANSLATIONS_COUNT,
             self.ACCEPTED_TRANSLATIONS_COUNT,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
             self.REJECTED_TRANSLATIONS_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )
@@ -3995,7 +3997,7 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
             'submitted_questions_count': (
                 self.SUBMITTED_QUESTIONS_COUNT),
             'accepted_questions_count': (
-                self.ACCEPTED_questionS_COUNT),
+                self.ACCEPTED_QUESTIONS_COUNT),
             'accepted_questions_without_reviewer_edits_count': (
                 self
                 .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),

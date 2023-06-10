@@ -2137,6 +2137,9 @@ class TranslationSubmitterTotalContributionStats:
             'language_code': self.language_code,
             'topic_ids_with_translation_submissions': (
                 self.topic_ids_with_translation_submissions),
+            'recent_review_outcomes': self.recent_review_outcomes,
+            'recent_performance': self.recent_performance,
+            'overall_accuracy': self.overall_accuracy,
             'submitted_translations_count': self.submitted_translations_count,
             'submitted_translation_word_count': (
                 self.submitted_translation_word_count),
@@ -2356,15 +2359,18 @@ class QuestionSubmitterTotalContributionStats:
         """
         return {
             'contributor_id': self.contributor_id,
-            'topic_ids_with_question_reviews': (
-                self.topic_ids_with_question_reviews),
-            'reviewed_questions_count': (
-                self.reviewed_questions_count),
+            'topic_ids_with_question_submissions': (
+                self.topic_ids_with_question_submissions),
+            'recent_review_outcomes': self.recent_review_outcomes,
+            'recent_performance': self.recent_performance,
+            'overall_accuracy': self.overall_accuracy,
+            'submitted_questions_count': (
+                self.submitted_questions_count),
             'accepted_questions_count': (
                 self.accepted_questions_count),
-            'accepted_questions_with_reviewer_edits_count': (
+            'accepted_questions_without_reviewer_edits_count': (
                 self
-                .accepted_questions_with_reviewer_edits_count),
+                .accepted_questions_without_reviewer_edits_count),
             'rejected_questions_count': (
                 self.rejected_questions_count),
             'first_contribution_date': self.first_contribution_date,
@@ -2385,6 +2391,9 @@ class QuestionSubmitterTotalContributionStats:
         return {
             'topic_ids_with_question_submissions': (
                 self.topic_ids_with_question_submissions),
+            'recent_review_outcomes': self.recent_review_outcomes,
+            'recent_performance': self.recent_performance,
+            'overall_accuracy': self.overall_accuracy,
             'submitted_questions_count': self.submitted_questions_count,
             'accepted_questions_count': self.accepted_questions_count,
             'accepted_questions_without_reviewer_edits_count': (
