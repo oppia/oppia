@@ -2154,7 +2154,7 @@ class TranslationSubmitterTotalContributionStats:
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
-                (today-self.last_contribution_date).days)
+                (today - self.last_contribution_date).days)
         }
 
 
@@ -2271,7 +2271,7 @@ class TranslationReviewerTotalContributionStats:
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
-                (today-self.last_contribution_date).days)
+                (today - self.last_contribution_date).days)
         }
 
 
@@ -2402,7 +2402,7 @@ class QuestionSubmitterTotalContributionStats:
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
-                (today-self.last_contribution_date).days)
+                (today - self.last_contribution_date).days)
         }
 
 
@@ -2508,5 +2508,5 @@ class QuestionReviewerTotalContributionStats:
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
-                (today-self.last_contribution_date).days)
+                (today - self.last_contribution_date).days)
         }
