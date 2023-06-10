@@ -2189,7 +2189,7 @@ class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
     accepted_translations_with_reviewer_edits_count: int
     accepted_translation_word_count: int
     rejected_translations_count: int
-    first_contribution_date: datetime.date
+    first_contribution_date: str
     last_contributed_in_days: int
 
 
@@ -2313,7 +2313,7 @@ class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
     accepted_questions_count: int
     accepted_questions_without_reviewer_edits_count: int
     rejected_questions_count: int
-    first_contribution_date: datetime.date
+    first_contribution_date: str
     last_contributed_in_days: int
 
 
@@ -2433,7 +2433,7 @@ class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
     accepted_questions_count: int
     accepted_questions_with_reviewer_edits_count: int
     rejected_questions_count: int
-    first_contribution_date: datetime.date
+    first_contribution_date: str
     last_contributed_in_days: int
 
 
