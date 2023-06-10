@@ -38,6 +38,7 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import {HtmlLengthService} from 'services/html-length.service'
 
 export interface Suggestion {
   change: {
@@ -173,7 +174,8 @@ export class ContributionsAndReview
     private skillBackendApiService: SkillBackendApiService,
     private translationTopicService: TranslationTopicService,
     private userService: UserService,
-    private featureService: PlatformFeatureService
+    private featureService: PlatformFeatureService,
+    private htmlLengthService: HtmlLengthService
   ) {}
 
   getQuestionContributionsSummary(
@@ -225,7 +227,13 @@ export class ContributionsAndReview
           details.topic_name + ' / ' + details.story_title +
           ' / ' + details.chapter_title);
       }
-
+      const translationLengthLabelRequired = (
+        this.isReviewTranslationsTab() && this.activeExplorationId);
+      let translationLabelDict;
+      if (translationLengthLabelRequired) {
+        translationLabelDict = this.computeTranslationLengthLabel(
+          suggestion.exploration_content_html);
+      }
       const requiredData = {
         id: suggestion.suggestion_id,
         heading: this.getTranslationSuggestionHeading(suggestion),
@@ -238,7 +246,11 @@ export class ContributionsAndReview
           this.SUGGESTION_LABELS[suggestion.status].text),
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
-          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
+          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
+        translationLengthLabelText: (
+          translationLengthLabelRequired ? translationLabelDict.label : null),
+        translationLengthInWords: (
+          translationLengthLabelRequired ? translationLabelDict.length : null)
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -534,6 +546,24 @@ export class ContributionsAndReview
     this.reviewableQuestionsSortKey = sortKey;
     this.contributionOpportunitiesService
       .reloadOpportunitiesEventEmitter.emit();
+  }
+
+  computeTranslationLengthLabel(translationHtml: string): {
+    label: string; length: number; } {
+    const translationLength = this.htmlLengthService.
+      computeHtmlLengthInWords(translationHtml);
+    let translationLabel = '';
+
+    if (translationLength <= 20) {
+      translationLabel = 'short';
+    } else {
+      translationLabel = 'long';
+    }
+
+    return {
+      label: translationLabel,
+      length: translationLength
+    };
   }
 
   ngOnInit(): void {
