@@ -858,7 +858,7 @@ describe('Learner dashboard page', () => {
 
       const focusSpy = spyOn(
         (document.querySelector(
-        '.oppia-exploration-title') as HTMLElement), 'focus');
+          '.oppia-exploration-title') as HTMLElement), 'focus');
 
       expect(component.numberOfUnreadThreads).toBe(10);
       expect(component.loadingFeedbacks).toBe(false);
