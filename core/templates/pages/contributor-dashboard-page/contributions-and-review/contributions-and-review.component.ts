@@ -38,7 +38,7 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import {HtmlLengthService} from 'services/html-length.service'
+import {HtmlLengthService} from 'services/html-length.service';
 
 export interface Suggestion {
   change: {
