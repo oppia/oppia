@@ -6,20 +6,21 @@
     </p>
   </div>
   <div class="modal-body">
-    <div class="reason-select">
+    <div class="oppia-reason-select">
       <span>Select Reason:</span>
       <div ngbDropdown class="oppia-unpublishing-dropdown">
         <div ngbDropdownToggle
              aria-label="Dropdown toggle to select unpublishing reason"
              aria-haspopup="menu"
              aria-expanded="false"
-             class="selected-reason-text">
+             class="oppia-selected-reason-text">
           {{ selectedReasonText }}
         </div>
         <div ngbDropdownMenu
              class="oppia-unpublishing-dropdown-menu">
           <div ngbDropdownItem
                (click)="setReason('BAD_CONTENT')"
+               (keydown.enter)="setReason('BAD_CONTENT')"
                class="oppia-unpublishing-dropdown-item"
                tabindex="0">
             {{ badContentReasonText }}
@@ -27,6 +28,7 @@
           <hr>
           <div ngbDropdownItem
                (click)="setReason('CHAPTER_NEEDS_SPLITTING')"
+               (keydown.enter)="setReason('CHAPTER_NEEDS_SPLITTING')"
                class="oppia-unpublishing-dropdown-item"
                tabindex="0">
             {{ splitChapterReasonText }}
@@ -35,29 +37,31 @@
       </div>
     </div>
 
-    <div class="warning-and-confirmation">
-      <div class="warning-container">
+    <div class="oppia-warning-and-confirmation">
+      <div class="oppia-warning-container">
         <span>Warning:</span>
-        <div class="bad-content-warning warning-text"
+        <div class="bad-content-warning oppia-warning-text"
              *ngIf="unpublishingReason=='BAD_CONTENT'"
              tabindex="0"
              role="alert">
           “Please edit the existing explorations instead of adding/deleting new ones, to avoid inadvertently impacting learners' progress”
         </div>
-        <div class="split-chapters-warning warning-text"
+        <div class="split-chapters-warning oppia-warning-text"
              *ngIf="unpublishingReason=='CHAPTER_NEEDS_SPLITTING'"
              tabindex="0"
              role="alert">
           “Please note that learners' overall progress score will decrease if some of the content they've played gets moved to a new exploration.”
         </div>
       </div>
-      <div class="modal-buttons">
-        <button class="btn cancel-button"
-                (click)="cancel()">
+      <div class="oppia-modal-buttons">
+        <button class="btn oppia-cancel-button"
+                (click)="cancel()"
+                (keydown.enter)="cancel()">
                 Cancel
         </button>
-        <button class="btn confirm-reason-button"
-                (click)="confirm()">
+        <button class="btn oppia-confirm-reason-button"
+                (click)="confirm()"
+                (keydown.enter)="confirm()">
           Confirm and Unpublish
         </button>
       </div>
@@ -76,11 +80,13 @@
   <div class="modal-footer">
     <button class="btn btn-secondary"
             (click)="cancel()"
+            (keydown.enter)="cancel()"
             type="button">
             Cancel
     </button>
     <button class="btn btn-success e2e-test-close-save-modal-button"
-            (click)="confirm()">
+            (click)="confirm()"
+            (keydown.enter)="confirm()">
       Unpublish Story
     </button>
   </div>
@@ -92,24 +98,24 @@
     justify-content: space-between;
   }
 
-  .reason-select {
+  .oppia-reason-select {
     border: 1px solid black;
     padding: 5px;
     width: 35%;
   }
 
-  .reason-select span {
+  .oppia-reason-select span {
     font-weight: bold;
     text-decoration: underline;
   }
 
-  .reason-select .oppia-unpublishing-dropdown {
+  .oppia-reason-select .oppia-unpublishing-dropdown {
     left: 50%;
     transform: translate(-50%);
     width: 90%;
   }
 
-  .reason-select .selected-reason-text {
+  .oppia-reason-select .oppia-selected-reason-text {
     background-color: #dadada;
     margin-top: 5px;
     padding: 5px;
@@ -118,50 +124,50 @@
     word-wrap: break-word;
   }
 
-  .reason-select .oppia-unpublishing-dropdown-menu {
+  .oppia-reason-select .oppia-unpublishing-dropdown-menu {
     width: 100%;
   }
 
-  .reason-select .oppia-unpublishing-dropdown-item {
+  .oppia-reason-select .oppia-unpublishing-dropdown-item {
     cursor: pointer;
     white-space: normal;
   }
 
-  .warning-and-confirmation {
+  .oppia-warning-and-confirmation {
     display: flex;
     flex-direction: column;
     width: 60%;
   }
 
-  .warning-container {
+  .oppia-warning-container {
     border: 1px solid black;
     padding: 10px;
   }
 
-  .warning-container span {
+  .oppia-warning-container span {
     font-weight: bold;
     text-decoration: underline;
   }
 
-  .warning-container .warning-text {
+  .oppia-warning-container .oppia-warning-text {
     font-style: italic;
     line-height: 100%;
     margin-top: 5px;
   }
 
-  .modal-buttons {
+  .oppia-modal-buttons {
     display: flex;
     justify-content: space-between;
     margin-top: 15px;
   }
 
-  .modal-buttons .cancel-button {
+  .oppia-modal-buttons .oppia-cancel-button {
     background-color: #79c979;
     opacity: 80%;
     width: 40%;
   }
 
-  .modal-buttons .confirm-reason-button {
+  .oppia-modal-buttons .oppia-confirm-reason-button {
     background-color: #f1dd95;
     opacity: 80%;
     width: 55%;
@@ -173,20 +179,20 @@
       gap: 15px;
     }
 
-    .modal-body .reason-select,.warning-and-confirmation {
+    .modal-body .oppia-reason-select,.oppia-warning-and-confirmation {
       width: 100%;
     }
 
-    .modal-buttons {
+    .oppia-modal-buttons {
       flex-direction: column;
       gap: 10px;
     }
 
-    .modal-buttons .confirm-reason-button {
+    .oppia-modal-buttons .oppia-confirm-reason-button {
       width: 100%;
     }
 
-    .modal-buttons .cancel-button {
+    .oppia-modal-buttons .oppia-cancel-button {
       width: 100%;
     }
   }
