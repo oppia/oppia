@@ -21,21 +21,18 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ExplorationEditorPage = (
   require('../webdriverio_utils/ExplorationEditorPage.js'));
 var ReleaseCoordinatorPage = require(
   '../webdriverio_utils/ReleaseCoordinatorPage');
 
 describe('Improvements tab', function() {
-  let adminPage = null;
   let explorationEditorPage = null;
   let explorationEditorImprovementsTab = null;
   let releaseCoordinatorPage = null;
   let improvementsTabFeature = null;
 
   beforeAll(async() => {
-    adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     releaseCoordinatorPage = (
       new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
@@ -47,7 +44,7 @@ describe('Improvements tab', function() {
     await users.createAndLoginCurriculumAdminUser(
       'superUser@improvementsTab.com', 'superUser');
     await releaseCoordinatorPage.enableFeatureForDev(
-      explorationEditorImprovementsTab);
+      improvementsTabFeature);
     await users.logout();
   });
 
