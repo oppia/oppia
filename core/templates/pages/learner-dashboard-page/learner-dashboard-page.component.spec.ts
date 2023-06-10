@@ -406,6 +406,10 @@ describe('Learner dashboard page', () => {
       learnerGroupBackendApiService = TestBed.inject(
         LearnerGroupBackendApiService);
 
+        const mockElement = document.createElement('div');
+        mockElement.className = 'oppia-exploration-title';
+        document.body.appendChild(mockElement);
+
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
         return Promise.resolve('sample-csrf-token');
       });
