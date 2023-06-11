@@ -587,8 +587,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1']))
         # Ruling out the possibility of None for mypy type checking.
@@ -603,8 +602,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1']))
         # Ruling out the possibility of None for mypy type checking.
@@ -620,8 +618,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1']))
         # Ruling out the possibility of None for mypy type checking.
@@ -637,8 +634,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=None,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1']))
         # Ruling out the possibility of None for mypy type checking.
@@ -781,8 +777,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code]))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -796,8 +791,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code]))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -812,8 +806,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code]))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -828,8 +821,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=None,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code]))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -910,8 +902,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 1)
@@ -924,8 +915,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
@@ -939,8 +929,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
@@ -987,8 +976,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_suggestion_models.
-                    SortChoices.SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), limit)
