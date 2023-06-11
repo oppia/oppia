@@ -2132,7 +2132,6 @@ class TranslationSubmitterTotalContributionStats:
             TranslationSubmitterTotalContributionStats domain object for
             frontend.
         """
-        today = datetime.date.today()
         return {
             'language_code': self.language_code,
             'contributor_id': self.contributor_id,
@@ -2155,7 +2154,7 @@ class TranslationSubmitterTotalContributionStats:
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
-                (today - self.last_contribution_date).days)
+                (datetime.date.today() - self.last_contribution_date).days)
         }
 
 
@@ -2261,7 +2260,6 @@ class TranslationReviewerTotalContributionStats:
             TranslationReviewerTotalContributionStats domain object for
             frontend.
         """
-        today = datetime.date.today()
         return {
             'language_code': self.language_code,
             'contributor_id': self.contributor_id,
@@ -2277,7 +2275,7 @@ class TranslationReviewerTotalContributionStats:
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
-                (today - self.last_contribution_date).days)
+                (datetime.date.today() - self.last_contribution_date).days)
         }
 
 
@@ -2387,7 +2385,6 @@ class QuestionSubmitterTotalContributionStats:
             QuestionSubmitterTotalContributionStats domain object for
             frontend.
         """
-        today = datetime.date.today()
         return {
             'contributor_id': self.contributor_id,
             'topic_ids_with_question_submissions': (
@@ -2403,7 +2400,7 @@ class QuestionSubmitterTotalContributionStats:
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
-                (today - self.last_contribution_date).days)
+                (datetime.date.today() - self.last_contribution_date).days)
         }
 
 
@@ -2498,7 +2495,6 @@ class QuestionReviewerTotalContributionStats:
             QuestionReviewerTotalContributionStats domain object for
             frontend.
         """
-        today = datetime.date.today()
         return {
             'contributor_id': self.contributor_id,
             'topic_ids_with_question_reviews': (
@@ -2511,5 +2507,5 @@ class QuestionReviewerTotalContributionStats:
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
             'last_contributed_in_days': int(
-                (today - self.last_contribution_date).days)
+                (datetime.date.today() - self.last_contribution_date).days)
         }
