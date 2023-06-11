@@ -5991,6 +5991,9 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
 
 
 class SortChoicesUnitTest(test_utils.GenericTestBase):
+    """Test for checking enum SortChoices matches with values in
+    CD_ADMIN_STATS_SORT_OPTIONS in constants.ts.
+    """
 
     def test_enum_dictionary_match(self):
         for enum_member in suggestion_models.SortChoices:
