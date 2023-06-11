@@ -31,27 +31,6 @@ describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
   var libraryPage = null;
   var feedbackUpdatesPage = null;
-  var dummyExplorationIds = [];
-
-  var createDummyExplorations = async function() {
-    var EXPLORATION = {
-      category: 'Biology',
-      objective: 'The goal is to check story viewer functionality.',
-      language: 'English'
-    };
-
-    for (var i = 1; i <= 3; i++) {
-      await workflow.createAndPublishTwoCardExploration(
-        `Learner Dashboard Exploration ${i}`,
-        EXPLORATION.category,
-        EXPLORATION.objective,
-        EXPLORATION.language,
-        i === 1,
-        true
-      );
-      dummyExplorationIds.push(await general.getExplorationIdFromEditor());
-    }
-  };
 
   beforeAll(function() {
     libraryPage = new LibraryPage.LibraryPage();

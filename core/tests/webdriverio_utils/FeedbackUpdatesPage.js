@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the feedback updates page, for use in WebdriverIO
+ * @fileoverview Page object for the feedback updates , for use in WebdriverIO
  * tests.
  */
 
@@ -26,7 +26,7 @@ var FeedbackUpdatesPage = function() {
   var feedbackMessage = $('.e2e-test-feedback-message');
   var feedbackSection = $('.e2e-test-feedback-section');
   var feedbackThread = $('.e2e-test-feedback-thread');
- 
+
   var feedbackExplorationTitleElement = $('.e2e-test-feedback-exploration');
   var feedbackExplorationTitleSelector = function() {
     return $$('.e2e-test-feedback-exploration');
@@ -66,7 +66,6 @@ var FeedbackUpdatesPage = function() {
       feedbackMessage, 'Feedback Message takes too long to appear');
     expect(await feedbackMessage.getText()).toMatch(message);
   };
-
 };
 
 exports.FeedbackUpdatesPage = FeedbackUpdatesPage;
