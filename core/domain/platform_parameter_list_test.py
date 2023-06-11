@@ -38,6 +38,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'serial_chapter_launch_curriculum_admin_view',
                             'show_translation_size',
                             'is_improvements_tab_enabled',
+                            'learner_groups_are_enabled',
                             'promo_bar_enabled',
                             'promo_bar_message']
 

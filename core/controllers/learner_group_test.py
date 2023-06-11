@@ -20,7 +20,6 @@ import json
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import platform_feature_services

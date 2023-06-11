@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import platform_parameter_domain as param_domain
@@ -169,7 +168,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                     'value_when_matched': False
                 })
             ]
-        )        
+        )
         self.assertFalse(
             learner_group_services.is_learner_group_feature_enabled())
 
