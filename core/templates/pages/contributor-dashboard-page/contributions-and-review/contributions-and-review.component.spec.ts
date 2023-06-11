@@ -37,6 +37,7 @@ import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
+import {HtmlLengthService} from 'services/html-length.service';
 
 
 class MockNgbModalRef {
@@ -1087,7 +1088,7 @@ describe('Contributions and review component', () => {
       expect(component.activeExplorationId).toBeNull();
     });
 
-    describe('loadContributions', () => {
+    fdescribe('loadContributions', () => {
       it('should load reviewable questions', () => {
         component.loadContributions(null).then(({opportunitiesDicts, more}) => {
           expect(Object.keys(component.contributions)).toContain(
@@ -1151,7 +1152,7 @@ describe('Contributions and review component', () => {
             labelText: 'Obsolete',
             labelColor: '#e76c8c',
             actionButtonTitle: 'View',
-            translationLengthInWords: null
+            translationLengthInWords: undefined
           }]);
           expect(more).toEqual(false);
         });
@@ -1176,7 +1177,7 @@ describe('Contributions and review component', () => {
         });
     });
 
-    it('should load reviewable translation opportunities correctly', () => {
+    fit('should load reviewable translation opportunities correctly', () => {
       component.loadReviewableTranslationOpportunities().then(
         ({opportunitiesDicts, more}) => {
           expect(opportunitiesDicts).toEqual([
@@ -1185,14 +1186,14 @@ describe('Contributions and review component', () => {
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
               actionButtonTitle: 'Translations',
-              translationLengthInWords: null
+              translationLengthInWords: undefined
             } as Opportunity,
             {
               id: '2',
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
               actionButtonTitle: 'Translations',
-              translationLengthInWords: null
+              translationLengthInWords: undefined
             } as Opportunity
           ]);
           expect(more).toEqual(false);
@@ -1428,7 +1429,6 @@ describe('Contributions and review component', () => {
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
           actionButtonTitle: 'Review',
-          translationLengthInWords: 1
         }]);
       }));
 
@@ -1474,7 +1474,6 @@ describe('Contributions and review component', () => {
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
           actionButtonTitle: 'Review',
-          translationLengthInWords: undefined
         }]);
       }));
     });

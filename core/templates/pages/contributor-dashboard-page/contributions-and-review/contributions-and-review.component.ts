@@ -63,7 +63,6 @@ export interface ContributionsSummary {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
-  translationLengthInWords?: number;
 }
 
 export interface Opportunity {
@@ -213,7 +212,7 @@ export class ContributionsAndReview
   }
 
   getTranslationContributionsSummary(
-      suggestionIdToSuggestions: Record<string, SuggestionDetails>
+      suggestionIdTfoSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
     const translationContributionsSummaryList = [];
 
@@ -231,12 +230,9 @@ export class ContributionsAndReview
       }
       const translationLengthLabelRequired = (
         this.isReviewTranslationsTab() && this.activeExplorationId);
-      let translationLengthInWords;
 
-      if (translationLengthLabelRequired) {
-        translationLengthInWords = this.computeTranslationLengthLabel(
-          suggestion.exploration_content_html);
-      }
+        const translationLengthInWords = translationLengthLabelRequired ? this.computeTranslationLengthLabel(suggestion.exploration_content_html): null;
+
       const requiredData = {
         id: suggestion.suggestion_id,
         heading: this.getTranslationSuggestionHeading(suggestion),
@@ -251,7 +247,7 @@ export class ContributionsAndReview
         actionButtonTitle: (
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
         translationLengthInWords: (
-          translationLengthLabelRequired ? translationLengthInWords : null)
+          translationLengthLabelRequired ? translationLengthInWords : undefined)
       };
 
       translationContributionsSummaryList.push(requiredData);
