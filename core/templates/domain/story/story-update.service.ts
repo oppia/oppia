@@ -161,8 +161,8 @@ export class StoryUpdateService {
 
   _applyStoryNodePropertyChange(
       story: Story, propertyName: string,
-      nodeId: string, oldValue: string | string[] | null,
-      newValue: string | string[],
+      nodeId: string, oldValue: number | string | string[] | null,
+      newValue: number | string | string[],
       apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_PROPERTY, {
@@ -566,6 +566,128 @@ export class StoryUpdateService {
         story.getStoryContents().setNodeExplorationId(
           nodeId, oldExplorationId);
         this._storyEditorStateService.setExpIdsChanged();
+      });
+  }
+
+  /**
+   * Sets the publication status of a node in the story and records the change
+   * in the undo/redo service.
+   */
+  setStoryNodeStatus(
+      story: Story, nodeId: string, newStatus: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldStatus = storyNode.getStatus();
+
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_STATUS, nodeId,
+      oldStatus, newStatus,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeStatus(nodeId, newStatus);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeStatus(nodeId, oldStatus);
+      });
+  }
+
+  /**
+   * Sets the planned publication date (in msecs) of a node in the story and
+   * records the change in the undo/redo service.
+   */
+  setStoryNodePlannedPublicationDateMsecs(
+      story: Story, nodeId: string,
+      newPlannedPublicationDateMsecs: number): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldPlannedPublicationDateMsecs =
+        storyNode.getPlannedPublicationDateMsecs();
+
+    this._applyStoryNodePropertyChange(
+      story,
+      StoryDomainConstants.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE_MSECS,
+      nodeId,
+      oldPlannedPublicationDateMsecs, newPlannedPublicationDateMsecs,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodePlannedPublicationDateMsecs(
+          nodeId, newPlannedPublicationDateMsecs);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodePlannedPublicationDateMsecs(
+          nodeId, oldPlannedPublicationDateMsecs);
+      });
+  }
+
+  /**
+ * Sets the last modified date and time (in msecs) of a node in the story and
+ * records the change in the undo/redo service.
+ */
+  setStoryNodeLastModifiedMsecs(
+      story: Story, nodeId: string,
+      newLastModifiedMsecs: number): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldLastModifiedMsecs = storyNode.getLastModifiedMsecs();
+
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_LAST_MODIFIED_MSECS,
+      nodeId, oldLastModifiedMsecs, newLastModifiedMsecs,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeLastModifiedMsecs(
+          nodeId, newLastModifiedMsecs);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeLastModifiedMsecs(
+          nodeId, oldLastModifiedMsecs);
+      });
+  }
+
+  /**
+ * Sets the first publication date (in msecs) of a node in the story and
+ * records the change in the undo/redo service.
+ */
+  setStoryNodeFirstPublicationDateMsecs(
+      story: Story, nodeId: string,
+      newFirstPublicationDateMsecs: number): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldFirstPublicationDateMsecs =
+      storyNode.getFirstPublicationDateMsecs();
+
+    this._applyStoryNodePropertyChange(
+      story,
+      StoryDomainConstants.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE_MSECS,
+      nodeId, oldFirstPublicationDateMsecs, newFirstPublicationDateMsecs,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeFirstPublicationDateMsecs(
+          nodeId, newFirstPublicationDateMsecs);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeFirstPublicationDateMsecs(
+          nodeId, oldFirstPublicationDateMsecs);
+      });
+  }
+
+  /**
+   * Sets the unpublishing reason of a node in the story and
+   * records the change in the undo/redo service.
+   */
+  setStoryNodeUnpublishingReason(
+      story: Story, nodeId: string,
+      newUnpublishingReason: string): void {
+    let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    let oldUnpublishingReason = storyNode.getUnpublishingReason();
+
+    this._applyStoryNodePropertyChange(
+      story, StoryDomainConstants.STORY_NODE_PROPERTY_UNPUBLISHING_REASON,
+      nodeId, oldUnpublishingReason, newUnpublishingReason,
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().setNodeUnpublishingReason(
+          nodeId, newUnpublishingReason);
+      }, (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().setNodeUnpublishingReason(
+          nodeId, oldUnpublishingReason);
       });
   }
 

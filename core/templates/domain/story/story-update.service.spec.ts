@@ -63,6 +63,11 @@ describe('Story update service', () => {
             outline_is_finalized: false,
             thumbnail_filename: 'fileName',
             thumbnail_bg_color: 'blue',
+            status: 'Published',
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 40,
+            first_publication_date_msecs: 20,
+            unpublishing_reason: null
           }, {
             id: 'node_2',
             title: 'Title 2',
@@ -75,6 +80,11 @@ describe('Story update service', () => {
             outline_is_finalized: true,
             thumbnail_filename: 'fileName',
             thumbnail_bg_color: 'blue',
+            status: 'Draft',
+            planned_publication_date_msecs: 10,
+            last_modified_msecs: 50,
+            first_publication_date_msecs: 10,
+            unpublishing_reason: 'Bad Content'
           }],
         next_node_id: 'node_3'
       },
@@ -537,6 +547,97 @@ describe('Story update service', () => {
       }]);
     }
   );
+
+  it('should set a story node status', () => {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getStatus()
+    ).toBe('Published');
+    storyUpdateService.setStoryNodeStatus(
+      _sampleStory, 'node_1', 'Draft');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getStatus()
+    ).toBe('Draft');
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getStatus()
+    ).toBe('Published');
+  });
+
+  it('should set a story node planned publication date', () => {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getPlannedPublicationDateMsecs()
+    ).toBe(30);
+    storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
+      _sampleStory, 'node_1', 40);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getPlannedPublicationDateMsecs()
+    ).toBe(40);
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getPlannedPublicationDateMsecs()
+    ).toBe(30);
+  });
+
+  it('should set a story node last modified', () => {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getLastModifiedMsecs()
+    ).toBe(40);
+    storyUpdateService.setStoryNodeLastModifiedMsecs(
+      _sampleStory, 'node_1', 50);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getLastModifiedMsecs()
+    ).toBe(50);
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getLastModifiedMsecs()
+    ).toBe(40);
+  });
+
+  it('should set a story node first publication date', () => {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getFirstPublicationDateMsecs()
+    ).toBe(20);
+    storyUpdateService.setStoryNodeFirstPublicationDateMsecs(
+      _sampleStory, 'node_1', 30);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getFirstPublicationDateMsecs()
+    ).toBe(30);
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[
+        0].getFirstPublicationDateMsecs()
+    ).toBe(20);
+  });
+
+  it('should set a story node unpublishing reason', () => {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getUnpublishingReason()
+    ).toBe(null);
+    storyUpdateService.setStoryNodeUnpublishingReason(
+      _sampleStory, 'node_1', 'Bad Content');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getUnpublishingReason()
+    ).toBe('Bad Content');
+
+    undoRedoService.undoChange(_sampleStory);
+
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getUnpublishingReason()
+    ).toBe(null);
+  });
 
   it('should set a story node description', () => {
     expect(
