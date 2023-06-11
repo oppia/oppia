@@ -3944,6 +3944,8 @@ class TranslationReviewerTotalContributionStatsUnitTests(
             'accepted_translations_with_reviewer_edits_count': (
                 self
                 .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
             'rejected_translations_count': (
                 self.REJECTED_TRANSLATIONS_COUNT),
             'first_contribution_date': (
