@@ -53,12 +53,13 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        parameter_registry = registry.Registry.parameter_registry
-        self.original_parameter_registry = (
-            {key: value for key, value in parameter_registry.items()})
+        self.original_parameter_registry = {
+            key: value
+            for key, value in registry.Registry.parameter_registry.items()}
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
         param_names = ['param_a', 'param_b']
+        param_name_enums = [ParamNames.PARAM_A, ParamNames.PARAM_B]
         param_names_features = ['feature_a', 'feature_b', 'feature_c']
         param_name_enums_features = [
             ParamNames.FEATURE_A, ParamNames.FEATURE_B, ParamNames.FEATURE_C]
@@ -145,6 +146,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.original_feature_name_set = (
             feature_services.ALL_FEATURES_NAMES_SET
         )
+        self.original_parameter_list = (
+            feature_services.ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES)
         # Here we use MyPy ignore because the expected type of ALL_FEATURES_LIST
         # is a list of 'PARAM_NAMES' Enum, but here for testing purposes we are
         # providing a list of 'ParamNames' enums, which causes MyPy to throw an
@@ -152,12 +155,16 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # used ignore here.
         feature_services.ALL_FEATURES_LIST = param_name_enums_features  # type: ignore[assignment]
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names_features)
+        feature_services.ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES = (
+            param_name_enums)
 
     def tearDown(self) -> None:
         super().tearDown()
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
+        feature_services.ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES = (
+            self.original_parameter_list)
         registry.Registry.parameter_registry = self.original_parameter_registry
 
     def test_get_all_platform_parameters_except_feature_flag_dicts(
@@ -425,6 +432,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
+        feature_services.ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES = (
+            self.original_parameter_list)
         registry.Registry.parameter_registry = self.original_parameter_registry
         all_params_name = registry.Registry.get_all_platform_parameter_names()
         all_features_names_list = [
