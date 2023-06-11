@@ -83,7 +83,7 @@ describe('Creator dashboard functionality', function() {
     await users.login('user2@creatorDashboard.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creatorDashboardOwner');
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_1);
     await libraryPage.playExploration(EXPLORATION_TITLE_1);
@@ -109,7 +109,7 @@ describe('Creator dashboard functionality', function() {
     await users.login('user4@creatorDashboard.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creatorDashboardOwner');
-    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.clickSubscribeButton();
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_2);
     await libraryPage.playExploration(EXPLORATION_TITLE_2);
