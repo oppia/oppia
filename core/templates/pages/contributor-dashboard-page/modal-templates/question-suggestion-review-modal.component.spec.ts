@@ -617,8 +617,8 @@ describe('Question Suggestion Review Modal component', () => {
     }];
 
     const messages = [
-      { text: 'Question submitted.' },
-      { text: 'This is a rejection.' }
+      { text: 'Question submitted.', author_username: 'Contributor' },
+      { text: 'This is a rejection.', author_username: 'Reviewer' }
     ];
     component.reviewable = false;
     component.suggestionIsRejected = true;
@@ -636,6 +636,7 @@ describe('Question Suggestion Review Modal component', () => {
     expect(component._getThreadMessagesAsync).toHaveBeenCalled();
     expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('2');
     expect(component.reviewMessage).toBe('This is a rejection.');
+    expect(component.reviewer).toBe('Reviewer');
   }));
 
   it('should allow users to navigate between suggestions', fakeAsync(()=>{
