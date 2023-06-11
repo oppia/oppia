@@ -138,7 +138,10 @@ NUM_MODELS_PER_FETCH: Final = 500
 
 
 class SortChoices(enum.Enum):
-    """Enum for Sort Options available in Contributor Admin Dashboard"""
+    """Enum for Sort Options available in Contributor Admin Dashboard.
+    Every attribute here should match with "CD_ADMIN_STATS_SORT_OPTIONS"
+    in constants.ts.
+    """
 
     SORT_KEY_INCREASING_LAST_ACTIVITY = 'IncreasingLastActivity'
     SORT_KEY_DECREASING_LAST_ACTIVITY = 'DecreasingLastActivity'
@@ -1284,7 +1287,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_user_id."""
+        """Model contains data corresponding to a user: contributor_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1524,7 +1527,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: reviewer_user_id."""
+        """Model contains data corresponding to a user: reviewer_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1741,7 +1744,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_user_id."""
+        """Model contains data corresponding to a user: contributor_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1947,7 +1950,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: reviewer_user_id."""
+        """Model contains data corresponding to a user: reviewer_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -2166,9 +2169,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def construct_id(
-        language_code: str, contributor_id: str
-    ) -> str:
+    def construct_id(language_code: str, contributor_id: str) -> str:
         """Constructs a unique ID for a
         TranslationSubmitterTotalContributionStatsModel instance.
 
@@ -2204,8 +2205,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             TranslationSubmitterTotalContributionStatsModel, or None if no
             such model instance exists.
         """
-        entity_id = cls.construct_id(
-            language_code, contributor_id)
+        entity_id = cls.construct_id(language_code, contributor_id)
         return cls.get_by_id(entity_id)
 
     @classmethod
@@ -2230,7 +2230,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
-                contributor stats.
+                contributor stats for.
             num_days_since_last_activity: int. To get number of users
                 who are active in num_days_since_last_activity.
 
@@ -2248,37 +2248,21 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
                 cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value:
                 cls.recent_performance,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value:
                 -cls.recent_performance,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_ACCURACY.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_ACCURACY.value:
                 -cls.overall_accuracy,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_ACCURACY.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_ACCURACY.value:
                 cls.overall_accuracy,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value:
                 -cls.submitted_translations_count,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value:
                 cls.submitted_translations_count
         }
 
@@ -2589,9 +2573,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def construct_id(
-        language_code: str, contributor_id: str
-    ) -> str:
+    def construct_id(language_code: str, contributor_id: str) -> str:
         """Constructs a unique ID for a
         TranslationReviewerTotalContributionStatsModel instance.
 
@@ -2627,8 +2609,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             TranslationReviewerTotalContributionStatsModel, or None
             if no such model instance exists.
         """
-        entity_id = cls.construct_id(
-            language_code, contributor_id)
+        entity_id = cls.construct_id(language_code, contributor_id)
         return cls.get_by_id(entity_id)
 
     @classmethod
@@ -2686,21 +2667,13 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
                 cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value:
                 cls.reviewed_translations_count,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS.value:
                 -cls.reviewed_translations_count
         }
 
@@ -2772,7 +2745,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_id."""
+        """Model contains data corresponding to a user: contributor_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -3002,7 +2975,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
-                stats.
+                stats for.
             num_days_since_last_activity: int|None. To get number of users
                 who are active in num_days_since_last_activity.
 
@@ -3020,37 +2993,21 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
                 cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value:
                 cls.recent_performance,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value:
                 -cls.recent_performance,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_ACCURACY.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_ACCURACY.value:
                 -cls.overall_accuracy,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_ACCURACY.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_ACCURACY.value:
                 cls.overall_accuracy,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value:
                 -cls.submitted_questions_count,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value:
                 cls.submitted_questions_count
         }
 
@@ -3110,7 +3067,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_id."""
+        """Model contains data corresponding to a user: contributor_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -3332,21 +3289,13 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
                 -cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
                 cls.last_contribution_date,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value
-            ]:
+            SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value:
                 cls.reviewed_questions_count,
-            constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                SortChoices.SORT_KEY_DECREASING_REVIEWED_QUESTIONS.value
-            ]:
+            SortChoices.SORT_KEY_DECREASING_REVIEWED_QUESTIONS.value:
                 -cls.reviewed_questions_count
         }
 
@@ -3400,7 +3349,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_id."""
+        """Model contains data corresponding to a user: contributor_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod

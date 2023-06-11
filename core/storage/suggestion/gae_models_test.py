@@ -3054,7 +3054,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             [translation_submitter_total_contribution_stats]
         )
 
-    def test_fetch_page_for_sorting(self) -> None:
+    def test_fetch_page_with_sorting(self) -> None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -3178,8 +3178,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingPerformance'],
+                sort_by='IncreasingPerformance',
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3196,8 +3195,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingAccuracy'],
+                sort_by='DecreasingAccuracy',
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3214,8 +3212,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingAccuracy'],
+                sort_by='IncreasingAccuracy',
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3232,8 +3229,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingSubmissions'],
+                sort_by='DecreasingSubmissions',
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3250,8 +3246,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingSubmissions'],
+                sort_by='IncreasingSubmissions',
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3267,8 +3262,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
+                sort_by='DecreasingLastActivity',
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3285,8 +3279,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
+                sort_by='IncreasingLastActivity',
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3297,7 +3290,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
-    def test_fetch_page_for_filtering(self) -> None:
+    def test_fetch_page_with_filtering(self) -> None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -3496,7 +3489,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-    def test_fetch_page_for_sorting_and_filtering(self) -> None:
+    def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -3601,8 +3594,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingPerformance'],
+                sort_by='IncreasingPerformance',
                 topic_ids=['topic1', 'topic2'],
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3619,8 +3611,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
+                sort_by='DecreasingLastActivity',
                 topic_ids=['topic1', 'topic2'],
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3631,7 +3622,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
-    def test_fetch_page_for_pagination(self) -> None:
+    def test_fetch_page_with_pagination(self) -> None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
             id='model_1',
             language_code=self.SUGGESTION_LANGUAGE_CODE,
@@ -3755,8 +3746,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=4,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingPerformance'],
+                sort_by='IncreasingPerformance',
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -4066,7 +4056,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             [translation_reviewer_total_contribution_stats]
         )
 
-    def test_fetch_page_for_sorting(self) -> None:
+    def test_fetch_page_with_sorting(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
@@ -4162,8 +4152,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedTranslations'],
+                sort_by='IncreasingReviewedTranslations',
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
@@ -4179,8 +4168,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
+                sort_by='DecreasingLastActivity',
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
@@ -4196,8 +4184,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
+                sort_by='IncreasingLastActivity',
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
@@ -4207,7 +4194,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertTrue(more)
         self.assertEqual(next_offset, 3)
 
-    def test_fetch_page_for_filtering(self) -> None:
+    def test_fetch_page_with_filtering(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
@@ -4356,7 +4343,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-    def test_fetch_page_for_sorting_and_filtering(self) -> None:
+    def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
@@ -4435,8 +4422,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=1,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
+                sort_by='IncreasingLastActivity',
                 num_days_since_last_activity=None,
                 language_code='hi'
             ))
@@ -4452,8 +4438,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedTranslations'],
+                sort_by='IncreasingReviewedTranslations',
                 num_days_since_last_activity=7,
                 language_code='es'
             ))
@@ -4462,7 +4447,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-    def test_fetch_page_for_pagination(self) -> None:
+    def test_fetch_page_with_pagination(self) -> None:
         suggestion_models.TranslationReviewerTotalContributionStatsModel(
             id='model_1',
             language_code=self.LANGUAGE_CODE,
@@ -4628,8 +4613,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
             page_size=2,
             offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslations'],
+            sort_by='IncreasingReviewedTranslations',
             num_days_since_last_activity=7,
             language_code='es'
             ))
@@ -4643,8 +4627,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
             page_size=1,
             offset=0,
-            sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                    'IncreasingReviewedTranslations'],
+            sort_by='IncreasingReviewedTranslations',
             num_days_since_last_activity=90,
             language_code='es'
             ))
@@ -4845,7 +4828,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
-    def test_fetch_page_for_sorting(self) -> None:
+    def test_fetch_page_with_sorting(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -4941,8 +4924,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingPerformance'],
+                sort_by='IncreasingPerformance',
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -4958,8 +4940,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingAccuracy'],
+                sort_by='DecreasingAccuracy',
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -4975,8 +4956,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingAccuracy'],
+                sort_by='IncreasingAccuracy',
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -4992,8 +4972,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingSubmissions'],
+                sort_by='DecreasingSubmissions',
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -5009,8 +4988,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingSubmissions'],
+                sort_by='IncreasingSubmissions',
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -5026,8 +5004,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
+                sort_by='DecreasingLastActivity',
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -5043,8 +5020,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
+                sort_by='IncreasingLastActivity',
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -5054,7 +5030,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
-    def test_fetch_page_for_filtering(self) -> None:
+    def test_fetch_page_with_filtering(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -5191,7 +5167,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 0)
 
-    def test_fetch_page_for_sorting_and_filtering(self) -> None:
+    def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -5271,8 +5247,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=1,
                 offset=1,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingPerformance'],
+                sort_by='IncreasingPerformance',
                 topic_ids=['topic1', 'topic2'],
                 num_days_since_last_activity=None
             ))
@@ -5287,8 +5262,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
+                sort_by='DecreasingLastActivity',
                 topic_ids=None,
                 num_days_since_last_activity=90
             ))
@@ -5298,7 +5272,7 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 4)
 
-    def test_fetch_page_for_pagination(self) -> None:
+    def test_fetch_page_with_pagination(self) -> None:
         suggestion_models.QuestionSubmitterTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -5462,25 +5436,25 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
         expected_data = {
-                'topic_ids_with_question_submissions': (
-                    self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
-                'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
-                'recent_performance': self.RECENT_PERFORMANCE,
-                'overall_accuracy': self.OVERALL_ACCURACY,
-                'submitted_questions_count': (
-                    self.SUBMITTED_QUESTIONS_COUNT),
-                'accepted_questions_count': (
-                    self.ACCEPTED_QUESTIONS_COUNT),
-                'accepted_questions_without_reviewer_edits_count': (
-                    self
-                    .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-                'rejected_questions_count': (
-                    self.REJECTED_QUESTIONS_COUNT
-                ),
-                'first_contribution_date': (
-                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
-                'last_contribution_date': (
-                    self.LAST_CONTRIBUTION_DATE.isoformat())
+            'topic_ids_with_question_submissions': (
+                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
+            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
+            'recent_performance': self.RECENT_PERFORMANCE,
+            'overall_accuracy': self.OVERALL_ACCURACY,
+            'submitted_questions_count': (
+                self.SUBMITTED_QUESTIONS_COUNT),
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_without_reviewer_edits_count': (
+                self
+                .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'rejected_questions_count': (
+                self.REJECTED_QUESTIONS_COUNT
+            ),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE.isoformat()),
+            'last_contribution_date': (
+                self.LAST_CONTRIBUTION_DATE.isoformat())
         }
 
         user_data = (
@@ -5543,7 +5517,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
-    def test_fetch_page_for_sorting(self) -> None:
+    def test_fetch_page_with_sorting(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -5611,8 +5585,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedQuestions'],
+                sort_by='IncreasingReviewedQuestions',
                 num_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -5627,8 +5600,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'DecreasingLastActivity'],
+                sort_by='DecreasingLastActivity',
                 num_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -5643,8 +5615,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
+                sort_by='IncreasingLastActivity',
                 num_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -5653,7 +5624,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
-    def test_fetch_page_for_filtering(self) -> None:
+    def test_fetch_page_with_filtering(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -5742,7 +5713,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-    def test_fetch_page_for_sorting_and_filtering(self) -> None:
+    def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -5796,8 +5767,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedQuestions'],
+                sort_by='IncreasingReviewedQuestions',
                 num_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -5813,8 +5783,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingReviewedQuestions'],
+                sort_by='IncreasingReviewedQuestions',
                 num_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -5829,8 +5798,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by=constants.CD_ADMIN_STATS_SORT_OPTIONS[
-                            'IncreasingLastActivity'],
+                sort_by='IncreasingLastActivity',
                 num_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -5839,7 +5807,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertTrue(more)
         self.assertEqual(next_offset, 2)
 
-    def test_fetch_page_for_pagination(self) -> None:
+    def test_fetch_page_with_pagination(self) -> None:
         suggestion_models.QuestionReviewerTotalContributionStatsModel(
             id='model_1',
             contributor_id=self.USER_ID_1,
@@ -5982,7 +5950,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 self.FIRST_CONTRIBUTION_DATE.isoformat()),
             'last_contribution_date': (
                 self.LAST_CONTRIBUTION_DATE.isoformat())
-            }
+        }
 
         user_data = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -6020,3 +5988,12 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertEqual(
             model.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+
+class SortChoicesUnitTest(test_utils.GenericTestBase):
+
+    def test_enum_dictionary_match(self):
+        for enum_member in suggestion_models.SortChoices:
+            self.assertTrue(
+                enum_member.value in constants.CD_ADMIN_STATS_SORT_OPTIONS
+            )
