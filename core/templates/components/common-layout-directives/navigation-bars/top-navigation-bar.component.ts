@@ -353,8 +353,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // Wait for userIsLoggedIn = true
-    // then call the function
+    // Wait for userIsLoggedIn = true.
     setTimeout(() => {
       this.showNumberOfUnreadfeedback();
     }, 1010);
