@@ -68,9 +68,16 @@ export class SubtopicSummaryTileComponent implements OnInit {
         }
       ), '_self'
     );
+    console.log("It is called!!!!!")
   }
 
   ngOnInit(): void {
+
+    window.addEventListener('keydown', (event: KeyboardEvent) => {
+      const focusedElement = document.activeElement as HTMLElement;
+      console.log('Focused Element:', focusedElement);
+    });
+
     this.thumbnailBgColor = this.subtopic.getThumbnailBgColor();
     this.subtopicTitle = this.subtopic.getTitle();
     let thumbnailFileName = this.subtopic.getThumbnailFilename();
