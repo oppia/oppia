@@ -587,7 +587,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1']))
         # Ruling out the possibility of None for mypy type checking.
@@ -602,7 +603,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1']))
         # Ruling out the possibility of None for mypy type checking.
@@ -618,7 +620,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1']))
         # Ruling out the possibility of None for mypy type checking.
@@ -634,7 +637,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=None,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1']))
         # Ruling out the possibility of None for mypy type checking.
@@ -777,7 +781,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE,
                 language_codes=[self.translation_language_code]))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -791,7 +796,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE,
                 language_codes=[self.translation_language_code]))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -806,7 +812,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE,
                 language_codes=[self.translation_language_code]))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -821,7 +828,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=None,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE,
                 language_codes=[self.translation_language_code]))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
@@ -902,7 +910,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 1)
@@ -915,7 +924,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
@@ -929,7 +939,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE))
         # Ruling out the possibility of None for mypy type checking.
         assert sorted_results is not None
         self.assertEqual(len(sorted_results), 2)
@@ -976,7 +987,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE))
+                sort_key=constants.SUGGESTIONS_suggestion_models.
+                    SortChoices.SORT_KEY_DATE))
         # Ruling out the possibility of None for mypy type checking.
         assert results is not None
         self.assertEqual(len(results), limit)
@@ -3178,7 +3190,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by='IncreasingPerformance',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3195,7 +3208,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by='DecreasingAccuracy',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_ACCURACY,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3212,7 +3226,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingAccuracy',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_ACCURACY,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3229,7 +3244,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='DecreasingSubmissions',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_SUBMISSIONS,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3246,7 +3262,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingSubmissions',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_SUBMISSIONS,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3262,7 +3279,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='DecreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3279,7 +3297,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3594,7 +3613,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingPerformance',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
                 topic_ids=['topic1', 'topic2'],
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3611,7 +3631,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='DecreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
                 topic_ids=['topic1', 'topic2'],
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -3746,7 +3767,8 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=4,
-                sort_by='IncreasingPerformance',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
                 topic_ids=None,
                 num_days_since_last_activity=None,
                 language_code='es'
@@ -4152,7 +4174,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by='IncreasingReviewedTranslations',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS,
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
@@ -4168,7 +4191,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='DecreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
@@ -4184,7 +4208,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by='IncreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
                 num_days_since_last_activity=None,
                 language_code='es'
             ))
@@ -4422,7 +4447,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=1,
                 offset=0,
-                sort_by='IncreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
                 num_days_since_last_activity=None,
                 language_code='hi'
             ))
@@ -4438,7 +4464,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingReviewedTranslations',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS,
                 num_days_since_last_activity=7,
                 language_code='es'
             ))
@@ -4613,7 +4640,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
             page_size=2,
             offset=0,
-            sort_by='IncreasingReviewedTranslations',
+            sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS,
             num_days_since_last_activity=7,
             language_code='es'
             ))
@@ -4627,7 +4655,8 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
             page_size=1,
             offset=0,
-            sort_by='IncreasingReviewedTranslations',
+            sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS,
             num_days_since_last_activity=90,
             language_code='es'
             ))
@@ -4924,7 +4953,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by='IncreasingPerformance',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -4940,7 +4970,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by='DecreasingAccuracy',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_ACCURACY,
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -4956,7 +4987,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=4,
                 offset=0,
-                sort_by='IncreasingAccuracy',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_ACCURACY,
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -4972,7 +5004,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by='DecreasingSubmissions',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_SUBMISSIONS,
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -4988,7 +5021,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by='IncreasingSubmissions',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_SUBMISSIONS,
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -5004,7 +5038,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='DecreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -5020,7 +5055,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
                 topic_ids=None,
                 num_days_since_last_activity=None
             ))
@@ -5247,7 +5283,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=1,
                 offset=1,
-                sort_by='IncreasingPerformance',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_PERFORMANCE,
                 topic_ids=['topic1', 'topic2'],
                 num_days_since_last_activity=None
             ))
@@ -5262,7 +5299,8 @@ class QuestionSubmitterTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='DecreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
                 topic_ids=None,
                 num_days_since_last_activity=90
             ))
@@ -5585,7 +5623,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=3,
                 offset=0,
-                sort_by='IncreasingReviewedQuestions',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS,
                 num_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 3)
@@ -5600,7 +5639,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='DecreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY,
                 num_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -5615,7 +5655,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
                 num_days_since_last_activity=None
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -5767,7 +5808,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingReviewedQuestions',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS,
                 num_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
@@ -5783,7 +5825,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingReviewedQuestions',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS,
                 num_days_since_last_activity=7
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -5798,7 +5841,8 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
             .fetch_page(
                 page_size=2,
                 offset=0,
-                sort_by='IncreasingLastActivity',
+                sort_by=suggestion_models.
+                    SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY,
                 num_days_since_last_activity=90
             ))
         self.assertEqual(len(sorted_results), 2)
