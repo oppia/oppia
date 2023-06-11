@@ -2540,7 +2540,7 @@ div#ng-curtain {
 
 .oppia-editor-warnings-indicator {
   border-style: inset;
-  border-width: 0 9px 14px 9px;
+  border-width: 0 15px 17px 15px;
   bottom: 10px;
   font-size: 0.7em;
   font-weight: bold;
@@ -2558,7 +2558,12 @@ div#ng-curtain {
   color: #fff;
 }
 .oppia-editor-warnings-count {
-  margin-left: -3px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: -3px;
+  padding-left: 0.5px;
+  padding-top: 3px;
+  text-align: center;
 }
 
 .uib-dropdown-menu.oppia-editor-warnings-box {
