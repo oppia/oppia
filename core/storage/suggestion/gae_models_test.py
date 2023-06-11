@@ -6028,7 +6028,18 @@ class SortChoicesUnitTest(test_utils.GenericTestBase):
     """
 
     def test_enum_dictionary_match(self) -> None:
+        enum_values = []
+        dict_values = []
         for enum_member in suggestion_models.SortChoices:
+            enum_values.append(enum_member.value)
             self.assertTrue(
                 enum_member.value in constants.CD_ADMIN_STATS_SORT_OPTIONS
             )
+
+        for key in constants.CD_ADMIN_STATS_SORT_OPTIONS:
+            dict_values.append(key)
+
+        enum_values.sort()
+        dict_values.sort()
+
+        self.assertEqual(enum_values, dict_values)
