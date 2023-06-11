@@ -397,7 +397,7 @@
     "I18N_DONATE_PAGE_VISION_TEXT": "To date, Oppia has served more than <b>1.5 million</b> learners around the world - many of whom come from the world's more underserved areas. Oppia relies on donations, and with <b>just $11</b>, you can help us continue our work and expand the reach of our platform, to expand equitable education for all.",
     "I18N_DONATE_PAGE_WATCH_VIDEO_BUTTON_TEXT": "Watch a video",
     "I18N_EDIT_LEARNER_GROUP_PAGE_TITLE": "Edit Learner Group | Oppia",
-    "I18N_EMPTY_FEEDBACK_UPDATES_THREADS": "Reply",
+    "I18N_EMPTY_FEEDBACK_UPDATES_THREADS": "You don’t have any active feedback threads yet. Your feedback helps improve the quality of our lessons. You can do so by starting any of our lessons and submitting your valuable feedback!",
     "I18N_EMPTY_LEARNER_GROUPS_MESSAGE": "You don’t have any group yet",
     "I18N_EMPTY_SOLUTION_MESSAGE": "Please provide the solution for the state.",
     "I18N_END_CHAPTER_MILESTONE_MESSAGE_1": "You just completed your 1st chapter!",

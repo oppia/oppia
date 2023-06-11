@@ -117,6 +117,10 @@ var suites = {
     './core/tests/webdriverio/featureGatingFlow.js'
   ],
 
+  feedbackUpdates: [
+    './core/tests/webdriverio_desktop/feedbackUpdates.js'
+  ],
+
   fileUploadExtensions: [
     './core/tests/webdriverio_desktop/fileUploadExtensions.js'
   ],
