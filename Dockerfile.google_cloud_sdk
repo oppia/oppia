@@ -16,6 +16,9 @@ RUN ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulat
 # RUN ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=localhost --port=8089 --store_on_disk=False  --consistency=1.0 /app/cloud_datastore_emulator_cache
 # RUN ../google-cloud-sdk/bin/gcloud beta emulators datastore start --project=dev-project-id --data-dir=/app/cloud_datastore_emulator_cache --host-port=localhost:8089 --consistency=1.0 --quiet --no-store-on-disk
 
+RUN apk add py3-pip
+RUN pip3 install --upgrade pip==21.2.3
+
 # COPY . .
 
 EXPOSE 8089
