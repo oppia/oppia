@@ -31,7 +31,8 @@ export enum FeatureNames {
   BlogPages = 'blog_pages',
   DiagnosticTest = 'diagnostic_test',
   SerialChapterLaunchCurriculumAdminView =
-  'serial_chapter_launch_curriculum_admin_view'
+  'serial_chapter_launch_curriculum_admin_view',
+  ShowTranslationSize = 'show_translation_size'
 }
 
 export interface FeatureStatusSummaryBackendDict {
