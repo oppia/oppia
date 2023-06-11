@@ -23,11 +23,9 @@ import { Story } from 'domain/story/story.model';
 import { StoryBackendDict } from 'domain/story/story.model';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
-import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
-
-require('domain/story/story-update.service.ts');
 
 class MockEditableStoryBackendApiService {
   newBackendStoryObject!: StoryBackendDict;
@@ -103,9 +101,6 @@ describe('Story editor state service', () => {
 
   const storyInitializedSpy = jasmine.createSpy('storyInitialized');
   const storyReinitializedSpy = jasmine.createSpy('storyReinitialized');
-
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
 
   beforeEach(() => {
     fakeEditableStoryBackendApiService = (
