@@ -33,7 +33,9 @@ export enum FeatureNames {
   DiagnosticTest = 'diagnostic_test',
   SerialChapterLaunchCurriculumAdminView =
   'serial_chapter_launch_curriculum_admin_view',
-  ShowTranslationSize = 'show_translation_size'
+  ShowTranslationSize = 'show_translation_size',
+  ShowFeedbackUpdatesInProfilepicDropdownMenu =
+  'show_feedback_updates_in_profile_pic_dropdown'
 }
 
 export interface FeatureStatusSummaryBackendDict {
