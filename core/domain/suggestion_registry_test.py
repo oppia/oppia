@@ -4200,7 +4200,7 @@ class QuestionReviewerTotalContributionStatsUnitTests(
         self.assertDictEqual(
             actual_stats.to_dict(), expected_stats_dict)
 
-    def test_create_question_reviewer_total_stats(self) -> None:
+    def test_to_frontend_dict(self) -> None:
         expected_stats_dict = {
             'contributor_id': self.USER_ID_1,
             'topic_ids_with_question_reviews': (
