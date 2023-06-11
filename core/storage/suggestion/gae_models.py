@@ -2667,13 +2667,13 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY:
                 -cls.last_contribution_date,
-            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY:
                 cls.last_contribution_date,
-            SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS.value:
+            SortChoices.SORT_KEY_INCREASING_REVIEWED_TRANSLATIONS:
                 cls.reviewed_translations_count,
-            SortChoices.SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS.value:
+            SortChoices.SORT_KEY_DECREASING_REVIEWED_TRANSLATIONS:
                 -cls.reviewed_translations_count
         }
 
@@ -2993,21 +2993,21 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY:
                 -cls.last_contribution_date,
-            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY:
                 cls.last_contribution_date,
-            SortChoices.SORT_KEY_INCREASING_PERFORMANCE.value:
+            SortChoices.SORT_KEY_INCREASING_PERFORMANCE:
                 cls.recent_performance,
-            SortChoices.SORT_KEY_DECREASING_PERFORMANCE.value:
+            SortChoices.SORT_KEY_DECREASING_PERFORMANCE:
                 -cls.recent_performance,
-            SortChoices.SORT_KEY_DECREASING_ACCURACY.value:
+            SortChoices.SORT_KEY_DECREASING_ACCURACY:
                 -cls.overall_accuracy,
-            SortChoices.SORT_KEY_INCREASING_ACCURACY.value:
+            SortChoices.SORT_KEY_INCREASING_ACCURACY:
                 cls.overall_accuracy,
-            SortChoices.SORT_KEY_DECREASING_SUBMISSIONS.value:
+            SortChoices.SORT_KEY_DECREASING_SUBMISSIONS:
                 -cls.submitted_questions_count,
-            SortChoices.SORT_KEY_INCREASING_SUBMISSIONS.value:
+            SortChoices.SORT_KEY_INCREASING_SUBMISSIONS:
                 cls.submitted_questions_count
         }
 
@@ -3289,13 +3289,13 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         """
 
         sort_options_dict = {
-            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY.value:
+            SortChoices.SORT_KEY_INCREASING_LAST_ACTIVITY:
                 -cls.last_contribution_date,
-            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY.value:
+            SortChoices.SORT_KEY_DECREASING_LAST_ACTIVITY:
                 cls.last_contribution_date,
-            SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS.value:
+            SortChoices.SORT_KEY_INCREASING_REVIEWED_QUESTIONS:
                 cls.reviewed_questions_count,
-            SortChoices.SORT_KEY_DECREASING_REVIEWED_QUESTIONS.value:
+            SortChoices.SORT_KEY_DECREASING_REVIEWED_QUESTIONS:
                 -cls.reviewed_questions_count
         }
 

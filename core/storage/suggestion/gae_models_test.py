@@ -6039,7 +6039,7 @@ class SortChoicesUnitTest(test_utils.GenericTestBase):
     CD_ADMIN_STATS_SORT_OPTIONS in constants.ts.
     """
 
-    def test_enum_dictionary_match(self):
+    def test_enum_dictionary_match(self) -> None:
         for enum_member in suggestion_models.SortChoices:
             self.assertTrue(
                 enum_member.value in constants.CD_ADMIN_STATS_SORT_OPTIONS
