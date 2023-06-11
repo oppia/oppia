@@ -41,6 +41,7 @@ from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 from core.domain import question_domain
 from core.domain import question_services
@@ -64,6 +65,12 @@ from core.domain import user_services
 from core.domain import wipeout_service
 
 from typing import Dict, List, Optional, TypedDict, Union, cast
+
+# Platform paramters that we plan to show on the the release-coordinator page.
+PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = [
+    platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value,
+    platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
+]
 
 
 class ClassroomPageDataDict(TypedDict):
@@ -246,10 +253,7 @@ class AdminHandler(
         # release coordinators in /release-coordinator page.
         platform_params_dicts = [
             param for param in platform_params_dicts
-            if (
-                param['name'] != 'promo_bar_enabled' and
-                param['name'] != 'promo_bar_message'
-            )
+            if param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE
         ]
 
         config_properties = config_domain.Registry.get_config_property_schemas()
