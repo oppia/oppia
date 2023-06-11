@@ -53,9 +53,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.original_parameter_registry = {
-            key: value
-            for key, value in registry.Registry.parameter_registry.items()}
+        self.original_parameter_registry = (
+            registry.Registry.parameter_registry.copy())
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
         param_names = ['param_a', 'param_b']
