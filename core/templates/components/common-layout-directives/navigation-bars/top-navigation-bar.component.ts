@@ -206,6 +206,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
       });
 
+    // TODO(#18362): Resolve the console error on the signup page and then
+    // add the error catch block to the 'validateAccessToClassroomPage'
+    // and 'fetchClassroomDataAsync'.
     this.accessValidationBackendApiService.validateAccessToClassroomPage(
       this.DEFAULT_CLASSROOM_URL_FRAGMENT).then(()=>{
       this.classroomBackendApiService.fetchClassroomDataAsync(
@@ -225,14 +228,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
               hackyTopicTranslationKey
             );
           }
-        }, (error) => {
-          this.alertsService.addWarning(
-            `Unable to fetch classroom page data.Error: ${error.error.error}`);
         });
-    }, (error) => {
-      this.alertsService.addWarning(
-        `Unable to check the validation access to classroom page.Error: ${
-          error.error.error}`);
     });
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to

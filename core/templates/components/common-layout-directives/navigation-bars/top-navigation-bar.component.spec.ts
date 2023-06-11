@@ -584,43 +584,6 @@ describe('TopNavigationBarComponent', () => {
     expect(component.donateMenuOffset).toBe(-10);
   }));
 
-  it('should use rejection handler when request to ' +
-  'validateAccessToClassroomPage fails', fakeAsync(() => {
-    spyOn(alertsService, 'addWarning');
-    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.reject({
-        error: {error: 'Backend error'},
-        status: 500
-      }));
-
-    component.ngOnInit();
-
-    tick();
-
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Unable to check the validation access to classroom page.Error: ' +
-      'Backend error');
-  }));
-
-  it('should use rejection handler when request to fetch classroom data fails',
-    fakeAsync(() => {
-      spyOn(alertsService, 'addWarning');
-      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-        .and.returnValue(Promise.resolve());
-      spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
-        .and.returnValue(Promise.reject({
-          error: {error: 'Backend error'},
-          status: 500
-        }));
-
-      component.ngOnInit();
-
-      tick();
-
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Unable to fetch classroom page data.Error: Backend error');
-    }));
-
   it('should fetch classroom data', fakeAsync(() => {
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
       .and.returnValue(Promise.resolve());
