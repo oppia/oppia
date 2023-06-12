@@ -11,7 +11,7 @@
         <div #dropdown class="oppia-three-dots-dropdown-container"
              (click)="toggleThreeDotsDropdown(i)">
           <i class="fa fa-ellipsis-v"></i>
-          <div *ngIf="showThreeDotsDropdown[i]" class="oppia-three-dots-dropdown">
+          <div *ngIf="indexselected == i" class="oppia-three-dots-dropdown">
             <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
               <i class="fa fa-trash"></i>
               <span>{{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}</span>
