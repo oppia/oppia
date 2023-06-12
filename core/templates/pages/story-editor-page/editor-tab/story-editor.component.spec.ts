@@ -251,10 +251,13 @@ describe('Story Editor Component having three story nodes', () => {
       currentIndex: 1,
     } as CdkDragDrop<string[]>;
 
+    expect(component.publishedChaptersDropErrorIsShown).toEqual(false);
     component.drop(event1);
-    tick();
+    expect(component.publishedChaptersDropErrorIsShown).toEqual(true);
+    tick(5000);
 
     expect(storyUpdateService.rearrangeNodeInStory).toHaveBeenCalledTimes(0);
+    expect(component.publishedChaptersDropErrorIsShown).toEqual(false);
 
     component.drop(event2);
     tick();

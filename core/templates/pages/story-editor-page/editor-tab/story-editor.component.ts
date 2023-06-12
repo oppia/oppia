@@ -74,6 +74,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   selectedChapterIndex: number;
   chapterIsPublishable: boolean[];
   selectedChapterIndexToPublishUpToInDropdown: number;
+  publishedChaptersDropErrorIsShown: boolean = false;
   NOTES_SCHEMA = {
     type: 'html',
     ui_config: {
@@ -142,6 +143,10 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
 
   drop(event: CdkDragDrop<string[]>): void {
     if (this.linearNodesList[event.currentIndex].getStatus() === 'Published') {
+      this.publishedChaptersDropErrorIsShown = true;
+      setTimeout(() => {
+        this.publishedChaptersDropErrorIsShown = false;
+      }, 5000);
       return;
     }
     this.rearrangeNodeInList(event.previousIndex, event.currentIndex);

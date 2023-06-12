@@ -1,3 +1,7 @@
+<div *ngIf="publishedChaptersDropErrorIsShown"
+     class="oppia-error-message-container">
+  Position of Published chapters cannot be changed.
+</div>
 <p class="oppia-mobile-back-to-parent e2e-test-mobile-back-to-topic" (click)="returnToTopicEditorPage()">
   <i class="fa fa-angle-left"></i>
   <span>Back to Topic</span>
@@ -280,6 +284,7 @@
                 [cdkDropListData]="linearNodesList"
                 (cdkDropListDropped)="drop($event)">
                   <tr class="chapter-list-heading">
+                    <th class="drag-handler-header"></th>
                     <th></th>
                     <th>Chapter Name</th>
                     <th>Status</th>
@@ -291,10 +296,16 @@
                       [ngClass]="{'published-node': (node.getStatus() === 'Published'),
                                  'ready-to-publish-node': (node.getStatus() === 'Ready To Publish'),
                                  'draft-node': (node.getStatus() === 'Draft')}"
+                      (click)="navigateToChapterWithId(node.getId(), idx)"
                       cdkDrag
                       [cdkDragDisabled]="node.getStatus()=='Published'"
                       [cdkDragData]="node"
                       >
+                    <td class="drag-handler" (click)="$event.stopPropagation()">
+                      <span class="fas fa-grip-vertical draggable-icon-indicator"
+                            *ngIf="node.getStatus()!=='Published'">
+                      </span>
+                    </td>
                     <td class="chapter-index"> {{ idx+1 }}. </td>
                     <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
                     <td class="chapter-status">
@@ -318,12 +329,12 @@
                            (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
                         <div class="chapter-edit-option e2e-test-move-chapter-up-button"
                              *ngIf="idx!=0 && linearNodesList[idx-1].getStatus()!='Published' && linearNodesList[idx].getStatus()!='Published'"
-                             (click)="moveNodeUpInStory(idx)">
+                             (click)="moveNodeUpInStory(idx);$event.stopPropagation()">
                           <span>Move Up</span>
                         </div>
                         <div class="chapter-edit-option e2e-test-move-chapter-down-button"
                              *ngIf="idx!=linearNodesList.length-1 && node.getStatus()!='Published'"
-                             (click)="moveNodeDownInStory(idx)">
+                             (click)="moveNodeDownInStory(idx);$event.stopPropagation()">
                           <span>Move Down</span>
                         </div>
                         <div class="chapter-edit-option e2e-test-edit-chapter-button"
@@ -331,7 +342,7 @@
                           <span>Edit</span>
                         </div>
                         <div class="chapter-edit-option e2e-test-delete-chapter-button"
-                             (click)="deleteNode(node.getId())">
+                             (click)="deleteNode(node.getId());$event.stopPropagation()">
                           <span>Delete</span>
                         </div>
                       </div>
@@ -407,6 +418,7 @@
   }
 
   .chapter-list-heading th {
+    border: 1px solid #dbdbdb;
     border-top: 4px solid black;
     font-size: 15px;
     font-weight: bold;
@@ -416,8 +428,8 @@
     word-wrap: break-word;
   }
 
-  .dndPlaceholder {
-    display: none;
+  .chapter-list-heading .drag-handler-header {
+    border: none;
   }
 
   .published-node {
@@ -449,22 +461,43 @@
     width: 95%;
   }
 
+  .story-node .drag-handler {
+    background-color: white;
+    border: none;
+    cursor: move;
+    padding: 1%;
+    width: 5%;
+  }
+
+  .draggable-icon-indicator {
+    position: absolute;
+    top: 15%;
+  }
+
   .story-node .chapter-index {
+    border: 1px solid #dbdbdb;
     font-weight: bold;
     padding-left: 5px;
-    width: 7%;
+    width: 6%;
   }
 
   .story-node .chapter-title {
+    border: 1px solid #dbdbdb;
     font-weight: bold;
-    width: 28%;
+    width: 25%;
   }
 
   .story-node .chapter-status {
+    border: 1px solid #dbdbdb;
     width: 20%;
   }
 
+  .story-node .chapter-last-modified {
+    border: 1px solid #dbdbdb;
+  }
+
   .story-node .chapter-planned-publication-date {
+    border: 1px solid #dbdbdb;
     font-weight: bold;
   }
 
@@ -484,10 +517,6 @@
   .story-node {
     cursor: pointer;
     position: relative;
-  }
-
-  .story-node:hover {
-    cursor: grab;
   }
 
   .story-editor-node:hover {
@@ -515,12 +544,7 @@
     white-space: initial;
   }
 
-  .story-nodes-container table, th, td {
-    border: 1px solid #dbdbdb;
-  }
-
   .story-nodes-container table {
-    border-right: none;
     font-size: 14px;
   }
 
@@ -536,6 +560,7 @@
   }
 
   .story-node-editor-container {
+    margin-left: 5%;
     padding: 10px 0;
   }
 
@@ -627,7 +652,7 @@
     background-color: #008098;
     color: #fff;
     font-weight: bold;
-    margin: 15px 0 15px;
+    margin: 15px 5% 15px;
     text-align: left;
   }
   .chapter-list-card-header {
@@ -676,6 +701,18 @@
   }
   .cdk-drag-placeholder {
     opacity: 0;
+  }
+
+  .oppia-error-message-container {
+    background-color: #fff;
+    border: 1px solid #00376d;
+    bottom: 30px;
+    max-width: 30%;
+    padding: 5px;
+    position: fixed;
+    right: 30px;
+    text-align: center;
+    z-index: 3000;
   }
   @media screen and (max-width: 1150px) {
     .content-container {
@@ -760,7 +797,11 @@
       padding-top: 15px;
     }
   }
-  @media screen and (max-width: 350px) {
+  @media screen and (max-width: 375px) {
+
+    .drag-handler,.drag-handler-header {
+      display: none;
+    }
     .chapter-control-bar {
       flex-direction: column;
       padding-left: 5px;
