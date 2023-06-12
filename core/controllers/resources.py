@@ -123,6 +123,10 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
                 string is encoded in the frontend using encodeURIComponent().
+
+        Raises:
+            PageNotFoundException. The page cannot be found.
+            Exception. File not found.
         """
         if not constants.EMULATOR_MODE:
             raise self.PageNotFoundException
@@ -191,6 +195,7 @@ class PromoBarHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Retrieves the configuration values for a promotional bar."""
         self.render_json({
             'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
             'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
@@ -198,6 +203,7 @@ class PromoBarHandler(
 
     @acl_decorators.can_access_release_coordinator_page
     def put(self) -> None:
+        """Updates the configuration values for a promotional bar."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
         promo_bar_enabled_value = self.normalized_payload['promo_bar_enabled']
