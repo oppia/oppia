@@ -47,6 +47,8 @@ class ParamNames(enum.Enum):
 
     PROMO_BAR_ENABLED = 'promo_bar_enabled'
     PROMO_BAR_MESSAGE = 'promo_bar_message'
+    ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = (
+        'always_ask_learners_for_answer_details')
 
 
 # Platform parameters should all be defined below.
@@ -127,7 +129,7 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamNames.PROMO_BAR_MESSAGE,
-    'The message to show to all users if the promo bar is enabled',
-    platform_parameter_domain.DataTypes.STRING
+    ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
+    'Always ask learners for answer details. For testing -- do not use',
+    platform_parameter_domain.DataTypes.BOOL
 )

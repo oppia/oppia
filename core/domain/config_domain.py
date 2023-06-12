@@ -199,6 +199,7 @@ class ConfigProperty:
     - admin_ids.
     - admin_usernames.
     - allow_yaml_file_upload.
+    - always_ask_learners_for_answer_details.
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
@@ -215,6 +216,8 @@ class ConfigProperty:
     - embedded_google_group_url.
     - featured_translation_languages.
     - full_site_url.
+    - is_improvements_tab_enabled.
+    - learner_groups_are_enabled.
     - list_of_default_tags_for_blog_post.
     - moderator_ids.
     - moderator_request_forum_url.
