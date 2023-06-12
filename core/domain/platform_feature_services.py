@@ -36,7 +36,7 @@ from core import feconf
 from core import platform_feature_list as feature_list
 from core.constants import constants
 from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
+from core.domain import platform_parameter_list as parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, List, Set
@@ -51,10 +51,10 @@ ALL_FEATURES_NAMES_SET: Set[str] = set(
     feature.value for feature in ALL_FEATURES_LIST
 )
 
-ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES: List[feature_list.ParamNames] = [
-    platform_parameter_list.ParamNames.DUMMY_PARAMETER,
-    platform_parameter_list.ParamNames.PROMO_BAR_ENABLED,
-    platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE
+ALL_PLATFORM_PARAMETERS_EXCEPT_FEATURES: List[parameter_list.ParamNames] = [
+    parameter_list.ParamNames.DUMMY_PARAMETER,
+    parameter_list.ParamNames.PROMO_BAR_ENABLED,
+    parameter_list.ParamNames.PROMO_BAR_MESSAGE
 ]
 
 
