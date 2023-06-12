@@ -110,7 +110,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   windowIsNarrow: boolean = false;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
-  numberOfUnreadThreads!: number;
+  numberOfUnreadThreads: number = 0;
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
 
 
@@ -213,26 +213,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       .then((featureIsEnabled) => {
         this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
       });
-
-    if (this.userIsLoggedIn) {
-      let feedbackUpdatesDataPromise = (
-        this.feedbackUpdatesBackendApiService
-          .fetchFeedbackUpdatesDataAsync(
-            this.paginatedThreadsList));
-      feedbackUpdatesDataPromise.then(
-        responseData => {
-          this.numberOfUnreadThreads =
-            responseData.numberOfUnreadThreads;
-        }, errorResponseStatus => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.
-              indexOf(errorResponseStatus) !== -1) {
-            this.alertsService.addWarning(
-              'Failed to get number of unread thread of feedback updates');
-          }
-        }
-      );
-    }
 
     let service = this.classroomBackendApiService;
     service.fetchClassroomPromosAreEnabledStatusAsync().then(
@@ -373,6 +353,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
+  ngAfterViewInit(): void {
+    // Wait for userIsLoggedIn = true.
+    setTimeout(() => {
+      this.showNumberOfUnreadfeedback();
+    }, 1010);
+  }
+
   ngAfterViewChecked(): void {
     this.getInvolvedMenuOffset = this
       .getDropdownOffset('.get-involved', 574);
@@ -408,6 +395,28 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       return this.OPPIA_BLOG_URL;
     } else {
       return this.MEDIUM_BLOG_URL;
+    }
+  }
+
+  showNumberOfUnreadfeedback(): void {
+    if (this.userIsLoggedIn) {
+      let feedbackUpdatesDataPromise = (
+        this.feedbackUpdatesBackendApiService
+          .fetchFeedbackUpdatesDataAsync(
+            this.paginatedThreadsList));
+      feedbackUpdatesDataPromise.then(
+        responseData => {
+          this.numberOfUnreadThreads =
+            responseData.numberOfUnreadThreads;
+        }, errorResponseStatus => {
+          if (
+            AppConstants.FATAL_ERROR_CODES.
+              indexOf(errorResponseStatus) !== -1) {
+            this.alertsService.addWarning(
+              'Failed to get number of unread thread of feedback updates');
+          }
+        }
+      );
     }
   }
 

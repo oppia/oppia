@@ -198,8 +198,8 @@ describe('TopNavigationBarComponent', () => {
     }));
 
     component.userIsLoggedIn = true;
+    component.showNumberOfUnreadfeedback();
 
-    component.ngOnInit();
     tick();
     expect(component.numberOfUnreadThreads).toBe(10);
     expect(fetchDataSpy).toHaveBeenCalled();
@@ -215,9 +215,9 @@ describe('TopNavigationBarComponent', () => {
 
       component.userIsLoggedIn = true;
 
-      component.ngOnInit();
+      component.showNumberOfUnreadfeedback();
 
-      tick(1000);
+      tick(1010);
       fixture.detectChanges();
 
       expect(alertsSpy).toHaveBeenCalledWith(

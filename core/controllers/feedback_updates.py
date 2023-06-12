@@ -51,20 +51,6 @@ class SuggestionSummaryDict(TypedDict):
     created_on_msecs: float
 
 
-class OldLearnerDashboardRedirectPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Redirects the old learner dashboard URL to the new one."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.redirect(feconf.FEEDBACK_UPDATES_URL, permanent=True)
-
-
 class FeedbackUpdatesPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
