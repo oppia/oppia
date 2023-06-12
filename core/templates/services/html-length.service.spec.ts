@@ -96,11 +96,10 @@ describe('Html Length Service', () => {
       ';quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_2023' +
       '0602_112152_9d1d0gzhm9_height_3d323_width_2d495_vertical_1d07.' +
       'svg&amp;quot;}\"></oppia-noninteractive-math></p>';
-    const expectedLength = 14;
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
 
-    expect(result).toBe(expectedLength);
+    expect(result).toBe(14);
   });
 
   it('should compute length of content with both text and non-text' +
@@ -111,32 +110,28 @@ describe('Html Length Service', () => {
       'h&amp;quot;" filepath-with-value="&amp;quot;img_20230602_111340' +
       '_gsmh599zj6_height_150_width_113.svg&amp;quot;" ng-version="11.2' +
       '.14"></oppia-noninteractive-image>';
-    const expectedLength = 9;
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
 
-    expect(result).toBe(expectedLength);
+    expect(result).toBe(9);
   });
 
   fit('should compute length of content of ordered lists', () => {
     const htmlString = '<ol><li>This is the first item</li><li> This is' +
       ' second item</li><li> This is the third item</li></ol>';
 
-    const expectedLength = 14;
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
 
-    expect(result).toBe(expectedLength);
+    expect(result).toBe(14);
   });
 
   fit('should compute length of content of unordered lists', () => {
     const htmlString = '<ul><li>This is the first item</li><li> This is' +
       ' second item</li><li> This is the third item</li></ul>';
 
-    const expectedLength = 14;
-
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
 
-    expect(result).toBe(expectedLength);
+    expect(result).toBe(14);
   });
 });
