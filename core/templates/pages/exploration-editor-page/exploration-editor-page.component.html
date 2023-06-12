@@ -14,14 +14,17 @@
     <div class="navbar-icons">
       <ul [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
-        <li href="#" class="nav-link navbar-tab e2e-test-main-tab" [ngbTooltip]="'Editor'" placement="{{countWarnings() ? 'left' : 'bottom'}}"
+        <li href="#"
+            class="nav-link navbar-tab e2e-test-main-tab"
+            [ngbTooltip]="'Editor'"
+            placement="{{countWarnings() ? 'left' : 'bottom'}}"
             aria-label="Exploration Editor Button">
           <i class="fas fa-pen navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'main'}"></i>
         </li>
         <li [hidden]="!(countWarnings())" class="oppia-editor-warnings-indicator"
             (mouseover)="isWarningsAreShown(true)"
             (mouseleave)="isWarningsAreShown(false)"
-             [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+            [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
           <li class="oppia-editor-warnings-count">
             {{ countWarnings() }}
           </li>
@@ -29,12 +32,12 @@
             <li class="oppia-editor-warnings-header">Warnings</li>
             <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(); index as index">
               <hr class="oppia-editor-warnings-separator">
-              <li *ngIf="warning && (warning.type === 'critical')">
-                <strong>{{ warning.message }}</strong>
-              </li>
-              <li *ngIf="warning && (warning.type !== 'critical')">
-                {{ warning.message }}
-              </li>
+              <ng-container *ngIf="warning && (warning.type === 'critical')">
+                <li><strong>{{ warning.message }}</strong></li>
+              </ng-container>
+              <ng-container *ngIf="warning && (warning.type !== 'critical')">
+                <li>{{ warning.message }}</li>
+              </ng-container>
             </li>
           </ul>
         </li>
@@ -138,9 +141,9 @@
           <i class="fas fa-comment-alt navbar-tab-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'feedback'}"></i>
         </li>
         <li [hidden]="!(getOpenThreadsCount())" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
-          <li class="oppia-exploration-open-threads-count">
+          <div class="oppia-exploration-open-threads-count">
               {{ getOpenThreadsCount() }}
-          </li>
+          </div>
         </li>
       </ul>
 
