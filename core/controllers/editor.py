@@ -57,7 +57,6 @@ def _require_valid_version(
             InvalidInputException. The version_from_payload does not match
                 the exploration_version.
     """
-
     if version_from_payload != exploration_version:
         raise base.BaseHandler.InvalidInputException(
             'Trying to update version %s of exploration from version %s, '
@@ -96,7 +95,6 @@ class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.can_play_exploration
     def get(self) -> None:
         """Handles GET requests."""
-
         self.render_template('exploration-editor-page.mainpage.html')
 
 
@@ -225,7 +223,17 @@ class ExplorationHandler(
 
     @acl_decorators.can_save_exploration
     def put(self, exploration_id: str) -> None:
-        """Updates properties of the given exploration."""
+        """Updates properties of the given exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Raises:
+            InvalidInputException.
+            - If version of the exploration being updated is invalid.
+            - If the exploration cannot be edited.
+            - A validation error during the update process.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -277,8 +285,11 @@ class ExplorationHandler(
 
     @acl_decorators.can_delete_exploration
     def delete(self, exploration_id: str) -> None:
-        """Deletes the given exploration."""
+        """Deletes the given exploration.
 
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.user_id is not None
         log_debug_string = '(%s) %s tried to delete exploration %s' % (
             self.roles, self.user_id, exploration_id)
@@ -310,7 +321,11 @@ class UserExplorationPermissionsHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        """Gets the user permissions for an exploration."""
+        """Gets the user permissions for an exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         self.values.update({
@@ -413,7 +428,22 @@ class ExplorationRightsHandler(
 
     @acl_decorators.can_modify_exploration_roles
     def put(self, exploration_id: str) -> None:
-        """Updates the editing rights for the given exploration."""
+        """Updates the editing rights for the given exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Raises:
+            InvalidInputException.
+            - If the input is invalid.
+            - If the user does not have permission.
+            - If the specified user cannot be found.
+            - If no role is provided for the new member of the exploration.
+            - If the user attempts to assign roles to themselves.
+            - If there is an error during the ownership release process.
+            - If the exploration fails validation.
+            - If no change is made to the exploration.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -471,7 +501,15 @@ class ExplorationRightsHandler(
 
     @acl_decorators.can_modify_exploration_roles
     def delete(self, exploration_id: str) -> None:
-        """Deletes user roles from the exploration."""
+        """Deletes user roles from the exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Raises:
+            InvalidInputException. If the specified user is not found or
+                if users try to remove their own roles.
+        """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -526,7 +564,7 @@ class ExplorationStatusHandler(
         """Publish an exploration.
 
         Args:
-            exploration_id: str. Id of the exploration.
+            exploration_id: str. The ID of the exploration.
 
         Raises:
             InvalidInputException. Given exploration is invalid.
@@ -543,6 +581,11 @@ class ExplorationStatusHandler(
 
     @acl_decorators.can_publish_exploration
     def put(self, exploration_id: str) -> None:
+        """Publishes an exploration_id and updates its rights
+
+        Args:
+            exploration_id: str. ID of the exploration.
+        """
         assert self.normalized_payload is not None
         make_public = self.normalized_payload['make_public']
 
@@ -594,6 +637,9 @@ class ExplorationModeratorRightsHandler(
     def put(self, exploration_id: str) -> None:
         """Unpublishes the given exploration, and sends an email to all its
         owners.
+
+        Args:
+            exploration_id: str. The ID of the exploration..
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -683,7 +729,6 @@ class UserExplorationEmailsHandler(
         Raises:
             InvalidInputException. Invalid message type.
         """
-
         assert self.user_id is not None
         assert self.normalized_payload is not None
         mute = self.normalized_payload.get('mute')
@@ -751,7 +796,11 @@ class ExplorationFileDownloader(
 
     @acl_decorators.can_download_exploration
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_request is not None
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.normalized_request.get('v')
@@ -826,7 +875,7 @@ class StateYamlHandler(
     }
 
     @acl_decorators.can_play_exploration
-    def post(self, unused_exploration_id: str) -> None:
+    def post(self) -> None:
         """Handles POST requests."""
         assert self.normalized_payload is not None
         state_dict = self.normalized_payload['state_dict']
@@ -853,8 +902,11 @@ class ExplorationSnapshotsHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
 
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         snapshots = exp_services.get_exploration_snapshots_metadata(
             exploration_id)
 
@@ -893,7 +945,12 @@ class ExplorationCheckRevertValidHandler(
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str, version: int) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            version: int. The version of the exploration.
+        """
         info = exp_services.get_exploration_validation_error(
             exploration_id, version)
         self.render_json({'valid': not info, 'details': info})
@@ -934,7 +991,15 @@ class ExplorationRevertHandler(
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Raises:
+            InvalidInputException. If the revert_to_version is greater than
+                or equal to the current_version.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         current_version = self.normalized_payload['current_version']
@@ -968,7 +1033,11 @@ class ExplorationStatisticsHandler(
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
 
@@ -1042,7 +1111,14 @@ class FetchIssuesHandler(
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exp_id: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+
+        Raises:
+            PageNotFoundException. The exploration issue is invalid.
+        """
         assert self.normalized_request is not None
         exp_version = self.normalized_request['exp_version']
         exp_issues = stats_services.get_exp_issues(
@@ -1080,8 +1156,15 @@ class FetchPlaythroughHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, unused_exploration_id: str, playthrough_id: str) -> None:
-        """Handles GET requests."""
+    def get(self, playthrough_id: str) -> None:
+        """Handles GET requests.
+
+        Args:
+            playthrough_id: str. The ID of the playthrough.
+
+        Raises:
+            PageNotFoundException. The playthrough is invalid.
+        """
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         if playthrough is None:
             raise self.PageNotFoundException(
@@ -1133,7 +1216,15 @@ class ResolveIssueHandler(
 
     @acl_decorators.can_edit_exploration
     def post(self, exp_id: str) -> None:
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+
+        Raises:
+            PageNotFoundException. Invalid exploration ID or
+                exploration issue not valid.
+        """
         assert self.normalized_payload is not None
         exp_issue_object = self.normalized_payload.get('exp_issue_object')
         exp_version = self.normalized_payload['exp_version']
@@ -1236,8 +1327,16 @@ class ImageUploadHandler(
 
     @acl_decorators.can_edit_entity
     def post(self, entity_type: str, entity_id: str) -> None:
-        """Saves an image uploaded by a content creator."""
+        """Saves an image uploaded by a content creator.
 
+        Args:
+            entity_type: str. The entity type.
+            entity_id: str. The ID of the entity.
+
+        Raises:
+            InvalidInputException. If there is an invalid input or
+                an existing file with the same name.
+        """
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
         raw = self.normalized_request['image']
@@ -1280,7 +1379,7 @@ class StartedTutorialEventHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_play_exploration
-    def post(self, unused_exploration_id: str) -> None:
+    def post(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
         user_services.record_user_started_state_editor_tutorial(self.user_id)
@@ -1330,9 +1429,15 @@ class EditorAutosaveHandler(ExplorationHandler):
 
     @acl_decorators.can_save_exploration
     def put(self, exploration_id: str) -> None:
-        """Handles PUT requests for draft updation."""
-        # Raise an Exception if the draft change list fails non-strict
-        # validation.
+        """Handles PUT requests for draft updation.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Raises:
+            InvalidInputException. If the draft change lists fails
+                non-strict validation.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         change_list = self.normalized_payload['change_list']
@@ -1371,7 +1476,11 @@ class EditorAutosaveHandler(ExplorationHandler):
 
     @acl_decorators.can_save_exploration
     def post(self, exploration_id: str) -> None:
-        """Handles POST request for discarding draft changes."""
+        """Handles POST request for discarding draft changes.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.user_id is not None
         exp_services.discard_draft(exploration_id, self.user_id)
         self.render_json({})
@@ -1391,7 +1500,7 @@ class StateAnswerStatisticsHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, unused_exploration_id: str) -> None:
+    def get(self) -> None:
         """Handles GET requests."""
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'answers': {}, 'interaction_ids': {}})
@@ -1411,7 +1520,7 @@ class TopUnresolvedAnswersHandler(
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_exploration
-    def get(self, unused_exploration_id: str) -> None:
+    def get(self) -> None:
         """Handles GET requests for unresolved answers."""
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'unresolved_answers': []})
@@ -1451,7 +1560,11 @@ class ExplorationEditsAllowedHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self, exploration_id: str) -> None:
-        """Handles PUT request to set whether exploration can be edited."""
+        """Handles PUT request to set whether exploration can be edited.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
         assert self.normalized_payload is not None
         exp_services.set_exploration_edits_allowed(
             exploration_id,
@@ -1513,6 +1626,10 @@ class LearnerAnswerInfoHandler(
     def get(self, entity_type: str, entity_id: str) -> None:
         """Handles the GET requests for learner answer info for an
         exploration state.
+
+        Args:
+            entity_type: str. The entity type.
+            entity_id: str. The ID of the entity.
         """
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
@@ -1569,8 +1686,15 @@ class LearnerAnswerInfoHandler(
 
     @acl_decorators.can_edit_entity
     def delete(self, entity_type: str, entity_id: str) -> None:
-        """Deletes the learner answer info by the given id."""
+        """Deletes the learner answer info by the given id.
 
+        Args:
+            entity_type: str. The entity type.
+            entity_id: str. The ID of the entity.
+
+        Raises:
+            InvalidInputException. If state_name is None.
+        """
         assert self.normalized_request is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
