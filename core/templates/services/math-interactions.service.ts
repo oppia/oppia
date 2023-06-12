@@ -80,6 +80,7 @@ export class MathInteractionsService {
           errorMessage = (
             'Your answer seems to be missing a variable/number before the ' +
             humanReadableOperator + ' operator.');
+          break;
         }
       }
     }
