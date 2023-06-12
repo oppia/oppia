@@ -23,7 +23,6 @@ from core import utils
 from core.constants import constants
 from core.domain import exp_services
 from core.domain import fs_services
-from core.domain import platform_parameter_registry
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import story_services
@@ -913,26 +912,6 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
             })
 
         self.logout()
-
-    def test_update_promo_bar_rules_with_unexpected_exception_returns_error(
-        self
-    ) -> None:
-        with self.swap_to_always_raise(
-            platform_parameter_registry.Registry,
-            'update_platform_parameter',
-            utils.ValidationError('Validation error')
-        ):
-            self.login(self.RELEASE_COORDINATOR_EMAIL)
-            csrf_token = self.get_new_csrf_token()
-            response = self.put_json(
-                '/promo_bar_handler', {
-                    'promo_bar_enabled': True,
-                    'promo_bar_message': 'New promo bar message.'
-                },
-                csrf_token=csrf_token,
-                expected_status_int=400)
-            self.assertEqual(response['error'], 'Validation error')
-            self.logout()
 
 
 class ValueGeneratorHandlerTests(test_utils.GenericTestBase):

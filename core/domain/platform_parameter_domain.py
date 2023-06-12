@@ -41,8 +41,8 @@ class ServerMode(enum.Enum):
 
 FeatureStages = ServerMode
 
-# Union type defined from allowed types that a platform can contain
-# for it's data types.
+# Union type defined from allowed types that a platform parameter can contain
+# for its data types.
 PlatformDataTypes = Union[str, int, bool, float]
 
 
