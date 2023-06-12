@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import enum
 
+from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import caching_services
@@ -34,6 +35,7 @@ class ParamNames(enum.Enum):
 
     FEATURE_A = 'feature_a'
     FEATURE_B = 'feature_b'
+    FEATURE_C = 'feature_c'
 
 
 ServerMode = platform_parameter_domain.ServerMode
@@ -51,8 +53,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
-        param_names = ['feature_a', 'feature_b']
-        param_name_enums = [ParamNames.FEATURE_A, ParamNames.FEATURE_B]
+        param_names = ['feature_a', 'feature_b', 'feature_c']
+        param_name_enums = [
+            ParamNames.FEATURE_A, ParamNames.FEATURE_B, ParamNames.FEATURE_C]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
@@ -60,8 +63,11 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.dev_feature = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_A, 'a feature in dev stage',
             FeatureStages.DEV)
+        self.test_feature = registry.Registry.create_feature_flag(
+            ParamNames.FEATURE_B, 'a feature in test stage',
+            FeatureStages.TEST)
         self.prod_feature = registry.Registry.create_feature_flag(
-            ParamNames.FEATURE_B, 'a feature in prod stage',
+            ParamNames.FEATURE_C, 'a feature in prod stage',
             FeatureStages.PROD)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
@@ -72,6 +78,24 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             'type': 'server_mode',
                             'conditions': [
                                 ['=', ServerMode.DEV.value]
+                            ]
+                        }
+                    ],
+                    'value_when_matched': True
+                })
+            ]
+        )
+
+        registry.Registry.update_platform_parameter(
+            self.test_feature.name, self.user_id, 'edit rules',
+            [
+                platform_parameter_domain.PlatformParameterRule.from_dict({
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                ['=', ServerMode.DEV.value],
+                                ['=', ServerMode.TEST.value],
                             ]
                         }
                     ],
@@ -139,6 +163,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_dicts_returns_correct_dicts(self) -> None:
         expected_dicts = [
             self.dev_feature.to_dict(),
+            self.test_feature.to_dict(),
             self.prod_feature.to_dict(),
         ]
         self.assertEqual(
@@ -159,13 +184,17 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     context),
                 {
                     self.dev_feature.name: True,
+                    self.test_feature.name: True,
                     self.prod_feature.name: True,
                 })
 
-    def test_get_all_feature_flag_values_in_prod_returns_correct_values(
+    def test_get_all_feature_flag_values_in_test_returns_correct_values(
         self
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
+        constants_swap = self.swap(constants, 'DEV_MODE', False)
+        env_swap = self.swap(
+            feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False)
+        with constants_swap, env_swap:
             context = feature_services.create_evaluation_context_for_client({
                 'platform_type': 'Android',
                 'browser_type': None,
@@ -176,6 +205,27 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     context),
                 {
                     self.dev_feature.name: False,
+                    self.test_feature.name: True,
+                    self.prod_feature.name: True,
+                })
+
+    def test_get_all_feature_flag_values_in_prod_returns_correct_values(
+        self
+    ) -> None:
+        constants_swap = self.swap(constants, 'DEV_MODE', False)
+        env_swap = self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True)
+        with constants_swap, env_swap:
+            context = feature_services.create_evaluation_context_for_client({
+                'platform_type': 'Android',
+                'browser_type': None,
+                'app_version': '1.0.0',
+            })
+            self.assertEqual(
+                feature_services.evaluate_all_feature_flag_values_for_client(
+                    context),
+                {
+                    self.dev_feature.name: False,
+                    self.test_feature.name: False,
                     self.prod_feature.name: True,
                 })
 
@@ -184,20 +234,51 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.assertTrue(
                 feature_services.is_feature_enabled(self.dev_feature.name))
 
+    def test_evaluate_test_feature_for_dev_server_returns_true(self) -> None:
+        with self.swap(constants, 'DEV_MODE', True):
+            self.assertTrue(
+                feature_services.is_feature_enabled(self.test_feature.name))
+
     def test_evaluate_prod_feature_for_dev_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', True):
             self.assertTrue(
                 feature_services.is_feature_enabled(self.prod_feature.name))
 
+    def test_evaluate_dev_feature_for_test_server_returns_false(self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+                self.assertFalse(
+                    feature_services.is_feature_enabled(self.dev_feature.name))
+
+    def test_evaluate_test_feature_for_test_server_returns_true(self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+                self.assertTrue(
+                    feature_services.is_feature_enabled(self.test_feature.name))
+
+    def test_evaluate_prod_feature_for_test_server_returns_true(self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+                self.assertTrue(
+                    feature_services.is_feature_enabled(self.prod_feature.name))
+
     def test_evaluate_dev_feature_for_prod_server_returns_false(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
-            self.assertFalse(
-                feature_services.is_feature_enabled(self.dev_feature.name))
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                self.assertFalse(
+                    feature_services.is_feature_enabled(self.dev_feature.name))
+
+    def test_evaluate_test_feature_for_prod_server_returns_false(self) -> None:
+        with self.swap(constants, 'DEV_MODE', False):
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                self.assertFalse(
+                    feature_services.is_feature_enabled(self.test_feature.name))
 
     def test_evaluate_prod_feature_for_prod_server_returns_true(self) -> None:
         with self.swap(constants, 'DEV_MODE', False):
-            self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                self.assertTrue(
+                    feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
         self
@@ -225,8 +306,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             ]
         )
         with self.swap(constants, 'DEV_MODE', False):
-            self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
+            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+                self.assertTrue(
+                    feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_get_feature_flag_values_with_unknown_name_raises_error(
         self

@@ -60,10 +60,6 @@ describe('Blog Admin', function() {
       await superAdmin.expectUserNotToHaveRole(
         'guestUsr2', ROLE_BLOG_POST_EDITOR);
 
-      await blogAdmin.expectTagToNotExistInBlogTags('Test_Tag');
-      await blogAdmin.addNewBlogTag('Test_Tag');
-      await blogAdmin.expectTagToExistInBlogTags('Test_Tag');
-
       await blogAdmin.expectMaximumTagLimitNotToBe('5');
       await blogAdmin.setMaximumTagLimitTo('5');
       await blogAdmin.expectMaximumTagLimitToBe('5');

@@ -349,7 +349,7 @@ URLS = [
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler),
     get_redirect_route(
-        r'/retrivefeaturedtranslationlanguages',
+        r'/retrievefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
         r'/gettranslatabletopicnames',
@@ -600,6 +600,9 @@ URLS = [
 
     get_redirect_route(
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
+    get_redirect_route(
+        r'%s' % feconf.FEATURE_FLAGS_URL,
+        release_coordinator.FeatureFlagsHandler),
 
     get_redirect_route(
         '/checkpoints_feature_status_handler',
