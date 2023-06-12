@@ -6030,7 +6030,7 @@ class SortChoicesUnitTest(test_utils.GenericTestBase):
     def test_enum_dictionary_match(self) -> None:
         enum_values = []
         dict_values = []
-        
+
         for enum_member in suggestion_models.SortChoices:
             enum_values.append(enum_member.value)
 
