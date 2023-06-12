@@ -116,17 +116,16 @@ describe('Html Length Service', () => {
     expect(result).toBe(9);
   });
 
-  fit('should compute length of content of ordered lists', () => {
+  it('should compute length of content of ordered lists', () => {
     const htmlString = '<ol><li>This is the first item</li><li> This is' +
       ' second item</li><li> This is the third item</li></ol>';
-
 
     const result = htmlLengthService.computeHtmlLengthInWords(htmlString);
 
     expect(result).toBe(14);
   });
 
-  fit('should compute length of content of unordered lists', () => {
+  it('should compute length of content of unordered lists', () => {
     const htmlString = '<ul><li>This is the first item</li><li> This is' +
       ' second item</li><li> This is the third item</li></ul>';
 
