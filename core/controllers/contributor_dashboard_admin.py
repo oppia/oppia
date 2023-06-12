@@ -132,6 +132,19 @@ class ContributionRightsHandler(
 
     @acl_decorators.can_manage_contributors_role
     def post(self, category: str) -> None:
+        """Manages contributors' roles.
+
+        Args:
+            category: str. The role's category.
+
+        Raises:
+            Exception. The language_code cannot be None if the review category
+                is translation.
+            InvalidInputException. User already has rights to review
+                translation.
+            InvalidInputException. User already has rights to review question.
+            InvalidInputException. User already has rights to submit question.
+        """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -185,6 +198,22 @@ class ContributionRightsHandler(
 
     @acl_decorators.can_manage_contributors_role
     def delete(self, category: str) -> None:
+        """Removes contributors' roles.
+
+        Args:
+            category: str. The role's category.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            Exception. The language_code cannot be None if the review category
+                is translation.
+            InvalidInputException. User does not have rights to review
+                translation.
+            InvalidInputException. User does not have rights to review
+                question.
+            InvalidInputException. User does not have rights to submit
+                question.
+        """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -281,6 +310,11 @@ class ContributorUsersListHandler(
 
     @acl_decorators.can_manage_contributors_role
     def get(self, category: str) -> None:
+        """Retrieves the usernames of contributors.
+
+        Args:
+            category: str. The role's category.
+        """
         assert self.normalized_request is not None
         language_code = self.normalized_request.get('language_code')
         usernames = user_services.get_contributor_usernames(
@@ -318,6 +352,11 @@ class ContributionRightsDataHandler(
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
     def get(self) -> None:
+        """Fetches contributor dashboard admin page data.
+
+        Raises:
+            InvalidInputException. Invalid username.
+        """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -370,6 +409,11 @@ class TranslationContributionStatsHandler(
 
     @acl_decorators.can_access_translation_stats
     def get(self) -> None:
+        """Fetches translation contribution statistics.
+
+        Raises:
+            InvalidInputException. Invalid username.
+        """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
