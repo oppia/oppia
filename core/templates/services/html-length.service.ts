@@ -54,7 +54,7 @@ export class HtmlLengthService {
     let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
 
     const tagList = Array.from(dom.body.querySelectorAll(
-      'p,ul,oppia-noninteractive-image,oppia-noninteractive-math'));
+      'p,ul,ol,oppia-noninteractive-image,oppia-noninteractive-math'));
     let totalWeight = 0;
     for (let tag of tagList) {
       const ltag = tag.tagName.toLowerCase();
