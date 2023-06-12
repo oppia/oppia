@@ -6033,7 +6033,7 @@ class SortChoicesUnitTest(test_utils.GenericTestBase):
         for enum_member in suggestion_models.SortChoices:
             enum_values.append(enum_member.value)
 
-        dict_values = dict_values = list(
+        dict_values = list(
             constants.CD_ADMIN_STATS_SORT_OPTIONS.keys())
 
         enum_values.sort()
