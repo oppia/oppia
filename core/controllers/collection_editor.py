@@ -127,7 +127,11 @@ class EditableCollectionDataHandler(
 
     @acl_decorators.can_edit_collection
     def get(self, collection_id: str) -> None:
-        """Populates the data on the individual collection page."""
+        """Populates the data on the individual collection page.
+
+        Args:
+            collection_id: str. The ID of the collection.
+        """
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
@@ -142,7 +146,11 @@ class EditableCollectionDataHandler(
 
     @acl_decorators.can_edit_collection
     def put(self, collection_id: str) -> None:
-        """Updates properties of the given collection."""
+        """Updates properties of the given collection.
+
+        Args:
+            collection_id: str. The ID of the collection.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(collection_id)
@@ -256,7 +264,11 @@ class CollectionPublishHandler(
 
     @acl_decorators.can_publish_collection
     def put(self, collection_id: str) -> None:
-        """Publishes the given collection."""
+        """Publishes the given collection.
+
+        Args:
+            collection_id: str. The ID of the collection.
+        """
         assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(
             collection_id, strict=True
@@ -324,7 +336,11 @@ class CollectionUnpublishHandler(
 
     @acl_decorators.can_unpublish_collection
     def put(self, collection_id: str) -> None:
-        """Unpublishes the given collection."""
+        """Unpublishes the given collection.
+
+        Args:
+            collection_id: str. The ID of the collection.
+        """
         assert self.normalized_payload is not None
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.normalized_payload.get('version')
