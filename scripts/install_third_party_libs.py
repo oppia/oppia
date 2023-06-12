@@ -22,10 +22,10 @@ import pathlib
 import shutil
 import subprocess
 import zipfile
-from scripts import install_python_dev_dependencies
+# from scripts import install_python_dev_dependencies
 from typing import Final, List
 
-install_python_dev_dependencies.main(['--assert_compiled'])
+# install_python_dev_dependencies.main(['--assert_compiled'])
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -164,66 +164,66 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
 
 def main() -> None:
     """Install third-party libraries for Oppia."""
-    setup.main(args=[])
-    setup_gae.main(args=[])
+    # setup.main(args=[])
+    # setup_gae.main(args=[])
 
-    # Download and install required JS and zip files.
-    print('Installing third-party JS libraries and zip files.')
-    install_third_party.main(args=[])
+    # # Download and install required JS and zip files.
+    # print('Installing third-party JS libraries and zip files.')
+    # install_third_party.main(args=[])
 
-    # The following steps solves the problem of multiple google paths confusing
-    # the python interpreter. Namely, there are two modules named google/, one
-    # that is installed with google cloud libraries and another that comes with
-    # the Google Cloud SDK. Python cannot import from both paths simultaneously
-    # so we must combine the two modules into one. We solve this by copying the
-    # Google Cloud SDK libraries that we need into the correct google
-    # module directory in the 'third_party/python_libs' directory.
-    print('Copying Google Cloud SDK modules to third_party/python_libs...')
-    correct_google_path = os.path.join(
-        common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-    if not os.path.isdir(correct_google_path):
-        os.mkdir(correct_google_path)
+    # # The following steps solves the problem of multiple google paths confusing
+    # # the python interpreter. Namely, there are two modules named google/, one
+    # # that is installed with google cloud libraries and another that comes with
+    # # the Google Cloud SDK. Python cannot import from both paths simultaneously
+    # # so we must combine the two modules into one. We solve this by copying the
+    # # Google Cloud SDK libraries that we need into the correct google
+    # # module directory in the 'third_party/python_libs' directory.
+    # print('Copying Google Cloud SDK modules to third_party/python_libs...')
+    # correct_google_path = os.path.join(
+    #     common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+    # if not os.path.isdir(correct_google_path):
+    #     os.mkdir(correct_google_path)
 
-    if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
-        shutil.copytree(
-            os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
-            os.path.join(correct_google_path, 'appengine'))
+    # if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
+    #     shutil.copytree(
+    #         os.path.join(
+    #             common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+    #         os.path.join(correct_google_path, 'appengine'))
 
-    if not os.path.isdir(os.path.join(correct_google_path, 'net')):
-        shutil.copytree(
-            os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
-            os.path.join(correct_google_path, 'net'))
+    # if not os.path.isdir(os.path.join(correct_google_path, 'net')):
+    #     shutil.copytree(
+    #         os.path.join(
+    #             common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+    #         os.path.join(correct_google_path, 'net'))
 
-    if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
-        shutil.copytree(
-            os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
-            os.path.join(correct_google_path, 'pyglib'))
+    # if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
+    #     shutil.copytree(
+    #         os.path.join(
+    #             common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+    #         os.path.join(correct_google_path, 'pyglib'))
 
-    # The following for loop populates all of the google modules with
-    # the correct __init__.py files if they do not exist. This solves the bug
-    # mentioned below where namespace packages sometimes install modules without
-    # __init__.py files (python requires modules to have __init__.py files in
-    # in order to recognize them as modules and import them):
-    # https://github.com/googleapis/python-ndb/issues/518
-    print(
-        'Checking that all google library modules contain __init__.py files...')
-    for path_list in os.walk(correct_google_path):
-        root_path = path_list[0]
-        if not root_path.endswith('__pycache__'):
-            with utils.open_file(
-                os.path.join(root_path, '__init__.py'), 'a'):
-                # If the file doesn't exist, it is created. If it does exist,
-                # this open does nothing.
-                pass
+    # # The following for loop populates all of the google modules with
+    # # the correct __init__.py files if they do not exist. This solves the bug
+    # # mentioned below where namespace packages sometimes install modules without
+    # # __init__.py files (python requires modules to have __init__.py files in
+    # # in order to recognize them as modules and import them):
+    # # https://github.com/googleapis/python-ndb/issues/518
+    # print(
+    #     'Checking that all google library modules contain __init__.py files...')
+    # for path_list in os.walk(correct_google_path):
+    #     root_path = path_list[0]
+    #     if not root_path.endswith('__pycache__'):
+    #         with utils.open_file(
+    #             os.path.join(root_path, '__init__.py'), 'a'):
+    #             # If the file doesn't exist, it is created. If it does exist,
+    #             # this open does nothing.
+    #             pass
 
-    if common.is_windows_os():
-        tweak_yarn_executable()
+    # if common.is_windows_os():
+    #     tweak_yarn_executable()
 
-    # Install third-party node modules needed for the build process.
-    subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
+    # # Install third-party node modules needed for the build process.
+    # subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
 
     # Compile protobuf files.
     print('Installing buf and protoc binary.')
@@ -231,16 +231,16 @@ def main() -> None:
     print('Compiling protobuf files.')
     compile_protobuf_files(PROTO_FILES_PATHS)
 
-    # Install pre-commit script.
-    print('Installing pre-commit hook for git')
-    pre_commit_hook.main(args=['--install'])
+    # # Install pre-commit script.
+    # print('Installing pre-commit hook for git')
+    # pre_commit_hook.main(args=['--install'])
 
-    # TODO(#8112): Once pre_commit_linter is working correctly, this
-    # condition should be removed.
-    if not common.is_windows_os():
-        # Install pre-push script.
-        print('Installing pre-push hook for git')
-        pre_push_hook.main(args=['--install'])
+    # # TODO(#8112): Once pre_commit_linter is working correctly, this
+    # # condition should be removed.
+    # if not common.is_windows_os():
+    #     # Install pre-push script.
+    #     print('Installing pre-push hook for git')
+    #     pre_push_hook.main(args=['--install'])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
