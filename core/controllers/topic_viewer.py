@@ -61,7 +61,11 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name: str) -> None:
-        """Handles GET requests."""
+        """Accesses a topic viewer page.
+
+        Args:
+            topic_name: str. The topic name.
+        """
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
         canonical_story_ids = topic.get_canonical_story_ids(

@@ -43,6 +43,7 @@ class MemoryCacheHandler(
 
     @acl_decorators.can_manage_memcache
     def get(self) -> None:
+        """Retrieves statistics about the memory cache."""
         cache_stats = caching_services.get_memory_cache_stats()
         self.render_json({
             'total_allocation': cache_stats.total_allocated_in_bytes,
@@ -52,6 +53,7 @@ class MemoryCacheHandler(
 
     @acl_decorators.can_manage_memcache
     def delete(self) -> None:
+        """Flushes the memory cache."""
         caching_services.flush_memory_caches()
         self.render_json({})
 

@@ -64,8 +64,11 @@ class ClassroomDataHandler(
 
     @acl_decorators.does_classroom_exist
     def get(self, classroom_url_fragment: str) -> None:
-        """Handles GET requests."""
+        """Retrieves information about a classroom.
 
+        Args:
+            classroom_url_fragment: str. THe classroom URL fragment.
+        """
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
@@ -136,6 +139,7 @@ class ClassroomPromosStatusHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Retrives the status of classroom promos."""
         self.render_json({
             'classroom_promos_are_enabled': (
                 config_domain.CLASSROOM_PROMOS_ARE_ENABLED.value)
@@ -152,7 +156,7 @@ class DefaultClassroomRedirectPage(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Redirects to default classroom page."""
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
@@ -166,7 +170,7 @@ class ClassroomAdminPage(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
-        """Handles GET requests."""
+        """Renders the classroom admin page."""
         self.render_template('classroom-admin-page.mainpage.html')
 
 
@@ -181,7 +185,7 @@ class ClassroomAdminDataHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves a mapping of classroom IDs to classroom names."""
         classroom_id_to_classroom_name = (
             classroom_config_services.get_classroom_id_to_classroom_name_dict())
 
@@ -202,7 +206,7 @@ class NewClassroomIdHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
-        """Handles GET requests."""
+        """Retrieves the new classroom ID."""
         self.values.update({
             'classroom_id': classroom_config_services.get_new_classroom_id()
         })
@@ -245,7 +249,15 @@ class ClassroomHandler(
 
     @acl_decorators.open_access
     def get(self, classroom_id: str) -> None:
-        """Handles GET requests."""
+        """Retrieves the classroom details.
+
+        Args:
+            classroom_id: str. The ID of the classroom.
+
+        Raises:
+            PageNotFoundException. The classroom with the given id or
+                url doesn't exist.
+        """
         classroom = classroom_config_services.get_classroom_by_id(
             classroom_id, strict=False)
         if classroom is None:
@@ -259,7 +271,15 @@ class ClassroomHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def put(self, classroom_id: str) -> None:
-        """Updates properties of a given classroom."""
+        """Updates properties of a given classroom.
+
+        Args:
+            classroom_id: str. The ID of the classroom.
+
+        Raises:
+            InvalidInputException. Classroom ID of the URL path argument must
+                match with the ID given in the classroom payload dict.
+        """
         assert self.normalized_payload is not None
         classroom = self.normalized_payload['classroom_dict']
         if classroom_id != classroom.classroom_id:
@@ -273,7 +293,11 @@ class ClassroomHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def delete(self, classroom_id: str) -> None:
-        """Deletes classroom from the classroom admin page."""
+        """Deletes classroom from the classroom admin page.
+
+        Args:
+            classroom_id: str. The ID of the classroom.
+        """
         classroom_config_services.delete_classroom(classroom_id)
         self.render_json(self.values)
 
@@ -294,7 +318,11 @@ class ClassroomUrlFragmentHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self, classroom_url_fragment: str) -> None:
-        """Get request to check whether a classroom with given exists."""
+        """Checks whether a classroom with given URL fragment exists.
+
+        Args:
+            classroom_url_fragment: str. The classroom URL fragment.
+        """
         classroom_url_fragment_exists = False
         if classroom_config_services.get_classroom_by_url_fragment(
                 classroom_url_fragment):
@@ -319,6 +347,15 @@ class ClassroomIdHandler(
 
     @acl_decorators.open_access
     def get(self, classroom_url_fragment: str) -> None:
+        """Retrieves the classroom ID.
+
+        Args:
+            classroom_url_fragment: str. The classroom URL fragment.
+
+        Raises:
+            PageNotFoundException. The classroom with the given url doesn't
+                exist.
+        """
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
         if classroom is None:

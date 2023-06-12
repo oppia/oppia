@@ -60,7 +60,11 @@ class CollectionDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_play_collection
     def get(self, collection_id: str) -> None:
-        """Populates the data on the individual collection page."""
+        """Populates the data on the individual collection page.
+
+        Args:
+            collection_id: str. The ID of the collection.
+        """
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user,

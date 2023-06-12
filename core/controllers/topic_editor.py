@@ -126,7 +126,11 @@ class TopicEditorStoryHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Handles GET requests."""
+        """Retrieves information about a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         topic = topic_fetchers.get_topic_by_id(topic_id)
         story_id_to_publication_status_map = {}
         for reference in topic.canonical_story_references:
@@ -287,7 +291,14 @@ class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Handles GET requests."""
+        """Displays the topic editor page.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            Exception. The topic with the given id doesn't exist.
+        """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
@@ -327,7 +338,12 @@ class EditableSubtopicPageDataHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str, subtopic_id: int) -> None:
-        """Handles GET requests."""
+        """Retrieves the details of a specific subtopic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+            subtopic_id: str. The ID of the subtopic.
+        """
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id, strict=False)
 
@@ -408,6 +424,10 @@ class EditableTopicDataHandler(
     ) -> None:
         """Check that the payload version matches the given topic
         version.
+
+        Args:
+            version_from_payload: int. The payload version.
+            topic_version: int. The topic version.
         """
 
         if version_from_payload != topic_version:
@@ -418,7 +438,11 @@ class EditableTopicDataHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Populates the data on the individual topic page."""
+        """Populates the data on the individual topic page.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
@@ -489,6 +513,9 @@ class EditableTopicDataHandler(
         means that change is for a topic (includes adding and removing
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
+
+        Args:
+            topic_id: str. The ID of the topic.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -553,7 +580,11 @@ class EditableTopicDataHandler(
 
     @acl_decorators.can_delete_topic
     def delete(self, topic_id: str) -> None:
-        """Handles Delete requests."""
+        """Deletes a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         assert self.user_id is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
@@ -585,7 +616,14 @@ class TopicRightsHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
-        """Returns the TopicRights object of a topic."""
+        """Fetches the topic rights of a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            InvalidInputException. The topic ID provided is not valid..
+        """
         assert self.user_id is not None
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
@@ -652,7 +690,11 @@ class TopicPublishSendMailHandler(
 
     @acl_decorators.can_view_any_topic_editor
     def put(self, topic_id: str) -> None:
-        """Returns the TopicRights object of a topic."""
+        """Requests a review and publication of a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+        """
         assert self.normalized_payload is not None
         topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
         if feconf.CAN_SEND_EMAILS:
@@ -709,7 +751,15 @@ class TopicPublishHandler(
 
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id: str) -> None:
-        """Publishes or unpublishes a topic."""
+        """Publishes or unpublishes a topic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            PageNotFoundException. The page cannot be found.
+            UnauthorizedUserException. User does not have permission.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -745,6 +795,9 @@ class TopicUrlFragmentHandler(
     def get(self, topic_url_fragment: str) -> None:
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.
+
+        Args:
+            topic_url_fragment: str. The topic URL fragment.
         """
         self.values.update({
             'topic_url_fragment_exists': (
@@ -777,6 +830,9 @@ class TopicNameHandler(
     def get(self, topic_name: str) -> None:
         """Handler that receives a topic name and checks whether
         a topic with the same name exists.
+
+        Args:
+            topic_name: str. The topic name.
         """
         self.values.update({
             'topic_name_exists': (
@@ -833,6 +889,7 @@ class TopicIdToTopicNameHandler(
 
     @acl_decorators.can_access_classroom_admin_page
     def get(self) -> None:
+        """Accesses a classroom admin page."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request[
             'comma_separated_topic_ids']
