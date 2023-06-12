@@ -24,7 +24,9 @@ jobs:
         run: git fetch source
       - name: Check for differences
         id: check-diff
-        run: echo "diff=$(git log source/develop..origin/master)" >> $GITHUB_OUTPUT
+        run: 
+          diff=$(git log source/develop..origin/master)
+          echo "diff=$diff" >> $GITHUB_OUTPUT
       - name: Revert commits
         if: ${{ steps.check-diff.outputs.diff != '' }}
         run: |
