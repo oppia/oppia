@@ -76,7 +76,7 @@ export class GoalsTabComponent implements OnInit {
     COMPLETED: 1,
     NEITHER: 2
   };
-  
+
   indexselected: number = -1;
   activityType: string = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
   editGoalsTopicPageUrl: string[] = [];
