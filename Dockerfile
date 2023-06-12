@@ -50,10 +50,7 @@ COPY dependencies.json .
 COPY buf.gen.yaml .
 RUN python -m scripts.install_third_party
 
-
-# RUN python -m scripts.install_third_party_libs
-
-# RUN python -m scripts.build
+RUN python -m scripts.build
 
 # installing buf and proto for Linux -- this docker container is based on Linux
 ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
@@ -96,11 +93,7 @@ RUN /app/buf-0.29.0/protoc/bin/protoc \
     --proto_path=$PROTOC_FILES_PATH \
     $PROTOC_FILES_PATH/*.proto
 
-# RUN for file in /app/oppia/proto_files/*.py; do \
-#     if [ -f "$file" ] && [ "${file##*.}" = "py" ]; then \
-#         sed -i -r 's/^import (\w*_pb2 as)/from proto_files import \1/g' "$file"; \
-#     fi; \
-# done
+RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import text_classifier_pb2 as text__classifier__pb2/' /app/oppia/proto_files/training_job_response_payload_pb2.py
 
 # COPY setup.py .
 # COPY requirements.in .
