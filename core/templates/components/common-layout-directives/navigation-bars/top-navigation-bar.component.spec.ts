@@ -52,6 +52,9 @@ class MockPlatformFeatureService {
     },
     BlogPages: {
       isEnabled: false
+    },
+    ShowFeedbackUpdatesInProfilepicDropdownMenu: {
+      isEnabled: false
     }
   };
 }
@@ -719,4 +722,20 @@ describe('TopNavigationBarComponent', () => {
       expect(component.getOppiaBlogUrl()).toEqual(
         'https://medium.com/oppia-org');
     });
+
+  it('should return correct value for show feedback updates' +
+    'in profile pic drop down menu feature flag', () => {
+    expect(
+      component.
+        isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable())
+      .toBeFalse();
+
+    mockPlatformFeatureService.status.
+      ShowFeedbackUpdatesInProfilepicDropdownMenu.isEnabled = true;
+
+    expect(
+      component.
+        isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable())
+      .toBeTrue();
+  });
 });
