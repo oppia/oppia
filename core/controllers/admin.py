@@ -88,7 +88,7 @@ class AdminPage(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        """Handles GET requests."""
+        """Renders the admin page."""
 
         self.render_template('admin-page.mainpage.html')
 
@@ -221,7 +221,7 @@ class AdminHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
-        """Handles GET requests."""
+        """Populates the data on the admin page."""
         demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
@@ -252,7 +252,38 @@ class AdminHandler(
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
-        """Handles POST requests."""
+        """Performs a series of actions based on the action parameter on the
+        admin page.
+
+        Raises:
+            Exception. The exploration_id must be provided when the action
+                is reload_exploration.
+            Exception. The collection_id must be provided when the action
+                is reload_collection.
+            Exception. The num_dummy_exps_to_generate must be provided when
+                the action is generate_dummy_explorations.
+            Exception. The num_dummy_exps_to_publish must be provided when
+                the action is generate_dummy_explorations.
+            InvalidInputException. Generate count cannot be less than publish
+                count.
+            Exception. The new_config_property_values must be provided
+                when the action is save_config_properties.
+            Exception. The config_property_id must be provided when the
+                action is revert_config_property.
+            Exception. The data must be provided when the action is
+                upload_topic_similarities.
+            Exception. The topic_id must be provided when the action is
+                regenerate_topic_related_opportunities.
+            Exception. The exp_id' must be provided when the action is
+                rollback_exploration_to_safe_state.
+            Exception. The feature_name must be provided when the action
+                is update_feature_flag_rules.
+            Exception. The new_rules must be provided when the action is
+                update_feature_flag_rules.
+            Exception. The commit_message must be provided when the action
+                is update_feature_flag_rules.
+            InvalidInputException. The input provided is not valid.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         action = self.normalized_payload.get('action')
@@ -1131,6 +1162,16 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Retrieves information about users based on different filter
+        criteria to populate the roles tab.
+
+        Raises:
+            Exception. The role must be provided when the filter criterion
+                is 'role'.
+            Exception. The username must be provided when the filter
+                criterion is 'username'.
+            InvalidInputException. User with given username does not exist.
+        """
         assert self.user_id is not None
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
@@ -1197,6 +1238,12 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Adds a role to a user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+            InvalidInputException. Unsupported role for this handler.
+        """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         role = self.normalized_payload['role']
@@ -1218,6 +1265,11 @@ class AdminRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Removes a role from a user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
         # particular TypedDict that was defined according to the schemas.
@@ -1284,6 +1336,12 @@ class TopicManagerRoleHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Adds or removes the topic-manager role for a user in the context
+        of a specific topic.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         action = self.normalized_payload['action']
@@ -1369,6 +1427,11 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Marks a user as banned.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -1383,6 +1446,11 @@ class BannedUsersHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Removes the banned status of the user.
+
+        Raises:
+            InvalidInputException. User with given username does not exist.
+        """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
@@ -1441,6 +1509,13 @@ class AdminSuperAdminPrivilegesHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Grants super admin privileges to a user.
+
+        Raises:
+            UnauthorizedUserException. Only the default system admin can
+                manage super admins.
+            InvalidInputException. No such user exists.
+        """
         assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
@@ -1456,6 +1531,15 @@ class AdminSuperAdminPrivilegesHandler(
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
+        """Revokes super admin privileges from a user.
+
+        Raises:
+            UnauthorizedUserException. Only the default system admin can
+                manage super admins.
+            InvalidInputException. No such user exists.
+            InvalidInputException. Cannot revoke privileges from the default
+                super admin account.
+        """
         assert self.normalized_request is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
@@ -1485,6 +1569,7 @@ class AdminTopicsCsvFileDownloader(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Generates a CSV file containing topic similarities."""
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv()
         )
@@ -1544,6 +1629,14 @@ class DataExtractionQueryHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Retrieves a specified number of submitted answers for a particular
+        state within an exploration.
+
+        Raises:
+            InvalidInputException. Entity not found.
+            InvalidInputException. Exploration does not have such state.
+            Exception. No state answer exists.
+        """
         assert self.normalized_request is not None
         exp_id = self.normalized_request['exp_id']
         exp_version = self.normalized_request['exp_version']
@@ -1593,6 +1686,12 @@ class SendDummyMailToAdminHandler(
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
+        """Sends a dummy email to the admin if the application is
+        configured to send emails.
+
+        Raises:
+            InvalidInputException. This app cannot send emails.
+        """
         username = self.username
         assert username is not None
         if feconf.CAN_SEND_EMAILS:
@@ -1640,6 +1739,15 @@ class UpdateUsernameHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Updates the username for a user.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            InvalidInputException. The user does not have a profile picture
+                with png extension.
+            InvalidInputException. The user does not have a profile picture
+                with webp extension.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         old_username = self.normalized_payload['old_username']
@@ -1701,6 +1809,7 @@ class NumberOfDeletionRequestsHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Retrieves the number of pending deletion requests for models."""
         self.render_json({
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
@@ -1736,6 +1845,9 @@ class VerifyUserModelsDeletedHandler(
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
+        """Checks if a user with a specific user_id has been deleted and
+        if there are related models or not.
+        """
         assert self.normalized_request is not None
         user_id = self.normalized_request['user_id']
 
@@ -1778,6 +1890,13 @@ class DeleteUserHandler(
 
     @acl_decorators.can_delete_any_user
     def delete(self) -> None:
+        """Initiates the pre-deletion process for a user.
+
+        Raises:
+            InvalidInputException. The username doesn't belong to any user.
+            InvalidInputException. The user ID retrieved from the username
+                and the user ID provided by admin differ.
+        """
         assert self.normalized_request is not None
         user_id = self.normalized_request['user_id']
         username = self.normalized_request['username']
@@ -1842,6 +1961,15 @@ class UpdateBlogPostHandler(
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
+        """Updates the author and published date of a blog post.
+
+        Raises:
+            InvalidInputException. Invalid username.
+            InvalidInputException. User does not have enough rights to be
+                blog post author.
+            PageNotFoundException. The blog post with the given id or url
+                doesn't exist.
+        """
         assert self.normalized_payload is not None
         blog_post_id = self.normalized_payload['blog_post_id']
         author_username = self.normalized_payload['author_username']
