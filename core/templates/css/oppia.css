@@ -2471,7 +2471,8 @@ div#ng-curtain {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.7px;
-  padding: 17px 12px 10px 12px;
+  padding: 17px 12px 10px;
+  padding-left: 3rem;
   text-transform: uppercase;
 }
 .oppia-option-list {
