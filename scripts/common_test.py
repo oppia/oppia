@@ -1289,6 +1289,14 @@ class CommonTests(test_utils.GenericTestBase):
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'test'
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output
+        )
+
         constants_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
@@ -1298,6 +1306,8 @@ class CommonTests(test_utils.GenericTestBase):
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": true,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('  "BRANCH_NAME": "",\n')
+            tmp.write('  "SHORT_COMMIT_HASH": ""\n')
             tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
@@ -1307,7 +1317,7 @@ class CommonTests(test_utils.GenericTestBase):
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
-        with constants_path_swap, feconf_path_swap:
+        with constants_path_swap, feconf_path_swap, check_output_swap:
             common.modify_constants(prod_env=True, maintenance_mode=False)
             with utils.open_file(
                 mock_constants_path, 'r') as constants_file:
@@ -1316,6 +1326,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": false,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "BRANCH_NAME": "test",\n'
+                    '  "SHORT_COMMIT_HASH": "test"\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -1329,6 +1341,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "BRANCH_NAME": "test",\n'
+                    '  "SHORT_COMMIT_HASH": "test"\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -1353,6 +1367,8 @@ class CommonTests(test_utils.GenericTestBase):
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": false,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
+            tmp.write('  "BRANCH_NAME": "test",\n')
+            tmp.write('  "SHORT_COMMIT_HASH": "test"\n')
             tmp.write('};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
@@ -1371,6 +1387,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "BRANCH_NAME": "",\n'
+                    '  "SHORT_COMMIT_HASH": ""\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(

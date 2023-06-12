@@ -18,6 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { Router } from '@angular/router';
 
 import { AppConstants } from 'app.constants';
 import { PlatformFeatureService } from 'services/platform-feature.service';
@@ -30,6 +31,10 @@ class MockPlatformFeatureService {
       isEnabled: false
     }
   };
+}
+
+class MockRouter {
+  url = '/about';
 }
 
 describe('OppiaFooterComponent', () => {
@@ -47,6 +52,9 @@ describe('OppiaFooterComponent', () => {
         {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService
+        }, {
+          provide: Router,
+          useClass: MockRouter,
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]

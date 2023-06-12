@@ -264,6 +264,27 @@ describe('Site language', function() {
     }
   );
 
+  it('should show version details in the about page footer',
+    async function() {
+      var footerVersionInfoComponent = $('.e2e-test-footer-version-info');
+      await browser.url('/learn');
+      await waitFor.pageToFullyLoad();
+      var footerVersionInfoInLearnPage = (
+        await footerVersionInfoComponent.isExisting());
+      expect(footerVersionInfoInLearnPage).toBe(false);
+
+      await browser.url('/about');
+      await waitFor.pageToFullyLoad();
+      await waitFor.visibilityOf(
+        footerVersionInfoComponent,
+        'Footer version info component taking too long to appear');
+      var footerVersionInfoText = (
+        await footerVersionInfoComponent.getText());
+      var footerVersionTextRegex = /Version: [^\s]+ \(\w+\)/;
+      expect(footerVersionTextRegex.test(footerVersionInfoText)).toBe(true);
+    }
+  );
+
   afterEach(async function() {
     // Reset language back to English.
     await browser.url('/about');
