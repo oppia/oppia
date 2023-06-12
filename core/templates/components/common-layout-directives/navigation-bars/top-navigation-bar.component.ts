@@ -19,7 +19,6 @@
  */
 
 import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
@@ -151,7 +150,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   );
 
   constructor(
-    private alertsService: AlertsService,
     private accessValidationBackendApiService:
       AccessValidationBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,

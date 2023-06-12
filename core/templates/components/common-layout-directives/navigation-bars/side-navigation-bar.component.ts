@@ -16,7 +16,6 @@
  * @fileoverview Component for the side navigation bar.
  */
 
-import { AlertsService } from 'services/alerts.service';
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -52,7 +51,6 @@ export class SideNavigationBarComponent {
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
-    private alertsService: AlertsService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private accessValidationBackendApiService:
     AccessValidationBackendApiService,
