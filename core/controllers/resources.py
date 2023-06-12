@@ -214,9 +214,6 @@ class PromoBarHandler(
         promo_bar_enabled_value = self.normalized_payload['promo_bar_enabled']
         promo_bar_message_value = self.normalized_payload['promo_bar_message']
 
-        assert isinstance(promo_bar_enabled_value, bool)
-        assert isinstance(promo_bar_message_value, str)
-
         logging.info(
             '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
             '%s' % (self.user_id, promo_bar_message_value))
