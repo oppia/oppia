@@ -1158,113 +1158,121 @@ describe('Contributions and review component', () => {
 
       it('should load translation reviews', () => {
         getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
-            Promise.resolve({
-              suggestionIdToDetails: {
-                suggestion_1: {
-                  suggestion: {
-                    target_type: null,
-                    author_name: null,
-                    last_updated_msecs: null,
-                    suggestion_id: 'suggestion_1',
-                    target_id: '1',
-                    suggestion_type: 'translate_content',
-                    change: {
-                      state_name: null,
-                      new_value: null,
-                      old_value: null,
-                      content_html: 'Translation',
-                      translation_html: 'Tradução',
-                      skill_id: 'skill_id'
-                    },
-                    status: 'rejected',
-                    exploration_content_html: null
+          Promise.resolve({
+            suggestionIdToDetails: {
+              suggestion_1: {
+                suggestion: {
+                  target_type: null,
+                  author_name: null,
+                  last_updated_msecs: null,
+                  suggestion_id: 'suggestion_1',
+                  target_id: '1',
+                  suggestion_type: 'translate_content',
+                  change: {
+                    state_name: null,
+                    new_value: null,
+                    old_value: null,
+                    content_html: 'Translation',
+                    translation_html: 'Tradução',
+                    skill_id: 'skill_id'
                   },
-                  details: {
-                    topic_name: 'topic_name',
-                    story_title: 'story_title',
-                    chapter_title: 'chapter_title'
-                  }
+                  status: 'rejected',
+                  exploration_content_html: null
                 },
-                suggestion_2: {
-                  suggestion: {
-                    target_type: null,
-                    author_name: null,
-                    last_updated_msecs: null,
-                    suggestion_id: 'suggestion_2',
-                    target_id: '2',
-                    suggestion_type: 'add_question',
-                    change: {
-                      state_name: null,
-                      new_value: null,
-                      old_value: null,
-                      content_html: 'Translation',
-                      translation_html: 'Tradução',
-                      skill_id: 'skill_id'
-                    },
-                    status: 'rejected',
-                    exploration_content_html: null
-                  },
-                  details: {
-                    topic_name: 'topic_name',
-                    story_title: 'story_title',
-                    chapter_title: 'chapter_title'
-                  }
+                details: {
+                  topic_name: 'topic_name',
+                  story_title: 'story_title',
+                  chapter_title: 'chapter_title'
                 }
               },
-              more: false
-            }));
-  
-          component.switchToTab(
-            component.TAB_TYPE_REVIEWS, 'translate_content');
-          // set up contributions with a translation and a question 
-          component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-            expect(Object.keys(component.contributions)).toContain(
-              'suggestion_1','suggestion_2');
-            expect(opportunitiesDicts).toEqual([{
-              id: 'suggestion_1',
-              heading: 'Tradução',
-              subheading: 'topic_name / story_title / chapter_title',
-              labelText: 'Obsolete',
-              labelColor: '#e76c8c',
-              actionButtonTitle: 'Review'
+              suggestion_2: {
+                suggestion: {
+                  target_type: null,
+                  author_name: null,
+                  last_updated_msecs: null,
+                  suggestion_id: 'suggestion_2',
+                  target_id: '2',
+                  suggestion_type: 'add_question',
+                  change: {
+                    state_name: null,
+                    new_value: null,
+                    old_value: null,
+                    content_html: 'Translation',
+                    translation_html: 'Tradução',
+                    skill_id: 'skill_id'
+                  },
+                  status: 'rejected',
+                  exploration_content_html: null
+                },
+                details: {
+                  topic_name: 'topic_name',
+                  story_title: 'story_title',
+                  chapter_title: 'chapter_title'
+                }
+              }
             },
-            {
-              id: 'suggestion_2',
-              heading: 'Tradução',
-              subheading: 'topic_name / story_title / chapter_title',
-              labelText: 'Obsolete',
-              labelColor: '#e76c8c',
-              actionButtonTitle: 'Review'
-            }]);
-            expect(more).toEqual(false);
-            // when opening the review modal for translations, only translations should be shown
-            spyOn(component,"_showTranslationSuggestionModal");
-            component.onClickViewSuggestion('suggestion_1');
-            expect(component._showTranslationSuggestionModal).toHaveBeenCalledWith( { suggestion_1: 
-                                                                                       { suggestion: { target_type: null, 
-                                                                                                  author_name: null, 
-                                                                                                  last_updated_msecs: null, 
-                                                                                                  suggestion_id: 'suggestion_1', 
-                                                                                                  target_id: '1', 
-                                                                                                  suggestion_type: 'translate_content', 
-                                                                                                  change: Object({ state_name: null, 
-                                                                                                                   new_value: null, 
-                                                                                                                   old_value: null, 
-                                                                                                                   content_html: 'Translation', 
-                                                                                                                   translation_html: 'Tradução', 
-                                                                                                                   skill_id: 'skill_id' }), 
-                                                                                                  status: 'rejected', 
-                                                                                                  exploration_content_html: null 
-                                                                                                }, 
-                                                                                         details: { topic_name: 'topic_name', 
-                                                                                                    story_title: 'story_title', 
-                                                                                                    chapter_title: 'chapter_title' } 
-                                                                                        }
-                                                                                    },
-                                                                                      'suggestion_1', 
-                                                                                      true );
-            
-          });
+            more: false
+          }));
+
+        component.switchToTab(
+          component.TAB_TYPE_REVIEWS, 'translate_content');
+        // Set up contributions with a translation and a question.
+        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
+          expect(Object.keys(component.contributions)).toContain(
+            'suggestion_1', 'suggestion_2');
+          expect(opportunitiesDicts).toEqual([{
+            id: 'suggestion_1',
+            heading: 'Tradução',
+            subheading: 'topic_name / story_title / chapter_title',
+            labelText: 'Obsolete',
+            labelColor: '#e76c8c',
+            actionButtonTitle: 'Review'
+          },
+          {
+            id: 'suggestion_2',
+            heading: 'Tradução',
+            subheading: 'topic_name / story_title / chapter_title',
+            labelText: 'Obsolete',
+            labelColor: '#e76c8c',
+            actionButtonTitle: 'Review'
+          }]);
+          expect(more).toEqual(false);
+          // When opening the review modal for translations,
+          // only translations should be shown.
+          spyOn(component, '_showTranslationSuggestionModal');
+          component.onClickViewSuggestion('suggestion_1');
+          expect(component._showTranslationSuggestionModal).
+            toHaveBeenCalledWith({
+              suggestion_1: {
+                suggestion: {
+                  target_type: null,
+                  author_name: null,
+                  last_updated_msecs: null,
+                  suggestion_id: 'suggestion_1',
+                  target_id: '1',
+                  suggestion_type: 'translate_content',
+                  change: {
+                    state_name: null,
+                    new_value: null,
+                    old_value: null,
+                    content_html: 'Translation',
+                    translation_html: 'Tradução',
+                    skill_id: 'skill_id'
+                  },
+                  status: 'rejected',
+                  exploration_content_html: null
+                },
+                details: {
+                  topic_name: 'topic_name',
+                  story_title: 'story_title',
+                  chapter_title: 'chapter_title'
+                }
+              }
+            },
+            'suggestion_1',
+            true
+            );
+        });
       });
 
       it('should return empty list if tab is not initialized', () => {
