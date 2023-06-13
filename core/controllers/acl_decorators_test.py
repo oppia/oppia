@@ -501,7 +501,9 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_logged_in_user_cannot_view_unowned_exploration_stats(self) -> None:
-        """Tests that a logged-in user cannot access unowned exploration stats."""
+        """Tests that a logged-in user cannot access unowned exploration
+        stats.
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -564,8 +566,8 @@ class RequireUserIdElseRedirectToHomepageTests(test_utils.GenericTestBase):
         ))
 
     def test_logged_in_user_is_redirected_to_access_page(self) -> None:
-        """Tests that a logged-in user is redirected to access page for accessing
-        the mock endpoint.
+        """Tests that a logged-in user is redirected to access page for
+        accessing the mock endpoint.
         """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2802,8 +2804,9 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_translation_admin_can_manage_translation_role(self) -> None:
-        """Tests that the translation admin can modify contributors' roles for the
-        translation role."""
+        """Tests that the translation admin can modify contributors' roles
+        for the translation role.
+        """
         self.login(self.TRANSLATION_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3182,6 +3185,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             self.role)
 
     def test_voiceover_admin_can_add_voice_artist_to_public_exp(self) -> None:
+        """Tests that the voiceover admin can add a voice artist to a pulbic
+        exploration.
+        """
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3193,6 +3199,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_can_remove_voice_artist_from_public_exp(
         self
     ) -> None:
+        """Tests that the voiceover admin can remove a voice artist from a
+        public exploration.
+        """
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.delete_json(
@@ -3202,6 +3211,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_adding_voice_artist_to_unsupported_entity_type_raises_400(
         self
     ) -> None:
+        """Tests that a user cannot add a voice artists to unsupported topic."""
         unsupported_entity_type = 'topic'
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -3217,6 +3227,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_removing_voice_artist_from_unsupported_entity_type_raises_400(
         self
     ) -> None:
+        """Tests that a auser cannot remove a voice artist from unsupported
+        topic.
+        """
         unsupported_entity_type = 'topic'
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3232,6 +3245,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_cannot_add_voice_artist_to_private_exp(
         self
     ) -> None:
+        """Tests that a voiceover admin cannot add a voice artist to a private
+        exploration.
+        """
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3247,12 +3263,18 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_can_remove_voice_artist_from_private_exp(
         self
     ) -> None:
+        """Tests that a voiceover admin can remove a voice artist from a
+        private exploration.
+        """
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.delete_json('/mock/exploration/%s' % self.private_exp_id_1, {})
         self.logout()
 
     def test_owner_cannot_add_voice_artist_to_public_exp(self) -> None:
+        """Tests that the owner cannot add a voice artist to a public
+        exploration.
+        """
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3265,6 +3287,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_cannot_remove_voice_artist_in_public_exp(self) -> None:
+        """Tests that the owner cannot remove a voice artist from a public
+        exploration.
+        """
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.delete_json(
@@ -3276,6 +3301,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_random_user_cannot_add_voice_artist_to_public_exp(self) -> None:
+        """Tests that a logged-in user cannot add a voice artist to a public
+        exploration.
+        """
         self.login(self.user_email)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3290,6 +3318,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_random_user_cannot_remove_voice_artist_from_public_exp(
         self
     ) -> None:
+        """Tests that a logged-in user cannot remove a voice artist from a
+        public exploration.
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.delete_json(
@@ -3303,6 +3334,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_cannot_add_voice_artist_to_invalid_exp(
         self
     ) -> None:
+        """Tests that a voiceover admin cannot add a voice artist if
+        exploration ID is invalid.
+        """
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3314,6 +3348,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_cannot_remove_voice_artist_to_invalid_exp(
         self
     ) -> None:
+        """Tests that a voiceover admin cannot remove a voice artist if
+        exploration ID is invalid.
+        """
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.delete_json(
@@ -3324,6 +3361,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_cannot_add_voice_artist_without_login(
         self
     ) -> None:
+        """Tests that the voiceover admin cannot add a voice artist if not
+        logged-in.
+        """
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -3333,6 +3373,9 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_cannot_remove_voice_artist_without_login(
         self
     ) -> None:
+        """Tests that a voiceover admin cannot remove a voice artist if not
+        logged-in.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             self.delete_json(
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
