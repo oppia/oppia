@@ -3,7 +3,8 @@
      target="{{ openInNewWindow ? '_blank' : '_self' }}"
      class="oppia-topic-link">
     <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-      <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
+      // We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information.
+      <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
     <div class="oppia-summary-section">
       <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">

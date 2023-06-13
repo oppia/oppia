@@ -537,6 +537,12 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
               messageSummaryDicts[index]));
         }
         this.loadingFeedbacks = false;
+
+        const explorationTitleReference = document
+          .querySelector('.oppia-exploration-title');
+        if (explorationTitleReference instanceof HTMLElement) {
+          explorationTitleReference.focus();
+        }
       });
   }
 

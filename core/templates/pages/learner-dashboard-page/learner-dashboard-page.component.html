@@ -94,6 +94,7 @@
           <p class="sort-by-text mt-0">Sort By</p>
           <select [(ngModel)]="currentFeedbackThreadsSortType"
                   class="sort-options oppia-sort-options"
+                  aria-label="Sort feedback by"
                   (change)="setFeedbackSortingOptions(currentFeedbackThreadsSortType)">
             <option *ngFor="let thread of FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS | keyvalue"
                     [value]="thread.value['key']">
@@ -181,7 +182,8 @@
           <table class="table" *ngIf="!feedbackThreadActive">
             <tr *ngFor="let thread of threadSummaries | sortBy: isCurrentFeedbackSortDescending: getValueOfFeedbackThreadSortKey()"
                 (click)="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
-                class="oppia-feedback-tab-row e2e-test-feedback-thread">
+                (keydown.enter)="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
+                class="oppia-feedback-tab-row e2e-test-feedback-thread" tabindex="0">
               <td width="10%">
                 <span [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status) }}</span>
               </td>
@@ -238,12 +240,13 @@
             <tr>
               <td>
                 <button (click)="showAllThreads()"
-                        class="btn btn-secondary oppia-btn-secondary oppia-box-size">
+                        class="btn btn-secondary oppia-btn-secondary oppia-box-size"
+                        aria-label="Return to the list of messages button">
                   <i class="fas fa-chevron-left"
                      title="{{ 'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
                   </i>
                 </button>
-                <span class="oppia-exploration-title">{{ explorationTitle }}</span>
+                <span class="oppia-exploration-title" tabindex="0">{{ explorationTitle }}</span>
               </td>
             </tr>
             <tr *ngIf="loadingFeedbacks">
@@ -256,7 +259,7 @@
             </tr>
             <ng-container *ngIf="!loadingFeedbacks">
               <tr *ngFor="let message of messageSummaries"
-                  class="oppia-message-summaries">
+                  class="oppia-message-summaries" tabindex="0">
                 <td>
                   <div class="row">
                     <div class="col-sm-9">
@@ -335,12 +338,15 @@
                   <div class="col-sm-11">
                     <div class="feedback-thread-new-message">
                       <textarea class="form-control feedback-thread-reply-box"
+                                aria-label="feedback thread textbox"
                                 placeholder="{{ 'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate }}" [(ngModel)]="newMessage.text">
                       </textarea>
                     </div>
                     <div>
                       <button class="btn btn-success feedback-thread-new-message-send"
                               (click)="addNewMessage(threadId, newMessage.text)"
+                              aria-label="Send message button"
+                              aria-live="polite"
                               ng-disabled="messageSendingInProgress || !newMessage.text">
                         <span *ngIf="messageSendingInProgress"
                               [innerHTML]="'I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS' | translate">
@@ -357,7 +363,8 @@
             </tr>
           </table>
           <div class="feedback-thread-warning"
-               *ngIf="feedbackThreadActive">
+               *ngIf="feedbackThreadActive"
+               tabindex="0">
             <i class="fas fa-exclamation-circle"></i>
             <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
           </div>

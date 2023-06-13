@@ -1,9 +1,13 @@
 <div class="progress-tab">
-  <div class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}" *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
+  <div tabindex="0"
+       class="skill-proficiency"
+       [ngClass]="{'empty-section': emptySkillProficiency}"
+       [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}"
+       *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
     <div class="skill-proficiency-heading">
       <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROGRESS_SECTION' | translate">
       </p>
-      <a class="info-tooltip" href="#/">
+      <a aria-label="Progress" class="info-tooltip" href="#/">
         <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
         <span>
           <div class="badge-info">
@@ -54,8 +58,21 @@
           <span class="skill-proficiency-topic-title e2e-test-skill-proficiency-topic-title" [ngStyle]="tile[0] === 0 && {'left': '51px'}">
           {{tile[1].name}}
           </span>
-          <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown image" class="oppia-svg-dropdown-image" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
-          <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')" alt="up image" class="oppia-svg-up-image" (click)="showSkills(i)" *ngIf="displaySkills[i]">
+          <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')"
+               alt="dropdown button"
+               class="oppia-svg-dropdown-image"
+               role="button" tabindex="0"
+               (keydown.enter)="showSkills(i)"
+               (click)="showSkills(i)"
+               *ngIf="!displaySkills[i]">
+          <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')"
+               alt="up button"
+               class="oppia-svg-up-image"
+               role="button"
+               tabindex="0"
+               (keydown.enter)="showSkills(i)"
+               (click)="showSkills(i)"
+               *ngIf="displaySkills[i]">
           <div *ngIf="tile[0] > 0">
             <div class="circle-border" [ngStyle]="{'background-image': calculateCircularProgress(i)}">
               <div class="circle">
@@ -82,7 +99,7 @@
       </div>
     </div>
   </div>
-  <div class="completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+  <div tabindex="0" class="completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
        *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
@@ -102,7 +119,7 @@
       </div>
     </div>
   </div>
-  <div class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
+  <div tabindex="0" class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
     *ngIf="windowIsNarrow && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
     <div class="completed-stories-heading">
       <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
