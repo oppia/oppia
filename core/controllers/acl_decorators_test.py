@@ -1997,7 +1997,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
     def test_normal_user_cannot_access_release_coordinator_page(self) -> None:
         """Tests that a normal user does not have access to the release
         coordinator page.
-        """"
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2341,6 +2341,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         self.blog_post_id = blog_post.id
 
     def test_guest_cannot_delete_blog_post(self) -> None:
+        """Tests that a guest user cannnot delete a blog post."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_blog_post/%s' % self.blog_post_id,
@@ -2350,6 +2351,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_blog_editor_can_delete_owned_blog_post(self) -> None:
+        """Tests that a blog editor can delete an owned blog post."""
         self.login(self.BLOG_EDITOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2358,6 +2360,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_blog_admin_can_delete_any_blog_post(self) -> None:
+        """Tests that a blog admin can delete any blog post."""
         self.login(self.BLOG_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2366,6 +2369,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_blog_editor_cannot_delete_not_owned_blog_post(self) -> None:
+        """Tests that a blog editor cannot delete unowned blog post."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2378,6 +2382,9 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_error_with_invalid_blog_post_id(self) -> None:
+        """Tests that a user cannot delete a blog post if blog post ID is
+        invalid.
+        """
         self.login(self.user_email)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         blog_post_rights_swap = self.swap_to_always_return(
@@ -2441,6 +2448,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         self.blog_post_id = blog_post.id
 
     def test_guest_cannot_edit_blog_post(self) -> None:
+        """Tests that a guest user cannot edit a blog post."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_blog_post/%s' % self.blog_post_id,
@@ -2450,6 +2458,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_blog_editor_can_edit_owned_blog_post(self) -> None:
+        """Tests that a blog editor can edit owned blog post."""
         self.login(self.BLOG_EDITOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2458,6 +2467,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_blog_admin_can_edit_any_blog_post(self) -> None:
+        """Tests that a blog admin can edit any blog post."""
         self.login(self.BLOG_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2466,6 +2476,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_blog_editor_cannot_edit_not_owned_blog_post(self) -> None:
+        """Tests that a blog editor cannot edit unowned blog post."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2478,6 +2489,9 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_error_with_invalid_blog_post_id(self) -> None:
+        """Tests that a user cannot edit a blog post if blog post ID is
+        invalid.
+        """
         self.login(self.user_email)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         blog_post_rights_swap = self.swap_to_always_return(
@@ -2527,6 +2541,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_normal_user_cannot_access_release_coordinator_page(self) -> None:
+        """Tests that a normal user cannot run any job."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
@@ -2537,6 +2552,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_release_coordinator_page(self) -> None:
+        """Tests that a guest user cannot run any job."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
 
@@ -2546,6 +2562,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
+        """Tests that the super user admin cannot run any job."""
         self.login(feconf.SYSTEM_EMAIL_ADDRESS)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2557,6 +2574,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_release_coordinator_can_run_any_job(self) -> None:
+        """Tests that the release coordinator can run any job."""
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2598,6 +2616,9 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_not_logged_in_user_cannot_access_translation_stats(self) -> None:
+        """Tests that a user who is not logged in cannot access translation
+        stats.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/translation-stats', expected_status_int=401)
@@ -2607,6 +2628,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_unauthorized_user_cannot_access_translation_stats(self) -> None:
+        """Tests that unauthorized user cannot access translation stats."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2618,6 +2640,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_authorized_user_can_access_translation_stats(self) -> None:
+        """Tests that an authorized user can access translation stats."""
         self.login(self.TRANSLATION_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/translation-stats')
@@ -2659,6 +2682,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_normal_user_cannot_access_release_coordinator_page(self) -> None:
+        """Tests that a normal user cannot manage memcache."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2670,6 +2694,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_release_coordinator_page(self) -> None:
+        """Tests that a guest user cannot manage memcache."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/manage-memcache', expected_status_int=401)
@@ -2680,6 +2705,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
+        """Tests that a super user cannot manage memcache."""
         self.login(feconf.SYSTEM_EMAIL_ADDRESS)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2692,6 +2718,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_release_coordinator_can_run_any_job(self) -> None:
+        """Tests that the release coordinator can manage memcache."""
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2746,6 +2773,9 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
             ], debug=feconf.DEBUG))
 
     def test_normal_user_cannot_access_release_coordinator_page(self) -> None:
+        """Tests that the normal user cannot modify contributor's roles for
+        the contributor dashboard.
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2758,6 +2788,9 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_manage_contributors_role(self) -> None:
+        """Tests that the guest user cannot modify contributor's roles for
+        the contributor dashboard.
+        """
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/can_manage_contributors_role/translation',
@@ -2769,6 +2802,8 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_translation_admin_can_manage_translation_role(self) -> None:
+        """Tests that the translation admin can modify contributors' roles for the
+        translation role."""
         self.login(self.TRANSLATION_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2779,6 +2814,9 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_translation_admin_cannot_manage_question_role(self) -> None:
+        """Tests that the translation admin cannot modify contributors' roles
+        for the question role.
+        """
         self.login(self.TRANSLATION_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2792,6 +2830,9 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_question_admin_can_manage_question_role(self) -> None:
+        """Tests that the question admin can modify contributors' roles for
+        the question role.
+        """
         self.login(self.QUESTION_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2802,6 +2843,9 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_question_admin_cannot_manage_translation_role(self) -> None:
+        """Tests that the question admin cannot modify contributors' roles
+        for the translation role.
+        """
         self.login(self.QUESTION_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2815,6 +2859,9 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_invalid_category_raise_error(self) -> None:
+        """Tests that user cannot manage contributors' roles for an invalid
+        role.
+        """
         self.login(self.QUESTION_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2851,16 +2898,19 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
         ))
 
     def test_normal_user_cannot_delete_any_user(self) -> None:
+        """Tests that a normal cannot delete any user."""
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_not_logged_user_cannot_delete_any_user(self) -> None:
+        """Tests that a user who is not logged in cannot delete any user."""
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_primary_admin_can_delete_any_user(self) -> None:
+        """Tests that the primary admin can delete any user."""
         self.login(feconf.SYSTEM_EMAIL_ADDRESS)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
@@ -2938,6 +2988,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
             self.role)
 
     def test_banned_user_cannot_voiceover_exploration(self) -> None:
+        """Tests that the banned user cannot voiceover an exploration."""
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -2945,6 +2996,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_owner_can_voiceover_exploration(self) -> None:
+        """Tests that the owner can voiceover an exploration."""
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
@@ -2952,6 +3004,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_voiceover_public_exploration(self) -> None:
+        """Tests that the moderator can voiceover a public exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id_1)
@@ -2959,6 +3012,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_moderator_can_voiceover_private_exploration(self) -> None:
+        """Tests that the moderator can voiceover a private exploration."""
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
@@ -2967,6 +3021,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_voiceover_private_exploration(self) -> None:
+        """Tests that the admin can voiceover a private exploration."""
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
@@ -2976,6 +3031,9 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
     def test_voice_artist_can_only_voiceover_assigned_public_exploration(
         self
     ) -> None:
+        """Tests that the voice artist can only voiceover an assigned public
+        exploration.
+        """
         self.login(self.VOICE_ARTIST_EMAIL)
         # Checking voice artist can voiceover assigned public exploration.
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2992,6 +3050,9 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
     def test_user_without_voice_artist_role_of_exploration_cannot_voiceover_public_exploration(  # pylint: disable=line-too-long
         self
     ) -> None:
+        """Tests that a user with no voice artist role for an exploration
+        cannot voiceover a public exploration.
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3001,6 +3062,9 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
     def test_user_without_voice_artist_role_of_exploration_cannot_voiceover_private_exploration(  # pylint: disable=line-too-long
         self
     ) -> None:
+        """Tests that a user with no voice artist role for an exploration
+        cannot voiceover a private exploration.
+        """
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3008,6 +3072,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_voiceover_exploration(self) -> None:
+        """Tests that a guest user cannot voiceover an exploration."""
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
@@ -3015,6 +3080,9 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
     def test_error_with_invalid_voiceover_exploration_id(self) -> None:
+        """Tests that a user cannot voiceover an exploration if exploration
+        ID is invalid.
+        """
         self.login(self.user_email)
         invalid_id = 'invalid'
         with self.swap(self, 'testapp', self.mock_testapp):
