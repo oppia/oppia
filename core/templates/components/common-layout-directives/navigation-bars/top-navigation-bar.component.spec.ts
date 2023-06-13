@@ -19,7 +19,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { AlertsService } from 'services/alerts.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -106,7 +105,6 @@ describe('TopNavigationBarComponent', () => {
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
-  let alertsService: AlertsService;
 
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -169,7 +167,6 @@ describe('TopNavigationBarComponent', () => {
     accessValidationBackendApiService = TestBed
       .inject(AccessValidationBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    alertsService = TestBed.inject(AlertsService);
 
     spyOn(searchService, 'onSearchBarLoaded')
       .and.returnValue(new EventEmitter<string>());

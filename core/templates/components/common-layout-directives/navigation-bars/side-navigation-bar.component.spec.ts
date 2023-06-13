@@ -22,7 +22,6 @@ import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angul
 import { APP_BASE_HREF } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import { AlertsService } from 'services/alerts.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -61,7 +60,6 @@ describe('Side Navigation Bar Component', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let userService: UserService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let alertsService: AlertsService;
 
   class MockUrlInterpolationService {
     getStaticImageUrl(imagePath: string): string {
@@ -111,7 +109,6 @@ describe('Side Navigation Bar Component', () => {
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     userService = TestBed.inject(UserService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    alertsService = TestBed.inject(AlertsService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
