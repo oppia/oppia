@@ -129,6 +129,12 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_MESSAGE,
+    'The message to show to all users if the promo bar is enabled',
+    platform_parameter_domain.DataTypes.STRING
+)
+
+Registry.create_platform_parameter(
     ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
     'Always ask learners for answer details. For testing -- do not use',
     platform_parameter_domain.DataTypes.BOOL
