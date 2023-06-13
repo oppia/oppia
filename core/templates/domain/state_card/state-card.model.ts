@@ -33,6 +33,7 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 export interface InputResponsePair {
   learnerInput: string | { answerDetails: string };
@@ -68,6 +69,27 @@ export class StateCard {
     this._contentId = contentId;
     this._completed = false;
     this.audioTranslationLanguageService = audioTranslationLanguageService;
+  }
+
+  toggleSubmitClicked(value: boolean): void {
+    if (this.getInteraction().id === 'Continue') {
+      return;
+    }
+    this.getInteraction().submitClicked = value;
+  }
+
+  updateCurrentAnswer(value: InteractionAnswer | null): void {
+    this.getInteraction().currentAnswer = value;
+    this.toggleSubmitClicked(false);
+  }
+
+  showNoResponseError(): boolean {
+    const currentAnswer = this.getInteraction().currentAnswer;
+    const notNumber = !(typeof currentAnswer === 'number');
+    const isEmptyArray = (
+      Array.isArray(currentAnswer) && currentAnswer.length === 0);
+    const noResponse = notNumber && (isEmptyArray || !currentAnswer);
+    return noResponse && this.getInteraction().submitClicked;
   }
 
   // Restore everything immutably so that Angular can detect changes.
@@ -222,7 +244,6 @@ export class StateCard {
     }
     return lastInputResponsePair.learnerInput;
   }
-
 
   // This will return null when no previous response exists.
   getLastOppiaResponse(): string | null {

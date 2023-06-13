@@ -1216,6 +1216,8 @@ export class ConversationSkinComponent {
 
   submitAnswer(
       answer: string, interactionRulesService: InteractionRulesService): void {
+    this.displayedCard.updateCurrentAnswer(null);
+
     // Safety check to prevent double submissions from occurring.
     if (this.answerIsBeingProcessed ||
       !this.isCurrentCardAtEndOfTranscript() ||
@@ -1625,6 +1627,7 @@ export class ConversationSkinComponent {
   }
 
   submitAnswerFromProgressNav(): void {
+    this.displayedCard.toggleSubmitClicked(true);
     this.currentInteractionService.submitAnswer();
   }
 
