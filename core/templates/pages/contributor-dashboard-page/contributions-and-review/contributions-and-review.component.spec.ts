@@ -1100,7 +1100,6 @@ describe('Contributions and review component', () => {
             labelText: 'Awaiting review',
             labelColor: '#eeeeee',
             actionButtonTitle: 'Review',
-            translationLengthInWords: undefined
           }]);
           expect(more).toEqual(false);
         });
@@ -1152,7 +1151,6 @@ describe('Contributions and review component', () => {
             labelText: 'Obsolete',
             labelColor: '#e76c8c',
             actionButtonTitle: 'View',
-            translationLengthInWords: undefined
           }]);
           expect(more).toEqual(false);
         });
@@ -1186,14 +1184,12 @@ describe('Contributions and review component', () => {
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
               actionButtonTitle: 'Translations',
-              translationLengthInWords: undefined
             } as Opportunity,
             {
               id: '2',
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
               actionButtonTitle: 'Translations',
-              translationLengthInWords: undefined
             } as Opportunity
           ]);
           expect(more).toEqual(false);
@@ -1302,7 +1298,6 @@ describe('Contributions and review component', () => {
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
           actionButtonTitle: 'Review',
-          translationLengthInWords: undefined
         }]);
         expect(more).toEqual(false);
       });
@@ -1317,7 +1312,6 @@ describe('Contributions and review component', () => {
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
           actionButtonTitle: 'Review',
-          translationLengthInWords: undefined
         }]);
         expect(more).toEqual(false);
       });
@@ -1333,7 +1327,6 @@ describe('Contributions and review component', () => {
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
           actionButtonTitle: 'Review',
-          translationLengthInWords: undefined
         }]);
         expect(more).toEqual(false);
       });
