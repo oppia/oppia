@@ -53,7 +53,7 @@ class MockWindowRef {
 }
 
 
-fdescribe('Admin page platform parameters tab', () => {
+describe('Admin page platform parameters tab', () => {
   let component: AdminPlatformParametersTabComponent;
   let fixture: ComponentFixture<AdminPlatformParametersTabComponent>;
   let adminDataService: AdminDataService;
