@@ -90,7 +90,6 @@ describe('Admin backend api service', () => {
       topic_list_intro: 'fsd',
       url_fragment: 'mathfsad',
     },
-    classroom_promos_are_enabled: false,
     contributor_dashboard_reviewer_emails_is_enabled: true,
     email_footer: 'fsdf',
     email_sender_name: 'Site Admin',
