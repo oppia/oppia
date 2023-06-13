@@ -600,6 +600,7 @@
     "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonymous",
     "I18N_FEEDBACK_UPDATES_BREADCRUMB": "Feedback Updates",
     "I18N_FEEDBACK_UPDATES_FEEDBACK_THREAD_WARNING": "Avoid sharing any personal information as this discussion is publicly viewable.",
+    "I18N_FEEDBACK_UPDATES_NO_ACTIVITY_CARD_HEADING": "Feedback Updates",
     "I18N_FEEDBACK_UPDATES_PAGE_TITLE": "Feedback Updates | Oppia",
     "I18N_FEEDBACK_UPDATES_RETURN_TO_FEEDBACK_THREADS_MESSAGE": "Return to list of messages",
     "I18N_FEEDBACK_UPDATES_SEND_FEEDBACK_THREAD_MESSAGE": "Send",

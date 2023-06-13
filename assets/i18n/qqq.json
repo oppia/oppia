@@ -600,6 +600,7 @@
 	"I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "The name of the author of a message in a feedback thread who wanted to stay anonymous.",
 	"I18N_FEEDBACK_UPDATES_BREADCRUMB": "Text displayed in the Feedback updates Page. - Text shown in the top left corner of the nav bar.",
 	"I18N_FEEDBACK_UPDATES_FEEDBACK_THREAD_WARNING": "This message appears when a feedback thread is opened in the feedback updates. It warns the user against divulging private information on a publicly viewable discussion.",
+	"I18N_FEEDBACK_UPDATES_NO_ACTIVITY_CARD_HEADING": "Heading of the feedback updates no activity card",
 	"I18N_FEEDBACK_UPDATES_PAGE_TITLE": "Text displayed on the browser tab when on the Feedback updates page.",
 	"I18N_FEEDBACK_UPDATES_RETURN_TO_FEEDBACK_THREADS_MESSAGE": "Text that appears in the feedback updates on hovering over a back button. The back buttons takes the learner back to the list of threads.",
 	"I18N_FEEDBACK_UPDATES_SEND_FEEDBACK_THREAD_MESSAGE": "The name of a button that appears in the feedback updates page. On clicking this button the message written by the user is sent to the feedback thread.\n{{Identical|Send}}",
