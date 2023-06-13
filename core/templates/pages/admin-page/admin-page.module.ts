@@ -27,8 +27,6 @@ import { APP_BASE_HREF } from '@angular/common';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { AdminFeaturesTabComponent } from
-  'pages/admin-page/features-tab/admin-features-tab.component';
 import { AdminNavbarComponent } from './navbar/admin-navbar.component';
 import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
 import { OppiaAngularRootComponent } from
@@ -66,7 +64,6 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
     AdminConfigTabComponent,
-    AdminFeaturesTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
     AdminPageComponent,
@@ -77,7 +74,6 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
     AdminConfigTabComponent,
-    AdminFeaturesTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
     AdminPageComponent,
