@@ -212,7 +212,7 @@ export class ContributionsAndReview
   }
 
   getTranslationContributionsSummary(
-      suggestionIdTfoSuggestions: Record<string, SuggestionDetails>
+      suggestionIdToSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
     const translationContributionsSummaryList = [];
 
