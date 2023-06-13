@@ -41,7 +41,9 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'learner_groups_are_enabled',
                             'promo_bar_enabled',
                             'promo_bar_message',
-                            'always_ask_learners_for_answer_details']
+                            'always_ask_learners_for_answer_details',
+                            'high_bounce_rate_task_state_bounce_'
+                            'rate_creation_threshold']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = params.Registry.get_all_platform_parameter_names()

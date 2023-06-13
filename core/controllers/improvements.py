@@ -29,6 +29,7 @@ from core.domain import exp_fetchers
 from core.domain import improvements_domain
 from core.domain import improvements_services
 from core.domain import platform_feature_services
+from core.domain import platform_parameter_list
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
@@ -242,9 +243,11 @@ class ExplorationImprovementsConfigHandler(
                     platform_feature_list.ParamNames.
                     IS_IMPROVEMENTS_TAB_ENABLED.value)),
             'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
-                config_domain
-                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD
-                .value),
+                platform_feature_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamNames.
+                    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.
+                    value
+                )),
             'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': (
                 config_domain
                 .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD

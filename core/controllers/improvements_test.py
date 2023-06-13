@@ -708,11 +708,14 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self.assertTrue(json_response['is_improvements_tab_enabled'])
 
     def test_custom_high_bounce_rate_creation_threshold(self) -> None:
-        self.set_config_property((
-            config_domain
-            .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD), 0.35)
-
-        with self.login_context(self.OWNER_EMAIL):
+        swap_get_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            0.35
+        )
+        with swap_get_platform_parameter_value, self.login_context(
+            self.OWNER_EMAIL
+        ):
             json_response = self.get_json(self.get_url())
 
         self.assertAlmostEqual(

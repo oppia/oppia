@@ -114,7 +114,6 @@ describe('Admin backend api service', () => {
     email_sender_name: 'Site Admin',
     enable_admin_notifications_for_reviewer_shortage: false,
     high_bounce_rate_task_minimum_exploration_starts: 1001,
-    high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.2,
     high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.2,
     is_improvements_tab_enabled: false,
     max_number_of_explorations_in_math_svgs_batch: 2,

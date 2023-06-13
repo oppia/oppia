@@ -465,11 +465,6 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
 
-ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
-    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
-    'Always ask learners for answer details. For testing -- do not use',
-    False)
-
 # TODO(#15682): Implement user checkpoints feature flag using feature-gating
 # service.
 CHECKPOINTS_FEATURE_IS_ENABLED = ConfigProperty(
@@ -483,12 +478,6 @@ CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
 BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
     'batch_index_for_mailchimp', INT_SCHEMA,
     'Index of batch to populate mailchimp database.', 0)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_creation_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must exceed to create a new improvements task.',
-    0.20)
 
 HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
     'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',

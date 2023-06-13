@@ -49,6 +49,8 @@ class ParamNames(enum.Enum):
     PROMO_BAR_MESSAGE = 'promo_bar_message'
     ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = (
         'always_ask_learners_for_answer_details')
+    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = (
+        'high_bounce_rate_task_state_bounce_rate_creation_threshold')
 
 
 # Platform parameters should all be defined below.
@@ -138,4 +140,11 @@ Registry.create_platform_parameter(
     ParamNames.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS,
     'Always ask learners for answer details. For testing -- do not use',
     platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD,
+    'The bounce-rate a state must exceed to create a new improvements task.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.20
 )
