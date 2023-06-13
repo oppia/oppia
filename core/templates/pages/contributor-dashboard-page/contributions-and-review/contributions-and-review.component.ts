@@ -63,6 +63,7 @@ export interface ContributionsSummary {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationLengthInWords?: number;
 }
 
 export interface Opportunity {

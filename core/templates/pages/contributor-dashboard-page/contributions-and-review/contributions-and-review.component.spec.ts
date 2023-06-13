@@ -37,7 +37,6 @@ import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
-import {HtmlLengthService} from 'services/html-length.service';
 
 
 class MockNgbModalRef {
@@ -1423,6 +1422,7 @@ describe('Contributions and review component', () => {
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
           actionButtonTitle: 'Review',
+          translationLengthInWords: undefined
         }]);
       }));
 
