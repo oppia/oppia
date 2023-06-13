@@ -7042,5 +7042,5 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "show-translation-contributions",
-  "SHORT_COMMIT_HASH": "f0d193abb"
+  "SHORT_COMMIT_HASH": "52e6c6798"
 } as const;
