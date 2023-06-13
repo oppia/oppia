@@ -456,3 +456,215 @@ indexes:
   - name: suggestion_type
   - name: target_id
   - name: author_id
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: last_contribution_date
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: last_contribution_date
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: recent_performance
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: recent_performance
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: overall_accuracy
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: overall_accuracy
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: submitted_translations_count
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: topic_ids_with_translation_submissions
+  - name: submitted_translations_count
+    direction: desc
+
+- kind: QuestionReviewerTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: reviewed_questions_count
+    direction: desc
+
+- kind: QuestionReviewerTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: reviewed_questions_count
+
+- kind: QuestionReviewerTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: last_contribution_date
+
+- kind: QuestionReviewerTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: last_contribution_date
+    direction: desc
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: topic_ids_with_question_submissions
+  - name: recent_performance
+    direction: desc
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: recent_performance
+    direction: desc
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: recent_performance
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: overall_accuracy
+    direction: desc
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: overall_accuracy
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: submitted_questions_count
+    direction: desc
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: submitted_questions_count
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: last_contribution_date
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: deleted
+  - name: last_contribution_date
+    direction: desc
+
+- kind: QuestionSubmitterTotalContributionStatsModel
+  properties:
+  - name: topic_ids_with_question_submissions
+  - name: recent_performance
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: status
+  - name: suggestion_type
+  - name: created_on
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: language_code
+  - name: status
+  - name: suggestion_type
+  - name: created_on
+
+- kind: TranslationReviewerTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: reviewed_translations_count
+
+- kind: TranslationReviewerTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: reviewed_translations_count
+    direction: desc
+
+- kind: TranslationReviewerTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: last_contribution_date
+
+- kind: TranslationReviewerTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: last_contribution_date
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: recent_performance
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: recent_performance
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: overall_accuracy
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: overall_accuracy
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: submitted_translations_count
+    direction: desc
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: submitted_translations_count
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: last_contribution_date
+
+- kind: TranslationSubmitterTotalContributionStatsModel
+  properties:
+  - name: language_code
+  - name: last_contribution_date
+    direction: desc

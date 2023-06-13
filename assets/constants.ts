@@ -115,6 +115,22 @@ export default {
     "IncreasingUpdatedOn": "Most Recently Updated",
     "DecreasingUpdatedOn": "Least Recently Updated"
   },
+
+  // Sorting categories for contributor admin dashboard.
+  "CD_ADMIN_STATS_SORT_OPTIONS": {
+    "IncreasingLastActivity": "Most Recently Active",
+    "DecreasingLastActivity": "Least Recently Active",
+    "IncreasingPerformance": "Lowest to Highest Performance",
+    "DecreasingPerformance": "Highest to Lowest Performance",
+    "IncreasingAccuracy": "Lowest to Highest Accuracy",
+    "DecreasingAccuracy": "Highest to Lowest Accuracy",
+    "IncreasingSubmissions": "Lowest to Highest Submitted Contributions",
+    "DecreasingSubmissions": "Highest to Lowest Submitted Contributions",
+    "IncreasingReviewedTranslations": "Lowest to Highest Reviewed Translations",
+    "DecreasingReviewedTranslations": "Highest to Lowest Reviewed Translations",
+    "IncreasingReviewedQuestions": "Lowest to Highest Reviewed Questions",
+    "DecreasingReviewedQuestions": "Highest to Lowest Reviewed Questions"
+  },
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
   "SEARCH_DROPDOWN_CATEGORIES": ["Algorithms", "Architecture", "Art",
