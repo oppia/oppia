@@ -424,7 +424,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     }
   }
 
-
   showSuggestionModal(
       newContent: string, oldContent: string, description: string): void {
     this.suggestionModalForLearnerDashboardService.showSuggestionModal(
