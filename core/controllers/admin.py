@@ -67,10 +67,10 @@ from core.domain import wipeout_service
 from typing import Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
-PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set(
+PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
     platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value,
     platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
-)
+])
 
 
 class ClassroomPageDataDict(TypedDict):
