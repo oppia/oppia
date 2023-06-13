@@ -70,6 +70,11 @@ class ContributorDashboardPage(
 
     @acl_decorators.open_access
     def get(self) -> None:
+        """Handles GET requests
+
+        Raises:
+            PageNotFoundException. If the contributor dashboard is not enabled.
+        """
         # TODO(#7402): Serve this page statically through app.yaml once
         # the CONTRIBUTOR_DASHBOARD_ENABLED flag is removed.
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
@@ -130,7 +135,16 @@ class ContributionOpportunitiesHandler(
 
     @acl_decorators.open_access
     def get(self, opportunity_type: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            opportunity_type: str. The opportunity type.
+
+        Raises:
+            PageNotFoundException. The contributor dashboard is not enabled or
+                the opportunity type is invalid.
+            InvalidInputException. If language code is None.
+        """
         assert self.normalized_request is not None
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
             raise self.PageNotFoundException
@@ -448,7 +462,11 @@ class TranslatableTextHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Raises:
+            InvalidInputExpection. The exporation ID is invalid.
+        """
         assert self.normalized_request is not None
         language_code = self.normalized_request['language_code']
         exp_id = self.normalized_request['exp_id']
