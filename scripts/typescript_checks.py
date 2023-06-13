@@ -52,6 +52,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
     'core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.spec.ts',
     'core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller.spec.ts',
+    'core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.spec.ts',
     'core/templates/components/entity-creation-services/story-creation.service.spec.ts',
     'core/templates/components/entity-creation-services/story-creation.service.ts',
     'core/templates/components/entity-creation-services/story-creation-backend-api.service.spec.ts',
@@ -150,6 +151,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-player-page/services/question-player-engine.service.spec.ts',
     'core/templates/pages/exploration-player-page/services/question-player-engine.service.ts',
     'core/templates/pages/facilitator-dashboard-page/facilitator-dashboard-page.import.ts',
+    'core/templates/pages/feedback-updates-page/feedback-updates-page.component.spec.ts'
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.spec.ts',
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.import.ts',
     'core/templates/pages/learner-group-pages/create-group/create-learner-group-page.import.ts',

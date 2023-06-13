@@ -162,19 +162,19 @@ describe('Feedback updates page', () => {
     _username: 'username1',
     _email: 'tester@example.org',
     _isLoggedIn: true,
-    isModerator: (): boolean => true,
-    isCurriculumAdmin: (): boolean => false,
-    isSuperAdmin: (): boolean => false,
-    isTopicManager: (): boolean => false,
-    isTranslationAdmin: (): boolean => false,
-    isBlogAdmin: (): boolean => false,
-    isBlogPostEditor: (): boolean => false,
-    isQuestionAdmin: (): boolean => false,
-    canCreateCollections: (): boolean => true,
-    getPreferredSiteLanguageCode: (): string =>'en',
-    getUsername: (): string => 'username1',
-    getEmail: (): string => 'tester@example.org',
-    isLoggedIn: (): boolean => true
+    isModerator: () => true,
+    isCurriculumAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isBlogAdmin: () => false,
+    isBlogPostEditor: () => false,
+    isQuestionAdmin: () => false,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => 'username1',
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
   };
 
   describe('when succesfully fetching feedback updates data', () => {
