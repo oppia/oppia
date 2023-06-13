@@ -1424,6 +1424,7 @@ describe('Contributions and review component', () => {
           actionButtonTitle: 'Review',
           translationLengthInWords: undefined
         }]);
+        expect(component.computeTranslationLengthLabel(null)).toHaveBeenCalled
       }));
 
       it('should get in-review question suggestions', fakeAsync(() => {
