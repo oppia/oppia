@@ -65,7 +65,7 @@ class MockPlatformFeatureService {
   };
 }
 
-fdescribe('Contributions and review component', () => {
+describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
@@ -1088,7 +1088,7 @@ fdescribe('Contributions and review component', () => {
       expect(component.activeExplorationId).toBeNull();
     });
 
-    fdescribe('loadContributions', () => {
+    describe('loadContributions', () => {
       it('should load reviewable questions', () => {
         component.loadContributions(null).then(({opportunitiesDicts, more}) => {
           expect(Object.keys(component.contributions)).toContain(
@@ -1176,7 +1176,7 @@ fdescribe('Contributions and review component', () => {
         });
     });
 
-    fit('should load reviewable translation opportunities correctly', () => {
+    it('should load reviewable translation opportunities correctly', () => {
       component.loadReviewableTranslationOpportunities().then(
         ({opportunitiesDicts, more}) => {
           expect(opportunitiesDicts).toEqual([
