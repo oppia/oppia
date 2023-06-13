@@ -130,6 +130,7 @@ export class FeaturesTabComponent implements OnInit {
   featureFlagsAreFetched: boolean = false;
   isDummyApiEnabled: boolean = false;
   loadingMessage: string = '';
+  serverStage: string = '';
   directiveSubscriptions = new Subscription();
 
   constructor(
@@ -142,6 +143,7 @@ export class FeaturesTabComponent implements OnInit {
 
   async reloadFeatureFlagsAsync(): Promise<void> {
     const data = await this.apiService.getFeatureFlags();
+    this.serverStage = data.serverStage;
     this.featureFlagsAreFetched = true;
     this.featureFlags = data.featureFlags;
     this.featureFlagNameToBackupMap = new Map(
@@ -192,6 +194,27 @@ export class FeaturesTabComponent implements OnInit {
     const rule = feature.rules[ruleIndex];
     this.removeRule(feature, ruleIndex);
     feature.rules.splice(ruleIndex + 1, 0, rule);
+  }
+
+  getFeatureValidOnCurrentServer(feature: PlatformParameter): boolean {
+    if (this.serverStage === 'dev') {
+      return true;
+    }
+    else if (this.serverStage === 'test') {
+      if (feature.featureStage === 'test' || feature.featureStage === 'prod') {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    else if (this.serverStage === 'prod') {
+      if (feature.featureStage === 'prod') {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
   }
 
   async updateFeatureRulesAsync(feature: PlatformParameter): Promise<void> {

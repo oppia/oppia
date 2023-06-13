@@ -72,7 +72,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
 
     let featureFlagsObject = {
       featureFlags: featureFlagsResponse.feature_flags.map(
-        dict => PlatformParameter.createFromBackendDict(dict))
+        dict => PlatformParameter.createFromBackendDict(dict)),
+      serverStage: 'dev'
     };
     featureAdminService.getFeatureFlags().then(successHandler, failHandler);
 

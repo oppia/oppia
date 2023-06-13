@@ -22,7 +22,9 @@
     <div class="admin-note">Note: The first rule that matches client criteria will be chosen.</div>
   </div>
   <div class="oppia-flex-center oppia-feature-bottom-margin">
-    <button class="btn btn-secondary" (click)="addNewRuleToTop(featureFlag)">
+    <button class="btn btn-secondary"
+            (click)="addNewRuleToTop(featureFlag)"
+            [disabled]="!getFeatureValidOnCurrentServer(featureFlag)">
       Add Rule To Top
     </button>
   </div>
@@ -172,7 +174,9 @@
     </div>
   </div>
   <div class="oppia-flex-center oppia-feature-bottom-margin">
-    <button class="btn btn-secondary e2e-test-feature-add-rule-button" (click)="addNewRuleToBottom(featureFlag)">
+    <button class="btn btn-secondary e2e-test-feature-add-rule-button"
+            (click)="addNewRuleToBottom(featureFlag)"
+            [disabled]="!getFeatureValidOnCurrentServer(featureFlag)">
       Add Rule To Bottom
     </button>
   </div>

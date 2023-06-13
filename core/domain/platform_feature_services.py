@@ -72,7 +72,7 @@ def create_evaluation_context_for_client(
     return platform_parameter_domain.EvaluationContext.from_dict(
         client_context_dict,
         {
-            'server_mode': _get_server_mode()
+            'server_mode': get_server_mode()
         }
     )
 
@@ -150,7 +150,7 @@ def update_feature_flag_rules(
         feature_name, committer_id, commit_message, new_rules)
 
 
-def _get_server_mode() -> platform_parameter_domain.ServerMode:
+def get_server_mode() -> platform_parameter_domain.ServerMode:
     """Returns the running mode of Oppia.
 
     Returns:
@@ -189,7 +189,7 @@ def _create_evaluation_context_for_server() -> (
             'app_version': None,
         },
         {
-            'server_mode': _get_server_mode()
+            'server_mode': get_server_mode()
         }
     )
 
