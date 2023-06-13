@@ -232,8 +232,9 @@ export class ContributionsAndReview
       const translationLengthLabelRequired = (
         this.isReviewTranslationsTab() && this.activeExplorationId);
 
-      const translationLengthInWords = translationLengthLabelRequired ? this.computeTranslationLengthLabel(
-        suggestion.exploration_content_html) : undefined;
+      const translationLengthInWords = (
+        translationLengthLabelRequired ? this.computeTranslationLengthLabel(
+          suggestion.exploration_content_html) : undefined);
 
       const requiredData = {
         id: suggestion.suggestion_id,
