@@ -245,7 +245,7 @@ export class StoryContents {
   }
 
   setNodeStatus(nodeId: string, status: string): void {
-    var index = this.getNodeIndex(nodeId);
+    let index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }
@@ -254,7 +254,7 @@ export class StoryContents {
 
   setNodePlannedPublicationDateMsecs(
       nodeId: string, plannedPublicationDateMsecs: number | null): void {
-    var index = this.getNodeIndex(nodeId);
+    let index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }
@@ -263,8 +263,9 @@ export class StoryContents {
   }
 
   setNodeLastModifiedMsecs(
-      nodeId: string, lastModifiedMsecs: number | null): void {
-    var index = this.getNodeIndex(nodeId);
+      nodeId: string, lastModifiedMsecs: number | null
+  ): void {
+    let index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }
@@ -272,8 +273,9 @@ export class StoryContents {
   }
 
   setNodeFirstPublicationDateMsecs(
-      nodeId: string, firstPublicationDateMsecs: number | null): void {
-    var index = this.getNodeIndex(nodeId);
+      nodeId: string, firstPublicationDateMsecs: number | null
+  ): void {
+    let index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }
@@ -283,7 +285,7 @@ export class StoryContents {
 
   setNodeUnpublishingReason(
       nodeId: string, unpublishingReason: string | null): void {
-    var index = this.getNodeIndex(nodeId);
+    let index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }

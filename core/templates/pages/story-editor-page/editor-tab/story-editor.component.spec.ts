@@ -32,6 +32,7 @@ import { NewChapterTitleModalComponent } from '../modal-templates/new-chapter-ti
 import { DeleteChapterModalComponent } from '../modal-templates/delete-chapter-modal.component';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { StoryNode } from 'domain/story/story-node.model';
+import { PlatformFeatureService } from '../../../services/platform-feature.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -47,10 +48,19 @@ class MockNgbModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
+
 describe('Story Editor Component having three story nodes', () => {
   let component: StoryEditorComponent;
   let fixture: ComponentFixture<StoryEditorComponent>;
   let ngbModal: NgbModal;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let story: Story;
   let windowDimensionsService: WindowDimensionsService;
   let undoRedoService: UndoRedoService;
@@ -74,6 +84,10 @@ describe('Story Editor Component having three story nodes', () => {
         StoryEditorNavigationService,
         StoryUpdateService,
         StoryEditorStateService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -173,6 +187,14 @@ describe('Story Editor Component having three story nodes', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+  });
+
+  it('should get status of Serial Chapter Launch Feature flag', () => {
+    expect(component.getSerialChapterFeatureFlagIsEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    expect(component.getSerialChapterFeatureFlagIsEnabled()).toEqual(true);
   });
 
   it('should correctly initialize chapterIsPublishable', () => {

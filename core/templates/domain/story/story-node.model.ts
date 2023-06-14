@@ -146,7 +146,8 @@ export class StoryNode {
   }
 
   setPlannedPublicationDateMsecs(
-      plannedPublicationDateMsecs: number | null): void {
+      plannedPublicationDateMsecs: number | null
+  ): void {
     this._plannedPublicationDateMsecs = plannedPublicationDateMsecs;
   }
 
@@ -155,7 +156,8 @@ export class StoryNode {
   }
 
   setFirstPublicationDateMsecs(
-      firstPublicationDateMsecs: number | null): void {
+      firstPublicationDateMsecs: number | null
+  ): void {
     this._firstPublicationDateMsecs = firstPublicationDateMsecs;
   }
 

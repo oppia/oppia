@@ -574,7 +574,8 @@ export class StoryUpdateService {
    * in the undo/redo service.
    */
   setStoryNodeStatus(
-      story: Story, nodeId: string, newStatus: string): void {
+      story: Story, nodeId: string, newStatus: string
+  ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldStatus = storyNode.getStatus();
 
