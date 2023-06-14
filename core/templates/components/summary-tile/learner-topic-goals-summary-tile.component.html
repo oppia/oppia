@@ -3,7 +3,8 @@
     <a [href]="getStoryNodeLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
       <div class="story-card">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-          <img class="oppia-thumbnail-image" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
+          // We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information.
+          <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
           <div class="oppia-story-completion">
             <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
             <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
