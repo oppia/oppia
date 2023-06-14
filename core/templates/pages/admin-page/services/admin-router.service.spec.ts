@@ -18,7 +18,7 @@
 
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 
-fdescribe('Admin router service', () => {
+describe('Admin router service', () => {
   let ars: AdminRouterService;
 
   beforeEach(() => {
