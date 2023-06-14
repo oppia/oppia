@@ -19,9 +19,10 @@
 # # COPY . .
 
 
+# using digestID of the 3rd party dockerhub image, as updates in the images might break the build
+FROM python@sha256:90834dba6381dfc3957573dc7a3e6c5c8ed255cf60079329a6da2b5e6d4257b8
 
-FROM python:3.8
-
+# python2 not installating as package might be removed - giving unable to locate python2
 RUN apt-get update && apt-get install -y python2 wget
 
 RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz
@@ -32,7 +33,7 @@ RUN rm gcloud-sdk.tar.gz
 RUN /google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras --quiet
 
 COPY . /app/oppia
-
+RUN chmod +x /app/oppia/wait-for-it.sh
 
 EXPOSE 8089
 EXPOSE 8000
