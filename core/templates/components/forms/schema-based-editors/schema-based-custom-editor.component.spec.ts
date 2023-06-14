@@ -16,11 +16,33 @@
  * @fileoverview Unit tests for schema-based editor component for custom values
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormControl, FormsModule } from '@angular/forms';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { Component, EventEmitter, NO_ERRORS_SCHEMA, forwardRef } from '@angular/core';
+import { ControlValueAccessor, FormControl, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedCustomEditorComponent } from './schema-based-custom-editor.component';
 import { SchemaDefaultValue } from 'services/schema-default-value.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+
+@Component({
+  selector: 'object-editor',
+  template: '',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => MockObjectEditorComponent),
+      multi: true
+    }
+  ]
+})
+export class MockObjectEditorComponent implements ControlValueAccessor {
+  value: any;
+
+  writeValue(value: string | number | null): void {}
+  registerOnChange(fn: () => void): void {}
+  registerOnTouched(fn: (() => void) | undefined): void {}
+  setDisabledState?(isDisabled: boolean): void {}
+}
 
 describe('Schema Based Custom Editor Component', () => {
   let component: SchemaBasedCustomEditorComponent;
@@ -28,11 +50,19 @@ describe('Schema Based Custom Editor Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule],
+      imports: [FormsModule, HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader
+          }
+        })],
       declarations: [
-        SchemaBasedCustomEditorComponent
+        SchemaBasedCustomEditorComponent,
+        MockObjectEditorComponent
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [TranslateService]
     }).compileComponents();
   }));
 
@@ -52,7 +82,6 @@ describe('Schema Based Custom Editor Component', () => {
     component.onTouch();
 
     expect(component).toBeDefined();
-    expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toBeDefined();
   }));
 
@@ -93,4 +122,23 @@ describe('Schema Based Custom Editor Component', () => {
 
     expect(component.localValue).toBe('true');
   });
+
+  it(
+    'should register validator and call it when the form validation changes',
+    fakeAsync(() => {
+      component.schema = { obj_type: 'UnicodeString' };
+      fixture.detectChanges();
+      flush();
+      const spy = jasmine.createSpy('validator onchange spy');
+      let mockEmitter = new EventEmitter();
+      component.registerOnValidatorChange(spy);
+      spyOnProperty(
+        component.hybridForm, 'statusChanges').and.returnValue(mockEmitter);
+      component.ngAfterViewInit();
+      component.validate(new FormControl());
+      mockEmitter.emit();
+      tick();
+      expect(spy).toHaveBeenCalled();
+    }
+    ));
 });

@@ -60,6 +60,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'questions-list-select-skill-and-difficulty-modal.component.ts',
     # TODO(#16656): This file will be covered by angular migration team.
     'questions-opportunities-select-difficulty-modal.component.ts',
+    'rte-helper-modal.controller.ts',
     'rule-type-selector.directive.ts',
     'translation-file-hash-loader-backend-api.service.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.

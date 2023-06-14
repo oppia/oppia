@@ -55,7 +55,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   @Input() alwaysEditable: boolean = false;
   @Input() value!: MathExpression;
   @Output() valueChanged = new EventEmitter();
-  private debouncedUpdate$: Subject<string> = new Subject();
+  debouncedUpdate$: Subject<string> = new Subject();
   numberOfElementsInQueue!: number;
   svgString!: string;
   placeholderText = '\\frac{x}{y}';

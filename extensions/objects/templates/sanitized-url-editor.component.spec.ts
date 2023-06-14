@@ -16,10 +16,15 @@
  * @fileoverview Unit tests for sanitized URL editor.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { SanitizedUrlEditorComponent } from './sanitized-url-editor.component';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
+import { DirectivesModule } from 'directives/directives.module';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 
 describe('SanitizedUrlEditorComponent', () => {
   let component: SanitizedUrlEditorComponent;
@@ -27,8 +32,18 @@ describe('SanitizedUrlEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [FormsModule, SharedFormsModule,
+        DirectivesModule,
+        HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useClass: TranslateFakeLoader
+          }
+        })],
       declarations: [SanitizedUrlEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [TranslateService]
     }).compileComponents();
   }));
 
@@ -84,4 +99,22 @@ describe('SanitizedUrlEditorComponent', () => {
     expect(component.valueChanged.emit).not.toHaveBeenCalledWith('http://oppia.org/');
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
+
+  it('should set form validity', fakeAsync(() => {
+    fixture.detectChanges();
+    flush();
+    let mockEmitter = new EventEmitter();
+    const validityChangeSpy = spyOn(component.validityChange, 'emit');
+
+    spyOnProperty(component.form, 'statusChanges')
+      .and.returnValue(mockEmitter);
+
+    component.ngAfterViewInit();
+    tick();
+    mockEmitter.emit('INVALID');
+    expect(validityChangeSpy).toHaveBeenCalledWith({validUrl: false});
+    tick();
+    mockEmitter.emit();
+    expect(validityChangeSpy).toHaveBeenCalledWith({validUrl: true});
+  }));
 });

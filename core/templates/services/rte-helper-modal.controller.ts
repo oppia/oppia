@@ -13,10 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for RteHelperService.
+ * @fileoverview Component for RteHelperModal.
  */
-
-require('services/external-rte-save.service.ts');
 
 import { Component, Input, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
