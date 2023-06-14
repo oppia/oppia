@@ -2001,3 +2001,387 @@ class ReviewableSuggestionEmailInfo:
         self.language_code = language_code
         self.suggestion_content = suggestion_content
         self.submission_datetime = submission_datetime
+
+
+class TranslationSubmitterTotalContributionStatsDict(TypedDict):
+    """Dictionary representing the TranslationSubmitterTotalContributionStats
+    object.
+    """
+
+    language_code: str
+    contributor_id: str
+    topic_ids_with_translation_submissions: List[str]
+    recent_review_outcomes: List[str]
+    recent_performance: int
+    overall_accuracy: float
+    submitted_translations_count: int
+    submitted_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translations_without_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    rejected_translation_word_count: int
+    first_contribution_date: datetime.date
+    last_contribution_date: datetime.date
+
+
+class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationSubmitterTotalContributionStats
+    object for frontend.
+    """
+
+    language_code: str
+    contributor_id: str
+    topic_ids_with_translation_submissions: List[str]
+    recent_review_outcomes: List[str]
+    recent_performance: int
+    overall_accuracy: float
+    submitted_translations_count: int
+    submitted_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translations_without_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    rejected_translation_word_count: int
+    first_contribution_date: str
+    last_contributed_in_days: int
+
+
+class TranslationSubmitterTotalContributionStats:
+    """Domain object for the TranslationSubmitterTotalContributionStatsModel."""
+
+    def __init__(
+        self,
+        language_code: str,
+        contributor_id: str,
+        topic_ids_with_translation_submissions: List[str],
+        recent_review_outcomes: List[str],
+        recent_performance: int,
+        overall_accuracy: float,
+        submitted_translations_count: int,
+        submitted_translation_word_count: int,
+        accepted_translations_count: int,
+        accepted_translations_without_reviewer_edits_count: int,
+        accepted_translation_word_count: int,
+        rejected_translations_count: int,
+        rejected_translation_word_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> None:
+        self.language_code = language_code
+        self.contributor_id = contributor_id
+        self.topic_ids_with_translation_submissions = (
+            topic_ids_with_translation_submissions)
+        self.recent_review_outcomes = recent_review_outcomes
+        self.recent_performance = recent_performance
+        self.overall_accuracy = overall_accuracy
+        self.submitted_translations_count = submitted_translations_count
+        self.submitted_translation_word_count = submitted_translation_word_count
+        self.accepted_translations_count = accepted_translations_count
+        self.accepted_translations_without_reviewer_edits_count = (
+            accepted_translations_without_reviewer_edits_count
+        )
+        self.accepted_translation_word_count = accepted_translation_word_count
+        self.rejected_translations_count = rejected_translations_count
+        self.rejected_translation_word_count = rejected_translation_word_count
+        self.first_contribution_date = first_contribution_date
+        self.last_contribution_date = last_contribution_date
+
+    def to_frontend_dict(
+            self) -> TranslationSubmitterTotalContributionStatsFrontendDict:
+        """Returns a dict representation of a
+        TranslationSubmitterTotalContributionStats domain object for frontend.
+
+        Returns:
+            dict. The dict representation.
+        """
+        return {
+            'language_code': self.language_code,
+            'contributor_id': self.contributor_id,
+            'topic_ids_with_translation_submissions': (
+                self.topic_ids_with_translation_submissions),
+            'recent_review_outcomes': self.recent_review_outcomes,
+            'recent_performance': self.recent_performance,
+            'overall_accuracy': self.overall_accuracy,
+            'submitted_translations_count': self.submitted_translations_count,
+            'submitted_translation_word_count': (
+                self.submitted_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.accepted_translations_without_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'rejected_translations_count': self.rejected_translations_count,
+            'rejected_translation_word_count': (
+                self.rejected_translation_word_count),
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contributed_in_days': int(
+                (datetime.date.today() - self.last_contribution_date).days)
+        }
+
+
+class TranslationReviewerTotalContributionStatsDict(TypedDict):
+    """Dictionary representing the TranslationReviewerTotalContributionStats
+    object.
+    """
+
+    language_code: str
+    contributor_id: str
+    topic_ids_with_translation_reviews: List[str]
+    reviewed_translations_count: int
+    accepted_translations_count: int
+    accepted_translations_with_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    first_contribution_date: datetime.date
+    last_contribution_date: datetime.date
+
+
+class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the TranslationReviewerTotalContributionStats
+    object for frontend.
+    """
+
+    language_code: str
+    contributor_id: str
+    topic_ids_with_translation_reviews: List[str]
+    reviewed_translations_count: int
+    accepted_translations_count: int
+    accepted_translations_with_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    first_contribution_date: str
+    last_contributed_in_days: int
+
+
+class TranslationReviewerTotalContributionStats:
+    """Domain object for the TranslationReviewerTotalContributionStats."""
+
+    def __init__(
+        self,
+        language_code: str,
+        contributor_id: str,
+        topic_ids_with_translation_reviews: List[str],
+        reviewed_translations_count: int,
+        accepted_translations_count: int,
+        accepted_translations_with_reviewer_edits_count: int,
+        accepted_translation_word_count: int,
+        rejected_translations_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> None:
+        self.language_code = language_code
+        self.contributor_id = contributor_id
+        self.topic_ids_with_translation_reviews = (
+            topic_ids_with_translation_reviews)
+        self.reviewed_translations_count = reviewed_translations_count
+        self.accepted_translations_count = accepted_translations_count
+        self.accepted_translations_with_reviewer_edits_count = (
+            accepted_translations_with_reviewer_edits_count
+        )
+        self.accepted_translation_word_count = accepted_translation_word_count
+        self.rejected_translations_count = rejected_translations_count
+        self.first_contribution_date = first_contribution_date
+        self.last_contribution_date = last_contribution_date
+
+    def to_frontend_dict(
+            self) -> TranslationReviewerTotalContributionStatsFrontendDict:
+        """Returns a dict representation of a
+        TranslationReviewerTotalContributionStats domain object for frontend.
+
+        Returns:
+            dict. The dict representation.
+        """
+        return {
+            'language_code': self.language_code,
+            'contributor_id': self.contributor_id,
+            'topic_ids_with_translation_reviews': (
+                self.topic_ids_with_translation_reviews),
+            'reviewed_translations_count': self.reviewed_translations_count,
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_with_reviewer_edits_count': (
+                self.accepted_translations_with_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'rejected_translations_count': self.rejected_translations_count,
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contributed_in_days': int(
+                (datetime.date.today() - self.last_contribution_date).days)
+        }
+
+
+class QuestionSubmitterTotalContributionStatsDict(TypedDict):
+    """Dictionary representing the QuestionSubmitterTotalContributionStats
+    object.
+    """
+
+    contributor_id: str
+    topic_ids_with_question_submissions: List[str]
+    recent_review_outcomes: List[str]
+    recent_performance: int
+    overall_accuracy: float
+    submitted_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_without_reviewer_edits_count: int
+    rejected_questions_count: int
+    first_contribution_date: datetime.date
+    last_contribution_date: datetime.date
+
+
+class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the QuestionSubmitterTotalContributionStats
+    object for frontend.
+    """
+
+    contributor_id: str
+    topic_ids_with_question_submissions: List[str]
+    recent_review_outcomes: List[str]
+    recent_performance: int
+    overall_accuracy: float
+    submitted_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_without_reviewer_edits_count: int
+    rejected_questions_count: int
+    first_contribution_date: str
+    last_contributed_in_days: int
+
+
+class QuestionSubmitterTotalContributionStats:
+    """Domain object for the QuestionSubmitterTotalContributionStats."""
+
+    def __init__(
+        self,
+        contributor_id: str,
+        topic_ids_with_question_submissions: List[str],
+        recent_review_outcomes: List[str],
+        recent_performance: int,
+        overall_accuracy: float,
+        submitted_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_without_reviewer_edits_count: int,
+        rejected_questions_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> None:
+        self.contributor_id = contributor_id
+        self.topic_ids_with_question_submissions = (
+            topic_ids_with_question_submissions)
+        self.recent_review_outcomes = recent_review_outcomes
+        self.recent_performance = recent_performance
+        self.overall_accuracy = overall_accuracy
+        self.submitted_questions_count = submitted_questions_count
+        self.accepted_questions_count = accepted_questions_count
+        self.accepted_questions_without_reviewer_edits_count = (
+            accepted_questions_without_reviewer_edits_count
+        )
+        self.rejected_questions_count = rejected_questions_count
+        self.first_contribution_date = first_contribution_date
+        self.last_contribution_date = last_contribution_date
+
+    def to_frontend_dict(
+            self) -> QuestionSubmitterTotalContributionStatsFrontendDict:
+        """Returns a dict representation of a
+        QuestionSubmitterTotalContributionStats domain object for frontend.
+
+        Returns:
+            dict. The dict representation.
+        """
+        return {
+            'contributor_id': self.contributor_id,
+            'topic_ids_with_question_submissions': (
+                self.topic_ids_with_question_submissions),
+            'recent_review_outcomes': self.recent_review_outcomes,
+            'recent_performance': self.recent_performance,
+            'overall_accuracy': self.overall_accuracy,
+            'submitted_questions_count': self.submitted_questions_count,
+            'accepted_questions_count': self.accepted_questions_count,
+            'accepted_questions_without_reviewer_edits_count': (
+                self.accepted_questions_without_reviewer_edits_count),
+            'rejected_questions_count': self.rejected_questions_count,
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contributed_in_days': int(
+                (datetime.date.today() - self.last_contribution_date).days)
+        }
+
+
+class QuestionReviewerTotalContributionStatsDict(TypedDict):
+    """Dictionary representing the QuestionReviewerTotalContributionStats
+    object.
+    """
+
+    contributor_id: str
+    topic_ids_with_question_reviews: List[str]
+    reviewed_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_with_reviewer_edits_count: int
+    rejected_questions_count: int
+    first_contribution_date: datetime.date
+    last_contribution_date: datetime.date
+
+
+class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
+    """Dictionary representing the QuestionReviewerTotalContributionStats
+    object for frontend.
+    """
+
+    contributor_id: str
+    topic_ids_with_question_reviews: List[str]
+    reviewed_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_with_reviewer_edits_count: int
+    rejected_questions_count: int
+    first_contribution_date: str
+    last_contributed_in_days: int
+
+
+class QuestionReviewerTotalContributionStats:
+    """Domain object for the QuestionReviewerTotalContributionStats."""
+
+    def __init__(
+        self,
+        contributor_id: str,
+        topic_ids_with_question_reviews: List[str],
+        reviewed_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_with_reviewer_edits_count: int,
+        rejected_questions_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> None:
+        self.contributor_id = contributor_id
+        self.topic_ids_with_question_reviews = (
+            topic_ids_with_question_reviews)
+        self.reviewed_questions_count = reviewed_questions_count
+        self.accepted_questions_count = accepted_questions_count
+        self.accepted_questions_with_reviewer_edits_count = (
+            accepted_questions_with_reviewer_edits_count
+        )
+        self.rejected_questions_count = rejected_questions_count
+        self.first_contribution_date = first_contribution_date
+        self.last_contribution_date = last_contribution_date
+
+    def to_frontend_dict(
+            self) -> QuestionReviewerTotalContributionStatsFrontendDict:
+        """Returns a dict representation of a
+        questionReviewerTotalContributionStats domain object for frontend.
+
+        Returns:
+            dict. The dict representation.
+        """
+        return {
+            'contributor_id': self.contributor_id,
+            'topic_ids_with_question_reviews': (
+                self.topic_ids_with_question_reviews),
+            'reviewed_questions_count': self.reviewed_questions_count,
+            'accepted_questions_count': self.accepted_questions_count,
+            'accepted_questions_with_reviewer_edits_count': (
+                self.accepted_questions_with_reviewer_edits_count),
+            'rejected_questions_count': self.rejected_questions_count,
+            'first_contribution_date': (
+                self.first_contribution_date.strftime('%b %d, %Y')),
+            'last_contributed_in_days': int(
+                (datetime.date.today() - self.last_contribution_date).days)
+        }
