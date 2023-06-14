@@ -1,4 +1,4 @@
-<div class="oppia-goals-box e2e-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
+<div tabindex="0" class="oppia-goals-box e2e-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
   <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
   </p>
   <div *ngIf="currentGoals.length > 0">
@@ -9,16 +9,26 @@
           <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
         </div>
         <div #dropdown class="oppia-three-dots-dropdown-container"
+             (keydown.enter)="toggleThreeDotsDropdown(i)"
+             role="button"
+             aria-label="More options"
+             tabindex="0"
              (click)="toggleThreeDotsDropdown(i)">
           <i class="fa fa-ellipsis-v"></i>
           <div *ngIf="showThreeDotsDropdown[i]" class="oppia-three-dots-dropdown">
-            <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
+            <div class="oppia-trash-button"
+                 (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)"
+                 tabindex="0"
+                 (keydown.enter)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
               <i class="fa fa-trash"></i>
               <span>{{'I18N_LEARNER_DASHBOARD_REMOVE_BUTTON' | translate}}</span>
             </div>
           </div>
         </div>
-        <label class="oppia-current-goals-topic-name e2e-test-topic-name-in-current-goals" (click)="toggleStory(i)">
+        <label class="oppia-current-goals-topic-name e2e-test-topic-name-in-current-goals"
+               (click)="toggleStory(i)"
+               (keydown.enter)="toggleStory(i)"
+               tabindex="0">
           <span [innerHTML]="'I18N_LEARN_TOPIC' | translate: { topicName: topic.name }"></span>
         </label>
         <p class="oppia-goals-story-name">
@@ -37,7 +47,7 @@
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CURRENT_GOALS_SECTION' | translate"></p>
   </div>
 </div>
-<div class="oppia-goals-box e2e-test-edit-goals-section">
+<div tabindex="0" class="oppia-goals-box e2e-test-edit-goals-section">
   <p class="oppia-edit-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION' | translate"> </p>
   <span class="oppia-input-box-subtitle">
     <em>
@@ -64,7 +74,7 @@
     </div>
   </div>
 </div>
-<div class="oppia-goals-box e2e-test-completed-goals-section">
+<div tabindex="0" class="oppia-goals-box e2e-test-completed-goals-section">
   <p class="oppia-goals-title"
      [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION' | translate">
   </p>
