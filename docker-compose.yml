@@ -11,7 +11,6 @@ services:
       - shared_root_dir:/app/oppia
       - node_modules:/app/oppia/node_modules
     environment:
-      - REDIS_CONN_STRING=redis://redis:6379
       - production=false
       - NODE_ENV=development
     depends_on:
@@ -49,8 +48,8 @@ services:
       - shared_root_dir:/app/oppia
     links:
       - redis
-    environment:
-      - REDIS_CONN_STRING=redis://redis:6379
+    # environment:
+    #   - REDIS_HOST=redis
     depends_on:
       - webserver
       - webpack-compiler
@@ -82,7 +81,7 @@ services:
       - node_modules:/app/oppia/node_modules
     # networks:
     #   - oppia-network
-    command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --export-on-exit /app/firebase_emulator_cache
+    command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --import /app/firebase_emulator_cache --export-on-exit /app/firebase_emulator_cache
 
   redis:
     image: redis:7.0-alpine
