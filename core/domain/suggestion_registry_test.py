@@ -3868,7 +3868,7 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
 
-    def test_create_translation_submitter_total_stats(self) -> None:
+    def test_to_dict_returns_dict(self) -> None:
         expected_stats_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
             'contributor_id': self.USER_ID_1,
@@ -3981,7 +3981,7 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
 
-    def test_create_translation_reviewer_total_stats(self) -> None:
+    def test_to_dict_returns_dict(self) -> None:
         expected_stats_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
             'contributor_id': self.USER_ID_1,
@@ -4076,7 +4076,7 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
 
-    def test_create_question_submitter_total_stats(self) -> None:
+    def test_to_dict_returns_dict(self) -> None:
         expected_stats_dict = {
             'contributor_id': self.USER_ID_1,
             'topic_ids_with_question_submissions': (
@@ -4167,7 +4167,7 @@ class QuestionReviewerTotalContributionStatsUnitTests(
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
 
-    def test_create_question_reviewer_total_stats(self) -> None:
+    def test_to_dict_returns_dict(self) -> None:
         expected_stats_dict = {
             'contributor_id': self.USER_ID_1,
             'topic_ids_with_question_reviews': (

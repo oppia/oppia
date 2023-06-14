@@ -2092,8 +2092,7 @@ class TranslationSubmitterTotalContributionStats:
         TranslationSubmitterTotalContributionStats domain object.
 
         Returns:
-            dict. A dict representation of a
-            TranslationSubmitterTotalContributionStats domain object.
+            dict. The dict representation..
         """
         return {
             'language_code': self.language_code,
@@ -2128,9 +2127,7 @@ class TranslationSubmitterTotalContributionStats:
         TranslationSubmitterTotalContributionStats domain object for frontend.
 
         Returns:
-            dict. A dict representation of a
-            TranslationSubmitterTotalContributionStats domain object for
-            frontend.
+            dict. The dict representation.
         """
         return {
             'language_code': self.language_code,
@@ -2227,8 +2224,7 @@ class TranslationReviewerTotalContributionStats:
         TranslationReviewerTotalContributionStats domain object.
 
         Returns:
-            dict. A dict representation of a
-            TranslationReviewerTotalContributionStats domain object.
+            dict. The dict representation.
         """
         return {
             'language_code': self.language_code,
@@ -2256,9 +2252,7 @@ class TranslationReviewerTotalContributionStats:
         TranslationReviewerTotalContributionStats domain object for frontend.
 
         Returns:
-            dict. A dict representation of a
-            TranslationReviewerTotalContributionStats domain object for
-            frontend.
+            dict. The dict representation.
         """
         return {
             'language_code': self.language_code,
@@ -2352,8 +2346,7 @@ class QuestionSubmitterTotalContributionStats:
         QuestionSubmitterTotalContributionStats domain object.
 
         Returns:
-            dict. A dict representation of a
-            QuestionSubmitterTotalContributionStats domain object.
+            dict. The dict representation.
         """
         return {
             'contributor_id': self.contributor_id,
@@ -2381,9 +2374,7 @@ class QuestionSubmitterTotalContributionStats:
         QuestionSubmitterTotalContributionStats domain object for frontend.
 
         Returns:
-            dict. A dict representation of a
-            QuestionSubmitterTotalContributionStats domain object for
-            frontend.
+            dict. The dict representation.
         """
         return {
             'contributor_id': self.contributor_id,
@@ -2465,8 +2456,7 @@ class QuestionReviewerTotalContributionStats:
         QuestionReviewerTotalContributionStats domain object.
 
         Returns:
-            dict. A dict representation of a
-            QuestionReviewerTotalContributionStats domain object.
+            dict. The dict representation.
         """
         return {
             'contributor_id': self.contributor_id,
@@ -2491,9 +2481,7 @@ class QuestionReviewerTotalContributionStats:
         questionReviewerTotalContributionStats domain object for frontend.
 
         Returns:
-            dict. A dict representation of a
-            QuestionReviewerTotalContributionStats domain object for
-            frontend.
+            dict. The dict representation.
         """
         return {
             'contributor_id': self.contributor_id,
