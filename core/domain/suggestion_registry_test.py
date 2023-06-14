@@ -3868,54 +3868,6 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
 
-    def test_to_dict_returns_dict(self) -> None:
-        expected_stats_dict = {
-            'language_code': self.SUGGESTION_LANGUAGE_CODE,
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_translation_submissions': (
-                self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS),
-            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
-            'recent_performance': self.RECENT_PERFORMANCE,
-            'overall_accuracy': self.OVERALL_ACCURACY,
-            'submitted_translations_count': (
-                self.SUBMITTED_TRANSLATIONS_COUNT),
-            'submitted_translation_word_count': (
-                self.SUBMITTED_TRANSLATION_WORD_COUNT),
-            'accepted_translations_count': (
-                self.ACCEPTED_TRANSLATIONS_COUNT),
-            'accepted_translations_without_reviewer_edits_count': (
-                self
-                .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            'accepted_translation_word_count': (
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            'rejected_translations_count': (
-                self.REJECTED_TRANSLATIONS_COUNT),
-            'rejected_translation_word_count': (
-                self.REJECTED_TRANSLATION_WORD_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE),
-            'last_contribution_date': (
-                self.LAST_CONTRIBUTION_DATE)
-        }
-
-        actual_stats = suggestion_registry.TranslationSubmitterTotalContributionStats( # pylint: disable=line-too-long
-            self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
-            self.TOPIC_IDS_WITH_TRANSLATION_SUBMISSIONS,
-            self.RECENT_REVIEW_OUTCOMES, self.RECENT_PERFORMANCE,
-            self.OVERALL_ACCURACY,
-            self.SUBMITTED_TRANSLATIONS_COUNT,
-            self.SUBMITTED_TRANSLATION_WORD_COUNT,
-            self.ACCEPTED_TRANSLATIONS_COUNT,
-            self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
-            self.ACCEPTED_TRANSLATION_WORD_COUNT,
-            self.REJECTED_TRANSLATIONS_COUNT,
-            self.REJECTED_TRANSLATION_WORD_COUNT,
-            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
-        )
-
-        self.assertDictEqual(
-            actual_stats.to_dict(), expected_stats_dict)
-
     def test_to_frontend_dict(self) -> None:
         expected_frontend_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -3981,43 +3933,6 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
 
-    def test_to_dict_returns_dict(self) -> None:
-        expected_stats_dict = {
-            'language_code': self.SUGGESTION_LANGUAGE_CODE,
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_translation_reviews': (
-                self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS),
-            'reviewed_translations_count': (
-                self.REVIEWED_TRANSLATIONS_COUNT),
-            'accepted_translations_count': (
-                self.ACCEPTED_TRANSLATIONS_COUNT),
-            'accepted_translations_with_reviewer_edits_count': (
-                self
-                .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
-            'accepted_translation_word_count': (
-                self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            'rejected_translations_count': (
-                self.REJECTED_TRANSLATIONS_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE),
-            'last_contribution_date': (
-                self.LAST_CONTRIBUTION_DATE)
-        }
-
-        actual_stats = suggestion_registry.TranslationReviewerTotalContributionStats( # pylint: disable=line-too-long
-            self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
-            self.TOPIC_IDS_WITH_TRANSLATION_REVIEWS,
-            self.REVIEWED_TRANSLATIONS_COUNT,
-            self.ACCEPTED_TRANSLATIONS_COUNT,
-            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
-            self.ACCEPTED_TRANSLATION_WORD_COUNT,
-            self.REJECTED_TRANSLATIONS_COUNT,
-            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
-        )
-
-        self.assertDictEqual(
-            actual_stats.to_dict(), expected_stats_dict)
-
     def test_to_frontend_dict(self) -> None:
         expected_stats_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -4076,44 +3991,6 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
 
-    def test_to_dict_returns_dict(self) -> None:
-        expected_stats_dict = {
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_question_submissions': (
-                self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS),
-            'recent_review_outcomes': self.RECENT_REVIEW_OUTCOMES,
-            'recent_performance': self.RECENT_PERFORMANCE,
-            'overall_accuracy': self.OVERALL_ACCURACY,
-            'submitted_questions_count': (
-                self.SUBMITTED_QUESTIONS_COUNT),
-            'accepted_questions_count': (
-                self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_without_reviewer_edits_count': (
-                self
-                .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            'rejected_questions_count': (
-                self.REJECTED_QUESTIONS_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE),
-            'last_contribution_date': (
-                self.LAST_CONTRIBUTION_DATE)
-        }
-
-        actual_stats = suggestion_registry.QuestionSubmitterTotalContributionStats( # pylint: disable=line-too-long
-            self.USER_ID_1,
-            self.TOPIC_IDS_WITH_QUESTION_SUBMISSIONS,
-            self.RECENT_REVIEW_OUTCOMES, self.RECENT_PERFORMANCE,
-            self.OVERALL_ACCURACY,
-            self.SUBMITTED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
-            self.REJECTED_QUESTIONS_COUNT,
-            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
-        )
-
-        self.assertDictEqual(
-            actual_stats.to_dict(), expected_stats_dict)
-
     def test_to_frontend_dict(self) -> None:
         expected_stats_dict = {
             'contributor_id': self.USER_ID_1,
@@ -4166,39 +4043,6 @@ class QuestionReviewerTotalContributionStatsUnitTests(
     FIRST_CONTRIBUTION_DATE = datetime.date.today()
     LAST_CONTRIBUTION_DATE = (
         datetime.date.today() - datetime.timedelta(25))
-
-    def test_to_dict_returns_dict(self) -> None:
-        expected_stats_dict = {
-            'contributor_id': self.USER_ID_1,
-            'topic_ids_with_question_reviews': (
-                self.TOPIC_IDS_WITH_QUESTION_REVIEWS),
-            'reviewed_questions_count': (
-                self.REVIEWED_QUESTIONS_COUNT),
-            'accepted_questions_count': (
-                self.ACCEPTED_QUESTIONS_COUNT),
-            'accepted_questions_with_reviewer_edits_count': (
-                self
-                .ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-            'rejected_questions_count': (
-                self.REJECTED_QUESTIONS_COUNT),
-            'first_contribution_date': (
-                self.FIRST_CONTRIBUTION_DATE),
-            'last_contribution_date': (
-                self.LAST_CONTRIBUTION_DATE)
-        }
-
-        actual_stats = suggestion_registry.QuestionReviewerTotalContributionStats( # pylint: disable=line-too-long
-            self.USER_ID_1,
-            self.TOPIC_IDS_WITH_QUESTION_REVIEWS,
-            self.REVIEWED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
-            self.REJECTED_QUESTIONS_COUNT,
-            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
-        )
-
-        self.assertDictEqual(
-            actual_stats.to_dict(), expected_stats_dict)
 
     def test_to_frontend_dict(self) -> None:
         expected_stats_dict = {
