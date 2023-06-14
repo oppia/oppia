@@ -75,7 +75,6 @@ RUN unzip $BUF_DIR/$PROTOC_LINUX_FILE -d $PROTOC_DIR \
 RUN chmod -R 744 $BUF_DIR \
     && chmod -R 744 $PROTOC_DIR
 
-RUN yarn add -D global grpc-tools ts-protoc-gen
 # compiling the protobuf files
 ENV PROTOC_FILES_PATH='/app/oppia/third_party/oppia-ml-proto-0.0.0'
     # PATH=':/app/buf-0.29.0/protoc/bin:/app/oppia/node_modules/protoc-gen-ts'

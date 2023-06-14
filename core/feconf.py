@@ -541,7 +541,7 @@ ES_USERNAME = None
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
 # redis.conf.
-REDISHOST = 'localhost'
+REDISHOST = '0.0.0.0'
 REDISPORT = 6379
 
 # The DB numbers for various Redis instances that Oppia uses. Do not reuse these

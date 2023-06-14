@@ -11,11 +11,15 @@ services:
       - shared_root_dir:/app/oppia
       - node_modules:/app/oppia/node_modules
     environment:
+      - REDIS_CONN_STRING=redis://redis:6379
+      - production=false
       - NODE_ENV=development
     depends_on:
       - firebase_emulator
       - redis
     # command: ./node_modules/.bin/ng build --watch
+    # networks:
+    #   - oppia-network
     command: >
       sh -c 'trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT; ./node_modules/.bin/ng build --watch'
 
@@ -28,6 +32,8 @@ services:
     volumes:
       - shared_root_dir:/app/oppia
       - node_modules:/app/oppia/node_modules
+    # networks:
+    #   - oppia-network
     command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
 
   google_app_engine:
@@ -41,10 +47,16 @@ services:
       - "8000:8000"
     volumes:
       - shared_root_dir:/app/oppia
+    links:
+      - redis
+    environment:
+      - REDIS_CONN_STRING=redis://redis:6379
     depends_on:
       - webserver
       - webpack-compiler
     # command: /google-cloud-sdk/bin/dev_appserver.py --runtime python38 --host=0.0.0.0 --port=8181 --log_level=info --admin_host=0.0.0.0 --admin_port=8000 --dev_appserver_log_level=info --skip_sdk_update_check=True --enable_host_checking=False --automatic_restart=True /app/oppia/app_dev.yaml
+    # networks:
+    #   - oppia-network
     command: /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181
   
   # google_cloud_datastore:
@@ -68,6 +80,8 @@ services:
     volumes:
       - shared_root_dir:/app/oppia
       - node_modules:/app/oppia/node_modules
+    # networks:
+    #   - oppia-network
     command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --export-on-exit /app/firebase_emulator_cache
 
   redis:
@@ -77,6 +91,9 @@ services:
       - "6379:6379"
     volumes:
       - shared_root_dir:/app/oppia
+    # networks:
+    #   - oppia-network
+    # command: redis-server --bind 0.0.0.0 --port 6379 --save "60 1" --tcp-keepalive 300 --dbfilename dump.rdb --dir /app/oppia/ --rdbcompression yes --appendonly yes
     # command: redis-server /app/oppia/redis.conf
     # redis running fine without any command, also seen in other orgs too, no need to pass any command
     # on running this command, redis server is exiting? why? checked the redis.conf file, not sure about the configurations defined there are compactible within the docker container? we can define all the configrations from redis.conf here in the docker compose service itself.
@@ -96,3 +113,7 @@ services:
 volumes:
   node_modules:
   shared_root_dir:
+
+# networks:
+#   oppia-network:
+#     driver: bridge
