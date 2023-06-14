@@ -2,7 +2,7 @@
 <div class="oppia-dashboard-container position-relative">
   <div class="oppia-dashboard-title"
     [ngClass]="{'oppia-dashboard-title-mobile': checkTabletView(), 'oppia-dashboard-title-desktop': !checkTabletView()}">
-    <h1 [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h1>
+    <h1 tabindex="0" [innerHTML]="'I18N_DASHBOARD_CREATOR_DASHBOARD' | translate"></h1>
     <oppia-create-activity-button></oppia-create-activity-button>
   </div>
 
@@ -239,12 +239,12 @@
           <div class="exp-private-text" *ngIf="exploration.status === 'private'">
             {{ publishText }}
           </div>
-          <ul *ngIf="exploration.status !== 'private'"
-              fxLayout="row"
-              layout-wrap
-              class="metrics"
-              fxLayoutAlign="space-between center">
-            <div class="row-one">
+          <div *ngIf="exploration.status !== 'private'"
+               fxLayout="row"
+               layout-wrap
+               class="metrics"
+               fxLayoutAlign="space-between center">
+            <ul class="row-one">
               <li flex="50" class="e2e-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
@@ -272,9 +272,9 @@
                   {{ exploration.numOpenThreads }}
                 </span>
               </li>
-            </div>
+            </ul>
 
-            <div class="row-two">
+            <ul class="row-two">
               <li flex="50" class="e2e-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
@@ -294,8 +294,8 @@
                   {{ getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec) }}
                 </span>
               </li>
-            </div>
-            <li flex="100">
+            </ul>
+            <div class="row-three" flex="100">
               <sharing-links *ngIf="exploration.status !== 'private'"
                              (click)="$event.stopPropagation()"
                              flex="100"
@@ -307,8 +307,8 @@
                              smallFont="true"
                              [explorationId]="exploration.id">
               </sharing-links>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </mat-card>
     </div>
@@ -406,7 +406,10 @@
   }
   .row-one, .row-two {
     display: flex;
+    font-size: 12px;
     justify-content: space-between;
+    list-style-type: none;
+    margin-bottom: 0;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 7px;
@@ -577,7 +580,7 @@
     padding: 13px 0 10px;
   }
 
-  .oppia-dashboard-card-view-item .metrics > li {
+  .oppia-dashboard-card-view-item .metrics > .row-three {
     padding: 0 0 5px 14px;
     text-align: left;
   }
@@ -875,7 +878,7 @@
       height: auto;
     }
 
-    .oppia-dashboard-card-view-item .metrics > li {
+    .oppia-dashboard-card-view-item .metrics > .row-three {
       flex-basis: 25%;
     }
 
