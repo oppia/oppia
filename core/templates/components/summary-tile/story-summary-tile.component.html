@@ -45,7 +45,7 @@
   <div class="story-details">
     <div class="story-thumbnail e2e-test-story-thumbnail"
          [ngStyle]="{background: thumbnailBgColor}">
-      <a [href]="storyLink" aria-label="Link to the story">
+      <a [href]="storyLink" [attr.aria-label]="'Link to the story ' + storyTitle"></a>">
         <img *ngIf="thumbnailUrl !== null"
              [src]="thumbnailUrl"
              alt=""
