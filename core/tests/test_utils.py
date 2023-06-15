@@ -286,7 +286,11 @@ def check_image_png_or_webp(image_string: str) -> bool:
 
 
 def get_storage_model_module_names() -> Iterator[models.Names]:
-    """Get all module names in storage."""
+    """Get all model names in storage.
+
+    Yields:
+        Names. The model with all model names in storage.
+    """
     # As models.Names is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
     for name in models.Names:
@@ -294,7 +298,11 @@ def get_storage_model_module_names() -> Iterator[models.Names]:
 
 
 def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
-    """Get all model classes in storage."""
+    """Get all model classes in storage.
+
+    Yields:
+        BaseModel. The model with all model classes in storage.
+    """
     for module_name in get_storage_model_module_names():
         (module,) = models.Registry.import_models([module_name])
         for member_name, member_obj in inspect.getmembers(module):
@@ -1209,6 +1217,9 @@ class TestBase(unittest.TestCase):
     def log_line(self, line: str) -> None:
         """Print the line with a prefix that can be identified by the script
         that calls the test.
+
+        Args:
+            line: str. The log line.
         """
         # We are using the b' prefix as all the stdouts are in bytes.
         print(b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
@@ -1229,6 +1240,17 @@ class TestBase(unittest.TestCase):
         Note that the list of parameter changes is ordered. Parameter changes
         later in the list may depend on parameter changes that have been set
         earlier in the same list.
+
+        Args:
+            param_dict: dict. The old param dict.
+            param_changes: list. The param changes to use for the update.
+            exp_param_specs: dict. The expected param specifications.
+
+        Returns:
+            dict. The updated param dict.
+
+        Raises:
+            Exception. Parameter not found.
         """
         new_param_dict = copy.deepcopy(param_dict)
         for param_change in param_changes:
@@ -2818,7 +2840,15 @@ version: 1
     def _parse_json_response(
         self, json_response: webtest.TestResponse, expect_errors: bool
     ) -> Any:
-        """Convert a JSON server response to an object (such as a dict)."""
+        """Convert a JSON server response to an object (such as a dict).
+
+        Args:
+            json_response: webtest.TestResponse. The test reponse.
+            expect_errors: bool. Whether errors are expected.
+
+        Returns:
+            dict. A json response from the server except the XSSI_PREFIX.
+        """
         if expect_errors:
             self.assertTrue(json_response.status_int >= 400)
         else:
@@ -2842,7 +2872,17 @@ version: 1
         expected_status_int: int = 200,
         headers: Optional[Dict[str, str]] = None
     ) -> Any:
-        """Get a JSON response, transformed to a Python object."""
+        """Get a JSON response, transformed to a Python object.
+
+        Args:
+            url: str. The url to make a request for.
+            params: Dict[str, Any]. The arguments to be sent over.
+            expected_status_int: int. The expetected response status.
+            headers: Dict[str, str]. The headers used in the request.
+
+        Returns:
+            dict. A json response from the server.
+        """
         if params is not None:
             self.assertIsInstance(params, dict)
 
@@ -3042,6 +3082,17 @@ version: 1
     ) -> webtest.TestApp:
         """Posts an object to the server by JSON with the specific headers
         specified; return the received object.
+
+        Args:
+            url: str. The url to post an object to.
+            payload: dict. The dictionary which needs to be sent.
+            headers: dict. The headers set in the request.
+            csrf_token: str. The csrf token to identify the user.
+            expect_errors: bool. Whether errors are expected.
+            expected_status_int: int. The expected status code.
+
+        Returns:
+            webtest.TestApp. The respose of the post task request.
         """
         if csrf_token:
             payload['csrf_token'] = csrf_token

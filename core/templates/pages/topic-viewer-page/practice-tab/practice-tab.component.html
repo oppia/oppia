@@ -20,6 +20,7 @@
         <div *ngFor="let subtopic of availableSubtopics; let i = index"
              class="practice-tab-subtopic-item">
           <mat-checkbox color="primary"
+                        tabindex="0"
                         class="practice-tab-mat-checkbox e2e-test-skill-checkbox"
                         [(ngModel)]="selectedSubtopicIndices[i]"
                         (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
