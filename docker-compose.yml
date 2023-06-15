@@ -19,7 +19,7 @@ services:
     # networks:
     #   - oppia-network
     command: >
-      sh -c 'trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT; ./node_modules/.bin/ng build --watch'
+      sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
 
   webpack-compiler:
     platform: linux/arm64
@@ -54,7 +54,7 @@ services:
     # command: /google-cloud-sdk/bin/dev_appserver.py --runtime python38 --host=0.0.0.0 --port=8181 --log_level=info --admin_host=0.0.0.0 --admin_port=8000 --dev_appserver_log_level=info --skip_sdk_update_check=True --enable_host_checking=False --automatic_restart=True /app/oppia/app_dev.yaml
     # networks:
     #   - oppia-network
-    command: /app/oppia/wait-for-it.sh -t 0 --folder=/app/oppia/dist/oppia-angular -- /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181
+    command: /app/oppia/wait-for-it.sh --folder=/app/oppia/dist/oppia-angular -- /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181
   
   # google_cloud_datastore:
   #   build:

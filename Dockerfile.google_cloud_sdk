@@ -33,7 +33,6 @@ RUN rm gcloud-sdk.tar.gz
 RUN /google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras --quiet
 
 COPY . /app/oppia
-RUN chmod +x /app/oppia/wait-for-it.sh
 
 EXPOSE 8089
 EXPOSE 8000

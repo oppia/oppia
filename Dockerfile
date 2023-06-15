@@ -94,6 +94,8 @@ RUN /app/buf-0.29.0/protoc/bin/protoc \
 
 RUN sed -i 's/import text_classifier_pb2 as text__classifier__pb2/from . import text_classifier_pb2 as text__classifier__pb2/' /app/oppia/proto_files/training_job_response_payload_pb2.py
 
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 # COPY setup.py .
 # COPY requirements.in .
 # COPY requirements.txt .
