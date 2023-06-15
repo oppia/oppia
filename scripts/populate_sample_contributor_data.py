@@ -47,7 +47,7 @@ from typing import Dict, Final, List
 PORT_NUMBER_FOR_GAE_SERVER: Final = 8181
 
 FIREBASE_AUTH_EMULATOR_HOST: Final = (
-    'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT)
+    'firebase:%s' % feconf.FIREBASE_EMULATOR_PORT)
 FIREBASE_SIGN_IN_URL: Final = (
     'http://%s/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword'
     % FIREBASE_AUTH_EMULATOR_HOST)

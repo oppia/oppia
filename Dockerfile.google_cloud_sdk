@@ -1,29 +1,8 @@
-# FROM google/cloud-sdk:364.0.0-alpine
-
-# # WORKDIR /app/google-cloud-sdk
-
-# RUN gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras
-# RUN apk add --update python2 openjdk8-jre
-# # below 3 lines referred from /oppia/ubuntu_dockerfile
-# ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
-# ENV PATH $PATH:$JAVA_HOME/bin
-# RUN export JAVA_HOME
-
-# COPY . /app/oppia
-# # RUN python /app/oppia/scripts/extend_index_yaml.py
-
-# RUN ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator create --project_id=dev-project-id /app/cloud_datastore_emulator_cache
-# # RUN ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=localhost --port=8089 --store_on_disk=False  --consistency=1.0 /app/cloud_datastore_emulator_cache
-# # RUN ../google-cloud-sdk/bin/gcloud beta emulators datastore start --project=dev-project-id --data-dir=/app/cloud_datastore_emulator_cache --host-port=localhost:8089 --consistency=1.0 --quiet --no-store-on-disk
-
-# # COPY . .
-
-
 # using digestID of the 3rd party dockerhub image, as updates in the images might break the build
 FROM python@sha256:90834dba6381dfc3957573dc7a3e6c5c8ed255cf60079329a6da2b5e6d4257b8
 
 # python2 not installating as package might be removed - giving unable to locate python2
-RUN apt-get update && apt-get install -y python2 wget
+RUN apt-get update && apt-get install -y python2 openjdk-11-jre wget
 
 RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz
 RUN tar -xzf gcloud-sdk.tar.gz

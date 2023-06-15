@@ -50,18 +50,18 @@ services:
     #   - oppia-network
     command: /app/oppia/wait-for-it.sh --folder=/app/oppia/dist/oppia-angular -- /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181
   
-  # google_cloud_datastore:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.google_cloud_sdk
-  #   container_name: oppia-cloud-datastore
-  #   ports:
-  #     - "8089:8089"
-  #   volumes:
-  #     - shared_root_dir:/app/oppia
-  #   depends_on:
-  #     - google_app_engine
-  #   command: ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=localhost --port=8089 --store_on_disk=False  --consistency=1.0 /app/cloud_datastore_emulator_cache
+  datastore:
+    build:
+      context: .
+      dockerfile: Dockerfile.google_cloud_sdk
+    container_name: oppia-cloud-datastore
+    ports:
+      - "8089:8089"
+    volumes:
+      - shared_root_dir:/app/oppia
+    depends_on:
+      - google_app_engine
+    command: ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=0.0.0.0 --port=8089 --store_on_disk=False  --consistency=1.0 /app/cloud_datastore_emulator_cache
 
   firebase:
     image: node:16.13.0-alpine

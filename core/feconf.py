@@ -1358,7 +1358,7 @@ FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 # use alpha-numeric characters, hence the tighter restriction.
 FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
 
-CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
+CLOUD_DATASTORE_EMULATOR_HOST = 'datastore'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'

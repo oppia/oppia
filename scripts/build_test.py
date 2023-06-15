@@ -715,7 +715,7 @@ class BuildTests(test_utils.GenericTestBase):
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
@@ -762,7 +762,7 @@ class BuildTests(test_utils.GenericTestBase):
             app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
