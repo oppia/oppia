@@ -49,7 +49,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   storyCompleted: boolean = false;
   buttonIsHovered: boolean = false;
   openInNewWindow = false;
-  circumference = (20 * 2 * Math.PI);
+  circumference = (18 * 2 * Math.PI);
+  getStrokeDashOffSet: number;
 
 
   constructor(
@@ -104,6 +105,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       this.storyCompleted = true;
     }
 
+    this.getStrokeDashOffSet =
     this.getStrokeDashOffSetValue(this.storyProgress);
 
     if (this.storySummary.getThumbnailFilename()) {
@@ -143,11 +145,9 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   }
 
   getStrokeDashOffSetValue(storyProgress: number): number {
- console.error(this.circumference - (storyProgress / 100) * this.circumference);
-  console.error(storyProgress,"progressssss");
-  console.log(this.circumference,"cirmcum");
-
-    return (this.circumference - (storyProgress / 100) * this.circumference);
+    let segmentLength =
+    (this.circumference - (storyProgress / 100) * this.circumference);
+    return segmentLength;
   }
 }
 
