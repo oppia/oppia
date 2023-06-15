@@ -371,13 +371,6 @@ describe('Release coordinator page feature tab', function() {
         featureFlagDevStage)).toBe(false);
     }));
 
-    it('should return false when the server in prod stage and feature ' +
-    'stage is dev', (() => {
-      component.serverStage = 'prod';
-      expect(component.getFeatureValidOnCurrentServer(
-        featureFlagDevStage)).toBe(false);
-    }));
-
     it('should return true when the server in test stage and feature ' +
     'stage is prod', (() => {
       component.serverStage = 'test';
@@ -390,6 +383,19 @@ describe('Release coordinator page feature tab', function() {
       component.serverStage = 'prod';
       expect(component.getFeatureValidOnCurrentServer(
         featureFlagProdStage)).toBe(true);
+    }));
+
+    it('should return false when the server in prod stage and feature ' +
+    'stage is dev', (() => {
+      component.serverStage = 'prod';
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
+    }));
+
+    it('should return false when the server stage is unknown', (() => {
+      component.serverStage = 'unknown';
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
     }));
   });
 
