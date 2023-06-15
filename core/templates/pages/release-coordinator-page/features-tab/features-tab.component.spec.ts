@@ -315,11 +315,30 @@ describe('Release coordinator page feature tab', function() {
   });
 
   describe('.getFeatureValidOnCurrentServer', () => {
-    let featureFlag = PlatformParameter.createFromBackendDict({
+    let featureFlagDevStage = PlatformParameter.createFromBackendDict({
       data_type: 'bool',
       default_value: false,
       description: 'This is a dummy feature flag.',
       feature_stage: FeatureStage.DEV,
+      is_feature: true,
+      name: 'dummy_feature',
+      rule_schema_version: 1,
+      rules: [{
+        filters: [
+          {
+            type: PlatformParameterFilterType.ServerMode,
+            conditions: [['=', ServerMode.Dev]]
+          }
+        ],
+        value_when_matched: true,
+      }],
+    });
+
+    let featureFlagProdStage = PlatformParameter.createFromBackendDict({
+      data_type: 'bool',
+      default_value: false,
+      description: 'This is a dummy feature flag.',
+      feature_stage: FeatureStage.PROD,
       is_feature: true,
       name: 'dummy_feature',
       rule_schema_version: 1,
@@ -341,34 +360,36 @@ describe('Release coordinator page feature tab', function() {
     it('should return true when the server in dev stage and feature ' +
     'stage is dev too', (() => {
       component.serverStage = 'dev';
-      expect(component.getFeatureValidOnCurrentServer(featureFlag)).toBe(true);
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(true);
     }));
 
     it('should return false when the server in test stage and feature ' +
     'stage is dev', (() => {
       component.serverStage = 'test';
-      expect(component.getFeatureValidOnCurrentServer(featureFlag)).toBe(false);
-    }));
-
-    it('should return true when the server in test stage and feature ' +
-    'stage is prod', (() => {
-      component.serverStage = 'test';
-      featureFlag.featureStage = 'prod';
-      expect(component.getFeatureValidOnCurrentServer(featureFlag)).toBe(true);
-    }));
-
-    it('should return true when the server in prod stage and feature ' +
-    'stage is prod', (() => {
-      component.serverStage = 'prod';
-      featureFlag.featureStage = 'prod';
-      expect(component.getFeatureValidOnCurrentServer(featureFlag)).toBe(true);
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
     }));
 
     it('should return false when the server in prod stage and feature ' +
     'stage is dev', (() => {
       component.serverStage = 'prod';
-      featureFlag.featureStage = 'dev';
-      expect(component.getFeatureValidOnCurrentServer(featureFlag)).toBe(false);
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagDevStage)).toBe(false);
+    }));
+
+    it('should return true when the server in test stage and feature ' +
+    'stage is prod', (() => {
+      component.serverStage = 'test';
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagProdStage)).toBe(true);
+    }));
+
+    it('should return true when the server in prod stage and feature ' +
+    'stage is prod', (() => {
+      component.serverStage = 'prod';
+      expect(component.getFeatureValidOnCurrentServer(
+        featureFlagProdStage)).toBe(true);
     }));
   });
 
