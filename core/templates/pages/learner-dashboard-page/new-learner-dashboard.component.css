@@ -7,7 +7,7 @@
 .new-learner-dashboard .oppia-learner-dashboard-container {
     margin: 0 auto 30px auto;
     text-align: left;
-    /* max-width: 1400px; */
+    max-width: 1480px;
     /* display: flex;
     flex-wrap: nowrap;
     justify-content: center;
@@ -18,7 +18,7 @@
 .new-learner-dashboard .oppia-learner-dashboard-content-container {
     display: flex;
     flex-wrap: nowrap;
-    gap: 33px;
+    gap: 16px;
 }
   .new-learner-dashboard .oppia-learner-dashboard-side-content-container {
     flex-wrap: nowrap;
@@ -119,13 +119,13 @@
   .new-learner-dashboard .oppia-learner-dashboard-side-content {
     margin-top: -47px;
     min-width: 241px;
-    padding-left: 13px;
-    width: 20%;
+    padding-left: 11px;
+    width: 16%;
   }
 
   .new-learner-dashboard .oppia-learner-dashboard-main-content {
-    padding: 0;
-    width: 60%;
+    padding-right: 11px;
+    width: 83%;
   }
   
   .new-learner-dashboard .oppia-learner-dashboard-main-content .remove-icon {
@@ -144,7 +144,7 @@
     color: white;
     height: 89vh;
     margin: 64px 0 0 0;
-    padding: 0;
+    padding: 11px;
   }
 
   .new-learner-dashboard .oppia-learner-dashboard-menu-profile-picture {
