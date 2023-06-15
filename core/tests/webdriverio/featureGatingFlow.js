@@ -54,32 +54,32 @@ describe('Feature Gating Flow', function() {
     await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
     await releaseCoordinatorPage.getFeaturesTab();
-    var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
+    var accomplishmentsFeatureElement = (
+      await releaseCoordinatorPage.
+      getContributorDashboardAccomplishmentsFeatureElement()
+    );
 
-    await releaseCoordinatorPage.removeAllRulesOfFeature(dummy);
-    await releaseCoordinatorPage.saveChangeOfFeature(dummy);
+    await releaseCoordinatorPage.removeAllRulesOfFeature(
+      accomplishmentsFeatureElement);
+    await releaseCoordinatorPage.saveChangeOfFeature(
+      accomplishmentsFeatureElement);
     await users.logout();
   });
 
-  it('should not show indicators gated by dummy feature when disabled',
+  it('should not show indicators gated by contributor_dashboard_' +
+  'accomplishments when disabled',
     async() => {
       await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
       await releaseCoordinatorPage.getFeaturesTab();
 
-      // Indicator in Angular component that is visible if the dummy_feature
-      // is enabled, and the feature status is successfully loaded in the
-      // Angular component.
-      var agDummyFeatureIndicator = $(
-        '.e2e-test-angular-dummy-feature-indicator');
+      // Indicator in Angular component that is visible if the
+      // contributor_dashboard_accomplishments is enabled, and the
+      // feature status is successfully loaded in the Angular component.
+      var accomplishmentsFeatureIndicator = $(
+        '.e2e-test-accomplishments-tab-enabled-indicator');
 
-      // Indicator in AngularJS directive that is visible if the dummy_feature
-      // is enabled, and the feature status is successfully loaded in the
-      // AngularJS directive.
-      var ajsDummyFeatureIndicator = $(
-        '.e2e-test-angularjs-dummy-feature-indicator');
-
-      expect(await agDummyFeatureIndicator.isExisting()).toBe(false);
-      expect(await ajsDummyFeatureIndicator.isExisting()).toBe(false);
+      expect(await agDummyFeatureIndicator.isExisting()).toBe(
+        accomplishmentsFeatureIndicator);
       await users.logout();
     }
   );
@@ -89,9 +89,12 @@ describe('Feature Gating Flow', function() {
 
     await releaseCoordinatorPage.getFeaturesTab();
 
-    var dummy = await releaseCoordinatorPage.getDummyFeatureElement();
+    var accomplishmentsFeatureElement = (
+      await releaseCoordinatorPage.
+      getContributorDashboardAccomplishmentsFeatureElement()
+    );
 
-    expect(await dummy.isExisting()).toBe(true);
+    expect(await accomplishmentsFeatureElement.isExisting()).toBe(true);
     await users.logout();
   });
 
