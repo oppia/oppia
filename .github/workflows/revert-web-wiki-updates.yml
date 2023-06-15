@@ -25,10 +25,8 @@ jobs:
       - name: Check for differences
         id: check-diff
         run: 
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "diff<<$EOF" >> $GITHUB_OUTPUT
-          echo "$(git log source/develop..origin/master)" >> $GITHUB_OUTPUT
-          echo "$EOF" >> $GITHUB_OUTPUT
+          message=$(git log source/develop..origin/master)
+          echo "diff=$message" >> $GITHUB_OUTPUT
       - name: Revert commits
         if: ${{ steps.check-diff.outputs.diff != '' }}
         run: |
