@@ -24,7 +24,7 @@ jobs:
         run: git fetch source
       - name: Check for differences
         id: check-diff
-        run: 
+        run: |
           message=$(git log source/develop..origin/master)
           echo "$message"
           echo "diff=$message" >> $GITHUB_OUTPUT
