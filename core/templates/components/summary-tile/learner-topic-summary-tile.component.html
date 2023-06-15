@@ -3,8 +3,7 @@
      target="{{ openInNewWindow ? '_blank' : '_self' }}"
      class="oppia-topic-link">
     <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-      // We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information.
-      <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
+      <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
     <div class="oppia-summary-section">
       <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
@@ -28,14 +27,13 @@
   }
   .oppia-topic-dashboard-card .oppia-topic-lessons {
     font-size: 14px;
-    font-style: italic;
     left: -1px;
     position: relative;
-    top: 53px;
+    top: 0px;
   }
   .oppia-topic-dashboard-card .oppia-summary-section {
     color: #fff;
-    padding: 8px;
+    padding: 15px 15px 0px 15px;
     position: absolute;
   }
   .oppia-topic-dashboard-card .lesson-title {
@@ -43,8 +41,8 @@
   }
   .oppia-topic-dashboard-card .oppia-topic-title {
     display: block;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 700;
     height: 16px;
     letter-spacing: 0.25px;
     text-align: left;
@@ -54,21 +52,21 @@
     background-color: #205d86;
     border-radius: 4px;
     display: inline-block;
-    height: 210px;
+    height: 220px;
     margin: 0 2px 30px 0;
     padding: 0;
     position: relative;
-    width: 148px;
+    width: 210px;
     z-index: 5;
   }
   .oppia-topic-dashboard-card .oppia-title-section {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    height: 108px;
-    width: 148px;
+    height: 120px;
+    width: 210px;
   }
   .oppia-topic-dashboard-card .oppia-thumbnail-image {
-    height: 108px;
-    width: 160px;
+    height: 120px;
+    width: 210px;
   }
 </style>
