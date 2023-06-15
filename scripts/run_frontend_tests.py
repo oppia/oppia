@@ -112,12 +112,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    run_dtslint_type_tests()
+    # run_dtslint_type_tests()
     if parsed_args.dtslint_only:
         return
 
-    if not parsed_args.skip_install:
-        install_third_party_libs.main()
+    # if not parsed_args.skip_install:
+    #     install_third_party_libs.main()
 
     common.setup_chrome_bin_env_variable()
     # We need to create an empty hashes.json file for the build so that

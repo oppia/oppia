@@ -36,8 +36,6 @@ import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService
   ]
 })
 export class MockObjectEditorComponent implements ControlValueAccessor {
-  value: any;
-
   writeValue(value: string | number | null): void {}
   registerOnChange(fn: () => void): void {}
   registerOnTouched(fn: (() => void) | undefined): void {}
@@ -126,7 +124,7 @@ describe('Schema Based Custom Editor Component', () => {
   it(
     'should register validator and call it when the form validation changes',
     fakeAsync(() => {
-      component.schema = { obj_type: 'UnicodeString' };
+      component.schema = { obj_type: 'UnicodeString', type: 'custom' };
       fixture.detectChanges();
       flush();
       const spy = jasmine.createSpy('validator onchange spy');
