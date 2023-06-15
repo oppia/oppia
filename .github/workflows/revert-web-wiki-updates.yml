@@ -26,8 +26,7 @@ jobs:
         id: check-diff
         run: |
           message=$(git log source/develop..origin/master)
-          message=${message/:/ }
-          echo "diff=$message" >> $GITHUB_OUTPUT
+          echo "diff=Author YONG LI <85102180+462702985@users.noreply.github.com>" >> $GITHUB_OUTPUT
       - name: Revert commits
         if: ${{ steps.check-diff.outputs.diff != '' }}
         run: |
