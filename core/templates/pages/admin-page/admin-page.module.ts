@@ -69,7 +69,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     AdminPageComponent,
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
-    TopicManagerRoleEditorModalComponent
+    TopicManagerRoleEditorModalComponent,
+    AdminPlatformParametersTabComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -113,6 +114,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { AdminBlogAdminCommonModule } from './admin-blog-admin-common.module';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { AdminPlatformParametersTabComponent } from './platform-parameters-tab/admin-platform-parameters-tab.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -85,14 +85,15 @@ describe('Release coordinator page', () => {
     expect(component.promoBarConfigForm.enabled).toBeTrue();
   }));
 
-  it('should update promo bar config and set success status',
+  it('should update promo bar parameter and set success status',
     fakeAsync(() => {
       spyOn(pbbas, 'updatePromoBarDataAsync').and.returnValue(
         Promise.resolve());
 
-      component.updatePromoBarConfig();
+      component.updatePromoBarParameter();
 
-      expect(component.statusMessage).toEqual('Updating promo-bar config...');
+      expect(component.statusMessage).toEqual(
+        'Updating promo-bar platform parameter...');
 
       tick();
 
@@ -100,14 +101,15 @@ describe('Release coordinator page', () => {
       expect(component.statusMessage).toEqual('Success!');
     }));
 
-  it('should set error status when update promo bar config fails',
+  it('should set error status when update promo bar parameter fails',
     fakeAsync(() => {
       spyOn(pbbas, 'updatePromoBarDataAsync').and.returnValue(
         Promise.reject('failed to update'));
 
-      component.updatePromoBarConfig();
+      component.updatePromoBarParameter();
 
-      expect(component.statusMessage).toEqual('Updating promo-bar config...');
+      expect(component.statusMessage).toEqual(
+        'Updating promo-bar platform parameter...');
 
       tick();
 

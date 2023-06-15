@@ -124,10 +124,12 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            Exception, 'Property with name promo_bar_enabled already exists'):
+            Exception, 'Property with name record_playthrough_probability '
+            'already exists'
+        ):
             config_domain.ConfigProperty(
-                'promo_bar_enabled',
-                config_domain.BOOL_SCHEMA,
+                'record_playthrough_probability',
+                config_domain.FLOAT_SCHEMA,
                 'description',
                 False
             )

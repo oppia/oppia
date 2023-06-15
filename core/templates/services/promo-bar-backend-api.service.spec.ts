@@ -88,7 +88,7 @@ describe('Promo bar backend api service', () => {
     })
   );
 
-  it('should make request to update promo bar config data',
+  it('should make request to update promo bar platform param data',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -110,7 +110,7 @@ describe('Promo bar backend api service', () => {
     })
   );
 
-  it('should make request to update promo bar config data',
+  it('should make request to update promo bar platform param data',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');

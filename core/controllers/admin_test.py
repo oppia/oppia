@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import enum
 import logging
 
 from core import feconf
@@ -31,6 +32,8 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import opportunity_services
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -70,6 +73,12 @@ BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
 
+class ParamNames(enum.Enum):
+    """Enum for parameter names."""
+
+    TEST_FEATURE_1 = 'test_param_1'
+
+
 class AdminIntegrationTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""
 
@@ -96,16 +105,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.get_html_response('/admin')
         self.logout()
-
-    def test_promo_bar_configuration_not_present_to_admin(self) -> None:
-        """Test that promo bar configuration is not presentd in admin page."""
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        response_dict = self.get_json('/adminhandler')
-        response_config_properties = response_dict['config_properties']
-
-        self.assertNotIn('promo_bar_enabled', response_config_properties)
-        self.assertNotIn('promo_bar_message', response_config_properties)
 
     def test_change_configuration_property(self) -> None:
         """Test that configuration properties can be changed."""
@@ -330,6 +329,81 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 '/adminhandler', {
                     'action': 'rollback_exploration_to_safe_state',
                     'exp_id': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_param_name_action_update_platform_param_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'platform_param_name\' must be provided when the action is '
+            'update_platform_parameter_rules.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_platform_parameter_rules',
+                    'platform_param_name': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_new_rules_action_update_param_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'new_rules\' must be provided when the action is '
+            'update_platform_parameter_rules.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_platform_parameter_rules',
+                    'platform_param_name': 'new_feature',
+                    'new_rules': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_commit_message_action_update_param_is_not_performed(
+        self
+    ) -> None:
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'commit_message\' must be provided when the action is '
+            'update_platform_parameter_rules.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_platform_parameter_rules',
+                    'platform_param_name': 'new_feature',
+                    'new_rules': new_rule_dicts,
+                    'commit_message': None
                 }, csrf_token=csrf_token)
 
         self.logout()
@@ -729,21 +803,24 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        config_services.set_property(self.admin_id, 'promo_bar_enabled', True)
-        self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
+        config_services.set_property(
+            self.admin_id, 'record_playthrough_probability', 0.5)
+        self.assertEqual(
+            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.5)
 
         with self.swap(logging, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler', {
                     'action': 'revert_config_property',
-                    'config_property_id': 'promo_bar_enabled'
+                    'config_property_id': 'record_playthrough_probability'
                 }, csrf_token=csrf_token)
 
-        self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
+        self.assertEqual(
+            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2)
         self.assertEqual(
             observed_log_messages,
-            ['[ADMIN] %s reverted config property: promo_bar_enabled'
-             % self.admin_id])
+            ['[ADMIN] %s reverted config property: '
+             'record_playthrough_probability' % self.admin_id])
 
         self.logout()
 
@@ -776,6 +853,323 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(recommendations_services.get_topic_similarity(
             'Art', 'Biology'), 0.2)
 
+        self.logout()
+
+    def test_get_handler_includes_all_platform_params(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        param = (
+            platform_parameter_registry.Registry.create_platform_parameter(
+                ParamNames.TEST_FEATURE_1,
+                'Param for test.',
+                platform_parameter_domain.DataTypes.BOOL)
+        )
+
+        with self.swap(
+            platform_parameter_registry.Registry,
+            'parameter_registry', {
+            'test_param_1': param
+        }):
+            response_dict = self.get_json('/adminhandler')
+        self.assertEqual(
+            response_dict['platform_params_dicts'], [param.to_dict()])
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            param.name)
+        self.logout()
+
+    def test_post_with_rules_changes_updates_platform_params(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        param = (
+            platform_parameter_registry.Registry.create_platform_parameter(
+                ParamNames.TEST_FEATURE_1,
+                'Param for test.',
+                platform_parameter_domain.DataTypes.BOOL)
+        )
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': param.name,
+                'new_rules': new_rule_dicts,
+                'commit_message': 'test update param',
+            }, csrf_token=csrf_token)
+
+        rule_dicts = [
+            rule.to_dict() for rule
+            in platform_parameter_registry.Registry.get_platform_parameter(
+                param.name).rules
+        ]
+        self.assertEqual(rule_dicts, new_rule_dicts)
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            param.name)
+        self.logout()
+
+    def test_post_rules_changes_correctly_updates_params_returned_by_getter(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        platform_parameter_registry.Registry.parameter_registry.clear()
+        param = platform_parameter_registry.Registry.create_platform_parameter(
+            ParamNames.TEST_FEATURE_1,
+            'Param for test.',
+            platform_parameter_domain.DataTypes.BOOL)
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        response_dict = self.get_json('/adminhandler')
+        self.assertEqual(
+            response_dict['platform_params_dicts'], [param.to_dict()])
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': param.name,
+                'new_rules': new_rule_dicts,
+                'commit_message': 'test update param',
+            }, csrf_token=csrf_token)
+
+        response_dict = self.get_json('/adminhandler')
+        rules = response_dict['platform_params_dicts'][0]['rules']
+        self.assertEqual(rules, new_rule_dicts)
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            param.name)
+        self.logout()
+
+    def test_update_parameter_rules_with_unknown_param_name_raises_error(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'prod']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': 'unknown_param',
+                'new_rules': new_rule_dicts,
+                'commit_message': 'test update param',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        self.assertEqual(
+            response['error'],
+            'Platform parameter not found: unknown_param.')
+
+        self.logout()
+
+    def test_update_parameter_rules_with_unknown_data_type_returns_400(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        platform_parameter_registry.Registry.parameter_registry.clear()
+        param = platform_parameter_registry.Registry.create_platform_parameter(
+            ParamNames.TEST_FEATURE_1,
+            'Param for test.',
+            platform_parameter_domain.DataTypes.BOOL)
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': 'unknown'
+            }
+        ]
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': param.name,
+                'new_rules': new_rule_dicts,
+                'commit_message': 'test update param',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Expected bool, received \'unknown\' in value_when_matched.')
+
+        self.logout()
+
+    def test_update_param_rules_with_param_name_of_non_string_type_returns_400(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': 123,
+                'new_rules': [],
+                'commit_message': 'test update param',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        error_msg = (
+            'Schema validation for \'platform_param_name\' failed: Expected '
+            'string, received 123')
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+    def test_update_param_rules_with_message_of_non_string_type_returns_400(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': 'param_name',
+                'new_rules': [],
+                'commit_message': 123,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        error_msg = (
+            'Schema validation for \'commit_message\' failed: Expected '
+            'string, received 123')
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+    def test_update_param_rules_with_rules_of_non_list_type_returns_400(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': 'param_name',
+                'new_rules': {},
+                'commit_message': 'test update param',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        error_msg = (
+            'Schema validation for \'new_rules\' failed: Expected list, '
+            'received {}')
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+    def test_update_param_rules_with_rules_of_non_list_of_dict_type_returns_400(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        error_msg = (
+            'Schema validation for \'new_rules\' failed: \'int\' '
+            'object is not subscriptable')
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': 'param_name',
+                'new_rules': [1, 2],
+                'commit_message': 'test update param',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(response['error'], error_msg)
+
+        self.logout()
+
+    def test_update_param_rules_with_unexpected_exception_returns_500(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        param = platform_parameter_registry.Registry.create_platform_parameter(
+            ParamNames.TEST_FEATURE_1,
+            'Param for test.',
+            platform_parameter_domain.DataTypes.BOOL)
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        # Here we use MyPy ignore because we are assigning a None value
+        # where instance of 'PlatformParameter' is expected, and this is
+        # done to Replace the stored instance with None in order to
+        # trigger the unexpected exception during update.
+        platform_parameter_registry.Registry.parameter_registry[
+            param.name] = None  # type: ignore[assignment]
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_platform_parameter_rules',
+                'platform_param_name': param.name,
+                'new_rules': new_rule_dicts,
+                'commit_message': 'test update param',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500
+        )
+        self.assertEqual(
+            response['error'],
+            '\'NoneType\' object has no attribute \'serialize\'')
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            param.name)
         self.logout()
 
     def test_grant_super_admin_privileges(self) -> None:

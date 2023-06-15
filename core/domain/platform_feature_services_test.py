@@ -36,6 +36,8 @@ class ParamNames(enum.Enum):
     FEATURE_A = 'feature_a'
     FEATURE_B = 'feature_b'
     FEATURE_C = 'feature_c'
+    PARAM_A = 'param_a'
+    PARAM_B = 'param_b'
 
 
 ServerMode = platform_parameter_domain.ServerMode
@@ -53,9 +55,13 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
-        param_names = ['feature_a', 'feature_b', 'feature_c']
-        param_name_enums = [
+        param_names = ['param_a', 'param_b']
+        param_names_features = ['feature_a', 'feature_b', 'feature_c']
+        param_name_enums_features = [
             ParamNames.FEATURE_A, ParamNames.FEATURE_B, ParamNames.FEATURE_C]
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            param_names_features)
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
@@ -69,6 +75,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.prod_feature = registry.Registry.create_feature_flag(
             ParamNames.FEATURE_C, 'a feature in prod stage',
             FeatureStages.PROD)
+        self.param_a = registry.Registry.create_platform_parameter(
+            ParamNames.PARAM_A,
+            'Parameter named a',
+            platform_parameter_domain.DataTypes.BOOL)
+        self.param_b = registry.Registry.create_platform_parameter(
+            ParamNames.PARAM_B,
+            'Parameter named b',
+            platform_parameter_domain.DataTypes.BOOL)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
             [
@@ -133,14 +147,38 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         # providing a list of 'ParamNames' enums, which causes MyPy to throw an
         # 'Incompatible types in assignment' error. Thus to avoid the error, we
         # used ignore here.
-        feature_services.ALL_FEATURES_LIST = param_name_enums  # type: ignore[assignment]
-        feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
+        feature_services.ALL_FEATURES_LIST = param_name_enums_features  # type: ignore[assignment]
+        feature_services.ALL_FEATURES_NAMES_SET = set(param_names_features)
 
     def tearDown(self) -> None:
         super().tearDown()
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
+
+    def test_get_all_platform_parameters_except_feature_flag_dicts(
+        self
+    ) -> None:
+        expected_dicts = [
+            self.param_a.to_dict(),
+            self.param_b.to_dict(),
+        ]
+        self.assertEqual(
+            feature_services.
+            get_all_platform_parameters_except_feature_flag_dicts(),
+            expected_dicts)
+
+    def test_get_platform_parameter_value(self) -> None:
+        self.assertEqual(
+            feature_services.get_platform_parameter_value(
+                self.param_a.name), False)
+
+    def test_get_unknown_platform_param_value_results_in_error(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Unknown platform parameter: unknown_platform_param'
+        ):
+            feature_services.get_platform_parameter_value(
+                'unknown_platform_param')
 
     def test_create_evaluation_context_for_client_returns_correct_context(
         self

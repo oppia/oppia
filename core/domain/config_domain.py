@@ -150,10 +150,6 @@ BOOL_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_BOOL
 }
 
-UNICODE_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_UNICODE
-}
-
 FLOAT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_FLOAT
 }
@@ -223,6 +219,8 @@ class ConfigProperty:
     - moderator_ids.
     - moderator_request_forum_url.
     - moderator_usernames.
+    - promo_bar_enabled.
+    - promo_bar_message.
     - publicize_exploration_email_html_body.
     - sharing_options.
     - sharing_options_twitter_text.
@@ -445,13 +443,6 @@ class Registry:
         """
         return list(cls._config_registry)
 
-
-PROMO_BAR_ENABLED = ConfigProperty(
-    'promo_bar_enabled', BOOL_SCHEMA,
-    'Whether the promo bar should be enabled for all users', False)
-PROMO_BAR_MESSAGE = ConfigProperty(
-    'promo_bar_message', UNICODE_SCHEMA,
-    'The message to show to all users if the promo bar is enabled', '')
 
 # Add classroom name to SEARCH_DROPDOWN_CLASSROOMS in constants.ts file
 # to add that classroom to learner group syllabus filter whenever a new
