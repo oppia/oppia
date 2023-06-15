@@ -69,7 +69,7 @@ describe('Auth service', function() {
     spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
       .and.returnValue(true);
 
-    expect(AuthService.firebaseEmulatorConfig).toEqual(['localhost', 9099]);
+    expect(AuthService.firebaseEmulatorConfig).toEqual(['firebase', 9099]);
   });
 
   it('should return undefined when emulator is disabled', () => {

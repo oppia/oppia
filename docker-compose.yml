@@ -13,13 +13,11 @@ services:
       - production=false
       - NODE_ENV=development
     depends_on:
-      - firebase_emulator
+      - firebase
       - redis
     # command: ./node_modules/.bin/ng build --watch
-    # networks:
-    #   - oppia-network
-    command: >
-      sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
+  #   command: >
+  #     sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
 
   webpack-compiler:
     platform: linux/arm64
@@ -29,9 +27,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - shared_root_dir:/app/oppia
-    # networks:
-    #   - oppia-network
-    command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
+  #   command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
 
   google_app_engine:
     build: 
@@ -46,11 +42,9 @@ services:
       - shared_root_dir:/app/oppia
     links:
       - redis
-    # environment:
-    #   - REDIS_HOST=redis
-    depends_on:
-      - webserver
-      - webpack-compiler
+    # depends_on:
+      # - webserver
+      # - webpack-compiler
     # command: /google-cloud-sdk/bin/dev_appserver.py --runtime python38 --host=0.0.0.0 --port=8181 --log_level=info --admin_host=0.0.0.0 --admin_port=8000 --dev_appserver_log_level=info --skip_sdk_update_check=True --enable_host_checking=False --automatic_restart=True /app/oppia/app_dev.yaml
     # networks:
     #   - oppia-network
@@ -69,14 +63,15 @@ services:
   #     - google_app_engine
   #   command: ../google-cloud-sdk/platform/cloud-datastore-emulator/cloud_datastore_emulator start --host=localhost --port=8089 --store_on_disk=False  --consistency=1.0 /app/cloud_datastore_emulator_cache
 
-  firebase_emulator:
+  firebase:
     image: node:16.13.0-alpine
     container_name: oppia-firebase-emulator
     ports:
       - "9099:9099"
+      - "4000:4000"
     volumes:
       - shared_root_dir:/app/oppia
-    command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --export-on-exit /app/firebase_emulator_cache
+    command: /app/oppia/node_modules/firebase-tools/lib/bin/firebase.js emulators:start --only auth --project dev-project-id --config /app/oppia/.firebase.json --import /app/firebase_emulator_cache --export-on-exit /app/firebase_emulator_cache
 
   redis:
     image: redis:7.0-alpine

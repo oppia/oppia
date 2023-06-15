@@ -129,7 +129,7 @@ env_variables:
 # FIREBASE_AUTH_EMULATOR_HOST is needed to allow the Firebase SDK to connect
 # with the Firebase emulator. THIS MUST NOT BE DEPLOYED TO PRODUCTION. We
 # protect against this in the build script.
-  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
+  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"
 # These environment variables allows Cloud NDB services to communicate with the
 # Cloud Datastore Emulator. THESE MUST NOT BE DEPLOYED TO PRODUCTION! We strip
 # them from the deployed app.yaml in scripts.build.

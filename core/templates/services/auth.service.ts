@@ -130,7 +130,7 @@ export class AuthService {
 
   static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
     return AuthService.firebaseEmulatorIsEnabled ?
-      ['localhost', 9099] : undefined;
+      ['firebase', 9099] : undefined;
   }
 
   async handleRedirectResultAsync(): Promise<boolean> {
