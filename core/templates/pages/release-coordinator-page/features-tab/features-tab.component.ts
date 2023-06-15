@@ -122,6 +122,11 @@ export class FeaturesTabComponent implements OnInit {
     })
   );
 
+  DEV_SERVER_STAGE = 'dev';
+  TEST_SERVER_STAGE = 'test';
+  PROD_SERVER_STAGE = 'prod';
+  serverStage: string = '';
+
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -130,7 +135,6 @@ export class FeaturesTabComponent implements OnInit {
   featureFlagsAreFetched: boolean = false;
   isDummyApiEnabled: boolean = false;
   loadingMessage: string = '';
-  serverStage: string = '';
   directiveSubscriptions = new Subscription();
 
   constructor(
@@ -197,22 +201,15 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   getFeatureValidOnCurrentServer(feature: PlatformParameter): boolean {
-    if (this.serverStage === 'dev') {
+    if (this.serverStage === this.DEV_SERVER_STAGE) {
       return true;
-    }
-    else if (this.serverStage === 'test') {
-      if (feature.featureStage === 'test' || feature.featureStage === 'prod') {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    else if (this.serverStage === 'prod') {
-      if (feature.featureStage === 'prod') {
-        return true;
-      } else {
-        return false;
-      }
+    } else if (this.serverStage === this.TEST_SERVER_STAGE) {
+      return (
+        feature.featureStage === this.TEST_SERVER_STAGE ||
+        feature.featureStage === this.PROD_SERVER_STAGE
+      ) ? true : false;
+    } else if (this.serverStage === this.PROD_SERVER_STAGE) {
+      return feature.featureStage === this.PROD_SERVER_STAGE ? true : false;
     }
     return false;
   }

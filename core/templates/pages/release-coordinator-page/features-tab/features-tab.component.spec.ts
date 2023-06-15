@@ -120,7 +120,7 @@ describe('Release coordinator page feature tab', function() {
           }],
         })
       ],
-      ServerMode: 'dev'
+      serverStage: 'dev'
     } as FeatureFlagsResponse);
 
     updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')

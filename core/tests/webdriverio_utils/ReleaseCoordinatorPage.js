@@ -50,6 +50,8 @@ var ReleaseCoordinatorPage = function() {
       featureFlagElement, 'Feature flags not showing up');
   };
 
+  // Remove this method after the dummy_feature feature flag
+  // is deprecated.
   this.getDummyFeatureElement = async function() {
     var featureFlagElements = await featureFlagElementsSelector();
     var count = featureFlagElements.length;
@@ -72,6 +74,22 @@ var ReleaseCoordinatorPage = function() {
           .$(removeRuleButtonLocator)
       );
     }
+  };
+
+  // Remove this method after the contributor_dashboard_accomplishments
+  // feature flag is deprecated.
+  this.getContributorDashboardAccomplishmentsFeatureElement = async function() {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if ((await elem.$(featureNameLocator).getText()) ===
+          'contributor_dashboard_accomplishments') {
+        return elem;
+      }
+    }
+
+    return null;
   };
 
   // Remove this method after the end_chapter_celebration feature flag
