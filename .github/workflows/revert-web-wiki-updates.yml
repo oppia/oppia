@@ -27,7 +27,7 @@ jobs:
         run: |
           delimiter="$(openssl rand -hex 8)"
           echo "diff<<$delimiter" >> "$GITHUB_OUTPUT"
-          $(git log source/develop..origin/master) >> "$GITHUB_OUTPUT"
+          echo $(git log source/develop..origin/master) >> "$GITHUB_OUTPUT"
           echo "$delimiter" >> "$GITHUB_OUTPUT"
       - name: Revert commits
         if: ${{ steps.check-diff.outputs.diff != '' }}
