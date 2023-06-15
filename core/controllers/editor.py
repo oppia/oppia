@@ -1065,7 +1065,16 @@ class StateInteractionStatsHandler(
 
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id: str, state_name: str) -> None:
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            state_name: str. The state name.
+
+        Raises:
+            PageNotFoundException. State name not was not found
+                in current exploration states.
+        """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
 
@@ -1693,6 +1702,8 @@ class LearnerAnswerInfoHandler(
             entity_id: str. The ID of the entity.
 
         Raises:
+            PageNotFoundException. The feature for soliciting answer
+                details is not enabled.
             InvalidInputException. If state_name is None.
         """
         assert self.normalized_request is not None
