@@ -49,6 +49,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   storyCompleted: boolean = false;
   buttonIsHovered: boolean = false;
   openInNewWindow = false;
+  circumference = (20 * 2 * Math.PI);
+
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -102,6 +104,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       this.storyCompleted = true;
     }
 
+    this.getStrokeDashOffSetValue(this.storyProgress);
+
     if (this.storySummary.getThumbnailFilename()) {
       this.thumbnailUrl = (
         this.assetsBackendApiService.getThumbnailUrlForPreview(
@@ -136,6 +140,14 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       return 'box-shadow: 0 5px 5px -5px #333;';
     }
     // Return 'height: 144px; width: 192px;';
+  }
+
+  getStrokeDashOffSetValue(storyProgress: number): number {
+ console.error(this.circumference - (storyProgress / 100) * this.circumference);
+  console.error(storyProgress,"progressssss");
+  console.log(this.circumference,"cirmcum");
+
+    return (this.circumference - (storyProgress / 100) * this.circumference);
   }
 }
 

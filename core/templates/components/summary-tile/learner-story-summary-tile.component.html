@@ -14,9 +14,10 @@
           <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
           <div class="oppia-story-completion">
             <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
-            <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
+            <!-- <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
               {{storyProgress}}% Complete
-            </p>
+            </p> -->
+    </svg>
           </div>
         </div>
         <div class="oppia-summary-section">
@@ -32,6 +33,26 @@
         </div>
       </div>
       <div class="continue-button" *ngIf="isDisplayAreaHome()" (mouseenter)="buttonIsHovered=true" (mouseleave)="buttonIsHovered=false">
+        <svg class="story-progress-svg" width="50" height="50">
+          <circle class="story-progress-circle total-circle"
+                  cx="25"
+                  cy="25"
+                  r="20"/>
+          <circle class="story-progress-circle completed-circle"
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  />
+          <text x="25"
+                y="-20"
+                text-anchor="middle"
+                stroke="#000"
+                stroke-width="0.5"
+                font-size="0.9em"
+                transform="rotate(90)">
+            {{ storyProgress }}%
+          </text>
+        </svg>
         <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
         <p class="continue-button-text">
           Resume
@@ -45,6 +66,27 @@
   </mat-card>
 </div>
 <style>
+
+  .learner-story-summary-tile .story-progress-svg {
+    transform: rotate(-90deg);
+  }
+
+  .learner-story-summary-tile .story-progress-circle {
+    fill: none;
+  }
+
+  .learner-story-summary-tile .total-circle {
+    stroke: #adadad;
+    stroke-width: 3;
+  }
+
+  .learner-story-summary-tile .completed-circle {
+    stroke: #be563c;
+    stroke-dasharray: 125.663706144;
+    stroke-dashoffset: 62.83185307179586;
+    stroke-width: 3;
+  }
+
   .learner-story-summary-tile .oppia-story-title {
     color: #333;
     display: inline-block;
