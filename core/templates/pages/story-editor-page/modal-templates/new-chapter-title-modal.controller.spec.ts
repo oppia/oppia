@@ -127,11 +127,14 @@ describe('Create New Chapter Modal Component', () => {
       storyUpdateService, 'setStoryNodeThumbnailBgColor');
     let storyUpdateSpyThumbnailFilename = spyOn(
       storyUpdateService, 'setStoryNodeThumbnailFilename');
+    let storyUpdateSpyStatus = spyOn(
+      storyUpdateService, 'setStoryNodeStatus');
 
     component.addStoryNodeWithData();
 
     expect(storyUpdateSpyThumbnailBgColor).toHaveBeenCalled();
     expect(storyUpdateSpyThumbnailFilename).toHaveBeenCalled();
+    expect(storyUpdateSpyStatus).toHaveBeenCalled();
   });
 
   it('should initialize component properties after controller is initialized',

@@ -258,7 +258,7 @@
         </div>
         <div *ngIf="chaptersListIsShown" class="oppia-mobile-collapsible-card-content chapter-control-panel">
           <div>
-            <div class="chapter-control-bar">
+            <div class="chapter-control-bar" *ngIf="linearNodesList.length">
               <div class="publish-upto-chapter-menu">
                 <span class="publish-upto-chapter-label">Publish upto Chapter ...</span>
                 <select [(ngModel)]="selectedChapterIndexToPublishUpToInDropdown"
@@ -315,7 +315,9 @@
                       <div *ngIf="node.getStatus()=='Ready To Publish'">(draft modified)</div>
                       <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
                     </td>
-                    <td class="chapter-planned-publication-date">{{ dateTimeFormatService.getLocaleAbbreviatedDatetimeString(node.getPlannedPublicationDateMsecs()) }}</td>
+                    <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
+                      dateTimeFormatService.getLocaleAbbreviatedDatetimeString(node.getPlannedPublicationDateMsecs()): '-' }}
+                    </td>
                     <td class="edit-options-container">
                       <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
                          (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"

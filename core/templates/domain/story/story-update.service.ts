@@ -396,6 +396,7 @@ export class StoryUpdateService {
    */
   finalizeStoryNodeOutline(story: Story, nodeId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
     if (storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already finalized.');
     }
@@ -424,6 +425,7 @@ export class StoryUpdateService {
     if (!storyNode.getOutlineStatus()) {
       throw new Error('Node outline is already not finalized.');
     }
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
         node_id: nodeId,
@@ -447,6 +449,7 @@ export class StoryUpdateService {
   setStoryNodeOutline(story: Story, nodeId: string, newOutline: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldOutline = storyNode.getOutline();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_OUTLINE, nodeId,
@@ -468,6 +471,7 @@ export class StoryUpdateService {
   setStoryNodeTitle(story: Story, nodeId: string, newTitle: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldTitle = storyNode.getTitle();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_TITLE, nodeId,
@@ -489,6 +493,7 @@ export class StoryUpdateService {
       story: Story, nodeId: string, newDescription: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldDescription = storyNode.getDescription();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESCRIPTION, nodeId,
@@ -510,6 +515,7 @@ export class StoryUpdateService {
       story: Story, nodeId: string, newThumbnailFilename: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldThumbnailFilename = storyNode.getThumbnailFilename();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
@@ -531,6 +537,7 @@ export class StoryUpdateService {
       story: Story, nodeId: string, newThumbnailBgColor: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldThumbnailBgColor = storyNode.getThumbnailBgColor();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -552,6 +559,7 @@ export class StoryUpdateService {
       story: Story, nodeId: string, newExplorationId: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldExplorationId = storyNode.getExplorationId();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_EXPLORATION_ID,
@@ -578,6 +586,7 @@ export class StoryUpdateService {
   ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldStatus = storyNode.getStatus();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_STATUS, nodeId,
@@ -601,6 +610,7 @@ export class StoryUpdateService {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldPlannedPublicationDateMsecs =
         storyNode.getPlannedPublicationDateMsecs();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story,
@@ -652,6 +662,7 @@ export class StoryUpdateService {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldFirstPublicationDateMsecs =
       storyNode.getFirstPublicationDateMsecs();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story,
@@ -677,6 +688,7 @@ export class StoryUpdateService {
       newUnpublishingReason: string): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldUnpublishingReason = storyNode.getUnpublishingReason();
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_UNPUBLISHING_REASON,
@@ -703,6 +715,7 @@ export class StoryUpdateService {
       storyNode.getDestinationNodeIds());
     let newDestinationNodeIds = cloneDeep(oldDestinationNodeIds);
     newDestinationNodeIds.push(destinationNodeId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
@@ -733,6 +746,7 @@ export class StoryUpdateService {
       throw new Error('The given destination node is not part of the node');
     }
     newDestinationNodeIds.splice(index, 1);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
@@ -777,6 +791,7 @@ export class StoryUpdateService {
       storyNode.getPrerequisiteSkillIds());
     let newPrerequisiteSkillIds = cloneDeep(oldPrerequisiteSkillIds);
     newPrerequisiteSkillIds.push(skillId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       nodeId, oldPrerequisiteSkillIds, newPrerequisiteSkillIds,
@@ -809,6 +824,7 @@ export class StoryUpdateService {
         'The given prerequisite skill is not part of the node');
     }
     newPrerequisiteSkillIds.splice(index, 1);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
@@ -837,6 +853,7 @@ export class StoryUpdateService {
       storyNode.getAcquiredSkillIds());
     let newAcquiredSkillIds = cloneDeep(oldAcquiredSkillIds);
     newAcquiredSkillIds.push(skillId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
 
     this._applyStoryNodePropertyChange(
       story, StoryDomainConstants.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
@@ -865,6 +882,7 @@ export class StoryUpdateService {
       storyNode.getAcquiredSkillIds());
     let newAcquiredSkillIds = cloneDeep(oldAcquiredSkillIds);
     let index = newAcquiredSkillIds.indexOf(skillId);
+    this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());
     if (index === -1) {
       throw new Error(
         'The given acquired skill id is not part of the node');

@@ -74,6 +74,8 @@ export class NewChapterTitleModalComponent implements OnInit {
       this.story, this.nodeId, this.editableThumbnailFilename);
     this.storyUpdateService.setStoryNodeThumbnailBgColor(
       this.story, this.nodeId, this.editableThumbnailBgColor);
+    this.storyUpdateService.setStoryNodeStatus(
+      this.story, this.nodeId, 'Draft');
   }
 
   init(): void {
