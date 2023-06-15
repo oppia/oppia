@@ -56,7 +56,7 @@ describe('Feature Gating Flow', function() {
     await releaseCoordinatorPage.getFeaturesTab();
     var accomplishmentsFeatureElement = (
       await releaseCoordinatorPage.
-      getContributorDashboardAccomplishmentsFeatureElement()
+        getContributorDashboardAccomplishmentsFeatureElement()
     );
 
     await releaseCoordinatorPage.removeAllRulesOfFeature(
@@ -67,22 +67,20 @@ describe('Feature Gating Flow', function() {
   });
 
   it('should not show indicators gated by contributor_dashboard_' +
-  'accomplishments when disabled',
-    async() => {
-      await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
-      await releaseCoordinatorPage.getFeaturesTab();
+  'accomplishments when disabled', async() => {
+    await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
+    await releaseCoordinatorPage.getFeaturesTab();
 
-      // Indicator in Angular component that is visible if the
-      // contributor_dashboard_accomplishments is enabled, and the
-      // feature status is successfully loaded in the Angular component.
-      var accomplishmentsFeatureIndicator = $(
-        '.e2e-test-accomplishments-tab-enabled-indicator');
+    // Indicator in Angular component that is visible if the
+    // contributor_dashboard_accomplishments is enabled, and the
+    // feature status is successfully loaded in the Angular component.
+    var accomplishmentsFeatureIndicator = $(
+      '.e2e-test-accomplishments-tab-enabled-indicator');
 
-      expect(await agDummyFeatureIndicator.isExisting()).toBe(
-        accomplishmentsFeatureIndicator);
-      await users.logout();
-    }
-  );
+    expect(await agDummyFeatureIndicator.isExisting()).toBe(
+      accomplishmentsFeatureIndicator);
+    await users.logout();
+  });
 
   it('should show dummy feature in the features tab', async() => {
     await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
@@ -91,7 +89,7 @@ describe('Feature Gating Flow', function() {
 
     var accomplishmentsFeatureElement = (
       await releaseCoordinatorPage.
-      getContributorDashboardAccomplishmentsFeatureElement()
+        getContributorDashboardAccomplishmentsFeatureElement()
     );
 
     expect(await accomplishmentsFeatureElement.isExisting()).toBe(true);
@@ -99,30 +97,29 @@ describe('Feature Gating Flow', function() {
   });
 
   it('should not show indicators for contributor_dashboard_accomplishments ' +
-  'to different users',
-    async() => {
-      await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
+  'to different users', async() => {
+    await users.login(RELEASE_COORDINATOR_USER1_EMAIL, true);
 
-      await releaseCoordinatorPage.getFeaturesTab();
-      var accomplishmentsFeatureElement = (
-        await releaseCoordinatorPage.
+    await releaseCoordinatorPage.getFeaturesTab();
+    var accomplishmentsFeatureElement = (
+      await releaseCoordinatorPage.
         getContributorDashboardAccomplishmentsFeatureElement()
-      );
-      await releaseCoordinatorPage.enableFeatureForDev(
-        accomplishmentsFeatureElement);
+    );
+    await releaseCoordinatorPage.enableFeatureForDev(
+      accomplishmentsFeatureElement);
 
-      await users.logout();
-      await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
+    await users.logout();
+    await users.login(RELEASE_COORDINATOR_USER2_EMAIL, true);
 
-      await releaseCoordinatorPage.getFeaturesTab();
+    await releaseCoordinatorPage.getFeaturesTab();
 
-      // Indicator in Angular component that is visible if the
-      // contributor_dashboard_accomplishments is enabled, and the
-      // feature status is successfully loaded in the Angular component.
-      var accomplishmentsFeatureIndicator = $(
-        '.e2e-test-accomplishments-tab-enabled-indicator');
+    // Indicator in Angular component that is visible if the
+    // contributor_dashboard_accomplishments is enabled, and the
+    // feature status is successfully loaded in the Angular component.
+    var accomplishmentsFeatureIndicator = $(
+      '.e2e-test-accomplishments-tab-enabled-indicator');
 
-      expect(await accomplishmentsFeatureIndicator.isExisting()).toBe(false);
-      await users.logout();
-    });
+    expect(await accomplishmentsFeatureIndicator.isExisting()).toBe(false);
+    await users.logout();
+  });
 });
