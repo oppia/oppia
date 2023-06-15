@@ -51,6 +51,10 @@ class ParamNames(enum.Enum):
         'always_ask_learners_for_answer_details')
     HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = (
         'high_bounce_rate_task_state_bounce_rate_creation_threshold')
+    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = (
+        'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold')
+    HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = (
+        'high_bounce_rate_task_minimum_exploration_starts')
 
 
 # Platform parameters should all be defined below.
@@ -147,4 +151,19 @@ Registry.create_platform_parameter(
     'The bounce-rate a state must exceed to create a new improvements task.',
     platform_parameter_domain.DataTypes.NUMBER,
     default=0.20
+)
+
+Registry.create_platform_parameter(
+    ParamNames.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD,
+    'The bounce-rate a state must exceed to create a new improvements task.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=0.20
+)
+
+Registry.create_platform_parameter(
+    ParamNames.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
+    'The minimum number of times an exploration is started before it can '
+    'generate high bounce-rate improvements tasks.',
+    platform_parameter_domain.DataTypes.NUMBER,
+    default=100
 )

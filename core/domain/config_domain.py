@@ -216,6 +216,9 @@ class ConfigProperty:
     - embedded_google_group_url.
     - featured_translation_languages.
     - full_site_url.
+    - high_bounce_rate_task_minimum_exploration_starts.
+    - high_bounce_rate_task_state_bounce_rate_creation_threshold.
+    - high_bounce_rate_task_state_bounce_rate_obsoletion_threshold.
     - is_improvements_tab_enabled.
     - learner_groups_are_enabled.
     - list_of_default_tags_for_blog_post.
@@ -478,19 +481,6 @@ CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
 BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
     'batch_index_for_mailchimp', INT_SCHEMA,
     'Index of batch to populate mailchimp database.', 0)
-
-HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
-    'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
-    FLOAT_SCHEMA,
-    'The bounce-rate a state must fall under to discard its improvement task.',
-    0.20)
-
-HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
-    'high_bounce_rate_task_minimum_exploration_starts',
-    INT_SCHEMA,
-    'The minimum number of times an exploration is started before it can '
-    'generate high bounce-rate improvements tasks.',
-    100)
 
 MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'max_number_of_svgs_in_math_svgs_batch',

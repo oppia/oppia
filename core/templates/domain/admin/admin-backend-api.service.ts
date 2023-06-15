@@ -102,8 +102,6 @@ export interface ConfigPropertyValues {
   'email_footer': string;
   'email_sender_name': string;
   'enable_admin_notifications_for_reviewer_shortage': boolean;
-  'high_bounce_rate_task_minimum_exploration_starts': number;
-  'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': number;
   'is_improvements_tab_enabled': boolean;
   'max_number_of_explorations_in_math_svgs_batch': number;
   'max_number_of_suggestions_per_reviewer': number;

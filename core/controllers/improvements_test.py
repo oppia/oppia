@@ -724,13 +724,15 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
             0.35)
 
     def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
-        self.set_config_property(
-            (
-                config_domain
-                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD),
-            0.05)
+        swap_get_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            0.05
+        )
 
-        with self.login_context(self.OWNER_EMAIL):
+        with swap_get_platform_parameter_value, self.login_context(
+            self.OWNER_EMAIL
+        ):
             json_response = self.get_json(self.get_url())
 
         self.assertAlmostEqual(
@@ -741,11 +743,15 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
     def test_custom_high_bounce_rate_task_minimum_exploration_starts(
         self
     ) -> None:
-        self.set_config_property(
-            config_domain.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
-            20)
+        swap_get_platform_parameter_value = self.swap_to_always_return(
+            platform_feature_services,
+            'get_platform_parameter_value',
+            20
+        )
 
-        with self.login_context(self.OWNER_EMAIL):
+        with swap_get_platform_parameter_value, self.login_context(
+            self.OWNER_EMAIL
+        ):
             json_response = self.get_json(self.get_url())
 
         self.assertAlmostEqual(
