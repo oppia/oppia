@@ -77,8 +77,7 @@ describe('Feature Gating Flow', function() {
     var accomplishmentsFeatureIndicator = $(
       '.e2e-test-accomplishments-tab-enabled-indicator');
 
-    expect(await agDummyFeatureIndicator.isExisting()).toBe(
-      accomplishmentsFeatureIndicator);
+    expect(await accomplishmentsFeatureIndicator.isExisting()).toBe(false);
     await users.logout();
   });
 

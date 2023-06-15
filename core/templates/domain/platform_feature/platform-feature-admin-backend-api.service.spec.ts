@@ -50,7 +50,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       default_value: false,
       is_feature: true,
       feature_stage: FeatureStage.DEV
-    }]
+    }],
+    server_stage: 'dev'
   };
 
   beforeEach(() => {
@@ -73,7 +74,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
     let featureFlagsObject = {
       featureFlags: featureFlagsResponse.feature_flags.map(
         dict => PlatformParameter.createFromBackendDict(dict)),
-      serverStage: 'dev'
+      serverStage: featureFlagsResponse.server_stage
     };
     featureAdminService.getFeatureFlags().then(successHandler, failHandler);
 
