@@ -24,7 +24,6 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
-from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import improvements_domain
 from core.domain import improvements_services

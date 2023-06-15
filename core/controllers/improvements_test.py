@@ -24,7 +24,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.controllers import improvements
-from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
