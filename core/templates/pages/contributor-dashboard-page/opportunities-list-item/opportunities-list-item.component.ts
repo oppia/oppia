@@ -104,7 +104,6 @@ export class OpportunitiesListItemComponent {
         this.opportunity.translationLengthInWords < 20 ? 'short' : 'long');
       this.translationLengthLabelRequired = true;
       this.translationLengthInWords = this.opportunity.translationLengthInWords;
-      console.log(this.opportunity.inReviewCount);
     }
 
     if (!this.opportunityHeadingTruncationLength) {
