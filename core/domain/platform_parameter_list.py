@@ -46,6 +46,9 @@ class ParamNames(enum.Enum):
         'show_feedback_updates_in_profile_pic_dropdown'
     )
 
+    PROMO_BAR_ENABLED = 'promo_bar_enabled'
+    PROMO_BAR_MESSAGE = 'promo_bar_message'
+
 
 # Platform parameters should all be defined below.
 
@@ -114,3 +117,16 @@ Registry.create_feature_flag(
     'This flag is to show feedback updates in the' +
     'profile pic drop-down menu.',
     platform_parameter_domain.FeatureStages.PROD)
+
+Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_ENABLED,
+    'Whether the promo bar should be enabled for all users',
+    platform_parameter_domain.DataTypes.BOOL
+)
+
+Registry.create_platform_parameter(
+    ParamNames.PROMO_BAR_MESSAGE,
+    'The message to show to all users if the promo bar is enabled',
+    platform_parameter_domain.DataTypes.STRING
+)
+
