@@ -1,6 +1,6 @@
 name: Manual revert
 on:
-  workflow_dispatch:
+  gollum
 
 jobs:
   revert:
