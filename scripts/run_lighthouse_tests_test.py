@@ -20,7 +20,6 @@ import builtins
 import os
 import subprocess
 import sys
-import ffmpeg
 
 from core.constants import constants
 from core.tests import test_utils
@@ -28,6 +27,8 @@ from scripts import build
 from scripts import common
 from scripts import run_lighthouse_tests
 from scripts import servers
+
+import ffmpeg
 
 GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
@@ -156,7 +157,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script failed. More details can be found above.',
             self.print_arr)
 
-        # check with screen recording
+        # Check with screen recording.
         name = 'lhci.mp4'
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
         os.mkdir(dir_path)
@@ -175,10 +176,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn('Return code: 1', self.print_arr)
         self.assertIn('ABC error.', self.print_arr)
         self.assertIn('Saved video of failed script.', self.print_arr)
-        self.assertTrue(vid_popen.poll() != None)
+        self.assertTrue(vid_popen.poll() is not None)
         self.assertTrue(os.path.isfile(video_path))
-        
-        if vid_popen.poll() == None:
+
+        if vid_popen.poll() is None:
             vid_popen.kill()
             vid_popen.wait()
 
@@ -258,7 +259,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Lighthouse checks completed successfully.', self.print_arr)
 
-        # check with screen recording
+        # Check with screen recording.
         name = 'lhci.mp4'
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
         os.mkdir(dir_path)
@@ -275,14 +276,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         with self.print_swap, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks(
                 LIGHTHOUSE_MODE_PERFORMANCE, '1', vid_popen, video_path)
-        
+
         self.assertIn(
             'Lighthouse checks completed successfully.', self.print_arr)
         self.assertIn('Corresponding video has been deleted.', self.print_arr)
-        self.assertTrue(vid_popen.poll() != None)
+        self.assertTrue(vid_popen.poll() is not None)
         self.assertFalse(os.path.isfile(video_path))
 
-        if vid_popen.poll() == None:
+        if vid_popen.poll() is None:
             vid_popen.kill()
             vid_popen.wait()
 
@@ -309,8 +310,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Lighthouse checks failed. More details can be found above.',
             self.print_arr)
-        
-        # check with screen recording
+
+        # Check with screen recording.
         name = 'lhci.mp4'
         dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
         os.mkdir(dir_path)
@@ -327,17 +328,17 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         with self.print_swap, self.swap_sys_exit, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks(
                 LIGHTHOUSE_MODE_PERFORMANCE, '1', vid_popen, video_path)
-        
+
         self.assertIn('Return code: 1', self.print_arr)
         self.assertIn('ABC error.', self.print_arr)
         self.assertIn(
             'Lighthouse checks failed. More details can be found above.',
             self.print_arr)   
-        self.assertIn('Saved video of failed check.', self.print_arr)     
-        self.assertTrue(vid_popen.poll() != None)
+        self.assertIn('Saved video of failed check.', self.print_arr)
+        self.assertTrue(vid_popen.poll() is not None)
         self.assertTrue(os.path.isfile(video_path))
-        
-        if vid_popen.poll() == None:
+
+        if vid_popen.poll() is None:
             vid_popen.kill()
             vid_popen.wait()
 
