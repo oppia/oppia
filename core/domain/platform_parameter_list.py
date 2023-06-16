@@ -129,4 +129,3 @@ Registry.create_platform_parameter(
     'The message to show to all users if the promo bar is enabled',
     platform_parameter_domain.DataTypes.STRING
 )
-
