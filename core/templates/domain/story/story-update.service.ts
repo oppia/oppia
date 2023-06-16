@@ -35,6 +35,7 @@ import { StoryNode } from './story-node.model';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { LocalStorageService } from 'services/local-storage.service';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
 type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
@@ -66,7 +67,8 @@ export class StoryUpdateService {
     private _undoRedoService: UndoRedoService,
     private _alertsService: AlertsService,
     private _storyEditorStateService: StoryEditorStateService,
-    private _localStorageService: LocalStorageService
+    private _localStorageService: LocalStorageService,
+    private _platformFeatureService: PlatformFeatureService
   ) {}
 
   get onStoryChapterUpdateEventEmitter(): EventEmitter<void> {
@@ -605,8 +607,8 @@ export class StoryUpdateService {
    * records the change in the undo/redo service.
    */
   setStoryNodePlannedPublicationDateMsecs(
-      story: Story, nodeId: string,
-      newPlannedPublicationDateMsecs: number): void {
+      story: Story, nodeId: string, newPlannedPublicationDateMsecs: number
+  ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldPlannedPublicationDateMsecs =
         storyNode.getPlannedPublicationDateMsecs();
@@ -633,23 +635,26 @@ export class StoryUpdateService {
  * records the change in the undo/redo service.
  */
   setStoryNodeLastModifiedMsecs(
-      story: Story, nodeId: string,
-      newLastModifiedMsecs: number): void {
+      story: Story, nodeId: string, newLastModifiedMsecs: number
+  ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldLastModifiedMsecs = storyNode.getLastModifiedMsecs();
 
-    this._applyStoryNodePropertyChange(
-      story, StoryDomainConstants.STORY_NODE_PROPERTY_LAST_MODIFIED_MSECS,
-      nodeId, oldLastModifiedMsecs, newLastModifiedMsecs,
-      (changeDict, story) => {
-        // ---- Apply ----
-        story.getStoryContents().setNodeLastModifiedMsecs(
-          nodeId, newLastModifiedMsecs);
-      }, (changeDict, story) => {
-        // ---- Undo ----
-        story.getStoryContents().setNodeLastModifiedMsecs(
-          nodeId, oldLastModifiedMsecs);
-      });
+    if (this._platformFeatureService.status.
+      SerialChapterLaunchCurriculumAdminView.isEnabled) {
+      this._applyStoryNodePropertyChange(
+        story, StoryDomainConstants.STORY_NODE_PROPERTY_LAST_MODIFIED_MSECS,
+        nodeId, oldLastModifiedMsecs, newLastModifiedMsecs,
+        (changeDict, story) => {
+          // ---- Apply ----
+          story.getStoryContents().setNodeLastModifiedMsecs(
+            nodeId, newLastModifiedMsecs);
+        }, (changeDict, story) => {
+          // ---- Undo ----
+          story.getStoryContents().setNodeLastModifiedMsecs(
+            nodeId, oldLastModifiedMsecs);
+        });
+    }
   }
 
   /**
@@ -657,8 +662,8 @@ export class StoryUpdateService {
  * records the change in the undo/redo service.
  */
   setStoryNodeFirstPublicationDateMsecs(
-      story: Story, nodeId: string,
-      newFirstPublicationDateMsecs: number): void {
+      story: Story, nodeId: string, newFirstPublicationDateMsecs: number
+  ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldFirstPublicationDateMsecs =
       storyNode.getFirstPublicationDateMsecs();
@@ -684,8 +689,8 @@ export class StoryUpdateService {
    * records the change in the undo/redo service.
    */
   setStoryNodeUnpublishingReason(
-      story: Story, nodeId: string,
-      newUnpublishingReason: string): void {
+      story: Story, nodeId: string, newUnpublishingReason: string
+  ): void {
     let storyNode = this._getStoryNode(story.getStoryContents(), nodeId);
     let oldUnpublishingReason = storyNode.getUnpublishingReason();
     this.setStoryNodeLastModifiedMsecs(story, nodeId, Date.now());

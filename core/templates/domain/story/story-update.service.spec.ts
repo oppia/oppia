@@ -25,16 +25,32 @@ import { StoryUpdateService } from 'domain/story/story-update.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import { LocalStorageService } from 'services/local-storage.service';
+import { PlatformFeatureService } from '../../services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false
+    }
+  };
+}
 
 describe('Story update service', () => {
   let storyUpdateService: StoryUpdateService;
   let undoRedoService: UndoRedoService;
   let localStorageService: LocalStorageService;
   let _sampleStory: Story;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService
+        },
+      ]
     });
 
     storyUpdateService = TestBed.inject(StoryUpdateService);
@@ -674,6 +690,8 @@ describe('Story update service', () => {
   });
 
   it('should set a story node last modified', () => {
+    mockPlatformFeatureService.
+      status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getLastModifiedMsecs()
     ).toBe(40);

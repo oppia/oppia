@@ -175,7 +175,7 @@
       </mat-card>
     </div>
 
-    <div class="chapter-list-container" *ngIf="!getSerialChapterFeatureFlagIsEnabled()">
+    <div class="chapter-list-container" *ngIf="!isSerialChapterFeatureFlagEnabled()">
       <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
         <div class="story-node-editor">
           <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
@@ -240,7 +240,7 @@
       </mat-card>
     </div>
 
-    <div class="chapter-list-container" *ngIf="getSerialChapterFeatureFlagIsEnabled()">
+    <div class="chapter-list-container" *ngIf="isSerialChapterFeatureFlagEnabled()">
       <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card chapter-control-container">
         <div class="story-node-editor-container">
           <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"

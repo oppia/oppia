@@ -284,7 +284,8 @@ export class StoryContents {
   }
 
   setNodeUnpublishingReason(
-      nodeId: string, unpublishingReason: string | null): void {
+      nodeId: string, unpublishingReason: string | null
+  ): void {
     let index = this.getNodeIndex(nodeId);
     if (index === -1) {
       throw new Error('The node with given id doesn\'t exist');

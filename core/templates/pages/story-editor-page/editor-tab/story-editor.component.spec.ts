@@ -190,11 +190,11 @@ describe('Story Editor Component having three story nodes', () => {
   });
 
   it('should get status of Serial Chapter Launch Feature flag', () => {
-    expect(component.getSerialChapterFeatureFlagIsEnabled()).toEqual(false);
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
 
     mockPlatformFeatureService.
       status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
-    expect(component.getSerialChapterFeatureFlagIsEnabled()).toEqual(true);
+    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
   });
 
   it('should correctly initialize chapterIsPublishable', () => {

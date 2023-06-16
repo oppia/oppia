@@ -162,7 +162,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.rearrangeNodeInList(index, index + 1);
   }
 
-  getSerialChapterFeatureFlagIsEnabled(): boolean {
+  isSerialChapterFeatureFlagEnabled(): boolean {
     return (
       this.platformFeatureService.
         status.SerialChapterLaunchCurriculumAdminView.isEnabled);
