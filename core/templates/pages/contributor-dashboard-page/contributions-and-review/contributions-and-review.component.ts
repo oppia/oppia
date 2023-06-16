@@ -394,8 +394,11 @@ export class ContributionsAndReview
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_TRANSLATE) {
       const suggestionIdToContribution = {};
       for (let suggestionId in this.contributions) {
-        const contribution = this.contributions[suggestionId];
-        suggestionIdToContribution[suggestionId] = contribution;
+        if (this.contributions[suggestionId].suggestion.suggestion_type ===
+            this.SUGGESTION_TYPE_TRANSLATE) {
+          const contribution = this.contributions[suggestionId];
+          suggestionIdToContribution[suggestionId] = contribution;
+        }
       }
       this.contextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
