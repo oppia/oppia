@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import collections
 import logging
 
 from core import feconf
@@ -191,9 +190,7 @@ def get_languages_with_complete_translation(
     content_count = exploration.get_content_count()
     language_code_list = []
     for language_code, count in get_translation_counts(
-        feconf.TranslatableEntityType.EXPLORATION,
-        exploration.id,
-        exploration.version
+        feconf.TranslatableEntityType.EXPLORATION, exploration
     ).items():
         if count == content_count:
             language_code_list.append(language_code)
@@ -226,8 +223,7 @@ def get_displayable_translation_languages(
 
 def get_translation_counts(
     entity_type: feconf.TranslatableEntityType,
-    entity_id: str,
-    entity_version: int
+    entity: exp_domain.Exploration
 ) -> Dict[str, int]:
     """Returns a dict representing the number of translations available in a
     language for which there exists at least one translation in the
@@ -237,23 +233,17 @@ def get_translation_counts(
         dict(str, int). A dict with language code as a key and number of
         translation available in that language as the value.
     """
-    exploration_translation_counts: Dict[str, int] = collections.defaultdict(
-        int)
     entity_translations = (
         translation_fetchers.get_all_entity_translations_for_entity(
             entity_type,
-            entity_id,
-            entity_version)
+            entity.id,
+            entity.version)
     )
-    for entity_translation in entity_translations:
-        lang_code = entity_translation.language_code
-        translation_count_in_a_lang_code = (
-            len(entity_translation.translations.keys()))
-
-        exploration_translation_counts[lang_code] += (
-            translation_count_in_a_lang_code)
-
-    return dict(exploration_translation_counts)
+    return {
+        entity_translation.language_code: entity.get_translation_count(
+            entity_translation
+        ) for entity_translation in entity_translations
+    }
 
 
 def get_translatable_text(

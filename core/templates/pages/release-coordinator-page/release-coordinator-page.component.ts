@@ -48,6 +48,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   submitButtonDisabled: boolean = false;
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
+  TAB_ID_FEATURES: string = ReleaseCoordinatorPageConstants.TAB_ID_FEATURES;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
 
   constructor(
@@ -78,8 +79,8 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
   }
 
-  updatePromoBarConfig(): void {
-    this.statusMessage = 'Updating promo-bar config...';
+  updatePromoBarParameter(): void {
+    this.statusMessage = 'Updating promo-bar platform parameter...';
     this.promoBarBackendApiService.updatePromoBarDataAsync(
       this.promoBarConfigForm.controls.enabled.value,
       this.promoBarConfigForm.controls.message.value).then(() => {
