@@ -1149,7 +1149,8 @@ describe('Contributions and review component', () => {
             subheading: 'topic_name / story_title / chapter_title',
             labelText: 'Obsolete',
             labelColor: '#e76c8c',
-            actionButtonTitle: 'View'
+            actionButtonTitle: 'View',
+            translationLengthInWords: undefined
           }]);
           expect(more).toEqual(false);
         });
@@ -1420,8 +1421,11 @@ describe('Contributions and review component', () => {
           subheading: 'topic_name / story_title / chapter_title',
           labelText: 'Awaiting review',
           labelColor: '#eeeeee',
-          actionButtonTitle: 'Review'
+          actionButtonTitle: 'Review',
+          translationLengthInWords: undefined
         }]);
+
+        expect(component.computeTranslationLengthLabel(null)).toHaveBeenCalled;
       }));
 
       it('should get in-review question suggestions', fakeAsync(() => {

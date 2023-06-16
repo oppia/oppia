@@ -38,6 +38,7 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { OpportunitiesListComponent } from '../opportunities-list/opportunities-list.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { HtmlLengthService } from 'services/html-length.service';
 
 export interface Suggestion {
   change: {
@@ -62,6 +63,7 @@ export interface ContributionsSummary {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationLengthInWords?: number;
 }
 
 export interface Opportunity {
@@ -71,6 +73,7 @@ export interface Opportunity {
   labelText: string;
   labelColor: string;
   actionButtonTitle: string;
+  translationLengthInWords?: number;
 }
 
 export interface GetOpportunitiesResponse {
@@ -173,7 +176,8 @@ export class ContributionsAndReview
     private skillBackendApiService: SkillBackendApiService,
     private translationTopicService: TranslationTopicService,
     private userService: UserService,
-    private featureService: PlatformFeatureService
+    private featureService: PlatformFeatureService,
+    private htmlLengthService: HtmlLengthService
   ) {}
 
   getQuestionContributionsSummary(
@@ -225,6 +229,12 @@ export class ContributionsAndReview
           details.topic_name + ' / ' + details.story_title +
           ' / ' + details.chapter_title);
       }
+      const translationLengthLabelRequired = (
+        this.isReviewTranslationsTab() && this.activeExplorationId);
+
+      const translationLengthInWords = (
+        translationLengthLabelRequired ? this.computeTranslationLengthLabel(
+          suggestion.exploration_content_html) : undefined);
 
       const requiredData = {
         id: suggestion.suggestion_id,
@@ -238,7 +248,9 @@ export class ContributionsAndReview
           this.SUGGESTION_LABELS[suggestion.status].text),
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
-          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
+          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View'),
+        translationLengthInWords: (
+          translationLengthLabelRequired ? translationLengthInWords : undefined)
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -534,6 +546,13 @@ export class ContributionsAndReview
     this.reviewableQuestionsSortKey = sortKey;
     this.contributionOpportunitiesService
       .reloadOpportunitiesEventEmitter.emit();
+  }
+
+  computeTranslationLengthLabel(translationHtml: string): number {
+    const translationLength = this.htmlLengthService.
+      computeHtmlLengthInWords(translationHtml);
+
+    return translationLength;
   }
 
   ngOnInit(): void {
