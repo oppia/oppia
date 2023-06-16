@@ -16,8 +16,8 @@ services:
       - firebase
       - redis
     # command: ./node_modules/.bin/ng build --watch
-  #   command: >
-  #     sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
+    command: >
+      sh -c '/app/oppia/wait-for-it.sh --folder=/app/oppia/webpack_bundles && trap "rm ./node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT && ./node_modules/.bin/ng build --watch'
 
   webpack-compiler:
     platform: linux/arm64
@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - shared_root_dir:/app/oppia
-  #   command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
+    command: node ./node_modules/webpack/bin/webpack.js --config ./webpack.dev.config.ts --watch
 
   google_app_engine:
     build: 
@@ -42,12 +42,10 @@ services:
       - shared_root_dir:/app/oppia
     links:
       - redis
-    # depends_on:
-      # - webserver
-      # - webpack-compiler
+    depends_on:
+      - webserver
+      - webpack-compiler
     # command: /google-cloud-sdk/bin/dev_appserver.py --runtime python38 --host=0.0.0.0 --port=8181 --log_level=info --admin_host=0.0.0.0 --admin_port=8000 --dev_appserver_log_level=info --skip_sdk_update_check=True --enable_host_checking=False --automatic_restart=True /app/oppia/app_dev.yaml
-    # networks:
-    #   - oppia-network
     command: /app/oppia/wait-for-it.sh --folder=/app/oppia/dist/oppia-angular -- /google-cloud-sdk/bin/dev_appserver.py /app/oppia/app_dev.yaml --runtime python38 --host=0.0.0.0 --port=8181
   
   datastore:
@@ -80,23 +78,24 @@ services:
       - "6379:6379"
     # command: redis-server --bind 0.0.0.0 --port 6379 --save "60 1" --tcp-keepalive 300 --dbfilename dump.rdb --dir /app/oppia/ --rdbcompression yes --appendonly yes
     # command: redis-server /app/oppia/redis.conf
-    # redis running fine without any command, also seen in other orgs too, no need to pass any command
-    # on running this command, redis server is exiting? why? checked the redis.conf file, not sure about the configurations defined there are compactible within the docker container? we can define all the configrations from redis.conf here in the docker compose service itself.
 
-  # elasticsearch:
-  #   image: elasticsearch:7.17.0
-  #   container_name: oppia-elasticsearch
-  #   ports:
-  #     - "9200:9200"
-  #   volumes:
-  #     - shared_root_dir:/app/oppia
-  #   environment:
-  #     - ES_JAVA_OPTS=-Xms100m -Xmx500m
-  #     - ES_PATH_CONF=/usr/share/elasticsearch/config
-  #   # command: elasticsearch -q
+  elasticsearch:
+    image: elasticsearch:7.17.0
+    container_name: oppia-elasticsearch
+    ports:
+      - "9200:9200"
+    volumes:
+      - shared_root_dir:/app/oppia
+    environment:
+      - ES_JAVA_OPTS=-Xms100m -Xmx500m
+      - ES_PATH_CONF=/usr/share/elasticsearch/config
+      # - bootstrap.memory_lock=true
+      - discovery.type=single-node
+    # ulimits:
+    #   memlock:
+    #     soft: -1
+    #     hard: -1
+    command: elasticsearch -q
+
 volumes:
   shared_root_dir:
-
-# networks:
-#   oppia-network:
-#     driver: bridge
