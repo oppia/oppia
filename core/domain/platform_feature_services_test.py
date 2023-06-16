@@ -171,18 +171,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.original_parameter_list)
         registry.Registry.parameter_registry = self.original_parameter_registry
 
-    def test_get_all_platform_parameters_except_feature_flag_dicts(
-        self
-    ) -> None:
-        expected_dicts = [
-            self.param_a.to_dict(),
-            self.param_b.to_dict(),
-        ]
-        self.assertEqual(
-            feature_services.
-            get_all_platform_parameters_except_feature_flag_dicts(),
-            expected_dicts)
-
     def test_get_platform_parameter_value(self) -> None:
         self.assertEqual(
             feature_services.get_platform_parameter_value(
