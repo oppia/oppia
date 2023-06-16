@@ -193,8 +193,8 @@ def run_lighthouse_checks(
             vid_popen.wait()
         print(vid_path)
         # If vid_path:.
-            # Os.remove(vid_path).
-            # Print('Corresponding video has been deleted.').
+        # Os.remove(vid_path).
+        # Print('Corresponding video has been deleted.').
     else:
         print('Return code: %s' % process.returncode)
         print('OUTPUT:')
