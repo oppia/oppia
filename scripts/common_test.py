@@ -658,8 +658,9 @@ class CommonTests(test_utils.GenericTestBase):
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
         with tempfile.NamedTemporaryFile(dir=temp_dirpath) as temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only. In order to
-            # silence the MyPy complaints `setattr` is used to set the attribute.
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr`
+            # is used to set the attribute.
             setattr(temp_file, 'name', 'temp_file')
             temp_file_path = os.path.join(temp_dirpath, 'temp_file')
             with utils.open_file(temp_file_path, 'w') as f:
@@ -728,8 +729,8 @@ class CommonTests(test_utils.GenericTestBase):
             """
             with tempfile.NamedTemporaryFile() as temp_file:
                 # Here MyPy assumes that the 'name' attribute is read-only.
-                # In order to silence the MyPy complaints `setattr` is used to set
-                # the attribute.
+                # In order to silence the MyPy complaints `setattr` is used
+                # to set the attribute.
                 setattr(temp_file, 'name', 'temp_file')
                 with utils.open_file('temp_file', 'w') as f:
                     f.write('content')
@@ -1297,8 +1298,9 @@ class CommonTests(test_utils.GenericTestBase):
         )
 
         with tempfile.NamedTemporaryFile() as constants_temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only. In order to
-            # silence the MyPy complaints `setattr` is used to set the attribute.
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
             setattr(
                 constants_temp_file, 'name', mock_constants_path)
             with utils.open_file(mock_constants_path, 'w') as tmp:
@@ -1310,8 +1312,9 @@ class CommonTests(test_utils.GenericTestBase):
                 tmp.write('};')
 
         with tempfile.NamedTemporaryFile() as feconf_temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only. In order to
-            # silence the MyPy complaints `setattr` is used to set the attribute.
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
             setattr(feconf_temp_file, 'name', mock_feconf_path)
             with utils.open_file(mock_feconf_path, 'w') as tmp:
                 tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
@@ -1355,8 +1358,9 @@ class CommonTests(test_utils.GenericTestBase):
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         with tempfile.NamedTemporaryFile() as constants_temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only. In order to
-            # silence the MyPy complaints `setattr` is used to set the attribute.
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
             setattr(
                 constants_temp_file, 'name', mock_constants_path)
             with utils.open_file(mock_constants_path, 'w') as tmp:
@@ -1368,8 +1372,9 @@ class CommonTests(test_utils.GenericTestBase):
                 tmp.write('};')
 
         with tempfile.NamedTemporaryFile() as feconf_temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only. In order to
-            # silence the MyPy complaints `setattr` is used to set the attribute.
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
             setattr(feconf_temp_file, 'name', mock_feconf_path)
             with utils.open_file(mock_feconf_path, 'w') as tmp:
                 tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
