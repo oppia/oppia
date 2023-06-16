@@ -26,11 +26,14 @@ class ConfigServicesTests(test_utils.GenericTestBase):
 
     def test_can_set_config_property(self) -> None:
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2)
+            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.2
+        )
         config_services.set_property(
-            'admin', 'record_playthrough_probability', 0.5)
+            'admin', 'record_playthrough_probability', 0.5
+        )
         self.assertEqual(
-            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.5)
+            config_domain.RECORD_PLAYTHROUGH_PROBABILITY.value, 0.5
+        )
 
     def test_can_not_set_config_property_with_invalid_config_property_name(
         self

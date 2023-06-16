@@ -67,10 +67,10 @@ from core.domain import wipeout_service
 from typing import Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
-PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = [
+PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
     platform_parameter_list.ParamNames.PROMO_BAR_ENABLED.value,
     platform_parameter_list.ParamNames.PROMO_BAR_MESSAGE.value
-]
+])
 
 
 class ClassroomPageDataDict(TypedDict):
@@ -248,7 +248,8 @@ class AdminHandler(
 
         platform_params_dicts = (
             feature_services.
-            get_all_platform_parameters_except_feature_flag_dicts())
+            get_all_platform_parameters_except_feature_flag_dicts()
+        )
         # Removes promo-bar related platform params as promo-bar is handled by
         # release coordinators in /release-coordinator page.
         platform_params_dicts = [
@@ -430,7 +431,8 @@ class AdminHandler(
                 # executed.
                 assert action == 'update_platform_parameter_rules'
                 platform_param_name = self.normalized_payload.get(
-                    'platform_param_name')
+                    'platform_param_name'
+                )
                 if platform_param_name is None:
                     raise Exception(
                         'The \'platform_param_name\' must be provided when '
@@ -452,7 +454,8 @@ class AdminHandler(
                 try:
                     registry.Registry.update_platform_parameter(
                         platform_param_name, self.user_id, commit_message,
-                        new_rules)
+                        new_rules
+                    )
                 except (
                     utils.ValidationError,
                     feature_services.PlatformParameterNotFoundException
