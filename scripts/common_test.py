@@ -658,8 +658,8 @@ class CommonTests(test_utils.GenericTestBase):
         root_temp_dir = tempfile.mkdtemp()
         temp_dirpath = tempfile.mkdtemp(dir=root_temp_dir)
         with tempfile.NamedTemporaryFile(dir=temp_dirpath) as temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only.
-            # In order to silence the MyPy complaints `setattr` is used.
+            # Here MyPy assumes that the 'name' attribute is read-only. In order to
+            # silence the MyPy complaints `setattr` is used to set the attribute.
             setattr(temp_file, 'name', 'temp_file')
             temp_file_path = os.path.join(temp_dirpath, 'temp_file')
             with utils.open_file(temp_file_path, 'w') as f:
@@ -728,12 +728,14 @@ class CommonTests(test_utils.GenericTestBase):
             """
             with tempfile.NamedTemporaryFile() as temp_file:
                 # Here MyPy assumes that the 'name' attribute is read-only.
-                # In order to silence the MyPy complaints `setattr` is used.
+                # In order to silence the MyPy complaints `setattr` is used to set
+                # the attribute.
                 setattr(temp_file, 'name', 'temp_file')
                 with utils.open_file('temp_file', 'w') as f:
                     f.write('content')
 
                 self.assertTrue(os.path.exists('temp_file'))
+
             if os.path.isfile('temp_file'):
                 # Occasionally this temp file is not deleted.
                 os.remove('temp_file')
@@ -1286,25 +1288,35 @@ class CommonTests(test_utils.GenericTestBase):
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'test'
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output
+        )
+
         with tempfile.NamedTemporaryFile() as constants_temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only.
-            # In order to silence the MyPy complaints `setattr` is used.
+            # Here MyPy assumes that the 'name' attribute is read-only. In order to
+            # silence the MyPy complaints `setattr` is used to set the attribute.
             setattr(
                 constants_temp_file, 'name', mock_constants_path)
             with utils.open_file(mock_constants_path, 'w') as tmp:
                 tmp.write('export = {\n')
                 tmp.write('  "DEV_MODE": true,\n')
                 tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('  "BRANCH_NAME": "",\n')
+                tmp.write('  "SHORT_COMMIT_HASH": ""\n')
                 tmp.write('};')
 
         with tempfile.NamedTemporaryFile() as feconf_temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only.
-            # In order to silence the MyPy complaints `setattr` is used.
+            # Here MyPy assumes that the 'name' attribute is read-only. In order to
+            # silence the MyPy complaints `setattr` is used to set the attribute.
             setattr(feconf_temp_file, 'name', mock_feconf_path)
             with utils.open_file(mock_feconf_path, 'w') as tmp:
                 tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
-        with constants_path_swap, feconf_path_swap:
+        with constants_path_swap, feconf_path_swap, check_output_swap:
             common.modify_constants(prod_env=True, maintenance_mode=False)
             with utils.open_file(
                 mock_constants_path, 'r') as constants_file:
@@ -1313,6 +1325,8 @@ class CommonTests(test_utils.GenericTestBase):
                     'export = {\n'
                     '  "DEV_MODE": false,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "BRANCH_NAME": "test",\n'
+                    '  "SHORT_COMMIT_HASH": "test"\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -1320,13 +1334,14 @@ class CommonTests(test_utils.GenericTestBase):
 
             common.modify_constants(prod_env=False, maintenance_mode=True)
             with utils.open_file(
-                mock_constants_path, 'r'
-            ) as constants_file:
+                mock_constants_path, 'r') as constants_file:
                 self.assertEqual(
                     constants_file.read(),
                     'export = {\n'
                     '  "DEV_MODE": true,\n'
                     '  "EMULATOR_MODE": true,\n'
+                    '  "BRANCH_NAME": "test",\n'
+                    '  "SHORT_COMMIT_HASH": "test"\n'
                     '};')
             with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -1340,19 +1355,21 @@ class CommonTests(test_utils.GenericTestBase):
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
         with tempfile.NamedTemporaryFile() as constants_temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only.
-            # In order to silence the MyPy complaints `setattr` is used.
+            # Here MyPy assumes that the 'name' attribute is read-only. In order to
+            # silence the MyPy complaints `setattr` is used to set the attribute.
             setattr(
                 constants_temp_file, 'name', mock_constants_path)
             with utils.open_file(mock_constants_path, 'w') as tmp:
                 tmp.write('export = {\n')
                 tmp.write('  "DEV_MODE": false,\n')
                 tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('  "BRANCH_NAME": "test",\n')
+                tmp.write('  "SHORT_COMMIT_HASH": "test"\n')
                 tmp.write('};')
 
         with tempfile.NamedTemporaryFile() as feconf_temp_file:
-            # Here MyPy assumes that the 'name' attribute is read-only.
-            # In order to silence the MyPy complaints `setattr` is used.
+            # Here MyPy assumes that the 'name' attribute is read-only. In order to
+            # silence the MyPy complaints `setattr` is used to set the attribute.
             setattr(feconf_temp_file, 'name', mock_feconf_path)
             with utils.open_file(mock_feconf_path, 'w') as tmp:
                 tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
@@ -1360,13 +1377,14 @@ class CommonTests(test_utils.GenericTestBase):
             with constants_path_swap, feconf_path_swap:
                 common.set_constants_to_default()
                 with utils.open_file(
-                    mock_constants_path, 'r'
-                ) as constants_file:
+                    mock_constants_path, 'r') as constants_file:
                     self.assertEqual(
                         constants_file.read(),
                         'export = {\n'
                         '  "DEV_MODE": true,\n'
                         '  "EMULATOR_MODE": true,\n'
+                        '  "BRANCH_NAME": "",\n'
+                        '  "SHORT_COMMIT_HASH": ""\n'
                         '};')
                 with utils.open_file(mock_feconf_path, 'r') as feconf_file:
                     self.assertEqual(

@@ -2120,6 +2120,7 @@ class QuestionSummaryDict(TypedDict):
     last_updated_msec: float
     created_on_msec: float
     misconception_ids: List[str]
+    version: int
 
 
 class QuestionSummary:
@@ -2132,7 +2133,8 @@ class QuestionSummary:
         misconception_ids: List[str],
         interaction_id: str,
         question_model_created_on: datetime.datetime,
-        question_model_last_updated: datetime.datetime
+        question_model_last_updated: datetime.datetime,
+        version: int
     ) -> None:
         """Constructs a Question Summary domain object.
 
@@ -2148,6 +2150,7 @@ class QuestionSummary:
                 the question model is created.
             question_model_last_updated: datetime.datetime. Date and time
                 when the question model was last updated.
+            version: int. The current version of the question.
         """
         self.id = question_id
         self.question_content = html_cleaner.clean(question_content)
@@ -2155,6 +2158,7 @@ class QuestionSummary:
         self.interaction_id = interaction_id
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
+        self.version = version
 
     def to_dict(self) -> QuestionSummaryDict:
         """Returns a dictionary representation of this domain object.
@@ -2169,7 +2173,8 @@ class QuestionSummary:
             'interaction_id': self.interaction_id,
             'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
             'created_on_msec': utils.get_time_in_millisecs(self.created_on),
-            'misconception_ids': self.misconception_ids
+            'misconception_ids': self.misconception_ids,
+            'version': self.version
         }
 
     def validate(self) -> None:
@@ -2209,6 +2214,13 @@ class QuestionSummary:
             raise utils.ValidationError(
                 'Expected misconception ids to be a list of '
                 'strings, received %s' % self.misconception_ids)
+        if not isinstance(self.version, int):
+            raise utils.ValidationError(
+                'Expected version to be int, received %s' % self.version)
+        if self.version < 0:
+            raise utils.ValidationError(
+                'Expected version to be non-negative, received %s' % (
+                    self.version))
 
 
 class QuestionSkillLinkDict(TypedDict):

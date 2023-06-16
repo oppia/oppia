@@ -42,3 +42,8 @@
     padding: 30px;
   }
 }
+
+.oppia-footer-version-info {
+  font-size: 10px;
+  text-align: right;
+}
