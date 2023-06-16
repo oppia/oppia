@@ -20,6 +20,7 @@ import builtins
 import os
 import subprocess
 import sys
+import ffmpeg
 
 from core.constants import constants
 from core.tests import test_utils
@@ -155,6 +156,32 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script failed. More details can be found above.',
             self.print_arr)
 
+        # check with screen recording
+        name = 'lhci.mp4'
+        dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
+        os.mkdir(dir_path)
+        video_path = os.path.join(dir_path, name)
+        vid_popen = (
+            ffmpeg
+            .input(format='x11grab', framerate=30, filename='desktop')
+            .output(
+            crf='0', preset='ultrafast', filename=video_path, c='libx264')
+            .overwrite_output()
+            )
+        vid_popen = vid_popen.run_async(pipe_stdin=True)
+        with self.print_swap, self.swap_sys_exit, swap_popen:
+            run_lighthouse_tests.run_lighthouse_puppeteer_script(vid_popen)
+
+        self.assertIn('Return code: 1', self.print_arr)
+        self.assertIn('ABC error.', self.print_arr)
+        self.assertIn('Saved video of failed script.', self.print_arr)
+        self.assertTrue(vid_popen.poll() != None)
+        self.assertTrue(os.path.isfile(video_path))
+        
+        if vid_popen.poll() == None:
+            vid_popen.kill()
+            vid_popen.wait()
+
     def test_run_webpack_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: True, expected_kwargs=[])
@@ -231,6 +258,34 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Lighthouse checks completed successfully.', self.print_arr)
 
+        # check with screen recording
+        name = 'lhci.mp4'
+        dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
+        os.mkdir(dir_path)
+        video_path = os.path.join(dir_path, name)
+        vid_popen = (
+            ffmpeg
+            .input(format='x11grab', framerate=30, filename='desktop')
+            .output(
+            crf='0', preset='ultrafast', filename=video_path, c='libx264')
+            .overwrite_output()
+            )
+        vid_popen = vid_popen.run_async(pipe_stdin=True)
+
+        with self.print_swap, swap_popen:
+            run_lighthouse_tests.run_lighthouse_checks(
+                LIGHTHOUSE_MODE_PERFORMANCE, '1', vid_popen, video_path)
+        
+        self.assertIn(
+            'Lighthouse checks completed successfully.', self.print_arr)
+        self.assertIn('Corresponding video has been deleted.', self.print_arr)
+        self.assertTrue(vid_popen.poll() != None)
+        self.assertFalse(os.path.isfile(video_path))
+
+        if vid_popen.poll() == None:
+            vid_popen.kill()
+            vid_popen.wait()
+
     def test_run_lighthouse_checks_failed(self) -> None:
         class MockTask:
             returncode = 1
@@ -254,6 +309,37 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Lighthouse checks failed. More details can be found above.',
             self.print_arr)
+        
+        # check with screen recording
+        name = 'lhci.mp4'
+        dir_path = os.path.join(os.getcwd(), '..', '..', 'webdriverio-video/')
+        os.mkdir(dir_path)
+        video_path = os.path.join(dir_path, name)
+        vid_popen = (
+            ffmpeg
+            .input(format='x11grab', framerate=30, filename='desktop')
+            .output(
+            crf='0', preset='ultrafast', filename=video_path, c='libx264')
+            .overwrite_output()
+            )
+        vid_popen = vid_popen.run_async(pipe_stdin=True)
+
+        with self.print_swap, self.swap_sys_exit, swap_popen:
+            run_lighthouse_tests.run_lighthouse_checks(
+                LIGHTHOUSE_MODE_PERFORMANCE, '1', vid_popen, video_path)
+        
+        self.assertIn('Return code: 1', self.print_arr)
+        self.assertIn('ABC error.', self.print_arr)
+        self.assertIn(
+            'Lighthouse checks failed. More details can be found above.',
+            self.print_arr)   
+        self.assertIn('Saved video of failed check.', self.print_arr)     
+        self.assertTrue(vid_popen.poll() != None)
+        self.assertTrue(os.path.isfile(video_path))
+        
+        if vid_popen.poll() == None:
+            vid_popen.kill()
+            vid_popen.wait()
 
     def test_run_lighthouse_tests_in_accessibility_mode(self) -> None:
         class MockTask:
