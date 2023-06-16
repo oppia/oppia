@@ -281,19 +281,19 @@ jobs:
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading webdriverio-video as Artifacts
-        if: ${{ failure() }}
+        # if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with: 
           name: webdriverio-video
           path: /home/runner/work/oppia/webdriverio-video
       - name: Uploading webpack bundles as an artifact
-        if: ${{ failure() }}
+        # if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
           name: webpack-bundles
           path: /home/runner/work/oppia/oppia/build
       - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        if: ${{ github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}} # failure() && 
         uses: ./.github/actions/send-webhook-notification
         with:
           message: "A Lighthouse test failed on the upstream develop branch."
